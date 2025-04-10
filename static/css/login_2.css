@@ -5,7 +5,9 @@ body {
     display: flex; 
     justify-content: center;
     align-self: center;
-    align-items: center;  
+    align-items: center;
+    height: 100vh;
+    margin: 0;
 }
 
 #Contenedor {
@@ -32,20 +34,20 @@ fieldset {
 input[type="text"], 
 input[type="email"],
 input[type="password"] {
-    color:#ffffff;
+    color:#414141;
     padding: 5px;
     width: 400px;
     margin-block: 10px;
-    border-radius: 30px;
+    border-radius: 5px;
     border: 0px;
-    background-color: #686868;
+    background-color: #d5d5d5;
     margin: 10px;
     padding-inline: 25px;
     height: 30px;
 }
 
 input::placeholder {
-    color: #b4b4b4;
+    color: #919191;
 }
 
 .btn {
@@ -53,7 +55,7 @@ input::placeholder {
     color: #ffffff;
     padding-inline: 25px;
     padding-block: 10px;
-    border-radius: 20px;
+    border-radius: 5px;
     border: 0px solid #01bb4f;
     margin-inline: 10px;
     margin-block: 10px;
