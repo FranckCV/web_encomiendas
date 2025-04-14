@@ -15,10 +15,15 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/")
 @app.route("/login")
 def login():
-    return render_template("login_2.html")
+    return render_template("login.html")
+
+
+@app.route("/")
+@app.route("/login_fcv")
+def login_fcv():
+    return render_template("login_fcv.html")
 
 
 @app.route("/login_2")

@@ -1,8 +1,6 @@
 :root {
-    --color-base: #b34306; 
     --color1: color-mix(in srgb, var(--color-base) 100%, #e6e6e6 0%); 
     --color2: color-mix(in srgb, var(--color-base) 100%, #ffffff 30%); 
-    /* --color2: var(--color-base);  */
     --color3: color-mix(in srgb, var(--color1) 100%, black 30%);
     --color4: color-mix(in srgb, var(--color1) 50%, black 90%);
     --color5: color-mix(in srgb, var(--color1) 70%, var(--color2) 30%);
@@ -14,7 +12,6 @@
 
     --color-background: color-mix(in srgb, #ffffff 30%, white 10%);
 
-    --color-tierra: #000;
     --height-header: 20vh;
     --height-footer: 50vh;
     --height-aside: 90vh;
@@ -27,7 +24,7 @@ body {
 
 a {
     text-decoration: none;
-    color: white;
+    /* color: white; */
 }
 
 h1 , h2 , p {

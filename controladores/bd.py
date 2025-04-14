@@ -6,5 +6,5 @@ def obtener_conexion():
                                 port=3306,
                                 user='root',
                                 password='',
-                                db='bd_'
+                                db='bd_encomiendas'
                                 )

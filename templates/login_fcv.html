@@ -1,0 +1,42 @@
+{% extends "MAESTRA.html" %}
+
+{% block titulo %}
+Login
+{% endblock %}
+
+{% block estilos %}
+<link rel="shortcut icon" href="/static/img/logo.png">
+<link rel="stylesheet" href="/static/css/login_fcv.css">
+{% endblock %}
+
+{% block contenido %}
+
+<form id="Contenedor" name="formulario1" method="post" action="">
+    <!-- <div class="img"></div> -->
+    <!-- <img src="/static/img/logo.png" alt="logo"> -->
+
+    <h2>Login</h2>
+
+    <div class="inputs">
+        <div class="input_box">
+            <input type="email" name="email" id="email" placeholder="Email" required>
+            <i class="fa-solid fa-envelope"></i>
+        </div>
+
+        <div class="input_box">
+            <input type="password" name="contraseña" id="contraseña" placeholder="Contraseña" required>
+            <i class="fa-solid fa-lock"></i>
+        </div>
+    </div>
+
+    <!-- <p><input type="checkbox" id="verificacion">&nbsp;Al crear esta cuenta, aceptas nuestros <b>Terminos & Condiciones.</b></p> -->
+    <p><a href="#">¿Olvidaste tu contraseña?</a></p>
+
+    <div id="send">
+        <input type="submit" class="btn" value="Iniciar sesión" required>
+    </div>
+
+    <p>¿No tienes una cuenta?&nbsp;<a href="#">Regístrate</a></p>
+
+</form>
+{% endblock %}
