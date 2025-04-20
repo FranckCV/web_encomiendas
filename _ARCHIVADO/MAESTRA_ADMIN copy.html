@@ -10,9 +10,10 @@
     <link rel="stylesheet" href="/static/css/common_styles/fonts.css" />
     <link rel="stylesheet" href="/static/css/common_styles/common_style.css" />
     <link rel="shortcut icon" href="/static/img/logo.png">
+    <link rel="stylesheet" href="/static/css/admin_styles.css">
     <style>
         :root {
-            --color-base: #001c9a;
+            --color-base: #893400;
             --color-sec: #00c552;
             --color-contrast: #fff;
         }
@@ -30,6 +31,9 @@
     </header>
 
     <aside class="general_element">
+        {% for page in lista_paginas_crud %}
+        <a href="{{url_for(page)}}">{{page}}</a>
+        {% endfor %}
     </aside>
 
     <section class="general_element">

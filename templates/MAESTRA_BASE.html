@@ -9,41 +9,27 @@
     <link rel="stylesheet" href="/static/css/common_styles/fontawesome.min.css" />
     <link rel="stylesheet" href="/static/css/common_styles/fonts.css" />
     <link rel="stylesheet" href="/static/css/common_styles/common_style.css" />
-    <link rel="shortcut icon" href="/static/img/logo.png">
     <style>
         :root {
             --color-base: #001c9a;
             --color-sec: #00c552;
-            --color-contrast: #fff;
+            --color-contrast: #ffffff;
         }
     </style>
-    {% block estilos %}
+    {% block estilos_html %}
     {% endblock %}
-    <title>
-        {% block titulo %}
-        {% endblock %}| xd
-    </title>
+    
 </head>
 
 <body class="general_body">
-    <header class="general_element">
-    </header>
-
-    <aside class="general_element">
-    </aside>
-
-    <section class="general_element">
-        {% block contenido %}
-        {% endblock %}
-    </section>
-
-    <footer class="general_element">
-    </footer>
+    {% block body_html %}
+    {% endblock %}
+    
 
     <script src="/static/js/common_scripts/bootstrap.bundle.min.js"></script>
     <script src="/static/js/common_scripts/bootstrap.min.js"></script>
     <script src="/static/js/common_scripts/common_script.js"></script>
-    {% block scripts %}
+    {% block scripts_html %}
     {% endblock %}
 
 </body>

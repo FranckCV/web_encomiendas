@@ -1,25 +1,88 @@
 :root {
-    --color1: color-mix(in srgb, var(--color-base) 100%, #e6e6e6 0%); 
-    --color2: color-mix(in srgb, var(--color-base) 100%, #ffffff 30%); 
+    --color1: color-mix(in srgb, var(--color-base) 100%, var(--color-contrast) 0%); 
+    --color2: color-mix(in srgb, var(--color-base) 100%, var(--color-contrast) 30%); 
     --color3: color-mix(in srgb, var(--color1) 100%, black 30%);
     --color4: color-mix(in srgb, var(--color1) 50%, black 90%);
     --color5: color-mix(in srgb, var(--color1) 70%, var(--color2) 30%);
     --color6: color-mix(in srgb, var(--color1) 70%, var(--color3) 90%);
     --color7: color-mix(in srgb, var(--color1) 70%, var(--color3) 0%);
     --color8: color-mix(in srgb, var(--color1) 70%, black 50%);
-    --color9: color-mix(in srgb, var(--color1) 40%, white 50%);
-    --color10: color-mix(in srgb, var(--color1) 100%, #cecece 100%);
+    --color9: color-mix(in srgb, var(--color1) 7.5%, var(--color-contrast) 100%);
+    --color10: color-mix(in srgb, var(--color1) 100%, var(--color-contrast) 100%);
 
-    --color-background: color-mix(in srgb, #ffffff 30%, white 10%);
+    --color-background: color-mix(in srgb, var(--color-contrast) 30%, var(--color-contrast) 100%);
 
-    --height-header: 20vh;
-    --height-footer: 50vh;
+    --height-header: 12.5vh;
+    --height-footer: 10vh;
     --height-aside: 90vh;
     --height-section: 1vh;
+    --width-aside: 20vw;
 }
 
 body {
     font-family: Poppins, sans-serif;
+    display: grid;
+    grid-template-columns: var(--width-aside) auto;
+    grid-template-rows: var(--height-header) auto var(--height-footer) ;
+    grid-template-areas: 
+                        "ge_header ge_header"
+                        "ge_aside ge_section"
+                        "ge_footer ge_footer"
+    ;
+    height: 100vh;
+    background-color: var(--color-background);
+}
+
+header.general_element {
+    grid-area: ge_header;
+    position: sticky;
+    top: 0;
+    background-color: var(--color1);
+    height: var(--height-header);
+    display: flex;
+    z-index: 9999;
+}
+
+#menu_aside.general_element {
+    font-size: 80%;
+    grid-area: ge_aside;
+    background-color: var(--color2);
+    display: flex;
+    width: var(--width-aside);
+    /* position: sticky; */
+    /* top: var(--height-header); */
+    /* left: 0; */
+
+    top: var(--height-header);
+    position: fixed;
+    height: 100%;
+    overflow-y: scroll;
+    z-index: 999;
+    left: 0;
+    transition: 0.15s ease-in-out;
+}
+
+#menu_aside::-webkit-scrollbar {
+    display: none;
+}
+
+#menu_aside.desplegar {
+    left: calc(-1 * var(--width-aside));
+}
+
+
+section.general_element {
+    font-size: 80%;
+    grid-area: ge_section;
+    height: 100%;
+    align-items: center;
+    display: flex;
+}
+
+footer.general_element {
+    grid-area: ge_footer;
+    height: var(--height-footer);
+    background-color: var(--color4);
 }
 
 a {
@@ -27,7 +90,21 @@ a {
     /* color: white; */
 }
 
-h1 , h2 , p {
+h1 , h2 , h3 , h4 , h5, h6 , p {
     margin: 0;
 }
+
+button {
+    border: 0;
+}
+
+
+
+
+
+
+
+
+
+
 

@@ -1,0 +1,93 @@
+:root {
+    --height-header: 20vh;
+    --height-footer: 50vh;
+    --height-aside: 90vh;
+    --height-section: 1vh;
+    --color-background: #e4e4e4;
+    --color1: #363636;
+    --color2: #585858;
+    --color3: #007430;
+    --color4: #02020e;
+}
+
+
+body {
+    font-family: Poppins, sans-serif;
+    font-size: 13px;
+}
+
+a {
+    text-decoration: none;
+}
+
+p {
+    margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+    margin: 0;
+}
+
+hr {
+    margin: 10px 0 !important;
+    /* margin-block: 15px; */
+    width: 100%;
+    padding: 0;
+}
+
+button {
+    border: 0;
+    padding-inline: 10px;
+    padding-block: 5px;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+button:hover {
+    cursor: pointer;
+}
+
+.btn_agregar {
+    background-color: #005d92;
+    color: white;
+}
+
+.btn_acept {
+    background-color: #009231;
+    color: white;
+}
+
+.btn_red {
+    background-color: red;
+    color: white;
+}
+
+.btn_back {
+    background-color: #6e6e6e;
+    color: white;
+}
+
+.modal_agregar {
+    box-shadow: 0 0 20px #00b84c;
+}
+
+.modal_ver {
+    /* box-shadow: 0 0 20px #2080ee; */
+    box-shadow: 0 0 20px #f8f8f8;
+}
+
+.modal_editar {
+    box-shadow: 0 0 20px #caee00;
+}
+
+.modal_eliminar {
+    box-shadow: 0 0 20px #df2100;
+}
+

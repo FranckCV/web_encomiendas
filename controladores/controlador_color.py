@@ -1,23 +1,20 @@
-from controladores.bd import obtener_conexion
+from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select_fetchone , sql_execute , sql_execute_lastrowid
 
-def obtener_colores():
-    conexion = obtener_conexion()
-    try:
-        with conexion.cursor() as cursor:
-            sql= "select id , nombre , valor from color"
-            cursor.execute(sql)
-            grupos = cursor.fetchall()
-        conexion.close()
-        return grupos
-    except Exception as e:
-        return e
-    
 
-def obtener_colores_id(id):
-    conexion = obtener_conexion()
-    with conexion.cursor() as cursor:
-        query = "select id , nombre , valor from color where id = "+str(id)
-        cursor.execute(query)
-        usuario = cursor.fetchone()
-    conexion.close()
-    return usuario
+def get_table_colores():
+    sql= '''
+        select 
+            id , 
+            nombre , 
+            valor 
+        from color
+    '''
+    columnas = [ 'ID' , 'Nombre' , 'Valor Hexadecimal' ]
+    resultados = sql_select_fetchall(sql)
+    return columnas , resultados
+
+
+
+
+
+

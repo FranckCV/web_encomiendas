@@ -1,0 +1,453 @@
+{% extends 'maestra_general.html' %}
+
+
+{% block titulo %}
+Listado Cursos
+{% endblock %}
+
+
+
+{% block estilos %}
+<link rel="stylesheet" href="/static/css/crud_list.css" />
+<link rel="stylesheet" href="/static/css/crud_form.css" />
+{% endblock %}
+
+
+{% block header %}
+Dashboard de Resultados de Participantes
+{% endblock %}
+
+
+
+{% block nav %}
+Lista de Resultados
+{% endblock %}
+
+
+
+{% block contenido %}
+<div class="container-fluid">
+
+
+  <div id="overlayImage" class="overlayImage">
+    <div id="enlargedImage">
+    </div>
+  </div>
+
+  <form class="space_modal modal_agregar" id="modalAgregar" action="{{ url_for('guardar_color') }}" method="POST">
+    <div class="row">
+      <h3>Agregar Color</h3>
+      <hr>
+    </div>
+
+    <div class="row">
+      <div class="form_field">
+        <div class="row">
+          <div class="col col-6">
+            <label for="">Nombre:</label>
+            <input type="text" placeholder="Nombre del color" id="nombre" name="nombre" required>
+          </div>
+          <div class="col">
+            <label for="">Color de Fondo:</label>
+            <input type="color" id="fondo" name="fondo" required>
+          </div>
+          <div class="col">
+            <label for="">Color de Texto:</label>
+            <input type="color" id="texto" name="texto" required>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <button class="btn_back" onclick="closeImage()">Cancelar</button>
+      </div>
+      <div class="col">
+        <button class="btn_acept" type="submit">Agregar</button>
+      </div>
+    </div>
+  </form>
+
+
+
+  <div class="row">
+
+    <div class="col campo_buscar">
+      <form enctype="multipart/form-data" method="GET" action="{{ url_for('buscar_curso') }}">
+        <div class="input-group">
+          <input type="text" class="form-control" placeholder="Buscar por nombre" id="buscarElemento"
+            name="buscarElemento" maxlength="85" {% if nombreBusqueda %} value="{{nombreBusqueda}}" {% endif %} />
+          <button class="btn btn-outline-secondary searchi" type="submit" id="">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    {% if nombreBusqueda %}
+    <div class="col-3">
+      <div class="input-group">
+        <a class="" href="{{ url_for('listado_curso') }}">
+          <button type="button" class="button_volver">
+            <i class="fa-solid fa-left-long"></i>
+            <p>
+              Volver al Listado General
+            </p>
+          </button>
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <div class="row">
+    <div class="col col-9">
+
+    </div>
+    <div class="col col-3">
+      <button class="clickable-image btn_agregar" id="modalAgregar">
+        <i class="fa-solid fa-circle-plus"></i>
+        <p>Agregar Nuevo Color</p>
+      </button>
+    </div>
+
+  </div>
+
+  <div class="table-container">
+    <table cellspacing="0" class="table_listado">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Color de Fondo y de Texto</th>
+          <th class="opciones_column">Opciones</th>
+        </tr>
+      </thead>
+      <tbody id="productTableBody">
+        {% for res in colores %}
+        <tr data-course-id="{{ res.1 }}">
+          <td class="celda_id">
+            <p>{{ res.0 }}</p>
+          </td>
+          <td>
+            <p>{{ res.1 }}</p>
+          </td>
+          <td>
+            <div style="background-color: {{ res.2 }}; color: {{ res.3 }};">
+              <p>{{ res.1 }}</p>
+            </div>
+          </td>
+          <td class="opciones_column">
+            <div class="acciones">
+
+              <div class="opciones_fila">
+                <button class="clickable-image" id="modalVer_{{res.1}}">
+                  <i class="fa-solid fa-circle-info"></i>
+                </button>
+              </div>
+
+              <div class="opciones_fila">
+                <button class="clickable-image" id="modalEditar_{{res.1}}">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+              </div>
+
+              <div class="opciones_fila">
+                <button class="clickable-image" id="modalEliminar_{{res.1}}">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+
+            </div>
+          </td>
+        </tr>
+
+        <style>
+          tr[data-course-id="{{ res.1 }}"] {
+            background-color: color-mix(in srgb, {{res.5}} 20%, white 50%);
+            color: black;
+          }
+
+          tr[data-course-id="{{ res.1 }}"]:hover {
+            background-color: color-mix(in srgb, {{res.5}} 100%, transparent 50%);
+            color: {{res.6}};
+          }
+
+          #modalVer_{{res.1}}.space_modal.modal_ver {
+            background-color: {{res.5}};
+            color: {{res.6}};
+          }
+
+          #modalVer_{{res.1}} label {
+            color: {{res.6}};
+          }
+        </style>
+
+        <div class="space_modal modal_ver" id="modalVer_{{res.1}}">
+          <div class="row">
+            <h3>Ver Curso ID {{res.1}}</h3>
+            <hr>
+          </div>
+
+          <div class="row">
+            <div class="form_field">
+              <div class="row">
+                <div class="col col-4">
+                  <label for="">Abreviacion:</label>
+                  <input type="text" value="{{res.3}}" disabled>
+                </div>
+                <div class="col">
+                  <label for="">Nombre:</label>
+                  <input type="text" value="{{res.2}}" disabled>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col col-4">
+                  <label for="">Creditos:</label>
+                  <input type="text" value="{{res.4}}" disabled>
+                </div>
+                <div class="col">
+                  <label class="">Ciclo:</label>
+                  <input type="text" value="{% if res.0 == 0 %}Sin ciclo específico{% else %}{{res.0}}{% endif %}"
+                    disabled>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <button class="btn_back" onclick="closeImage()">Volver</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="space_modal modal_editar" id="modalEditar_{{res.1}}">
+          <form action="">
+            <div class="row">
+              <h3>Editar Curso ID {{res.1}}</h3>
+              <hr>
+            </div>
+  
+            <div class="row">
+              <div class="form_field">
+                <div class="row">
+                  <div class="col col-4">
+                    <label for="">Abreviacion:</label>
+                    <input type="text" value="{{res.3}}">
+                  </div>
+                  <div class="col">
+                    <label for="">Nombre:</label>
+                    <input type="text" value="{{res.2}}">
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col col-4">
+                    <label for="">Creditos:</label>
+                    <input type="number" max="5" min="1" value="{{res.4}}">
+                  </div>
+                  <div class="col">
+                    <label class="">Ciclo:</label>
+                    <select class="" id="cicloSelect">
+                      {% for valor in range(11) %}
+  
+                      <option value="{{valor}}" {% if valor==res.0 %} selected {% endif %}>
+                        {% if valor == 0 %}
+                        Sin ciclo específico
+                        {% else %}
+                        {{valor}}
+                        {% endif %}
+                      </option>
+  
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <div class="row">
+              <div class="col">
+                <button class="btn_back" onclick="closeImage()">Cancelar</button>
+              </div>
+              <div class="col">
+                <button class="btn_acept">Editar</button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="space_modal modal_eliminar" id="modalEliminar_{{res.1}}">
+          <div class="row">
+            <h3>Eliminar Curso ID {{res.1}}</h3>
+            <hr>
+          </div>
+
+          <div class="row">
+            <div class="form_field">
+              <div class="row">
+                <div class="col col-4">
+                  <label for="">Abreviacion:</label>
+                  <input type="text" value="{{res.3}}" disabled>
+                </div>
+                <div class="col">
+                  <label for="">Nombre:</label>
+                  <input type="text" value="{{res.2}}" disabled>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col col-4">
+                  <label for="">Creditos:</label>
+                  <input type="text" value="{{res.4}}" disabled>
+                </div>
+                <div class="col">
+                  <label class="">Ciclo:</label>
+                  <input type="text" value="{% if res.0 == 0 %}Sin ciclo específico{% else %}{{res.0}}{% endif %}"
+                    disabled>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <button class="btn_back" onclick="closeImage()">Cancelar</button>
+            </div>
+            <div class="col">
+              <button class="btn_red">Eliminar</button>
+            </div>
+          </div>
+        </div>
+
+        {% endfor %}
+      </tbody>
+    </table>
+
+
+  </div>
+
+
+</div>
+
+
+{% endblock %}
+
+
+
+{% block scripts %}
+<script src="/static/js/toggleModal.js"></script>
+
+<!-- <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"
+  integrity="sha384-/KNQL8Nu5gCHLqwqfQjA689Hhoqgi2S84SNUxC3roTe4EhJ9AfLkp8QiQcU8AMzI" crossorigin="anonymous"></script>
+<script src="/static/js/filtroCRUDListado.js"></script>
+
+<script>
+  function confirmarEliminacion() {
+    return confirm('¿Estás seguro que deseas eliminar este registro? Esta acción no se puede deshacer.')
+  }
+
+  const socket = io();
+
+  socket.on("connect", function () {
+    // console.log("Socket Activo.!");
+  });
+
+  socket.on("disconnect", function () {
+    // console.log("Socket Desconectado.!");
+  });
+
+  function pintarFila(fila) {
+    const valor = fila.querySelector("#cant_now_progreso").textContent;
+    const MAX = fila.querySelector("#cant_max_progreso").textContent;
+
+    if (parseFloat(valor) === parseFloat(MAX)) {
+      fila.classList.add('fila_disp_si');
+      fila.classList.remove('fila_disp_no');
+    } else {
+      fila.classList.remove('fila_disp_si');
+      fila.classList.add('fila_disp_no');
+    }
+    fila.dispatchEvent(new Event('change'));
+  }
+
+  function putValueCellNumber(id, elemento, valor) {
+    const rows = document.querySelectorAll("#productTableBody tr");
+    for (const row of rows) {
+      const personId = row.getAttribute('data-person-id');
+      if (parseInt(personId) === parseInt(id)) {
+        var filaAux = row.querySelector(elemento);
+        filaAux.innerHTML = valor;
+      }
+      row.querySelector("#progressInput").dispatchEvent(new Event('input'));
+      pintarFila(row);
+    }
+  }
+
+  function actualizarFilas(datos) {
+    datos.forEach(res => {
+      putValueCellNumber(res[0], "#cant_now_progreso", (res[1]));
+      putValueCellNumber(res[0], ".nro_fuego  p", (res[2] - res[3]));
+      putValueCellNumber(res[0], ".nro_aire   p", (res[4] - res[5]));
+      putValueCellNumber(res[0], ".nro_agua   p", (res[6] - res[7]));
+      putValueCellNumber(res[0], ".nro_tierra p", (res[8] - res[9]));
+    });
+  }
+
+  socket.on("update_valores", (data) => {
+    // console.log(data.resultados);
+    actualizarFilas(data.resultados);
+    mostrarProgreso();
+  });
+
+  // socket.emit("get_tabla");
+
+  setInterval(() => {
+    // progresoResultado();
+    socket.emit("get_valores");
+  }, 1500);
+
+
+  function mostrarProgreso() {
+    const bloques = document.querySelectorAll(".bloque_progreso");
+    bloques.forEach(bloque => {
+      const progressInput = bloque.querySelector("#progressInput");
+      const progressBar = bloque.querySelector("#progressBar");
+      const progressNow = bloque.querySelector("#cant_now_progreso");
+      const progressMax = bloque.querySelector("#cant_max_progreso");
+
+      progressInput.value = parseFloat(parseFloat(progressNow.textContent) * 100 / parseFloat(progressMax.textContent));
+      progressInput.dispatchEvent(new Event('input'));
+
+      const calculateColor = (percentage) => {
+        const red = Math.max(0, 255 - Math.floor((percentage / 100) * 255));
+        const green = Math.min(255, Math.floor((percentage / 100) * 255));
+        return `rgb(${red}, ${green}, 70)`;
+      };
+
+      function calcularValor() {
+        var percentage = parseFloat(progressInput.value);
+        progressBar.style.width = `${percentage}%`;
+        progressBar.style.backgroundColor = calculateColor(percentage);
+
+        if (!isNaN(percentage)) {
+          progressInput.value = percentage.toFixed(2);
+        }
+      }
+
+      calcularValor();
+
+      progressInput.addEventListener("input", () => {
+        calcularValor();
+      });
+
+    });
+
+  }
+  mostrarProgreso();
+
+
+</script> -->
+
+{% endblock %}
