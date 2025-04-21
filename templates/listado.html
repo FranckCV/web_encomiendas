@@ -53,7 +53,7 @@
 
       <tr
       {% for resultado in resultados %}
-        {% if resultado["id"] == fila['id'] %}
+        {% if resultado[primary_key] == fila[primary_key] %}
           {% for col in bd_columns %}
             data-{{col}}="{{resultado[col]}}"
           {% endfor %}
@@ -84,7 +84,7 @@
 
             {% if crud_consult %}
             <div class="opciones_fila">
-              <button class="clickable-modal modal_consult" id="modal_crud_consult_{{fila['id']}}">
+              <button class="clickable-modal modal_consult" id="modal_crud_consult_{{fila[primary_key]}}">
                 <i class="fa-solid fa-eye"></i>
               </button>
             </div>
@@ -92,7 +92,7 @@
 
             {% if crud_unactive %}
             <div class="opciones_fila">
-              <button class="clickable-modal modal_unactive" id="modal_crud_unactive_{{fila['id']}}">
+              <button class="clickable-modal modal_unactive" id="modal_crud_unactive_{{fila[primary_key]}}">
                 <i class="fa-solid fa-square-check"></i>
               </button>
             </div>
@@ -100,7 +100,7 @@
 
             {% if crud_update %}
             <div class="opciones_fila">
-              <button class="clickable-modal modal_update" id="modal_crud_update_{{fila['id']}}">
+              <button class="clickable-modal modal_update" id="modal_crud_update_{{fila[primary_key]}}">
                 <i class="fa-solid fa-pen"></i>
               </button>
             </div>
@@ -108,7 +108,7 @@
 
             {% if crud_delete %}
             <div class="opciones_fila">
-              <button class="clickable-modal modal_delete" id="modal_crud_delete_{{fila['id']}}">
+              <button class="clickable-modal modal_delete" id="modal_crud_delete_{{fila[primary_key]}}">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             </div>
@@ -130,10 +130,34 @@
 {% for fila in filas %}
 
   {% if crud_consult %}
-  <div class="space_modal" id="modal_crud_consult_{{fila[0]}}">
+  <div class="space_modal" id="modal_crud_consult_{{fila[primary_key]}}">
     <div class="row">
-      <h3>{{NOMBRE_BTN_CONSULT}} {{nombre_tabla}} ID {{fila[0]}}</h3>
+      <h3>{{NOMBRE_BTN_CONSULT}} {{nombre_tabla}} ({{primary_key | upper }}: {{fila[primary_key]}})</h3>
       <hr>
+    </div>
+
+    <div class="row form_fields">
+
+      {% for campo in fields_consult  %}
+
+      <div class="">
+        <label for="">{{campo[1]}}:</label>
+        {% if campo[3] == 'select' %}
+          <select id="{{campo[0]}}" name="{{campo[0]}}" >
+            <option value="-1" disabled selected>{{campo[2]}}</option>
+            {% for option in campo[5]  %}
+            <option value="{{option[0]}}">{{option[1]}}</option>
+            {% endfor %}
+          </select>
+        {% elif campo[3] == 'textarea' %}
+          <textarea id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif %}>{{fila[campo[0]]}}</textarea>
+        {% else %}
+          <input  type="{{campo[3]}}" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif %} value="{{fila[campo[0]]}}" disabled>
+        {% endif %}
+      </div>
+
+      {% endfor %}
+
     </div>
 
     <div class="row">
@@ -145,11 +169,11 @@
   {% endif %}
 
   {% if crud_update %}
-  <div class="space_modal" id="modal_crud_update_{{fila[0]}}">
+  <div class="space_modal" id="modal_crud_update_{{fila[primary_key]}}">
     <form action="" method="POST">
       
       <div class="row">
-        <h3>{{NOMBRE_BTN_UPDATE}} {{nombre_tabla}} ID {{fila[0]}}</h3>
+        <h3>{{NOMBRE_BTN_UPDATE}} {{nombre_tabla}} ({{primary_key | upper }}: {{fila[primary_key]}})</h3>
         <hr>
       </div>
 
@@ -187,38 +211,58 @@
   {% endif %}
 
   {% if crud_unactive %}
-  <div class="space_modal" id="modal_crud_unactive_{{fila[0]}}">
+  <div class="space_modal" id="modal_crud_unactive_{{fila[primary_key]}}">
+    <form action="{{ url_for('crud_unactive', tabla = tabla) }}" method="POST">
+
     <div class="row">
-      <h3>{{NOMBRE_BTN_UNACTIVE}} {{nombre_tabla}} ID {{fila[0]}}</h3>
+      <h3>{{NOMBRE_BTN_UNACTIVE}} {{nombre_tabla}} ({{primary_key | upper }}: {{fila[primary_key]}})</h3>
       <hr>
     </div>
+    <input type="hidden" name="id" id="id" value="{{fila[primary_key]}}">
 
     <div class="row">
       <div class="col">
-        <button class="btn_back" onclick="closeModal()">Cancelar</button>
+        <div class="btn_back" onclick="closeModal()">Cancelar</div>
       </div>
       <div class="col">
-        <button class="btn_red">Eliminar</button>
+        <button class="btn_red" type="submit">
+          {% if fila['activo'] == 0 %}
+          Activar
+          {% elif fila['activo'] == 1 %}
+          Desactivar
+          {% endif %}
+        </button>
       </div>
     </div>
+    
+  </form>
   </div>
   {% endif %}
 
   {% if crud_delete %}
-  <div class="space_modal" id="modal_crud_delete_{{fila[0]}}">
-    <div class="row">
-      <h3>{{NOMBRE_BTN_DELETE}} {{nombre_tabla}} ID {{fila[0]}}</h3>
-      <hr>
-    </div>
+  <div class="space_modal" id="modal_crud_delete_{{fila[primary_key]}}">
+    <form action="{{ url_for('crud_delete', tabla = tabla) }}" method="POST">
 
-    <div class="row">
-      <div class="col">
-        <button class="btn_back" onclick="closeModal()">Cancelar</button>
+      <input type="hidden" name="id" id="id" value="{{fila[primary_key]}}">
+
+      <div class="row">
+        <h3>{{NOMBRE_BTN_DELETE}} {{nombre_tabla}} ({{primary_key | upper }}: {{fila[primary_key]}})</h3>
+        <hr>
       </div>
-      <div class="col">
-        <button class="btn_red">Eliminar</button>
+
+      <p>¿Está seguro de que desea eliminar este {{nombre_tabla}} (ID: {{fila[primary_key]}}) ?</p>
+
+      <div class="row">
+        <div class="col">
+          <div class="btn_back" onclick="closeModal()">Cancelar</div>
+        </div>
+
+        <div class="col">
+          <button class="btn_red" type="submit">Eliminar</button>
+        </div>
       </div>
-    </div>
+
+    </form>
   </div>
   {% endif %}
 

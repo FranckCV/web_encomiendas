@@ -35,7 +35,9 @@ FUNC_LIST     = 'crud'
 FUNC_CONSULT  = 'ver'
 FUNC_SEARCH   = 'search'
 
-# id/name , label , placeholder , type/element_html , required , list
+# INSERT  - id/name , label , placeholder , type/element_html , required , list
+# UPDATE  - id/name , label , placeholder , type/element_html , required , list , disabled
+# CONSULT - id/name , label , placeholder , type/element_html , required , list , disabled
 
 CONTROLADORES = {
     "marca": {
@@ -55,11 +57,11 @@ CONTROLADORES = {
         "crud_forms": {
             "crud_list":     True ,
             "crud_search":   False ,
-            "crud_consult":  False ,
+            "crud_consult":  True ,
             "crud_insert":   True ,
             "crud_update":   False ,
-            "crud_delete":   False ,
-            "crud_unactive": False ,
+            "crud_delete":   True ,
+            "crud_unactive": True ,
         }
     },
     "unidad": {
@@ -79,16 +81,21 @@ CONTROLADORES = {
             ['nombre', 'Nombre', 'Nombre', 'text', True],
         ],
         "fields_consult": [
-            ['nombre', 'Nombre', 'Nombre', 'text', True],
+            ['placa', 'Placa', 'Placa', 'text', True , None ],
+            ['capacidad', 'Capacidad', 'capacidad', 'text', True , None ],
+            ['volumen', 'Volumen', 'volumen', 'text', True , None ],
+            ['observaciones', 'Observaciones', 'observaciones', 'text', False , None ],
+            ['activo', 'Actividad', 'activo', 'text', True , None ],
+            ['nom_modelo', 'Nombre del Modelo', 'modeloid', 'text', True , None ],
         ],
         "crud_forms": {
             "crud_list": True ,
             "crud_search": False ,
-            "crud_consult": False ,
+            "crud_consult": True ,
             "crud_insert": True ,
             "crud_update": False ,
-            "crud_delete": False ,
-            "crud_unactive": False ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
         }
     },
     "modelo": {
@@ -105,16 +112,19 @@ CONTROLADORES = {
             ['nombre', 'Nombre', 'Nombre', 'text', True],
         ],
         "fields_consult": [
-            ['nombre', 'Nombre', 'Nombre', 'text', True],
+            ['id', 'ID', 'Nombre', 'text', True],
+            ['nom_mod', 'Nombre del Modelo', 'Nombre', 'text', True],
+            ['nom_mar', 'Marca', 'Nombre', 'text', True],
+            ['nom_tip', 'Tipo de Unidad', 'Nombre', 'text', True],
         ],
         "crud_forms": {
             "crud_list": True ,
             "crud_search": False ,
-            "crud_consult": False ,
+            "crud_consult": True ,
             "crud_insert": True ,
             "crud_update": False ,
-            "crud_delete": False ,
-            "crud_unactive": False ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
         }
     },
     "tipo_unidad": {
@@ -131,16 +141,19 @@ CONTROLADORES = {
             ['nombre', 'Nombre', 'Nombre', 'text', True],
         ],
         "fields_consult": [
+            ['id', 'ID:', 'Nombre', 'text', True],
             ['nombre', 'Nombre', 'Nombre', 'text', True],
+            ['descripcion', 'Descripción', 'Nombre', 'textarea', True],
+            ['activo', 'Actividad', 'Nombre', 'text', True],
         ],
         "crud_forms": {
             "crud_list": True ,
             "crud_search": False ,
-            "crud_consult": False ,
+            "crud_consult": True ,
             "crud_insert": True ,
             "crud_update": False ,
-            "crud_delete": False ,
-            "crud_unactive": False ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
         }
     },
 
@@ -162,6 +175,7 @@ def listar_cruds():
 @app.context_processor
 def inject_globals():
     lista_paginas_crud = listar_cruds()
+
 
     return dict(
         lista_paginas_crud = lista_paginas_crud ,
@@ -213,6 +227,12 @@ def crud_generico(tabla):
     fields_insert = config["fields_insert"]
     fields_update = config["fields_update"]
     fields_consult = config["fields_consult"]
+    
+    resultados = controlador.table_fetchall()
+    existe_activo = controlador.exists_Activo()
+    columnas , filas = controlador.get_table()
+    info_columns = controlador.get_info_columns()
+    primary_key = controlador.get_primary_key()
 
     CRUD_FORMS = config["crud_forms"]
     crud_list = CRUD_FORMS.get("crud_list")
@@ -221,11 +241,7 @@ def crud_generico(tabla):
     crud_insert = CRUD_FORMS.get("crud_insert")
     crud_update = CRUD_FORMS.get("crud_update")
     crud_delete = CRUD_FORMS.get("crud_delete")
-    crud_unactive = CRUD_FORMS.get("crud_unactive")
-
-    resultados = controlador.table_fetchall()
-    columnas , filas = controlador.get_table()
-    info_columns = controlador.get_info_columns()
+    crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo
 
     return render_template(
         "listado.html" ,
@@ -234,6 +250,7 @@ def crud_generico(tabla):
         titulo = titulo ,
         columnas = columnas ,
         filas = filas ,
+        primary_key = primary_key ,
         resultados = resultados,
         fields_insert = fields_insert ,
         fields_update = fields_update ,
@@ -298,8 +315,30 @@ def crud_delete(tabla):
         return "Tabla no soportada", 404
 
     controlador = config["controlador"]
+    primary_key = controlador.get_primary_key()
 
-    controlador.delete_row( request.form["id"] )
+    controlador.delete_row( request.form.get(primary_key) )
+
+    return redirect(url_for('crud_generico', tabla = tabla))
+
+
+@app.route("/{FUNC_UNACTIVE}=<tabla>", methods=["POST"])
+def crud_unactive(tabla):
+    config = CONTROLADORES.get(tabla)
+    if not config:
+        return "Tabla no soportada", 404
+
+    active = config["active"]
+
+    if active is False:
+        return "Tabla no soportada", 404
+
+    controlador = config["controlador"]
+    existe_activo = controlador.exists_Activo()
+    primary_key = controlador.get_primary_key()
+
+    if existe_activo:
+        controlador.unactive_row( request.form.get(primary_key) )
 
     return redirect(url_for('crud_generico', tabla = tabla))
 
@@ -317,8 +356,9 @@ def crud_update(tabla):
 
     controlador = config["controlador"]
     fields = config["fields_update"]
+    primary_key = controlador.get_primary_key()
 
-    valores = []
+    valores = [request.form.get(primary_key)]
     for campo in fields:
         nombre = campo[0] 
         requerido = campo[4]
