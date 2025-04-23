@@ -1,44 +1,40 @@
 {% extends "MAESTRA.html" %}
 
 {% block titulo %}
-Inicio de Sesion
+Login
 {% endblock %}
 
 {% block estilos %}
 <link rel="stylesheet" href="/static/css/login_form.css">
-
 {% endblock %}
 
 {% block contenido %}
-<div class="container_form cont_form_1">
-    <form class="login_form" action="" method="POST">
-        <h2>Inicia Sesión</h2>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <ul style="list-style-type: none; padding: 0; margin: 0" class="error-message" >
-                {% for category, message in messages %}
-                    <li class="{{ category }}">{{ message }}</li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-        <div class="par form_username">
-            <input type="text" placeholder="Nombre de Usuario" name="username" id="username"><br>
-            <small></small>
-        </div>
-        <div class="par form_password">
-            <input type="password" placeholder="Contraseña" name="password" id="password"><br>
-            <small></small>
-        </div>
-        <button type="submit" class="start" id="btnEmpezar">Iniciar</button>
-        <p>
-            ¿No tienes una cuenta?
-            <a href="{{url_for('sign_up')}}">Regístrate aquí</a>
-        </p>
-    </form>
-</div>
-{% endblock %}
 
-{% block scripts %}
-<script src="/static/js/login.js"></script>
+<form id="Contenedor" name="formulario1" method="post" action="">
+    <!-- <div class="img"></div> -->
+    <!-- <img src="/static/img/logo.png" alt="logo"> -->
+
+    <h2>Inicio de sesión</h2>
+
+    <div class="inputs">
+        <div class="input_box">
+            <input type="email" name="email" id="email" placeholder="Correo" required>
+            <i class="fa-solid fa-envelope"></i>
+        </div>
+
+        <div class="input_box">
+            <input type="password" name="contraseña" id="contraseña" placeholder="Contraseña" required>
+            <i class="fa-solid fa-lock"></i>
+        </div>
+    </div>
+    <!-- <p><input type="checkbox" id="verificacion">&nbsp;Al crear esta cuenta, aceptas nuestros <b>Terminos & Condiciones.</b></p> -->
+    <p><a href="#">¿Olvidaste tu contraseña?</a></p>
+
+    <div id="send">
+        <input type="submit" class="btn" value="Iniciar sesión" required>
+    </div>
+
+    <p>¿No tienes una cuenta?&nbsp;<a href="#">Regístrate</a></p>
+
+</form>
 {% endblock %}

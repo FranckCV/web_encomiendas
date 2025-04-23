@@ -1,0 +1,105 @@
+:root {
+    --width-aside: 15vw;
+    --heigh-header: 65px;
+}
+
+.general_body {
+    display: grid;
+    grid-template-columns: var(--width-aside) auto;
+    grid-template-rows: var(--heigh-header) auto;
+    grid-template-areas: "body_header body_header"
+                         "body_aside body_section"
+                         /* "body_footer body_footer" */
+    ;
+    background-color: var(--color-background);
+}
+
+.general_element {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+header {
+    background-color: var(--color1);
+    grid-area: body_header;
+    height: var(--heigh-header);
+    width: 100%;
+    position: sticky; 
+    z-index: 9999;
+    top: 0;
+    gap: 20px;
+}
+
+aside {
+    background-color: var(--color2);
+    grid-area: body_aside;
+    flex-direction: column;
+    width: var(--width-aside);
+    position: fixed;
+    height: 100%;
+    overflow-y: scroll;
+    z-index: 50;
+    gap: 20px;
+}
+
+aside::-webkit-scrollbar {
+    display: none;
+}
+
+section {
+    min-height: var(--height-section);
+    grid-area: body_section;
+    padding: 30px;
+    min-height: 100%;
+    overflow-x: hidden;
+    position: relative;
+}
+
+
+/* HEADER */
+
+.header_item {
+    border-radius: 10px;
+    background-color: var(--color2);
+    padding-inline: 10px;
+    padding-block: 10px;
+    text-decoration: none;
+    color: white;
+}
+
+/* ASIDE */
+
+.aside_item {
+    display: grid;
+    text-align: center;
+    /* font-size: 85%; */
+    grid-template-rows: auto;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+    grid-template-columns: 1fr 1fr;
+    color: white;
+    border-radius: 20px;
+    background-color: #2b2b2b;
+    padding-inline: 10px;
+    padding-block: 5px;
+}
+
+.aside_item p {
+    padding: 0;
+    margin: 0;
+}
+
+/* SECTION */
+
+section.general_element {
+    color: white;
+}
+
+/* FOOTER */
+
+
+.asdsad {
+    color: #c4c400;
+}

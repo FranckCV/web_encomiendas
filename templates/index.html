@@ -1,24 +1,27 @@
 {% extends "MAESTRA.html" %}
 
 
+{% block titulo %}
 
-{% block titulo %} 
-    Homepage 
 {% endblock %}
 
 
+{% block estilos %}
 
-{% block estilos %} 
 {% endblock %}
-
 
 
 {% block contenido %}
-    index
+
+<div>
+  {{columnas}}
+  {{filas}}
+</div>
+
 {% endblock %}
 
 
 
-{% block scripts %} 
-{% endblock %}
+{% block scripts %}
 
+{% endblock %}

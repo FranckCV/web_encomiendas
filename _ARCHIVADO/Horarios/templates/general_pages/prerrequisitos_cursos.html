@@ -1,0 +1,84 @@
+{% extends "maestra_general.html" %}
+
+{% block titulo %}
+Curso
+{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet" href="/static/css/horario.css">
+<style>
+    td {
+        width: auto;
+    }
+
+    .nombre ,
+    .nombre_alt {
+        width: 450px;
+    }
+
+    .nombre {
+        justify-content: flex-end;
+    }
+    .nombre_alt {
+        justify-content: flex-start;
+    }
+    .nombre p {
+        text-align: right;
+        justify-content: flex-end;
+    }
+    .nombre_alt p {
+        text-align: left;
+        justify-content: flex-start;
+    }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<table>
+    <thead>
+        <th>ID pre</th>
+        <th>Prerrequisito</th>
+        <th>Curso</th>
+        <th>ID cur</th>
+    </thead>
+    <tbody>
+        {% for curso in cursos %}
+        <tr>
+            <td>
+                <div class="cell">
+                    <p
+                        style="background-color: color-mix(in srgb,  {{curso.10}}  80%, transparent 20%); color: {{curso.11}} ;">
+                        {{curso.6}}</p>
+                </div>
+            </td>
+            <td>
+                <div class="cell nombre">
+                    <p
+                        style="background-color: color-mix(in srgb,  {{curso.10}}  80%, transparent 20%); color: {{curso.11}} ;">
+                        {{curso.7}} - {{curso.9}}</p>
+                </div>
+            </td>
+            <td>
+                <div class="cell nombre_alt">
+                    <p
+                        style="background-color: color-mix(in srgb,  {{curso.4}}  80%, transparent 20%); color: {{curso.5}} ;">
+                        {{curso.3}} - {{curso.1}}
+                    </p>
+                </div>
+            </td>
+            <td>
+                <div class="cell">
+                    <p
+                        style="background-color: color-mix(in srgb,  {{curso.4}}  80%, transparent 20%); color: {{curso.5}} ;">
+                        {{curso.0}}</p>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/general_script.js"></script>
+{% endblock %}

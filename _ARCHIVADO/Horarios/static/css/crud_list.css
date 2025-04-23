@@ -1,0 +1,399 @@
+:root {
+    --width-element-column: 5vw;
+}
+
+.container-fluid {
+    padding: 0;
+    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+
+table {
+    background-color: white;
+    color: #333;
+}
+
+td,
+th {
+    text-align: center;
+}
+
+a {
+    color: black;
+}
+
+th {
+    padding-inline: 20px;
+    color: white;
+}
+
+.campo_buscar {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.campo_buscar form {
+    width: 100%;
+}
+
+
+.campo_tiempo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.campo_tiempo input {
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+    padding: .375rem .20rem .375rem .75rem;
+    font-size: 1rem;
+    font-family: Poppins, sans-serif;
+}
+
+/* TABLA RESULTADOS */
+
+.table_results {
+    border-radius: 10px;
+    font-size: 90%;
+    box-shadow: 0 4px 8px #0000006c;
+
+}
+
+.table_results th {
+    background-color: var(--color4);
+    border: 0;
+}
+
+.table_results th,
+.table_results td {
+    padding-block: 5px;
+}
+
+.table_results tr+tr th {
+    border: 1px solid white;
+    background-color: var(--color3);
+}
+
+.table_results tr+tr+tr {
+    background-color: white;
+}
+
+.table_results tbody tr:first-of-type th {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.table_results tbody tr td:first-of-type {
+    border-radius: 10px;
+}
+
+.table_results tbody td {
+    border-radius: 10px;
+}
+
+
+/* TABLA LISTADO */
+
+
+.table-container {
+    border-radius: 8px;
+    box-shadow: 0 4px 8px #0000006c;
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 57.5vh;
+    width: 75vw;
+    position: relative;
+}
+
+.table-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background-color: var(--color1);
+    border-radius: 10px;
+}
+
+.table-container::-webkit-scrollbar-track {
+    background-color: #f0f0f0;
+}
+
+.table-container {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color3) #f0f0f0;
+}
+
+/* TABLA DE LISTADO */
+
+.table_listado {
+    border-collapse: separate;
+    font-size: 12px;
+    background-color: transparent;
+    border-radius: 20px;
+    width: 100%;
+}
+
+.table_listado thead {
+    color: white;
+    background-color: transparent;
+    gap: 10px;
+}
+
+.table_listado thead tr {
+    background-color: transparent;
+}
+
+.table_listado th,
+.table_listado td {
+    padding: 10px;
+    text-align: center;
+}
+
+.table_listado th {
+    font-weight: bold;
+    text-align: center;
+    border: 1px solid white;
+    /* border: 0px solid white; */
+    background-color: var(--color4);
+    padding-block: 10px;
+    padding-inline: 30px;
+    border-radius: 15px;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.table_listado th:last-of-type {
+    border: 0px solid white;
+}
+
+.table_listado tr {
+    border-bottom: 1px solid #ececec;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table_listado .fila_disp_no {
+    background-color: #ffefef;
+}
+
+.table_listado .fila_disp_no:hover {
+    background-color: #ffdada;
+}
+
+.table_listado td {
+    border-block: 1px solid #f3f3f3;
+}
+
+.table_listado td i {
+    font-size: 20px;
+}
+
+.table_listado th.opciones_column {
+    background-color: var(--color4);
+    z-index: 3;
+    padding-inline: 5px;
+}
+
+.table_listado td.opciones_column {
+    background: linear-gradient(270deg, #bdbdbd00 30%, #ffffff4b 70%);
+    border-bottom: 1px solid #c2c2c2;
+}
+
+.table_listado .opciones_column {
+    position: sticky;
+    right: 0;
+    z-index: 1;
+}
+
+.table_listado .opciones_fila {
+    display: flex;
+    width: fit-content;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
+
+.table_listado .opciones_fila button i {
+    padding: 7px;
+    height: 30px;
+    transition: 0.1s ease;
+    font-size: 150%;
+    border-radius: 100%;
+    text-align: center;
+}
+
+.opciones_fila button {
+    background-color: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 35px;
+    width: 35px;
+    border-radius: 100%;
+}
+
+.opciones_fila button:hover {
+    background-color: #1e1c7a;
+    color: white;
+}
+
+.acciones {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.acciones * {
+    display: flex;
+}
+
+.acciones a {
+    color: black;
+    text-decoration: none;
+}
+
+.acciones img {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+
+.acciones .opciones_fila {
+    display: flex;
+}
+
+
+
+.bloque_progreso {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    color: black;
+}
+
+.progress-bar-container {
+    width: 100%;
+    background-color: #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    height: 7.5px;
+    margin-bottom: 10px;
+    display: flex;
+    /* flex-direction: column; */
+    gap: 30px;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0;
+    background-color: red;
+    text-align: center;
+    color: white;
+    line-height: 10px;
+    transition: width 0.3s, background-color 0.3s;
+}
+
+#progressText {
+    color: black;
+    font-size: 130%;
+    display: flex;
+}
+
+.progreso_input {
+    background-color: transparent;
+    border: 0;
+    text-align: right;
+    padding: 0px;
+    color: black;
+    width: 5vw;
+}
+
+/* .percent {
+    position: relative;
+    right: 10px;
+} */
+
+
+.celda_numero {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.celda_numero p {
+    height: 30px;
+    min-width: 30px;
+    padding-inline: 5px;
+    text-align: center;
+    border-radius: 10px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nro_fuego p {
+    background-color: var(--color-fuego);
+    color: white;
+}
+
+.nro_aire p {
+    background-color: var(--color-aire);
+    color: black;
+}
+
+.nro_agua p {
+    background-color: var(--color-agua);
+    color: white;
+}
+
+.nro_tierra p {
+    background-color: var(--color-tierra);
+    color: white;
+}
+
+th.nro_tierra,
+th.nro_aire,
+th.nro_agua,
+th.nro_fuego {
+    width: 8vw;
+    padding-inline: 15px;
+}
+
+th.nro_fuego {
+    background-color: color-mix(in srgb, var(--color4) 70%, var(--color-fuego) 40%);
+}
+
+th.nro_aire {
+    background-color: color-mix(in srgb, var(--color4) 70%, var(--color-aire) 40%);
+}
+
+th.nro_agua {
+    background-color: color-mix(in srgb, var(--color4) 70%, var(--color-agua) 40%);
+}
+
+th.nro_tierra {
+    background-color: color-mix(in srgb, var(--color4) 70%, var(--color-tierra) 40%);
+}
+
+label {
+    color: black;
+}
+
+
+
+

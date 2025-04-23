@@ -1,0 +1,97 @@
+{% extends "maestra_general.html" %}
+
+{% block titulo %}
+Curso
+{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet" href="/static/css/horario.css">
+<style>
+    td {
+        width: 50px;
+    }
+
+    .nombre,
+    .nombre_alt {
+        width: 450px;
+    }
+
+    /* 
+
+    .nombre {
+        justify-content: flex-end;
+    }
+    .nombre_alt {
+        justify-content: flex-start;
+    }
+    .nombre p {
+        text-align: right;
+        justify-content: flex-end;
+    }
+    .nombre_alt p {
+        text-align: left;
+        justify-content: flex-start;
+    } */
+</style>
+{% endblock %}
+
+{% block contenido %}
+<table>
+    <thead>
+        <th>ID cur</th>
+        <th>Abreviacion</th>
+        <th>Curso</th>
+        <th>Creditos</th>
+        <th>Ciclo</th>
+    </thead>
+    <tbody>
+        {% for curso in cursos %}
+        <tr>
+            <td>
+                <div class="cell">
+                    <p
+                        style="background-color: color-mix(in srgb,  {{curso.8}}  80%, transparent 20%); color: {{curso.9}} ;">
+                        {{curso.0}}</p>
+                </div>
+            </td>
+            <td>
+                <div class="cell">
+                    <p
+                        style="background-color: color-mix(in srgb,  {{curso.8}}  80%, transparent 20%); color: {{curso.9}} ;">
+                        {{curso.1}}
+                    </p>
+                </div>
+            </td>
+            <td>
+                <div class="cell nombre">
+                    <p
+                        style="background-color: color-mix(in srgb,  {{curso.8}}  80%, transparent 20%); color: {{curso.9}} ;">
+                        {{curso.2}}
+                    </p>
+                </div>
+            </td>
+            <td>
+                <div class="cell">
+                    <p
+                        style="background-color: color-mix(in srgb,  {{curso.8}}  80%, transparent 20%); color: {{curso.9}} ;">
+                        {{curso.3}}
+                    </p>
+                </div>
+            </td>
+            <td>
+                <div class="cell">
+                    <p
+                        style="background-color: color-mix(in srgb,  {{curso.8}}  80%, transparent 20%); color: {{curso.9}} ;">
+                        {{curso.4}}
+                    </p>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/general_script.js"></script>
+{% endblock %}
