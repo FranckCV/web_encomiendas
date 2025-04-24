@@ -19,15 +19,17 @@ def exists_Activo():
 def table_fetchall():
     sql= f'''
         select 
-            *
-        from {table_name}
+            ud.* ,
+            mo.nombre as nom_modelo
+        from {table_name} ud
+        left join modelo mo on ud.modeloid = mo.id
     '''
     resultados = sql_select_fetchall(sql)
     
     return resultados
 
 
-def get_table():
+def get_table(columns_search=[],value_search=None):
     sql= f'''
         select 
             ud.id ,
@@ -39,9 +41,20 @@ def get_table():
             mo.nombre as nom_modelo
         from {table_name} ud
         inner join modelo mo on ud.modeloid = mo.id
-        order by ud.id desc
+    
+        {bd.include_list_search(True , list_columns=columns_search , value_search = value_search)} 
+        
     '''
-    columnas = [ 'ID' , 'Placa' , 'Capacidad (kg)' , 'Volumen (m³)' , 'Observaciones' , 'Actividad' , 'Modelo' ]
+    
+    columnas = {
+        'id':'ID' , 
+        'placa' : 'Placa' , 
+        'nom_modelo' : 'Modelo' ,
+        'capacidad' : 'Capacidad (kg)' , 
+        'volumen' : 'Volumen (m³)' ,
+        # 'observaciones' : 'Observaciones' ,
+        'activo' : 'Actividad' ,
+        }
     filas = sql_select_fetchall(sql)
     
     return columnas , filas
@@ -61,26 +74,25 @@ def unactive_row( id ):
     unactive_row_table(table_name , id)
 
 
-def insert_row( placa , capacidad ,volumen , observaciones , activo , modeloid ):
+def insert_row( placa , capacidad ,volumen  , modeloid , observaciones = None):
     sql = f'''
         INSERT INTO 
             {table_name} 
             ( placa , capacidad , volumen , observaciones , activo , modeloid )
         VALUES 
-            ( '{placa}' , '{capacidad}' , '{volumen}' , '{observaciones}' , '{activo}' , '{modeloid}')
+            ( '{placa}' , '{capacidad}' , '{volumen}' , '{observaciones}' , 1 , '{modeloid}')
     '''
     sql_execute(sql)
 
 
-def update_row( id , placa , capacidad ,volumen , observaciones , activo , modeloid ):
+def update_row( id , placa , capacidad ,volumen , modeloid  , observaciones):
     sql = f'''
         Update {table_name} set 
         placa = '{placa}' , 
-        capacidad = '{capacidad}' ,
-        volumen = '{volumen}' ,
+        capacidad = {capacidad} ,
+        volumen = {volumen} ,
         observaciones = '{observaciones}' ,
-        activo = {activo} ,
-        modeloid = {modeloid} ,
+        modeloid = {modeloid} 
         where id = {id}
     '''
     sql_execute(sql)

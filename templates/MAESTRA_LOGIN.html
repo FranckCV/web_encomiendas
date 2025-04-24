@@ -1,0 +1,34 @@
+{% extends "MAESTRA_BASE.html" %}
+
+{% block estilos_html %}
+        
+    <link rel="stylesheet" href="/static/css/login_form.css">
+    {% block estilos %}
+    {% endblock %}
+    <title>
+        {% block titulo %}
+        {% endblock %}| xd
+    </title>
+
+{% endblock %}
+
+
+{% block body_html %}
+        
+    {% block contenido %}
+    {% endblock %}
+
+{% endblock %}
+
+
+
+{% block scripts_html %}
+
+    <script src="/static/js/common_scripts/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/common_scripts/bootstrap.min.js"></script>
+    <script src="/static/js/common_scripts/common_script.js"></script>
+    
+    {% block scripts %}
+    {% endblock %}
+
+{% endblock %}

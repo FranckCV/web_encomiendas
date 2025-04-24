@@ -1,15 +1,24 @@
+const FILTER_VALUE_DEFAULT = 'default';
+
 function applyFilters() {
-    const estadoSelect = document.getElementById('filterSelect');
-    const columnElement = estadoSelect.getAttribute('data-column')
-    const selectedValue = estadoSelect ? estadoSelect.value : '0';
-    const rows = document.querySelectorAll(itemElement);
+    document.querySelectorAll('.filterSelect').forEach(filter => {
+        filter.addEventListener('change', function () {
+            var nombreSelect = this.id;
+            var elementSelect = this.value;
+            const rows = document.querySelectorAll('#productTableBody tr[data-' + nombreSelect + ']');
 
-    rows.forEach(row => {
-        const itemValue = row.getAttribute(columnElement);
-        row.style.display = (selectedValue === '0' || itemValue === selectedValue) ? '' : 'none';
+            rows.forEach(row => {
+                const itemDiv = row;
+                const itemSelect = itemDiv ? itemDiv.getAttribute('data-' + nombreSelect) : null;
+
+                if (elementSelect === `${FILTER_VALUE_DEFAULT}` || itemSelect === elementSelect) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
     });
-
 }
 
 applyFilters();
-

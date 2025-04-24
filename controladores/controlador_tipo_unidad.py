@@ -27,7 +27,7 @@ def table_fetchall():
     return resultados
 
 
-def get_table():
+def get_table(columns_search=[],value_search=None):
     sql= f'''
         select 
             tip.id ,
@@ -35,9 +35,16 @@ def get_table():
             tip.descripcion ,
             tip.activo 
         from {table_name} tip
-        order by tip.id desc
+
+        {bd.include_list_search(True , list_columns=columns_search , value_search = value_search)} 
+
     '''
-    columnas = [ 'ID' , 'Nombre' , 'Descripcion' , 'Activo' ]
+    columnas = {
+        'id':'ID' , 
+        'nombre' : 'Nombre' , 
+        'descripcion' : 'Descripción' , 
+        'activo' : 'Activo' 
+        }
     filas = sql_select_fetchall(sql)
     
     return columnas , filas
@@ -57,13 +64,23 @@ def unactive_row( id ):
     unactive_row_table(table_name , id)
 
 
-def insert_row( nombre , descripcion , activo ):
+def insert_row( nombre , descripcion=None ):
     sql = f'''
         INSERT INTO 
             {table_name} 
             ( nombre , descripcion , activo )
         VALUES 
-            ( '{nombre}' , '{descripcion}' , {activo} )
+            ( '{nombre}' , '{descripcion}' , 1 )
+    '''
+    sql_execute(sql)
+
+
+def update_row( id , nombre , descripcion ):
+    sql = f'''
+        update {table_name} set 
+        nombre = '{nombre}' ,
+        descripcion = '{descripcion}'
+        where {get_primary_key()} = {id}
     '''
     sql_execute(sql)
 
@@ -76,6 +93,7 @@ def get_options():
             {get_primary_key()} ,
             nombre
         from {table_name}
+        where activo = 1
         order by id asc
     '''
     filas = sql_select_fetchall(sql)

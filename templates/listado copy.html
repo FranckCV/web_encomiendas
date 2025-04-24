@@ -77,18 +77,16 @@
 </div>
 
 
-<div class="block_crud block_table">
+<div class="block_crud">
   <div class="table-container">
     <table cellspacing="0" class="table_listado">
       <thead>
         <tr>
           {% for col in key_columns %}
-          <th class="{% if primary_key == col %} td_primary_key {% endif %}">
-            <div class="th_content">
-              <p>
-                {{columnas[col]}}
-              </p>
-            </div>
+          <th>
+            <p>
+              {{columnas[col]}}
+            </p>
           </th>
           {% endfor %}
 
@@ -107,8 +105,8 @@
         <tr {% for resultado in resultados %} {% if resultado[primary_key]==fila[primary_key] %} {% for col in
           bd_columns %} data-{{col}}="{{resultado[col]}}" {% endfor %} {% endif %} {% endfor %}>
           {% for col_name in key_columns %}
-          <td class="{% if primary_key == col_name %} td_primary_key {% endif %}">
-            <div class="td_content {% if primary_key == col_name %} td_primary_key {% endif %}">
+          <td>
+            <div class="td_content">
               {% if col_name == 'activo' %}
               {% if fila[col_name] == 1 %}
               <p class="activo btn_active">{{STATE_1}}</p>
@@ -119,7 +117,7 @@
               {% if fila[col_name] == None or fila[col_name] == '' %}
               <p class="text_none">Sin {{columnas[col_name] | lower }}</p>
               {% else %}
-              <p class="p_value">{{ fila[col_name] }}</p>
+              <p>{{ fila[col_name] }}</p>
               {% endif %}
               {% endif %}
             </div>
@@ -132,7 +130,7 @@
 
               {% if crud_consult %}
               <div class="opciones_fila">
-                <button class="clickable-modal btn_consult" id="modal_crud_consult_{{fila[primary_key]}}">
+                <button class="clickable-modal modal_consult btn_consult" id="modal_crud_consult_{{fila[primary_key]}}">
                   <i class="fa-solid fa-eye"></i>
                 </button>
               </div>
@@ -141,13 +139,15 @@
               {% if crud_unactive %}
               {% if fila['activo'] == 1 %}
               <div class="opciones_fila">
-                <button class="clickable-modal btn_active" id="modal_crud_unactive_{{fila[primary_key]}}">
+                <button class="clickable-modal modal_unactive btn_active"
+                  id="modal_crud_unactive_{{fila[primary_key]}}">
                   <i class="fa-solid fa-square-check"></i>
                 </button>
               </div>
               {% else %}
               <div class="opciones_fila">
-                <button class="clickable-modal btn_unactive" id="modal_crud_unactive_{{fila[primary_key]}}">
+                <button class="clickable-modal modal_unactive btn_unactive"
+                  id="modal_crud_unactive_{{fila[primary_key]}}">
                   <i class="fa-regular fa-square-check"></i>
                 </button>
               </div>
@@ -156,7 +156,7 @@
 
               {% if crud_update %}
               <div class="opciones_fila">
-                <button class="clickable-modal btn_update" id="modal_crud_update_{{fila[primary_key]}}">
+                <button class="clickable-modal modal_update btn_update" id="modal_crud_update_{{fila[primary_key]}}">
                   <i class="fa-solid fa-pen"></i>
                 </button>
               </div>
@@ -164,7 +164,7 @@
 
               {% if crud_delete %}
               <div class="opciones_fila">
-                <button class="clickable-modal btn_delete" id="modal_crud_delete_{{fila[primary_key]}}">
+                <button class="clickable-modal modal_delete btn_delete" id="modal_crud_delete_{{fila[primary_key]}}">
                   <i class="fa-solid fa-trash-can"></i>
                 </button>
               </div>
@@ -183,100 +183,6 @@
   </div>
 </div>
 
-<div class="block_crud">
-  <div class="row pagination_block">
-    <div class="col-2">
-      <div class="form_field">
-        <label for="">Número de filas por página:</label>
-        <select name="cant_pag" id="cant_pag">
-          {% for option in options_pagination_crud %}
-          <option value="{{ option }}" {% if option==selected_option_crud %}selected{% endif %}>{{ option }}</option>
-          {% endfor %}
-        </select>
-      </div>
-    </div>
-
-    <div class="col">
-      <div class="pagination" id="paginationControls">
-        <a href="javascript:void(0)" class="previous-page disable"><i class="fas fa-angle-left"></i></a>
-        <div id="pageNumbers" class="page-numbers"></div>
-        <a href="javascript:void(0)" class="next-page"><i class="fas fa-angle-right"></i></a>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-{% if info_variables_crud %}
-<div class="block_crud">
-  <div class="col-2">
-    <button class="button clickable-modal btn_consult" id="modal_crud_info">
-      <i class="fa-solid fa-info"></i>
-    </button>
-  </div>
-
-  <div class="space_modal" id="modal_crud_info">
-    <div class="row form_fields">
-      <p>{{tabla }} = tabla ,
-      </p>
-      <p>{{nombre_tabla }} = nombre_tabla ,
-      </p>
-      <p>{{titulo }} = titulo ,
-      </p>
-      <p>{{filas }} = filas ,
-      </p>
-      <p>{{primary_key }} = primary_key ,
-      </p>
-      <p>{{resultados }} = resultados,
-      </p>
-      <p>{{filters }} = filters,
-      </p>
-      <p>{{fields_insert }} = fields_insert ,
-      </p>
-      <p>{{fields_update }} = fields_update ,
-      </p>
-      <p>{{fields_consult }} = fields_consult ,
-      </p>
-      <p>{{field_search }} = field_search ,
-      </p>
-      <p>{{value_search }} = value_search,
-      </p>
-      <p>{{columnas }} = columnas ,
-      </p>
-      <p>{{main_column }} = main_column,
-      </p>
-      <p>{{key_columns }} = list(columnas.keys()) ,
-      </p>
-      <p>{{bd_columns }} = list(resultados[0].keys()) if resultados else [] ,
-      </p>
-      <p>{{table_columns }} = list(filas[0].keys()) if filas else [] ,
-      </p>
-      <p>{{info_columns }} = info_columns,
-      </p>
-      <p>{{crud_list }} = crud_list,
-      </p>
-      <p>{{crud_search }} = crud_search,
-      </p>
-      <p>{{crud_consult }} = crud_consult,
-      </p>
-      <p>{{crud_insert }} = crud_insert,
-      </p>
-      <p>{{crud_update }} = crud_update,
-      </p>
-      <p>{{crud_delete }} = crud_delete,
-      </p>
-      <p>{{crud_unactive }} = crud_unactive
-      </p>
-    </div>
-    <div class="row">
-      <div class="col">
-        <button class="button btn_back" onclick="closeModal()">Cancelar</button>
-      </div>
-    </div>
-  </div>
-</div>
-{% endif %}
-
 
 {% for fila in resultados %}
 
@@ -284,35 +190,51 @@
 <div class="space_modal modal_crud_consult" id="modal_crud_consult_{{fila[primary_key]}}">
   <div class="modal_crud_content">
     <div class="row">
-      <h3>{{NOMBRE_BTN_CONSULT}} {{nombre_tabla}} ({{bd_columns[main_column] | lower }}: {{fila[main_column]}})</h3>
+      <h3>{{NOMBRE_BTN_CONSULT}} {{nombre_tabla}} ({{columnas[main_column] | lower }}: {{fila[main_column]}})</h3>
       <!-- <hr> -->
     </div>
 
     <div class="row form_fields">
 
-      {% for campo in fields_consult %}
+      <div class="form_inputs">
+        {% for campo in fields_consult %}
+        <div class="form_field form_{{campo[3]}}">
+          <label for="">{{campo[1]}}:</label>
+          {% if campo[3] == 'text' or campo[3] == 'number' %}
+          {% if fila[campo[0]] == None or fila[campo[0]] == '' %}
+          <input class="input_vacio" type="{{campo[3]}}" placeholder="{{campo[2]}}" id="{{campo[0]}}"
+            name="{{campo[0]}}" {% if campo[4] %}required{% endif %} value="Sin {{columnas[campo[0]] | lower }}"
+            disabled>
+          {% else %}
+          <input type="{{campo[3]}}" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4]
+            %}required{% endif %} value="{{fila[campo[0]]}}" disabled>
+          {% endif %}
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
 
+
+      {% for campo in fields_consult %}
       <div class="form_field form_{{campo[3]}}">
-        <label for="{{campo[0]}}">{{campo[1]}}:</label>
-        {% if campo[3] == 'textarea' %}
+        <label for="">{{campo[1]}}:</label>
+
+        {% if campo[3] == 'select' %}
+        <select id="{{campo[0]}}" name="{{campo[0]}}">
+          <option value="-1" disabled selected>{{campo[2]}}</option>
+          {% for option in campo[5] %}
+          <option value="{{option[0]}}">{{option[1]}}</option>
+          {% endfor %}
+        </select>
+        {% elif campo[3] == 'textarea' %}
         <textarea id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif %}
           disabled>{% if fila[campo[0]] != None  %} {{fila[campo[0]]}} {% endif %}</textarea>
         {% elif campo[3] == 'p' %}
-        <div class="form_p_content">
-          {% if campo[0] == 'activo' %}
-          {% if fila[campo[0]] == 1 %}<p class="activo btn_active">{{STATE_1}}</p>{% else %}<p
-            class="activo btn_unactive">{{STATE_0}}</p>{% endif %}
-          {% else %}
-          <p id="{{campo[0]}}" name="{{campo[0]}}">{% if fila[campo[0]] != None %} {{fila[campo[0]]}} {% endif %}</p>
-          {% endif %}
-        </div>
+        {% if campo[0] == 'activo' %}
+        {% if fila[campo[0]] == 1 %}<p class="activo btn_active">{{STATE_1}}</p>{% else %}<p
+          class="activo btn_unactive">{{STATE_0}}</p>{% endif %}
         {% else %}
-        {% if fila[campo[0]] == None or fila[campo[0]] == '' %}
-        <input class="input_vacio" type="{{campo[3]}}" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}"
-          {% if campo[4] %}required{% endif %} value="Sin {{columnas[campo[0]] | lower }}" disabled>
-        {% else %}
-        <input type="{{campo[3]}}" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4]
-          %}required{% endif %} value="{{fila[campo[0]]}}" disabled>
+        <p id="{{campo[0]}}" name="{{campo[0]}}">{% if fila[campo[0]] != None %} {{fila[campo[0]]}} {% endif %}</p>
         {% endif %}
         {% endif %}
       </div>
@@ -410,7 +332,7 @@
 
       {% for campo in fields_update %}
 
-      <div class="form_field form_{{campo[3]}}">
+      <div class="form_field">
         <label for="">{{campo[1]}}:</label>
         {% if campo[3] == 'select' %}
         <select id="{{campo[0]}}" name="{{campo[0]}}">
@@ -459,7 +381,7 @@
 
       {% for campo in fields_insert %}
 
-      <div class="form_field form_{{campo[3]}}">
+      <div class="form_field">
         <label for="">{{campo[1]}}:</label>
         {% if campo[3] == 'select' %}
         <select id="{{campo[0]}}" name="{{campo[0]}}">
@@ -493,7 +415,6 @@
 </div>
 {% endif %}
 
-
 <div id="overlayModal" class="overlayModal">
   <div id="enlargedModal">
   </div>
@@ -505,32 +426,9 @@
 
 
 {% block scripts %}
-<script>
-  const divs = document.querySelectorAll('.td_content:not(.td_primary_key)');
-
-  divs.forEach(div => {
-    let elementP = div.querySelector('.p_value');
-    if (elementP) {
-      let content = elementP.innerText.trim();
-
-      if (!isNaN(content) && content.includes('.')) {
-        div.classList.add('td_right');
-      }
-      else if (!isNaN(content)) {
-        div.classList.add('td_right');
-      }
-      else {
-        div.classList.add('td_left');
-      }
-    }
-  });
-</script>
-<script src="/static/js/crudModal.js"></script>
+<script src="/static/js/toggleCrudModal.js"></script>
+<script src="/static/js/filterSelect.js"></script>
 <script src="/static/js/orderHeadTable.js"></script>
-<script src="/static/js/paginationCrud.js"></script>
-
-
-
 
 
 {% endblock %}

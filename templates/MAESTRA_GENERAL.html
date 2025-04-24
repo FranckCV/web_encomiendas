@@ -14,17 +14,12 @@
 {% endblock %}
 
 
-
 {% block body_html %}
         
-    <header class="general_element">
-        <img src="/static/img/logo.png" class="logo_admin">
+    <header class="general_element">        
     </header>
 
-    <aside class="general_element" id="menu_aside" class="">
-        {% for page in lista_paginas_crud %}
-            <a href="{{url_for('crud_generico',tabla = page[0])}}">{{NOMBRE_CRUD_PAGE}} {{page[1]}}</a>
-        {% endfor %}
+    <aside class="general_element" id="menu_aside" class="">        
     </aside>
 
     <section class="general_element">
@@ -44,20 +39,7 @@
     <script src="/static/js/common_scripts/bootstrap.bundle.min.js"></script>
     <script src="/static/js/common_scripts/bootstrap.min.js"></script>
     <script src="/static/js/common_scripts/common_script.js"></script>
-    <script>
-        // MENU OPTION
-        const menuButton = document.querySelector("#menu_button");
-        const aside = document.querySelector("#menu_aside");
-        function toggleMenu() {
-            aside.classList.toggle("desplegar");
-        }
-
-        if (menuButton && aside) {
-            menuButton.addEventListener("click", () => {
-                aside.classList.toggle("desplegar");
-            });
-        }
-    </script>
+    
     {% block scripts %}
     {% endblock %}
 
