@@ -94,7 +94,7 @@ def get_options():
             nombre
         from {table_name}
         where activo = 1
-        order by id asc
+        order by nombre asc
     '''
     filas = sql_select_fetchall(sql)
     

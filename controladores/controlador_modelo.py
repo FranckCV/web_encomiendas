@@ -40,6 +40,7 @@ def get_table(columns_search=[],value_search=None):
 
         {bd.include_list_search(True , list_columns=columns_search , value_search = value_search)} 
 
+        order by mo.id asc
     '''
     columnas = {
         'id':'ID' , 
@@ -80,7 +81,7 @@ def insert_row( nombre , marcaid , tipo_unidadid ):
 def update_row( id , nombre , marcaid , tipo_unidadid):
     sql = f'''
         update {table_name} set 
-        nombre = '{nombre}',
+        nombre = '{str(nombre)}',
         marcaid = {marcaid} ,
         tipo_unidadid = {tipo_unidadid}
         where {get_primary_key()} = {id}

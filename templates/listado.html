@@ -31,16 +31,17 @@
     {% endif %}
 
     <div class="col">
-      <form class="input_search" enctype="multipart/form-data" method="GET" action="">
+      <div class="input_search" >
         <div class="input-group">
           <input required type="text" class="form-control" placeholder="Buscar por {{field_search[1]}}"
             aria-label="Recipient's username" aria-describedby="button-addon2" id="value_search" name="value_search"
             maxlength="{{field_search[2]}}" {% if value_search %} value="{{value_search}}" {% endif %} />
+            
           <button class="btn" type="submit" id="button-addon2">
             <i class="fa-solid fa-magnifying-glass"></i>
           </button>
         </div>
-      </form>
+      </div>
     </div>
 
     {% endif %}
@@ -49,9 +50,8 @@
     {% for filter in filters %}
     <div class="col-2">
       <div class="form_field">
-        <label for="">Filtrar según {{filter[1] | lower}}:</label>
         <select name="{{filter[0]}}" id="{{filter[0]}}" class="filterSelect">
-          <option value="default" selected>Seleccionar</option>
+          <option value="default" selected>{{filter[1]}}</option>
           {% for option in filter[2] %}
           <option value="{{option[0]}}">{{option[1]}}</option>
           {% endfor %}
@@ -67,7 +67,7 @@
     <div class="col-2">
       <button class="button clickable-modal btn_crud btn_insert" id="modal_crud_insert">
         <i class="fa-solid fa-circle-plus"></i>
-        <p>{{NOMBRE_BTN_INSERT}} {{nombre_tabla}}</p>
+        <p>{{NOMBRE_BTN_INSERT}}</p>
       </button>
     </div>
     {% endif %}
@@ -104,10 +104,16 @@
       <tbody id="productTableBody">
         {% for fila in filas %}
 
-        <tr {% for resultado in resultados %} {% if resultado[primary_key]==fila[primary_key] %} {% for col in
-          bd_columns %} data-{{col}}="{{resultado[col]}}" {% endfor %} {% endif %} {% endfor %}>
+        <tr 
+          {% for resultado in filas %} 
+            {% if resultado[primary_key]==fila[primary_key] %} 
+              {% for col in table_columns %} 
+                data-{{col}}="{{resultado[col]}}" 
+              {% endfor %} 
+            {% endif %} 
+          {% endfor %}>
           {% for col_name in key_columns %}
-          <td class="{% if primary_key == col_name %} td_primary_key {% endif %}">
+          <td class="{% if primary_key == col_name %} td_primary_key {% endif %}" td_name="{{col_name}}">
             <div class="td_content {% if primary_key == col_name %} td_primary_key {% endif %}">
               {% if col_name == 'activo' %}
               {% if fila[col_name] == 1 %}
@@ -185,14 +191,17 @@
 
 <div class="block_crud">
   <div class="row pagination_block">
-    <div class="col-2">
+    <div class="col-4">
       <div class="form_field">
-        <label for="">Número de filas por página:</label>
+        <p for="">Mostrar</p>
         <select name="cant_pag" id="cant_pag">
           {% for option in options_pagination_crud %}
           <option value="{{ option }}" {% if option==selected_option_crud %}selected{% endif %}>{{ option }}</option>
           {% endfor %}
         </select>
+        <p for="">registros por página</p>
+
+
       </div>
     </div>
 
@@ -245,11 +254,11 @@
       </p>
       <p>{{main_column }} = main_column,
       </p>
-      <p>{{key_columns }} = list(columnas.keys()) ,
+      <p>{{key_columns }} = key_columns ,
       </p>
-      <p>{{bd_columns }} = list(resultados[0].keys()) if resultados else [] ,
-      </p>
-      <p>{{table_columns }} = list(filas[0].keys()) if filas else [] ,
+      <!-- <p>{{bd_columns }} = bd_columns , 
+      </p>-->
+      <p>{{table_columns }} = table_columns,
       </p>
       <p>{{info_columns }} = info_columns,
       </p>
@@ -284,7 +293,7 @@
 <div class="space_modal modal_crud_consult" id="modal_crud_consult_{{fila[primary_key]}}">
   <div class="modal_crud_content">
     <div class="row">
-      <h3>{{NOMBRE_BTN_CONSULT}} {{nombre_tabla}} ({{bd_columns[main_column] | lower }}: {{fila[main_column]}})</h3>
+      <h3>{{NOMBRE_BTN_CONSULT}} {{nombre_tabla}}</h3>
       <!-- <hr> -->
     </div>
 
@@ -320,6 +329,7 @@
       {% endfor %}
 
     </div>
+    <p class="error_form"></p>
 
     <div class="row">
       <div class="col">
@@ -339,7 +349,7 @@
   <form class="modal_crud_content" action="{{ url_for('crud_unactive', tabla = tabla) }}" method="POST">
 
     <div class="row">
-      <h3>{{NOMBRE_BTN_UNACTIVE}} {{nombre_tabla}} ({{columnas[main_column] | lower }}: {{fila[main_column]}})</h3>
+      <h3>{{NOMBRE_BTN_UNACTIVE}} {{nombre_tabla}} </h3>
       <!-- <hr> -->
     </div>
     <input type="hidden" name="{{primary_key}}" id="{{primary_key}}" value="{{fila[primary_key]}}">
@@ -372,7 +382,7 @@
     <input type="hidden" name="{{primary_key}}" id="{{primary_key}}" value="{{fila[primary_key]}}">
 
     <div class="row">
-      <h3>{{NOMBRE_BTN_DELETE}} {{nombre_tabla}} ({{columnas[main_column] | lower }}: {{fila[main_column]}})</h3>
+      <h3>{{NOMBRE_BTN_DELETE}} {{nombre_tabla}} </h3>
       <!-- <hr> -->
     </div>
 
@@ -401,7 +411,7 @@
   <form class="modal_crud_content" action="{{ url_for('crud_update', tabla = tabla) }}" method="POST">
 
     <div class="row">
-      <h3>{{NOMBRE_BTN_UPDATE}} {{nombre_tabla}} ({{columnas[main_column] | lower }}: {{fila[main_column]}})</h3>
+      <h3>{{NOMBRE_BTN_UPDATE}} {{nombre_tabla}} </h3>
     </div>
     <!-- <hr> -->
 
@@ -423,13 +433,14 @@
           %}>{{fila[campo[0]]}}</textarea>
         {% else %}
         <input type="{{campo[3]}}" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4]
-          %}required{% endif %} value="{{fila[campo[0]]}}">
+          %}required{% endif %} value="{{fila[campo[0]]}}" {% if campo[5]==False %}disabled{% endif %}>
         {% endif %}
       </div>
 
       {% endfor %}
 
     </div>
+    <p class="error_form"></p>
 
     <div class="row">
       <div class="col">
@@ -472,13 +483,14 @@
         <textarea id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif %}></textarea>
         {% else %}
         <input type="{{campo[3]}}" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4]
-          %}required{% endif %}>
+          %}required{% endif %} {% if campo[5]==False %}disabled{% endif %}>
         {% endif %}
       </div>
 
       {% endfor %}
 
     </div>
+    <p class="error_form"></p>
 
     <div class="row">
       <div class="col">
@@ -505,6 +517,43 @@
 
 
 {% block scripts %}
+
+
+<script>
+  const forms = document.querySelectorAll('.modal_crud_content');
+
+forms.forEach(form => {
+  const boton = form.querySelector('button[type="submit"]');
+
+  boton.addEventListener('click', function () {
+    const textInputs = form.querySelectorAll('input[type="text"], textarea');
+    let valid = true;
+    let mensaje = "";
+
+    textInputs.forEach(input => {
+      const valor = input.value;
+
+      if (valor.includes("'")) {
+        valid = false;
+        mensaje += `El campo "${input.name || 'sin nombre'}" no puede contener comillas simples (').\n`;
+        input.style.border = "2px solid red";
+      } else {
+        input.style.border = "";
+      }
+    });
+
+    if (!valid) {
+      alert("Errores en el formulario:\n\n" + mensaje);
+    } else {
+      form.submit(); // acá sí funciona bien
+    }
+  });
+});
+
+</script>
+
+
+
 <script>
   const divs = document.querySelectorAll('.td_content:not(.td_primary_key)');
 

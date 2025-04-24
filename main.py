@@ -37,7 +37,7 @@ def get_options_active():
 
 def get_options_pagination_crud():
     lista = [ 5 , 10 , 15 , 20 , 25  ]
-    selected_option_crud = 15
+    selected_option_crud = 5
     return lista , selected_option_crud
 
 
@@ -49,7 +49,7 @@ CONTROLADORES = {
         "controlador": controlador_tipo_unidad,
         "main_column": 'nombre',
         "filters": [
-            ['activo', f'{TITLE_STATE}', get_options_active() ],
+            ['activo', f'Actividad', get_options_active() ],
         ] ,
         "fields_insert": [
             ['nombre', 'Nombre', 'Nombre', 'text', True , None ],
@@ -119,12 +119,14 @@ CONTROLADORES = {
         "main_column": 'nom_mod',
         "filters": [] ,
         "fields_insert": [
-            ['nombre', 'Nombre', 'Nombre', 'text', True , None ],
+            ['', 'ID', 'ID', 'text', False , False ],
+            ['nombre', 'Nombre', 'Nombre', 'text', True , True ],
             ['marcaid', 'Marca', 'Marca', 'select', True , controlador_marca.get_options_marca() ],
             ['tipo_unidadid', 'Tipo de Unidad', 'Tipo de Unidad', 'select', True , controlador_tipo_unidad.get_options() ],
         ],
         "fields_update": [
-            ['nombre', 'Nombre', 'Nombre', 'text', True],
+            ['', 'ID', 'ID', 'text', False , False ],
+            ['nombre', 'Nombre', 'Nombre', 'text', True , True],
             ['marcaid', 'Marca', 'Marca', 'select', True , controlador_marca.get_options_marca() ],
             ['tipo_unidadid', 'Tipo de Unidad', 'Tipo de Unidad', 'select', True , controlador_tipo_unidad.get_options() ],
         ],
@@ -156,12 +158,12 @@ CONTROLADORES = {
         "controlador": controlador_unidad,
         "main_column": 'placa',
         "filters": [
-            ['activo', f'{TITLE_STATE}', get_options_active() ],
+            ['activo', f'Actividad', get_options_active() ],
             ['modeloid', 'Modelo', controlador_modelo.get_options() ],
         ] ,
         "fields_insert": [
-            ['placa', 'Placa', 'Placa', 'text', True , None ],
-            ['capacidad', 'Capacidad', 'Capacidad', 'text', True , None ],
+            ['placa', 'Placa', 'Placa', 'text', True , True ],
+            ['capacidad', 'Capacidad', 'Capacidad', 'text', True , True ],
             ['volumen', 'Volumen', 'Volumen', 'number', True , None ],
             ['modeloid', 'Modelo', 'Elegir modelo', 'select', True , controlador_modelo.get_options() ],
             ['observaciones', 'Observaciones', 'observaciones', 'textarea', False , None ],
@@ -182,7 +184,8 @@ CONTROLADORES = {
             ['observaciones', 'Observaciones', 'observaciones', 'textarea', False , None ],
         ],
         "field_search": [ 
-            ['ud.placa' , 'mo.nombre' ], 
+            # ['ud.placa' , 'mo.nombre' ], 
+            ['placa' , 'nom_mod' ], 
             'placa o modelo de unidad' , 
             10
         ],
@@ -210,7 +213,7 @@ def inject_globals():
     options_pagination_crud , selected_option_crud = get_options_pagination_crud()
 
     return dict(
-        info_variables_crud = False,
+        info_variables_crud = True,
         lista_paginas_crud = lista_paginas_crud ,
         options_pagination_crud = options_pagination_crud ,
         selected_option_crud = selected_option_crud ,
@@ -272,6 +275,9 @@ def crud_generico(tabla):
     columnas , filas = controlador.get_table(field_search[0] , value_search)
     info_columns = controlador.get_info_columns()
     primary_key = controlador.get_primary_key()
+    table_columns  = list(filas[0].keys()) if filas else []
+    # print(filas)
+    # print(table_columns)
 
     CRUD_FORMS = config["crud_forms"]
     crud_list = CRUD_FORMS.get("crud_list")
@@ -299,8 +305,8 @@ def crud_generico(tabla):
         columnas       = columnas ,
         main_column    = main_column,
         key_columns    = list(columnas.keys()) ,
-        bd_columns     = list(resultados[0].keys()) if resultados else [] ,
-        table_columns  = list(filas[0].keys()) if filas else [] ,
+        # bd_columns     = list(resultados[0].keys()) if resultados else [] ,
+        table_columns  = table_columns ,
         info_columns   = info_columns,
         crud_list      = crud_list,
         crud_search    = crud_search,
@@ -316,30 +322,34 @@ def crud_generico(tabla):
 
 @app.route("/insert_row=<tabla>", methods=["POST"])
 def crud_insert(tabla):
-    config = CONTROLADORES.get(tabla)
-    if not config:
-        return "Tabla no soportada", 404
+    # try:
+        config = CONTROLADORES.get(tabla)
+        if not config:
+            return "Tabla no soportada", 404
 
-    active = config["active"]
+        active = config["active"]
 
-    if active is False:
-        return "Tabla no soportada", 404
+        if active is False:
+            return "Tabla no soportada", 404
 
-    controlador = config["controlador"]
-    fields = config["fields_insert"]
+        controlador = config["controlador"]
+        fields = config["fields_insert"]
 
-    valores = []
-    for campo in fields:
-        nombre = campo[0] 
-        requerido = campo[4]
-        valor = request.form.get(nombre)
-        if requerido and not valor:
-            return f"Campo {nombre} es obligatorio", 400
-        valores.append(valor)
+        valores = []
+        for campo in fields:
+            nombre = campo[0] 
+            requerido = campo[4]
+            if nombre != '' :
+                valor = request.form.get(nombre)
+                if requerido and not valor:
+                    return f"Campo {nombre} es obligatorio", 400
+                valores.append(str(valor))
 
-    controlador.insert_row( *valores )
+        controlador.insert_row( *valores )
 
-    return redirect(url_for('crud_generico', tabla = tabla))
+        return redirect(url_for('crud_generico', tabla = tabla))
+    # except Exception as e:
+    #     return f"No se aceptan carácteres especiales", 400
 
 
 @app.route("/delete_row=<tabla>", methods=["POST"])
@@ -384,32 +394,36 @@ def crud_unactive(tabla):
 
 @app.route("/update_row=<tabla>", methods=["POST"])
 def crud_update(tabla):
-    config = CONTROLADORES.get(tabla)
-    if not config:
-        return "Tabla no soportada", 404
+    # try:
+        config = CONTROLADORES.get(tabla)
+        if not config:
+            return "Tabla no soportada", 404
 
-    active = config["active"]
+        active = config["active"]
 
-    if active is False:
-        return "Tabla no soportada", 404
+        if active is False:
+            return "Tabla no soportada", 404
 
-    controlador = config["controlador"]
-    fields = config["fields_update"]
-    primary_key = controlador.get_primary_key()
+        controlador = config["controlador"]
+        fields = config["fields_update"]
+        primary_key = controlador.get_primary_key()
 
-    valores = []
-    valores.append(request.form.get(primary_key))
-    for campo in fields:
-        nombre = campo[0] 
-        requerido = campo[4]
-        valor = request.form.get(nombre)
-        if requerido and not valor:
-            return f"Campo {nombre} es obligatorio", 400
-        valores.append(valor)
+        valores = []
+        valores.append(request.form.get(primary_key))
+        for campo in fields:
+            nombre = campo[0] 
+            requerido = campo[4]
+            if nombre != '' :
+                valor = request.form.get(nombre)
+                if requerido and not valor:
+                    return f"Campo {nombre} es obligatorio", 400
+                valores.append(valor)
 
-    controlador.update_row( *valores )
+        controlador.update_row( *valores )
 
-    return redirect(url_for('crud_generico', tabla = tabla))
+        return redirect(url_for('crud_generico', tabla = tabla))
+    # except Exception as e:
+    #     return f"No se aceptan carácteres especiales", 400
 
 
 

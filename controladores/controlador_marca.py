@@ -89,7 +89,7 @@ def get_options_marca():
             id ,
             nombre
         from {table_name}
-        order by id asc
+        order by nombre asc
     '''
     filas = sql_select_fetchall(sql)
     

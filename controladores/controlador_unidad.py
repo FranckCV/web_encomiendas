@@ -38,7 +38,8 @@ def get_table(columns_search=[],value_search=None):
             ud.volumen ,
             ud.observaciones ,
             ud.activo ,
-            mo.nombre as nom_modelo
+            ud.modeloid ,
+            mo.nombre as nom_modelo 
         from {table_name} ud
         inner join modelo mo on ud.modeloid = mo.id
     
