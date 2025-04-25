@@ -1,164 +1,19 @@
-from flask import Flask, render_template, request, redirect, flash, jsonify, session, make_response,  redirect, url_for
-# from flask_jwt import JWT, jwt_required, current_identity
-# import uuid
-# from functools import wraps
-import hashlib
-import base64
-from datetime import datetime, date
+from flask import Flask, render_template, request, redirect, flash, jsonify, session, make_response,  redirect, url_for , after_this_request
 from controladores import bd as bd
 from controladores import controlador_color as controlador_color
 from controladores import controlador_marca as controlador_marca
 from controladores import controlador_unidad as controlador_unidad
 from controladores import controlador_tipo_unidad as controlador_tipo_unidad
 from controladores import controlador_modelo as controlador_modelo
+from configuraciones import NOMBRE_BTN_UPDATE , NOMBRE_BTN_UNACTIVE , ACT_STATE_0 , ACT_STATE_1 , FUNCIONES_CRUD , NOMBRE_BTN_CONSULT , NOMBRE_BTN_DELETE , NOMBRE_BTN_INSERT , NOMBRE_BTN_LIST , NOMBRE_BTN_SEARCH , NOMBRE_CRUD_PAGE , NOMBRE_OPTIONS_COL , STATE_0 , STATE_1 , TITLE_STATE
+# from flask_jwt import JWT, jwt_required, current_identity
+# import uuid
+# from functools import wraps
+# import hashlib
+# import base64
+# from datetime import datetime, date
 
 app = Flask(__name__, template_folder='templates')
-
-# NOMBRE_CRUD_PAGE = 'Mantenimiento de'
-FUNCIONES_CRUD = 'crud'
-NOMBRE_CRUD_PAGE = 'Gestionar'
-NOMBRE_OPTIONS_COL = 'Acciones'
-
-NOMBRE_BTN_INSERT   = 'Agregar'
-NOMBRE_BTN_UPDATE   = 'Editar'
-NOMBRE_BTN_DELETE   = 'Eliminar'
-NOMBRE_BTN_UNACTIVE = 'Activar/Desactivar'
-NOMBRE_BTN_LIST     = 'Listar'
-NOMBRE_BTN_CONSULT  = 'Consultar'
-NOMBRE_BTN_SEARCH   = 'Buscar'
-
-FUNC_INSERT   = 'insert'
-FUNC_UPDATE   = 'update'
-FUNC_DELETE   = 'delete'
-FUNC_UNACTIVE = 'unactive'
-FUNC_LIST     = 'crud'
-FUNC_CONSULT  = 'ver'
-FUNC_SEARCH   = 'search'
-
-# INSERT  - id/name , label , placeholder , type/element_html , required , list
-# UPDATE  - id/name , label , placeholder , type/element_html , required , list , disabled
-# CONSULT - id/name , label , placeholder , type/element_html , required , list , disabled
-
-CONTROLADORES = {
-    "marca": {
-        "active" : True ,
-        "titulo": "Marcas",
-        "nombre_tabla": "marca",
-        "controlador": controlador_marca,
-        "fields_insert": [
-            ['nombre', 'Nombre', 'Nombre', 'text', True , None ],
-        ],
-        "fields_update": [
-            ['nombre', 'Nombre', 'Nombre', 'text', True , None ],
-        ],
-        "fields_consult": [
-            ['nombre', 'Nombre', 'Nombre', 'text', True , None ],
-        ],
-        "crud_forms": {
-            "crud_list":     True ,
-            "crud_search":   False ,
-            "crud_consult":  True ,
-            "crud_insert":   True ,
-            "crud_update":   False ,
-            "crud_delete":   True ,
-            "crud_unactive": True ,
-        }
-    },
-    "unidad": {
-        "active" : True ,
-        "titulo": "Unidades",
-        "nombre_tabla": "unidad",
-        "controlador": controlador_unidad,
-        "fields_insert": [
-            ['placa', 'Placa', 'Placa', 'text', True , None ],
-            ['capacidad', 'capacidad', 'capacidad', 'text', True , None ],
-            ['volumen', 'volumen', 'volumen', 'text', True , None ],
-            ['observaciones', 'observaciones', 'observaciones', 'text', False , None ],
-            ['activo', 'activo', 'activo', 'text', True , None ],
-            ['modeloid', 'modeloid', 'modeloid', 'text', True , None ],
-        ],
-        "fields_update": [
-            ['nombre', 'Nombre', 'Nombre', 'text', True],
-        ],
-        "fields_consult": [
-            ['placa', 'Placa', 'Placa', 'text', True , None ],
-            ['capacidad', 'Capacidad', 'capacidad', 'text', True , None ],
-            ['volumen', 'Volumen', 'volumen', 'text', True , None ],
-            ['observaciones', 'Observaciones', 'observaciones', 'text', False , None ],
-            ['activo', 'Actividad', 'activo', 'text', True , None ],
-            ['nom_modelo', 'Nombre del Modelo', 'modeloid', 'text', True , None ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": False ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": False ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
-    "modelo": {
-        "active" : True ,
-        "titulo": "Modelos",
-        "nombre_tabla": "modelo",
-        "controlador": controlador_modelo,
-        "fields_insert": [
-            ['nombre', 'Nombre', 'Nombre', 'text', True , None ],
-            ['marcaid', 'Marca', 'Marca', 'select', True , controlador_marca.get_options_marca() ],
-            ['tipo_unidadid', 'Tipo de Unidad', 'Tipo de Unidad', 'select', True , controlador_tipo_unidad.get_options() ],
-        ],
-        "fields_update": [
-            ['nombre', 'Nombre', 'Nombre', 'text', True],
-        ],
-        "fields_consult": [
-            ['id', 'ID', 'Nombre', 'text', True],
-            ['nom_mod', 'Nombre del Modelo', 'Nombre', 'text', True],
-            ['nom_mar', 'Marca', 'Nombre', 'text', True],
-            ['nom_tip', 'Tipo de Unidad', 'Nombre', 'text', True],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": False ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": False ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
-    "tipo_unidad": {
-        "active" : True ,
-        "titulo": "Tipos de Unidad",
-        "nombre_tabla": "tipo de unidad",
-        "controlador": controlador_tipo_unidad,
-        "fields_insert": [
-            ['nombre', 'Nombre', 'Nombre', 'text', True , None ],
-            ['descripcion', 'descripcion', 'descripcion', 'textarea', True , None ],
-            ['activo', 'Activo', 'Activo', 'text', True , None ],
-        ],
-        "fields_update": [
-            ['nombre', 'Nombre', 'Nombre', 'text', True],
-        ],
-        "fields_consult": [
-            ['id', 'ID:', 'Nombre', 'text', True],
-            ['nombre', 'Nombre', 'Nombre', 'text', True],
-            ['descripcion', 'Descripción', 'Nombre', 'textarea', True],
-            ['activo', 'Actividad', 'Nombre', 'text', True],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": False ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": False ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
-
-}
-
 
 def listar_cruds():
     table_names = list(CONTROLADORES.keys())
@@ -172,14 +27,201 @@ def listar_cruds():
     return pages
 
 
+def get_options_active():
+    lista = [
+        [ 0 , STATE_0 ],
+        [ 1 , STATE_1 ],
+    ]
+    return lista
+
+
+def get_options_pagination_crud():
+    lista = [ 5 , 10 , 15 , 20 , 25  ]
+    selected_option_crud = 5
+    return lista , selected_option_crud
+
+
+CONTROLADORES = {
+    "tipo_unidad": {
+        "active" : True ,
+        "titulo": "tipos de unidades",
+        "nombre_tabla": "tipo de unidad",
+        "controlador": controlador_tipo_unidad,
+        "main_column": 'nombre',
+        "filters": [
+            ['activo', f'Actividad', get_options_active() ],
+        ] ,
+        "fields_insert": [
+            ['nombre', 'Nombre', 'Nombre', 'text', True , None ],
+            ['descripcion', 'Descripción', 'descripcion', 'textarea', False , None ],
+        ],
+        "fields_update": [
+            ['nombre', 'Nombre', 'Nombre', 'text', True],
+            ['descripcion', 'Descripción', 'descripcion', 'textarea', False , None ],
+        ],
+        "fields_consult": [
+            ['id', 'ID:', 'Nombre', 'text', True],
+            ['nombre', 'Nombre', 'Nombre', 'text', True],
+            ['activo', f'{TITLE_STATE}', 'Nombre', 'p', True],
+            ['descripcion', 'Descripción', 'Nombre', 'textarea', True],
+        ],
+        "field_search": [ 
+            ['nombre' , ], 
+            'nombre' , 
+            150
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "marca": {
+        "active" : True ,
+        "titulo": "marcas de unidades",
+        "nombre_tabla": "marca",
+        "controlador": controlador_marca,
+        "main_column": 'nombre',
+        "filters": [] ,
+        "fields_insert": [
+            ['nombre', 'Nombre', 'Nombre', 'text', True , None ],
+        ],
+        "fields_update": [
+            ['nombre', 'Nombre', 'Nombre', 'text', True , None ],
+        ],
+        "fields_consult": [
+            ['nombre', 'Nombre', 'Nombre', 'text', True , None ],
+        ],
+        "field_search": [ 
+            ['mar.nombre' , ], 
+            'nombre' , 
+            150
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "modelo": {
+        "active" : True ,
+        "titulo": "modelos de unidades",
+        "nombre_tabla": "modelo",
+        "controlador": controlador_modelo,
+        "main_column": 'nom_mod',
+        "filters": [] ,
+        "fields_insert": [
+            ['', 'ID', 'ID', 'text', False , False ],
+            ['nombre', 'Nombre', 'Nombre', 'text', True , True ],
+            ['marcaid', 'Marca', 'Marca', 'select', True , controlador_marca.get_options_marca() ],
+            ['tipo_unidadid', 'Tipo de Unidad', 'Tipo de Unidad', 'select', True , controlador_tipo_unidad.get_options() ],
+        ],
+        "fields_update": [
+            ['', 'ID', 'ID', 'text', False , False ],
+            ['nombre', 'Nombre', 'Nombre', 'text', True , True],
+            ['marcaid', 'Marca', 'Marca', 'select', True , controlador_marca.get_options_marca() ],
+            ['tipo_unidadid', 'Tipo de Unidad', 'Tipo de Unidad', 'select', True , controlador_tipo_unidad.get_options() ],
+        ],
+        "fields_consult": [
+            ['id', 'ID', 'Nombre', 'text', True],
+            ['nom_mod', 'Nombre del Modelo', 'Nombre', 'text', True],
+            ['nom_mar', 'Marca', 'Nombre', 'text', True],
+            ['nom_tip', 'Tipo de Unidad', 'Nombre', 'text', True],
+        ],
+        "field_search": [ 
+            [ 'mo.nombre' , 'mar.nombre' , 'tip.nombre' ], 
+            'nombre, marca del modelo o tipo de unidad del modelo' , 
+            150
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "unidad": {
+        "active" : True ,
+        "titulo": "unidades",
+        "nombre_tabla": "unidad",
+        "controlador": controlador_unidad,
+        "main_column": 'placa',
+        "filters": [
+            ['activo', f'Actividad', get_options_active() ],
+            ['modeloid', 'Modelo', controlador_modelo.get_options() ],
+        ] ,
+        "fields_insert": [
+            ['placa', 'Placa', 'Placa', 'text', True , True ],
+            ['capacidad', 'Capacidad', 'Capacidad', 'text', True , True ],
+            ['volumen', 'Volumen', 'Volumen', 'number', True , None ],
+            ['modeloid', 'Modelo', 'Elegir modelo', 'select', True , controlador_modelo.get_options() ],
+            ['observaciones', 'Observaciones', 'observaciones', 'textarea', False , None ],
+        ],
+        "fields_update": [
+            ['placa', 'Placa', 'Placa', 'text', True , None ],
+            ['capacidad', 'capacidad', 'capacidad', 'text', True , None ],
+            ['volumen', 'volumen', 'volumen', 'text', True , None ],
+            ['modeloid', 'Modelo', 'Elegir modelo', 'select', True , controlador_modelo.get_options() ],
+            ['observaciones', 'observaciones', 'observaciones', 'textarea', False , None ],
+        ],
+        "fields_consult": [
+            ['placa', 'Placa', 'Placa', 'text', True , None ],
+            ['activo', f'{TITLE_STATE}', 'activo', 'p', True , None ],
+            ['nom_modelo', 'Nombre del Modelo', 'modeloid', 'text', True , None ],
+            ['capacidad', 'Capacidad', 'capacidad', 'text', True , None ],
+            ['volumen', 'Volumen', 'volumen', 'text', True , None ],
+            ['observaciones', 'Observaciones', 'observaciones', 'textarea', False , None ],
+        ],
+        "field_search": [ 
+            # ['ud.placa' , 'mo.nombre' ], 
+            ['placa' , 'nom_mod' ], 
+            'placa o modelo de unidad' , 
+            10
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+}
+
+
+@app.route("/")
+def main_page():
+    return redirect(url_for('dashboard'))
+
+
 @app.context_processor
 def inject_globals():
     lista_paginas_crud = listar_cruds()
-
+    options_pagination_crud , selected_option_crud = get_options_pagination_crud()
 
     return dict(
+        info_variables_crud = True,
         lista_paginas_crud = lista_paginas_crud ,
+        options_pagination_crud = options_pagination_crud ,
+        selected_option_crud = selected_option_crud ,
 
+        STATE_0 = STATE_0,   
+        STATE_1 = STATE_1,
+        ACT_STATE_0 = ACT_STATE_0,
+        ACT_STATE_1 = ACT_STATE_1,
         NOMBRE_CRUD_PAGE    = NOMBRE_CRUD_PAGE,
         NOMBRE_OPTIONS_COL  = NOMBRE_OPTIONS_COL,
         NOMBRE_BTN_INSERT   = NOMBRE_BTN_INSERT,
@@ -193,7 +235,7 @@ def inject_globals():
     )
 
 
-paginas_simples = [ "index" ]
+paginas_simples = [ "index" , 'login' , 'sign_up' , 'dashboard']
 
 for pagina in paginas_simples:
     app.add_url_rule(
@@ -202,11 +244,6 @@ for pagina in paginas_simples:
         lambda p=pagina: render_template(f"{p}.html")  # Renderiza la plantilla
     )
 
-
-@app.route("/")
-@app.route("/login")
-def login():
-    return render_template("login.html")
 
 ##################_ CRUD PAGE _################## 
 
@@ -220,19 +257,27 @@ def crud_generico(tabla):
 
     if active is False:
         return "Tabla no soportada", 404
+    
+    value_search = request.args.get("value_search")
 
     titulo = config["titulo"]
     controlador = config["controlador"]
     nombre_tabla = config["nombre_tabla"]
+    main_column = config["main_column"]
+    filters = config["filters"]
     fields_insert = config["fields_insert"]
     fields_update = config["fields_update"]
     fields_consult = config["fields_consult"]
+    field_search = config["field_search"]
     
     resultados = controlador.table_fetchall()
     existe_activo = controlador.exists_Activo()
-    columnas , filas = controlador.get_table()
+    columnas , filas = controlador.get_table(field_search[0] , value_search)
     info_columns = controlador.get_info_columns()
     primary_key = controlador.get_primary_key()
+    table_columns  = list(filas[0].keys()) if filas else []
+    # print(filas)
+    # print(table_columns)
 
     CRUD_FORMS = config["crud_forms"]
     crud_list = CRUD_FORMS.get("crud_list")
@@ -245,65 +290,69 @@ def crud_generico(tabla):
 
     return render_template(
         "listado.html" ,
-        tabla = tabla ,
-        nombre_tabla = nombre_tabla ,
-        titulo = titulo ,
-        columnas = columnas ,
-        filas = filas ,
-        primary_key = primary_key ,
-        resultados = resultados,
-        fields_insert = fields_insert ,
-        fields_update = fields_update ,
+        tabla          = tabla ,
+        nombre_tabla   = nombre_tabla ,
+        titulo         = titulo ,
+        filas          = filas ,
+        primary_key    = primary_key ,
+        resultados     = resultados,
+        filters        = filters,
+        fields_insert  = fields_insert ,
+        fields_update  = fields_update ,
         fields_consult = fields_consult ,
-        bd_columns = list(resultados[0].keys()) if resultados else [] ,
-        table_columns = list(filas[0].keys()) if filas else [] ,
-        info_columns = info_columns,
-        crud_list     = crud_list,
-        crud_search   = crud_search,
-        crud_consult  = crud_consult,
-        crud_insert   = crud_insert,
-        crud_update   = crud_update,
-        crud_delete   = crud_delete,
-        crud_unactive = crud_unactive,
+        field_search   = field_search ,
+        value_search   = value_search,
+        columnas       = columnas ,
+        main_column    = main_column,
+        key_columns    = list(columnas.keys()) ,
+        # bd_columns     = list(resultados[0].keys()) if resultados else [] ,
+        table_columns  = table_columns ,
+        info_columns   = info_columns,
+        crud_list      = crud_list,
+        crud_search    = crud_search,
+        crud_consult   = crud_consult,
+        crud_insert    = crud_insert,
+        crud_update    = crud_update,
+        crud_delete    = crud_delete,
+        crud_unactive  = crud_unactive,
     )
-
-
-
-
 
 
 ##################_ METHOD POST _################## 
 
-
-@app.route(f"/{FUNC_INSERT}=<tabla>", methods=["POST"])
+@app.route("/insert_row=<tabla>", methods=["POST"])
 def crud_insert(tabla):
-    config = CONTROLADORES.get(tabla)
-    if not config:
-        return "Tabla no soportada", 404
+    # try:
+        config = CONTROLADORES.get(tabla)
+        if not config:
+            return "Tabla no soportada", 404
 
-    active = config["active"]
+        active = config["active"]
 
-    if active is False:
-        return "Tabla no soportada", 404
+        if active is False:
+            return "Tabla no soportada", 404
 
-    controlador = config["controlador"]
-    fields = config["fields_insert"]
+        controlador = config["controlador"]
+        fields = config["fields_insert"]
 
-    valores = []
-    for campo in fields:
-        nombre = campo[0] 
-        requerido = campo[4]
-        valor = request.form.get(nombre)
-        if requerido and not valor:
-            return f"Campo {nombre} es obligatorio", 400
-        valores.append(valor)
+        valores = []
+        for campo in fields:
+            nombre = campo[0] 
+            requerido = campo[4]
+            if nombre != '' :
+                valor = request.form.get(nombre)
+                if requerido and not valor:
+                    return f"Campo {nombre} es obligatorio", 400
+                valores.append(str(valor))
 
-    controlador.insert_row( *valores )
+        controlador.insert_row( *valores )
 
-    return redirect(url_for('crud_generico', tabla = tabla))
+        return redirect(url_for('crud_generico', tabla = tabla))
+    # except Exception as e:
+    #     return f"No se aceptan carácteres especiales", 400
 
 
-@app.route(f"/{FUNC_DELETE}=<tabla>", methods=["POST"])
+@app.route("/delete_row=<tabla>", methods=["POST"])
 def crud_delete(tabla):
     config = CONTROLADORES.get(tabla)
     if not config:
@@ -322,7 +371,7 @@ def crud_delete(tabla):
     return redirect(url_for('crud_generico', tabla = tabla))
 
 
-@app.route("/{FUNC_UNACTIVE}=<tabla>", methods=["POST"])
+@app.route("/unactive_row=<tabla>", methods=["POST"])
 def crud_unactive(tabla):
     config = CONTROLADORES.get(tabla)
     if not config:
@@ -343,33 +392,38 @@ def crud_unactive(tabla):
     return redirect(url_for('crud_generico', tabla = tabla))
 
 
-@app.route(f"/{FUNC_UPDATE}=<tabla>", methods=["POST"])
+@app.route("/update_row=<tabla>", methods=["POST"])
 def crud_update(tabla):
-    config = CONTROLADORES.get(tabla)
-    if not config:
-        return "Tabla no soportada", 404
+    # try:
+        config = CONTROLADORES.get(tabla)
+        if not config:
+            return "Tabla no soportada", 404
 
-    active = config["active"]
+        active = config["active"]
 
-    if active is False:
-        return "Tabla no soportada", 404
+        if active is False:
+            return "Tabla no soportada", 404
 
-    controlador = config["controlador"]
-    fields = config["fields_update"]
-    primary_key = controlador.get_primary_key()
+        controlador = config["controlador"]
+        fields = config["fields_update"]
+        primary_key = controlador.get_primary_key()
 
-    valores = [request.form.get(primary_key)]
-    for campo in fields:
-        nombre = campo[0] 
-        requerido = campo[4]
-        valor = request.form.get(nombre)
-        if requerido and not valor:
-            return f"Campo {nombre} es obligatorio", 400
-        valores.append(valor)
+        valores = []
+        valores.append(request.form.get(primary_key))
+        for campo in fields:
+            nombre = campo[0] 
+            requerido = campo[4]
+            if nombre != '' :
+                valor = request.form.get(nombre)
+                if requerido and not valor:
+                    return f"Campo {nombre} es obligatorio", 400
+                valores.append(valor)
 
-    controlador.update_row( *valores )
+        controlador.update_row( *valores )
 
-    return redirect(url_for('crud_generico', tabla = tabla))
+        return redirect(url_for('crud_generico', tabla = tabla))
+    # except Exception as e:
+    #     return f"No se aceptan carácteres especiales", 400
 
 
 

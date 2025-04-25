@@ -1,4 +1,4 @@
-{% extends "MAESTRA.html" %}
+{% extends "MAESTRA_LOGIN.html" %}
 
 {% block titulo %}
 Login
@@ -10,31 +10,34 @@ Login
 
 {% block contenido %}
 
-<form id="Contenedor" name="formulario1" method="post" action="">
-    <!-- <div class="img"></div> -->
-    <!-- <img src="/static/img/logo.png" alt="logo"> -->
+<section class="general_element">
+    <form id="form_login" name="" method="" action="">
+        <!-- <div class="img"></div> -->
+        <img src="/static/img/logo.png" alt="logo">
 
-    <h2>Inicio de sesión</h2>
+        <h2>Inicio de sesión</h2>
 
-    <div class="inputs">
-        <div class="input_box">
-            <input type="email" name="email" id="email" placeholder="Correo" required>
-            <i class="fa-solid fa-envelope"></i>
+        <div class="inputs">
+            <div class="input_box">
+                <input type="email" name="email" id="email" placeholder="Correo" required>
+                <i class="fa-solid fa-envelope"></i>
+            </div>
+
+            <div class="input_box">
+                <input type="password" name="contraseña" id="contraseña" placeholder="Contraseña" required>
+                <i class="fa-solid fa-lock"></i>
+            </div>
+        </div>
+        <!-- <p><input type="checkbox" id="verificacion">&nbsp;Al crear esta cuenta, aceptas nuestros <b>Terminos & Condiciones.</b></p> -->
+        <p><a href="#">¿Olvidaste tu contraseña?</a></p>
+
+        <div id="send">
+            <input type="submit" class="btn" value="Iniciar sesión" required>
         </div>
 
-        <div class="input_box">
-            <input type="password" name="contraseña" id="contraseña" placeholder="Contraseña" required>
-            <i class="fa-solid fa-lock"></i>
-        </div>
-    </div>
-    <!-- <p><input type="checkbox" id="verificacion">&nbsp;Al crear esta cuenta, aceptas nuestros <b>Terminos & Condiciones.</b></p> -->
-    <p><a href="#">¿Olvidaste tu contraseña?</a></p>
+        <p>¿No tienes una cuenta?&nbsp;<a href="{{url_for('sign_up')}}">Regístrate</a></p>
 
-    <div id="send">
-        <input type="submit" class="btn" value="Iniciar sesión" required>
-    </div>
+    </form>
+</section>
 
-    <p>¿No tienes una cuenta?&nbsp;<a href="#">Regístrate</a></p>
-
-</form>
 {% endblock %}

@@ -28,15 +28,21 @@ def table_fetchall():
     return resultados
 
 
-def get_table():
+def get_table(columns_search=[],value_search=None):
     sql= f'''
         select 
-            id ,
-            nombre
-        from {table_name}
-        order by id desc
+            mar.id ,
+            mar.nombre
+        from {table_name} mar
+
+        {bd.include_list_search(True , list_columns=columns_search , value_search = value_search)} 
+
     '''
-    columnas = [ 'ID' , 'Nombre' ]
+    # columnas = [ 'ID' , 'Nombre' ]
+    columnas = {
+        'id':'ID' , 
+        'nombre' : 'Nombre' , 
+        }
     filas = sql_select_fetchall(sql)
     
     return columnas , filas
@@ -68,9 +74,9 @@ def insert_row( nombre ):
 
 def update_row( id , nombre ):
     sql = f'''
-        Update {table_name} set 
+        update {table_name} set 
         nombre = '{nombre}'
-        where id = {id}
+        where {get_primary_key()} = {id}
     '''
     sql_execute(sql)
 
@@ -83,7 +89,7 @@ def get_options_marca():
             id ,
             nombre
         from {table_name}
-        order by id asc
+        order by nombre asc
     '''
     filas = sql_select_fetchall(sql)
     

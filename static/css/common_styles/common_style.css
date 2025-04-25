@@ -46,7 +46,6 @@ header.general_element {
 #menu_aside.general_element {
     font-size: 80%;
     grid-area: ge_aside;
-    background-color: var(--color2);
     display: flex;
     width: var(--width-aside);
     /* position: sticky; */
@@ -69,7 +68,6 @@ header.general_element {
 #menu_aside.desplegar {
     left: calc(-1 * var(--width-aside));
 }
-
 
 section.general_element {
     font-size: 80%;

@@ -57,8 +57,19 @@ img {
     flex-direction: column;
     gap: 20px;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    max-height: 40vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color1) #f0f0f0;
+    /* scrollbar */
 }
+
+.inputs::-webkit-scrollbar-thumb {
+    background-color: var(--color1);
+    border-radius: 50px;
+}
+
 
 .input_box {
     position: relative;

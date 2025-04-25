@@ -93,3 +93,26 @@ def unactive_row_table(table , pk):
     '''
     sql_execute(sql)
     # return 0
+
+
+def include_data_search(where = None, column_search = None , value_search = None):
+    strSQL = ' '
+    if where is not None and column_search is not None and value_search is not None:
+        if where is True:
+            strSQL += 'where'
+        strSQL += f'''
+            UPPER({column_search}) LIKE UPPER ('%{str(value_search)}%')
+        '''
+    return strSQL
+
+
+def include_list_search(where = None, list_columns = [] , value_search = None):
+    strSQL = ' '
+    if where is not None and list_columns is not [] and value_search is not None:
+        for column in list_columns:
+            if list_columns[0] == column:
+                strSQL += f'''{include_data_search(where,column,value_search)}'''
+            else:
+                strSQL += f''' or {include_data_search(False,column,value_search)}'''
+    return strSQL
+
