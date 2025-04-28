@@ -1,6 +1,6 @@
 from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select_fetchone , sql_execute , sql_execute_lastrowid , show_columns , show_primary_key , exists_column_Activo , unactive_row_table
 import controladores.bd as bd
-#####_ CRUD _#####
+#####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####
 
 table_name = 'modelo'
 
@@ -16,6 +16,16 @@ def exists_Activo():
     return exists_column_Activo(table_name)
 
 
+def delete_row( id ):
+    sql = f'''
+        delete from {table_name}
+        where id = {id}
+    '''
+    sql_execute(sql)
+
+
+#####_ CAMBIAR SQL y DICT INTERNO _#####
+
 def table_fetchall():
     sql= f'''
         select 
@@ -27,38 +37,31 @@ def table_fetchall():
     return resultados
 
 
-def get_table(columns_search=[],value_search=None):
+def get_table():
     sql= f'''
         select 
             mo.id ,
-            mo.nombre as nom_mod,
+            mo.nombre ,
             mar.nombre as nom_mar,
-            tip.nombre as nom_tip 
+            tip.nombre as nom_tip ,
+            mo.tipo_unidadid ,
+            mo.marcaid
         from {table_name} mo
         inner join marca mar on mar.id = mo.marcaid 
         inner join tipo_unidad tip on tip.id = mo.tipo_unidadid
 
-        {bd.include_list_search(True , list_columns=columns_search , value_search = value_search)} 
 
         order by mo.id asc
     '''
     columnas = {
-        'id':'ID' , 
-        'nom_mod' : 'Nombre' , 
-        'nom_mar' : 'Marca' , 
-        'nom_tip' : 'Tipo de Unidad' 
+        'id': ['ID' , 0.5 ] , 
+        'nombre' : ['Nombre' , 3] , 
+        'nom_mar' : ['Marca' , 3 ] , 
+        'nom_tip' : ['Tipo de Unidad' , 3]
         }
     filas = sql_select_fetchall(sql)
     
     return columnas , filas
-
-
-def delete_row( id ):
-    sql = f'''
-        delete from {table_name}
-        where id = {id}
-    '''
-    sql_execute(sql)
 
 
 ######_ CRUD ESPECIFICAS _###### 
@@ -97,7 +100,7 @@ def get_options():
             {get_primary_key()} ,
             nombre
         from {table_name}
-        order by id asc
+        order by nombre asc
     '''
     filas = sql_select_fetchall(sql)
     

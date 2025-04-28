@@ -1,0 +1,48 @@
+:root {
+    --height-header: 12.5vh;
+    --height-footer: 10vh;
+    --height-aside: 90vh;
+    --height-section: 1vh;
+    --width-aside: 20vw;
+}
+
+
+body {
+    font-family: Poppins, sans-serif;
+    display: grid;
+    grid-template-columns: var(--width-aside) auto;
+    grid-template-rows: var(--height-header) auto var(--height-footer) ;
+    grid-template-areas: 
+                        "ge_header ge_header"
+                        "ge_aside ge_section"
+                        "ge_footer ge_footer"
+    ;
+    height: 100vh;
+    background-color: var(--color-background);
+}
+
+
+aside.general_element {
+    font-size: 80%;
+    grid-area: ge_aside;
+    display: flex;
+    width: var(--width-aside);
+
+    top: var(--height-header);
+    position: fixed;
+    height: 100%;
+    overflow-y: scroll;
+    z-index: 999;
+    left: 0;
+    transition: 0.15s ease-in-out;
+}
+
+aside::-webkit-scrollbar {
+    display: none;
+}
+
+aside.desplegar {
+    left: calc(-1 * var(--width-aside));
+}
+
+

@@ -18,4 +18,4 @@ NOMBRE_BTN_LIST     = 'Listar'
 NOMBRE_BTN_CONSULT  = 'Consultar'
 NOMBRE_BTN_SEARCH   = 'Buscar'
 
-
+ICON_PAGE_CRUD = 'fa-solid fa-file'

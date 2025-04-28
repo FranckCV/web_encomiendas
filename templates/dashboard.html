@@ -2,23 +2,126 @@
 
 
 {% block titulo %}
-
+Dashboard
 {% endblock %}
 
 
 {% block estilos %}
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .section_content {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: auto 1fr 1fr;
+        grid-template-areas: 
+                            'db_ingresos'
+        ;
+        background-color: rgb(229, 229, 229);
+    }
+
+    .section_content > div {
+        background-color: white;
+    }
+
+    #chart-container {
+        width: 700px;
+        height: auto;
+        grid-area: db_ingresos;
+        /* margin: auto; */
+        /* background-color: grey; */
+    }
+
+    .db_block_2 {
+        grid-area: db_block_2;
+    }
+
+</style>
 {% endblock %}
 
 
 {% block contenido %}
+<div id="chart-container">
+    <canvas id="ingresosChart"></canvas>
+</div>
 
-
+<div class="dh_block_2"></div>
+<div class="dh_block_3"></div>
+<div class="dh_block_4"></div>
+<div class="dh_block_5"></div>
+<div class="dh_block_6"></div>
+<div class="dh_block_7"></div>
+<div class="dh_block_8"></div>
 
 {% endblock %}
 
 
 
 {% block scripts %}
+
+
+
+<script>
+    const ctx = document.getElementById('ingresosChart').getContext('2d');
+    const ingresosChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'], // Meses
+            datasets: [
+                {
+                    label: 'Envíos de Encomiendas',
+                    data: [1200, 1500, 1700, 1400, 1800, 2000],
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    tension: 0.3
+                },
+                {
+                    label: 'Ventas de Cajas',
+                    data: [300, 350, 400, 380, 420, 450],
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.3
+                },
+                {
+                    label: 'Ventas de Sobres',
+                    data: [150, 180, 200, 170, 190, 220],
+                    borderColor: '#ffc107',
+                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Ingresos por mes',
+                    font: {
+                        size: 20
+                    }
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Ingresos ($)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Meses'
+                    }
+                }
+            }
+        }
+    });
+</script>
 
 {% endblock %}

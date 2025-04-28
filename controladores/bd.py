@@ -66,7 +66,7 @@ def show_columns(table_name):
 
 def show_primary_key(tabla):
     for row in show_columns(tabla):
-        if row['Key'] == 'PRI':
+        if row['Key'] == 'PRI' and row['Null'] == 'NO':
             column = row['Field']
     return column
 
@@ -77,6 +77,14 @@ def find_column_table(column_name, tabla):
         if row['Field'] == column_name:
             return row
     return None
+
+
+def delete_row_table( table_name , id ):
+    sql = f'''
+        delete from {table_name}
+        where {show_primary_key()} = {id}
+    '''
+    sql_execute(sql)
 
 
 def exists_column_Activo(tabla):

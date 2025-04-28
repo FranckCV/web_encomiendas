@@ -1,6 +1,6 @@
 :root {
-    --color1: color-mix(in srgb, var(--color-base) 100%, var(--color-contrast) 0%); 
-    --color2: color-mix(in srgb, var(--color-base) 100%, var(--color-contrast) 30%); 
+    --color1: color-mix(in srgb, var(--color-base) 100%, var(--color-contrast) 0%);
+    --color2: color-mix(in srgb, var(--color-base) 100%, var(--color-contrast) 30%);
     --color3: color-mix(in srgb, var(--color1) 100%, black 30%);
     --color4: color-mix(in srgb, var(--color1) 50%, black 90%);
     --color5: color-mix(in srgb, var(--color1) 70%, var(--color2) 30%);
@@ -11,27 +11,8 @@
     --color10: color-mix(in srgb, var(--color1) 100%, var(--color-contrast) 100%);
 
     --color-background: color-mix(in srgb, var(--color-contrast) 30%, var(--color-contrast) 100%);
-
-    --height-header: 12.5vh;
-    --height-footer: 10vh;
-    --height-aside: 90vh;
-    --height-section: 1vh;
-    --width-aside: 20vw;
 }
 
-body {
-    font-family: Poppins, sans-serif;
-    display: grid;
-    grid-template-columns: var(--width-aside) auto;
-    grid-template-rows: var(--height-header) auto var(--height-footer) ;
-    grid-template-areas: 
-                        "ge_header ge_header"
-                        "ge_aside ge_section"
-                        "ge_footer ge_footer"
-    ;
-    height: 100vh;
-    background-color: var(--color-background);
-}
 
 header.general_element {
     grid-area: ge_header;
@@ -43,16 +24,12 @@ header.general_element {
     z-index: 9999;
 }
 
-#menu_aside.general_element {
+aside.general_element {
     font-size: 80%;
     grid-area: ge_aside;
     display: flex;
     width: var(--width-aside);
-    /* position: sticky; */
-    /* top: var(--height-header); */
-    /* left: 0; */
 
-    top: var(--height-header);
     position: fixed;
     height: 100%;
     overflow-y: scroll;
@@ -61,11 +38,11 @@ header.general_element {
     transition: 0.15s ease-in-out;
 }
 
-#menu_aside::-webkit-scrollbar {
+aside::-webkit-scrollbar {
     display: none;
 }
 
-#menu_aside.desplegar {
+aside.desplegar {
     left: calc(-1 * var(--width-aside));
 }
 
@@ -88,7 +65,13 @@ a {
     /* color: white; */
 }
 
-h1 , h2 , h3 , h4 , h5, h6 , p {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
     margin: 0;
 }
 
@@ -106,3 +89,130 @@ button {
 
 
 
+
+.modalMsg * {
+    font-family: BlinkMacSystemFont, "Segoe UI", Fontawesome;
+}
+
+.modalMsg {
+    height: fit-content;
+    width: fit-content;
+    overflow-y: hidden;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    box-shadow: 0px 0px 7px black;
+    border-radius: 10px;
+    display: none;
+}
+
+.modalMsg .modal-dialog {
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+}
+
+.modalMsg.ver_modalMsg .modal-content {
+    display: grid !important;
+    grid-template-areas: "mo_h mo_b mo_f";
+    grid-template-columns: 50px auto 60px;
+    padding-block: 10px;
+    padding-inline: 5px;
+    gap: 5px;
+    background-color: transparent;
+    border: 0;
+    border-radius: 6px;
+    outline: 0;
+    background-clip: padding-box;
+    position: relative;
+    margin: 0;
+    width: 100%;
+}
+
+.modalMsg .modal-header,
+.modalMsg .modal-body,
+.modalMsg .modal-footer {
+    display: flex;
+    padding: 0;
+    margin: 0;
+    justify-content: center;
+    align-items: center;
+    border: 0;
+}
+
+.modalMsg .modal-header {
+    grid-area: mo_h;
+}
+
+.modalMsg .modal-header i {
+    font-size: 30px;
+}
+
+.modalMsg .modal-body {
+    grid-area: mo_b;
+    justify-content: left;
+}
+
+.modalMsg .modal-body p {
+    padding: 0;
+    margin: 0;
+    color: black;
+    /* font-size: 15px; */
+}
+
+.modalMsg .modal-footer {
+    grid-area: mo_f;
+}
+
+.modalMsg .modal-footer button:hover {
+    cursor: pointer;
+}
+
+.modalMsg .modal-footer button {
+    display: flex;
+    border-radius: 20px;
+    padding: 0;
+    font-size: 100%;
+    width: 32.5px;
+    height: 32.5px;
+    justify-items: center;
+    justify-content: center;
+    align-items: center;
+    border: 0;
+}
+
+.modalMsg .modal-footer button i {
+    font-size: 15px;
+}
+
+.modalMsg.ver_modalMsg {
+    display: block !important;
+}
+
+
+
+.modalError .modal-header i {
+    color: #e61f65;
+}
+
+.modalError {
+    background-color: #fcdada;
+    right: auto;
+    top: auto;
+    bottom: 10px;
+    left: 10px;
+}
+
+.modalError .modal-dialog {
+    width: var(--width-msg-error);
+}
+
+.modal_button_cancelar {
+    background-color: #db0000bd;
+    color: white;
+}
+
+.modalError .modal-body p {
+    font-size: 15px;
+    line-height: 1.6em;
+}

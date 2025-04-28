@@ -1,6 +1,6 @@
 from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select_fetchone , sql_execute , sql_execute_lastrowid , show_columns , show_primary_key , exists_column_Activo , unactive_row_table
 import controladores.bd as bd
-#####_ CRUD _#####
+#####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####
 
 table_name = 'unidad'
 
@@ -16,6 +16,16 @@ def exists_Activo():
     return exists_column_Activo(table_name)
 
 
+def delete_row( id ):
+    sql = f'''
+        delete from {table_name}
+        where id = {id}
+    '''
+    sql_execute(sql)
+
+
+#####_ CAMBIAR SQL y DICT INTERNO _#####
+
 def table_fetchall():
     sql= f'''
         select 
@@ -29,7 +39,7 @@ def table_fetchall():
     return resultados
 
 
-def get_table(columns_search=[],value_search=None):
+def get_table():
     sql= f'''
         select 
             ud.id ,
@@ -39,37 +49,34 @@ def get_table(columns_search=[],value_search=None):
             ud.observaciones ,
             ud.activo ,
             ud.modeloid ,
-            mo.nombre as nom_modelo 
+            mo.nombre as nom_modelo ,
+            tip.id ,
+            tip.nombre as nom_tipounidad ,
+            mar.nombre as nom_marca,
+            mar.id
         from {table_name} ud
         inner join modelo mo on ud.modeloid = mo.id
-    
-        {bd.include_list_search(True , list_columns=columns_search , value_search = value_search)} 
+        inner join tipo_unidad tip on mo.tipo_unidadid = tip.id
+        inner join marca mar on mo.marcaid = mar.id
         
     '''
     
     columnas = {
-        'id':'ID' , 
-        'placa' : 'Placa' , 
-        'nom_modelo' : 'Modelo' ,
-        'capacidad' : 'Capacidad (kg)' , 
-        'volumen' : 'Volumen (m³)' ,
-        # 'observaciones' : 'Observaciones' ,
-        'activo' : 'Actividad' ,
+        'id':['ID' , 0.5] , 
+        'placa' : ['Placa' , 1.5]  , 
+        'nom_modelo' : ['Modelo' , 1.5] ,
+        'nom_tipounidad' : ['Tipo de unidad' , 1.5] ,
+        'nom_marca' :     ['Marca' , 1.5] ,
+        'capacidad' : ['Capacidad (kg)' , 1 ] , 
+        'volumen' : ['Volumen (m³)' , 1 ] ,
+        'activo' : ['Actividad', 1 ] ,
         }
     filas = sql_select_fetchall(sql)
     
     return columnas , filas
 
 
-def delete_row( id ):
-    sql = f'''
-        delete from {table_name}
-        where id = {id}
-    '''
-    sql_execute(sql)
-
-
-######_ CRUD ESPECIFICAS _###### 
+######_ CAMBIAR PARAMETROS Y SQL INTERNO _###### 
 
 def unactive_row( id ):
     unactive_row_table(table_name , id)

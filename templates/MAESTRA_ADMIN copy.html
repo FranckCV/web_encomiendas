@@ -18,13 +18,11 @@
 {% block body_html %}
 
 <header class="general_element">
+    <img src="/static/img/logo.png" class="logo_admin">
 </header>
 
 <aside class="general_element" id="menu_aside" class="">
-    <img src="/static/img/logo.png" class="logo_admin">
-
     <a href="{{ url_for('dashboard') }}">
-        <i class="ri-dashboard-line"></i>
         <p>Dashboard</p>
     </a>
     <hr>
@@ -39,10 +37,8 @@
 </aside>
 
 <section class="general_element">
-    <div class="section_content">
-        {% block contenido %}
-        {% endblock %}
-    </div>
+    {% block contenido %}
+    {% endblock %}
 </section>
 
 <footer class="general_element">

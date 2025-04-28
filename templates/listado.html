@@ -13,7 +13,12 @@
 {% block contenido %}
 
 <div class="block_crud">
-  <h3 class="crud_title">{{NOMBRE_CRUD_PAGE}} {{titulo}}</h3>
+  <h3 class="crud_title">
+    {% if HABILITAR_ICON_PAGES %}
+    <i class="{{icon_page_crud}}"></i>
+    {% endif  %}
+    {{NOMBRE_CRUD_PAGE}} {{titulo}}
+  </h3>
 </div>
 
 
@@ -31,12 +36,11 @@
     {% endif %}
 
     <div class="col">
-      <div class="input_search" >
+      <div class="input_search">
         <div class="input-group">
-          <input required type="text" class="form-control" placeholder="Buscar por {{field_search[1]}}"
-            aria-label="Recipient's username" aria-describedby="button-addon2" id="value_search" name="value_search"
-            maxlength="{{field_search[2]}}" {% if value_search %} value="{{value_search}}" {% endif %} />
-            
+          <input required type="text" class="form-control" placeholder="Buscar {{ titulo }}"
+            aria-label="Recipient's username" aria-describedby="button-addon2" id="value_search" name="value_search" />
+
           <button class="btn" type="submit" id="button-addon2">
             <i class="fa-solid fa-magnifying-glass"></i>
           </button>
@@ -83,17 +87,18 @@
       <thead>
         <tr>
           {% for col in key_columns %}
-          <th class="{% if primary_key == col %} td_primary_key {% endif %}">
+          <th {% if primary_key==col %} class="td_primary_key" {% elif col=='activo' %} style="width: calc( 1 * var(--width-column) );"
+            {% else %} style="width: calc( {{columnas[col][1]}} * var(--width-column) );" {% endif %}>
             <div class="th_content">
               <p>
-                {{columnas[col]}}
+                {{ columnas[col][0] }}
               </p>
             </div>
           </th>
           {% endfor %}
 
           {% if crud_consult or crud_unactive or crud_update or crud_delete %}
-          <th class="opciones_column">
+          <th class="opciones_column" style="width: calc( 0.5 * var(--width-column) );">
             <p>
               {{NOMBRE_OPTIONS_COL}}
             </p>
@@ -104,17 +109,12 @@
       <tbody id="productTableBody">
         {% for fila in filas %}
 
-        <tr 
-          {% for resultado in filas %} 
-            {% if resultado[primary_key]==fila[primary_key] %} 
-              {% for col in table_columns %} 
-                data-{{col}}="{{resultado[col]}}" 
-              {% endfor %} 
-            {% endif %} 
-          {% endfor %}>
+        <tr {% for resultado in filas %} {% if resultado[primary_key]==fila[primary_key] %} {% for col in table_columns
+          %} data-{{col}}="{{resultado[col]}}" {% endfor %} {% endif %} {% endfor %}>
           {% for col_name in key_columns %}
           <td class="{% if primary_key == col_name %} td_primary_key {% endif %}" td_name="{{col_name}}">
-            <div class="td_content {% if primary_key == col_name %} td_primary_key {% endif %}">
+            <div
+              class="td_content {% if col_name == primary_key %} td_primary_key {% elif col_name == 'activo' %} td_activo {% endif %}">
               {% if col_name == 'activo' %}
               {% if fila[col_name] == 1 %}
               <p class="activo btn_active">{{STATE_1}}</p>
@@ -287,62 +287,7 @@
 {% endif %}
 
 
-{% for fila in resultados %}
-
-{% if crud_consult %}
-<div class="space_modal modal_crud_consult" id="modal_crud_consult_{{fila[primary_key]}}">
-  <div class="modal_crud_content">
-    <div class="row">
-      <h3>{{NOMBRE_BTN_CONSULT}} {{nombre_tabla}}</h3>
-      <!-- <hr> -->
-    </div>
-
-    <div class="row form_fields">
-
-      {% for campo in fields_consult %}
-
-      <div class="form_field form_{{campo[3]}}">
-        <label for="{{campo[0]}}">{{campo[1]}}:</label>
-        {% if campo[3] == 'textarea' %}
-        <textarea id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif %}
-          disabled>{% if fila[campo[0]] != None  %} {{fila[campo[0]]}} {% endif %}</textarea>
-        {% elif campo[3] == 'p' %}
-        <div class="form_p_content">
-          {% if campo[0] == 'activo' %}
-          {% if fila[campo[0]] == 1 %}<p class="activo btn_active">{{STATE_1}}</p>{% else %}<p
-            class="activo btn_unactive">{{STATE_0}}</p>{% endif %}
-          {% else %}
-          <p id="{{campo[0]}}" name="{{campo[0]}}">{% if fila[campo[0]] != None %} {{fila[campo[0]]}} {% endif %}</p>
-          {% endif %}
-        </div>
-        {% else %}
-        {% if fila[campo[0]] == None or fila[campo[0]] == '' %}
-        <input class="input_vacio" type="{{campo[3]}}" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}"
-          {% if campo[4] %}required{% endif %} value="Sin {{columnas[campo[0]] | lower }}" disabled>
-        {% else %}
-        <input type="{{campo[3]}}" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4]
-          %}required{% endif %} value="{{fila[campo[0]]}}" disabled>
-        {% endif %}
-        {% endif %}
-      </div>
-
-      {% endfor %}
-
-    </div>
-    <p class="error_form"></p>
-
-    <div class="row">
-      <div class="col">
-        <button class="button btn_back" onclick="closeModal()">Cancelar</button>
-      </div>
-      <div class="col-1"></div>
-      <div class="col">
-        <button class="button btn_acept" onclick="closeModal()">Aceptar</button>
-      </div>
-    </div>
-  </div>
-</div>
-{% endif %}
+{% for fila in filas %}
 
 {% if crud_unactive %}
 <div class="space_modal modal_crud_unactive" id="modal_crud_unactive_{{fila[primary_key]}}">
@@ -402,45 +347,129 @@
 </div>
 {% endif %}
 
-{% endfor %}
 
-
-{% if crud_update %}
-{% for fila in resultados %}
-<div class="space_modal modal_crud_update" id="modal_crud_update_{{fila[primary_key]}}">
-  <form class="modal_crud_content" action="{{ url_for('crud_update', tabla = tabla) }}" method="POST">
-
+{% if crud_consult %}
+<div class="space_modal modal_crud_consult" id="modal_crud_consult_{{fila[primary_key]}}">
+  <div class="modal_crud_content">
     <div class="row">
-      <h3>{{NOMBRE_BTN_UPDATE}} {{nombre_tabla}} </h3>
+      <h3>{{NOMBRE_BTN_CONSULT}} {{nombre_tabla}}</h3>
     </div>
-    <!-- <hr> -->
 
     <div class="row form_fields">
-      <input type="hidden" id="{{primary_key}}" name="{{primary_key}}" value="{{fila[primary_key]}}">
 
-      {% for campo in fields_update %}
+      {% for campo in fields_form %}
 
       <div class="form_field form_{{campo[3]}}">
-        <label for="">{{campo[1]}}:</label>
+        <label for="{{campo[0]}}">{{campo[1]}}:</label>
         {% if campo[3] == 'select' %}
-        <select id="{{campo[0]}}" name="{{campo[0]}}">
-          {% for option in campo[5] %}
-          <option value="{{option[0]}}" {% if fila[campo[0]]==option[0] %}selected{% endif %}>{{option[1]}}</option>
-          {% endfor %}
+        <input 
+          id="{{campo[0]}}" 
+          name="{{campo[0]}}" 
+          placeholder="{{campo[2]}}" 
+          type="text" 
+          {% if campo[4] %}required{% endif %} 
+          {% if campo[5]==False %}disabled{% endif %}
+          value="{{ fila[campo[6][1]] }}" 
+          disabled
+          >
         </select>
         {% elif campo[3] == 'textarea' %}
-        <textarea id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif
-          %}>{{fila[campo[0]]}}</textarea>
+        <textarea id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif %}
+          disabled>{% if fila[campo[0]] != None  %} {{fila[campo[0]]}} {% endif %}</textarea>
+        {% elif campo[3] == 'p' %}
+        <div class="form_p_content">
+          {% if campo[0] == 'activo' %}
+          {% if fila[campo[0]] == 0 %}
+          <p class="activo btn_unactive">{{STATE_0}}</p>
+          {% else %}
+          <p class="activo btn_active">{{STATE_1}}</p>
+          {% endif %}
+          {% else %}
+          <p id="{{campo[0]}}" name="{{campo[0]}}">{% if fila[campo[0]] != None %} {{fila[campo[0]]}} {% endif %}</p>
+          {% endif %}
+        </div>
+        {% else %}
+        {% if fila[campo[0]] == None or fila[campo[0]] == '' %}
+        <input class="input_vacio" type="{{campo[3]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{%
+          endif %} placeholder="Sin {{columnas[campo[0]] | lower }}" disabled>
         {% else %}
         <input type="{{campo[3]}}" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4]
-          %}required{% endif %} value="{{fila[campo[0]]}}" {% if campo[5]==False %}disabled{% endif %}>
+          %}required{% endif %} value="{{fila[campo[0]]}}" disabled>
+        {% endif %}
         {% endif %}
       </div>
 
       {% endfor %}
 
     </div>
-    <p class="error_form"></p>
+
+    <div class="row">
+      <div class="col">
+        <button class="button btn_back" onclick="closeModal()">Cancelar</button>
+      </div>
+      <div class="col-1"></div>
+      <div class="col">
+        <button class="button btn_acept" onclick="closeModal()">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+
+{% if crud_update %}
+<div class="space_modal modal_crud_update" id="modal_crud_update_{{fila[primary_key]}}">
+  <form class="modal_crud_content" action="{{ url_for('crud_update', tabla = tabla) }}" method="POST">
+
+    <div class="row">
+      <h3>{{NOMBRE_BTN_UPDATE}} {{nombre_tabla}} </h3>
+    </div>
+
+    <div class="row form_fields">
+      <input type="hidden" id="{{primary_key}}" name="{{primary_key}}" value="{{fila[primary_key]}}">
+
+      {% for campo in fields_form %}
+
+      <div class="form_field form_{{campo[3]}}">
+        <label for="">{{campo[1]}}:</label>
+        {% if campo[3] == 'select' %}
+        <select id="{{campo[0]}}" name="{{campo[0]}}">
+          {% for option in campo[6][0] %}
+          <option value="{{option[0]}}" {% if fila[campo[0]]==option[0] %}selected{% endif %}>{{option[1]}}</option>
+          {% endfor %}
+        </select>
+        {% elif campo[3] == 'p' %}
+        <div class="form_p_content">
+          {% if campo[0] == 'activo' %}
+          {% if fila[campo[0]] == 0 %}
+          <p class="activo btn_unactive">{{STATE_0}}</p>
+          {% else %}
+          <p class="activo btn_active">{{STATE_1}}</p>
+          {% endif %}
+          {% else %}
+          <p id="{{campo[0]}}" name="{{campo[0]}}">{% if fila[campo[0]] != None %} {{fila[campo[0]]}} {% endif %}</p>
+          {% endif %}
+        </div>
+        {% elif campo[3] == 'textarea' %}
+        <textarea id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif
+          %}>{{fila[campo[0]]}}</textarea>
+        {% else %}
+          <input 
+          {% if primary_key == campo[0] %}
+          id="_{{campo[0]}}" name="_{{campo[0]}}" disabled
+          {% else %}
+          id="{{campo[0]}}" name="{{campo[0]}}" 
+          {% endif %}
+          type="{{campo[3]}}" placeholder="{{campo[2]}}" 
+          {% if campo[4] %}required{% endif %} value="{{fila[campo[0]]}}" 
+          {% if campo[5]==False %}disabled{% endif %}>
+        {% endif %}
+      </div>
+
+      {% endfor %}
+
+    </div>
+    <!-- <p class="error_form"></p> -->
 
     <div class="row">
       <div class="col">
@@ -454,8 +483,8 @@
 
   </form>
 </div>
-{% endfor %}
 {% endif %}
+{% endfor %}
 
 
 {% if crud_insert %}
@@ -468,29 +497,41 @@
 
     <div class="row form_fields">
 
-      {% for campo in fields_insert %}
+      {% for campo in fields_form %}
 
       <div class="form_field form_{{campo[3]}}">
         <label for="">{{campo[1]}}:</label>
         {% if campo[3] == 'select' %}
         <select id="{{campo[0]}}" name="{{campo[0]}}">
           <option value="-1" disabled selected>{{campo[2]}}</option>
-          {% for option in campo[5] %}
+          {% for option in campo[6][0] %}
           <option value="{{option[0]}}">{{option[1]}}</option>
           {% endfor %}
         </select>
+        {% elif campo[3] == 'p' %}
+        <div class="form_p_content">
+          {% if campo[0] == 'activo' %}
+          <p class="activo btn_active">{{STATE_1}}</p>
+          {% else %}
+          <p id="{{campo[0]}}" name="{{campo[0]}}"></p>
+          {% endif %}
+        </div>
         {% elif campo[3] == 'textarea' %}
-        <textarea id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif %}></textarea>
+        <textarea id="{{campo[0]}}" placeholder="{{campo[2]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif
+          %}></textarea>
         {% else %}
-        <input type="{{campo[3]}}" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4]
-          %}required{% endif %} {% if campo[5]==False %}disabled{% endif %}>
+        <input 
+        
+        id="{{campo[0]}}" name="{{campo[0]}}" 
+        type="{{campo[3]}}" placeholder="{{campo[2]}}" {% if campo[4]
+          %}required{% endif %} {% if campo[5]==False or campo[5] == None %}disabled{% endif %}>
         {% endif %}
       </div>
 
       {% endfor %}
 
     </div>
-    <p class="error_form"></p>
+    <!-- <p class="error_form"></p> -->
 
     <div class="row">
       <div class="col">
@@ -517,41 +558,6 @@
 
 
 {% block scripts %}
-
-
-<script>
-  const forms = document.querySelectorAll('.modal_crud_content');
-
-forms.forEach(form => {
-  const boton = form.querySelector('button[type="submit"]');
-
-  boton.addEventListener('click', function () {
-    const textInputs = form.querySelectorAll('input[type="text"], textarea');
-    let valid = true;
-    let mensaje = "";
-
-    textInputs.forEach(input => {
-      const valor = input.value;
-
-      if (valor.includes("'")) {
-        valid = false;
-        mensaje += `El campo "${input.name || 'sin nombre'}" no puede contener comillas simples (').\n`;
-        input.style.border = "2px solid red";
-      } else {
-        input.style.border = "";
-      }
-    });
-
-    if (!valid) {
-      alert("Errores en el formulario:\n\n" + mensaje);
-    } else {
-      form.submit(); // acá sí funciona bien
-    }
-  });
-});
-
-</script>
-
 
 
 <script>

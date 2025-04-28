@@ -1,0 +1,19 @@
+- _HECHO
+  -  Login
+  -  Sign Up
+  -  Crud generico
+- Cortez
+  -  Dashboard (admin)
+  - 
+- Diaz
+  -  Gestion de encomiendas (cliente)
+  - 
+- Guzman
+  - 
+  - 
+- Paucar
+  - Seguimiento de encomienda
+  - 
+- Perez
+  - 
+  - 

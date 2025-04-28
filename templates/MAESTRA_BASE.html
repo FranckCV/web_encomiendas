@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="/static/img/logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css" crossorigin="">
     <link rel="stylesheet" href="/static/css/common_styles/bootstrap.min.css" />
     <link rel="stylesheet" href="/static/css/common_styles/all.min.css" />
     <link rel="stylesheet" href="/static/css/common_styles/fontawesome.min.css" />
@@ -12,8 +13,12 @@
     <link rel="stylesheet" href="/static/css/common_styles/common_style.css" />
     <style>
         :root {
-            --color-base: #07376e;
-            --color-sec: #00c552;
+            /* --color-base: #18076e; */
+            /* --color-base: #8a5105; */
+            /* --color-base: #107444; */
+            --color-base: #1d4c82;
+            --color-sec: #0dd2e4;
+            /* --color-contrast: #fff; */
             --color-contrast: #ffffff;
         }
     </style>
@@ -26,10 +31,47 @@
     {% block body_html %}
     {% endblock %}
     
-
+    {% if cookie_error %}
+    <div id="modalError" class="modal modalMsg modalError ver_modalMsg">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div class="modal-body">
+                    <p>{{cookie_error}}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="modal_button_cancelar" id="cancelarError">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     <script src="/static/js/common_scripts/bootstrap.bundle.min.js"></script>
     <script src="/static/js/common_scripts/bootstrap.min.js"></script>
     <script src="/static/js/common_scripts/common_script.js"></script>
+    <script>
+        const modalError = document.getElementById('modalError');
+        if (modalError) {
+            function closeModalError() {
+                document.cookie = "error=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                modalError.classList.remove('ver_modalMsg');
+            }
+
+            modalError.querySelector('#cancelarError').onclick = function () {
+                closeModalError();
+            };
+
+            document.querySelectorAll('input[type="submit"]').forEach(button => {
+                button.onclick = function () {
+                    closeModalError();
+                }
+            });
+        }
+    </script>
     {% block scripts_html %}
     {% endblock %}
 
