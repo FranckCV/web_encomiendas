@@ -254,7 +254,7 @@ def inject_globals():
     )
 
 
-paginas_simples = [ "index" , 'login' , 'sign_up' , 'dashboard']
+paginas_simples = [ "index" , 'login' , 'sign_up' , 'dashboard', 'agencias']
 
 for pagina in paginas_simples:
     app.add_url_rule(
