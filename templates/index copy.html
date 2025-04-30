@@ -1,0 +1,109 @@
+{% extends "MAESTRA_GENERAL.html" %}
+
+
+{% block titulo %}
+
+{% endblock %}
+
+
+{% block estilos %}
+<style>
+    .block_tracking {
+        display: grid;
+        grid-template-columns: 1fr 2.5fr;
+        background-color: var(--color4);
+        color: white;
+        border-radius: var(--border-radius1);
+        width: 70vw;
+    }
+
+    .block_tracking > * {
+        display: flex;
+        gap: 10px;
+        padding: 15px;
+        align-items: center;
+        justify-content: center;
+
+    }
+
+    .trk_title {
+        flex-direction: column;
+        justify-items: center;
+        text-align: center;
+        padding: 20px;
+        font-size: 120%;
+    }
+
+    .trk_title i {
+        font-size: 490%;
+    }
+
+    .trk_form {
+        border-radius: var(--border-radius1);
+        gap: 20px;
+        padding: 0;
+        /* background-color: color-mix(in srgb, var(--color11) 60%, var(--color-sec) 80%); */
+        /* background: linear-gradient( var(--color-sec) , var(--color11) ); */
+        background: var(--color-sec) ;
+    }
+
+
+    .trk_form .form_field {
+        width: 250px ;
+        border-radius: 5px;
+        border: 0;
+        text-decoration-line: none;
+        padding-block: 7px;
+        padding-inline: 10px;
+    }
+
+    .form_field:focus {
+        text-decoration-line: none;
+    }
+
+    .trk_form .button {
+        border-radius: 40px;
+        padding: 10px;
+        height: 40px;
+        width:  40px;
+        background-color: var(--color4);
+        color: white;
+    }
+
+</style>
+{% endblock %}
+
+
+{% block contenido %}
+
+<div class="block_tracking">
+    <div class="trk_title">
+        <i class="fa-solid fa-map"></i>
+        <p> Dale seguimiento a tu encomienda aquí</p>
+    </div>
+    <div class="trk_form">
+        <input placeholder="Nro de Tracking" class="form_field" type="text">
+        <select class="form_field" name="" id="">
+            <option value="">2025</option>
+            <option value="">2024</option>
+            <option value="">2023</option>
+            <option value="">2022</option>
+            <option value="">2021</option>
+            <option value="">2020</option>
+            <option value="">2019</option>
+        </select>
+        <button class="button">
+            <i class="fa-solid fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+
+
+
+{% endblock %}
+
+
+
+{% block scripts %}
+
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends "MAESTRA_BASE.html" %}
+
+{% block estilos_html %}
+
+<link rel="stylesheet" href="/static/css/general_styles.css">
+<link rel="shortcut icon" href="/static/img/logo.png">
+{% block estilos %}
+{% endblock %}
+<title>
+    {% block titulo %}
+    {% endblock %}| {{SYSTEM_NAME}}
+</title>
+
+{% endblock %}
+
+
+{% block body_html %}
+
+<header class="general_element">
+    <div class="img_logo">
+        <img src="/static/img/logo.png" alt="">
+    </div>
+
+    <div class="header_options">
+
+        <a href="#" class="h_options">
+            <i class="fa-solid fa-home"></i>
+            <p>Inicio</p>
+        </a>
+        <a href="#" class="h_options">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <p>Seguimiento</p>
+        </a>
+        <a href="#" class="h_options">
+            <i class="fa-solid fa-dollar-sign"></i>
+            <p>Pagar</p>
+        </a>
+        <a href="#" class="h_options">
+            <i class="fa-solid fa-plane"></i>
+            <p>Sucursales</p>
+        </a>
+        <!-- <a href="#" class="h_options">
+            <i class="fa-solid fa-plane"></i>
+            <p>hacer envio</p>
+        </a> -->
+
+    </div>
+
+    <div class="header_user">
+        <i class="fa-solid fa-user"></i>
+    </div>
+</header>
+
+<div class="layout">
+    <aside class="general_element">
+        <div class="a_options">
+            <a class="a_option">
+                <i class="fa-solid fa-truck-fast"></i>
+                <p>Envios</p>
+            </a>
+            <a class="a_option">
+                <i class="fa-solid fa-store"></i>
+                <p>Tienda</p>
+            </a>
+            <a class="a_option">
+                <i class="fa-solid fa-circle-question"></i>
+                <p>Ayuda</p>
+            </a>
+        </div>
+    </aside>
+
+    <section class="general_element">
+        {% block contenido %}
+        {% endblock %}
+    </section>
+</div>
+
+<footer class="general_element">
+    <div class="footer_icons">
+        <a href="#" class="footer_icon"><i class="fa-brands fa-facebook "></i></a>
+        <a href="#" class="footer_icon"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" class="footer_icon"><i class="fa-brands fa-tiktok   "></i></a>
+        <a href="#" class="footer_icon"><i class="fa-brands fa-youtube  "></i></a>
+        <a href="#" class="footer_icon"><i class="fa-brands fa-linkedin "></i></a>
+    </div>
+
+    <div class="footer_info">
+    </div>
+
+    <div class="footer_under">
+        <p>{{SYSTEM_NAME}}</p>
+        <p>Todos los derechos reservados</p>
+    </div>
+
+</footer>
+
+{% endblock %}
+
+
+
+{% block scripts_html %}
+
+<script src="/static/js/common_scripts/bootstrap.bundle.min.js"></script>
+<script src="/static/js/common_scripts/bootstrap.min.js"></script>
+<script src="/static/js/common_scripts/common_script.js"></script>
+
+{% block scripts %}
+{% endblock %}
+
+{% endblock %}

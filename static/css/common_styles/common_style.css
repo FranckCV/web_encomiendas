@@ -1,3 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&family=Raleway:wght@100&display=swap');
+
+:root {
+    /* --color-base: #18076e; */
+    /* --color-base: #8a5105; */
+    /* --color-base: #107444; */
+    --color-base: #1d4c82;
+    --color-sec: #00cee9;
+    /* --color-sec: #f07305; */
+    /* --color-sec: #a20eff; */
+    /* --color-contrast: #fff; */
+    --color-contrast: #ffffff;
+}
+
 :root {
     --color1: color-mix(in srgb, var(--color-base) 100%, var(--color-contrast) 0%);
     --color2: color-mix(in srgb, var(--color-base) 100%, var(--color-contrast) 30%);
@@ -9,18 +23,28 @@
     --color8: color-mix(in srgb, var(--color1) 70%, black 50%);
     --color9: color-mix(in srgb, var(--color1) 7.5%, var(--color-contrast) 100%);
     --color10: color-mix(in srgb, var(--color1) 100%, var(--color-contrast) 100%);
+    --color11: color-mix(in srgb, var(--color4) 100%, var(--color-sec) 100%);
+    --color12: color-mix(in srgb, var(--color-sec) 20%, transparent 80%);
+    --color13: color-mix(in srgb, var(--color1) 40%, var(--color-sec) 30%);
+
+    --color15: color-mix(in srgb, var(--color-base) 50%, var(--color-sec) 100%);
 
     --color-background: color-mix(in srgb, var(--color-contrast) 30%, var(--color-contrast) 100%);
 }
 
+*:not(i) {
+    font-family: Poppins, sans-serif !important;
+    /* font-weight: bold; */
+    transition: 0.15s ease;
+}
 
 header.general_element {
-    grid-area: ge_header;
-    position: sticky;
+    /* grid-area: ge_header; */
+    /* position: sticky; */
     top: 0;
     background-color: var(--color1);
-    height: var(--height-header);
-    display: flex;
+    /* height: var(--height-header); */
+    /* display: flex; */
     z-index: 9999;
 }
 
@@ -56,7 +80,7 @@ section.general_element {
 
 footer.general_element {
     grid-area: ge_footer;
-    height: var(--height-footer);
+    /* height: var(--height-footer); */
     background-color: var(--color4);
 }
 
