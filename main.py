@@ -334,8 +334,6 @@ def inject_globals():
 
     )
 
-
-paginas_simples = [ "index" , 'login' , 'sign_up' , 'dashboard', 'agencias']
 paginas_simples = [ "index" , 'login' , 'sign_up' ]
 
 for pagina in paginas_simples:
