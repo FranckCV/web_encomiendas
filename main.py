@@ -16,6 +16,7 @@ import inspect
 
 app = Flask(__name__, template_folder='templates')
 
+SYSTEM_NAME = 'ENCOMIENDAS_LUCIA'
 
 ###########_ FUNCIONES _#############
 
@@ -30,6 +31,81 @@ def listar_paginas_crud():
             icon_page = config.get("icon_page")
             pages.append([ tabla , titulo , get_icon_page(icon_page) ])
     return pages
+
+
+def listar_admin_pages():
+    menu_keys = list(MENU_ADMIN.keys())
+    pages = []
+    for page in menu_keys:
+        config = MENU_ADMIN.get(page)
+
+        active = config["active"]
+        if active is True:
+            titulo = config["titulo"]
+            icon_page = config.get("icon_page")
+            # pages.append([ tabla , titulo , get_icon_page(icon_page) ])
+    return pages
+
+
+MENU_ADMIN = {
+    'seguridad' : {
+        'name' : 'Seguridad',
+        'active': True ,
+        'icon_page' : '',
+        'dashboard' : False,
+        'cruds' :     [  ],
+        'reports' :   [ 'aa' ],
+    },
+    'logistica' : {
+        'name' : 'Logística',
+        'active': True ,
+        'icon_page' : '',
+        'dashboard' : False,
+        'cruds' :     [  ],
+        'reports' :   [  ],
+    },
+    'encomienda' : {
+        'name' : 'Encomiendas',
+        'active': True ,
+        'icon_page' : '',
+        'dashboard' : False,
+        'cruds' :     [  ],
+        'reports' :   [  ],
+    },
+    'atencion' : {
+        'name' : 'Atención al Cliente',
+        'active': True ,
+        'icon_page' : '',
+        'dashboard' : False,
+        'cruds' :     [  ],
+        'reports' :   [  ],
+    },
+    'administracion' : {
+        'name' : 'Administración',
+        'active': True ,
+        'icon_page' : '',
+        'dashboard' : False,
+        'cruds' :     [ 'tipo_unidad' , 'marca' , 'modelo' , 'unidad' ],
+        'reports' :   [  ],
+    },
+    'ventas' : {
+        'name' : 'Ventas',
+        'active': True ,
+        'icon_page' : '',
+        'dashboard' : False,
+        'cruds' :     [  ],
+        'reports' :   [  ],
+    },
+    'personal' : {
+        'name' : 'Personal',   
+        'active': True ,
+        'icon_page' : '',
+        'dashboard' : False,
+        'cruds' :     [  ],
+        'reports' :   [  ],
+    },
+}
+
 
 
 def get_options_active():
@@ -80,7 +156,6 @@ ERRORES = {
 }
 
 
-
 CONTROLADORES = {
     "tipo_unidad": {
         "active" : True ,
@@ -88,7 +163,7 @@ CONTROLADORES = {
         "nombre_tabla": "tipo de unidad",
         "controlador": controlador_tipo_unidad,
         "main_column": 'nombre',
-        "icon_page": 'fa-solid fa-truck-moving',
+        "icon_page": 'fa-solid fa-truck-plane',
         "filters": [
             ['activo', f'{TITLE_STATE}', get_options_active() ],
         ] ,
@@ -120,6 +195,7 @@ CONTROLADORES = {
         "nombre_tabla": "marca",
         "controlador": controlador_marca,
         "main_column": 'nombre',
+        "icon_page": 'fa-solid fa-car-side',
         "filters": [] ,
         "fields_form": [
 #            ID/NAME   LABEL     PLACEHOLDER  TYPE     REQUIRED   ABLE/DISABLE   DATOS
@@ -142,6 +218,7 @@ CONTROLADORES = {
         "nombre_tabla": "modelo",
         "controlador": controlador_modelo,
         "main_column": 'nom_mod',
+        "icon_page": 'fa-solid fa-cogs',
         "filters": [] ,
         "fields_form": [
 #            ID/NAME            LABEL               PLACEHOLDER         TYPE        REQUIRED   ABLE/DISABLE   DATOS
@@ -166,6 +243,7 @@ CONTROLADORES = {
         "nombre_tabla": "unidad",
         "controlador": controlador_unidad,
         "main_column": 'placa',
+        "icon_page": 'fa-solid fa-truck-fast',
         "filters": [
             ['activo', f'{TITLE_STATE}', get_options_active() ],
             ['modeloid', 'Modelo', controlador_modelo.get_options() ],
@@ -236,7 +314,10 @@ def inject_globals():
         selected_option_crud = selected_option_crud ,
         cookie_error = cookie_error,
 
+        ICON_PAGE_CRUD = ICON_PAGE_CRUD,
+        MENU_ADMIN = MENU_ADMIN,
         HABILITAR_ICON_PAGES = HABILITAR_ICON_PAGES,
+        SYSTEM_NAME = SYSTEM_NAME,
         STATE_0 = STATE_0,   
         STATE_1 = STATE_1,
         ACT_STATE_0 = ACT_STATE_0,
@@ -255,6 +336,7 @@ def inject_globals():
 
 
 paginas_simples = [ "index" , 'login' , 'sign_up' , 'dashboard', 'agencias']
+paginas_simples = [ "index" , 'login' , 'sign_up' ]
 
 for pagina in paginas_simples:
     app.add_url_rule(
@@ -266,7 +348,7 @@ for pagina in paginas_simples:
 
 @app.route("/")
 def main_page():
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('index'))
 
 
 ##################_ CRUD PAGE _################## 
@@ -315,6 +397,8 @@ def crud_generico(tabla):
     crud_update = CRUD_FORMS.get("crud_update")
     crud_delete = CRUD_FORMS.get("crud_delete")
     crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo
+
+    # print(bd.show_columns(tabla))
 
     return render_template(
         "listado.html" ,
@@ -444,6 +528,71 @@ def crud_unactive(tabla):
         controlador.unactive_row( request.form.get(primary_key) )
 
     return redirect(url_for('crud_generico', tabla = tabla))
+
+
+@app.route("/dashboard=<modulo>")
+def dashboard(modulo):
+    return render_template('dashboard.html')
+    # return f'Aca hay un dashboard del modulo de {modulo}'
+
+
+@app.route("/reporte=<modulo>")
+def reporte(modulo):
+    return f'Aca hay un reporte del modulo de {modulo}'
+
+
+@app.route("/panel")
+def panel():
+
+    return render_template('panel.html')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@app.route("/colores")
+def colores():
+    html = '''
+    <link rel="stylesheet" href="../static/css/common_styles/common_style.css" />
+    <style>
+        body {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0;
+            gap: 0;
+            align-content: flex-start;
+        }
+        .color_block {
+            border: 1px solid black;
+            display: flex;
+            flex-direction: column;
+            height: 100px;
+            width:  9.85vw;
+            font-size: 15px;
+        }
+    </style>    
+'''
+
+    for color in range(30):
+        text = f'--color{color}'
+        html += f'''
+        <div class="color_block">
+        <p>{text}</p> 
+        <div style="height: 100%; width: 100%; background-color: var({text})"></div>
+        </div>
+    '''
+    return html
 
 
 

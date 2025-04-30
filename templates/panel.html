@@ -1,0 +1,84 @@
+{% extends "MAESTRA_ADMIN.html" %}
+
+
+{% block titulo %}
+Panel Administrativo
+{% endblock %}
+
+
+{% block estilos %}
+
+<style>
+    .section_content {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: repeat(3, 1fr);
+
+    }
+
+    .panel_cell {
+        border: 1px solid black;
+        border-radius: 10px;
+        box-shadow: 0px 0px 3px #0000008f;
+        height: 100%;
+    }
+
+    .panel_cell * {
+        display: flex;
+    }
+
+</style>
+
+{% endblock %}
+
+
+
+
+
+
+{% block contenido %}
+
+{% for menu in MENU_ADMIN %}
+<div class="panel_cell">
+    {% set config = MENU_ADMIN[menu] %}
+    <p>
+        <i class="{{config['icon_page']}}"></i>
+    <div>{{config['name']}}</div>
+    </p>
+    <div>
+        <div>
+            CRUDS
+        </div>
+        <div>
+            {% for page in config['cruds'] %}
+            <a href="" class="{{url_for('crud_generico' , tabla = page)}}">
+                {{page}}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    <div>
+        <div>
+            Reportes
+        </div>
+        <div>
+            {% for page in config['reports'] %}
+            <a href="" class="{{url_for('crud_generico' , tabla = page)}}">
+                {{page}}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}
+
+
+
+
+
+{% block scripts %}
+
+
+{% endblock %}

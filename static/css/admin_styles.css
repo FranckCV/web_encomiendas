@@ -13,7 +13,7 @@
 
     --table-size-space: 3px;
 
-    --color-bg-admin: color-mix(in srgb , var(--color4) 100% , #000000 0%) ;
+    --color-bg-admin: color-mix(in srgb, var(--color4) 100%, #000000 0%);
 
     --color-consult: color-mix(in srgb, var(--color5) 100%, var(--color-contrast) 15%);
     --color-insert: color-mix(in srgb, var(--color5) 50%, #0cc84e 100%);
@@ -31,11 +31,11 @@ body {
     font-family: Poppins, sans-serif;
     display: grid;
     grid-template-columns: var(--width-aside) auto;
-    grid-template-rows: var(--height-header) auto var(--height-footer) ;
-    grid-template-areas: 
-                        "ge_aside ge_header"
-                        "ge_aside ge_section"
-                        "ge_footer ge_footer"
+    grid-template-rows: var(--height-header) auto var(--height-footer);
+    grid-template-areas:
+        "ge_aside ge_header"
+        "ge_aside ge_section"
+        "ge_footer ge_footer"
     ;
     height: 100vh;
     background-color: var(--color-background);
@@ -43,7 +43,6 @@ body {
 
 
 .logo_admin {
-    /* height: auto; */
     width: 50%;
 }
 
@@ -60,30 +59,30 @@ aside.general_element {
     padding: 15px;
     background-color: var(--color-bg-admin);
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
     top: 0;
     align-items: center;
+    font-size: 70%;
 }
 
-aside hr {
-    color: white;
+.aside_line {
+    min-height: 1px;
     width: 100%;
+    /* background: linear-gradient(to right, white, transparent); */
+    background: radial-gradient(white 1%, transparent 100%);
 }
 
 aside a {
     transition: 0.1s ease;
-    /* background-color: color-mix(in srgb, var(--color1) 100%, black 45%); */
     border-radius: var(--border-radius-size);
     padding-inline: 10px;
     padding-block: 5px;
     justify-items: center;
-    /* font-weight: bold; */
     color: var(--color-contrast);
     font-size: 115%;
     width: 100%;
-    /* display: flex; */
     display: grid;
-    grid-template-columns: 13.5% auto ;
+    grid-template-columns: 13.5% auto;
     justify-items: flex-start;
     align-items: center;
 }
@@ -91,6 +90,7 @@ aside a {
 aside a:hover {
     scale: 1.05;
     color: var(--color-sec);
+    filter: saturate(190%);
 }
 
 aside a i {
@@ -98,21 +98,30 @@ aside a i {
     justify-self: center;
 }
 
+/* aside.general_element:hover::-webkit-scrollbar {
+    display: block;
+    width: 10em;
+} */
 
 .crud_page {
     font-size: 105%;
     padding-inline: 15px;
     padding-block: 5px;
+    width: 90%;
+    /* justify-self: flex-end; */
+    align-self: flex-end;
     font-weight: normal;
     display: grid;
-    grid-template-columns: 13.5% auto ;
+    grid-template-columns: 13.5% auto;
     gap: 7px;
     /* margin-inline: 10px; */
     /* background-color: #ffffff;
     color: var(--color1); */
-    background-color: #ffffff1f;
+    background-color: #ffffff1a;
     color: white;
     border: 1px solid rgba(255, 255, 255, 0.381);
+    /* margin-inline: auto; */
+    /* margin-left: 30px; */
 }
 
 .crud_page p {
@@ -148,9 +157,10 @@ section {
     font-size: 75% !important;
     /* background-color: color-mix(in srgb, var(--color1) 80%, #fff 60% ); */
     background-color: var(--color-bg-admin);
-    padding-right: 15px;
-    padding-block: 15px;
     padding: 0;
+    padding-right: 10px;
+    padding-block: 10px;
+    /* padding: 0; */
 
 }
 
@@ -165,7 +175,8 @@ section {
     padding-block: 25px;
     padding-inline: 25px;
     background-color: var(--color-contrast);
-    border-radius: var(--border-radius-size);
+    /* border-radius: var(--border-radius-size); */
+    border-radius: 15px;
 }
 
 .block_crud {
@@ -249,7 +260,7 @@ i {
     overflow-y: scroll;
     /* height: 52.5vh; */
     max-height: 52.5vh;
-    width: calc( 100vw - var(--width-aside) - 4vw );
+    width: calc(100vw - var(--width-aside) - 4vw);
     /* width: 100%; */
     /* width: 1000px; */
     position: relative;

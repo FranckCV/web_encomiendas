@@ -8,7 +8,7 @@
 {% endblock %}
 <title>
     {% block titulo %}
-    {% endblock %}| xd
+    {% endblock %}| {{SYSTEM_NAME}}
 </title>
 
 {% endblock %}
@@ -23,19 +23,47 @@
 <aside class="general_element" id="menu_aside" class="">
     <img src="/static/img/logo.png" class="logo_admin">
 
-    <a href="{{ url_for('dashboard') }}">
+    <a href="{{url_for('panel')}}">
         <i class="ri-dashboard-line"></i>
-        <p>Dashboard</p>
+        <p>Panel</p>
     </a>
-    <hr>
-    {% for page in lista_paginas_crud %}
+
+    {% for modulo in MENU_ADMIN %}
+    <div class="aside_line"></div>
+    {% set config = MENU_ADMIN[modulo] %}
+    <a href="">
+        <i class="{{ ICON_PAGE_CRUD }}"></i>
+        <p>{{ config['name']  }}</p>
+    </a>
+        {% if config['dashboard'] %}
+        <a class="crud_page" href="{{url_for('dashboard',modulo = modulo )}}">
+            <i class="{{ ICON_PAGE_CRUD }}"></i>
+            <p>Dashboard</p>
+        </a>
+        {% endif %}
+        {% for page in config['cruds'] %}
+        <a class="crud_page" href="{{url_for('crud_generico',tabla = page )}}">
+            <i class="{{ ICON_PAGE_CRUD }}"></i>
+            <p>{{NOMBRE_CRUD_PAGE}} {{ page }}</p>
+        </a>
+        {% endfor %}
+        {% for page in config['reports'] %}
+        <a class="crud_page" href="{{url_for('reporte', modulo = modulo )}}">
+            <i class="{{ ICON_PAGE_CRUD }}"></i>
+            <p>{{a}} {{ page }}</p>
+        </a>
+        {% endfor %}
+    <!-- <p>{{ config }}</p> -->
+        
+    {% endfor %}
+    <!-- {% for page in lista_paginas_crud %}
     <a class="crud_page" href="{{url_for('crud_generico',tabla = page[0])}}">
         {% if HABILITAR_ICON_PAGES %}
         <i class="{{page[2]}}"></i>
         {% endif %}
         <p>{{NOMBRE_CRUD_PAGE}} {{page[1]}}</p>
     </a>
-    {% endfor %}
+    {% endfor %} -->
 </aside>
 
 <section class="general_element">

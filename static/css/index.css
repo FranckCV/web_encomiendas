@@ -1,0 +1,142 @@
+.section_tracking {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    /* padding-block: 10px; */
+    /* padding-inline: 20px; */
+    height: 115vh;
+    background-color: color-mix(in srgb, var(--color-base) 60%, var(--color-sec) 20%);
+    background-image: url(/static/img/bg_index.png);
+    background-position: center;
+    background-size: cover;
+    background-blend-mode: luminosity;
+    gap: 10px;
+}
+
+.track_content {
+    backdrop-filter: blur(3px);
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+}
+
+.section_tracking h3 {
+    color: white;
+    font-weight: bold;
+    text-shadow: 0px 0px 7px color-mix(in srgb,  var(--color11) 60%, black 80%);
+}
+
+.block_tracking {
+    display: grid;
+    grid-template-columns: auto auto;
+    background-color: var(--color4);
+    color: white;
+    border-radius: var(--border-radius1);
+    width: fit-content;
+}
+
+.block_tracking>* {
+    display: flex;
+    gap: 10px;
+    padding: 15px;
+    align-items: center;
+    justify-content: center;
+}
+
+.trk_head {
+    grid-column: 1 / -1;
+}
+
+.trk_title {
+    flex-direction: column;
+    justify-items: center;
+    text-align: center;
+    padding-block: 20px;
+    padding-inline: 20px;
+    padding-left: 60px;
+    font-size: 120%;
+}
+
+.trk_title i {
+    font-size: 200%;
+}
+
+.trk_form {
+    border-radius: var(--border-radius1);
+    gap: 20px;
+    padding-inline: 40px;
+    width: fit-content;
+    /* background-color: color-mix(in srgb, var(--color11) 60%, var(--color-sec) 80%); */
+    /* background: linear-gradient( var(--color-sec) , var(--color11) ); */
+    background: var(--color-sec);
+}
+
+
+.trk_form .form_field {
+    width: 250px;
+    /* border-radius: 5px; */
+    border-radius: 100px;
+    border: 0;
+    text-decoration-line: none;
+    padding-block: 12px;
+    padding-inline: 15px;
+}
+
+.form_field:focus {
+    text-decoration-line: none;
+}
+
+.trk_form .button {
+    border-radius: 40px;
+    padding: 10px;
+    height: 40px;
+    width: 40px;
+    background-color: var(--color4);
+    color: white;
+}
+
+.section_cotizacion {
+    width: 100%;
+
+}
+
+.section_cotizacion form  {
+    padding: 20px;
+    /* gap: 20px; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.section_cotizacion h5 {
+    margin-bottom: 10px;
+}
+
+.cotizacion_forms {
+    display: grid;
+    grid-template-columns: repeat(3, 25%) ;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.cotizacion_forms * {
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.cotizacion_forms *:not(select) {
+    height: auto;
+}
+
+
+
