@@ -12,12 +12,12 @@ Panel Administrativo
     .section_content {
         display: grid;
         gap: 20px;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
 
     }
 
     .panel_cell {
-        border: 1px solid black;
+        /* border: 1px solid black; */
         border-radius: 10px;
         box-shadow: 0px 0px 3px #0000008f;
         height: 100%;
@@ -26,31 +26,27 @@ Panel Administrativo
     .panel_cell * {
         display: flex;
     }
-
 </style>
 
 {% endblock %}
 
 
 
-
-
-
 {% block contenido %}
 
-{% for menu in MENU_ADMIN %}
+{% for modulo in listar_pages_admin %}
 <div class="panel_cell">
-    {% set config = MENU_ADMIN[menu] %}
-    <p>
-        <i class="{{config['icon_page']}}"></i>
-    <div>{{config['name']}}</div>
-    </p>
+    <!-- {% set config = MENU_ADMIN[menu] %} -->
+    <div class="title_cell">
+        <i class="{{ modulo[1] }}"></i>
+        <div>{{ modulo[0] }}</div>
+    </div>
     <div>
         <div>
             CRUDS
         </div>
         <div>
-            {% for page in config['cruds'] %}
+            {% for page in modulo[3] %}
             <a href="" class="{{url_for('crud_generico' , tabla = page)}}">
                 {{page}}
             </a>
@@ -62,7 +58,7 @@ Panel Administrativo
             Reportes
         </div>
         <div>
-            {% for page in config['reports'] %}
+            {% for page in modulo[4] %}
             <a href="" class="{{url_for('crud_generico' , tabla = page)}}">
                 {{page}}
             </a>

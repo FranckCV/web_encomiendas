@@ -65,7 +65,8 @@ aside.general_element {
     font-size: 70%;
 }
 
-.aside_line {
+.line_separator {
+    height: 1px;
     min-height: 1px;
     width: 100%;
     /* background: linear-gradient(to right, white, transparent); */
@@ -260,7 +261,7 @@ i {
     overflow-y: scroll;
     /* height: 52.5vh; */
     max-height: 52.5vh;
-    width: calc(100vw - var(--width-aside) - 4vw);
+    width: calc(100vw - var(--width-aside) - 4.5vw);
     /* width: 100%; */
     /* width: 1000px; */
     position: relative;

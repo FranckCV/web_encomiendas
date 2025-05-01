@@ -35,77 +35,37 @@ def listar_paginas_crud():
 
 def listar_admin_pages():
     menu_keys = list(MENU_ADMIN.keys())
-    pages = []
-    for page in menu_keys:
-        config = MENU_ADMIN.get(page)
-
+    # print(menu_keys)
+    modules = []
+    for module in menu_keys:
+        pages_crud = []
+        pages_report = []
+        config = MENU_ADMIN.get(module)
         active = config["active"]
         if active is True:
-            titulo = config["titulo"]
-            icon_page = config.get("icon_page")
-            # pages.append([ tabla , titulo , get_icon_page(icon_page) ])
-    return pages
-
-
-MENU_ADMIN = {
-    'seguridad' : {
-        'name' : 'Seguridad',
-        'active': True ,
-        'icon_page' : '',
-        'dashboard' : False,
-        'cruds' :     [  ],
-        'reports' :   [ 'aa' ],
-    },
-    'logistica' : {
-        'name' : 'Logística',
-        'active': True ,
-        'icon_page' : '',
-        'dashboard' : False,
-        'cruds' :     [  ],
-        'reports' :   [  ],
-    },
-    'encomienda' : {
-        'name' : 'Encomiendas',
-        'active': True ,
-        'icon_page' : '',
-        'dashboard' : False,
-        'cruds' :     [  ],
-        'reports' :   [  ],
-    },
-    'atencion' : {
-        'name' : 'Atención al Cliente',
-        'active': True ,
-        'icon_page' : '',
-        'dashboard' : False,
-        'cruds' :     [  ],
-        'reports' :   [  ],
-    },
-    'administracion' : {
-        'name' : 'Administración',
-        'active': True ,
-        'icon_page' : '',
-        'dashboard' : False,
-        'cruds' :     [ 'tipo_unidad' , 'marca' , 'modelo' , 'unidad' ],
-        'reports' :   [  ],
-    },
-    'ventas' : {
-        'name' : 'Ventas',
-        'active': True ,
-        'icon_page' : '',
-        'dashboard' : False,
-        'cruds' :     [  ],
-        'reports' :   [  ],
-    },
-    'personal' : {
-        'name' : 'Personal',   
-        'active': True ,
-        'icon_page' : '',
-        'dashboard' : False,
-        'cruds' :     [  ],
-        'reports' :   [  ],
-    },
-}
-
+            name = config.get("name")
+            icon_module = get_icon_page(config.get("icon_page"))
+            dashboard = config.get("dashboard")
+            cruds = config.get("cruds")
+            reports = config.get("reports")
+            
+            if cruds != [] and cruds is not None:
+                for page in cruds:
+                    config_page = CONTROLADORES.get(page)
+                    if config_page:
+                        p_active = config_page.get('active')
+                        if p_active is True:
+                            p_titulo = config_page.get('titulo')
+                            p_icon_page = get_icon_page(config_page.get('icon_page'))
+                            pages_crud.append([ page , p_titulo , p_icon_page ])
+            
+            if reports != [] and reports is not None:
+                for page in reports:
+                    if page is not None or page != '' :
+                        pages_report.append( page )
+            
+            modules.append([ name , icon_module , dashboard , pages_crud , pages_report])
+    return modules
 
 
 def get_options_active():
@@ -270,6 +230,67 @@ CONTROLADORES = {
     },
 }
 
+
+MENU_ADMIN = {
+    'encomienda' : {
+        'name' : 'Encomiendas',
+        'active': True ,
+        'icon_page' : '',
+        'dashboard' : False,
+        'cruds' :     [  ],
+        'reports' :   [  ],
+    },
+    'administracion' : {
+        'name' : 'Administración',
+        'active': True ,
+        'icon_page' : '',
+        'dashboard' : False,
+        'cruds' :     [ 'tipo_unidad' , 'marca' , 'modelo' , 'unidad' ],
+        # 'reports' :   [ '' ],
+    },
+    'logistica' : {
+        'name' : 'Logística',
+        'active': True ,
+        'icon_page' : '',
+        'dashboard' : False,
+        'cruds' :     [  ],
+        'reports' :   [  ],
+    },
+    'ventas' : {
+        'name' : 'Ventas',
+        'active': True ,
+        'icon_page' : '',
+        'dashboard' : False,
+        'cruds' :     [  ],
+        'reports' :   [  ],
+    },
+    'personal' : {
+        'name' : 'Personal',   
+        'active': True ,
+        'icon_page' : '',
+        'dashboard' : False,
+        'cruds' :     [  ],
+        'reports' :   [  ],
+    },
+    'seguridad' : {
+        'name' : 'Seguridad',
+        'active': True ,
+        'icon_page' : '',
+        'dashboard' : False,
+        'cruds' :     [  ],
+        # 'reports' :   [ '' ],
+    },
+    'atencion' : {
+        'name' : 'Atención al Cliente',
+        'active': True ,
+        'icon_page' : '',
+        'dashboard' : False,
+        'cruds' :     [  ],
+        'reports' :   [  ],
+    },
+}
+
+
 ###########_ REDIRECT _#############
 
 def redirect_url(url):
@@ -300,6 +321,7 @@ def validar_error_crud():
 @app.context_processor
 def inject_globals():
     lista_paginas_crud = listar_paginas_crud()
+    listar_pages_admin = listar_admin_pages()
     options_pagination_crud , selected_option_crud = get_options_pagination_crud()
     cookie_error = request.cookies.get('error')
     info_variables_crud = False
@@ -310,6 +332,7 @@ def inject_globals():
     return dict(
         info_variables_crud = info_variables_crud,
         lista_paginas_crud = lista_paginas_crud ,
+        listar_pages_admin = listar_pages_admin,
         options_pagination_crud = options_pagination_crud ,
         selected_option_crud = selected_option_crud ,
         cookie_error = cookie_error,
