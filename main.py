@@ -285,14 +285,12 @@ MENU_ADMIN = {
 
 ###########_ REDIRECT _#############
 
-<<<<<<< HEAD
 @app.route("/")
 def main_page():
     return redirect(url_for('index'))
-=======
+
 def redirect_url(url):
     return redirect(url_for(url))
->>>>>>> 5a14225c0c89236d9a65f78d41c5ac75dc64a048
 
 
 def redirect_crud(tabla):
