@@ -364,9 +364,6 @@ for pagina in paginas_simples:
     )
 
 
-@app.route("/")
-def main_page():
-    return redirect(url_for('index'))
 
 
 ##################_ CRUD PAGE _################## 
