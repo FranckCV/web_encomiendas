@@ -5,10 +5,11 @@ from controladores import controlador_marca as controlador_marca
 from controladores import controlador_unidad as controlador_unidad
 from controladores import controlador_tipo_unidad as controlador_tipo_unidad
 from controladores import controlador_modelo as controlador_modelo
-from configuraciones import NOMBRE_BTN_UPDATE , NOMBRE_BTN_UNACTIVE , ACT_STATE_0 , ACT_STATE_1 , FUNCIONES_CRUD , NOMBRE_BTN_CONSULT , NOMBRE_BTN_DELETE , NOMBRE_BTN_INSERT , NOMBRE_BTN_LIST , NOMBRE_BTN_SEARCH , NOMBRE_CRUD_PAGE , NOMBRE_OPTIONS_COL , STATE_0 , STATE_1 , TITLE_STATE , ICON_PAGE_CRUD
+from configuraciones import NOMBRE_BTN_UPDATE , NOMBRE_BTN_UNACTIVE , ACT_STATE_0 , ACT_STATE_1 , FUNCIONES_CRUD , NOMBRE_BTN_CONSULT , NOMBRE_BTN_DELETE , NOMBRE_BTN_INSERT , NOMBRE_BTN_LIST , NOMBRE_BTN_SEARCH , NOMBRE_CRUD_PAGE , NOMBRE_OPTIONS_COL , STATE_0 , STATE_1 , TITLE_STATE, ICON_PAGE_CRUD
+from functools import wraps
+import inspect
 # from flask_jwt import JWT, jwt_required, current_identity
 # import uuid
-# from functools import wraps
 # import hashlib
 # import base64
 # from datetime import datetime, date
@@ -281,12 +282,39 @@ MENU_ADMIN = {
     },
 }
 
+
 ###########_ REDIRECT _#############
 
+<<<<<<< HEAD
 @app.route("/")
 def main_page():
     return redirect(url_for('index'))
+=======
+def redirect_url(url):
+    return redirect(url_for(url))
+>>>>>>> 5a14225c0c89236d9a65f78d41c5ac75dc64a048
 
+
+def redirect_crud(tabla):
+    return redirect(url_for('crud_generico', tabla = tabla))
+
+
+###########_ DECORADORES _#############
+
+def validar_error_crud():
+    def decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            try:
+                return f(*args, **kwargs)
+            except Exception as e:
+                tabla = kwargs.get('tabla') or args[0] 
+                return rdrct_error(redirect_crud(tabla) , e) 
+        return wrapper
+    return decorator
+
+
+###########_ PAGES _#############
 
 @app.context_processor
 def inject_globals():
@@ -328,7 +356,6 @@ def inject_globals():
     )
 
 
-
 paginas_simples = [ "index" , 'login' , 'sign_up' ]
 
 for pagina in paginas_simples:
@@ -337,6 +364,11 @@ for pagina in paginas_simples:
         pagina,        # Nombre de la función
         lambda p=pagina: render_template(f"{p}.html")  # Renderiza la plantilla
     )
+
+
+@app.route("/")
+def main_page():
+    return redirect(url_for('index'))
 
 
 ##################_ CRUD PAGE _################## 
@@ -354,24 +386,28 @@ def crud_generico(tabla):
     
     value_search = request.args.get("value_search")
 
+    icon_page_crud = get_icon_page(config.get("icon_page"))
     titulo = config["titulo"]
     controlador = config["controlador"]
     nombre_tabla = config["nombre_tabla"]
     main_column = config["main_column"]
     filters = config["filters"]
-    fields_insert = config["fields_insert"]
-    fields_update = config["fields_update"]
-    fields_consult = config["fields_consult"]
-    field_search = config["field_search"]
+    fields_form = config["fields_form"]
+    # fields_insert = config["fields_insert"]
+    # fields_update = config["fields_update"]
+    # fields_consult = config["fields_consult"]
     
-    resultados = controlador.table_fetchall()
+    # resultados = controlador.table_fetchall()
     existe_activo = controlador.exists_Activo()
-    columnas , filas = controlador.get_table(field_search[0] , value_search)
+    columnas , filas = controlador.get_table()
     info_columns = controlador.get_info_columns()
     primary_key = controlador.get_primary_key()
     table_columns  = list(filas[0].keys()) if filas else []
-    # print(filas)
-    # print(table_columns)
+    
+    # firma = inspect.signature(controlador.insert_row)
+
+    # for nombre_parametro, parametro in firma.parameters.items():
+    #     print(nombre_parametro)
 
     CRUD_FORMS = config["crud_forms"]
     crud_list = CRUD_FORMS.get("crud_list")
@@ -382,24 +418,26 @@ def crud_generico(tabla):
     crud_delete = CRUD_FORMS.get("crud_delete")
     crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo
 
+    # print(bd.show_columns(tabla))
+
     return render_template(
         "listado.html" ,
         tabla          = tabla ,
         nombre_tabla   = nombre_tabla ,
+        icon_page_crud = icon_page_crud ,
         titulo         = titulo ,
         filas          = filas ,
         primary_key    = primary_key ,
-        resultados     = resultados,
+        # resultados     = resultados,
         filters        = filters,
-        fields_insert  = fields_insert ,
-        fields_update  = fields_update ,
-        fields_consult = fields_consult ,
-        field_search   = field_search ,
+        fields_form    = fields_form ,
+        # fields_insert  = fields_insert ,
+        # fields_update  = fields_update ,
+        # fields_consult = fields_consult ,
         value_search   = value_search,
         columnas       = columnas ,
         main_column    = main_column,
         key_columns    = list(columnas.keys()) ,
-        # bd_columns     = list(resultados[0].keys()) if resultados else [] ,
         table_columns  = table_columns ,
         info_columns   = info_columns,
         crud_list      = crud_list,
@@ -415,6 +453,7 @@ def crud_generico(tabla):
 ##################_ METHOD POST _################## 
 
 @app.route("/insert_row=<tabla>", methods=["POST"])
+@validar_error_crud()
 def crud_insert(tabla):
     # try:
         config = CONTROLADORES.get(tabla)
@@ -427,17 +466,12 @@ def crud_insert(tabla):
             return "Tabla no soportada", 404
 
         controlador = config["controlador"]
-        fields = config["fields_insert"]
+        firma = inspect.signature(controlador.insert_row)
 
         valores = []
-        for campo in fields:
-            nombre = campo[0] 
-            requerido = campo[4]
-            if nombre != '' :
-                valor = request.form.get(nombre)
-                if requerido and not valor:
-                    return f"Campo {nombre} es obligatorio", 400
-                valores.append(str(valor))
+        for nombre, parametro in firma.parameters.items():
+            valor = request.form.get(nombre)
+            valores.append(valor)
 
         controlador.insert_row( *valores )
 
@@ -446,7 +480,36 @@ def crud_insert(tabla):
     #     return f"No se aceptan carácteres especiales", 400
 
 
+@app.route("/update_row=<tabla>", methods=["POST"])
+@validar_error_crud()
+def crud_update(tabla):
+    # try:
+        config = CONTROLADORES.get(tabla)
+        if not config:
+            return "Tabla no soportada", 404
+
+        active = config["active"]
+
+        if active is False:
+            return "Tabla no soportada", 404
+
+        controlador = config["controlador"]
+        firma = inspect.signature(controlador.update_row)
+
+        valores = []
+        for nombre, parametro in firma.parameters.items():
+            valor = request.form.get(nombre)
+            valores.append(valor)
+
+        controlador.update_row( *valores )
+
+        return redirect(url_for('crud_generico', tabla = tabla))
+    # except Exception as e:
+    #     return f"No se aceptan carácteres especiales", 400
+
+
 @app.route("/delete_row=<tabla>", methods=["POST"])
+@validar_error_crud()
 def crud_delete(tabla):
     config = CONTROLADORES.get(tabla)
     if not config:
@@ -466,6 +529,7 @@ def crud_delete(tabla):
 
 
 @app.route("/unactive_row=<tabla>", methods=["POST"])
+@validar_error_crud()
 def crud_unactive(tabla):
     config = CONTROLADORES.get(tabla)
     if not config:
@@ -484,42 +548,6 @@ def crud_unactive(tabla):
         controlador.unactive_row( request.form.get(primary_key) )
 
     return redirect(url_for('crud_generico', tabla = tabla))
-
-
-@app.route("/update_row=<tabla>", methods=["POST"])
-def crud_update(tabla):
-    # try:
-        config = CONTROLADORES.get(tabla)
-        if not config:
-            return "Tabla no soportada", 404
-
-        active = config["active"]
-
-        if active is False:
-            return "Tabla no soportada", 404
-
-        controlador = config["controlador"]
-        fields = config["fields_update"]
-        primary_key = controlador.get_primary_key()
-
-        valores = []
-        valores.append(request.form.get(primary_key))
-        for campo in fields:
-            nombre = campo[0] 
-            requerido = campo[4]
-            if nombre != '' :
-                valor = request.form.get(nombre)
-                if requerido and not valor:
-                    return f"Campo {nombre} es obligatorio", 400
-                valores.append(valor)
-
-        controlador.update_row( *valores )
-
-        return redirect(url_for('crud_generico', tabla = tabla))
-    # except Exception as e:
-    #     return f"No se aceptan carácteres especiales", 400
-
-
 
 
 @app.route("/dashboard=<modulo>")
@@ -541,6 +569,50 @@ def panel():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+@app.route("/colores")
+def colores():
+    html = '''
+    <link rel="stylesheet" href="../static/css/common_styles/common_style.css" />
+    <style>
+        body {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0;
+            gap: 0;
+            align-content: flex-start;
+        }
+        .color_block {
+            border: 1px solid black;
+            display: flex;
+            flex-direction: column;
+            height: 100px;
+            width:  9.85vw;
+            font-size: 15px;
+        }
+    </style>    
+'''
+
+    for color in range(30):
+        text = f'--color{color}'
+        html += f'''
+        <div class="color_block">
+        <p>{text}</p> 
+        <div style="height: 100%; width: 100%; background-color: var({text})"></div>
+        </div>
+    '''
+    return html
 
 
 
