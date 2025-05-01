@@ -285,7 +285,7 @@ MENU_ADMIN = {
 
 @app.route("/")
 def main_page():
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('index'))
 
 
 @app.context_processor
