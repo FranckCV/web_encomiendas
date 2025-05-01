@@ -15,5 +15,5 @@
   - Seguimiento de encomienda
   - 
 - Perez
-  - 
+  - Visualización de sucursales en mapa
   - 
