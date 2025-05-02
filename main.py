@@ -5,6 +5,8 @@ from controladores import controlador_marca as controlador_marca
 from controladores import controlador_unidad as controlador_unidad
 from controladores import controlador_tipo_unidad as controlador_tipo_unidad
 from controladores import controlador_modelo as controlador_modelo
+from controladores import controlador_ubigeo as controlador_ubigeo
+
 from configuraciones import NOMBRE_BTN_UPDATE , NOMBRE_BTN_UNACTIVE , ACT_STATE_0 , ACT_STATE_1 , FUNCIONES_CRUD , NOMBRE_BTN_CONSULT , NOMBRE_BTN_DELETE , NOMBRE_BTN_INSERT , NOMBRE_BTN_LIST , NOMBRE_BTN_SEARCH , NOMBRE_CRUD_PAGE , NOMBRE_OPTIONS_COL , STATE_0 , STATE_1 , TITLE_STATE, ICON_PAGE_CRUD
 from functools import wraps
 import inspect
@@ -228,6 +230,32 @@ CONTROLADORES = {
             "crud_delete": True ,
             "crud_unactive": True ,
         }
+    },
+    #ESTO ES PARA LO QUE SALE EN EL MODAL
+    "ubigeo" : {
+        "active":True,
+        "titulo":"Ubigeo",
+        "nombre_tabla":"ubigeo",
+        "controlador": controlador_ubigeo,
+        "main_column":"distrito",
+        "icon_page" : "ri-map-pin-line",
+        "filters":[],
+        "fields_form": [
+#            ID/NAME   LABEL     PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
+            ['codigo','Código',     'Código',  'text',   True ,       False ,      None ],
+            ['distrito', 'Distrito', 'Distrito',   'text',  True ,      True ,         None ],
+            ['provincia', 'Provincia', 'Provincia',   'text',  True ,      True ,         None ],
+            ['departamento', 'Departamento', 'Departamento',   'text',  True ,      True ,         None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": False ,
+            "crud_update": False ,
+            "crud_delete": False ,
+            "crud_unactive": False ,
+        }
     }
 }
 
@@ -238,7 +266,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : '',
         'dashboard' : False,
-        'cruds' :     [ 'tipo_unidad' , 'marca' , 'modelo' , 'unidad'],
+        'cruds' :     [ 'tipo_unidad' , 'marca' , 'modelo' , 'unidad','ubigeo'],
         # 'reports' :   [ '' ],
     },
     'logistica' : {

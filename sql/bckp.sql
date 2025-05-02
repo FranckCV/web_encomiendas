@@ -142,7 +142,7 @@ CREATE TABLE `ubigeo` (
 --
 
 INSERT INTO `ubigeo` (`codigo`, `departamento`, `distrito`, `provincia`, `activo`) VALUES
-('', 'LIMA', 'LIMA', 'SANTA MARIA DE HUACHIPA', 1),
+-- ('', 'LIMA', 'LIMA', 'SANTA MARIA DE HUACHIPA', 1),
 ('010101', 'AMAZONAS', 'CHACHAPOYAS', 'CHACHAPOYAS', 1),
 ('010102', 'AMAZONAS', 'CHACHAPOYAS', 'ASUNCION', 1),
 ('010103', 'AMAZONAS', 'CHACHAPOYAS', 'BALSAS', 1),
@@ -2162,3 +2162,12 @@ ALTER TABLE `modelo`
 ALTER TABLE `unidad`
   ADD CONSTRAINT `FKunidad608127` FOREIGN KEY (`modeloid`) REFERENCES `modelo` (`id`);
 COMMIT;
+---TABLA TIPO_RECOJO
+CREATE TABLE tipo_recojo (
+  id     int(11) NOT NULL AUTO_INCREMENT, 
+  nombre varchar(100) NOT NULL, 
+  PRIMARY KEY (id));
+
+  INSERT INTO tipo_recojo (nombre) VALUES ('Recojo en tienda');
+INSERT INTO tipo_recojo (nombre) VALUES ('Envío a domicilio');
+INSERT INTO tipo_recojo (nombre) VALUES ('Con recojo y pago en tienda');
