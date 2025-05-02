@@ -1,63 +1,57 @@
-{% extends "MAESTRA_BASE.html" %}
+{% extends 'MAESTRA_BASE.html' %}
 
 {% block estilos_html %}
+  <link rel="stylesheet" href="/static/css/admin_styles.css" />
+  <link rel="shortcut icon" href="/static/img/logo.png" />
+  {% block estilos %}
 
-<link rel="stylesheet" href="/static/css/admin_styles.css">
-<link rel="shortcut icon" href="/static/img/logo.png">
-{% block estilos %}
-{% endblock %}
-<title>
+  {% endblock %}
+  <title>
     {% block titulo %}
-    {% endblock %}| {{SYSTEM_NAME}}
-</title>
 
+    {% endblock %}| {{ SYSTEM_NAME }}
+  </title>
 {% endblock %}
-
-
 
 {% block body_html %}
+  <header class="general_element"></header>
 
-<header class="general_element">
-</header>
+  <aside class="general_element" id="menu_aside" class="">
+    <img src="/static/img/logo.png" class="logo_admin" />
 
-<aside class="general_element" id="menu_aside" class="">
-    <img src="/static/img/logo.png" class="logo_admin">
-
-    <a href="{{url_for('panel')}}">
-        <i class="ri-dashboard-line"></i>
-        <p>Panel</p>
+    <a href="{{ url_for('panel') }}">
+      <i class="ri-dashboard-line"></i>
+      <p>Panel</p>
     </a>
 
     {% for modulo in listar_pages_admin %}
-    <!-- <div class="line_separator"></div> -->
-    <!-- {% set config = modulo %} -->
-    <a href="">
-        <i class="{{ modulo[1] }}"></i>
-        <p>{{ modulo[0] }}</p>
-    </a>
-        {% if modulo[2] %}
-        <a class="crud_page" href="{{url_for('dashboard',modulo = modulo )}}">
-            <i class="{{ ICON_PAGE_CRUD }}"></i>
-            <p>Dashboard</p>
+      <!-- <div class="line_separator"></div> -->
+      <!-- {% set config = modulo %} -->
+      <a href="">
+        <i class="{{ modulo.1 }}"></i>
+        <p>{{ modulo.0 }}</p>
+      </a>
+      {% if modulo.2 %}
+        <a class="crud_page" href="{{ url_for('dashboard', modulo=modulo) }}">
+          <i class="{{ ICON_PAGE_CRUD }}"></i>
+          <p>Dashboard</p>
         </a>
-        {% endif %}
-        {% for page in modulo[3] %}
-        <a class="crud_page" href="{{url_for('crud_generico',tabla = page[0] )}}">
-            <i class="{{ page[2] }}"></i>
-            <p>{{NOMBRE_CRUD_PAGE}} {{ page[1] }}</p>
+      {% endif %}
+      {% for page in modulo.3 %}
+        <a class="crud_page" href="{{ url_for('crud_generico', tabla=page.0) }}">
+          <i class="{{ page.2 }}"></i>
+          <p>{{ NOMBRE_CRUD_PAGE }} {{ page.1 }}</p>
         </a>
-        {% endfor %}
-        {% for page in modulo[4] %}
-        <a class="crud_page" href="{{url_for('reporte', modulo = page[0] )}}">
-            <i class="{{ page[2] }}"></i>
-            <p>Reporte de {{ page[1] }}</p>
+      {% endfor %}
+      {% for page in modulo.4 %}
+        <a class="crud_page" href="{{ url_for('reporte', modulo=page.0) }}">
+          <i class="{{ page.2 }}"></i>
+          <p>Reporte de {{ page.1 }}</p>
         </a>
-        {% endfor %}
-        
+      {% endfor %}
     {% endfor %}
 
-
-    <!-- {% for modulo in MENU_ADMIN %}
+    <!--  {% for modulo in MENU_ADMIN %}
     <div class="line_separator"></div>
     {% set config = MENU_ADMIN[modulo] %}
     <a href="">
@@ -83,47 +77,44 @@
         </a>
         {% endfor %}
         
-    {% endfor %} -->
-    <!-- {% for page in lista_paginas_crud %}
+    {% endfor %}  -->
+    <!--  {% for page in lista_paginas_crud %}
     <a class="crud_page" href="{{url_for('crud_generico',tabla = page[0])}}">
         {% if HABILITAR_ICON_PAGES %}
         <i class="{{page[2]}}"></i>
         {% endif %}
         <p>{{NOMBRE_CRUD_PAGE}} {{page[1]}}</p>
     </a>
-    {% endfor %} -->
-</aside>
+    {% endfor %}  -->
+  </aside>
 
-<section class="general_element">
+  <section class="general_element">
     <div class="section_content">
-        {% block contenido %}
-        {% endblock %}
+      {% block contenido %}
+
+      {% endblock %}
     </div>
-</section>
+  </section>
 
-<footer class="general_element">
-</footer>
-
+  <footer class="general_element"></footer>
 {% endblock %}
-
-
 
 {% block scripts_html %}
-<script>
+  <script>
     // MENU OPTION
-    const menuButton = document.querySelector("#menu_button");
-    const aside = document.querySelector("#menu_aside");
+    const menuButton = document.querySelector('#menu_button')
+    const aside = document.querySelector('#menu_aside')
     function toggleMenu() {
-        aside.classList.toggle("desplegar");
+      aside.classList.toggle('desplegar')
     }
-
+    
     if (menuButton && aside) {
-        menuButton.addEventListener("click", () => {
-            aside.classList.toggle("desplegar");
-        });
+      menuButton.addEventListener('click', () => {
+        aside.classList.toggle('desplegar')
+      })
     }
-</script>
-{% block scripts %}
-{% endblock %}
+  </script>
+  {% block scripts %}
 
+  {% endblock %}
 {% endblock %}

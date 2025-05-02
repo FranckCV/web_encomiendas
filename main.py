@@ -21,7 +21,7 @@ SYSTEM_NAME = 'ENCOMIENDAS_LUCIA'
 ###########_ FUNCIONES _#############
 
 def listar_paginas_crud():
-    table_names = list(CONTROLADORES.keys())
+    table_names = list(CONTROLADORES.keys()) #obtiene todas las claves de ese diccionario
     pages = []
     for tabla in table_names:
         config = CONTROLADORES.get(tabla)
@@ -68,6 +68,7 @@ def listar_admin_pages():
     return modules
 
 
+#Opciones para activar o desacticar
 def get_options_active():
     lista = [
         [ 0 , STATE_0 ],
@@ -75,13 +76,13 @@ def get_options_active():
     ]
     return lista
 
-
+#Opciones de paginación 
 def get_options_pagination_crud():
     lista = [ 5 , 10 , 15 , 20 , 25  ]
     selected_option_crud = 20
     return lista , selected_option_crud
 
-
+#Manejo de errores
 def rdrct_error(resp_redirect , e):
     resp = make_response(resp_redirect)
     error_message = str(e)
@@ -96,7 +97,7 @@ def rdrct_error(resp_redirect , e):
     resp.set_cookie('error', msg , max_age=30)
     return resp 
 
-
+#Obtiene el ícono, si no hay, retorna uno por defecto
 def get_icon_page(icon):
     if not icon or icon == '':
         return ICON_PAGE_CRUD 
@@ -227,7 +228,7 @@ CONTROLADORES = {
             "crud_delete": True ,
             "crud_unactive": True ,
         }
-    },
+    }
 }
 
 
@@ -237,7 +238,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : '',
         'dashboard' : False,
-        'cruds' :     [ 'tipo_unidad' , 'marca' , 'modelo' , 'unidad' ],
+        'cruds' :     [ 'tipo_unidad' , 'marca' , 'modelo' , 'unidad'],
         # 'reports' :   [ '' ],
     },
     'logistica' : {
@@ -544,7 +545,7 @@ def crud_unactive(tabla):
 
     return redirect(url_for('crud_generico', tabla = tabla))
 
-
+########################################################################
 @app.route("/dashboard=<modulo>")
 def dashboard(modulo):
     return render_template('dashboard.html')
