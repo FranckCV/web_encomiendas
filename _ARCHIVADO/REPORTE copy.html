@@ -8,9 +8,10 @@ Dashboard
 
 {% block estilos %}
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+
 <style>
-    .db_1 {
+    /* .db_1 {
         grid-area: db_1;
     }
 
@@ -45,10 +46,7 @@ Dashboard
     .section_content {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
-        /* grid-template-rows: 0.75fr 0.5fr 0.5fr 0.5fr; */
         grid-template-rows: 1fr 1fr 2fr 1fr;
-        /* grid-template-rows: 1fr 1.5fr 0.75fr; */
-        /* grid-template-rows: repeat(3, minmax(300px, 1fr)); */
         grid-template-areas:
             'db_3 db_7 db_4'
             'db_1 db_1 db_8'
@@ -58,7 +56,6 @@ Dashboard
         background-color: #f1f1f1;
         gap: 10px;
         padding: 15px;
-        /* height: 100%; */
         width: 100%;
         max-height: 100vh;
     }
@@ -88,10 +85,6 @@ Dashboard
         font-size: 10px !important;
         height: 100%;
         min-height: auto !important;
-        /* height: 80px !important; */
-        /* min-height: fit-content !important; */
-        /* max-height: 100%; */
-        /* display: flex; */
     }
 
     .title_db_card {
@@ -116,6 +109,11 @@ Dashboard
 
     .db_cnt_3 {
         color: var(--color11);
+    } */
+
+    #reporte-container {
+        height: 70vh;
+        width:  75%;
     }
 
 </style>
@@ -124,47 +122,87 @@ Dashboard
 
 {% block contenido %}
 
-<div class="db_card db_3">
-    <h3 class="title_db_card">Sucursales activas</h3>
-    <div class="db_counter db_cnt_1">6565</div>
-</div>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
-<div class="db_card db_7">
-    <h3 class="title_db_card">Clientes registrados</h3>
-    <div class="db_counter db_cnt_2">5656</div>
-</div>
+<div id="reporte-container">
+    {% for key, config in REPORTES.items() %}
+      {% if config.active %}
+        <div class="reporte-seccion">
+          <h2>{{ config.titulo }}</h2>
+  
+          {% if config.elements.graph %}
+            <div id="chart-{{ key }}" class="chart"></div>
+            <script>
+              document.addEventListener("DOMContentLoaded", function () {
+                const options_{{ key }} = {
+                  chart: {
+                    type: "{{ config.graph.type }}",
+                    // height: 350
+                  },
+                  title: {
+                    text: "{{ config.graph.name }}"
+                  },
+                  xaxis: {
+                    categories: {{ config.graph.categories|tojson }}
+                  },
+                  series: [
+                    {% for k, v in config.graph.items() %}
+                      {% if k != 'name' and k != 'type' and k != 'categories' %}
+                        {
+                          name: "{{ k }}",
+                          data: {{ v|tojson }}
+                        },
+                      {% endif %}
+                    {% endfor %}
+                  ]
+                };
+                new ApexCharts(document.querySelector("#chart-{{ key }}"), options_{{ key }}).render();
+              });
+            </script>
+          {% endif %}
+  
+          <!-- Aquí puedes agregar la lógica de tabla y contador en el futuro -->
+  
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+  
 
-<div class="db_card db_4">
-    <h3 class="title_db_card">Tiempo promedio de entrega</h3>
-    <div class="db_counter db_cnt_3">545,75 min</div>
-</div>
-
-<div class="db_card db_1">
-    <h3 class="title_db_card">Ingresos por mes</h3>
-    <div class="db_graph" id="ingresos_mes"></div>
-</div>
-
-<div class="db_card db_2">
-    <h3 class="title_db_card">Encomiendas entregadas vs pendientes</h3>
-    <div class="db_graph" id="encomiendas_estado"></div>
-</div>
-
-<div class="db_card db_6">
-    <h3 class="title_db_card">Ingresos por sucursal</h3>
-    <div class="db_graph" id="ingresos_sucursal"></div>
-</div>
-
-<div class="db_card db_8">
-    <h3 class="title_db_card">Top Sucursales por envíos</h3>
-    <div class="db_graph" class="db_graph" id="top_envios"></div>
-</div>
-
-<div class="db_card db_5">
-    <h3 class="title_db_card">Envíos por tipo de encomienda</h3>
-    <div class="db_graph" id="envios_tipo"></div>
-</div>
 
 
+  
+<!-- 
+
+chart: {
+    type: 'line',
+    height: 100,
+    width: 100,
+    zoom: {
+        enabled: false
+    }
+},
+series: [{
+    name: '',
+    data: [
+        1000, 1500, 1800, 1400, 1900, 2100
+    ]
+}],
+xaxis: {
+    categories: [
+    '', '', '', '', '', ''
+    ]
+},
+colors: [ 
+    '' ,
+],
+stroke: {
+    curve: 'smooth'
+},
+markers: {
+    size: 5
+}
+ -->
 
 {% endblock %}
 
@@ -172,9 +210,9 @@ Dashboard
 
 {% block scripts %}
 
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-<script>
-    const GRAPH_HEIGHT = 205;
+
+<!-- <script>
+    const GRAPH_HEIGHT = 200;
     const GRAPH_HEIGHT2 = 125;
     const GRAPH_WIDTH = 325;
 </script>
@@ -214,6 +252,9 @@ Dashboard
     var optionsIngresos = {
         chart: {
             type: 'bar',
+            // height: GRAPH_HEIGHT,
+            // height: GRAPH_HEIGHT + GRAPH_HEIGHT2 / 2,
+            // width: GRAPH_WIDTH
         },
         series: [{
             name: 'Ingresos',
@@ -317,7 +358,7 @@ Dashboard
     var chartEstado = new ApexCharts(document.querySelector("#encomiendas_estado"), optionsEstado);
     chartEstado.render();
 
-</script>
+</script> -->
 
 
 

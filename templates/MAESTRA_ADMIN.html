@@ -21,78 +21,73 @@
 </header>
 
 <aside class="general_element" id="menu_aside" class="">
-    <img src="/static/img/logo.png" class="logo_admin">
+    <div class="menu_img">
+        <img src="/static/img/logo.png" class="logo_admin">
+    </div>
 
-    <a href="{{url_for('panel')}}">
-        <i class="ri-dashboard-line"></i>
-        <p>Panel</p>
-    </a>
+    <div class="menu_option">
+        <a class="menu_title" href="{{url_for('panel')}}">
+            <p>Panel</p>
+            <i class="ri-dashboard-line"></i>
+        </a>
+    </div>
 
     {% for modulo in listar_pages_admin %}
-    <!-- <div class="line_separator"></div> -->
-    <!-- {% set config = modulo %} -->
-    <a href="">
-        <i class="{{ modulo[1] }}"></i>
-        <p>{{ modulo[0] }}</p>
-    </a>
-        {% if modulo[2] %}
-        <a class="crud_page" href="{{url_for('dashboard',modulo = modulo )}}">
-            <i class="{{ ICON_PAGE_CRUD }}"></i>
-            <p>Dashboard</p>
-        </a>
+
+    <div class="line_separator"></div>
+    <div class="menu_option">
+        <div class="menu_title">
+            <p>{{ modulo[0] }}</p>
+            <i class="{{ modulo[1] }}"></i>
+        </div>
+        {% if modulo[2] or modulo[3] or modulo[4] %}
+        <div class="menu_content">
+
+            {% if modulo[2] %}
+            <a class="mu_page mu_dashboard" href="{{url_for('dashboard',modulo = modulo )}}">
+                <i class="{{ ICON_PAGE_CRUD }}"></i>
+                <p>Dashboard</p>
+            </a>
+            {% endif %}
+            {% for page in modulo[3] %}
+            <a class="mu_page mu_crud" href="{{url_for('crud_generico',tabla = page[0] )}}">
+                <i class="{{ page[2] }}"></i>
+                <p>{{NOMBRE_CRUD_PAGE}} {{ page[1] }}</p>
+            </a>
+            {% endfor %}
+            {% for page in modulo[4] %}
+            <a class="mu_page mu_rprt" href="{{url_for('reporte', report_name = page[0] )}}">
+                <i class="{{ page[2] }}"></i>
+                <p>Reporte de {{ page[1] }}</p>
+            </a>
+            {% endfor %}
+        </div>
         {% endif %}
-        {% for page in modulo[3] %}
-        <a class="crud_page" href="{{url_for('crud_generico',tabla = page[0] )}}">
-            <i class="{{ page[2] }}"></i>
-            <p>{{NOMBRE_CRUD_PAGE}} {{ page[1] }}</p>
-        </a>
-        {% endfor %}
-        {% for page in modulo[4] %}
-        <a class="crud_page" href="{{url_for('reporte', modulo = page[0] )}}">
-            <i class="{{ page[2] }}"></i>
-            <p>Reporte de {{ page[1] }}</p>
-        </a>
-        {% endfor %}
-        
+
+    </div>
+
     {% endfor %}
 
 
-    <!-- {% for modulo in MENU_ADMIN %}
-    <div class="line_separator"></div>
-    {% set config = MENU_ADMIN[modulo] %}
-    <a href="">
-        <i class="{{ ICON_PAGE_CRUD }}"></i>
-        <p>{{ config['name']  }}</p>
-    </a>
-        {% if config['dashboard'] %}
-        <a class="crud_page" href="{{url_for('dashboard',modulo = modulo )}}">
-            <i class="{{ ICON_PAGE_CRUD }}"></i>
-            <p>Dashboard</p>
-        </a>
-        {% endif %}
-        {% for page in config['cruds'] %}
-        <a class="crud_page" href="{{url_for('crud_generico',tabla = page )}}">
-            <i class="{{ ICON_PAGE_CRUD }}"></i>
-            <p>{{NOMBRE_CRUD_PAGE}} {{ page }}</p>
-        </a>
-        {% endfor %}
-        {% for page in config['reports'] %}
-        <a class="crud_page" href="{{url_for('reporte', modulo = modulo )}}">
-            <i class="{{ ICON_PAGE_CRUD }}"></i>
-            <p>{{a}} {{ page }}</p>
-        </a>
-        {% endfor %}
-        
-    {% endfor %} -->
-    <!-- {% for page in lista_paginas_crud %}
-    <a class="crud_page" href="{{url_for('crud_generico',tabla = page[0])}}">
-        {% if HABILITAR_ICON_PAGES %}
-        <i class="{{page[2]}}"></i>
-        {% endif %}
-        <p>{{NOMBRE_CRUD_PAGE}} {{page[1]}}</p>
-    </a>
-    {% endfor %} -->
+    <div class="menu_user">
+        <div class="mu_content">
+            <div class="mu_option">
+                <div class="user_icon">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <p class="user_name">Nombre de usuario</p>
+                <p class="user_type">Cargo de usuario</p>
+
+                <div class="user_out">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </div>
+            </div>
+        </div>
+    </div>
 </aside>
+
+
 
 <section class="general_element">
     <div class="section_content">

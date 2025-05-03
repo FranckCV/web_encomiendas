@@ -1,0 +1,117 @@
+{% extends "MAESTRA_ADMIN.html" %}
+
+
+{% block titulo %}
+{{titulo}}
+{% endblock %}
+
+
+{% block estilos %}
+
+
+<style>
+    /* #reporte-container {
+        height: 70vh;
+        width: 75%;
+    } */
+    .block_report {
+        height: 100%;
+        width: 75%;
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    #space_graph {
+        min-height: 50vh !important;
+        width: 100%;
+    }
+
+    #space_graph > * {
+        margin: 0 auto;
+    }
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+{% endblock %}
+
+
+{% block contenido %}
+<div class="block_crud">
+    <h3 class="crud_title">
+        {% if HABILITAR_ICON_PAGES %}
+        <i class="{{icon_page}}"></i>
+        {% endif %}
+        {{titulo}}
+    </h3>
+</div>
+
+<div class="block_crud block_report">
+    <div class="report_graph">
+        <div id="space_graph">
+
+        </div>
+    </div>
+    <!-- <div class="report_table">
+
+    </div> -->
+</div>
+
+
+
+{% endblock %}
+
+
+
+{% block scripts %}
+<script>
+    const GRAPH_HEIGHT = 200;
+    const GRAPH_HEIGHT2 = 125;
+    const GRAPH_WIDTH = 325;
+</script>
+
+<script>
+    var optionsGraph = {{ graph | tojson }};
+
+    var chartReport = new ApexCharts(document.querySelector("#space_graph"), optionsGraph);
+    chartReport.render();
+
+</script>
+
+<!-- 
+
+
+
+<script>
+    var optionsEstado = {
+        chart: {
+            type: 'donut',
+            height: GRAPH_HEIGHT2,
+            toolbar: {
+                show: true
+            }
+        },
+        series: [70, 30], // Ejemplo: 70 entregadas, 30 pendientes
+        labels: ['Entregadas', 'Pendientes'],
+        colors: [' var(--color3) ', ' var(--color-sec) '],
+        responsive: [{
+            breakpoint: 480,
+            options: {
+                chart: {
+                    // width: 20,
+                    // height: GRAPH_HEIGHT,
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }]
+    };
+
+    var chartEstado = new ApexCharts(document.querySelector("#encomiendas_estado"), optionsEstado);
+    chartEstado.render();
+
+</script> -->
+
+
+
+{% endblock %}

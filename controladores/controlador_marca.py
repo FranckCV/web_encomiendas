@@ -59,11 +59,12 @@ def unactive_row( id ):
 def insert_row( nombre ):
     sql = f'''
         INSERT INTO 
-            {table_name} ( nombre )
+            {table_name} ( nombre )'''
+    sql += '''
         VALUES 
-            ( '{nombre}' )
+            ( %s )
     '''
-    sql_execute(sql)
+    sql_execute(sql,(nombre))
 
 
 def update_row( id , nombre ):

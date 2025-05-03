@@ -26,8 +26,10 @@
     --color11: color-mix(in srgb, var(--color4) 100%, var(--color-sec) 100%);
     --color12: color-mix(in srgb, var(--color-sec) 20%, transparent 80%);
     --color13: color-mix(in srgb, var(--color1) 40%, var(--color-sec) 30%);
-
+    --color14: color-mix(in srgb, var(--color4) 90%, #1e1e1e 90%);
     --color15: color-mix(in srgb, var(--color-base) 50%, var(--color-sec) 100%);
+    --color16: color-mix(in srgb, var(--color11) 100%, var(--color3) 80%);
+
 
     --color-background: color-mix(in srgb, var(--color-contrast) 30%, var(--color-contrast) 100%);
 }
@@ -35,7 +37,7 @@
 *:not(i) {
     font-family: Poppins, sans-serif !important;
     /* font-weight: bold; */
-    transition: 0.15s ease;
+    transition: 0.15s ease-in-out;
 }
 
 header.general_element {

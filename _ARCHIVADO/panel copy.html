@@ -1,0 +1,111 @@
+{% extends "MAESTRA_ADMIN.html" %}
+
+
+{% block titulo %}
+Panel Administrativo
+{% endblock %}
+
+
+{% block estilos %}
+
+<link rel="stylesheet" href="/static/css/panel.css">
+
+{% endblock %}
+
+
+
+{% block contenido %}
+
+{% for modulo in listar_pages_admin %}
+<div class="panel_cell">
+    <div class="cell_title">
+        <i class="{{ modulo[1] }}"></i>
+        <div>{{ modulo[0] }}</div>
+    </div>
+    <div class="line_separator"></div>
+    <div class="cell_content">
+        {% if modulo[3] or modulo[4] %}
+        {% if modulo[3] %}
+        {% for page in modulo[3] %}
+        <a class="panel_link link_crud" href="{{url_for('crud_generico' , tabla = page[0] )}}">
+            <i class="{{ page[2] }}"></i>
+            <p> {{NOMBRE_CRUD_PAGE}} {{ page[1] }} </p>
+        </a>
+        <!-- <a class="panel_link link_report" href="{{url_for('crud_generico' , tabla = page[0] )}}">
+            <i class="{{ page[2] }}"></i>
+            <p> {{NOMBRE_CRUD_PAGE}} {{ page[1] }} </p>
+        </a> -->
+        {% endfor %}
+        {% endif %}
+
+        {% if modulo[4] %}
+        {% for page in modulo[4] %}
+        <a class="panel_link link_report" href="{{url_for('crud_generico' , tabla = page)}}">
+            {{page}}
+        </a>
+        {% endfor %}
+        {% endif %}
+        {% else %}
+        <p class="cell_empty">Sin contenido</p>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+
+<style>
+    .square {
+        max-height: min-content;
+        background-color: #0022ff86;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .square>* {
+        width: 100%;
+    }
+
+    .square .title {
+        background-color: rgb(17, 255, 0);
+        height: 25px;
+        cursor: pointer;
+    }
+
+    .square .content {
+        background-color: rgb(93, 0, 255);
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.1s ease-in-out, opacity 0.15s ease-in-out;
+        opacity: 0;
+    }
+
+    .square:hover {
+        gap: 10px;
+    }
+
+    .square:hover .content {
+        max-height: 200px;
+        opacity: 1;
+    }
+
+</style>
+
+<div class="panel_cell test">
+    <div class="square">
+        <div class="title"></div>
+        <div class="content">
+            <p style="color:white">Contenido animado aquí</p>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+
+
+
+{% block scripts %}
+
+
+{% endblock %}

@@ -8,6 +8,7 @@ from controladores import controlador_modelo as controlador_modelo
 from configuraciones import NOMBRE_BTN_UPDATE , NOMBRE_BTN_UNACTIVE , ACT_STATE_0 , ACT_STATE_1 , FUNCIONES_CRUD , NOMBRE_BTN_CONSULT , NOMBRE_BTN_DELETE , NOMBRE_BTN_INSERT , NOMBRE_BTN_LIST , NOMBRE_BTN_SEARCH , NOMBRE_CRUD_PAGE , NOMBRE_OPTIONS_COL , STATE_0 , STATE_1 , TITLE_STATE, ICON_PAGE_CRUD
 from functools import wraps
 import inspect
+import json
 # from flask_jwt import JWT, jwt_required, current_identity
 # import uuid
 # import hashlib
@@ -16,7 +17,45 @@ import inspect
 
 app = Flask(__name__, template_folder='templates')
 
-SYSTEM_NAME = 'ENCOMIENDAS_LUCIA'
+SYSTEM_NAME = 'New Olva'
+
+###########_ TEST FUNCIONES _#############
+
+def ingresos_periodo():
+    lista = [
+        [ 'Enero' , 1520.22 ] , 
+        [ 'Febrero' , 1920.21 ] ,
+        [ 'Marzo' , 2223.89 ] ,
+        [ 'Abril' , 3720.02 ] ,
+        [ 'Mayo' , 5220.2 ] ,
+    ]
+
+    return lista
+
+
+def articulos_mas_vendidos():
+    lista = [
+        [ 'Cajas' , 1520.22 ] , 
+        [ 'Sobres' , 6920.21 ] ,
+        [ 'Encomiendas' , 2223.89 ] ,
+        [ 'Donativos Fabs' , 3720.02 ] ,
+        [ 'Contrabando de Arduinos' , 5220.2 ] ,
+    ]
+
+    return lista
+
+
+def datos_usuario():
+    lista = {
+        'id': 1 ,
+        'correo': 'correo@dom.com' ,
+        '': 'Nombre Apepat Apemat' ,
+        '': 'a' ,
+        '': 'Cargo' ,
+    }
+
+    return lista
+
 
 ###########_ FUNCIONES _#############
 
@@ -35,7 +74,6 @@ def listar_paginas_crud():
 
 def listar_admin_pages():
     menu_keys = list(MENU_ADMIN.keys())
-    # print(menu_keys)
     modules = []
     for module in menu_keys:
         pages_crud = []
@@ -61,8 +99,13 @@ def listar_admin_pages():
             
             if reports != [] and reports is not None:
                 for page in reports:
-                    if page is not None or page != '' :
-                        pages_report.append( page )
+                    config_page = REPORTES.get(page)
+                    if config_page:
+                        p_active = config_page.get('active')
+                        if p_active is True:
+                            p_titulo = config_page.get('titulo')
+                            p_icon_page = get_icon_page(config_page.get('icon_page'))
+                            pages_report.append([ page , p_titulo , p_icon_page ])
             
             modules.append([ name , icon_module , dashboard , pages_crud , pages_report])
     return modules
@@ -104,6 +147,18 @@ def get_icon_page(icon):
         return icon 
 
 
+def extract_col_row(lista):
+    columns = []
+    rows = []
+
+    for c , r in lista:
+        columns.append( c )
+        rows.append( r )
+
+    return [columns , rows]
+
+
+
 ###########_ DICCIONARIOS _#############
 
 ERRORES = {
@@ -133,11 +188,6 @@ CONTROLADORES = {
             ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
             ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
-        ],
-        "field_search": [ 
-            ['nombre' , ], 
-            'nombre' , 
-            150
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -231,19 +281,180 @@ CONTROLADORES = {
 }
 
 
+REPORTES = {
+    # LINEA
+    "ingresos_periodo": {
+        "active": True,
+        'icon_page' : 'fa-solid fa-dollar-sign' ,
+        "titulo": "ingresos por mes",
+        "elements": {
+            "graph": True,
+            "table": False,
+            "counter": False,
+        },
+        "graph": {
+            "chart": {
+                "type": 'line',
+                "zoom": {
+                    "enabled": True
+                }
+            },
+            "series": [{
+                "name": 'Ingresos',
+                "data": extract_col_row(ingresos_periodo())[1]
+            }],
+            "xaxis": {
+                "categories": extract_col_row(ingresos_periodo())[0]
+            },
+            "colors": [' var(--color1) '],
+            "stroke": {
+                "curve": 'smooth'
+            },
+            "markers": {
+                "size": 5
+            }
+        },
+    },
+    # BARRA VERTICAL
+    "articulos_mas_vendidos": {
+        "active" : True ,
+        'icon_page' : 'fa-solid fa-dollar-sign' ,
+        "titulo": "artículos más vendidos",
+        "elements" : {
+            'graph'  : False ,
+            'table'  : True,
+            'counter': False ,
+        } ,
+        "graph" : {
+            "chart": {
+                "type": 'bar',
+            },
+            "series": [{
+                "name": 'Ingresos',
+                "data": extract_col_row(articulos_mas_vendidos())[1]
+            }],
+            "xaxis": {
+                "categories": extract_col_row(articulos_mas_vendidos())[0]
+            },
+            "colors": [' var(--color15) ']
+        }
+    },
+    # BARRA HORIZONTAL
+    "top_envios": {
+        "active" : True ,
+        'icon_page' : 'fa-solid fa-dollar-sign' ,
+        "titulo": "top de envios de encomiendas",
+        "elements" : {
+            'graph'  : False ,
+            'table'  : True,
+            'counter': False ,
+        } ,
+        "graph" : {
+            "chart": {
+                "type": 'bar',
+            },
+            "series": [{
+                "name": 'Envíos',
+                "data": [400, 350, 300, 200] 
+            }],
+            "xaxis": {
+                "categories": ['Sucursal A', 'Sucursal B', 'Sucursal C', 'Sucursal D']
+            },
+            "plotOptions": {
+                "bar": {
+                    "horizontal": True,
+                }
+            },
+            "colors": [' var(--color5) ']
+        }
+    },
+    # PASTEL
+    "envios_tipo": {
+        "active" : True ,
+        'icon_page' : 'fa-solid fa-dollar-sign' ,
+        "titulo": "envios por tipo de articulo",
+        "elements" : {
+            'graph'  : False ,
+            'table'  : True,
+            'counter': False ,
+        } ,
+        "graph" : {
+            "chart": {
+                "type": 'pie',
+                "height": 500,
+                "toolbar": {
+                    "show": True
+                }
+            },
+            "series": [55, 30, 15],
+            "labels": ['Cajas', 'Sobres', 'Otros'],
+            "colors": [' var(--color8) ', ' var(--color11) ', ' var(--color-sec) '],
+            "responsive": [{
+                "breakpoint": 200,
+                "options": {
+                    "chart": {
+                        "width": 100
+                    },
+                    "legend": {
+                        "position": 'bottom'
+                    }
+                }
+            }]
+        }
+    },
+    # DONUT
+    "entregado_pendiente": {
+        "active" : True ,
+        'icon_page' : 'fa-solid fa-dollar-sign' ,
+        "titulo": "encomiendas entregadas vs pendientes",
+        "elements" : {
+            'graph'  : False ,
+            'table'  : True,
+            'counter': False ,
+        } ,
+        "graph" : {
+            "chart": {
+                "type": 'donut',
+                "height": 500,
+                "toolbar": {
+                    "show": True,
+                }
+            },
+            "series": [70, 30] ,
+            "labels": ['Entregadas', 'Pendientes'],
+            "colors": [' var(--color3) ', ' var(--color-sec) '],
+            "responsive": [{
+                "breakpoint": 480,
+                "options": {
+                    "chart": {
+                        "height": 100,
+                    },
+                    "legend": {
+                        "position": 'bottom'
+                    }
+                }
+            }]
+        },
+    },
+}
+
+
 MENU_ADMIN = {
     'administracion' : {
         'name' : 'Administración',
         'active': True ,
-        'icon_page' : '',
+        'icon_page' : 'fa-solid fa-user-tie',
         'dashboard' : False,
-        'cruds' :     [ 'tipo_unidad' , 'marca' , 'modelo' , 'unidad' ],
-        # 'reports' :   [ '' ],
+        'cruds' :     [ 'tipo_unidad' , 'marca' , 'modelo' , 'unidad' , 'sucursal'],
+        'reports' :   [ 
+            'ingresos_periodo' , 
+            ''
+        ],
     },
     'logistica' : {
         'name' : 'Logística',
         'active': True ,
-        'icon_page' : '',
+        'icon_page' : 'fa-solid fa-truck-front',
         'dashboard' : False,
         'cruds' :     [  ],
         'reports' :   [  ],
@@ -251,23 +462,31 @@ MENU_ADMIN = {
     'encomienda' : {
         'name' : 'Encomiendas',
         'active': True ,
-        'icon_page' : '',
+        'icon_page' : 'fa-solid fa-box',
         'dashboard' : False,
         'cruds' :     [  ],
-        'reports' :   [  ],
+        'reports' :   [ 'top_envios' , 'envios_tipo' , 'entregado_pendiente' ],
     },
     'atencion' : {
         'name' : 'Atención al Cliente',
         'active': True ,
-        'icon_page' : '',
+        'icon_page' : 'fa-solid fa-circle-question',
         'dashboard' : False,
         'cruds' :     [  ],
-        'reports' :   [  ],
+        'reports' :   [ ],
     },
     'ventas' : {
         'name' : 'Ventas',
         'active': True ,
-        'icon_page' : '',
+        'icon_page' : 'fa-solid fa-file-invoice-dollar',
+        'dashboard' : False,
+        'cruds' :     [  ],
+        'reports' :   [ 'articulos_mas_vendidos'  ],
+    },
+    'seguridad' : {
+        'name' : 'Seguridad',
+        'active': True ,
+        'icon_page' : 'fa-solid fa-shield-halved',
         'dashboard' : False,
         'cruds' :     [  ],
         'reports' :   [  ],
@@ -275,7 +494,7 @@ MENU_ADMIN = {
     'personal' : {
         'name' : 'Personal',   
         'active': True ,
-        'icon_page' : '',
+        'icon_page' : 'fa-solid fa-briefcase',
         'dashboard' : False,
         'cruds' :     [  ],
         'reports' :   [  ],
@@ -318,8 +537,6 @@ def inject_globals():
     cookie_error = request.cookies.get('error')
     info_variables_crud = False
     HABILITAR_ICON_PAGES = True
-
-    # print(request)
 
     return dict(
         info_variables_crud = info_variables_crud,
@@ -387,22 +604,13 @@ def crud_generico(tabla):
     main_column = config["main_column"]
     filters = config["filters"]
     fields_form = config["fields_form"]
-    # fields_insert = config["fields_insert"]
-    # fields_update = config["fields_update"]
-    # fields_consult = config["fields_consult"]
-    
-    # resultados = controlador.table_fetchall()
+
     existe_activo = controlador.exists_Activo()
     columnas , filas = controlador.get_table()
     info_columns = controlador.get_info_columns()
     primary_key = controlador.get_primary_key()
     table_columns  = list(filas[0].keys()) if filas else []
     
-    # firma = inspect.signature(controlador.insert_row)
-
-    # for nombre_parametro, parametro in firma.parameters.items():
-    #     print(nombre_parametro)
-
     CRUD_FORMS = config["crud_forms"]
     crud_list = CRUD_FORMS.get("crud_list")
     crud_search = CRUD_FORMS.get("crud_search")
@@ -412,7 +620,6 @@ def crud_generico(tabla):
     crud_delete = CRUD_FORMS.get("crud_delete")
     crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo
 
-    # print(bd.show_columns(tabla))
 
     return render_template(
         "listado.html" ,
@@ -550,9 +757,35 @@ def dashboard(modulo):
     # return f'Aca hay un dashboard del modulo de {modulo}'
 
 
-@app.route("/reporte=<modulo>")
-def reporte(modulo):
-    return f'Aca hay un reporte del modulo de {modulo}'
+@app.route("/reporte=<report_name>")
+def reporte(report_name):
+    config = REPORTES.get(report_name)
+    if not config:
+        return "Reporte no encontrado", 404
+
+    active = config["active"]
+
+    if active is False:
+        return "Reporte no encontrado", 404
+        
+    titulo = 'Reporte de ' + config.get("titulo")
+    elements = config.get("elements")
+    icon_page = get_icon_page(config.get("icon_page"))
+    graph = config.get("graph")
+    table = config.get("table")
+    counter = config.get("counter")
+
+    return render_template(
+        "REPORTE.html" ,
+        titulo = titulo ,
+        elements = elements ,
+        graph = graph ,
+        table = table ,
+        counter = counter ,
+        icon_page = icon_page,
+    )
+
+
 
 
 @app.route("/panel")

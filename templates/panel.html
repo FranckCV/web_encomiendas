@@ -8,25 +8,7 @@ Panel Administrativo
 
 {% block estilos %}
 
-<style>
-    .section_content {
-        display: grid;
-        gap: 20px;
-        grid-template-columns: repeat(4, 1fr);
-
-    }
-
-    .panel_cell {
-        /* border: 1px solid black; */
-        border-radius: 10px;
-        box-shadow: 0px 0px 3px #0000008f;
-        height: 100%;
-    }
-
-    .panel_cell * {
-        display: flex;
-    }
-</style>
+<link rel="stylesheet" href="/static/css/panel.css">
 
 {% endblock %}
 
@@ -36,34 +18,33 @@ Panel Administrativo
 
 {% for modulo in listar_pages_admin %}
 <div class="panel_cell">
-    <!-- {% set config = MENU_ADMIN[menu] %} -->
-    <div class="title_cell">
+    <div class="cell_title">
         <i class="{{ modulo[1] }}"></i>
         <div>{{ modulo[0] }}</div>
     </div>
-    <div>
-        <div>
-            CRUDS
-        </div>
-        <div>
-            {% for page in modulo[3] %}
-            <a href="" class="{{url_for('crud_generico' , tabla = page)}}">
-                {{page}}
-            </a>
-            {% endfor %}
-        </div>
-    </div>
-    <div>
-        <div>
-            Reportes
-        </div>
-        <div>
-            {% for page in modulo[4] %}
-            <a href="" class="{{url_for('crud_generico' , tabla = page)}}">
-                {{page}}
-            </a>
-            {% endfor %}
-        </div>
+    <div class="line_separator"></div>
+    <div class="cell_content">
+        {% if modulo[3] or modulo[4] %}
+        {% if modulo[3] %}
+        {% for page in modulo[3] %}
+        <a class="panel_link link_crud" href="{{url_for('crud_generico' , tabla = page[0] )}}">
+            <i class="{{ page[2] }}"></i>
+            <p> {{NOMBRE_CRUD_PAGE}} {{ page[1] }} </p>
+        </a>
+        {% endfor %}
+        {% endif %}
+
+        {% if modulo[4] %}
+        {% for page in modulo[4] %}
+        <a class="panel_link link_report" href="{{url_for('reporte' , report_name = page[0] )}}">
+            <i class="{{ page[2] }}"></i>
+            <p>Reporte de {{ page[1] }} </p>
+        </a>
+        {% endfor %}
+        {% endif %}
+        {% else %}
+        <p class="cell_empty">Sin contenido</p>
+        {% endif %}
     </div>
 </div>
 {% endfor %}
