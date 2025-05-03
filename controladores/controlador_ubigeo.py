@@ -1,0 +1,42 @@
+from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select_fetchone , sql_execute , sql_execute_lastrowid , show_columns , show_primary_key , exists_column_Activo , unactive_row_table
+import controladores.bd as bd
+
+table_name =  'ubigeo'
+
+def get_info_columns():
+    return show_columns(table_name)
+
+
+def get_primary_key():
+    return show_primary_key(table_name)
+
+
+def exists_Activo():
+    return exists_column_Activo(table_name)
+
+
+def delete_row( id ):
+    bd.delete_row_table(table_name , id)
+    
+#####_ CAMBIAR SQL y DICT INTERNO _#####
+def table_fetch_all():
+    sql = f'select * from {table_name}'
+    resultados = sql_select_fetchall(sql)
+    return resultados
+
+def get_table():
+    sql = f'select codigo, distrito, provincia,departamento, activo from {table_name} order by distrito asc'
+    columnas = {
+        'codigo': ['Código' , 0.5] , 
+        'distrito' : ['Distrito' , 2.5],
+        'provincia' : ['Provincia' , 2.5] , 
+        'departamento' : ['Departamento' , 2.5] , 
+        'activo' : ['Activo',0.5]
+        }
+    filas = sql_select_fetchall(sql)
+    return columnas,filas
+
+#####_ ADICIONALES _#####
+
+
+

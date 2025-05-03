@@ -5,6 +5,8 @@ from controladores import controlador_marca as controlador_marca
 from controladores import controlador_unidad as controlador_unidad
 from controladores import controlador_tipo_unidad as controlador_tipo_unidad
 from controladores import controlador_modelo as controlador_modelo
+from controladores import controlador_ubigeo as controlador_ubigeo
+
 from configuraciones import NOMBRE_BTN_UPDATE , NOMBRE_BTN_UNACTIVE , ACT_STATE_0 , ACT_STATE_1 , FUNCIONES_CRUD , NOMBRE_BTN_CONSULT , NOMBRE_BTN_DELETE , NOMBRE_BTN_INSERT , NOMBRE_BTN_LIST , NOMBRE_BTN_SEARCH , NOMBRE_CRUD_PAGE , NOMBRE_OPTIONS_COL , STATE_0 , STATE_1 , TITLE_STATE, ICON_PAGE_CRUD
 from functools import wraps
 import inspect
@@ -60,7 +62,7 @@ def datos_usuario():
 ###########_ FUNCIONES _#############
 
 def listar_paginas_crud():
-    table_names = list(CONTROLADORES.keys())
+    table_names = list(CONTROLADORES.keys()) #obtiene todas las claves de ese diccionario
     pages = []
     for tabla in table_names:
         config = CONTROLADORES.get(tabla)
@@ -111,6 +113,7 @@ def listar_admin_pages():
     return modules
 
 
+#Opciones para activar o desacticar
 def get_options_active():
     lista = [
         [ 0 , STATE_0 ],
@@ -118,13 +121,13 @@ def get_options_active():
     ]
     return lista
 
-
+#Opciones de paginación 
 def get_options_pagination_crud():
     lista = [ 5 , 10 , 15 , 20 , 25  ]
     selected_option_crud = 20
     return lista , selected_option_crud
 
-
+#Manejo de errores
 def rdrct_error(resp_redirect , e):
     resp = make_response(resp_redirect)
     error_message = str(e)
@@ -139,7 +142,7 @@ def rdrct_error(resp_redirect , e):
     resp.set_cookie('error', msg , max_age=30)
     return resp 
 
-
+#Obtiene el ícono, si no hay, retorna uno por defecto
 def get_icon_page(icon):
     if not icon or icon == '':
         return ICON_PAGE_CRUD 
@@ -278,6 +281,32 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
+    #ESTO ES PARA LO QUE SALE EN EL MODAL
+    "ubigeo" : {
+        "active":True,
+        "titulo":"Ubigeo",
+        "nombre_tabla":"ubigeo",
+        "controlador": controlador_ubigeo,
+        "main_column":"distrito",
+        "icon_page" : "ri-map-pin-line",
+        "filters":[],
+        "fields_form": [
+#            ID/NAME   LABEL     PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
+            ['codigo','Código',     'Código',  'text',   True ,       False ,      None ],
+            ['distrito', 'Distrito', 'Distrito',   'text',  True ,      True ,         None ],
+            ['provincia', 'Provincia', 'Provincia',   'text',  True ,      True ,         None ],
+            ['departamento', 'Departamento', 'Departamento',   'text',  True ,      True ,         None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": False ,
+            "crud_update": False ,
+            "crud_delete": False ,
+            "crud_unactive": False ,
+        }
+    }
 }
 
 
@@ -504,6 +533,10 @@ MENU_ADMIN = {
 
 ###########_ REDIRECT _#############
 
+@app.route("/")
+def main_page():
+    return redirect(url_for('index'))
+
 def redirect_url(url):
     return redirect(url_for(url))
 
@@ -567,7 +600,7 @@ def inject_globals():
     )
 
 
-paginas_simples = [ "index" , 'login' , 'sign_up' ]
+paginas_simples = [ "index" , 'login' , 'sign_up', 'sucursales']
 
 for pagina in paginas_simples:
     app.add_url_rule(
@@ -577,9 +610,6 @@ for pagina in paginas_simples:
     )
 
 
-@app.route("/")
-def main_page():
-    return redirect(url_for('index'))
 
 
 ##################_ CRUD PAGE _################## 
@@ -750,7 +780,7 @@ def crud_unactive(tabla):
 
     return redirect(url_for('crud_generico', tabla = tabla))
 
-
+########################################################################
 @app.route("/dashboard=<modulo>")
 def dashboard(modulo):
     return render_template('dashboard.html')
