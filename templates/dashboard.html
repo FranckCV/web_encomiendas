@@ -2,7 +2,7 @@
 
 
 {% block titulo %}
-Dashboard
+Dashboard de {{modulo[0]}}
 {% endblock %}
 
 
@@ -10,45 +10,25 @@ Dashboard
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-    .db_1 {
-        grid-area: db_1;
-    }
-
-    .db_2 {
-        grid-area: db_2;
-    }
-
-    .db_3 {
-        grid-area: db_3;
-    }
-
-    .db_4 {
-        grid-area: db_4;
-    }
-
-    .db_5 {
-        grid-area: db_5;
-    }
-
-    .db_6 {
-        grid-area: db_6;
-    }
-
-    .db_7 {
-        grid-area: db_7;
-    }
-
-    .db_8 {
-        grid-area: db_8;
-    }
 
     .section_content {
         display: grid;
+        grid-template-columns: 3fr 1fr;
+        background-color: #f1f1f1;
+        gap: 10px;
+        padding: 15px;
+        width: 100%;
+        max-height: 100vh;
+    }
+
+    .cell_content {
+        height: 72.5vh;
+    }
+
+    .reports_grid {
+        display: grid;
         grid-template-columns: 1fr 1fr 1fr;
-        /* grid-template-rows: 0.75fr 0.5fr 0.5fr 0.5fr; */
         grid-template-rows: 1fr 1fr 2fr 1fr;
-        /* grid-template-rows: 1fr 1.5fr 0.75fr; */
-        /* grid-template-rows: repeat(3, minmax(300px, 1fr)); */
         grid-template-areas:
             'db_3 db_7 db_4'
             'db_1 db_1 db_8'
@@ -57,13 +37,13 @@ Dashboard
         ;
         background-color: #f1f1f1;
         gap: 10px;
-        padding: 15px;
-        /* height: 100%; */
+        padding: 5px;
         width: 100%;
+        height: 100%;
         max-height: 100vh;
     }
 
-    .db_card {
+    /* .db_card {
         background-color: #f5f5f5;
         box-shadow: 0px 0px 5px #00000057;
         border-radius: 5px;
@@ -88,10 +68,6 @@ Dashboard
         font-size: 10px !important;
         height: 100%;
         min-height: auto !important;
-        /* height: 80px !important; */
-        /* min-height: fit-content !important; */
-        /* max-height: 100%; */
-        /* display: flex; */
     }
 
     .title_db_card {
@@ -99,71 +75,55 @@ Dashboard
         margin-block: 10px;
         text-align: center;
         font-weight: bold;
-    }
-
-    .db_counter {
-        font-size: 200%;
-        font-weight: bold;
-    }
-
-    .db_cnt_1 {
-        color: var(--color4);
-    }
-
-    .db_cnt_2 {
-        color: var(--color-sec);
-    }
-
-    .db_cnt_3 {
-        color: var(--color11);
-    }
-
+    } */
 </style>
 {% endblock %}
 
 
 {% block contenido %}
 
-<div class="db_card db_3">
-    <h3 class="title_db_card">Sucursales activas</h3>
-    <div class="db_counter db_cnt_1">6565</div>
+<!--  -->
+
+<div class="reports_grid">
+
+
 </div>
 
-<div class="db_card db_7">
-    <h3 class="title_db_card">Clientes registrados</h3>
-    <div class="db_counter db_cnt_2">5656</div>
+<!-- <div class=""> -->
+
+<div class="panel_cell">
+    <div class="cell_title">
+        <i class="{{ modulo[1] }}"></i>
+        <div>{{ modulo[0] }}</div>
+    </div>
+
+    <div class="line_separator"></div>
+    <div class="cell_content">
+        {% if modulo[3] or modulo[4] %}
+        {% if modulo[3] %}
+        {% for page in modulo[3] %}
+        <a class="panel_link link_crud" href="{{url_for('crud_generico' , tabla = page[0] )}}">
+            <i class="{{ page[2] }}"></i>
+            <p> {{NOMBRE_CRUD_PAGE}} {{ page[1] }} </p>
+        </a>
+        {% endfor %}
+        {% endif %}
+
+        {% if modulo[4] %}
+        {% for page in modulo[4] %}
+        <a class="panel_link link_report" href="{{url_for('reporte' , report_name = page[0] )}}">
+            <i class="{{ page[2] }}"></i>
+            <p>Reporte de {{ page[1] }} </p>
+        </a>
+        {% endfor %}
+        {% endif %}
+        {% else %}
+        <p class="cell_empty">Sin contenido</p>
+        {% endif %}
+    </div>
 </div>
 
-<div class="db_card db_4">
-    <h3 class="title_db_card">Tiempo promedio de entrega</h3>
-    <div class="db_counter db_cnt_3">545,75 min</div>
-</div>
-
-<div class="db_card db_1">
-    <h3 class="title_db_card">Ingresos por mes</h3>
-    <div class="db_graph" id="ingresos_mes"></div>
-</div>
-
-<div class="db_card db_2">
-    <h3 class="title_db_card">Encomiendas entregadas vs pendientes</h3>
-    <div class="db_graph" id="encomiendas_estado"></div>
-</div>
-
-<div class="db_card db_6">
-    <h3 class="title_db_card">Ingresos por sucursal</h3>
-    <div class="db_graph" id="ingresos_sucursal"></div>
-</div>
-
-<div class="db_card db_8">
-    <h3 class="title_db_card">Top Sucursales por envíos</h3>
-    <div class="db_graph" class="db_graph" id="top_envios"></div>
-</div>
-
-<div class="db_card db_5">
-    <h3 class="title_db_card">Envíos por tipo de encomienda</h3>
-    <div class="db_graph" id="envios_tipo"></div>
-</div>
-
+<!-- </div> -->
 
 
 {% endblock %}
@@ -173,151 +133,6 @@ Dashboard
 {% block scripts %}
 
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-<script>
-    const GRAPH_HEIGHT = 205;
-    const GRAPH_HEIGHT2 = 125;
-    const GRAPH_WIDTH = 325;
-</script>
-
-<script>
-    var optionsIngresosMes = {
-        chart: {
-            type: 'line',
-            height: GRAPH_HEIGHT + GRAPH_HEIGHT2 - 60,
-            // width: GRAPH_WIDTH,
-            zoom: {
-                enabled: false
-            }
-        },
-        series: [{
-            name: 'Ingresos',
-            data: [1000, 1500, 1800, 1400, 1900, 2100] // Tus ingresos por mes
-        }],
-        xaxis: {
-            categories: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio']
-        },
-        colors: [' var(--color-sec) '],
-        stroke: {
-            curve: 'smooth'
-        },
-        markers: {
-            size: 5
-        }
-    };
-
-    var chartIngresosMes = new ApexCharts(document.querySelector("#ingresos_mes"), optionsIngresosMes);
-    chartIngresosMes.render();
-
-</script>
-
-<script>
-    var optionsIngresos = {
-        chart: {
-            type: 'bar',
-        },
-        series: [{
-            name: 'Ingresos',
-            data: [15000, 12000, 8000, 6000] // Ejemplo de ingresos
-        }],
-        xaxis: {
-            categories: ['Sucursal A', 'Sucursal B', 'Sucursal C', 'Sucursal D']
-        },
-        colors: [' var(--color11) ']
-    };
-
-    var chartIngresos = new ApexCharts(document.querySelector("#ingresos_sucursal"), optionsIngresos);
-    chartIngresos.render();
-
-</script>
-
-<script>
-    var optionsTopEnvios = {
-        chart: {
-            type: 'bar',
-            height: 150 ,
-            // height: GRAPH_HEIGHT - (GRAPH_HEIGHT2 / 2),
-            // height: GRAPH_HEIGHT/ 2,
-            // width: GRAPH_WIDTH
-        },
-        series: [{
-            name: 'Envíos',
-            data: [400, 350, 300, 200] // Ejemplo de envíos
-        }],
-        xaxis: {
-            categories: ['Sucursal A', 'Sucursal B', 'Sucursal C', 'Sucursal D']
-        },
-        plotOptions: {
-            bar: {
-                horizontal: true,
-            }
-        },
-        colors: [' var(--color5) ']
-    };
-
-    var chartTopEnvios = new ApexCharts(document.querySelector("#top_envios"), optionsTopEnvios);
-    chartTopEnvios.render();
-</script>
-
-<script>
-    var optionsEnviosTipo = {
-        chart: {
-            type: 'pie',
-            height: GRAPH_HEIGHT2,
-            toolbar: {
-                show: true
-            }
-        },
-        series: [55, 30, 15], // Cantidades ejemplo: cajas, sobres, otros
-        labels: ['Cajas', 'Sobres', 'Otros'],
-        colors: [' var(--color8) ', ' var(--color11) ', ' var(--color-sec) '],
-        responsive: [{
-            breakpoint: 480,
-            options: {
-                chart: {
-                    width: 300
-                },
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }]
-    };
-
-    var chartEnviosTipo = new ApexCharts(document.querySelector("#envios_tipo"), optionsEnviosTipo);
-    chartEnviosTipo.render();
-
-</script>
-
-<script>
-    var optionsEstado = {
-        chart: {
-            type: 'donut',
-            height: GRAPH_HEIGHT2,
-            toolbar: {
-                show: true
-            }
-        },
-        series: [70, 30], // Ejemplo: 70 entregadas, 30 pendientes
-        labels: ['Entregadas', 'Pendientes'],
-        colors: [' var(--color3) ', ' var(--color-sec) '],
-        responsive: [{
-            breakpoint: 480,
-            options: {
-                chart: {
-                    // width: 20,
-                    // height: GRAPH_HEIGHT,
-                },
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }]
-    };
-
-    var chartEstado = new ApexCharts(document.querySelector("#encomiendas_estado"), optionsEstado);
-    chartEstado.render();
-
-</script>
 
 
 

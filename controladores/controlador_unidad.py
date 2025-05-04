@@ -86,28 +86,62 @@ def insert_row( placa , capacidad ,volumen  , modeloid , observaciones = None):
     sql = f'''
         INSERT INTO 
             {table_name} 
-            ( placa , capacidad , volumen , observaciones , activo , modeloid )
+            ( placa , capacidad , volumen , modeloid , activo , observaciones )
         VALUES 
-            ( '{placa}' , '{capacidad}' , '{volumen}' , '{observaciones}' , 1 , '{modeloid}')
+            ( %s ,  %s , %s , %s , 1 ,  %s )
     '''
-    sql_execute(sql)
+    sql_execute(sql,( placa , capacidad ,volumen  , modeloid , observaciones))
 
 
 def update_row( id , placa , capacidad ,volumen , modeloid  , observaciones):
     sql = f'''
         Update {table_name} set 
-        placa = '{placa}' , 
-        capacidad = {capacidad} ,
-        volumen = {volumen} ,
-        observaciones = '{observaciones}' ,
-        modeloid = {modeloid} 
+            placa = %s , 
+            capacidad = %s ,
+            volumen = %s ,
+            observaciones = %s ,
+            modeloid = %s
         where id = {id}
     '''
-    sql_execute(sql)
+    sql_execute(sql,( placa , capacidad ,volumen , modeloid  , observaciones))
 
 
 
 #####_ ADICIONALES _#####
 
 
+
+def get_report_test():
+    sql= f'''
+        select 
+            ud.id ,
+            ud.placa,
+            ud.capacidad ,
+            ud.volumen ,
+            ud.observaciones ,
+            ud.activo ,
+            ud.modeloid ,
+            mo.nombre as nom_modelo ,
+            tip.id ,
+            tip.nombre as nom_tipounidad ,
+            mar.nombre as nom_marca,
+            mar.id
+        from {table_name} ud
+        inner join modelo mo on ud.modeloid = mo.id
+        inner join tipo_unidad tip on mo.tipo_unidadid = tip.id
+        inner join marca mar on mo.marcaid = mar.id
+        
+    '''
+    
+    columnas = {
+        'id'            : ['ID' , 0.5] , 
+        'placa'         : ['Placa' , 1.5]  , 
+        'nom_modelo'    : ['Modelo' , 1.5] ,
+        'nom_tipounidad': ['Tipo de unidad' , 1.5] ,
+        'nom_marca'     : ['Marca' , 1.5] ,
+        'activo'        : ['Actividad', 1 ] ,
+        }
+    filas = sql_select_fetchall(sql)
+    
+    return columnas , filas
 

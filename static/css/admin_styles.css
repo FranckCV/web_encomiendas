@@ -145,10 +145,13 @@ aside .line_separator {
     max-height: min-content;
 }
 
+.menu_option.mu_active ,
 .menu_option:hover {
     gap: 5px;
 }
 
+
+.menu_option.mu_active .menu_content ,
 .menu_option:hover .menu_content {
     max-height: max-content;
     opacity: 1;
@@ -186,7 +189,7 @@ aside .line_separator {
 
 .mu_page:hover {
     font-weight: bold;
-    scale: 1.05;    
+    scale: 1.05;
     filter: saturate(250%);
     background-color: color-mix(in srgb, var(--color10) 15%, transparent 95%);
     color: var(--color10);
@@ -254,7 +257,8 @@ aside .line_separator {
 }
 
 .mu_option {
-    backdrop-filter: blur(20px);
+    /* backdrop-filter: blur(20px); */
+    background-color: color-mix(in srgb, var(--color14) 100%, black 30%);
     border: 1px solid white;
     border-radius: 10px;
     display: grid;
@@ -865,7 +869,7 @@ label {
 }
 
 .page-numbers a.page-number.active {
-    background-color: var(--color5);
+    background-color: var(--color3);
     color: white;
     font-weight: bold;
 }
@@ -878,15 +882,180 @@ label {
 
 }
 
+.page-number {
+    margin: 0 4px;
+    padding: 4px 8px;
+    text-decoration: none;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.page-number:hover {
+    background-color: #ddd;
+}
 
 
-.block_report {
-    display: grid;
-    /* grid-template-columns: repeat(2,1fr); */
+
+.dots {
+    margin: 0 6px;
+    color: #777;
+    user-select: none;
 }
 
 
 
 
+
+
+
+.block_report {
+    display: grid;
+}
+
+
+
+
+
+
+
+
+.panel_cell {
+    border-radius: 10px;
+    box-shadow: 0px 0px 3px #0000008f;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-block: 15px;
+    padding-inline: 10px;
+    gap: 10px;
+    background-color: var(--color14);
+    color: white;
+    position: relative;
+}
+
+.panel_cell * {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+
+.cell_title {
+    gap: 10px;
+    justify-content: center;
+    font-size: 115%;
+    align-self: flex-start;
+    padding-inline: 10px;
+    color: var(--color-sec);
+    filter: saturate(195%);
+    position: relative;
+    /* width: 100%; */
+    /* display: grid; */
+    /* grid-template-columns: 25px auto 25px; */
+}
+
+.cell_title i {
+    font-size: 125%;
+}
+
+.cell_content {
+    /* display: none; */
+    flex-direction: column;
+    gap: 10px;
+    height: 30vh;
+    overflow-y: auto;
+    padding-block: 5px;
+}
+
+.cell_content::-webkit-scrollbar {
+    width: 5px;
+    height: 8px;
+}
+
+.cell_content::-webkit-scrollbar-thumb {
+    background-color: #ffffffbb;
+    border-radius: var(--border-radius-size);
+}
+
+.cell_content::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+.cell_empty {
+    color: #ffffffa8;
+    margin-top: 5px;
+    justify-self: center;
+}
+
+.panel_link {
+    border: 1px solid #ffffff70;
+    border-radius: 15px;
+    padding-inline: 10px;
+    padding-block: 5px;
+    display: grid;
+    grid-template-columns: 20px auto;
+    gap: 10px;
+    width: 95%;
+    color: white;
+}
+
+.panel_link i {
+    justify-self: center;
+    font-size: 115%;
+}
+
+.panel_link p {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.panel_link:hover {
+    filter: saturate(170%);
+    background-color: white;
+    /* box-shadow: 0px 0px 5px color-mix(in srgb, black 10%, var(--color15) 95%); */
+}
+
+.panel_link:hover i {
+    font-size: 140%;
+}
+
+.panel_link:hover p {
+    font-size: 110%;
+    /* z-index: 99999999; */
+    /* overflow: hidden; */
+    /* white-space: wrap; */
+}
+
+.link_crud:hover {
+    color: var(--color1);
+}
+
+.link_report:hover {
+    color: var(--color15);
+}
+
+.link_dashboard {
+    position: absolute;
+    top: 22.5px;
+    right: 15px;
+    font-size: 175%;
+    color: var(--color-sec);
+}
+
+.link_dashboard:hover {
+    /* color: white; */
+    color: var(--color16) ;
+    scale: 1.15;
+    /* box-shadow: 0px 0px 0px 5px white; */
+}
+
+/* .link_dashboard:hover i {
+} */
 
 

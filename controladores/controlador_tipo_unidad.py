@@ -70,19 +70,19 @@ def insert_row( nombre , descripcion=None ):
             {table_name} 
             ( nombre , descripcion , activo )
         VALUES 
-            ( '{nombre}' , '{descripcion}' , 1 )
+            ( %s , %s , 1 )
     '''
-    sql_execute(sql)
+    sql_execute(sql,( nombre , descripcion ))
 
 
 def update_row( id , nombre , descripcion ):
     sql = f'''
         update {table_name} set 
-        nombre = '{nombre}' ,
-        descripcion = '{descripcion}'
+        nombre = %s ,
+        descripcion = %s
         where {get_primary_key()} = {id}
     '''
-    sql_execute(sql)
+    sql_execute(sql, (nombre , descripcion ))
 
 
 #####_ ADICIONALES _#####
