@@ -6,6 +6,7 @@ from controladores import controlador_unidad as controlador_unidad
 from controladores import controlador_tipo_unidad as controlador_tipo_unidad
 from controladores import controlador_modelo as controlador_modelo
 from controladores import controlador_ubigeo as controlador_ubigeo
+from controladores import controlador_sucursal as controlador_sucursal
 
 import configuraciones
 from configuraciones import NOMBRE_BTN_UPDATE , NOMBRE_BTN_UNACTIVE , ACT_STATE_0 , ACT_STATE_1 , FUNCIONES_CRUD , NOMBRE_BTN_CONSULT , NOMBRE_BTN_DELETE , NOMBRE_BTN_INSERT , NOMBRE_BTN_LIST , NOMBRE_BTN_SEARCH , NOMBRE_CRUD_PAGE , NOMBRE_OPTIONS_COL , STATE_0 , STATE_1 , TITLE_STATE, ICON_PAGE_CRUD
@@ -304,7 +305,39 @@ CONTROLADORES = {
             "crud_delete": False ,
             "crud_unactive": False ,
         }
+    },
+    "sucursal" : {
+        "active":True,
+        "titulo":"Sucursal",
+        "nombre_tabla":"sucursal",
+        "controlador": controlador_sucursal,
+        "icon_page" : "ri-store-3-line",
+        "filters":[
+            ],
+        "fields_form": [
+        #         ID/NAME         LABEL             PLACEHOLDER        TYPE       REQUIRED   ABLE/DISABLE   DATOS
+            ['id',            'ID',               'ID',            'text',      True ,    False,         True ],
+            ['direccion',     'Dirección',       'Dirección',       'text',     True,       True,         None ],
+            ['ubigeo',         'Ubigeo',       'Elegir ubigeo',   'select',     True,       True,         [controlador_ubigeo.get_options() , 'ubigeo' ] ],
+            ['horario_l_v',   'Horario L-V',     'Ej: 9am - 6pm',    'text',     False,      True,         None ],
+            ['horario_s_d',   'Horario S-D',     'Ej: 9am - 1pm',    'text',     False,      True,         None ],
+            ['latitud',       'Latitud',         'Latitud',          'number',   False,      True,         None ],
+            ['longitud',      'Longitud',        'Longitud',         'number',   False,      True,         None ],
+            ['teléfono',      'Teléfono',        'Teléfono',         'text',     False,      True,         None ],
+            ['referencia',    'Referencia',      'Referencia',       'text',     False,      True,         None ],
+            ['activo',        f'{TITLE_STATE}',   'activo',        'p',         True ,     False,          None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
     }
+    
 }
 
 
