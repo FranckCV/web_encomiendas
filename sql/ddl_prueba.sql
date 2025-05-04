@@ -84,7 +84,7 @@ CREATE TABLE empleado (
   ape_materno varchar(150) NOT NULL, 
   cargoid     int(11) NOT NULL, 
   PRIMARY KEY (usuarioid));
-CREATE TABLE persona_natural (
+CREATE TABLE p_natural (
   usuarioid   int(10) NOT NULL, 
   nombre      int(11) NOT NULL, 
   ape_paterno int(11) NOT NULL, 
@@ -262,6 +262,6 @@ ALTER TABLE cargo ADD CONSTRAINT FKcargo330823 FOREIGN KEY (tipo_cargoid) REFERE
 ALTER TABLE empleado ADD CONSTRAINT FKempleado448484 FOREIGN KEY (usuarioid) REFERENCES usuario (id);
 ALTER TABLE usuario ADD CONSTRAINT FKusuario632844 FOREIGN KEY (tipo_documentoid) REFERENCES tipo_documento (id);
 ALTER TABLE juridica ADD CONSTRAINT FKjuridica199325 FOREIGN KEY (usuarioid) REFERENCES usuario (id);
-ALTER TABLE persona_natural ADD CONSTRAINT FKnatural685166 FOREIGN KEY (usuarioid) REFERENCES usuario (id);
+ALTER TABLE p_natural ADD CONSTRAINT FKnatural685166 FOREIGN KEY (usuarioid) REFERENCES usuario (id);
 ALTER TABLE reclamo ADD CONSTRAINT FKreclamo865871 FOREIGN KEY (usuarioid) REFERENCES usuario (id);
 ALTER TABLE paquete ADD CONSTRAINT FKpaquete426948 FOREIGN KEY (tipo_paqueteid) REFERENCES tipo_paquete (id);
