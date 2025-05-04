@@ -76,6 +76,11 @@ Dashboard de {{modulo[0]}}
         text-align: center;
         font-weight: bold;
     } */
+
+    .panel_options {
+        background-color: var(--color1);
+    }
+
 </style>
 {% endblock %}
 
@@ -109,14 +114,14 @@ Dashboard de {{modulo[0]}}
         {% endfor %}
         {% endif %}
 
-        {% if modulo[4] %}
+        <!-- {% if modulo[4] %}
         {% for page in modulo[4] %}
         <a class="panel_link link_report" href="{{url_for('reporte' , report_name = page[0] )}}">
             <i class="{{ page[2] }}"></i>
             <p>Reporte de {{ page[1] }} </p>
         </a>
         {% endfor %}
-        {% endif %}
+        {% endif %} -->
         {% else %}
         <p class="cell_empty">Sin contenido</p>
         {% endif %}

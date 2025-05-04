@@ -43,6 +43,7 @@ def get_table():
                 s.id,
                 s.direccion,
                 CONCAT(u.distrito, "/", u.provincia, "/", u.departamento) AS ubigeo,
+                s.ubigeocodigo,
                 s.horario_l_v,
                 s.horario_s_d,
                 s.latitud,
@@ -59,6 +60,7 @@ def get_table():
     columnas = {
         'id': ['ID', 0.5],
         'direccion': ['Dirección', 2.5],
+        # 'ubigeocodigo': ['Codigo', 2.5],
         'ubigeo': ['Ubigeo', 2.5], 
         'horario_l_v': ['Horario L-V', 2.5],
         'horario_s_d': ['Horario S-D', 2.5],
