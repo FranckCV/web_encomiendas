@@ -921,6 +921,12 @@ label {
 
 
 
+.block_panel {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(4, 1fr);
+    height: 100%;
+}
 
 .panel_cell {
     border-radius: 10px;
@@ -965,7 +971,7 @@ label {
     /* display: none; */
     flex-direction: column;
     gap: 10px;
-    height: 30vh;
+    height: 25vh;
     overflow-y: auto;
     padding-block: 5px;
 }
