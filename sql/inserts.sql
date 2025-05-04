@@ -1943,6 +1943,7 @@ INSERT INTO tipo_recojo (nombre) VALUES ('Recojo en tienda');
 INSERT INTO tipo_recojo (nombre) VALUES ('Envío a domicilio');
 INSERT INTO tipo_recojo (nombre) VALUES ('Con recojo y pago en tienda');
 
+
 -- Sucursal en Chiclayo - Central
 INSERT INTO sucursal (
   direccion,
@@ -1962,7 +1963,7 @@ INSERT INTO sucursal (
   -6.7714,
   -79.8409,
   '074-123456',
-  'Frente al parque principal',
+  'Frente a la cochera "Puerto del Inka"',
   1
 );
 
@@ -1989,28 +1990,6 @@ INSERT INTO sucursal (
   1
 );
 
--- Sucursal en Chiclayo - Tacna
-INSERT INTO sucursal (
-  direccion,
-  ubigeocodigo,
-  horario_l_v,
-  horario_s_d,
-  latitud,
-  longitud,
-  teléfono,
-  referencia,
-  activo
-) VALUES (
-  'Av. Tacna 164, Chiclayo',
-  '140101',
-  '09:00-13:00,14:00-18:00',
-  '09:00-13:00',
-  -6.7725,
-  -79.8420,
-  '074-789012',
-  'Cerca al mercado Modelo',
-  1
-);
 
 -- Sucursal en Pimentel
 INSERT INTO sucursal (
