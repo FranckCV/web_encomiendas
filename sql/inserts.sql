@@ -1942,3 +1942,118 @@ INSERT INTO `modelo` (`id`, `nombre`, `marcaid`, `tipo_unidadid`) VALUES
 INSERT INTO tipo_recojo (nombre) VALUES ('Recojo en tienda');
 INSERT INTO tipo_recojo (nombre) VALUES ('Envío a domicilio');
 INSERT INTO tipo_recojo (nombre) VALUES ('Con recojo y pago en tienda');
+
+-- Sucursal en Chiclayo - Central
+INSERT INTO sucursal (
+  direccion,
+  ubigeocodigo,
+  horario_l_v,
+  horario_s_d,
+  latitud,
+  longitud,
+  teléfono,
+  referencia,
+  activo
+) VALUES (
+  'Av. Mariscal Castilla 208, Chiclayo',
+  '140101',
+  '08:00-19:00',
+  '09:00-17:00',
+  -6.7714,
+  -79.8409,
+  '074-123456',
+  'Frente al parque principal',
+  1
+);
+
+-- Sucursal en Chiclayo - Santa Victoria
+INSERT INTO sucursal (
+  direccion,
+  ubigeocodigo,
+  horario_l_v,
+  horario_s_d,
+  latitud,
+  longitud,
+  teléfono,
+  referencia,
+  activo
+) VALUES (
+  'Av. Miguel Grau 675, Urb. Santa Victoria, Chiclayo',
+  '140101',
+  '09:00-13:00,14:00-18:00',
+  '09:00-13:00',
+  -6.7730,
+  -79.8415,
+  '074-654321',
+  'A una cuadra de la Av. Balta',
+  1
+);
+
+-- Sucursal en Chiclayo - Tacna
+INSERT INTO sucursal (
+  direccion,
+  ubigeocodigo,
+  horario_l_v,
+  horario_s_d,
+  latitud,
+  longitud,
+  teléfono,
+  referencia,
+  activo
+) VALUES (
+  'Av. Tacna 164, Chiclayo',
+  '140101',
+  '09:00-13:00,14:00-18:00',
+  '09:00-13:00',
+  -6.7725,
+  -79.8420,
+  '074-789012',
+  'Cerca al mercado Modelo',
+  1
+);
+
+-- Sucursal en Pimentel
+INSERT INTO sucursal (
+  direccion,
+  ubigeocodigo,
+  horario_l_v,
+  horario_s_d,
+  latitud,
+  longitud,
+  teléfono,
+  referencia,
+  activo
+) VALUES (
+  'Calle Torres Paz Nro. 224, Interior C, Pimentel',
+  '140104',
+  '09:00-13:00,14:00-18:00',
+  '09:00-13:00',
+  -6.8280,
+  -79.9300,
+  '074-345678',
+  'Frente al parque principal de Pimentel',
+  1
+);
+
+-- Sucursal en Lambayeque
+INSERT INTO sucursal (
+  direccion,
+  ubigeocodigo,
+  horario_l_v,
+  horario_s_d,
+  latitud,
+  longitud,
+  teléfono,
+  referencia,
+  activo
+) VALUES (
+  'Av. Huamachuco Nro. 809, Lambayeque',
+  '140201',
+  '09:00-14:00,15:00-18:00',
+  '09:00-13:00',
+  -6.7020,
+  -79.9060,
+  '074-987654',
+  'Frente al parque infantil',
+  1
+);
