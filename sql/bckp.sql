@@ -2058,15 +2058,15 @@ CREATE TABLE `unidad` (
 -- Volcado de datos para la tabla `unidad`
 --
 
-INSERT INTO `unidad` (`id`, `placa`, `capacidad`, `volumen`, `observaciones`, `activo`, `modeloid`) VALUES
-(1, 'ABC123f', 15000.00, 60.00, 'Unidad en buen estado', 1, 1),
-(2, 'DEF456', 4000.00, 20.00, 'Requiere revisión técnica', 0, 2),
-(3, 'GHI789', 30000.00, 80.00, NULL, 1, 12),
-(4, 'JKL321', 8000.00, 50.00, 'Unidad fuera de servicio', 0, 7),
-(5, 'MNO654', 2500.00, 10.00, 'Unidad nueva', 1, 10),
-(6, 'PQR987', 1500.00, 60.00, 'None', 1, 3),
-(7, 'STU135', 4000.00, 20.00, 'Unidad asignada a ruta norte', 1, 9),
-(8, 'VWX246', 8000.00, 50.00, 'Con aire acondicionado', 1, 4);
+-- INSERT INTO `unidad` (`id`, `placa`, `capacidad`, `volumen`, `observaciones`, `activo`, `modeloid`) VALUES
+-- (1, 'ABC123f', 15000.00, 60.00, 'Unidad en buen estado', 1, 1),
+-- (2, 'DEF456', 4000.00, 20.00, 'Requiere revisión técnica', 0, 2),
+-- (3, 'GHI789', 30000.00, 80.00, NULL, 1, 12),
+-- (4, 'JKL321', 8000.00, 50.00, 'Unidad fuera de servicio', 0, 7),
+-- (5, 'MNO654', 2500.00, 10.00, 'Unidad nueva', 1, 10),
+-- (6, 'PQR987', 1500.00, 60.00, 'None', 1, 3),
+-- (7, 'STU135', 4000.00, 20.00, 'Unidad asignada a ruta norte', 1, 9),
+-- (8, 'VWX246', 8000.00, 50.00, 'Con aire acondicionado', 1, 4);
 
 --
 -- Índices para tablas volcadas
