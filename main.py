@@ -7,6 +7,12 @@ from controladores import controlador_tipo_unidad as controlador_tipo_unidad
 from controladores import controlador_modelo as controlador_modelo
 from controladores import controlador_ubigeo as controlador_ubigeo
 from controladores import controlador_sucursal as controlador_sucursal
+from controladores import controlador_tamaño_caja as controlador_tamaño_caja
+from controladores import controlador_tipo_cargo as controlador_tipo_cargo
+from controladores import controlador_tipo_paquete as controlador_tipo_paquete
+from controladores import controlador_estado_encomienda as controlador_estado_encomienda
+
+
 
 import configuraciones
 from configuraciones import NOMBRE_BTN_UPDATE , NOMBRE_BTN_UNACTIVE , ACT_STATE_0 , ACT_STATE_1 , FUNCIONES_CRUD , NOMBRE_BTN_CONSULT , NOMBRE_BTN_DELETE , NOMBRE_BTN_INSERT , NOMBRE_BTN_LIST , NOMBRE_BTN_SEARCH , NOMBRE_CRUD_PAGE , NOMBRE_OPTIONS_COL , STATE_0 , STATE_1 , TITLE_STATE, ICON_PAGE_CRUD
@@ -321,8 +327,8 @@ CONTROLADORES = {
             ['ubigeocodigo',  'Ubigeo',          'Elegir ubigeo',   'select',     True,       True,         [controlador_ubigeo.get_options() , 'ubigeo' ] ],
             ['horario_l_v',   'Horario L-V',     'Ej: 9am - 6pm',   'text',     False,      True,         None ],
             ['horario_s_d',   'Horario S-D',     'Ej: 9am - 1pm',   'text',     False,      True,         None ],
-            ['latitud',       'Latitud',         'Latitud',         'number',   False,      True,         None ],
-            ['longitud',      'Longitud',        'Longitud',        'number',   False,      True,         None ],
+            ['latitud',       'Latitud',         'Latitud',         'text',   False,      True,         None ],
+            ['longitud',      'Longitud',        'Longitud',        'text',   False,      True,         None ],
             ['teléfono',      'Teléfono',        'Teléfono',        'text',     False,      True,         None ],
             ['referencia',    'Referencia',      'Referencia',      'text',     False,      True,         None ],
             ['activo',        f'{TITLE_STATE}',  'activo',          'p',         True ,     False,          None ],
@@ -336,8 +342,109 @@ CONTROLADORES = {
             "crud_delete": True ,
             "crud_unactive": True ,
         }
-    }
-    
+    },
+    "tamaño_caja": {
+        "active" : True ,
+        "titulo": "tamaños de cajas",
+        "nombre_tabla": "tamaño de caja",
+        "controlador": controlador_tamaño_caja,
+        "icon_page": 'fa-solid fa-box-open',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "estado_encomienda": {
+        "active" : True ,
+        "titulo": "estados de encomiendas",
+        "nombre_tabla": "estado de encomienda",
+        "controlador": controlador_estado_encomienda,
+        "icon_page": 'fa-solid fa-boxes-packing',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "tipo_cargo": {
+        "active" : True ,
+        "titulo": "tipos de cargos",
+        "nombre_tabla": "tipo de cargo",
+        "controlador": controlador_tipo_cargo,
+        "icon_page": 'ri-file-user-fill',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "tipo_paquete": {
+        "active" : True ,
+        "titulo": "tipos de paquetes",
+        "nombre_tabla": "tipo de paquete",
+        "controlador": controlador_tipo_paquete,
+        "icon_page": 'ri-box-3-fill',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
 }
 
 
@@ -536,7 +643,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : 'fa-solid fa-box',
         'dashboard' : True,
-        'cruds' :     [  ],
+        'cruds' :     [ 'estado_encomienda','tipo_paquete' ],
         'reports' :   [ 'top_envios' , 'envios_tipo' , 'entregado_pendiente' ],
     },
     'atencion' : {
@@ -552,7 +659,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : 'fa-solid fa-file-invoice-dollar',
         'dashboard' : True,
-        'cruds' :     [  ],
+        'cruds' :     ['tamaño_caja' ],
         'reports' :   [ 'articulos_mas_vendidos'  ],
     },
     'seguridad' : {
@@ -568,7 +675,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : 'fa-solid fa-briefcase',
         'dashboard' : True,
-        'cruds' :     [  ],
+        'cruds' :     [ 'tipo_cargo' ],
         'reports' :   [  ],
     },
 }
