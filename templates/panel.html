@@ -8,7 +8,13 @@ Panel Administrativo
 
 {% block estilos %}
 
-<link rel="stylesheet" href="/static/css/panel.css">
+<style>
+    .section_content {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: repeat(4, 1fr);
+    }
+</style>
 
 {% endblock %}
 
@@ -22,6 +28,13 @@ Panel Administrativo
         <i class="{{ modulo[1] }}"></i>
         <div>{{ modulo[0] }}</div>
     </div>
+
+    {% if modulo[2] %}
+    <a class="link_dashboard" href="{{url_for('dashboard',module_name = modulo[5] )}}">
+        <i class="{{ICON_PAGE_DASHBOARD}}"></i>
+    </a>
+    {% endif %}
+
     <div class="line_separator"></div>
     <div class="cell_content">
         {% if modulo[3] or modulo[4] %}

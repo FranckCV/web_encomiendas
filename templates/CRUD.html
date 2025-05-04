@@ -1,0 +1,503 @@
+{% extends "MAESTRA_ADMIN.html" %}
+
+
+{% block titulo %}
+{{NOMBRE_CRUD_PAGE}} {{titulo}}
+{% endblock %}
+
+
+{% block estilos %}
+{% endblock %}
+
+
+{% block contenido %}
+<!--Nombre del crud-->
+<div class="block_crud">
+  <h3 class="crud_title">
+    {% if HABILITAR_ICON_PAGES %}
+    <i class="{{icon_page_crud}}"></i>
+    {% endif %}
+    {{NOMBRE_CRUD_PAGE}} {{titulo}}
+  </h3>
+</div>
+
+<!--Panel de búsqueda-->
+<div class="block_crud">
+  <div class="panel_row row">
+    {% if crud_search %}
+    {% if value_search %}
+    <div class="col-3">
+      <a class="button" href="{{ url_for('crud_generico', tabla = tabla) }}">
+        <i class="fa-solid fa-left-long"></i>
+        <p>Volver al listado principal</p>
+      </a>
+    </div>
+    <!-- <div class="col-1"></div> -->
+    {% endif %}
+
+    <div class="col">
+      <div class="input_search">
+        <div class="input-group">
+          <input required type="text" class="form-control" placeholder="Buscar {{ titulo }}"
+            aria-label="Recipient's username" aria-describedby="button-addon2" id="value_search" name="value_search" />
+
+          <button class="btn" type="submit" id="button-addon2">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {% endif %}
+
+    {% if filters != [] %}
+    {% for filter in filters %}
+    <div class="col-2">
+      <div class="form_field">
+        <select name="{{filter[0]}}" id="{{filter[0]}}" class="filterSelect">
+          <option value="default" selected>{{filter[1]}}</option>
+          {% for option in filter[2] %}
+          <option value="{{option[0]}}">{{option[1]}}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if not value_search %}
+    {% if crud_insert %}
+    <!-- <div class="col-1"></div> -->
+    <div class="col-2">
+      <button class="button clickable-modal btn_crud btn_insert" id="modal_crud_insert">
+        <i class="fa-solid fa-circle-plus"></i>
+        <p>{{NOMBRE_BTN_INSERT}}</p>
+      </button>
+    </div>
+    {% endif %}
+    {% endif %}
+
+  </div>
+</div>
+
+<!--Tabla-->
+<div class="block_crud block_table">
+  <div class="table-container">
+    <table cellspacing="0" class="table_listado">
+      <thead>
+        <tr>
+          {% for col in key_columns %}
+          <th {% if primary_key==col %} class="td_primary_key" {% elif col=='activo' %}
+            style="width: calc( 1 * var(--width-column) );" {% else %}
+            style="width: calc( {{columnas[col][1]}} * var(--width-column) );" {% endif %}>
+            <div class="th_content">
+              <p>
+                {{ columnas[col][0] }}
+              </p>
+            </div>
+          </th>
+          {% endfor %}
+
+          {% if crud_consult or crud_unactive or crud_update or crud_delete %}
+          <th class="opciones_column" style="width: calc( 0.5 * var(--width-column) );">
+            <p>
+              {{NOMBRE_OPTIONS_COL}}
+            </p>
+          </th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody id="productTableBody">
+        {% for fila in filas %}
+
+        <tr {% for resultado in filas %} {% if resultado[primary_key]==fila[primary_key] %} {% for col in table_columns
+          %} data-{{col}}="{{resultado[col]}}" {% endfor %} {% endif %} {% endfor %}>
+          {% for col_name in key_columns %}
+          <td class="{% if primary_key == col_name %} td_primary_key {% endif %}" td_name="{{col_name}}">
+            <div
+              class="td_content {% if col_name == primary_key %} td_primary_key {% elif col_name == 'activo' %} td_activo {% endif %}">
+              {% if col_name == 'activo' %}
+              {% if fila[col_name] == 1 %}
+              <p class="activo btn_active">{{STATE_1}}</p>
+              {% else %}
+              <p class="activo btn_unactive">{{STATE_0}}</p>
+              {% endif %}
+              {% else %}
+              {% if fila[col_name] == None or fila[col_name] == '' %}
+              <p class="text_none">Sin {{columnas[col_name][0] | lower }}</p>
+              {% else %}
+              <p class="p_value">{{ fila[col_name] }}</p>
+              {% endif %}
+              {% endif %}
+            </div>
+          </td>
+          {% endfor %}
+
+          {% if crud_consult or crud_unactive or crud_update or crud_delete %}
+          <td class="opciones_column">
+            <div class="acciones">
+
+              {% if crud_consult %}
+              <div class="opciones_fila">
+                <button class="clickable-modal btn_consult" id="modal_crud_consult_{{fila[primary_key]}}">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+              {% endif %}
+
+              {% if crud_unactive %}
+              {% if fila['activo'] == 1 %}
+              <div class="opciones_fila">
+                <button class="clickable-modal btn_active" id="modal_crud_unactive_{{fila[primary_key]}}">
+                  <i class="fa-solid fa-square-check"></i>
+                </button>
+              </div>
+              {% else %}
+              <div class="opciones_fila">
+                <button class="clickable-modal btn_unactive" id="modal_crud_unactive_{{fila[primary_key]}}">
+                  <i class="fa-regular fa-square-check"></i>
+                </button>
+              </div>
+              {% endif %}
+              {% endif %}
+
+              {% if crud_update %}
+              <div class="opciones_fila">
+                <button class="clickable-modal btn_update" id="modal_crud_update_{{fila[primary_key]}}">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+              </div>
+              {% endif %}
+
+              {% if crud_delete %}
+              <div class="opciones_fila">
+                <button class="clickable-modal btn_delete" id="modal_crud_delete_{{fila[primary_key]}}">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+              {% endif %}
+
+            </div>
+          </td>
+          {% endif %}
+
+        </tr>
+
+        {% endfor %}
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+<!--Paginación-->
+<div class="block_crud">
+  <div class="row pagination_block">
+    <div class="col-4">
+      <div class="form_field">
+        <p for="">Mostrar</p>
+        <select name="cant_pag" id="cant_pag">
+          {% for option in options_pagination_crud %}
+          <option value="{{ option }}" {% if option==selected_option_crud %}selected{% endif %}>{{ option }}</option>
+          {% endfor %}
+        </select>
+        <p for="">registros por página</p>
+
+
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="pagination" id="paginationControls">
+        <a href="javascript:void(0)" class="previous-page disable"><i class="fas fa-angle-left"></i></a>
+        <div id="pageNumbers" class="page-numbers"></div>
+        <a href="javascript:void(0)" class="next-page"><i class="fas fa-angle-right"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% for fila in filas %}
+
+{% if crud_unactive %}
+<div class="space_modal modal_crud_unactive" id="modal_crud_unactive_{{fila[primary_key]}}">
+  <form class="modal_crud_content" action="{{ url_for('crud_unactive', tabla = tabla) }}" method="POST">
+
+    <div class="row">
+      <h3>{{NOMBRE_BTN_UNACTIVE}} {{nombre_tabla}} </h3>
+      <!-- <hr> -->
+    </div>
+    <input type="hidden" name="{{primary_key}}" id="{{primary_key}}" value="{{fila[primary_key]}}">
+    <p>¿Está seguro de que desea {% if fila['activo'] == 0 %}
+      {{ ACT_STATE_1 | lower }}
+      {% elif fila['activo'] == 1 %}
+      {{ ACT_STATE_0 | lower }}
+      {% endif %} este {{nombre_tabla}} (ID: {{fila[primary_key]}}) ?</p>
+
+    <div class="row">
+      <div class="col">
+        <div class="button btn_back" onclick="closeModal()">Cancelar</div>
+      </div>
+      <div class="col-1"></div>
+      <div class="col">
+        <button class="button btn_acept" type="submit">
+          Aceptar
+        </button>
+      </div>
+    </div>
+
+  </form>
+</div>
+{% endif %}
+
+{% if crud_delete %}
+<div class="space_modal modal_crud_delete" id="modal_crud_delete_{{fila[primary_key]}}">
+  <form class="modal_crud_content" action="{{ url_for('crud_delete', tabla = tabla) }}" method="POST">
+
+    <input type="hidden" name="{{primary_key}}" id="{{primary_key}}" value="{{fila[primary_key]}}">
+
+    <div class="row">
+      <h3>{{NOMBRE_BTN_DELETE}} {{nombre_tabla}} </h3>
+      <!-- <hr> -->
+    </div>
+
+    <p>¿Está seguro de que desea eliminar este {{nombre_tabla}} (ID: {{fila[primary_key]}}) ?</p>
+
+    <div class="row">
+      <div class="col">
+        <div class="button btn_back" onclick="closeModal()">Cancelar</div>
+      </div>
+      <div class="col-1"></div>
+      <div class="col">
+        <button class="button btn_acept" type="submit">Aceptar</button>
+      </div>
+    </div>
+
+  </form>
+</div>
+{% endif %}
+
+
+{% if crud_consult %}
+<div class="space_modal modal_crud_consult" id="modal_crud_consult_{{fila[primary_key]}}">
+  <div class="modal_crud_content">
+    <div class="row">
+      <h3>{{NOMBRE_BTN_CONSULT}} {{nombre_tabla}}</h3>
+    </div>
+
+    <div class="row form_fields">
+
+      {% for campo in fields_form %}
+
+      <div class="form_field form_{{campo[3]}}">
+        <label for="{{campo[0]}}">{{campo[1]}}:</label>
+        {% if campo[3] == 'select' %}
+        <input id="{{campo[0]}}" name="{{campo[0]}}" placeholder="{{campo[2]}}" type="text" {% if campo[4] %}required{%
+          endif %} {% if campo[5]==False %}disabled{% endif %} value="{{ fila[campo[6][1]] }}" disabled>
+        </select>
+        {% elif campo[3] == 'textarea' %}
+        <textarea id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif %}
+          disabled>{% if fila[campo[0]] != None  %} {{fila[campo[0]]}} {% endif %}</textarea>
+        {% elif campo[3] == 'p' %}
+        <div class="form_p_content">
+          {% if campo[0] == 'activo' %}
+          {% if fila[campo[0]] == 0 %}
+          <p class="activo btn_unactive">{{STATE_0}}</p>
+          {% else %}
+          <p class="activo btn_active">{{STATE_1}}</p>
+          {% endif %}
+          {% else %}
+          <p id="{{campo[0]}}" name="{{campo[0]}}">{% if fila[campo[0]] != None %} {{fila[campo[0]]}} {% endif %}</p>
+          {% endif %}
+        </div>
+        {% else %}
+        {% if fila[campo[0]] == None or fila[campo[0]] == '' %}
+        <input class="input_vacio" type="{{campo[3]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{%
+          endif %} placeholder="Sin {{columnas[campo[0]] | lower }}" disabled>
+        {% else %}
+        <input type="{{campo[3]}}" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4]
+          %}required{% endif %} value="{{fila[campo[0]]}}" disabled>
+        {% endif %}
+        {% endif %}
+      </div>
+
+      {% endfor %}
+
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <button class="button btn_back" onclick="closeModal()">Cancelar</button>
+      </div>
+      <div class="col-1"></div>
+      <div class="col">
+        <button class="button btn_acept" onclick="closeModal()">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+
+{% if crud_update %}
+<div class="space_modal modal_crud_update" id="modal_crud_update_{{fila[primary_key]}}">
+  <form class="modal_crud_content" action="{{ url_for('crud_update', tabla = tabla) }}" method="POST">
+
+    <div class="row">
+      <h3>{{NOMBRE_BTN_UPDATE}} {{nombre_tabla}} </h3>
+    </div>
+
+    <div class="row form_fields">
+      <input type="hidden" id="{{primary_key}}" name="{{primary_key}}" value="{{fila[primary_key]}}">
+
+      {% for campo in fields_form %}
+
+      <div class="form_field form_{{campo[3]}}">
+        <label for="">{{campo[1]}}:</label>
+        {% if campo[3] == 'select' %}
+        <select id="{{campo[0]}}" name="{{campo[0]}}">
+          {% for option in campo[6][0] %}
+          <option value="{{option[0]}}" {% if fila[campo[0]]==option[0] %}selected{% endif %}>{{option[1]}}</option>
+          {% endfor %}
+        </select>
+        {% elif campo[3] == 'p' %}
+        <div class="form_p_content">
+          {% if campo[0] == 'activo' %}
+          {% if fila[campo[0]] == 0 %}
+          <p class="activo btn_unactive">{{STATE_0}}</p>
+          {% else %}
+          <p class="activo btn_active">{{STATE_1}}</p>
+          {% endif %}
+          {% else %}
+          <p id="{{campo[0]}}" name="{{campo[0]}}">{% if fila[campo[0]] != None %} {{fila[campo[0]]}} {% endif %}</p>
+          {% endif %}
+        </div>
+        {% elif campo[3] == 'textarea' %}
+        <textarea id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif
+          %}>{{fila[campo[0]]}}</textarea>
+        {% else %}
+        <input {% if primary_key==campo[0] %} id="_{{campo[0]}}" name="_{{campo[0]}}" disabled {% else %}
+          id="{{campo[0]}}" name="{{campo[0]}}" {% endif %} type="{{campo[3]}}" placeholder="{{campo[2]}}" {% if
+          campo[4] %}required{% endif %} value="{{fila[campo[0]]}}" {% if campo[5]==False %}disabled{% endif %}>
+        {% endif %}
+      </div>
+
+      {% endfor %}
+
+    </div>
+    <!-- <p class="error_form"></p> -->
+
+    <div class="row">
+      <div class="col">
+        <div class="button btn_back" onclick="closeModal()">Cancelar</div>
+      </div>
+      <div class="col-1"></div>
+      <div class="col">
+        <button class="button btn_acept" type="submit">Aceptar</button>
+      </div>
+    </div>
+
+  </form>
+</div>
+{% endif %}
+{% endfor %}
+
+
+{% if crud_insert %}
+<div class="space_modal modal_crud_insert" id="modal_crud_insert">
+  <form class="modal_crud_content" action="{{ url_for('crud_insert', tabla = tabla) }}" method="POST">
+
+    <div class="row">
+      <h3>{{NOMBRE_BTN_INSERT}} {{nombre_tabla}}</h3>
+    </div>
+
+    <div class="row form_fields">
+
+      {% for campo in fields_form %}
+
+      <div class="form_field form_{{campo[3]}}">
+        <label for="">{{campo[1]}}:</label>
+        {% if campo[3] == 'select' %}
+        <select id="{{campo[0]}}" name="{{campo[0]}}">
+          <option value="-1" disabled selected>{{campo[2]}}</option>
+          {% for option in campo[6][0] %}
+          <option value="{{option[0]}}">{{option[1]}}</option>
+          {% endfor %}
+        </select>
+        {% elif campo[3] == 'p' %}
+        <div class="form_p_content">
+          {% if campo[0] == 'activo' %}
+          <p class="activo btn_active">{{STATE_1}}</p>
+          {% else %}
+          <p id="{{campo[0]}}" name="{{campo[0]}}"></p>
+          {% endif %}
+        </div>
+        {% elif campo[3] == 'textarea' %}
+        <textarea id="{{campo[0]}}" placeholder="{{campo[2]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif
+          %}></textarea>
+        {% else %}
+        <input id="{{campo[0]}}" name="{{campo[0]}}" type="{{campo[3]}}" placeholder="{{campo[2]}}" {% if campo[4]
+          %}required{% endif %} {% if campo[5]==False or campo[5]==None %}disabled{% endif %}>
+        {% endif %}
+      </div>
+
+      {% endfor %}
+
+    </div>
+    <!-- <p class="error_form"></p> -->
+
+    <div class="row">
+      <div class="col">
+        <button class="button btn_back" onclick="closeModal()">Cancelar</button>
+      </div>
+      <div class="col-1"></div>
+      <div class="col">
+        <button class="button btn_acept" type="submit">Aceptar</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+
+<div id="overlayModal" class="overlayModal">
+  <div id="enlargedModal">
+  </div>
+</div>
+
+{% endblock %}
+
+
+
+{% block scripts %}
+
+
+<script>
+  const divs = document.querySelectorAll('.td_content:not(.td_primary_key)');
+
+  divs.forEach(div => {
+    let elementP = div.querySelector('.p_value');
+    if (elementP) {
+      let content = elementP.innerText.trim();
+
+      if (!isNaN(content) && content.includes('.')) {
+        div.classList.add('td_right');
+      }
+      else if (!isNaN(content)) {
+        div.classList.add('td_right');
+      }
+      else {
+        div.classList.add('td_left');
+      }
+    }
+  });
+</script>
+<script src="/static/js/crudModal.js"></script>
+<script src="/static/js/orderHeadTable.js"></script>
+<script src="/static/js/paginationCrud.js"></script>
+
+
+
+
+
+{% endblock %}

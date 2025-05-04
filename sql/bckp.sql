@@ -2162,12 +2162,3 @@ ALTER TABLE `modelo`
 ALTER TABLE `unidad`
   ADD CONSTRAINT `FKunidad608127` FOREIGN KEY (`modeloid`) REFERENCES `modelo` (`id`);
 COMMIT;
----TABLA TIPO_RECOJO
-CREATE TABLE tipo_recojo (
-  id     int(11) NOT NULL AUTO_INCREMENT, 
-  nombre varchar(100) NOT NULL, 
-  PRIMARY KEY (id));
-
-  INSERT INTO tipo_recojo (nombre) VALUES ('Recojo en tienda');
-INSERT INTO tipo_recojo (nombre) VALUES ('Envío a domicilio');
-INSERT INTO tipo_recojo (nombre) VALUES ('Con recojo y pago en tienda');

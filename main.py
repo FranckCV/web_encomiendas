@@ -7,6 +7,7 @@ from controladores import controlador_tipo_unidad as controlador_tipo_unidad
 from controladores import controlador_modelo as controlador_modelo
 from controladores import controlador_ubigeo as controlador_ubigeo
 
+import configuraciones
 from configuraciones import NOMBRE_BTN_UPDATE , NOMBRE_BTN_UNACTIVE , ACT_STATE_0 , ACT_STATE_1 , FUNCIONES_CRUD , NOMBRE_BTN_CONSULT , NOMBRE_BTN_DELETE , NOMBRE_BTN_INSERT , NOMBRE_BTN_LIST , NOMBRE_BTN_SEARCH , NOMBRE_CRUD_PAGE , NOMBRE_OPTIONS_COL , STATE_0 , STATE_1 , TITLE_STATE, ICON_PAGE_CRUD
 from functools import wraps
 import inspect
@@ -46,6 +47,9 @@ def articulos_mas_vendidos():
 
     return lista
 
+# ri-layout-grid-fill
+# ri-function-line
+# ri-layout-4-fill
 
 def datos_usuario():
     lista = {
@@ -109,7 +113,7 @@ def listar_admin_pages():
                             p_icon_page = get_icon_page(config_page.get('icon_page'))
                             pages_report.append([ page , p_titulo , p_icon_page ])
             
-            modules.append([ name , icon_module , dashboard , pages_crud , pages_report])
+            modules.append([ name , icon_module , dashboard , pages_crud , pages_report , module])
     return modules
 
 
@@ -180,7 +184,6 @@ CONTROLADORES = {
         "titulo": "tipos de unidades",
         "nombre_tabla": "tipo de unidad",
         "controlador": controlador_tipo_unidad,
-        "main_column": 'nombre',
         "icon_page": 'fa-solid fa-truck-plane',
         "filters": [
             ['activo', f'{TITLE_STATE}', get_options_active() ],
@@ -207,7 +210,6 @@ CONTROLADORES = {
         "titulo": "marcas de unidades",
         "nombre_tabla": "marca",
         "controlador": controlador_marca,
-        "main_column": 'nombre',
         "icon_page": 'fa-solid fa-car-side',
         "filters": [] ,
         "fields_form": [
@@ -230,7 +232,6 @@ CONTROLADORES = {
         "titulo": "modelos de unidades",
         "nombre_tabla": "modelo",
         "controlador": controlador_modelo,
-        "main_column": 'nom_mod',
         "icon_page": 'fa-solid fa-cogs',
         "filters": [] ,
         "fields_form": [
@@ -255,7 +256,6 @@ CONTROLADORES = {
         "titulo": "unidades",
         "nombre_tabla": "unidad",
         "controlador": controlador_unidad,
-        "main_column": 'placa',
         "icon_page": 'fa-solid fa-truck-fast',
         "filters": [
             ['activo', f'{TITLE_STATE}', get_options_active() ],
@@ -281,13 +281,11 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-    #ESTO ES PARA LO QUE SALE EN EL MODAL
     "ubigeo" : {
         "active":True,
         "titulo":"Ubigeo",
         "nombre_tabla":"ubigeo",
         "controlador": controlador_ubigeo,
-        "main_column":"distrito",
         "icon_page" : "ri-map-pin-line",
         "filters":[],
         "fields_form": [
@@ -349,11 +347,11 @@ REPORTES = {
         "active" : True ,
         'icon_page' : 'fa-solid fa-dollar-sign' ,
         "titulo": "artículos más vendidos",
-        "elements" : {
-            'graph'  : False ,
-            'table'  : True,
-            'counter': False ,
-        } ,
+        "elements": {
+            "graph": True,
+            "table": False,
+            "counter": False,
+        },
         "graph" : {
             "chart": {
                 "type": 'bar',
@@ -373,11 +371,11 @@ REPORTES = {
         "active" : True ,
         'icon_page' : 'fa-solid fa-dollar-sign' ,
         "titulo": "top de envios de encomiendas",
-        "elements" : {
-            'graph'  : False ,
-            'table'  : True,
-            'counter': False ,
-        } ,
+        "elements": {
+            "graph": True,
+            "table": False,
+            "counter": False,
+        },
         "graph" : {
             "chart": {
                 "type": 'bar',
@@ -402,11 +400,11 @@ REPORTES = {
         "active" : True ,
         'icon_page' : 'fa-solid fa-dollar-sign' ,
         "titulo": "envios por tipo de articulo",
-        "elements" : {
-            'graph'  : False ,
-            'table'  : True,
-            'counter': False ,
-        } ,
+        "elements": {
+            "graph": True,
+            "table": False,
+            "counter": False,
+        },
         "graph" : {
             "chart": {
                 "type": 'pie',
@@ -436,11 +434,11 @@ REPORTES = {
         "active" : True ,
         'icon_page' : 'fa-solid fa-dollar-sign' ,
         "titulo": "encomiendas entregadas vs pendientes",
-        "elements" : {
-            'graph'  : False ,
-            'table'  : True,
-            'counter': False ,
-        } ,
+        "elements": {
+            "graph": True,
+            "table": False,
+            "counter": False,
+        },
         "graph" : {
             "chart": {
                 "type": 'donut',
@@ -465,6 +463,18 @@ REPORTES = {
             }]
         },
     },
+    # LISTADO
+    "lista_unidades": {
+        "active" : True ,
+        'icon_page' : 'fa-solid fa-dollar-sign' ,
+        "titulo": "unidades",
+        "elements" : {
+            'graph'  : False ,
+            'table'  : True,
+            'counter': False ,
+        } ,
+        "table" : controlador_unidad.get_report_test(),
+    },
 }
 
 
@@ -473,7 +483,7 @@ MENU_ADMIN = {
         'name' : 'Administración',
         'active': True ,
         'icon_page' : 'fa-solid fa-user-tie',
-        'dashboard' : False,
+        'dashboard' : True,
         'cruds' :     [ 'tipo_unidad' , 'marca' , 'modelo' , 'unidad' , 'sucursal'],
         'reports' :   [ 
             'ingresos_periodo' , 
@@ -484,15 +494,15 @@ MENU_ADMIN = {
         'name' : 'Logística',
         'active': True ,
         'icon_page' : 'fa-solid fa-truck-front',
-        'dashboard' : False,
-        'cruds' :     [  ],
-        'reports' :   [  ],
+        'dashboard' : True,
+        'cruds' :     [ 'ubigeo' ],
+        'reports' :   [ 'lista_unidades' ],
     },
     'encomienda' : {
         'name' : 'Encomiendas',
         'active': True ,
         'icon_page' : 'fa-solid fa-box',
-        'dashboard' : False,
+        'dashboard' : True,
         'cruds' :     [  ],
         'reports' :   [ 'top_envios' , 'envios_tipo' , 'entregado_pendiente' ],
     },
@@ -500,7 +510,7 @@ MENU_ADMIN = {
         'name' : 'Atención al Cliente',
         'active': True ,
         'icon_page' : 'fa-solid fa-circle-question',
-        'dashboard' : False,
+        'dashboard' : True,
         'cruds' :     [  ],
         'reports' :   [ ],
     },
@@ -508,7 +518,7 @@ MENU_ADMIN = {
         'name' : 'Ventas',
         'active': True ,
         'icon_page' : 'fa-solid fa-file-invoice-dollar',
-        'dashboard' : False,
+        'dashboard' : True,
         'cruds' :     [  ],
         'reports' :   [ 'articulos_mas_vendidos'  ],
     },
@@ -516,7 +526,7 @@ MENU_ADMIN = {
         'name' : 'Seguridad',
         'active': True ,
         'icon_page' : 'fa-solid fa-shield-halved',
-        'dashboard' : False,
+        'dashboard' : True,
         'cruds' :     [  ],
         'reports' :   [  ],
     },
@@ -524,7 +534,7 @@ MENU_ADMIN = {
         'name' : 'Personal',   
         'active': True ,
         'icon_page' : 'fa-solid fa-briefcase',
-        'dashboard' : False,
+        'dashboard' : True,
         'cruds' :     [  ],
         'reports' :   [  ],
     },
@@ -536,6 +546,11 @@ MENU_ADMIN = {
 @app.route("/")
 def main_page():
     return redirect(url_for('index'))
+
+
+def admin_page():
+    return redirect(url_for('panel'))
+
 
 def redirect_url(url):
     return redirect(url_for(url))
@@ -570,6 +585,7 @@ def inject_globals():
     cookie_error = request.cookies.get('error')
     info_variables_crud = False
     HABILITAR_ICON_PAGES = True
+    modulo_actual = ''
 
     return dict(
         info_variables_crud = info_variables_crud,
@@ -578,8 +594,8 @@ def inject_globals():
         options_pagination_crud = options_pagination_crud ,
         selected_option_crud = selected_option_crud ,
         cookie_error = cookie_error,
+        modulo_actual = modulo_actual ,
 
-        ICON_PAGE_CRUD = ICON_PAGE_CRUD,
         MENU_ADMIN = MENU_ADMIN,
         HABILITAR_ICON_PAGES = HABILITAR_ICON_PAGES,
         SYSTEM_NAME = SYSTEM_NAME,
@@ -596,11 +612,18 @@ def inject_globals():
         NOMBRE_BTN_LIST     = NOMBRE_BTN_LIST,
         NOMBRE_BTN_CONSULT  = NOMBRE_BTN_CONSULT,
         NOMBRE_BTN_SEARCH   = NOMBRE_BTN_SEARCH,
-
+        ICON_PAGE_CRUD      = configuraciones.ICON_PAGE_CRUD ,
+        ICON_PAGE_REPORT    = configuraciones.ICON_PAGE_REPORT ,
+        ICON_PAGE_DASHBOARD = configuraciones.ICON_PAGE_DASHBOARD ,
     )
 
 
-paginas_simples = [ "index" , 'login' , 'sign_up', 'sucursales']
+paginas_simples = [ 
+    "index" , 
+    'login' , 
+    'sign_up', 
+    'sucursales' ,
+]
 
 for pagina in paginas_simples:
     app.add_url_rule(
@@ -611,8 +634,13 @@ for pagina in paginas_simples:
 
 
 
+@app.route("/panel")
+def panel():
+    return render_template('panel.html')
 
-##################_ CRUD PAGE _################## 
+
+
+##################_ ADMIN PAGE _################## 
 
 @app.route("/crud=<tabla>")
 def crud_generico(tabla):
@@ -631,7 +659,6 @@ def crud_generico(tabla):
     titulo = config["titulo"]
     controlador = config["controlador"]
     nombre_tabla = config["nombre_tabla"]
-    main_column = config["main_column"]
     filters = config["filters"]
     fields_form = config["fields_form"]
 
@@ -652,22 +679,17 @@ def crud_generico(tabla):
 
 
     return render_template(
-        "listado.html" ,
+        "CRUD.html" ,
         tabla          = tabla ,
         nombre_tabla   = nombre_tabla ,
         icon_page_crud = icon_page_crud ,
         titulo         = titulo ,
         filas          = filas ,
         primary_key    = primary_key ,
-        # resultados     = resultados,
         filters        = filters,
         fields_form    = fields_form ,
-        # fields_insert  = fields_insert ,
-        # fields_update  = fields_update ,
-        # fields_consult = fields_consult ,
         value_search   = value_search,
         columnas       = columnas ,
-        main_column    = main_column,
         key_columns    = list(columnas.keys()) ,
         table_columns  = table_columns ,
         info_columns   = info_columns,
@@ -678,6 +700,64 @@ def crud_generico(tabla):
         crud_update    = crud_update,
         crud_delete    = crud_delete,
         crud_unactive  = crud_unactive,
+    )
+
+
+@app.route("/dashboard=<module_name>")
+def dashboard(module_name):
+    info_modulo = MENU_ADMIN.get(module_name)
+
+    for page in listar_admin_pages():
+        if module_name == page[5] and page[2] is True:
+            modulo = page
+
+    return render_template(
+        'dashboard.html' , 
+        module_name = module_name , 
+        modulo = modulo ,
+        info_modulo = info_modulo,
+        )
+
+
+@app.route("/reporte=<report_name>")
+def reporte(report_name):
+    config = REPORTES.get(report_name)
+    if not config:
+        return "Reporte no encontrado", 404
+
+    active = config["active"]
+
+    if active is False:
+        return "Reporte no encontrado", 404
+        
+    titulo = 'Reporte de ' + config.get("titulo")
+    elements = config.get("elements")
+    e_graph = elements.get('graph')
+    e_table = elements.get('table')
+    e_counter = elements.get('counter')
+    icon_page = get_icon_page(config.get("icon_page"))
+    graph = config.get("graph")
+    table = config.get("table")
+    columnas = None
+    filas = None
+    if table is not None and e_table is True:
+        columnas , filas = table
+
+    counter = config.get("counter")
+
+    return render_template(
+        "REPORTE.html" ,
+        titulo = titulo ,
+        elements = elements ,
+        e_graph = e_graph,
+        e_table = e_table,
+        e_counter = e_counter,
+        graph = graph ,
+        table = table ,
+        columnas = columnas,
+        filas = filas,
+        counter = counter ,
+        icon_page = icon_page,
     )
 
 
@@ -780,58 +860,6 @@ def crud_unactive(tabla):
 
     return redirect(url_for('crud_generico', tabla = tabla))
 
-########################################################################
-@app.route("/dashboard=<modulo>")
-def dashboard(modulo):
-    return render_template('dashboard.html')
-    # return f'Aca hay un dashboard del modulo de {modulo}'
-
-
-@app.route("/reporte=<report_name>")
-def reporte(report_name):
-    config = REPORTES.get(report_name)
-    if not config:
-        return "Reporte no encontrado", 404
-
-    active = config["active"]
-
-    if active is False:
-        return "Reporte no encontrado", 404
-        
-    titulo = 'Reporte de ' + config.get("titulo")
-    elements = config.get("elements")
-    icon_page = get_icon_page(config.get("icon_page"))
-    graph = config.get("graph")
-    table = config.get("table")
-    counter = config.get("counter")
-
-    return render_template(
-        "REPORTE.html" ,
-        titulo = titulo ,
-        elements = elements ,
-        graph = graph ,
-        table = table ,
-        counter = counter ,
-        icon_page = icon_page,
-    )
-
-
-
-
-@app.route("/panel")
-def panel():
-
-    return render_template('panel.html')
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -849,6 +877,7 @@ def colores():
             margin: 0;
             gap: 0;
             align-content: flex-start;
+            background: grey;
         }
         .color_block {
             border: 1px solid black;
@@ -860,8 +889,15 @@ def colores():
         }
     </style>    
 '''
-
-    for color in range(30):
+    for color in ['-base' , '-sec' , '-contrast']:
+        text = f'--color{color}'
+        html += f'''
+        <div class="color_block">
+        <p>{text}</p> 
+        <div style="height: 100%; width: 100%; background-color: var({text})"></div>
+        </div>
+    '''
+    for color in range(25):
         text = f'--color{color}'
         html += f'''
         <div class="color_block">

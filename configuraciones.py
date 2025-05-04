@@ -19,3 +19,5 @@ NOMBRE_BTN_CONSULT  = 'Consultar'
 NOMBRE_BTN_SEARCH   = 'Buscar'
 
 ICON_PAGE_CRUD = 'fa-solid fa-file'
+ICON_PAGE_REPORT = 'fa-solid fa-file'
+ICON_PAGE_DASHBOARD = 'ri-layout-grid-fill'
