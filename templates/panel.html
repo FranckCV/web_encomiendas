@@ -9,7 +9,7 @@ Panel Administrativo
 {% block estilos %}
 
 <style>
-    .section_content {
+    .block_panel {
         display: grid;
         gap: 20px;
         grid-template-columns: repeat(4, 1fr);
@@ -21,7 +21,13 @@ Panel Administrativo
 
 
 {% block contenido %}
+<div class="block_crud">
+    <h3 class="crud_title">
+        Panel Administrativo
+    </h3>
+</div>
 
+<div class="block_crud block_panel">
 {% for modulo in listar_pages_admin %}
 <div class="panel_cell">
     <div class="cell_title">
@@ -61,6 +67,7 @@ Panel Administrativo
     </div>
 </div>
 {% endfor %}
+</div>
 
 {% endblock %}
 
