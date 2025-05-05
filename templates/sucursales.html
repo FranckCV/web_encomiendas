@@ -7,34 +7,43 @@ Sucursales
 {% block estilos %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
 <link rel="stylesheet" href="../static/css/sucursales.css">
+<style>
+    .listado-agencias {
+        max-height: 345px; /* Ajusta la altura según tus necesidades */
+        overflow-y: auto;
+    }
+</style>
+
 {% endblock %}
 
 {% block contenido %}
 <div class="sucursales-container row">
     <!-- <h1 class="sucursales-titulo">Nuestras Agencias</h1>
     <p class="sucursales-subtitle">Encuentra la agencia más cercana a tu ubicación</p> -->
-
     <div class="filtros-mapa-container row col">
-        <div class="filtros-container row">
-            <div class="form_field col">
-                <label class="filtro-label">Departamento</label>
-                <select id="departamento" class="filtro-select">
-                    <option value="">Seleccionar</option>
-                </select>
+        <div class="filtros-container">
+            <div class="row g-3">
+                <div class="col-12 col-md-4 form_field">
+                    <label class="form-label filtro-label" for="departamento">Departamento</label>
+                    <select id="departamento" class="form-select filtro-select">
+                        <option value="">Seleccionar</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-4 form_field">
+                    <label class="form-label filtro-label" for="provincia">Provincia</label>
+                    <select id="provincia" class="form-select filtro-select" disabled>
+                        <option value="">Seleccionar</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-4 form_field">
+                    <label class="form-label filtro-label" for="distrito">Distrito</label>
+                    <select id="distrito" class="form-select filtro-select" disabled>
+                        <option value="">Seleccionar</option>
+                    </select>
+                </div>
             </div>
-            <div class="form_field col">
-                <label class="filtro-label">Provincia</label>
-                <select id="provincia" class="filtro-select" disabled>
-                    <option value="">Seleccionar</option>
-                </select>
-            </div>
-            <div class="form_field col">
-                <label class="filtro-label">Distrito</label>
-                <select id="distrito" class="filtro-select" disabled>
-                    <option value="">Seleccionar</option>
-                </select>
-            </div>
-            <button id="btn-buscar" class="btn-buscar">Buscar agencias</button>
+            
+            <!-- <button id="btn-buscar" class="btn-buscar">Buscar agencias</button> -->
             <div class="listado-agencias">
                 <div id="agencias-list">
                     <div class="sin-resultados">

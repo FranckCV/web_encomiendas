@@ -87,7 +87,7 @@ def find_column_table(column_name, tabla):
 def delete_row_table( table_name , id ):
     sql = f'''
         delete from {table_name}
-        where {show_primary_key()} = {id}
+        where {show_primary_key(table_name)} = {id}
     '''
     sql_execute(sql)
 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 04-05-2025 a las 07:49:16
+-- Tiempo de generación: 05-05-2025 a las 14:30:17
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.1.17
 
@@ -34,6 +34,32 @@ CREATE TABLE `color` (
 INSERT INTO `color` (`id`, `nombre`, `valor`) VALUES
 (1, 'color1', '#370268'),
 (2, 'color2', '#00c552');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `estado_encomienda`
+--
+
+CREATE TABLE `estado_encomienda` (
+  `id` int(10) NOT NULL,
+  `nombre` varchar(50) NOT NULL,
+  `descripcion` text NOT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `estado_encomienda`
+--
+
+INSERT INTO `estado_encomienda` (`id`, `nombre`, `descripcion`, `activo`) VALUES
+(1, 'Registrada', 'La encomienda ha sido registrada en el sistema.', 1),
+(2, 'En tránsito', 'La encomienda está siendo transportada al destino.', 1),
+(3, 'En sucursal destino', 'La encomienda llegó a la sucursal de destino y está lista para ser retirada o entregada.', 1),
+(4, 'Entregada', 'La encomienda fue entregada al destinatario.', 1),
+(5, 'Devuelta', 'La encomienda fue devuelta al remitente por motivos diversos.', 1),
+(6, 'Cancelada', 'La encomienda fue cancelada antes del envío.', 1),
+(7, 'Perdido', 'Cuando se pierde la encomienda, con todo y unidad de encomienda', 0);
 
 -- --------------------------------------------------------
 
@@ -97,6 +123,36 @@ INSERT INTO `modelo` (`id`, `nombre`, `marcaid`, `tipo_unidadid`) VALUES
 (12, 'T680', 12, 3),
 (13, 'modelo nuevecito caosa', 9, 1),
 (14, 'isuzu kuchau', 9, 7);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `sucursal`
+--
+
+CREATE TABLE `sucursal` (
+  `id` int(10) NOT NULL,
+  `direccion` varchar(150) NOT NULL,
+  `ubigeocodigo` varchar(10) NOT NULL,
+  `horario_l_v` varchar(255) DEFAULT NULL,
+  `horario_s_d` varchar(255) DEFAULT NULL,
+  `latitud` decimal(9,6) DEFAULT NULL,
+  `longitud` decimal(9,6) DEFAULT NULL,
+  `teléfono` char(255) DEFAULT NULL,
+  `referencia` varchar(255) DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `sucursal`
+--
+
+INSERT INTO `sucursal` (`id`, `direccion`, `ubigeocodigo`, `horario_l_v`, `horario_s_d`, `latitud`, `longitud`, `teléfono`, `referencia`, `activo`) VALUES
+(1, 'Av. Mariscal Castilla 208, Chiclayo', '130101', '08:00-19:00', '09:00-17:00', -6.771400, -79.840900, '074-123456', 'Frente a la cochera \"Puerto del Inka\"', 1),
+(2, 'Av. Miguel Grau 675, Urb. Santa Victoria, Chiclayo', '130101', '09:00-13:00,14:00-18:00', '09:00-13:00', -6.773000, -79.841500, '074-654321', 'A una cuadra de la Av. Balta', 1),
+(3, 'Calle Torres Paz Nro. 224, Interior C, Pimentel', '130110', '09:00-13:00,14:00-18:00', '09:00-13:00', -6.828000, -79.930000, '074-345678', 'Frente al parque principal de Pimentel', 1),
+(4, 'Av. Huamachuco Nro. 809, Lambayeque', '130301', '09:00-14:00,15:00-18:00', '09:00-13:00', -6.702000, -79.906000, '074-987654', 'Frente al parque infantil', 1),
+(5, 'xd', '50410', '3', '8', 999.999999, 999.999999, '577', 'gfh', 0);
 
 -- --------------------------------------------------------
 
@@ -2058,15 +2114,15 @@ CREATE TABLE `unidad` (
 -- Volcado de datos para la tabla `unidad`
 --
 
--- INSERT INTO `unidad` (`id`, `placa`, `capacidad`, `volumen`, `observaciones`, `activo`, `modeloid`) VALUES
--- (1, 'ABC123f', 15000.00, 60.00, 'Unidad en buen estado', 1, 1),
--- (2, 'DEF456', 4000.00, 20.00, 'Requiere revisión técnica', 0, 2),
--- (3, 'GHI789', 30000.00, 80.00, NULL, 1, 12),
--- (4, 'JKL321', 8000.00, 50.00, 'Unidad fuera de servicio', 0, 7),
--- (5, 'MNO654', 2500.00, 10.00, 'Unidad nueva', 1, 10),
--- (6, 'PQR987', 1500.00, 60.00, 'None', 1, 3),
--- (7, 'STU135', 4000.00, 20.00, 'Unidad asignada a ruta norte', 1, 9),
--- (8, 'VWX246', 8000.00, 50.00, 'Con aire acondicionado', 1, 4);
+INSERT INTO `unidad` (`id`, `placa`, `capacidad`, `volumen`, `observaciones`, `activo`, `modeloid`) VALUES
+(1, 'ABC123f', 15000.00, 60.00, 'Unidad en buen estado', 1, 1),
+(2, 'DEF456', 4000.00, 20.00, 'Requiere revisión técnica', 0, 2),
+(3, 'GHI789', 30000.00, 80.00, NULL, 1, 12),
+(4, 'JKL321', 8000.00, 50.00, 'Unidad fuera de servicio', 0, 7),
+(5, 'MNO654', 2500.00, 10.00, 'Unidad nueva', 1, 10),
+(6, 'PQR987', 1500.00, 60.00, 'None', 1, 3),
+(7, 'STU135', 4000.00, 20.00, 'Unidad asignada a ruta norte', 1, 9),
+(8, 'VWX246', 8000.00, 50.00, 'Con aire acondicionado', 1, 4);
 
 --
 -- Índices para tablas volcadas
@@ -2076,6 +2132,12 @@ CREATE TABLE `unidad` (
 -- Indices de la tabla `color`
 --
 ALTER TABLE `color`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `estado_encomienda`
+--
+ALTER TABLE `estado_encomienda`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -2091,6 +2153,12 @@ ALTER TABLE `modelo`
   ADD PRIMARY KEY (`id`),
   ADD KEY `FKmodelo121578` (`marcaid`),
   ADD KEY `FKmodelo83299` (`tipo_unidadid`);
+
+--
+-- Indices de la tabla `sucursal`
+--
+ALTER TABLE `sucursal`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `tipo_unidad`
@@ -2123,6 +2191,12 @@ ALTER TABLE `color`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT de la tabla `estado_encomienda`
+--
+ALTER TABLE `estado_encomienda`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
 -- AUTO_INCREMENT de la tabla `marca`
 --
 ALTER TABLE `marca`
@@ -2133,6 +2207,12 @@ ALTER TABLE `marca`
 --
 ALTER TABLE `modelo`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT de la tabla `sucursal`
+--
+ALTER TABLE `sucursal`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `tipo_unidad`

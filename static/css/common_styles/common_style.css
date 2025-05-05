@@ -89,6 +89,7 @@ footer.general_element {
 
 a {
     text-decoration: none;
+    cursor: pointer;
     /* color: white; */
 }
 
@@ -104,6 +105,7 @@ p {
 
 button {
     border: 0;
+    cursor: pointer;
 }
 
 
