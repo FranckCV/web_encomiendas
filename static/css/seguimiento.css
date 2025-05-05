@@ -1,0 +1,158 @@
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    background: url('buscar.png') no-repeat center center;
+    background-size: cover;
+    padding: 40px 20px;
+    display: flex;
+    align-items: center;
+    padding-left: 200px;
+    justify-content: flex-start;
+}
+
+.search-img {
+    width: 50px;
+    height: 50px;
+}
+
+.order-search {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.order-input {
+    padding: 10px;
+    margin: 5px 0;
+    width: 200px;
+    border: none;
+    border-radius: 4px;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-btn {
+    padding: 10px;
+    background-color: #ff4040;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 30%;
+    height: 38px;
+    cursor: pointer;
+}
+
+.search-btn:hover {
+    background-color: #e03737;
+}
+
+/*ESTADO*/
+.img_estado{
+  width: 20%;
+}
+
+/* General container styling */
+.status {
+    background-color: #fff;
+    display: flex;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 100%;
+    margin: auto;
+    margin-top: 8px;
+    border: 0.5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    gap: 25px;
+  }
+  
+  /* Header styling */
+  .status-header {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .status-text {
+    font-size: 24px;
+    font-weight: bold;
+    color: #E60000; /* Red color */
+  }
+  
+  .order-info {
+    font-size: 12px;
+    color: #888;
+  }
+  .information{
+    width: 100%;
+  }
+  .order-number {
+    font-weight: bold;
+  }
+  
+  .order-time {
+    font-style: italic;
+  }
+  
+  /* Timeline styling */
+  .timeline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .timeline-step {
+    position: relative;
+    font-size: 14px;
+    color: #555;
+    flex: 1;
+    text-align: center;
+  }
+  
+  .timeline-step::before {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #E60000; /* Red color */
+    border-radius: 50%;
+    left: 50%;
+    top: -10px;
+    transform: translateX(-50%);
+  }
+  
+  .timeline-step.completed::before {
+    background-color: #00C853; /* Green color */
+  }
+  
+  /* Add check mark icon to steps */
+  .timeline-step.completed {
+    font-weight: bold;
+    color: #00C853;
+  }
+  
+  .timeline-step:nth-child(1).completed::before {
+    background-color: #00C853;
+  }
+  
+  /* Custom styles for 'Entregado' status */
+  .status .timeline-step:last-child {
+    font-weight: bold;
+    color: #00C853; /* Green color */
+  }
+  
+  .timeline-step:nth-child(1)::after,
+  .timeline-step:nth-child(2)::after,
+  .timeline-step:nth-child(3)::after,
+  .timeline-step:last-child::after {
+    display: none;
+  }
+  

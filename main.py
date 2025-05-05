@@ -763,6 +763,8 @@ paginas_simples = [
     'login' , 
     'sign_up', 
     'sucursales' ,
+    'tracking',
+    'seguimiento'
 ]
 
 for pagina in paginas_simples:

@@ -1,0 +1,68 @@
+{% extends 'MAESTRA_GENERAL.html' %}
+
+{% block titulo %}
+  Seguimiento
+{% endblock %}
+
+{% block estilos %}
+  <link rel="stylesheet" href="/static/css/seguimiento.css" />
+{% endblock %}
+
+{% block contenido %}
+  <div class="container">
+    <div class="header">
+      <div class="order-search">
+        <input type="text" placeholder="Nº de Orden" class="order-input" />
+        <input type="text" placeholder="Año de emisión" class="order-input" />
+        <button class="search-btn">Buscar <i class="ri-arrow-right-line"></i></button>
+      </div>
+    </div>
+    <div class="status">
+      <img class="img_estado" src="{{ url_for('static', filename='img/entregado.png') }}" />
+      <div class="information">
+        <div class="status-header">
+          <div class="status_information">
+            <span class="status-text">Entregado</span>
+            <button>GRT<i class="ri-arrow-down-line"></i></button>
+          </div>
+          <div class="order-info">
+            <span class="order-number">Nº DE ORDEN: 45106974</span>
+            <span class="order-time">Desde el 25/04/25 a las 09:27</span>
+          </div>
+        </div>
+        <div class="timeline">
+          <span class="timeline-step">En origen</span>
+          <span class="timeline-step">En tránsito</span>
+          <span class="timeline-step">En destino</span>
+          <span class="timeline-step">Entregado</span>
+        </div>
+      </div>
+    </div>
+    <div class="details">
+      <div class="detail">
+        <span class="detail-label">Origen:</span>
+        <span class="detail-info">Av. Huarochirí</span>
+      </div>
+      <div class="detail">
+        <span class="detail-label">Destinatario:</span>
+        <span class="detail-info">Fabiana Lucia Paucar Mejia</span>
+      </div>
+      <div class="detail">
+        <span class="detail-label">Remitente:</span>
+        <span class="detail-info">Margiory Betsy Palacios Damiano</span>
+      </div>
+      <div class="detail">
+        <span class="detail-label">Contenido:</span>
+        <span class="detail-info">1 PAQUETE XXS</span>
+      </div>
+    </div>
+    <div class="pdf">
+      <button class="pdf-btn">PDF</button>
+      <span class="status-cancelled">Pago cancelado</span>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+
+{% endblock %}
