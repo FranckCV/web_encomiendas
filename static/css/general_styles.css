@@ -127,6 +127,60 @@ header * {
     flex-direction: column;
 }
 
+.menu_ayuda {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 138px;
+    transform: translateX(-50%);
+    flex-direction: column;
+    width: 240px;
+    display: none;
+    z-index: 1000;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.menu_ayuda.show {
+    display: flex;
+}
+
+.menu_ayuda a {
+    color: #000000;
+    padding: 15px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items:center;
+    text-decoration: none;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.menu_ayuda a:last-child {
+    border-bottom: none;
+}
+
+.menu_ayuda a:hover {
+    background-color: #0f80f8;
+}
+
+.menu_ayuda a i {
+    color: #4f92d9; /* Color para las flechas */
+}
+
+/* Mantenemos el estilo del botón de ayuda */
+.ayuda_toggle {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ayuda_toggle i {
+    color: #007bff;
+}
+
 .user_options a {
     padding-block: 5px;
     padding-inline: 10px;

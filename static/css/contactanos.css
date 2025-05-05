@@ -1,0 +1,229 @@
+/* Variables de colores */
+:root {
+    --primary-color: #2a3b8f;
+    --secondary-color: #e2f1f8;
+    --accent-color: #2a3b8f;
+    --text-color: #333;
+    --light-text: #666;
+    --border-color: #ddd;
+    --success-color: #2a3b8f;
+    --hover-color: #f8f8f8;
+}
+
+
+/* Estilos generales */
+.contacto-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+}
+
+h2 {
+    color: #1a365d;
+    margin-bottom: 25px;
+    font-size: 28px;
+}
+
+/* Banner de bienvenida */
+.welcome-banner {
+    background-color: var(--secondary-color);
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 35px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-banner::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100%;
+    background-image: url('/static/img/logo.png');
+    background-size: 60%;
+    background-position: center right 30px;
+    background-repeat: no-repeat;
+    opacity: 0.1;
+}
+
+.welcome-content h1 {
+    font-size: 24px;
+    font-weight: normal;
+    margin-bottom: 5px;
+}
+
+.welcome-content h2 {
+    font-size: 32px;
+    font-weight: bolder;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.welcome-content p {
+    font-size: 16px;
+    color: var(--light-text);
+    max-width: 1050px;
+}
+
+/* Sección de información de contacto */
+.info-contacto {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 50px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+}
+
+.info-contacto h2 {
+    width: 100%;
+    margin-bottom: 30px;
+    color: #1a365d;
+    font-size: 24px;
+}
+
+.info-item {
+    width: 23%;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.info-icon {
+    display: inline-block;
+    height: 60px;
+    width: 60px;
+    line-height: 60px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+}
+
+.info-icon i {
+    color: #2a3b8f;
+    font-size: 28px;
+}
+
+.info-titulo {
+    font-weight: bold;
+    color: #4a5568;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.info-texto {
+    color: #4a5568;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.info-texto a {
+    color: #4a5568;
+    text-decoration: none;
+}
+
+.info-texto a:hover {
+    text-decoration: underline;
+}
+
+.whatsapp-text {
+    color: #2a3b8f;
+    font-weight: bolder;
+}
+
+/* Sección del formulario */
+.formulario-contacto {
+    background-color: #e2f1f8;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #2a3b8f;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+select.form-control {
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.checkbox-group input {
+    margin-right: 10px;
+}
+
+.checkbox-group label {
+    color: #333;
+    font-size: 14px;
+}
+
+.checkbox-group a {
+    color: #1a365d;
+    text-decoration: underline;
+}
+
+.btn-submit {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #1a3c5b;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background-color 0.3s;
+}
+
+.btn-submit:hover {
+    background-color: #2a3b8f;
+}
+
+/* Clase de error para validación */
+.form-control.error {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .info-item {
+        width: 48%;
+    }
+}
+
+@media (max-width: 767px) {
+    .info-item {
+        width: 100%;
+    }
+}

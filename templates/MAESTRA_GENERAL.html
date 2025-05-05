@@ -65,18 +65,67 @@
 </header>
 
 <nav class="general_element">
-    <a class="n_option">
-        <i class="fa-solid fa-truck-fast"></i>
-        <p>Envios</p>
-    </a>
-    <a class="n_option">
-        <i class="fa-solid fa-store"></i>
-        <p>Tienda</p>
-    </a>
-    <a class="n_option">
-        <i class="fa-solid fa-circle-question"></i>
-        <p>Ayuda</p>
-    </a>
+    <!-- Menú Envíos -->
+    <div class="h_user_block">
+        <div class="n_option ayuda_toggle" onclick="toggleMenu('enviosMenu')">
+            <i class="fa-solid fa-truck-fast"></i>
+            <p>Envíos</p>
+        </div>
+        <div class="menu_ayuda" id="enviosMenu">
+            <a href="#">
+                <span>Masivos</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            <a href="#">
+                <span>Actualiza tu clave</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Menú Tienda -->
+    <div class="h_user_block">
+        <div class="n_option ayuda_toggle" onclick="toggleMenu('tiendaMenu')">
+            <i class="fa-solid fa-store"></i>
+            <p>Tienda</p>
+        </div>
+        <div class="menu_ayuda" id="tiendaMenu">
+            <a href="{{url_for('cajas')}}">
+                <span>Cajas</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            <a href="{{url_for('articulos')}}">
+                <span>Más Productos</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Menú Ayuda -->
+    <div class="h_user_block">
+        <div class="n_option ayuda_toggle" onclick="toggleMenu('ayudaMenu')">
+            <i class="fa-solid fa-circle-question"></i>
+            <p>Ayuda</p>
+        </div>
+        <div class="menu_ayuda" id="ayudaMenu">
+            <a href="{{url_for('Faq')}}">
+                <span>Preguntas Frecuentes</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            <a href="{{url_for('contac')}}">
+                <span>Contáctanos</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            <a href="#">
+                <span>No recibimos</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            <a href="#">
+                <span>Envíos en abandono</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
 </nav>
 
 <!-- <div class="layout"> -->
@@ -124,6 +173,7 @@
 <script src="/static/js/common_scripts/bootstrap.bundle.min.js"></script>
 <script src="/static/js/common_scripts/bootstrap.min.js"></script>
 <script src="/static/js/common_scripts/common_script.js"></script>
+<script src="/static/js/leo.js"></script>
 
 {% block scripts %}
 {% endblock %}
