@@ -38,5 +38,17 @@ def get_table():
 
 #####_ ADICIONALES _#####
 
+def get_options():
+    sql= f'''
+        SELECT 
+            {get_primary_key()},
+            CONCAT(distrito, "/", provincia, "/", departamento) AS ubigeo
+        FROM {table_name}
+        order by ubigeo
+    '''
+    filas = sql_select_fetchall(sql)
+    
+    lista = [(fila[get_primary_key()], fila["ubigeo"]) for fila in filas]
+    return lista
 
 

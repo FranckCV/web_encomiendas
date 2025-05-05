@@ -70,26 +70,36 @@ def unactive_row( id ):
     unactive_row_table(table_name , id)
 
 
+# def insert_row( nombre , marcaid , tipo_unidadid ):
+#     sql = f'''
+#         INSERT INTO 
+#             {table_name} 
+#             ( nombre , marcaid , tipo_unidadid )
+#         VALUES 
+#             ( '{nombre}' , '{marcaid}' , '{tipo_unidadid}' )
+#     '''
+#     sql_execute(sql)
+
+
 def insert_row( nombre , marcaid , tipo_unidadid ):
     sql = f'''
         INSERT INTO 
-            {table_name} 
-            ( nombre , marcaid , tipo_unidadid )
+            {table_name} ( nombre , marcaid , tipo_unidadid ) 
         VALUES 
-            ( '{nombre}' , '{marcaid}' , '{tipo_unidadid}' )
+            ( %s ,  %s , %s )
     '''
-    sql_execute(sql)
+    sql_execute(sql,( nombre , marcaid , tipo_unidadid ))
 
 
-def update_row( id , nombre , marcaid , tipo_unidadid):
+def update_row( nombre , marcaid , tipo_unidadid , id):
     sql = f'''
         update {table_name} set 
-        nombre = '{str(nombre)}',
-        marcaid = {marcaid} ,
-        tipo_unidadid = {tipo_unidadid}
+        nombre = %s,
+        marcaid = %s ,
+        tipo_unidadid = %s
         where {get_primary_key()} = {id}
     '''
-    sql_execute(sql)
+    sql_execute(sql,(nombre , marcaid , tipo_unidadid))
 
 
 #####_ ADICIONALES _#####

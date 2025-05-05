@@ -14,22 +14,30 @@
         height: 70vh;
         width: 75%;
     } */
-    .block_report {
-        height: 100%;
-        width: 75%;
-        display: grid;
-        grid-template-columns: 1fr;
+    .block_table {
+        height: 80%;
+        /* display: grid; */
+        /* grid-template-columns: 1fr; */
+        margin-top: 20px;
     }
 
     #space_graph {
         min-height: 50vh !important;
-        width: 100%;
+        width: 75%;
+        justify-self: center;
     }
 
-    #space_graph > * {
+    #space_graph>* {
         margin: 0 auto;
-    }
+    } 
 
+    tr td {
+        /* display: flex; */
+        gap: 5px;
+        justify-content: center;
+        /* padding-inline: 10px; */
+        padding-block: 5px;
+    }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 {% endblock %}
@@ -45,15 +53,68 @@
     </h3>
 </div>
 
-<div class="block_crud block_report">
+<div class="block_crud block_table">
+    {% if e_graph %}
     <div class="report_graph">
-        <div id="space_graph">
-
-        </div>
+        <div id="space_graph"></div>
     </div>
-    <!-- <div class="report_table">
+    {% endif %}
 
-    </div> -->
+    {% if e_table %}
+    {% set table_columns = filas[0].keys() | list if filas else [] %}
+    {% set key_columns = columnas.keys() | list %}
+    <div class="table-container">
+        <table cellspacing="0" class="table_listado">
+            <thead>
+                <tr>
+                    {% for col in key_columns %}
+                    <th {% if primary_key==col %} class="td_primary_key" {% elif col=='activo' %}
+                        style="width: calc( 1 * var(--width-column) );" {% else %}
+                        style="width: calc( {{columnas[col][1]}} * var(--width-column) );" {% endif %}>
+                        <div class="th_content">
+                            <p>
+                                {{ columnas[col][0] }}
+                            </p>
+                        </div>
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody id="productTableBody">
+                {% for fila in filas %}
+
+                <tr {% for resultado in filas %} {% if resultado[primary_key]==fila[primary_key] %} {% for col in
+                    table_columns %} data-{{col}}="{{resultado[col]}}" {% endfor %} {% endif %} {% endfor %}>
+                    {% for col_name in key_columns %}
+                    <td class="{% if primary_key == col_name %} td_primary_key {% endif %}" td_name="{{col_name}}">
+                        <div
+                            class="td_content {% if col_name == primary_key %} td_primary_key {% elif col_name == 'activo' %} td_activo {% endif %}">
+                            {% if col_name == 'activo' %}
+                            {% if fila[col_name] == 1 %}
+                            <p class="activo btn_active">{{STATE_1}}</p>
+                            {% else %}
+                            <p class="activo btn_unactive">{{STATE_0}}</p>
+                            {% endif %}
+                            {% else %}
+                            {% if fila[col_name] == None or fila[col_name] == '' %}
+                            <p class="text_none">Sin {{columnas[col_name][0] | lower }}</p>
+                            {% else %}
+                            <p class="p_value">{{ fila[col_name] }}</p>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+                    </td>
+                    {% endfor %}
+
+                </tr>
+
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+    {% endif %}
+
 </div>
 
 
@@ -63,12 +124,8 @@
 
 
 {% block scripts %}
-<script>
-    const GRAPH_HEIGHT = 200;
-    const GRAPH_HEIGHT2 = 125;
-    const GRAPH_WIDTH = 325;
-</script>
 
+{% if e_graph %}
 <script>
     var optionsGraph = {{ graph | tojson }};
 
@@ -76,42 +133,34 @@
     chartReport.render();
 
 </script>
+{% endif %}
 
-<!-- 
-
-
+{% if e_table %}
 
 <script>
-    var optionsEstado = {
-        chart: {
-            type: 'donut',
-            height: GRAPH_HEIGHT2,
-            toolbar: {
-                show: true
+    const divs = document.querySelectorAll('.td_content:not(.td_primary_key)');
+
+    divs.forEach(div => {
+        let elementP = div.querySelector('.p_value');
+        if (elementP) {
+            let content = elementP.innerText.trim();
+
+            if (!isNaN(content) && content.includes('.')) {
+                div.classList.add('td_right');
             }
-        },
-        series: [70, 30], // Ejemplo: 70 entregadas, 30 pendientes
-        labels: ['Entregadas', 'Pendientes'],
-        colors: [' var(--color3) ', ' var(--color-sec) '],
-        responsive: [{
-            breakpoint: 480,
-            options: {
-                chart: {
-                    // width: 20,
-                    // height: GRAPH_HEIGHT,
-                },
-                legend: {
-                    position: 'bottom'
-                }
+            else if (!isNaN(content)) {
+                div.classList.add('td_right');
             }
-        }]
-    };
+            else {
+                div.classList.add('td_left');
+            }
+        }
+    });
+</script>
+<script src="/static/js/orderHeadTable.js"></script>
+<script src="/static/js/paginationCrud_4.js"></script>
 
-    var chartEstado = new ApexCharts(document.querySelector("#encomiendas_estado"), optionsEstado);
-    chartEstado.render();
 
-</script> -->
-
-
+{% endif %}
 
 {% endblock %}

@@ -1,0 +1,98 @@
+.container {
+    /* display: flex;
+    justify-content: center;
+    align-items: center;*/
+    height: 80vh; 
+    position: relative; 
+    padding: 50px;
+    background-color: rgb(213, 239, 246);
+    
+}
+
+
+/* Estilo del título */
+.titulo-seguimiento {
+    font-weight: 900;
+    color: rgb(0, 0, 0); /* Gris oscuro para el texto */
+    position: relative;
+    display: inline-block;
+    padding-left: 30px; /* Espacio para el fondo azul */
+    margin-bottom: 40px;
+}
+
+/* Estilo para el fondo azul en forma de paralelogramo con puntas redondeadas */
+.titulo-seguimiento::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 20px; /* Ancho del paralelogramo */
+    height: 100%;
+    background-color: rgb(4, 36, 69);; /* Azul brillante */
+    transform: skewX(-20deg); /* Aplica la rotación para crear el efecto de paralelogramo */
+    border-radius: 5px; 
+}
+
+
+
+/* Estilos para el formulario */
+.form-container {
+    background-color: color-mix(in srgb, var(--color9) 80%, rgb(253, 253, 255) 20%); /* Fondo oscuro semi-transparente */
+    padding: 40px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3); /* Sombra suave para dar profundidad */
+}
+
+/* Estilos de los inputs */
+.input-container {
+    margin-bottom: 25px;
+}
+
+.input-container label {
+    font-size: 1rem;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 8px;
+    color: #090808;
+    /* text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);  */
+
+}
+
+.input-container input,
+.input-container select {
+    width: 100%;
+    padding: 12px;
+    font-size: 0.8rem;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    color: #333;
+}
+
+.input-container input:focus,
+.input-container select:focus {
+    outline: none;
+    border-color: #0e0c81;
+    box-shadow: 0 0 8px rgba(6, 51, 142, 0.7);
+}
+
+/* Estilo del botón */
+.buscar-btn {
+    background-color: rgb(4, 36, 69); /* Color rojo contrastante */
+    color: white;
+    padding: 14px 22px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s;
+    font-weight: bold;
+}
+
+.buscar-btn:hover {
+    background-color: #c0392b; /* Color más oscuro en hover */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}

@@ -17,24 +17,23 @@ document.addEventListener("DOMContentLoaded", function () {
     filters.forEach(filter => {
       activeFilters[filter.id] = filter.value;
     });
-  
+
     const searchTerm = searchInput.value.trim().toLowerCase();
-  
+
     filteredRows = allRows.filter(row => {
       const matchesFilters = Object.entries(activeFilters).every(([key, value]) => {
         return value === FILTER_VALUE_DEFAULT || row.getAttribute(`data-${key}`) === value;
       });
-  
+
       const matchesSearch = Array.from(row.querySelectorAll("p"))
         .some(cell => cell.textContent.toLowerCase().includes(searchTerm));
-  
+
       return matchesFilters && matchesSearch;
     });
-  
+
     currentPage = 1;
     showPage(currentPage);
   }
-  
 
   function showPage(page) {
     rowsPerPage = parseInt(selectCantidad.value);
@@ -64,18 +63,49 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function updateNumberButtons(totalPages) {
     pageNumbersContainer.innerHTML = "";
-    for (let i = 1; i <= totalPages; i++) {
+    const maxVisible = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let endPage = startPage + maxVisible - 1;
+
+    if (endPage > totalPages) {
+      endPage = totalPages;
+      startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+
+    if (startPage > 1) {
+      createPageButton(1);
+      if (startPage > 2) {
+        createDots();
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      createPageButton(i);
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        createDots();
+      }
+      createPageButton(totalPages);
+    }
+
+    function createPageButton(i) {
       const btn = document.createElement("a");
       btn.href = "javascript:void(0)";
       btn.textContent = i;
       btn.className = "page-number";
       if (i === currentPage) btn.classList.add("active");
 
-      btn.addEventListener("click", () => {
-        showPage(i);
-      });
-
+      btn.addEventListener("click", () => showPage(i));
       pageNumbersContainer.appendChild(btn);
+    }
+
+    function createDots() {
+      const dots = document.createElement("span");
+      dots.textContent = "...";
+      dots.className = "dots";
+      pageNumbersContainer.appendChild(dots);
     }
   }
 

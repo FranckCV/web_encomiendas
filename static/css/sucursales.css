@@ -221,3 +221,8 @@
     font-size: 95%;
 }
 
+.agencias-scroll {
+    max-height: 400px; /* Ajusta este valor según tu diseño */
+    overflow-y: auto;
+    padding-right: 10px;
+}

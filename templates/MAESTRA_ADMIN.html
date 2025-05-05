@@ -35,7 +35,7 @@
     {% for modulo in listar_pages_admin %}
 
     <div class="line_separator"></div>
-    <div class="menu_option">
+    <div class="menu_option {% if modulo_actual == modulo[5] %} mu_active {% endif %}">
         <div class="menu_title">
             <p>{{ modulo[0] }}</p>
             <i class="{{ modulo[1] }}"></i>
@@ -44,9 +44,9 @@
         <div class="menu_content">
 
             {% if modulo[2] %}
-            <a class="mu_page mu_dashboard" href="{{url_for('dashboard',modulo = modulo )}}">
-                <i class="{{ ICON_PAGE_CRUD }}"></i>
-                <p>Dashboard</p>
+            <a class="mu_page mu_dashboard" href="{{url_for('dashboard',module_name = modulo[5] )}}">
+                <i class="{{ICON_PAGE_DASHBOARD}}"></i>
+                <p>Dashboard {{modulo[0]}}</p>
             </a>
             {% endif %}
             {% for page in modulo[3] %}
