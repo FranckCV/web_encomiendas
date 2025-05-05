@@ -1,0 +1,188 @@
+{% extends 'MAESTRA_GENERAL.html' %}
+
+{% block titulo %}
+  Seguimiento
+{% endblock %}
+
+{% block estilos %}
+  <link rel="stylesheet" href="/static/css/seguimiento.css" />
+{% endblock %}
+
+{% block contenido %}
+  <div class="container">
+    <div class="header">
+      <div class="order-search">
+        <input type="text" placeholder="Nº de Orden" class="order-input" />
+        <input type="text" placeholder="Año de emisión" class="order-input" />
+        <button class="search-btn">Buscar <i class="ri-arrow-right-line"></i></button>
+      </div>
+    </div>
+    <div class="container_estado">
+      <!-- Tarjeta de estado -->
+      <div class="card status-card">
+        <div class="status-detail">
+          <img class="img_estado" src="{{ url_for('static', filename='img/entregado.png') }}" alt="Persona con paquete entregado" />
+
+          <div class="status-content">
+            <div class="status-header">
+              <div class="status-title">
+                <h1>Entregado</h1>
+                <button class="grt-btn">GRT<i class="fa-solid fa-download"></i></button>
+              </div>
+              <div class="order-number">
+                <p>N° DE ORDEN: 45106974</p>
+              </div>
+            </div>
+            <div class="delivery-info">
+              <p>Entregado a FABIANA LUCIA PAUCAR MEJIA</p>
+              <p>con DNI 72428857, el día 29/04/25 a las 14:57.</p>
+            </div>
+            <!--             
+            <div class="delivery-time">
+              <p>Desde el 25/04/25 a las 09:27</p>
+            </div>          -->
+            <!-- Tracker de progreso -->
+            <div class="progress-tracker">
+              <div class="progress-line"></div>
+
+              <div class="progress-step">
+                <div class="step-icon">
+                  <span class="check-icon">✓</span>
+                </div>
+                <div class="step-label">En origen</div>
+              </div>
+
+              <div class="progress-step">
+                <div class="step-icon">
+                  <span class="check-icon">✓</span>
+                </div>
+                <div class="step-label">En tránsito</div>
+              </div>
+
+              <div class="progress-step">
+                <div class="step-icon">
+                  <span class="check-icon">✓</span>
+                </div>
+                <div class="step-label">En destino</div>
+              </div>
+
+              <div class="progress-step">
+                <div class="step-icon">
+                  <span class="check-icon">✓</span>
+                </div>
+                <div class="step-label">Entregado</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="details-container">
+          <div class="details-header">
+            <h3>Detalles del envío</h3>
+            <div class="details-toggle">Ver más</div>
+          </div>
+
+          <div class="timeline">
+            <div class="timeline-item active">
+              <div class="timeline-dot"></div>
+              <div class="timeline-line"></div>
+              <div class="timeline-content">
+                <div class="timeline-title">En origen</div>
+                <div class="timeline-date">25/04/25 - 09:27</div>
+                <div class="timeline-location">Recibido en agencia Arequipa</div>
+              </div>
+            </div>
+
+            <div class="timeline-item active">
+              <div class="timeline-dot"></div>
+              <div class="timeline-line"></div>
+              <div class="timeline-content">
+                <div class="timeline-title">En tránsito</div>
+                <div class="timeline-date">26/04/25 - 07:35</div>
+                <div class="timeline-location">En ruta hacia destino</div>
+              </div>
+            </div>
+
+            <div class="timeline-item active">
+              <div class="timeline-dot"></div>
+              <div class="timeline-line"></div>
+              <div class="timeline-content">
+                <div class="timeline-title">En destino</div>
+                <div class="timeline-date">28/04/25 - 18:20</div>
+                <div class="timeline-location">Agencia Lima Centro</div>
+              </div>
+            </div>
+
+            <div class="timeline-item active">
+              <div class="timeline-dot"></div>
+              <div class="timeline-line"></div>
+              <div class="timeline-content">
+                <div class="timeline-title">Entregado</div>
+                <div class="timeline-date">29/04/25 - 14:57</div>
+                <div class="timeline-location">Entregado a FABIANA LUCIA PAUCAR MEJIA con DNI 7242857</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjeta de información origen/destino -->
+      <div class="card info-card">
+        <div class="info-section">
+          <h3>Origen : <span style="font-weight: normal; color: #666;">Av. Huarochirí</span></h3>
+        </div>
+        <div class="info-section">
+          <h3>Destino : <span style="font-weight: normal; color: #666;">Mariscal Nieto</span></h3>
+        </div>
+      </div>
+
+      <!-- Tarjeta de detalles -->
+      <div class="card details-card">
+        <div class="detail-section">
+          <i class="fa-solid fa-user icono"></i>
+          <div class="detail-title">Remitente</div>
+          <div class="detail-value">Margiory Betsy Palacios Damiano</div>
+        </div>
+
+        <div class="detail-section">
+          <i class="fa-solid fa-box-open icono"></i>
+          <div class="detail-title">Contenido</div>
+          <div class="detail-value">1 PAQUETE XXS</div>
+        </div>
+
+        <div class="detail-section">
+          <i class="fa-solid fa-user icono"></i>
+          <div class="detail-title">Destinatario</div>
+          <div class="detail-value">Fabiana Lucia Paucar Mejia</div>
+          <div class="detail-value">72428857</div>
+        </div>
+
+        <div class="detail-section">
+          <i class="fa-solid fa-dollar-sign icono"></i>
+          <div class="detail-title">Pago cancelado</div>
+          <div class="payment-status">
+            <!-- <span>PDF</span> -->
+            <a href="#" class="download-link">
+              <i class="fa-solid fa-download"></i>
+              Comprobante
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    document.querySelector('.details-toggle').addEventListener('click', function () {
+      const timeline = document.querySelector('.timeline')
+      if (timeline.style.display === 'none') {
+        timeline.style.display = 'block'
+        this.textContent = 'Ver menos'
+      } else {
+        timeline.style.display = 'none'
+        this.textContent = 'Ver más'
+      }
+    })
+  </script>
+{% endblock %}

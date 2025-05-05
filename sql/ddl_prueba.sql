@@ -14,7 +14,9 @@ CREATE TABLE transaccion_encomienda (
   transaccionnum_serie          int(11) NOT NULL, 
   transacciontipo_comprobanteid int(10) NOT NULL, 
   sucursal_origen_id            int(10) NOT NULL, 
-  masivo                        tinyint(1) NOT NULL, 
+  masivo                        tinyint(1) NOT NULL comment ' 1 si es envío masivo
+0 si es un empaque (paquete o sobre)
+ ', 
   descripcion                   varchar(255) NOT NULL, 
   monto_total                   numeric(9, 6), 
   recojo_casa                   tinyint(1) NOT NULL, 
@@ -24,23 +26,25 @@ CREATE TABLE estado_encomienda (
   id          int(10) NOT NULL AUTO_INCREMENT, 
   nombre      varchar(50) NOT NULL, 
   descripción text NOT NULL, 
-  activo      tinyint(1) NOT NULL, 
+  activo      tinyint(1) DEFAULT 1 NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE usuario (
   id               int(10) NOT NULL AUTO_INCREMENT, 
   correo           varchar(150) NOT NULL UNIQUE, 
   contraseña       varchar(150) NOT NULL, 
-  activo           tinyint(1) NOT NULL, 
   telefono         varchar(15), 
-  tipo_usuario     char(2) NOT NULL , 
+  tipo_usuario     char(2) NOT NULL comment 'E
+C
+ ', 
   num_documento    varchar(20) NOT NULL, 
+  activo           tinyint(1) NOT NULL, 
   tipo_documentoid int(11) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE tipo_unidad (
   id          int(10) NOT NULL AUTO_INCREMENT, 
   nombre      varchar(20) NOT NULL, 
   descripcion text NOT NULL, 
-  activo      tinyint(1) NOT NULL, 
+  activo      tinyint(1) DEFAULT 1 NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE articulo (
   id            int(10) NOT NULL AUTO_INCREMENT, 
@@ -59,6 +63,7 @@ CREATE TABLE salida (
 CREATE TABLE tipo_cargo (
   id     int(10) NOT NULL AUTO_INCREMENT, 
   nombre varchar(150) NOT NULL, 
+  activo tinyint(1) DEFAULT 1 NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE unidad (
   id                int(10) NOT NULL AUTO_INCREMENT, 
@@ -68,7 +73,7 @@ CREATE TABLE unidad (
   observaciones     text, 
   estado            char(1) NOT NULL, 
   modeloid          int(11) NOT NULL, 
-  sucursal_actualid int(10) NOT NULL, 
+  sucursal_actualid int(10), 
   PRIMARY KEY (id));
 CREATE TABLE ubigeo (
   codigo       varchar(10) NOT NULL, 
@@ -89,7 +94,9 @@ CREATE TABLE p_natural (
   nombre      int(11) NOT NULL, 
   ape_paterno int(11) NOT NULL, 
   ape_materno varchar(150) NOT NULL, 
-  PRIMARY KEY (usuarioid));
+  PRIMARY KEY (usuarioid)) comment='DNI
+Carnet de extranjería
+ ';
 CREATE TABLE juridica (
   usuarioid    int(10) NOT NULL, 
   razon_social varchar(150) NOT NULL, 
@@ -134,6 +141,7 @@ CREATE TABLE reclamo (
 CREATE TABLE estado_reclamo (
   id     int(10) NOT NULL AUTO_INCREMENT, 
   nombre varchar(100) NOT NULL, 
+  activo tinyint(1) DEFAULT 1 NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE tipo_indemnizacion (
   id                int(10) NOT NULL AUTO_INCREMENT, 
@@ -144,29 +152,31 @@ CREATE TABLE tipo_comprobante (
   id          int(10) NOT NULL AUTO_INCREMENT, 
   nombre      char(1) NOT NULL, 
   descripcion varchar(100) NOT NULL, 
-  activo      tinyint(1) NOT NULL, 
+  activo      tinyint(1) DEFAULT 1 NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE marca (
   id     int(11) NOT NULL AUTO_INCREMENT, 
   nombre varchar(20) NOT NULL, 
+  activo tinyint(1) DEFAULT 1 NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE modelo (
   id            int(11) NOT NULL AUTO_INCREMENT, 
   nombre        varchar(20) NOT NULL, 
+  activo        tinyint(1) NOT NULL, 
   marcaid       int(11) NOT NULL, 
   tipo_unidadid int(10) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE cargo (
   id           int(11) NOT NULL AUTO_INCREMENT, 
   nombre       varchar(100) NOT NULL, 
-  activo       tinyint(1) NOT NULL, 
   descripcion  varchar(150) NOT NULL, 
+  activo       tinyint(1) NOT NULL, 
   tipo_cargoid int(10) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE metodo_pago (
   id     int(11) NOT NULL AUTO_INCREMENT, 
   nombre varchar(100) NOT NULL, 
-  activo tinyint(1) NOT NULL, 
+  activo tinyint(1) DEFAULT 1 NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE metodos_venta (
   id                            int(11) NOT NULL AUTO_INCREMENT, 
@@ -176,11 +186,34 @@ CREATE TABLE metodos_venta (
   PRIMARY KEY (id));
 CREATE TABLE tipo_paquete (
   id     int(11) NOT NULL AUTO_INCREMENT, 
-  nombre varchar(150) NOT NULL, 
+  nombre varchar(150) NOT NULL comment ' 
+ACCESORIOS PARA FIESTAS
+ACCESORIOS ELECTRÓNICOS
+ARTÍCULOS DE LIMPIEZA
+ARTÍCULOS PUBLICITARIOS
+BISUTERIA
+CAJA
+TARJETAS PERSONALES
+MUEBLES Y DECOHOGAR
+FERRETERÍA Y CONSTRUCCIÓN
+ALIMENTACION Y BEBIDAS
+COSMETICOS
+ELECTROHOGAR
+JUGUETES
+MATERIAL MEDICO
+MEDICINAS
+REPUESTOS
+ROPA Y ACCESORIOS
+VALIJA-DOCUMENTOS
+UTILES DE ESCRITORIO
+UTILES DE OFICINA
+ ', 
+  activo tinyint(1) DEFAULT 1 NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE tipo_documento (
   id     int(11) NOT NULL AUTO_INCREMENT, 
   nombre varchar(50) NOT NULL, 
+  activo tinyint(1) DEFAULT 1 NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE paquete (
   tracking                                            int(11) NOT NULL AUTO_INCREMENT, 
@@ -197,21 +230,29 @@ CREATE TABLE paquete (
   adquirenteNum_documento                             int(11) NOT NULL, 
   num_documento_destinatario                          int(11), 
   telefono_destinatario                               int(11), 
-  tipo_empaque                                        char(1) NOT NULL, 
+  tipo_empaque                                        char(1) NOT NULL comment 'P : Paquete
+S: Sobre
+ ', 
   tipo_paqueteid                                      int(11) NOT NULL, 
   tipo_recojoid                                       int(11) NOT NULL, 
   salidaid                                            int(10) NOT NULL, 
   tipo_documento_destinatario_id                      int(11) NOT NULL, 
   transaccion_encomiendatransaccionnum_serie          int(11), 
   transaccion_encomiendatransacciontipo_comprobanteid int(10), 
+  tipo_recojoactivo                                   tinyint(1) NOT NULL, 
   PRIMARY KEY (tracking));
 CREATE TABLE tamaño_caja (
   id     int(11) NOT NULL AUTO_INCREMENT, 
   nombre varchar(3) NOT NULL, 
+  activo tinyint(1) DEFAULT 1 NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE tipo_recojo (
   id     int(11) NOT NULL AUTO_INCREMENT, 
-  nombre varchar(100) NOT NULL, 
+  nombre varchar(100) NOT NULL comment 'Recojo en tienda
+Envío a domicilio
+Con recojo y pago en tienda
+ ', 
+  activo tinyint(1) DEFAULT 1 NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE transaccion (
   num_serie          int(11) NOT NULL, 
@@ -226,6 +267,10 @@ CREATE TABLE tarifa_ruta (
   sucursal_destino_id int(10) NOT NULL, 
   PRIMARY KEY (sucursal_origen_id, 
   sucursal_destino_id));
+CREATE TABLE modulo (
+  id       int(11) NOT NULL AUTO_INCREMENT, 
+  `Column` int(11), 
+  PRIMARY KEY (id));
 
 ALTER TABLE sucursal ADD CONSTRAINT FKsucursal756715 FOREIGN KEY (ubigeocodigo) REFERENCES ubigeo (codigo);
 ALTER TABLE escalas ADD CONSTRAINT FKescalas126327 FOREIGN KEY (sucursalid) REFERENCES sucursal (id);

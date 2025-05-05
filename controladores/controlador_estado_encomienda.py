@@ -81,17 +81,23 @@ def update_row( id , nombre , descripcion ):
 
 #####_ ADICIONALES _#####
 
-def get_options_marca():
+def get_options():
     sql= f'''
         select 
-            id ,
+            {get_primary_key()} ,
             nombre
         from {table_name}
+        where activo = 1
         order by nombre asc
     '''
     filas = sql_select_fetchall(sql)
     
-    lista = [(fila["id"], fila["nombre"]) for fila in filas]
+    lista = [(fila[get_primary_key()], fila["nombre"]) for fila in filas]
 
     return lista
+
+
+
+
+
 
