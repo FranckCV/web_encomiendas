@@ -1002,8 +1002,7 @@ def crud_unactive(tabla):
 
     return redirect(url_for('crud_generico', tabla = tabla))
 
-<<<<<<< HEAD
-########################################################################
+
 @app.route("/dashboard=<modulo>")
 def dashboard(modulo):
     return render_template('dashboard.html')
@@ -1068,8 +1067,7 @@ def articulos():
 
 
 
-=======
->>>>>>> e505fbdd8f4474cec7ea33dc7c562817bb53350b
+
 
 
 
