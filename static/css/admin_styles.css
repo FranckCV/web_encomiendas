@@ -56,7 +56,7 @@ body {
 }
 
 header.general_element {
-    display: flex;
+    display: none;
     align-items: center;
     /* padding-inline: 30px; */
     /* padding-block: 10px; */
@@ -991,14 +991,16 @@ label {
 }
 
 .cell_empty {
-    color: #ffffffa8;
+    color: #808080;
     margin-top: 5px;
     justify-self: center;
+    grid-column: 1/ -1;
+    align-self: center;
 }
 
 .panel_link {
     border: 1px solid #ffffff70;
-    border-radius: 15px;
+    border-radius: 5px;
     padding-inline: 10px;
     padding-block: 5px;
     display: grid;

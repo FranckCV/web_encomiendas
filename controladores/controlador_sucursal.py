@@ -100,7 +100,7 @@ def update_row(direccion, ubigeocodigo, horario_l_v, horario_s_d, latitud, longi
             latitud = %s,
             longitud = %s,
             teléfono = %s,
-            referencia = %s,
+            referencia = %s
         WHERE {get_primary_key()} = %s
     '''
     sql_execute(sql, (direccion, ubigeocodigo, horario_l_v, horario_s_d, latitud, longitud, teléfono, referencia, id))

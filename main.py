@@ -7,6 +7,7 @@ from controladores import controlador_tipo_unidad as controlador_tipo_unidad
 from controladores import controlador_modelo as controlador_modelo
 from controladores import controlador_ubigeo as controlador_ubigeo
 from controladores import controlador_sucursal as controlador_sucursal
+from controladores import controlador_estado_encomienda as controlador_estado_encomienda
 
 import configuraciones
 from configuraciones import NOMBRE_BTN_UPDATE , NOMBRE_BTN_UNACTIVE , ACT_STATE_0 , ACT_STATE_1 , FUNCIONES_CRUD , NOMBRE_BTN_CONSULT , NOMBRE_BTN_DELETE , NOMBRE_BTN_INSERT , NOMBRE_BTN_LIST , NOMBRE_BTN_SEARCH , NOMBRE_CRUD_PAGE , NOMBRE_OPTIONS_COL , STATE_0 , STATE_1 , TITLE_STATE, ICON_PAGE_CRUD
@@ -112,7 +113,8 @@ def listar_admin_pages():
                         if p_active is True:
                             p_titulo = config_page.get('titulo')
                             p_icon_page = get_icon_page(config_page.get('icon_page'))
-                            pages_report.append([ page , p_titulo , p_icon_page ])
+                            p_elements = config_page.get('elements')
+                            pages_report.append([ page , p_titulo , p_icon_page , p_elements ])
             
             modules.append([ name , icon_module , dashboard , pages_crud , pages_report , module])
     return modules
@@ -131,21 +133,6 @@ def get_options_pagination_crud():
     lista = [ 5 , 10 , 15 , 20 , 25  ]
     selected_option_crud = 20
     return lista , selected_option_crud
-
-#Manejo de errores
-def rdrct_error(resp_redirect , e):
-    resp = make_response(resp_redirect)
-    error_message = str(e)
-
-    for clave in ERRORES:
-        if clave in error_message:
-            msg = ERRORES[clave]
-            break 
-    else:
-        msg =  'ERROR DESCONOCIDO ENCONTRADO: '+error_message
-
-    resp.set_cookie('error', msg , max_age=30)
-    return resp 
 
 #Obtiene el ícono, si no hay, retorna uno por defecto
 def get_icon_page(icon):
@@ -336,8 +323,33 @@ CONTROLADORES = {
             "crud_delete": True ,
             "crud_unactive": True ,
         }
-    }
-    
+    },
+    "estado_encomienda": {
+        "active" : True ,
+        "titulo": "estados de encomiendas",
+        "nombre_tabla": "estado de la encomienda",
+        "controlador": controlador_estado_encomienda,
+        "icon_page": '',
+        "filters": [
+            # ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME   LABEL     PLACEHOLDER                TYPE          REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',      False ,   False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',      True ,    True ,         None ],
+            ['activo',       f'{TITLE_STATE}', 'Actividad',   'p',         False ,   True ,         None ],
+            ['descripcion', 'Descripción',     'Descripcion', 'textarea',  True ,    True ,         None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
 }
 
 
@@ -520,7 +532,7 @@ MENU_ADMIN = {
         'cruds' :     [ 'tipo_unidad' , 'marca' , 'modelo' , 'unidad' , 'sucursal'],
         'reports' :   [ 
             'ingresos_periodo' , 
-            ''
+            '' ,
         ],
     },
     'logistica' : {
@@ -536,7 +548,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : 'fa-solid fa-box',
         'dashboard' : True,
-        'cruds' :     [  ],
+        'cruds' :     [ 'estado_encomienda' ],
         'reports' :   [ 'top_envios' , 'envios_tipo' , 'entregado_pendiente' ],
     },
     'atencion' : {
@@ -557,9 +569,9 @@ MENU_ADMIN = {
     },
     'seguridad' : {
         'name' : 'Seguridad',
-        'active': True ,
+        'active': True,
         'icon_page' : 'fa-solid fa-shield-halved',
-        'dashboard' : True,
+        'dashboard' : False,
         'cruds' :     [  ],
         'reports' :   [  ],
     },
@@ -567,7 +579,7 @@ MENU_ADMIN = {
         'name' : 'Personal',   
         'active': True ,
         'icon_page' : 'fa-solid fa-briefcase',
-        'dashboard' : True,
+        'dashboard' : False,
         'cruds' :     [  ],
         'reports' :   [  ],
     },
@@ -593,6 +605,21 @@ def redirect_crud(tabla):
     return redirect(url_for('crud_generico', tabla = tabla))
 
 
+#Manejo de errores
+def rdrct_error(resp_redirect , e):
+    resp = make_response(resp_redirect)
+    error_message = str(e)
+
+    for clave in ERRORES:
+        if clave in error_message:
+            msg = ERRORES[clave]
+            break 
+    else:
+        msg =  'ERROR DESCONOCIDO ENCONTRADO: '+error_message
+
+    resp.set_cookie('error', msg , max_age=30)
+    return resp 
+
 ###########_ DECORADORES _#############
 
 def validar_error_crud():
@@ -607,6 +634,21 @@ def validar_error_crud():
         return wrapper
     return decorator
 
+
+def validar_admin():
+    def decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            try:
+                page = f(*args, **kwargs)
+                if page is None:
+                    return redirect_url('panel')
+                else:
+                    return page
+            except Exception as e:
+                return rdrct_error(redirect_url('panel') , e) 
+        return wrapper
+    return decorator
 
 ###########_ PAGES _#############
 
@@ -658,6 +700,7 @@ paginas_simples = [
     'sucursales' ,
 ]
 
+
 for pagina in paginas_simples:
     app.add_url_rule(
         f"/{pagina}",  # URL
@@ -666,25 +709,24 @@ for pagina in paginas_simples:
     )
 
 
-
 @app.route("/panel")
 def panel():
     return render_template('panel.html')
 
 
-
 ##################_ ADMIN PAGE _################## 
 
 @app.route("/crud=<tabla>")
+# @validar_admin()
 def crud_generico(tabla):
     config = CONTROLADORES.get(tabla)
     if not config:
-        return "Tabla no soportada", 404
+        return None
 
     active = config["active"]
 
     if active is False:
-        return "Tabla no soportada", 404
+        return None
     
     value_search = request.args.get("value_search")
 
@@ -737,22 +779,35 @@ def crud_generico(tabla):
 
 
 @app.route("/dashboard=<module_name>")
+@validar_admin()
 def dashboard(module_name):
     info_modulo = MENU_ADMIN.get(module_name)
 
     for page in listar_admin_pages():
         if module_name == page[5] and page[2] is True:
             modulo = page
+            list_reports = []
 
-    return render_template(
-        'dashboard.html' , 
-        module_name = module_name , 
-        modulo = modulo ,
-        info_modulo = info_modulo,
-        )
+            for re in modulo[4]:
+                if re[3].get('graph') is True:
+                    print(re)
+                    list_reports.append(re)
+
+
+            return render_template(
+                'dashboard.html' , 
+                module_name = module_name , 
+                modulo = modulo ,
+                info_modulo = info_modulo,
+                list_reports = list_reports ,
+                REPORTES = REPORTES ,
+                )
+    return None
+    # return 'No hay dashboard' ,404
 
 
 @app.route("/reporte=<report_name>")
+@validar_admin()
 def reporte(report_name):
     config = REPORTES.get(report_name)
     if not config:
@@ -892,11 +947,6 @@ def crud_unactive(tabla):
         controlador.unactive_row( request.form.get(primary_key) )
 
     return redirect(url_for('crud_generico', tabla = tabla))
-
-
-
-
-
 
 
 @app.route("/colores")
