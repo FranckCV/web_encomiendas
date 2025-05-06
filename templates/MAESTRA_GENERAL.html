@@ -16,80 +16,51 @@
 
 {% block body_html %}
 
-<header class="general_element">
-    <div class="img_logo">
-        <img src="/static/img/logo.png" alt="">
+<header class="general_element top-header">
+    <div class="logo-container">
+        <img class="logo" src="/static/img/logo.png" alt="">
+        <div class="logo-text">{{SYSTEM_NAME}}</div>
     </div>
 
-    <div class="header_options">
+    <nav class="main-nav">
+        <a href="{{url_for('main_page')}}" class="nav-link">
+            <i class="fas fa-home"></i>
+            <span>Inicio</span>
+        </a>
+        <a href="{{url_for('seguimiento')}}" class="nav-link">
+            <i class="fas fa-search"></i>
+            <span>Seguimiento</span>
+        </a>
+        <a href="{{url_for('cotizador')}}" class="nav-link">
+            <i class="fas fa-dollar-sign"></i>
+            <span>Cotizar</span>
+        </a>
+        <a href="{{url_for('sucursales')}}" class="nav-link">
+            <i class="fas fa-plane"></i>
+            <span>Sucursales</span>
+        </a>
+    </nav>
 
-        <a href="{{url_for('main_page')}}" class="h_options">
-            <i class="fa-solid fa-home"></i>
-            <p>Inicio</p>
-        </a>
-        <a href="{{url_for('tracking')}}" class="h_options">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <p>Seguimiento</p>
-        </a>
-        <a href="#" class="h_options">
-            <i class="fa-solid fa-dollar-sign"></i>
-            <p>Pagar</p>
-        </a>
-        <a href="#" class="h_options">
-            <i class="fa-solid fa-plane"></i>
-            <p>Sucursales</p>
-        </a>
-
-    </div>
-
-    <div class="h_user_block">
-        <div class="header_user">
-            <i class="fa-solid fa-user"></i>
+    <a href="{{url_for('login')}}" class="account-area">
+        <div class="user-icon">
+            <i class="fas fa-user"></i>
         </div>
-        <div class="user_options">
-            <a href="">
-                <i class="fa-solid fa-truck"></i>
-                <p>Mi perfil</p>
-            </a>
-            <a href="">
-                <i class="fa-solid fa-truck"></i>
-                <p>Mis envios</p>
-            </a>
-            <a href="">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <p>Cerra sesión</p>
-            </a>
+        <div class="user-text">
+            <p>
+                Iniciar sesión
+            </p>
         </div>
-    </div>
+    </a>
 
 </header>
 
-<nav class="general_element">
-    <!-- Menú Envíos -->
-    <div class="h_user_block">
-        <div class="n_option ayuda_toggle" onclick="toggleMenu('enviosMenu')">
-            <i class="fa-solid fa-truck-fast"></i>
-            <p>Envíos</p>
+<div class="secondary-menu">
+    <div class="secondary-block">
+        <div class="secondary-link">
+            <i class="fas fa-store"></i>
+            <span>Tienda</span>
         </div>
-        <div class="menu_ayuda" id="enviosMenu">
-            <a href="#">
-                <span>Masivos</span>
-                <i class="fa-solid fa-chevron-right"></i>
-            </a>
-            <a href="#">
-                <span>Actualiza tu clave</span>
-                <i class="fa-solid fa-chevron-right"></i>
-            </a>
-        </div>
-    </div>
-    
-    <!-- Menú Tienda -->
-    <div class="h_user_block">
-        <div class="n_option ayuda_toggle" onclick="toggleMenu('tiendaMenu')">
-            <i class="fa-solid fa-store"></i>
-            <p>Tienda</p>
-        </div>
-        <div class="menu_ayuda" id="tiendaMenu">
+        <div class="secondary-content">
             <a href="{{url_for('cajas')}}">
                 <span>Cajas</span>
                 <i class="fa-solid fa-chevron-right"></i>
@@ -100,14 +71,13 @@
             </a>
         </div>
     </div>
-    
-    <!-- Menú Ayuda -->
-    <div class="h_user_block">
-        <div class="n_option ayuda_toggle" onclick="toggleMenu('ayudaMenu')">
-            <i class="fa-solid fa-circle-question"></i>
-            <p>Ayuda</p>
+
+    <div class="secondary-block">
+        <div class="secondary-link">
+            <i class="fas fa-question-circle"></i>
+            <span>Ayuda</span>
         </div>
-        <div class="menu_ayuda" id="ayudaMenu">
+        <div class="secondary-content">
             <a href="{{url_for('Faq')}}">
                 <span>Preguntas Frecuentes</span>
                 <i class="fa-solid fa-chevron-right"></i>
@@ -126,43 +96,73 @@
             </a>
         </div>
     </div>
-</nav>
 
-<!-- <div class="layout"> -->
-<!-- <aside class="general_element"> -->
-<!-- </aside> -->
+    <div class="secondary-block">
+        <div class="secondary-link">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>Sobre nosotros</span>
+        </div>
+    </div>
+
+</div>
 
 <section class="general_element">
     {% block contenido %}
     {% endblock %}
 </section>
-<!-- </div> -->
 
-<footer class="general_element">
-    <div class="footer_icons">
-        <h3>Redes sociales</h3>
-        <div class="">
-            <a href="#" class="footer_icon"><i class="fa-brands fa-facebook "></i></a>
-            <a href="#" class="footer_icon"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#" class="footer_icon"><i class="fa-brands fa-tiktok   "></i></a>
-            <a href="#" class="footer_icon"><i class="fa-brands fa-youtube  "></i></a>
-            <a href="#" class="footer_icon"><i class="fa-brands fa-linkedin "></i></a>
+<footer class="footer">
+    <div class="footer-top">
+        <div class="footer-column">
+            <h3 class="footer-title"> {{SYSTEM_NAME}}</h3>
+            <p>Soluciones de logística y envío confiables desde 2005. Comprometidos con la calidad y eficiencia en cada
+                entrega.</p>
+            <div class="social-links">
+                <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
+
+        <div class="footer-column">
+            <h3 class="footer-title">Enlaces rápidos</h3>
+            <ul class="footer-links">
+                <li class="footer-link"><a href="{{url_for('main_page')}}">Inicio</a></li>
+                <li class="footer-link"><a href="{{url_for('seguimiento')}}">Seguimiento</a></li>
+                <li class="footer-link"><a href="#">Cotizar</a></li>
+                <li class="footer-link"><a href="{{url_for('sucursales')}}">Sucursales</a></li>
+                <li class="footer-link"><a href="#">Sobre nosotros</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h3 class="footer-title">Servicios</h3>
+            <ul class="footer-links">
+                <li class="footer-link"><a href="#">Envíos nacionales</a></li>
+                <li class="footer-link"><a href="#">Envíos internacionales</a></li>
+                <li class="footer-link"><a href="#">Paquetería empresarial</a></li>
+                <li class="footer-link"><a href="#">Logística e-commerce</a></li>
+                <li class="footer-link"><a href="#">Servicios especiales</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h3 class="footer-title">Contáctanos</h3>
+            <ul class="footer-links">
+                <li class="footer-link"><i class="fas fa-map-marker-alt"></i> Av. Principal #123</li>
+                <li class="footer-link"><i class="fas fa-phone"></i> +123 456 789</li>
+                <li class="footer-link"><i class="fas fa-envelope"></i> info@expressenvios.com</li>
+                <li class="footer-link"><i class="fas fa-clock"></i> Lun-Vie: 8:00 - 18:00</li>
+            </ul>
         </div>
     </div>
 
-    <div class="footer_info">
-        <h3>Informacion</h3>
-        <a href="" class="footer_i">Consultas y Reclamos</a>
-        <a href="" class="footer_i">Libro de Reclamaciones</a>
-        <a href="" class="footer_i">Terminos y Condiciones</a>
+    <div class="footer-bottom">
+        <p>&copy; 2025 {{SYSTEM_NAME}}. Todos los derechos reservados.</p>
     </div>
-
-    <div class="footer_under">
-        <p>{{SYSTEM_NAME}}</p>
-        <p>2025 &copy; Todos los derechos reservados</p>
-    </div>
-
 </footer>
+
 
 {% endblock %}
 
@@ -173,7 +173,16 @@
 <script src="/static/js/common_scripts/bootstrap.bundle.min.js"></script>
 <script src="/static/js/common_scripts/bootstrap.min.js"></script>
 <script src="/static/js/common_scripts/common_script.js"></script>
-<script src="/static/js/leo.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.secondary-block').forEach(function (element) {
+            element.addEventListener('click', function () {
+                this.classList.toggle('active');
+            });
+        });
+    });
+</script>
 
 {% block scripts %}
 {% endblock %}

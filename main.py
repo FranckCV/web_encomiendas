@@ -451,7 +451,7 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-     "tipo_documento": {
+    "tipo_documento": {
         "active" : True ,
         "titulo": "tipos de documentos",
         "nombre_tabla": "tipo de documento",
@@ -476,7 +476,7 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-     "tipo_comprobante": {
+    "tipo_comprobante": {
         "active" : True ,
         "titulo": "tipos de comprobantes",
         "nombre_tabla": "tipo de comprobante",
@@ -1162,42 +1162,6 @@ def crud_unactive(tabla):
         controlador.unactive_row( request.form.get(primary_key) )
 
     return redirect(url_for('crud_generico', tabla = tabla))
-
-
-@app.route("/dashboard=<modulo>")
-def dashboard(modulo):
-    return render_template('dashboard.html')
-    # return f'Aca hay un dashboard del modulo de {modulo}'
-
-
-@app.route("/reporte=<report_name>")
-def reporte(report_name):
-    config = REPORTES.get(report_name)
-    if not config:
-        return "Reporte no encontrado", 404
-
-    active = config["active"]
-
-    if active is False:
-        return "Reporte no encontrado", 404
-        
-    titulo = 'Reporte de ' + config.get("titulo")
-    elements = config.get("elements")
-    icon_page = get_icon_page(config.get("icon_page"))
-    graph = config.get("graph")
-    table = config.get("table")
-    counter = config.get("counter")
-
-    return render_template(
-        "REPORTE.html" ,
-        titulo = titulo ,
-        elements = elements ,
-        graph = graph ,
-        table = table ,
-        counter = counter ,
-        icon_page = icon_page,
-    )
-
 
 
 
