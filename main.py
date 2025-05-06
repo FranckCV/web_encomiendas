@@ -484,7 +484,8 @@ CONTROLADORES = {
             "crud_delete": True ,
             "crud_unactive": True ,
         }
-    }
+    },
+     
 }
 
 
