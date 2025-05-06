@@ -1,0 +1,181 @@
+{% extends "MAESTRA_BASE.html" %}
+
+{% block estilos_html %}
+
+<link rel="stylesheet" href="/static/css/general_styles.css">
+<link rel="shortcut icon" href="/static/img/logo.png">
+{% block estilos %}
+{% endblock %}
+<title>
+    {% block titulo %}
+    {% endblock %}| {{SYSTEM_NAME}}
+</title>
+
+{% endblock %}
+
+
+{% block body_html %}
+
+<header class="general_element">
+    <div class="img_logo">
+        <img src="/static/img/logo.png" alt="">
+    </div>
+
+    <div class="header_options">
+
+        <a href="{{url_for('main_page')}}" class="h_options">
+            <i class="fa-solid fa-home"></i>
+            <p>Inicio</p>
+        </a>
+        <a href="{{url_for('tracking')}}" class="h_options">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <p>Seguimiento</p>
+        </a>
+        <a href="#" class="h_options">
+            <i class="fa-solid fa-dollar-sign"></i>
+            <p>Pagar</p>
+        </a>
+        <a href="#" class="h_options">
+            <i class="fa-solid fa-plane"></i>
+            <p>Sucursales</p>
+        </a>
+
+    </div>
+
+    <div class="h_user_block">
+        <div class="header_user">
+            <i class="fa-solid fa-user"></i>
+        </div>
+        <div class="user_options">
+            <a href="">
+                <i class="fa-solid fa-truck"></i>
+                <p>Mi perfil</p>
+            </a>
+            <a href="">
+                <i class="fa-solid fa-truck"></i>
+                <p>Mis envios</p>
+            </a>
+            <a href="">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <p>Cerra sesión</p>
+            </a>
+        </div>
+    </div>
+
+</header>
+
+<nav class="general_element">
+    <!-- Menú Envíos -->
+    <div class="h_user_block">
+        <div class="n_option ayuda_toggle" onclick="toggleMenu('enviosMenu')">
+            <i class="fa-solid fa-truck-fast"></i>
+            <p>Envíos</p>
+        </div>
+        <div class="menu_ayuda" id="enviosMenu">
+            <a href="#">
+                <span>Masivos</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            <a href="#">
+                <span>Actualiza tu clave</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Menú Tienda -->
+    <div class="h_user_block">
+        <div class="n_option ayuda_toggle" onclick="toggleMenu('tiendaMenu')">
+            <i class="fa-solid fa-store"></i>
+            <p>Tienda</p>
+        </div>
+        <div class="menu_ayuda" id="tiendaMenu">
+            <a href="{{url_for('cajas')}}">
+                <span>Cajas</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            <a href="{{url_for('articulos')}}">
+                <span>Más Productos</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Menú Ayuda -->
+    <div class="h_user_block">
+        <div class="n_option ayuda_toggle" onclick="toggleMenu('ayudaMenu')">
+            <i class="fa-solid fa-circle-question"></i>
+            <p>Ayuda</p>
+        </div>
+        <div class="menu_ayuda" id="ayudaMenu">
+            <a href="{{url_for('Faq')}}">
+                <span>Preguntas Frecuentes</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            <a href="{{url_for('contac')}}">
+                <span>Contáctanos</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            <a href="#">
+                <span>No recibimos</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+            <a href="#">
+                <span>Envíos en abandono</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- <div class="layout"> -->
+<!-- <aside class="general_element"> -->
+<!-- </aside> -->
+
+<section class="general_element">
+    {% block contenido %}
+    {% endblock %}
+</section>
+<!-- </div> -->
+
+<footer class="general_element">
+    <div class="footer_icons">
+        <h3>Redes sociales</h3>
+        <div class="">
+            <a href="#" class="footer_icon"><i class="fa-brands fa-facebook "></i></a>
+            <a href="#" class="footer_icon"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" class="footer_icon"><i class="fa-brands fa-tiktok   "></i></a>
+            <a href="#" class="footer_icon"><i class="fa-brands fa-youtube  "></i></a>
+            <a href="#" class="footer_icon"><i class="fa-brands fa-linkedin "></i></a>
+        </div>
+    </div>
+
+    <div class="footer_info">
+        <h3>Informacion</h3>
+        <a href="" class="footer_i">Consultas y Reclamos</a>
+        <a href="" class="footer_i">Libro de Reclamaciones</a>
+        <a href="" class="footer_i">Terminos y Condiciones</a>
+    </div>
+
+    <div class="footer_under">
+        <p>{{SYSTEM_NAME}}</p>
+        <p>2025 &copy; Todos los derechos reservados</p>
+    </div>
+
+</footer>
+
+{% endblock %}
+
+
+
+{% block scripts_html %}
+
+<script src="/static/js/common_scripts/bootstrap.bundle.min.js"></script>
+<script src="/static/js/common_scripts/bootstrap.min.js"></script>
+<script src="/static/js/common_scripts/common_script.js"></script>
+<script src="/static/js/leo.js"></script>
+
+{% block scripts %}
+{% endblock %}
+
+{% endblock %}

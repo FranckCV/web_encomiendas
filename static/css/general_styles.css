@@ -124,6 +124,7 @@ body {
     gap: 30px;
 }
 
+
 .secondary-link {
     color: var(--color4);
     text-decoration: none;
@@ -132,6 +133,7 @@ body {
     align-items: center;
     font-weight: 500;
     transition: all 0.15s ease;
+    gap: 8px;
 }
 
 .secondary-link:hover {
@@ -142,9 +144,21 @@ body {
 }
 
 .secondary-link i {
-    margin-right: 0.5rem;
+    /* margin-right: 0.5rem; */
     font-size: 1.2rem;
 }
+
+.secondary-content {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+}
+
+.secondary-block.active .secondary-content {
+    display: flex;
+}
+
+    
 
 section.general_element {
     flex-direction: column;
