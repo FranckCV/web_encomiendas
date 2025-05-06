@@ -1,0 +1,59 @@
+{% extends "MAESTRA_LOGIN.html" %}
+
+{% block titulo %}
+Recuperar Contraseña
+{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet" href="/static/css/login_form.css">
+{% endblock %}
+
+{% block contenido %}
+
+<section class="general_element">
+    <form id="form_recuperar" name="form_recuperar" method="POST" action="{{ url_for('recuperar_contrasena') }}">
+        <img src="/static/img/logo.png" alt="logo">
+
+        <h2>Recuperar Contraseña</h2>
+
+        <div class="inputs">
+            <div class="input_box">
+                <input type="email" name="email" id="email" placeholder="Correo electrónico" required>
+                <i class="fa-solid fa-envelope"></i>
+            </div>
+        </div>
+
+        <p class="instruccion">Introduce tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.</p>
+
+        <div id="send">
+            <input type="submit" class="btn" value="Enviar enlace" required>
+        </div>
+
+        <p><a href="{{ url_for('login') }}">Volver a inicio de sesión</a></p>
+    </form>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const formRecuperar = document.getElementById('form_recuperar');
+        
+        formRecuperar.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            
+            // Aquí puedes agregar la lógica para enviar la solicitud de recuperación
+            // Por ejemplo, usando fetch para hacer una petición al servidor
+            
+            // Ejemplo de feedback visual (puedes personalizarlo)
+            alert('Se ha enviado un enlace de recuperación a tu correo electrónico');
+            
+            // Redirigir al login después de mostrar el mensaje
+            // window.location.href = "{{ url_for('login') }}";
+        });
+    });
+</script>
+{% endblock %}
