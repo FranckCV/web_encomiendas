@@ -14,6 +14,7 @@ from controladores import controlador_estado_encomienda as controlador_estado_en
 from controladores import controlador_tipo_documento as controlador_tipo_documento
 from controladores import controlador_tipo_comprobante as controlador_tipo_comprobante
 from controladores import controlador_empleado as controlador_empleado
+from controladores import controlador_metodo_pago as controlador_metodo_pago
 
 
 
@@ -518,6 +519,32 @@ CONTROLADORES = {
         ['ape_paterno',  'Apellido Paterno','Apellido Paterno','text',   True ,    True ,         None ],
         ['ape_materno',  'Apellido Materno','Apellido Materno','text',   True ,    True ,         None ],
         ['cargoid',      'Cargo',           'Cargo',           'select', True ,    None ,         None],#[controlador_cargo.get_options(), 'nombre'] ],
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": True,
+        }
+    },
+
+    "metodo_pago": {
+        "active": True,
+        "titulo": "métodos de pago",
+        "nombre_tabla": "método de pago",
+        "controlador": controlador_metodo_pago,
+        "icon_page": "fa-solid fa-money-bill-wave",
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active()],
+        ],
+        "fields_form": [
+            #  ID/NAME     LABEL             PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
+            ['id',        'ID',             'ID',          'text',  True,      False,         None],
+            ['nombre',    'Nombre',         'Nombre',      'text',  True,      True,          None],
+            ['activo',    f'{TITLE_STATE}', 'Activo',      'p',     True,      False,         None],
         ],
         "crud_forms": {
             "crud_list": True,
