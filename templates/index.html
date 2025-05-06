@@ -2,77 +2,178 @@
 
 
 {% block titulo %}
-
+Bienvenido a {{SYSTEM_NAME}}
 {% endblock %}
 
 
 {% block estilos %}
+
 <link rel="stylesheet" href="/static/css/index.css">
+
 {% endblock %}
 
 
 {% block contenido %}
 
-<div class="section_tracking">
-    <div class="track_content">
 
-        <div>
-            <h3>Rastrea tu encomienda</h3>
-        </div>
-        <div class="block_tracking">
-            <div class="trk_title">
-                <i class="fa-solid fa-map"></i>
-                <p> Dale seguimiento aquí</p>
-            </div>
-            <div class="trk_form">
-                <input placeholder="Nro de Tracking" class="form_field" type="text">
-                <!-- <select class="form_field" name="" id="">
-                    <option value="">2025</option>
-                    <option value="">2024</option>
-                    <option value="">2023</option>
-                    <option value="">2022</option>
-                    <option value="">2021</option>
-                    <option value="">2020</option>
-                    <option value="">2019</option>
-                </select> -->
-                <button class="button">
-                    <i class="fa-solid fa-paper-plane"></i>
+<section class="hero">
+    <div class="hero_cont">
+        <h1>Envíos rápidos y seguros</h1>
+        <p>Transportamos tus encomiendas con la mayor seguridad y eficiencia a cualquier destino</p>
+
+        <div class="tracking-container">
+            <h2 class="tracking-title">Rastrea tu encomienda</h2>
+            <form class="tracking-form">
+                <input type="text" class="tracking-input" placeholder="Ingresa tu número de tracking">
+                <button type="submit" class="tracking-btn">
+                    <i class="fas fa-paper-plane"></i>
                 </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<section class="stats-section">
+    <div class="stats-header">
+        <h2>Nuestros Números Hablan</h2>
+        <p>Confía en nuestra experiencia y capacidad para manejar tus envíos con la mayor eficiencia y seguridad.</p>
+    </div>
+    
+    <div class="stats-container">
+        <div class="stat-item">
+            <div class="stat-icon">
+                <i class="fas fa-truck"></i>
             </div>
+            <div class="stat-number">1.5M+</div>
+            <div class="stat-text">Envíos realizados cada año con éxito y puntualidad</div>
+        </div>
+        
+        <div class="stat-item">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-number">98%</div>
+            <div class="stat-text">Clientes satisfechos con nuestro servicio y atención</div>
+        </div>
+        
+        <div class="stat-item">
+            <div class="stat-icon">
+                <i class="fas fa-globe-americas"></i>
+            </div>
+            <div class="stat-number">120+</div>
+            <div class="stat-text">Destinos nacionales e internacionales disponibles</div>
+        </div>
+        
+        <div class="stat-item">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-number">24/7</div>
+            <div class="stat-text">Servicio de atención en linea y seguimiento en tiempo real</div>
+        </div>
+    </div>
+</section>
+
+<section class="process-section">
+    <div class="process-header">
+        <h2>Proceso Simple y Rápido</h2>
+        <p>Enviar paquetes nunca había sido tan fácil. Sigue estos simples pasos para hacer tus envíos:</p>
+    </div>
+    
+    <div class="process-steps">
+        <div class="process-step">
+            <div class="step-number">1</div>
+            <div class="step-icon">
+                <i class="fas fa-edit"></i>
+            </div>
+            <div class="step-title">Registra tu envío</div>
+            <div class="step-desc">Ingresa los datos del remitente y destinatario en nuestro sistema.</div>
+        </div>
+        
+        <div class="process-step">
+            <div class="step-number">2</div>
+            <div class="step-icon">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="step-title">Prepara el paquete</div>
+            <div class="step-desc">Empaca tus artículos de forma segura para su transporte.</div>
+        </div>
+        
+        <div class="process-step">
+            <div class="step-number">3</div>
+            <div class="step-icon">
+                <i class="fa-solid fa-truck-ramp-box"></i>
+            </div>
+            <div class="step-title">Entrega o recogida</div>
+            <div class="step-desc">Lleva tu paquete a una sucursal o solicita recogida a domicilio.</div>
+        </div>
+        
+        <div class="process-step">
+            <div class="step-number">4</div>
+            <div class="step-icon">
+                <i class="fas fa-shipping-fast"></i>
+            </div>
+            <div class="step-title">Seguimiento</div>
+            <div class="step-desc">Monitorea tu envío en tiempo real hasta su entrega.</div>
+        </div>
+        
+        <div class="process-step">
+            <div class="step-number">5</div>
+            <div class="step-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="step-title">Entrega garantizada</div>
+            <div class="step-desc">Tu paquete llega a su destino de forma segura y puntual.</div>
+        </div>
+    </div>
+</section>
+
+<section class="cta">
+    <h2>¿Listo para hacer un envío?</h2>
+    <p>Crea una cuenta y obtén beneficios exclusivos como descuentos, historial de envíos y notificaciones automáticas
+    </p>
+    <div class="cta-buttons">
+        <a href="#" class="btn btn-primary">Crear cuenta</a>
+        <a href="#" class="btn btn-secondary">Más información</a>
+    </div>
+</section>
+
+<section class="features">
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-calculator"></i>
+        </div>
+        <div class="feature-content">
+            <h3 class="feature-title">Calcula el costo de tu envío</h3>
+            <p class="feature-text">Utiliza nuestra calculadora para obtener un presupuesto inmediato basado en peso,
+                dimensiones y destino.</p>
+            <a href="#" class="feature-link">Calcular ahora <i class="fas fa-chevron-right"></i></a>
         </div>
     </div>
 
-</div>
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-map-marked-alt"></i>
+        </div>
+        <div class="feature-content">
+            <h3 class="feature-title">Encuentra nuestras sucursales</h3>
+            <p class="feature-text">Más de 100 sucursales a nivel nacional para recibir o enviar tus paquetes con
+                facilidad.</p>
+            <a href="{{url_for('sucursales')}}" class="feature-link">Ver ubicaciones <i class="fas fa-chevron-right"></i></a>
+        </div>
+    </div>
 
-<div class="section_cotizacion">
-    <form action="">
-        <h5>Lugar de origen</h5>
-        <div class="cotizacion_forms">
-            <select name="" id=""></select>
-            <select name="" id=""></select>
-            <select name="" id=""></select>
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-box"></i>
         </div>
-        <h5>Lugar de destino</h5>
-        <div class="cotizacion_forms">
-            <select name="" id=""></select>
-            <select name="" id=""></select>
-            <select name="" id=""></select>
+        <div class="feature-content">
+            <h3 class="feature-title">Servicios empresariales</h3>
+            <p class="feature-text">Soluciones logísticas personalizadas para empresas de todos los tamaños.</p>
+            <a href="#" class="feature-link">Conocer más <i class="fas fa-chevron-right"></i></a>
         </div>
-        <h5>Datos de envio</h5>
-        <div class="cotizacion_forms">
-            <select name="" id=""></select>
-            <div>
-                <input type="radio" name="tipo_envio" id="">
-                <input type="radio" name="tipo_envio" id="">
-            </div>
-            <input type="number" name="" id="">
-        </div>
-        <div>
-            <div></div>
-            <button></button>
-        </div>
-    </form>
-</div>
+    </div>
+</section>
 
 
 {% endblock %}

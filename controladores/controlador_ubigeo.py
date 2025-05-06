@@ -52,3 +52,50 @@ def get_options():
     return lista
 
 
+def get_options_departamento():
+    sql= f'''
+        SELECT DISTINCT 
+            departamento 
+        FROM {table_name}
+        order by departamento
+    '''
+    filas = sql_select_fetchall(sql)
+    
+    # lista = [(fila["departamento"]) for fila in filas]
+    lista = filas
+    return lista
+
+
+def get_options_provincia():
+    sql= f'''
+        SELECT DISTINCT 
+            departamento ,
+            provincia
+        FROM {table_name}
+        order by departamento , provincia
+    '''
+    filas = sql_select_fetchall(sql)
+    
+    # lista = [( fila["departamento"] , fila["provincia"]) for fila in filas]
+    lista = filas
+    return lista
+
+
+def get_options_distrito():
+    sql= f'''
+        SELECT 
+            codigo , 
+            departamento ,
+            provincia ,
+            distrito 
+        FROM {table_name}
+        where activo = 1
+        order by departamento , provincia , distrito
+    '''
+    filas = sql_select_fetchall(sql)
+    
+    # lista = [( fila["codigo"] , fila["departamento"] , fila["provincia"] , fila["distrito"] ) for fila in filas]
+    lista = filas
+    return lista
+
+
