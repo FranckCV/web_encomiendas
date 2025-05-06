@@ -120,7 +120,8 @@ def listar_admin_pages():
                         if p_active is True:
                             p_titulo = config_page.get('titulo')
                             p_icon_page = get_icon_page(config_page.get('icon_page'))
-                            pages_report.append([ page , p_titulo , p_icon_page ])
+                            p_elements = config_page.get('elements')
+                            pages_report.append([ page , p_titulo , p_icon_page , p_elements ])
             
             modules.append([ name , icon_module , dashboard , pages_crud , pages_report , module])
     return modules
@@ -139,21 +140,6 @@ def get_options_pagination_crud():
     lista = [ 5 , 10 , 15 , 20 , 25  ]
     selected_option_crud = 20
     return lista , selected_option_crud
-
-#Manejo de errores
-def rdrct_error(resp_redirect , e):
-    resp = make_response(resp_redirect)
-    error_message = str(e)
-
-    for clave in ERRORES:
-        if clave in error_message:
-            msg = ERRORES[clave]
-            break 
-    else:
-        msg =  'ERROR DESCONOCIDO ENCONTRADO: '+error_message
-
-    resp.set_cookie('error', msg , max_age=30)
-    return resp 
 
 #Obtiene el ícono, si no hay, retorna uno por defecto
 def get_icon_page(icon):
@@ -681,7 +667,7 @@ MENU_ADMIN = {
         'cruds' :     [ 'tipo_unidad' , 'marca' , 'modelo' , 'unidad' , 'sucursal'],
         'reports' :   [ 
             'ingresos_periodo' , 
-            ''
+            '' ,
         ],
     },
     'logistica' : {
@@ -718,9 +704,9 @@ MENU_ADMIN = {
     },
     'seguridad' : {
         'name' : 'Seguridad',
-        'active': True ,
+        'active': True,
         'icon_page' : 'fa-solid fa-shield-halved',
-        'dashboard' : True,
+        'dashboard' : False,
         'cruds' :     [  ],
         'reports' :   [  ],
     },
@@ -754,6 +740,21 @@ def redirect_crud(tabla):
     return redirect(url_for('crud_generico', tabla = tabla))
 
 
+#Manejo de errores
+def rdrct_error(resp_redirect , e):
+    resp = make_response(resp_redirect)
+    error_message = str(e)
+
+    for clave in ERRORES:
+        if clave in error_message:
+            msg = ERRORES[clave]
+            break 
+    else:
+        msg =  'ERROR DESCONOCIDO ENCONTRADO: '+error_message
+
+    resp.set_cookie('error', msg , max_age=30)
+    return resp 
+
 ###########_ DECORADORES _#############
 
 def validar_error_crud():
@@ -768,6 +769,21 @@ def validar_error_crud():
         return wrapper
     return decorator
 
+
+def validar_admin():
+    def decorator(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
+            try:
+                page = f(*args, **kwargs)
+                if page is None:
+                    return redirect_url('panel')
+                else:
+                    return page
+            except Exception as e:
+                return rdrct_error(redirect_url('panel') , e) 
+        return wrapper
+    return decorator
 
 ###########_ PAGES _#############
 
@@ -821,6 +837,7 @@ paginas_simples = [
     'seguimiento'
 ]
 
+
 for pagina in paginas_simples:
     app.add_url_rule(
         f"/{pagina}",  # URL
@@ -830,24 +847,19 @@ for pagina in paginas_simples:
 
 
 
-@app.route("/panel")
-def panel():
-    return render_template('panel.html')
-
-
-
 ##################_ ADMIN PAGE _################## 
 
 @app.route("/crud=<tabla>")
+# @validar_admin()
 def crud_generico(tabla):
     config = CONTROLADORES.get(tabla)
     if not config:
-        return "Tabla no soportada", 404
+        return None
 
     active = config["active"]
 
     if active is False:
-        return "Tabla no soportada", 404
+        return None
     
     value_search = request.args.get("value_search")
 
@@ -900,22 +912,35 @@ def crud_generico(tabla):
 
 
 @app.route("/dashboard=<module_name>")
+@validar_admin()
 def dashboard(module_name):
     info_modulo = MENU_ADMIN.get(module_name)
 
     for page in listar_admin_pages():
         if module_name == page[5] and page[2] is True:
             modulo = page
+            list_reports = []
 
-    return render_template(
-        'dashboard.html' , 
-        module_name = module_name , 
-        modulo = modulo ,
-        info_modulo = info_modulo,
-        )
+            for re in modulo[4]:
+                if re[3].get('graph') is True:
+                    print(re)
+                    list_reports.append(re)
+
+
+            return render_template(
+                'dashboard.html' , 
+                module_name = module_name , 
+                modulo = modulo ,
+                info_modulo = info_modulo,
+                list_reports = list_reports ,
+                REPORTES = REPORTES ,
+                )
+    return None
+    # return 'No hay dashboard' ,404
 
 
 @app.route("/reporte=<report_name>")
+@validar_admin()
 def reporte(report_name):
     config = REPORTES.get(report_name)
     if not config:
@@ -1057,8 +1082,66 @@ def crud_unactive(tabla):
     return redirect(url_for('crud_generico', tabla = tabla))
 
 
+@app.route("/dashboard=<modulo>")
+def dashboard(modulo):
+    return render_template('dashboard.html')
+    # return f'Aca hay un dashboard del modulo de {modulo}'
 
 
+@app.route("/reporte=<report_name>")
+def reporte(report_name):
+    config = REPORTES.get(report_name)
+    if not config:
+        return "Reporte no encontrado", 404
+
+    active = config["active"]
+
+    if active is False:
+        return "Reporte no encontrado", 404
+        
+    titulo = 'Reporte de ' + config.get("titulo")
+    elements = config.get("elements")
+    icon_page = get_icon_page(config.get("icon_page"))
+    graph = config.get("graph")
+    table = config.get("table")
+    counter = config.get("counter")
+
+    return render_template(
+        "REPORTE.html" ,
+        titulo = titulo ,
+        elements = elements ,
+        graph = graph ,
+        table = table ,
+        counter = counter ,
+        icon_page = icon_page,
+    )
+
+
+
+
+@app.route("/panel")
+def panel():
+    return render_template('panel.html')
+
+@app.route("/faq")
+def Faq():
+
+    return render_template('Faq.html')
+
+@app.route("/contactanos")
+def contac():
+
+    return render_template('contactanos.html')
+
+@app.route("/cajas")
+def cajas():
+
+    return render_template('cajas.html')
+
+@app.route("/articulos")
+def articulos():
+
+    return render_template('articulos.html')
 
 
 

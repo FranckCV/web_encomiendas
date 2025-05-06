@@ -1,0 +1,156 @@
+{% extends "MAESTRA_GENERAL.html" %}
+
+{% block estilos %}
+<link rel="stylesheet" href="/static/css/FAQ.css">
+{% endblock %}
+
+{% block titulo %}
+Preguntas Frecuentes
+{% endblock %}
+
+{% block contenido %}
+<div class="faq-container">
+    <!-- Banner de bienvenida -->
+    <div class="welcome-banner">
+        <div class="welcome-content">
+            <h2>Preguntas Frecuentes</h2>
+            <p>Resuelve tus dudas sobre nuestro servicio de envío.</p>
+        </div>
+    </div>
+
+    <div class="faq-content">
+        <!-- Sección de preguntas -->
+        <div class="faq-section">
+            <h2>Tus envíos</h2>
+            
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header" data-toggle="collapse">
+                        ¿Qué tipos de servicios ofrece Shalom?
+                        <span class="accordion-icon">
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>En Shalom, nos especializamos en ofrecer servicios de envío de carga y encomiendas a nivel nacional, con más de 250 destinos terrestres y 15 destinos aéreos. Además, facilitamos el recojo y reparto de tus envíos directamente en tu domicilio.</p>
+                        <p>Para conocer más visita nuestra página web en el siguiente enlace: <a href="https://shalom.com.pe" target="_blank">https://shalom.com.pe</a></p>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <div class="accordion-header" data-toggle="collapse">
+                        ¿Cuáles son los medios para realizar el pago de mi envío?
+                        <span class="accordion-icon">
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Puedes realizar el pago de tu envío a través de los siguientes medios:</p>
+                        <ul>
+                            <li>Efectivo en cualquiera de nuestras agencias</li>
+                            <li>Transferencia bancaria a nuestra cuenta corporativa</li>
+                            <li>Tarjetas de débito y crédito (Visa, Mastercard)</li>
+                            <li>Pago en línea a través de nuestra plataforma web</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <div class="accordion-header" data-toggle="collapse">
+                        ¿Cómo debe realizar un correcto embalaje?
+                        <span class="accordion-icon">
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Para garantizar la seguridad de tu envío, te recomendamos:</p>
+                        <ul>
+                            <li>Utilizar cajas en buen estado y del tamaño adecuado para el contenido</li>
+                            <li>Proteger los artículos frágiles con material amortiguador (burbujas, papel, etc.)</li>
+                            <li>Sellar todas las aberturas con cinta de embalaje resistente</li>
+                            <li>Etiquetar claramente el exterior con la información de destino</li>
+                            <li>No sobrecargar las cajas (máximo 25 kg por bulto)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <div class="accordion-header" data-toggle="collapse">
+                        ¿Cómo puedo obtener mi guía de remisión transportista?
+                        <span class="accordion-icon">
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Para obtener tu guía de remisión transportista, puedes:</p>
+                        <ul>
+                            <li>Solicitarla en cualquiera de nuestras agencias al momento de realizar tu envío</li>
+                            <li>Descargarla directamente desde nuestra plataforma web en la sección "Mis envíos"</li>
+                            <li>Recibirla por correo electrónico cuando registres tu envío</li>
+                        </ul>
+                        <p>Recuerda que este documento es importante para el seguimiento y control de tu envío.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sección de ayuda adicional -->
+        <div class="help-section">
+            <h2>¿Necesitas más ayuda?</h2>
+            
+            <div class="help-card">
+                <div class="help-icon">
+                    <i class="fa-solid fa-phone"></i>
+                </div>
+                <div class="help-content">
+                    <h3>Llama al 01 500 7878</h3>
+                    <p>Un asesor de nuestra central telefónica te ayudará a resolver tus dudas.</p>
+                </div>
+            </div>
+            
+            <div class="help-card">
+                <div class="help-icon">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+                <div class="help-content">
+                    <h3>Horarios de atención</h3>
+                    <p>Selecciona tu <a href="#" class="accent-link">agencia</a> de interés y encuentra el horario de atención y más información sobre la <a href="#" class="accent-link">agencia</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sección de valoración -->
+    <div class="rating-section">
+        <h3>¿Te fue útil esta información?</h3>
+        <p>Selecciona una expresión para calificar.</p>
+        
+        <div class="rating-options">
+            <div class="rating-option" data-rating="1">
+                <i class="fa-regular fa-face-frown"></i>
+                <span>Terrible</span>
+            </div>
+            <div class="rating-option" data-rating="2">
+                <i class="fa-regular fa-face-frown-open"></i>
+                <span>Malo</span>
+            </div>
+            <div class="rating-option" data-rating="3">
+                <i class="fa-regular fa-face-meh"></i>
+                <span>Normal</span>
+            </div>
+            <div class="rating-option" data-rating="4">
+                <i class="fa-regular fa-face-smile"></i>
+                <span>Bueno</span>
+            </div>
+            <div class="rating-option" data-rating="5">
+                <i class="fa-regular fa-face-smile-beam"></i>
+                <span>Excelente</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/FAQ.js"></script>
+{% endblock %}

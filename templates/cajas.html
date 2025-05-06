@@ -1,0 +1,112 @@
+{% extends "MAESTRA_GENERAL.html" %}
+
+{% block estilos %}
+<link rel="stylesheet" href="/static/css/cajas.css">
+{% endblock %}
+
+{% block titulo %}
+Producto - Caja Shalom
+{% endblock %}
+
+{% block contenido %}
+<div class="producto-container">
+    <!-- Banner de bienvenida -->
+    <div class="welcome-banner">
+        <div class="welcome-content">
+            <h2>Encuentra la caja perfecta para tus envíos.</h2>
+        </div>
+    </div>
+
+    <!-- Sección del producto -->
+    <div class="producto-detalle">
+        <div class="producto-imagen">
+            <img src="/static/img/caja-shalom.jpg" alt="Caja Shalom">
+            <div class="size-options">
+                <button class="size-btn xxs active">XXS</button>
+                <button class="size-btn xs">XS</button>
+                <button class="size-btn s">S</button>
+                <button class="size-btn m">M</button>
+                <button class="size-btn l">L</button>
+            </div>
+        </div>
+        
+        <div class="producto-info">
+            <h1 class="producto-titulo">Caja Shalom</h1>
+            <p class="producto-dimensiones">15 x 10 x 10 cm</p>
+            
+            <div class="precio-seccion">
+                <div class="precio-principal">
+                    <span class="moneda">S/</span>
+                    <span class="precio">1.50</span>
+                    <div class="info-icon">
+                        <i class="fa-solid fa-info-circle"></i>
+                        <div class="tooltip">Precio unitario. Descuentos disponibles por volumen.</div>
+                    </div>
+                </div>
+                
+                <div class="precios-volumen">
+                    <div class="precio-volumen-item">
+                        <span class="etiqueta-precio">s/. 1.20</span>
+                        <span class="etiqueta-cantidad">a partir de 25 uds.</span>
+                    </div>
+                    <div class="precio-volumen-item">
+                        <span class="etiqueta-precio">s/. 1.00</span>
+                        <span class="etiqueta-cantidad">a partir de 50 uds.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="selector-cantidad">
+                <button class="qty-btn decrease">-</button>
+                <input type="text" class="qty-input" value="1" readonly>
+                <button class="qty-btn increase">+</button>
+            </div>
+
+            <button type="button" class="btn-agregar">
+                Agregar al carrito
+                <i class="fa-solid fa-cart-shopping"></i>
+            </button>
+
+            <div class="promo-banner">
+                <div class="promo-icon">
+                    <i class="fa-solid fa-bullhorn"></i>
+                </div>
+                <div class="promo-text">
+                    <h3>¡Compra al por mayor y obtén super descuentos!</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sección de productos relacionados -->
+    <div class="productos-relacionados">
+        <h2>También te puede interesar</h2>
+        <div class="productos-grid">
+            <div class="producto-item">
+                <img src="/static/img/plumon.png" alt="Plumon Indeleble">
+                <h3>Plumon Indeleble</h3>
+                <p>S/ 3.50</p>
+            </div>
+            <div class="producto-item">
+                <img src="/static/img/cintaEmbalaje.png" alt="Cinta de Empaque">
+                <h3>Cinta de Embalaje</h3>
+                <p>S/ 5.90</p>
+            </div>
+            <div class="producto-item">
+                <img src="/static/img/sobre.png" alt="Sobres Manila">
+                <h3>Sobres A4</h3>
+                <p>S/ 12.00</p>
+            </div>
+            <div class="producto-item">
+                <img src="/static/img/burbupack.png" alt="Burbupack">
+                <h3>Burbupack</h3>
+                <p>S/ 2.50</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/cajas.js"></script>
+{% endblock %}

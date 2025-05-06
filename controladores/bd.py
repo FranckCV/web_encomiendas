@@ -3,8 +3,18 @@ from pymysql.cursors import DictCursor
 #Establecemos la conexión
 def obtener_conexion():
     return pymysql.connect(host='localhost',
+<<<<<<< HEAD
                                 # port=3306,
                                 port=3307,
+=======
+<<<<<<< HEAD
+                                # port=3306,
+                                port=3306,
+=======
+                                port=3306,
+                                # port=3307,
+>>>>>>> e505fbdd8f4474cec7ea33dc7c562817bb53350b
+>>>>>>> b9b076b3768b1c943c949a93192d784b2403fcca
                                 user='root',
                                 password='',
                                 db='bd_encomiendas' ,
@@ -82,7 +92,7 @@ def find_column_table(column_name, tabla):
 def delete_row_table( table_name , id ):
     sql = f'''
         delete from {table_name}
-        where {show_primary_key()} = {id}
+        where {show_primary_key(table_name)} = {id}
     '''
     sql_execute(sql)
 

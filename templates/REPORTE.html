@@ -10,32 +10,23 @@
 
 
 <style>
-    /* #reporte-container {
-        height: 70vh;
-        width: 75%;
-    } */
     .block_table {
         height: 80%;
-        /* display: grid; */
-        /* grid-template-columns: 1fr; */
         margin-top: 20px;
     }
 
-    #space_graph {
-        min-height: 50vh !important;
+    .space_graph {
         width: 75%;
         justify-self: center;
     }
 
-    #space_graph>* {
+    .space_graph>* {
         margin: 0 auto;
     } 
 
     tr td {
-        /* display: flex; */
         gap: 5px;
         justify-content: center;
-        /* padding-inline: 10px; */
         padding-block: 5px;
     }
 </style>
@@ -56,7 +47,7 @@
 <div class="block_crud block_table">
     {% if e_graph %}
     <div class="report_graph">
-        <div id="space_graph"></div>
+        <div class="space_graph" id="space_graph"></div>
     </div>
     {% endif %}
 

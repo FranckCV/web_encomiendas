@@ -17,11 +17,7 @@ def exists_Activo():
 
 
 def delete_row( id ):
-    sql = f'''
-        delete from {table_name}
-        where id = {id}
-    '''
-    sql_execute(sql)
+    bd.delete_row_table(table_name , id)
 
 
 #####_ CAMBIAR SQL y DICT INTERNO _#####
@@ -40,32 +36,33 @@ def table_fetchall():
 def get_table():
     sql= f'''
         select 
-            *
-        from {table_name} 
-
+            est.id ,
+            est.nombre,
+            est.descripcion,
+            est.activo 
+        from {table_name} est
     '''
     columnas = {
-        'id': ['ID' , 0.5] , 
-        'nombre' : ['Nombre' , 4.5] , 
-        'descripcion' : ['Descripción' , 4.5] , 
-        'activo' : ['Actividad' , 1] 
+        'id': ['ID' , 0.5 ] , 
+        'nombre' : ['Nombre' , 3.5] , 
+        'descripcion' : ['Descripcion' , 3.5] , 
+        'activo' : ['Actividad' , 3.5] , 
         }
     filas = sql_select_fetchall(sql)
     
     return columnas , filas
 
 
-######_ CRUD ESPECIFICAS _###### 
+######_ CAMBIAR PARAMETROS Y SQL INTERNO _###### 
 
 def unactive_row( id ):
     unactive_row_table(table_name , id)
 
 
-def insert_row( nombre , descripcion=None ):
+def insert_row( nombre , descripcion ):
     sql = f'''
         INSERT INTO 
-            {table_name} 
-            ( nombre , descripcion , activo )
+            {table_name} ( nombre , descripcion , activo )
         VALUES 
             ( %s , %s , 1 )
     '''
@@ -79,7 +76,7 @@ def update_row( id , nombre , descripcion ):
         descripcion = %s
         where {get_primary_key()} = {id}
     '''
-    sql_execute(sql, (nombre , descripcion ))
+    sql_execute(sql,(nombre , descripcion))
 
 
 #####_ ADICIONALES _#####

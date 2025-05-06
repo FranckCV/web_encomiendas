@@ -200,9 +200,9 @@
             } else {
                 provinciaSelect.disabled = true;
             }
+            actualizarAgencias();
         });
 
-        // Función para actualizar distritos según provincia
         document.getElementById('provincia').addEventListener('change', function() {
             const distritoSelect = document.getElementById('distrito');
             
@@ -222,10 +222,14 @@
             } else {
                 distritoSelect.disabled = true;
             }
+            actualizarAgencias();
         });
 
+        document.getElementById('distrito').addEventListener('change', actualizarAgencias);
+        
+
         // Función para buscar agencias según filtros
-        document.getElementById('btn-buscar').addEventListener('click', function() {
+        function actualizarAgencias() {
             const departamento = document.getElementById('departamento').value;
             const provincia = document.getElementById('provincia').value;
             const distrito = document.getElementById('distrito').value;
@@ -248,7 +252,8 @@
             // Actualizar mapa y listado
             actualizarMapa(agenciasFiltradas);
             actualizarListado(agenciasFiltradas);
-        });
+        }
+
 
         // Función para actualizar marcadores en el mapa
         function actualizarMapa(agencias) {
@@ -332,4 +337,79 @@
             listContainer.innerHTML = html;
         }
     });
+
+
+    departamentoSelect.addEventListener('change', function() {
+            const provinciaSelect = document.getElementById('provincia');
+            const distritoSelect = document.getElementById('distrito');
+            
+            // Limpiar selects
+            provinciaSelect.innerHTML = '<option value="">Todas</option>';
+            distritoSelect.innerHTML = '<option value="">Todos</option>';
+            distritoSelect.disabled = true;
+            
+            if (this.value) {
+                // Llenar provincias
+                const provs = provincias[this.value] || [];
+                provs.forEach(prov => {
+                    const option = document.createElement('option');
+                    option.value = prov;
+                    option.textContent = prov;
+                    provinciaSelect.appendChild(option);
+                });
+                provinciaSelect.disabled = false;
+            } else {
+                provinciaSelect.disabled = true;
+            }
+        });
+
+        // Función para actualizar distritos según provincia
+        // document.getElementById('provincia').addEventListener('change', function() {
+        //     const distritoSelect = document.getElementById('distrito');
+            
+        //     // Limpiar select de distritos
+        //     distritoSelect.innerHTML = '<option value="">Todos</option>';
+            
+        //     if (this.value) {
+        //         // Llenar distritos
+        //         const dists = distritos[this.value] || [];
+        //         dists.forEach(dist => {
+        //             const option = document.createElement('option');
+        //             option.value = dist;
+        //             option.textContent = dist;
+        //             distritoSelect.appendChild(option);
+        //         });
+        //         distritoSelect.disabled = false;
+        //     } else {
+        //         distritoSelect.disabled = true;
+        //     }
+        // });
+    // document.getElementById('btn-buscar').addEventListener('click', function() {
+        //     const departamento = document.getElementById('departamento').value;
+        //     const provincia = document.getElementById('provincia').value;
+        //     const distrito = document.getElementById('distrito').value;
+            
+        //     // Filtrar agencias
+        //     let agenciasFiltradas = agenciasData;
+            
+        //     if (departamento) {
+        //         agenciasFiltradas = agenciasFiltradas.filter(a => a.departamento === departamento);
+                
+        //         if (provincia) {
+        //             agenciasFiltradas = agenciasFiltradas.filter(a => a.provincia === provincia);
+                    
+        //             if (distrito) {
+        //                 agenciasFiltradas = agenciasFiltradas.filter(a => a.distrito === distrito);
+        //             }
+        //         }
+        //     }
+            
+        //     // Actualizar mapa y listado
+        //     actualizarMapa(agenciasFiltradas);
+        //     actualizarListado(agenciasFiltradas);
+        // });
 </script>
+
+
+
+
