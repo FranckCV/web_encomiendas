@@ -938,9 +938,7 @@ def cotizador():
 
 ##################_ ADMIN PAGE _################## 
 
-@app.route("/panel")
-def panel():
-    return render_template('panel.html')
+
 
 
 @app.route("/crud=<tabla>")
@@ -1181,8 +1179,6 @@ def crud_unactive(tabla):
         controlador.unactive_row( request.form.get(primary_key) )
 
     return redirect(url_for('crud_generico', tabla = tabla))
-
-
 
 @app.route("/colores")
 def colores():
