@@ -15,6 +15,7 @@ from controladores import controlador_tipo_documento as controlador_tipo_documen
 from controladores import controlador_tipo_comprobante as controlador_tipo_comprobante
 from controladores import controlador_empleado as controlador_empleado
 from controladores import controlador_metodo_pago as controlador_metodo_pago
+from controladores import controlador_tipo_indemnizacion as controlador_tipo_indemnizacion
 
 
 
@@ -547,6 +548,31 @@ CONTROLADORES = {
             "crud_unactive": True,
         }
     },
+    "tipo_indemnizacion": {
+        "active": True,
+        "titulo": "tipos de indemnización",
+        "nombre_tabla": "tipo de indemnización",
+        "controlador": controlador_tipo_indemnizacion,
+        "icon_page": "fa-solid fa-hand-holding-dollar",
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active()],
+        ],
+        "fields_form": [
+            #  ID/NAME     LABEL             PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
+            ['id',        'ID',             'ID',          'text',  True,      False,         None],
+            ['nombre',    'Nombre',         'Nombre',      'text',  True,      True,          None],
+            ['activo',    f'{TITLE_STATE}', 'Activo',      'p',     True,      False,         None],
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": True,
+        }
+    },
 
 }
 
@@ -758,7 +784,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : 'fa-solid fa-circle-question',
         'dashboard' : True,
-        'cruds' :     [  ],
+        'cruds' :     [ 'tipo_indemnizacion' ],
         'reports' :   [ ],
     },
     'ventas' : {
