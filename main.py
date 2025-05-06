@@ -878,6 +878,32 @@ for pagina in paginas_simples:
     )
 
 
+##################_ CLIENTE PAGE _################## 
+
+@app.route("/faq")
+def Faq():
+
+    return render_template('Faq.html')
+
+
+@app.route("/contactanos")
+def contac():
+
+    return render_template('contactanos.html')
+
+
+@app.route("/cajas")
+def cajas():
+
+    return render_template('cajas.html')
+
+
+@app.route("/articulos")
+def articulos():
+
+    return render_template('articulos.html')
+
+
 @app.route("/cotizador")
 def cotizador():
     departamentos = controlador_ubigeo.get_options_departamento()
@@ -1172,32 +1198,6 @@ def reporte(report_name):
         icon_page = icon_page,
     )
 
-
-
-
-@app.route("/panel")
-def panel():
-    return render_template('panel.html')
-
-@app.route("/faq")
-def Faq():
-
-    return render_template('Faq.html')
-
-@app.route("/contactanos")
-def contac():
-
-    return render_template('contactanos.html')
-
-@app.route("/cajas")
-def cajas():
-
-    return render_template('cajas.html')
-
-@app.route("/articulos")
-def articulos():
-
-    return render_template('articulos.html')
 
 
 
