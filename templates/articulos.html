@@ -1,0 +1,95 @@
+{% extends "MAESTRA_GENERAL.html" %}
+
+{% block estilos %}
+<link rel="stylesheet" href="/static/css/articulos.css">
+{% endblock %}
+
+{% block titulo %}
+Productos de Embalaje
+{% endblock %}
+
+{% block contenido %}
+<div class="productos-container">
+    <!-- Banner de bienvenida -->
+    <div class="welcome-banner">
+        <div class="welcome-content">
+            <h2>¡Adquiere más artículos de embalaje!</h2>
+        </div>
+    </div>
+
+    <!-- Sección del producto -->
+    <div class="producto-detalle">
+        <div class="producto-imagen">
+            <img id="producto-img" src="/static/img/caja-shalom.jpg" alt="Caja Shalom">
+            <div class="navigation-arrows">
+                <button id="prev-btn" class="nav-arrow"><i class="fa-solid fa-chevron-left"></i></button>
+                <button id="next-btn" class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            <div id="size-options" class="size-options">
+                <!-- Los botones de tamaño se cargarán dinámicamente si el producto los tiene -->
+            </div>
+        </div>
+        
+        <div class="producto-info">
+            <h1 id="producto-titulo" class="producto-titulo">Caja Shalom</h1>
+            <p id="producto-descripcion" class="producto-descripcion">Ideal para envíos pequeños y seguros.</p>
+            <p id="producto-dimensiones" class="producto-dimensiones">15 x 10 x 10 cm</p>
+            
+            <div class="precio-seccion">
+                <div class="precio-principal">
+                    <span class="moneda">S/</span>
+                    <span id="precio" class="precio">1.50</span>
+                    <div class="info-icon">
+                        <i class="fa-solid fa-info-circle"></i>
+                        <div id="precio-tooltip" class="tooltip">Precio unitario. Descuentos disponibles por volumen.</div>
+                    </div>
+                </div>
+                
+                <div id="precios-volumen" class="precios-volumen">
+                    <!-- Los precios por volumen se cargarán dinámicamente -->
+                </div>
+            </div>
+
+            <div class="selector-cantidad">
+                <button class="qty-btn decrease">-</button>
+                <input type="text" class="qty-input" value="1" readonly>
+                <button class="qty-btn increase">+</button>
+            </div>
+
+            <button type="button" class="btn-agregar">
+                Agregar al carrito
+                <i class="fa-solid fa-cart-shopping"></i>
+            </button>
+
+            <div class="promo-banner">
+                <div class="promo-icon">
+                    <i class="fa-solid fa-bullhorn"></i>
+                </div>
+                <div class="promo-text">
+                    <h3>¡Compra al por mayor y obtén super descuentos!</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sección de productos relacionados -->
+    <div class="productos-relacionados">
+        <h2>También te puede interesar</h2>
+        <div id="productos-relacionados-grid" class="productos-grid">
+            <!-- Los productos relacionados se cargarán dinámicamente -->
+        </div>
+    </div>
+
+    <!-- Miniaturas de navegación -->
+    <div class="producto-thumbs">
+        <h3>Nuestros productos</h3>
+        <div id="thumbs-container" class="thumbs-container">
+            <!-- Las miniaturas se cargarán dinámicamente -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/articulos.js"></script>
+{% endblock %}

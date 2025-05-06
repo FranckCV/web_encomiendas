@@ -1,0 +1,152 @@
+{% extends "MAESTRA_GENERAL.html" %}
+
+{% block estilos %}
+<link rel="stylesheet" href="/static/css/contactanos.css">
+{% endblock %}
+
+{% block titulo %}
+Contáctanos - Shalom
+{% endblock %}
+
+{% block contenido %}
+<div class="contacto-container">
+    <!-- Banner de bienvenida -->
+    <div class="welcome-banner">
+        <div class="welcome-content">
+            <h2>Contáctanos</h2>
+            <p>Estamos aquí para ayudarte con tus envíos. No dudes en comunicarte con nosotros.</p>
+        </div>
+    </div>
+
+    <!-- Sección de información de contacto -->
+    <div class="info-contacto">
+        <h2>{{SYSTEM_NAME}}</h2>
+        
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <div class="info-titulo">Dirección</div>
+            <div class="info-texto">
+                Av. México N° 1187,<br>
+                Urb. Matute, La Victoria
+            </div>
+        </div>
+        
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="fa-solid fa-phone"></i>
+            </div>
+            <div class="info-titulo">Teléfono</div>
+            <div class="info-texto">
+                (01) 500 7878<br>
+                +51 987 576 777 <span class="whatsapp-text">(Solo Whatsapp)</span>
+            </div>
+        </div>
+        
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="fa-solid fa-envelope"></i>
+            </div>
+            <div class="info-titulo">Email</div>
+            <div class="info-texto">
+                <a href="mailto:atencionalcliente@shalom.com.pe">atencionalcliente@shalom.com.pe</a><br>
+                <a href="mailto:ventas@shalom.com.pe">ventas@shalom.com.pe</a>
+            </div>
+        </div>
+        
+        <div class="info-item">
+            <div class="info-icon">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+            <div class="info-titulo">Horario</div>
+            <div class="info-texto">
+                Lun a Sáb: 9:00 am - 6:00 pm
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección del formulario -->
+    <div class="formulario-contacto">
+        <form id="contactForm" action="/enviar-formulario" method="POST">
+            <div class="form-group">
+                <label for="nombreCompleto">Nombre Completo</label>
+                <input type="text" class="form-control" id="nombreCompleto" name="nombreCompleto" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="numeroDocumento">Número de Documento</label>
+                <input type="text" class="form-control" id="numeroDocumento" name="numeroDocumento" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="telefono">Teléfono</label>
+                <input type="tel" class="form-control" id="telefono" name="telefono" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="servicio">¿Qué servicio deseas descubrir?</label>
+                <select class="form-control" id="servicio" name="servicio" required>
+                    <option value="" selected disabled>-</option>
+                    <option value="envios_nacionales">Envíos Nacionales</option>
+                    <option value="envios_aereos">Envíos Aéreos</option>
+                    <option value="envios_corporativos">Envíos Corporativos</option>
+                    <option value="recojo_domicilio">Recojo a Domicilio</option>
+                    <option value="entrega_domicilio">Entrega a Domicilio</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="enviosMensuales">¿Cuántos envíos al mes? (Estimado)</label>
+                <select class="form-control" id="enviosMensuales" name="enviosMensuales" required>
+                    <option value="" selected disabled>-</option>
+                    <option value="1-5">1-5 envíos</option>
+                    <option value="6-20">6-20 envíos</option>
+                    <option value="21-50">21-50 envíos</option>
+                    <option value="51-100">51-100 envíos</option>
+                    <option value="mas_100">Más de 100 envíos</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="tipoCliente">Tipo de cliente</label>
+                <select class="form-control" id="tipoCliente" name="tipoCliente" required>
+                    <option value="" selected disabled>-</option>
+                    <option value="persona_natural">Persona Natural</option>
+                    <option value="empresa">Empresa</option>
+                    <option value="pyme">PYME</option>
+                    <option value="corporativo">Corporativo</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="sede">Sede</label>
+                <select class="form-control" id="sede" name="sede" required>
+                    <option value="" selected disabled>-</option>
+                    <option value="lima_central">Lima - Central</option>
+                    <option value="lima_norte">Lima - Norte</option>
+                    <option value="lima_sur">Lima - Sur</option>
+                    <option value="lima_este">Lima - Este</option>
+                    <option value="provincia">Provincia</option>
+                </select>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="aceptoTerminos" name="aceptoTerminos" required>
+                <label for="aceptoTerminos">Al registrarme, acepto los <a href="#">Términos y condiciones</a></label>
+            </div>
+            
+            <button type="submit" class="btn-submit">¡Descubrir!</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/contactanos.js"></script>
+{% endblock %}

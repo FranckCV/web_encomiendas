@@ -11,6 +11,11 @@ from controladores import controlador_tamaño_caja as controlador_tamaño_caja
 from controladores import controlador_tipo_cargo as controlador_tipo_cargo
 from controladores import controlador_tipo_paquete as controlador_tipo_paquete
 from controladores import controlador_estado_encomienda as controlador_estado_encomienda
+from controladores import controlador_tipo_documento as controlador_tipo_documento
+from controladores import controlador_tipo_comprobante as controlador_tipo_comprobante
+
+
+
 import configuraciones
 from functools import wraps
 import inspect
@@ -446,6 +451,59 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
+     "tipo_documento": {
+        "active" : True ,
+        "titulo": "tipos de documentos",
+        "nombre_tabla": "tipo de documento",
+        "controlador": controlador_tipo_documento,
+        "icon_page": 'fa-solid fa-id-card',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+     "tipo_comprobante": {
+        "active" : True ,
+        "titulo": "tipos de comprobantes",
+        "nombre_tabla": "tipo de comprobante",
+        "controlador": controlador_tipo_comprobante,
+        "icon_page": 'fa-solid fa-file-lines',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['inicial',          'Inicial',    'Inicial',     'text',     True ,     True ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+     
 }
 
 
@@ -1078,6 +1136,69 @@ def crud_unactive(tabla):
         controlador.unactive_row( request.form.get(primary_key) )
 
     return redirect(url_for('crud_generico', tabla = tabla))
+
+
+@app.route("/dashboard=<modulo>")
+def dashboard(modulo):
+    return render_template('dashboard.html')
+    # return f'Aca hay un dashboard del modulo de {modulo}'
+
+
+@app.route("/reporte=<report_name>")
+def reporte(report_name):
+    config = REPORTES.get(report_name)
+    if not config:
+        return "Reporte no encontrado", 404
+
+    active = config["active"]
+
+    if active is False:
+        return "Reporte no encontrado", 404
+        
+    titulo = 'Reporte de ' + config.get("titulo")
+    elements = config.get("elements")
+    icon_page = get_icon_page(config.get("icon_page"))
+    graph = config.get("graph")
+    table = config.get("table")
+    counter = config.get("counter")
+
+    return render_template(
+        "REPORTE.html" ,
+        titulo = titulo ,
+        elements = elements ,
+        graph = graph ,
+        table = table ,
+        counter = counter ,
+        icon_page = icon_page,
+    )
+
+
+
+
+@app.route("/panel")
+def panel():
+    return render_template('panel.html')
+
+@app.route("/faq")
+def Faq():
+
+    return render_template('Faq.html')
+
+@app.route("/contactanos")
+def contac():
+
+    return render_template('contactanos.html')
+
+@app.route("/cajas")
+def cajas():
+
+    return render_template('cajas.html')
+
+@app.route("/articulos")
+def articulos():
+
+    return render_template('articulos.html')
+
 
 
 @app.route("/colores")

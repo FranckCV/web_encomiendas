@@ -1,0 +1,273 @@
+/* Variables de colores */
+:root {
+    --primary-color: #2a3b8f;
+    --secondary-color: #e2f1f8;
+    --accent-color: #2a3b8f;
+    --text-color: #333;
+    --light-text: #666;
+    --border-color: #ddd;
+    --success-color: #2a3b8f;
+    --hover-color: #f8f8f8;
+}
+
+/* Estilos generales */
+.faq-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+    color: var(--text-color);
+}
+
+h1, h2, h3 {
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.accent-link {
+    color: var(--accent-color);
+}
+
+/* Banner de bienvenida */
+.welcome-banner {
+    background-color: var(--secondary-color);
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 35px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-banner::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100%;
+    background-image: url('/static/img/logo.png');
+    background-size: 60%;
+    background-position: center right 30px;
+    background-repeat: no-repeat;
+    opacity: 0.1;
+}
+
+.welcome-content h1 {
+    font-size: 24px;
+    font-weight: normal;
+    margin-bottom: 5px;
+}
+
+.welcome-content h2 {
+    font-size: 32px;
+    font-weight: bolder;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.welcome-content p {
+    font-size: 16px;
+    color: var(--light-text);
+    max-width: 450px;
+}
+
+/* Layout principal */
+.faq-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+@media (max-width: 768px) {
+    .faq-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Sección de preguntas frecuentes */
+.faq-section h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* Estilos del acordeón */
+.accordion {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.accordion-item {
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.accordion-header {
+    padding: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-color);
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--accent-color);
+}
+
+.accordion-item:nth-child(even) .accordion-header {
+    border-left-color: var(--primary-color);
+}
+
+.accordion-header:hover {
+    background-color: var(--hover-color);
+}
+
+.accordion-icon {
+    transition: transform 0.3s ease;
+}
+
+.accordion-header.active .accordion-icon {
+    transform: rotate(180deg);
+}
+
+.accordion-content {
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    background-color: white;
+}
+
+.accordion-content.show {
+    padding: 20px;
+    max-height: 500px;
+}
+
+.accordion-content p {
+    margin-top: 0;
+    line-height: 1.6;
+}
+
+.accordion-content ul {
+    padding-left: 20px;
+}
+
+.accordion-content li {
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+/* Sección de ayuda adicional */
+.help-section h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.help-card {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+}
+
+.help-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--secondary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    flex-shrink: 0;
+}
+
+.help-icon i {
+    font-size: 24px;
+    color: var(--primary-color);
+}
+
+.help-content h3 {
+    font-size: 18px;
+    font-weight: bolder;
+    margin-bottom: 5px;
+    color: var(--accent-color);
+}
+
+.help-content p {
+    font-size: 14px;
+    color: var(--light-text);
+    margin: 0;
+}
+
+/* Sección de valoración */
+.rating-section {
+    text-align: center;
+    padding: 30px 0;
+    border-top: 1px solid var(--border-color);
+}
+
+.rating-section h3 {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+
+.rating-section p {
+    color: var(--light-text);
+    margin-bottom: 25px;
+}
+
+.rating-options {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.rating-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.rating-option:hover {
+    transform: translateY(-5px);
+}
+
+.rating-option i {
+    font-size: 32px;
+    color: #ccc;
+    margin-bottom: 8px;
+    transition: color 0.3s ease;
+}
+
+.rating-option span {
+    font-size: 12px;
+    color: var(--light-text);
+}
+
+.rating-option.selected i {
+    color: var(--success-color);
+}
+
+.rating-option:nth-child(5).selected i {
+    color: #e74c3c;
+}
