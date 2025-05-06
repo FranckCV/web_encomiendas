@@ -1188,11 +1188,6 @@ def crud_unactive(tabla):
 
     return redirect(url_for('crud_generico', tabla = tabla))
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> e1bbf2553c08682721d8c7b4b3632b35e1dd0db3
 @app.route("/colores")
 def colores():
     html = '''
