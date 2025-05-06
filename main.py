@@ -766,7 +766,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : 'fa-solid fa-file-invoice-dollar',
         'dashboard' : True,
-        'cruds' :     ['tamaño_caja' ],
+        'cruds' :     ['tamaño_caja', 'metodo_pago' ],
         'reports' :   [ 'articulos_mas_vendidos'  ],
     },
     'seguridad' : {
