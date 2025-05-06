@@ -919,9 +919,7 @@ def cotizador():
 
 ##################_ ADMIN PAGE _################## 
 
-@app.route("/panel")
-def panel():
-    return render_template('panel.html')
+
 
 
 @app.route("/crud=<tabla>")
@@ -1162,35 +1160,6 @@ def crud_unactive(tabla):
         controlador.unactive_row( request.form.get(primary_key) )
 
     return redirect(url_for('crud_generico', tabla = tabla))
-
-###
-
-
-
-@app.route("/panel")
-def panel():
-    return render_template('panel.html')
-
-@app.route("/faq")
-def Faq():
-
-    return render_template('Faq.html')
-
-@app.route("/contactanos")
-def contac():
-
-    return render_template('contactanos.html')
-
-@app.route("/cajas")
-def cajas():
-
-    return render_template('cajas.html')
-
-@app.route("/articulos")
-def articulos():
-
-    return render_template('articulos.html')
-
 
 @app.route("/colores")
 def colores():
