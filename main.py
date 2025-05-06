@@ -939,7 +939,7 @@ def dashboard(module_name):
     return None
     # return 'No hay dashboard' ,404
 
-
+##
 @app.route("/reporte=<report_name>")
 @validar_admin()
 def reporte(report_name):
@@ -1082,40 +1082,8 @@ def crud_unactive(tabla):
 
     return redirect(url_for('crud_generico', tabla = tabla))
 
+###
 
-@app.route("/dashboard=<modulo>")
-def dashboard(modulo):
-    return render_template('dashboard.html')
-    # return f'Aca hay un dashboard del modulo de {modulo}'
-
-
-@app.route("/reporte=<report_name>")
-def reporte(report_name):
-    config = REPORTES.get(report_name)
-    if not config:
-        return "Reporte no encontrado", 404
-
-    active = config["active"]
-
-    if active is False:
-        return "Reporte no encontrado", 404
-        
-    titulo = 'Reporte de ' + config.get("titulo")
-    elements = config.get("elements")
-    icon_page = get_icon_page(config.get("icon_page"))
-    graph = config.get("graph")
-    table = config.get("table")
-    counter = config.get("counter")
-
-    return render_template(
-        "REPORTE.html" ,
-        titulo = titulo ,
-        elements = elements ,
-        graph = graph ,
-        table = table ,
-        counter = counter ,
-        icon_page = icon_page,
-    )
 
 
 
