@@ -58,8 +58,11 @@ Producto - Caja Shalom
 
             <div class="selector-cantidad">
                 <button class="qty-btn decrease">-</button>
-                <input type="text" class="qty-input" value="1" readonly>
+                <input type="number" class="qty-input" value="1" min="1">
                 <button class="qty-btn increase">+</button>
+            </div>
+            <div class="quantity-limit-container">
+                <span class="quantity-limit"> Máximo: 100 unidades</span>
             </div>
 
             <button type="button" class="btn-agregar">
