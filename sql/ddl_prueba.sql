@@ -150,8 +150,9 @@ CREATE TABLE tipo_indemnizacion (
   PRIMARY KEY (id));
 CREATE TABLE tipo_comprobante (
   id          int(10) NOT NULL AUTO_INCREMENT, 
-  nombre      char(1) NOT NULL, 
+  nombre      varchar(50) NOT NULL, 
   descripcion varchar(100) NOT NULL, 
+  inicial      char(1) not null,
   activo      tinyint(1) DEFAULT 1 NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE marca (

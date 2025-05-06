@@ -11,6 +11,8 @@ from controladores import controlador_tamaño_caja as controlador_tamaño_caja
 from controladores import controlador_tipo_cargo as controlador_tipo_cargo
 from controladores import controlador_tipo_paquete as controlador_tipo_paquete
 from controladores import controlador_estado_encomienda as controlador_estado_encomienda
+from controladores import controlador_tipo_documento as controlador_tipo_documento
+from controladores import controlador_tipo_comprobante as controlador_tipo_comprobante
 
 
 
@@ -445,6 +447,58 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
+     "tipo_documento": {
+        "active" : True ,
+        "titulo": "tipos de documentos",
+        "nombre_tabla": "tipo de documento",
+        "controlador": controlador_tipo_documento,
+        "icon_page": 'fa-solid fa-id-card',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+     "tipo_comprobante": {
+        "active" : True ,
+        "titulo": "tipos de comprobantes",
+        "nombre_tabla": "tipo de comprobante",
+        "controlador": controlador_tipo_comprobante,
+        "icon_page": 'fa-solid fa-file-lines',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['inicial',          'Inicial',    'Inicial',     'text',     True ,     True ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    }
 }
 
 
