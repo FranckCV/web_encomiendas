@@ -1,5 +1,7 @@
 :root {
     --height-header: 15vh;
+    --height-menu: 10vh;
+    --border-radius-sublink: 5px;
 }
 
 * {
@@ -117,11 +119,14 @@ body {
     background-color: var(--color-sec);
     display: flex;
     justify-content: center;
+    align-items: center;
     padding: 0.5rem ;
     position: sticky;
     top: var(--height-header);
+    height: var(--height-menu);
     z-index: 9999;
-    gap: 30px;
+    gap: 50px;
+    /* margin: 0; */
 }
 
 
@@ -134,13 +139,14 @@ body {
     font-weight: 500;
     transition: all 0.15s ease;
     gap: 8px;
+    border-radius: 4px;
 }
 
+.active .secondary-link ,
 .secondary-link:hover {
     /* background-color: rgba(255, 255, 255, 0.3); */
     background-color: var(--color4);
     color: var(--color-sec);
-    border-radius: 4px;
 }
 
 .secondary-link i {
@@ -152,13 +158,54 @@ body {
     display: none;
     flex-direction: column;
     position: absolute;
+    background-color: #e6e6e6;
+    gap: 1px;
+    border-radius: 3px;
+    /* position: relative; */
+}
+
+.secondary-block.active {
+    gap: 5px;
+    display: flex;
+    flex-direction: column;
+    /* position: relative; */
 }
 
 .secondary-block.active .secondary-content {
     display: flex;
+    top: calc(var(--height-menu) - 0.5rem);
 }
 
-    
+.secondary-sublink {
+    background-color: #ffffff;
+    color: var(--color4);
+    padding: 0.75rem 1.25rem;
+    padding-right: 0.5rem;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: auto 30px;
+    align-items: center;
+    justify-items: center;
+}
+
+.secondary-sublink span {
+    justify-self: flex-start;
+}
+
+.secondary-sublink:first-of-type {
+    border-top-left-radius: var(--border-radius-sublink);
+    border-top-right-radius: var(--border-radius-sublink);
+}
+
+.secondary-sublink:last-of-type {
+    border-bottom-left-radius: var(--border-radius-sublink);
+    border-bottom-right-radius: var(--border-radius-sublink);
+}
+
+.secondary-sublink:hover {
+    color: #ffffff;
+    background-color: var(--color4);
+}
 
 section.general_element {
     flex-direction: column;
