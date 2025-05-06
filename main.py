@@ -1013,7 +1013,7 @@ def dashboard(module_name):
     return None
     # return 'No hay dashboa
 
-
+##
 @app.route("/reporte=<report_name>")
 @validar_admin()
 def reporte(report_name):
@@ -1163,6 +1163,33 @@ def crud_unactive(tabla):
 
     return redirect(url_for('crud_generico', tabla = tabla))
 
+###
+
+
+
+@app.route("/panel")
+def panel():
+    return render_template('panel.html')
+
+@app.route("/faq")
+def Faq():
+
+    return render_template('Faq.html')
+
+@app.route("/contactanos")
+def contac():
+
+    return render_template('contactanos.html')
+
+@app.route("/cajas")
+def cajas():
+
+    return render_template('cajas.html')
+
+@app.route("/articulos")
+def articulos():
+
+    return render_template('articulos.html')
 
 
 @app.route("/colores")
