@@ -56,7 +56,9 @@
       <div class="form_field">
         <select name="{{filter[0]}}" id="{{filter[0]}}" class="filterSelect">
           <option value="default" selected>{{filter[1]}}</option>
-          {% for option in filter[2] %}
+          {% set datos = filter[2]() if filter[2] is callable else filter[2] %}
+
+          {% for option in datos %}
           <option value="{{option[0]}}">{{option[1]}}</option>
           {% endfor %}
         </select>
@@ -292,9 +294,11 @@
       <div class="form_field form_{{campo[3]}}">
         <label for="{{campo[0]}}">{{campo[1]}}:</label>
         {% if campo[3] == 'select' %}
+        {% set datos = campo[6][0]() if campo[6] and campo[6][0] is callable else campo[6][0] %}
+
         <input id="{{campo[0]}}" name="{{campo[0]}}" placeholder="{{campo[2]}}" type="text" {% if campo[4] %}required{%
           endif %} {% if campo[5]==False %}disabled{% endif %} value="{{ fila[campo[6][1]] }}" disabled>
-        </select>
+        
         {% elif campo[3] == 'textarea' %}
         <textarea id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif %}
           disabled>{% if fila[campo[0]] != None  %} {{fila[campo[0]]}} {% endif %}</textarea>
@@ -355,8 +359,9 @@
       <div class="form_field form_{{campo[3]}}">
         <label for="">{{campo[1]}}:</label>
         {% if campo[3] == 'select' %}
+        {% set datos = campo[6][0]() if campo[6] and campo[6][0] is callable else campo[6][0] %}
         <select id="{{campo[0]}}" name="{{campo[0]}}">
-          {% for option in campo[6][0] %}
+          {% for option in datos %}
           <option value="{{option[0]}}" {% if fila[campo[0]]==option[0] %}selected{% endif %}>{{option[1]}}</option>
           {% endfor %}
         </select>
@@ -418,9 +423,10 @@
       <div class="form_field form_{{campo[3]}}">
         <label for="">{{campo[1]}}:</label>
         {% if campo[3] == 'select' %}
+        {% set datos = campo[6][0]() if campo[6] and campo[6][0] is callable else campo[6][0] %}
         <select id="{{campo[0]}}" name="{{campo[0]}}">
           <option value="-1" disabled selected>{{campo[2]}}</option>
-          {% for option in campo[6][0] %}
+          {% for option in datos %}
           <option value="{{option[0]}}">{{option[1]}}</option>
           {% endfor %}
         </select>
