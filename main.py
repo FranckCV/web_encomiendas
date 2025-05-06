@@ -13,6 +13,7 @@ from controladores import controlador_tipo_paquete as controlador_tipo_paquete
 from controladores import controlador_estado_encomienda as controlador_estado_encomienda
 from controladores import controlador_tipo_documento as controlador_tipo_documento
 from controladores import controlador_tipo_comprobante as controlador_tipo_comprobante
+from controladores import controlador_empleado as controlador_empleado
 
 
 
@@ -503,7 +504,32 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-     
+    "empleado": {
+        "active": True,
+        "titulo": "empleados del sistema",
+        "nombre_tabla": "empleado",
+        "controlador": controlador_empleado,
+        "icon_page": "fa-solid fa-user-tie",
+        "filters": [],
+        "fields_form": [
+    #   ID/NAME         LABEL              PLACEHOLDER       TYPE      REQUIRED  ABLE/DISABLE   DATOS
+        ['usuarioid',    'Usuario ID',      'Usuario ID',      'text',   False ,   False ,        None ],
+        ['nombre',       'Nombre',          'Nombre',          'text',   True ,    True ,         None ],
+        ['ape_paterno',  'Apellido Paterno','Apellido Paterno','text',   True ,    True ,         None ],
+        ['ape_materno',  'Apellido Materno','Apellido Materno','text',   True ,    True ,         None ],
+        ['cargoid',      'Cargo',           'Cargo',           'select', True ,    None ,         None],#[controlador_cargo.get_options(), 'nombre'] ],
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": True,
+        }
+    },
+
 }
 
 
@@ -866,7 +892,8 @@ paginas_simples = [
     'sign_up', 
     'sucursales' ,
     'tracking',
-    'seguimiento' ,
+    'seguimiento',
+    'recuperar_contrasenia'
 ]
 
 
@@ -1013,7 +1040,7 @@ def dashboard(module_name):
     return None
     # return 'No hay dashboa
 
-##
+
 @app.route("/reporte=<report_name>")
 @validar_admin()
 def reporte(report_name):
@@ -1163,33 +1190,6 @@ def crud_unactive(tabla):
 
     return redirect(url_for('crud_generico', tabla = tabla))
 
-###
-
-
-
-@app.route("/panel")
-def panel():
-    return render_template('panel.html')
-
-@app.route("/faq")
-def Faq():
-
-    return render_template('Faq.html')
-
-@app.route("/contactanos")
-def contac():
-
-    return render_template('contactanos.html')
-
-@app.route("/cajas")
-def cajas():
-
-    return render_template('cajas.html')
-
-@app.route("/articulos")
-def articulos():
-
-    return render_template('articulos.html')
 
 
 @app.route("/colores")
