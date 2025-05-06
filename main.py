@@ -93,19 +93,6 @@ def articulos_mas_vendidos():
 
 ###########_ FUNCIONES _#############
 
-# def listar_paginas_crud():
-#     table_names = list(CONTROLADORES.keys()) #obtiene todas las claves de ese diccionario
-#     pages = []
-#     for tabla in table_names:
-#         config = CONTROLADORES.get(tabla)
-#         active = config["active"]
-#         if active is True:
-#             titulo = config["titulo"]
-#             icon_page = config.get("icon_page")
-#             pages.append([ tabla , titulo , get_icon_page(icon_page) ])
-#     return pages
-
-
 def listar_admin_pages():
     menu_keys = list(MENU_ADMIN.keys())
     modules = []
@@ -252,8 +239,10 @@ CONTROLADORES = {
 #            ID/NAME            LABEL               PLACEHOLDER         TYPE        REQUIRED   ABLE/DISABLE   DATOS
             ['id',              'ID',               'ID',               'text',     False ,    False ,        None ],
             ['nombre',          'Nombre',           'Nombre',           'text',     True ,     True ,         None ],
-            ['marcaid',         'Marca',            'Marca',            'select',   True ,     None,          [controlador_marca.get_options_marca() , 'nom_mar'] ],
-            ['tipo_unidadid',   'Tipo de Unidad',   'Tipo de Unidad',   'select',   True ,     None ,         [controlador_tipo_unidad.get_options() , 'nom_tip'] ],
+            ['marcaid',         'Marca',            'Marca',            'select',   True ,     None,          [lambda: controlador_marca.get_options_marca() , 'nom_mar'] ],
+            ['tipo_unidadid',   'Tipo de Unidad',   'Tipo de Unidad',   'select',   True ,     None ,         [lambda: controlador_tipo_unidad.get_options() , 'nom_tip'] ],
+            # ['marcaid',         'Marca',            'Marca',            'select',   True ,     None,          [controlador_marca.get_options_marca() , 'nom_mar'] ],
+            # ['tipo_unidadid',   'Tipo de Unidad',   'Tipo de Unidad',   'select',   True ,     None ,         [controlador_tipo_unidad.get_options() , 'nom_tip'] ],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -273,7 +262,7 @@ CONTROLADORES = {
         "icon_page": 'fa-solid fa-truck-fast',
         "filters": [
             ['activo', f'{TITLE_STATE}', get_options_active() ],
-            ['modeloid', 'Modelo', controlador_modelo.get_options() ],
+            ['modeloid', 'Modelo', lambda: controlador_modelo.get_options() ],
         ] ,
         "fields_form": [
 #            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
@@ -282,7 +271,7 @@ CONTROLADORES = {
             ['activo',        f'{TITLE_STATE}',   'activo',        'p',         True ,     True,          None ],
             ['capacidad',     'Capacidad',        'Capacidad',     'number',    True ,     True,          True ],
             ['volumen',       'Volumen',          'Volumen',       'number',    True ,     True,          None ],
-            ['modeloid',      'Nombre de Modelo', 'Elegir modelo', 'select',    True ,     True,          [controlador_modelo.get_options() , 'nom_modelo' ] ],
+            ['modeloid',      'Nombre de Modelo', 'Elegir modelo', 'select',    True ,     True,          [lambda: controlador_modelo.get_options() , 'nom_modelo' ] ],
             ['observaciones', 'Observaciones',    'observaciones', 'textarea',  False,     True,          None ],
         ],
         "crud_forms": {
@@ -301,7 +290,9 @@ CONTROLADORES = {
         "nombre_tabla":"ubigeo",
         "controlador": controlador_ubigeo,
         "icon_page" : "ri-map-pin-line",
-        "filters":[],
+        "filters":[
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ],
         "fields_form": [
 #            ID/NAME   LABEL     PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
             ['codigo','Código',     'Código',  'text',   True ,       False ,      None ],
@@ -331,7 +322,7 @@ CONTROLADORES = {
         #         ID/NAME         LABEL             PLACEHOLDER        TYPE       REQUIRED   ABLE/DISABLE   DATOS
             ['id',            'ID',              'ID',              'text',      True ,    False,         True ],
             ['direccion',     'Dirección',       'Dirección',       'text',     True,       True,         None ],
-            ['ubigeocodigo',  'Ubigeo',          'Elegir ubigeo',   'select',     True,       True,         [controlador_ubigeo.get_options() , 'ubigeo' ] ],
+            ['ubigeocodigo',  'Ubigeo',          'Elegir ubigeo',   'select',     True,       True,         [lambda: controlador_ubigeo.get_options() , 'ubigeo' ] ],
             ['horario_l_v',   'Horario L-V',     'Ej: 9am - 6pm',   'text',     False,      True,         None ],
             ['horario_s_d',   'Horario S-D',     'Ej: 9am - 1pm',   'text',     False,      True,         None ],
             ['latitud',       'Latitud',         'Latitud',         'text',   False,      True,         None ],
@@ -850,6 +841,7 @@ def validar_admin():
 def inject_globals():
     # lista_paginas_crud = listar_paginas_crud()
     listar_pages_admin = listar_admin_pages()
+    # listar_pages_admin = []
     options_pagination_crud , selected_option_crud = get_options_pagination_crud()
     cookie_error = request.cookies.get('error')
     # info_variables_crud = False
