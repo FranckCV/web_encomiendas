@@ -1,6 +1,6 @@
 .container {
-    width: 80%;
-    margin: 0 auto;
+    /* width: 80%;
+    margin: 0 auto; */
     padding: 20px;
     background-color: white;
     border-radius: 8px;
@@ -63,10 +63,7 @@
   width: 30%;
   height: 30%;
 }
-.container {
-  max-width: 1000px;
-  margin: 0 auto;
-}
+
 .card {
   background-color: white;
   border-radius: 12px;

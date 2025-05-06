@@ -909,7 +909,6 @@ for pagina in paginas_simples:
 
 @app.route("/faq")
 def Faq():
-
     return render_template('Faq.html')
 
 
@@ -946,7 +945,10 @@ def cotizador():
 
 ##################_ ADMIN PAGE _################## 
 
-
+# NO JOROBES
+@app.route("/panel")
+def panel():
+    return render_template('panel.html')
 
 
 @app.route("/crud=<tabla>")
