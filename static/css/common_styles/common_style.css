@@ -1,15 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&family=Raleway:wght@100&display=swap');
 
 :root {
+    --color-contrast: #ffffff;
+
     /* --color-base: #18076e; */
     /* --color-base: #8a5105; */
     /* --color-base: #107444; */
-    --color-base: #1d4c82;
-    --color-sec: #00cee9;
+    /* --color-sec: #00cee9; */
     /* --color-sec: #f07305; */
     /* --color-sec: #a20eff; */
     /* --color-contrast: #fff; */
-    --color-contrast: #ffffff;
+    
+    --color-base: #1d4c82;
+    --color-sec: #13e2da;
+    --color-thr: #1b98e0; 
 }
 
 :root {
@@ -28,9 +32,19 @@
     --color13: color-mix(in srgb, var(--color1) 40%, var(--color-sec) 30%);
     --color14: color-mix(in srgb, var(--color4) 90%, #1e1e1e 90%);
     --color15: color-mix(in srgb, var(--color-base) 50%, var(--color-sec) 100%);
-    --color16: color-mix(in srgb, var(--color11) 100%, var(--color3) 80%);
     --color16: color-mix(in srgb, var(--color-sec) 60%, white 90%);
+    --color17: color-mix(in srgb, var(--color11) 100%, var(--color3) 80%);
+    --color18: color-mix(in srgb, var(--color-base) 60%, var(--color-sec) 20%);
+    --color19: var(--color-thr);
+    --color20: color-mix(in srgb, var(--color4) 100%, color-mix(in srgb, #00000069 100%, transparent 68%) 40%) ;
 
+    /* --color19: color-mix(in srgb, var(--color-base) 65%, var(--color-sec) 65%); */
+    /* --color19: color-mix(in srgb, #00cee9 65%, color-mix(in srgb , #1d4c82 100% , white 70% ) 35%); */
+    /* --color19: color-mix(in srgb, color-mix(in srgb, var(--color-base) 45%, var(--color-sec)) 90%, white 10%); */
+
+    --light-color: #f8f9fa;
+    --dark-color: color-mix(in srgb , var(--color-base) 5%, rgb(35, 35, 35) 100%);
+    --color0: rgb(33, 37, 41);
 
     --color-background: color-mix(in srgb, var(--color-contrast) 30%, var(--color-contrast) 100%);
 }
@@ -43,12 +57,12 @@
 
 header.general_element {
     /* grid-area: ge_header; */
-    /* position: sticky; */
+    position: sticky;
     top: 0;
-    background-color: var(--color1);
-    /* height: var(--height-header); */
+    background-color: var(--color4);
+    height: var(--height-header);
     /* display: flex; */
-    z-index: 9999;
+    z-index: 999999;
 }
 
 aside.general_element {
@@ -83,14 +97,12 @@ section.general_element {
 
 footer.general_element {
     grid-area: ge_footer;
-    /* height: var(--height-footer); */
     background-color: var(--color4);
 }
 
 a {
     text-decoration: none;
     cursor: pointer;
-    /* color: white; */
 }
 
 h1,
@@ -109,14 +121,13 @@ button {
 }
 
 
+/* Esto es para que vean cuales son los enlaces que no llevan a nada */
 
-
-
-
-
-
-
-
+a[href=""] ,
+a[href="#"] {
+    text-decoration: underline !important;
+    color: red !important;
+}
 
 
 .modalMsg * {

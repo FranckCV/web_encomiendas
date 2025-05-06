@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, flash, jsonify, session, make_response,  redirect, url_for , after_this_request
+from flask import Flask, render_template, request, redirect, make_response, url_for #, after_this_request, flash, jsonify, session
 from controladores import bd as bd
 from controladores import controlador_color as controlador_color
 from controladores import controlador_marca as controlador_marca
@@ -11,14 +11,10 @@ from controladores import controlador_tamaño_caja as controlador_tamaño_caja
 from controladores import controlador_tipo_cargo as controlador_tipo_cargo
 from controladores import controlador_tipo_paquete as controlador_tipo_paquete
 from controladores import controlador_estado_encomienda as controlador_estado_encomienda
-
-
-
 import configuraciones
-from configuraciones import NOMBRE_BTN_UPDATE , NOMBRE_BTN_UNACTIVE , ACT_STATE_0 , ACT_STATE_1 , FUNCIONES_CRUD , NOMBRE_BTN_CONSULT , NOMBRE_BTN_DELETE , NOMBRE_BTN_INSERT , NOMBRE_BTN_LIST , NOMBRE_BTN_SEARCH , NOMBRE_CRUD_PAGE , NOMBRE_OPTIONS_COL , STATE_0 , STATE_1 , TITLE_STATE, ICON_PAGE_CRUD
 from functools import wraps
 import inspect
-import json
+# import json
 # from flask_jwt import JWT, jwt_required, current_identity
 # import uuid
 # import hashlib
@@ -27,7 +23,26 @@ import json
 
 app = Flask(__name__, template_folder='templates')
 
-SYSTEM_NAME = 'New Olva'
+SYSTEM_NAME          = 'New Olva'
+STATE_0              = configuraciones.STATE_0
+STATE_1              = configuraciones.STATE_1
+TITLE_STATE          = configuraciones.TITLE_STATE
+HABILITAR_ICON_PAGES = configuraciones.HABILITAR_ICON_PAGES
+ACT_STATE_0          = configuraciones.ACT_STATE_0
+ACT_STATE_1          = configuraciones.ACT_STATE_1
+NOMBRE_CRUD_PAGE     = configuraciones.NOMBRE_CRUD_PAGE
+NOMBRE_OPTIONS_COL   = configuraciones.NOMBRE_OPTIONS_COL
+NOMBRE_BTN_INSERT    = configuraciones.NOMBRE_BTN_INSERT
+NOMBRE_BTN_UPDATE    = configuraciones.NOMBRE_BTN_UPDATE
+NOMBRE_BTN_DELETE    = configuraciones.NOMBRE_BTN_DELETE
+NOMBRE_BTN_UNACTIVE  = configuraciones.NOMBRE_BTN_UNACTIVE
+NOMBRE_BTN_LIST      = configuraciones.NOMBRE_BTN_LIST
+NOMBRE_BTN_CONSULT   = configuraciones.NOMBRE_BTN_CONSULT
+NOMBRE_BTN_SEARCH    = configuraciones.NOMBRE_BTN_SEARCH
+ICON_PAGE_CRUD       = configuraciones.ICON_PAGE_CRUD 
+ICON_PAGE_REPORT     = configuraciones.ICON_PAGE_REPORT 
+ICON_PAGE_DASHBOARD  = configuraciones.ICON_PAGE_DASHBOARD 
+
 
 ###########_ TEST FUNCIONES _#############
 
@@ -58,31 +73,31 @@ def articulos_mas_vendidos():
 # ri-function-line
 # ri-layout-4-fill
 
-def datos_usuario():
-    lista = {
-        'id': 1 ,
-        'correo': 'correo@dom.com' ,
-        '': 'Nombre Apepat Apemat' ,
-        '': 'a' ,
-        '': 'Cargo' ,
-    }
+# def datos_usuario():
+#     lista = {
+#         'id': 1 ,
+#         'correo': 'correo@dom.com' ,
+#         '': 'Nombre Apepat Apemat' ,
+#         '': 'a' ,
+#         '': 'Cargo' ,
+#     }
 
-    return lista
+#     return lista
 
 
 ###########_ FUNCIONES _#############
 
-def listar_paginas_crud():
-    table_names = list(CONTROLADORES.keys()) #obtiene todas las claves de ese diccionario
-    pages = []
-    for tabla in table_names:
-        config = CONTROLADORES.get(tabla)
-        active = config["active"]
-        if active is True:
-            titulo = config["titulo"]
-            icon_page = config.get("icon_page")
-            pages.append([ tabla , titulo , get_icon_page(icon_page) ])
-    return pages
+# def listar_paginas_crud():
+#     table_names = list(CONTROLADORES.keys()) #obtiene todas las claves de ese diccionario
+#     pages = []
+#     for tabla in table_names:
+#         config = CONTROLADORES.get(tabla)
+#         active = config["active"]
+#         if active is True:
+#             titulo = config["titulo"]
+#             icon_page = config.get("icon_page")
+#             pages.append([ tabla , titulo , get_icon_page(icon_page) ])
+#     return pages
 
 
 def listar_admin_pages():
@@ -452,11 +467,11 @@ REPORTES = {
                     "enabled": True
                 }
             },
-            "series": [{
+            "series": lambda: [{
                 "name": 'Ingresos',
                 "data": extract_col_row(ingresos_periodo())[1]
             }],
-            "xaxis": {
+            "xaxis": lambda: {
                 "categories": extract_col_row(ingresos_periodo())[0]
             },
             "colors": [' var(--color1) '],
@@ -482,11 +497,11 @@ REPORTES = {
             "chart": {
                 "type": 'bar',
             },
-            "series": [{
+            "series": lambda: [{
                 "name": 'Ingresos',
                 "data": extract_col_row(articulos_mas_vendidos())[1]
             }],
-            "xaxis": {
+            "xaxis": lambda: {
                 "categories": extract_col_row(articulos_mas_vendidos())[0]
             },
             "colors": [' var(--color15) ']
@@ -630,7 +645,11 @@ MENU_ADMIN = {
         'icon_page' : 'fa-solid fa-box',
         'dashboard' : True,
         'cruds' :     [ 'estado_encomienda','tipo_paquete' ],
-        'reports' :   [ 'top_envios' , 'envios_tipo' , 'entregado_pendiente' ],
+        'reports' :   [ 
+            'envios_tipo' , 
+            'entregado_pendiente' ,
+            'top_envios' , 
+            ],
     },
     'atencion' : {
         'name' : 'Atención al Cliente',
@@ -715,62 +734,71 @@ def validar_error_crud():
         return wrapper
     return decorator
 
-
 def validar_admin():
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
             try:
-                page = f(*args, **kwargs)
-                if page is None:
-                    return redirect_url('panel')
-                else:
-                    return page
+                return f(*args, **kwargs)
             except Exception as e:
                 return rdrct_error(redirect_url('panel') , e) 
         return wrapper
     return decorator
 
+# def validar_admin():
+#     def decorator(f):
+#         @wraps(f)
+#         def wrapper(*args, **kwargs):
+#             try:
+#                 page = f(*args, **kwargs)
+#                 if page is None:
+#                     return redirect_url('panel')
+#                 else:
+#                     return page
+#             except Exception as e:
+#                 return rdrct_error(redirect_url('panel') , e) 
+#         return wrapper
+#     return decorator
+
 ###########_ PAGES _#############
 
 @app.context_processor
 def inject_globals():
-    lista_paginas_crud = listar_paginas_crud()
+    # lista_paginas_crud = listar_paginas_crud()
     listar_pages_admin = listar_admin_pages()
     options_pagination_crud , selected_option_crud = get_options_pagination_crud()
     cookie_error = request.cookies.get('error')
-    info_variables_crud = False
-    HABILITAR_ICON_PAGES = True
+    # info_variables_crud = False
     modulo_actual = ''
 
     return dict(
-        info_variables_crud = info_variables_crud,
-        lista_paginas_crud = lista_paginas_crud ,
+        # info_variables_crud = info_variables_crud,
+        # lista_paginas_crud = lista_paginas_crud ,
         listar_pages_admin = listar_pages_admin,
         options_pagination_crud = options_pagination_crud ,
         selected_option_crud = selected_option_crud ,
         cookie_error = cookie_error,
         modulo_actual = modulo_actual ,
 
-        MENU_ADMIN = MENU_ADMIN,
+        MENU_ADMIN           = MENU_ADMIN,
         HABILITAR_ICON_PAGES = HABILITAR_ICON_PAGES,
-        SYSTEM_NAME = SYSTEM_NAME,
-        STATE_0 = STATE_0,   
-        STATE_1 = STATE_1,
-        ACT_STATE_0 = ACT_STATE_0,
-        ACT_STATE_1 = ACT_STATE_1,
-        NOMBRE_CRUD_PAGE    = NOMBRE_CRUD_PAGE,
-        NOMBRE_OPTIONS_COL  = NOMBRE_OPTIONS_COL,
-        NOMBRE_BTN_INSERT   = NOMBRE_BTN_INSERT,
-        NOMBRE_BTN_UPDATE   = NOMBRE_BTN_UPDATE,
-        NOMBRE_BTN_DELETE   = NOMBRE_BTN_DELETE,
-        NOMBRE_BTN_UNACTIVE = NOMBRE_BTN_UNACTIVE,
-        NOMBRE_BTN_LIST     = NOMBRE_BTN_LIST,
-        NOMBRE_BTN_CONSULT  = NOMBRE_BTN_CONSULT,
-        NOMBRE_BTN_SEARCH   = NOMBRE_BTN_SEARCH,
-        ICON_PAGE_CRUD      = configuraciones.ICON_PAGE_CRUD ,
-        ICON_PAGE_REPORT    = configuraciones.ICON_PAGE_REPORT ,
-        ICON_PAGE_DASHBOARD = configuraciones.ICON_PAGE_DASHBOARD ,
+        SYSTEM_NAME          = SYSTEM_NAME,
+        STATE_0              = STATE_0,   
+        STATE_1              = STATE_1,
+        ACT_STATE_0          = ACT_STATE_0,
+        ACT_STATE_1          = ACT_STATE_1,
+        NOMBRE_CRUD_PAGE     = NOMBRE_CRUD_PAGE,
+        NOMBRE_OPTIONS_COL   = NOMBRE_OPTIONS_COL,
+        NOMBRE_BTN_INSERT    = NOMBRE_BTN_INSERT,
+        NOMBRE_BTN_UPDATE    = NOMBRE_BTN_UPDATE,
+        NOMBRE_BTN_DELETE    = NOMBRE_BTN_DELETE,
+        NOMBRE_BTN_UNACTIVE  = NOMBRE_BTN_UNACTIVE,
+        NOMBRE_BTN_LIST      = NOMBRE_BTN_LIST,
+        NOMBRE_BTN_CONSULT   = NOMBRE_BTN_CONSULT,
+        NOMBRE_BTN_SEARCH    = NOMBRE_BTN_SEARCH,
+        ICON_PAGE_CRUD       = ICON_PAGE_CRUD ,
+        ICON_PAGE_REPORT     = ICON_PAGE_REPORT ,
+        ICON_PAGE_DASHBOARD  = ICON_PAGE_DASHBOARD ,
     )
 
 
@@ -780,7 +808,7 @@ paginas_simples = [
     'sign_up', 
     'sucursales' ,
     'tracking',
-    'seguimiento'
+    'seguimiento' ,
 ]
 
 
@@ -792,15 +820,28 @@ for pagina in paginas_simples:
     )
 
 
+@app.route("/cotizador")
+def cotizador():
+    departamentos = controlador_ubigeo.get_options_departamento()
+    provincias = controlador_ubigeo.get_options_provincia()
+    distritos = controlador_ubigeo.get_options_distrito()
+    return render_template(
+        'cotizador.html' ,
+        departamentos = departamentos,
+        provincias = provincias,
+        distritos = distritos,
+    )
+
+
+##################_ ADMIN PAGE _################## 
+
 @app.route("/panel")
 def panel():
     return render_template('panel.html')
 
 
-##################_ ADMIN PAGE _################## 
-
 @app.route("/crud=<tabla>")
-# @validar_admin()
+@validar_admin()
 def crud_generico(tabla):
     config = CONTROLADORES.get(tabla)
     if not config:
@@ -873,7 +914,7 @@ def dashboard(module_name):
 
             for re in modulo[4]:
                 if re[3].get('graph') is True:
-                    print(re)
+                    # print(re)
                     list_reports.append(re)
 
 
@@ -886,7 +927,7 @@ def dashboard(module_name):
                 REPORTES = REPORTES ,
                 )
     return None
-    # return 'No hay dashboard' ,404
+    # return 'No hay dashboa
 
 
 @app.route("/reporte=<report_name>")
@@ -907,7 +948,14 @@ def reporte(report_name):
     e_table = elements.get('table')
     e_counter = elements.get('counter')
     icon_page = get_icon_page(config.get("icon_page"))
+
     graph = config.get("graph")
+    if graph:
+        if callable(graph.get("series")):
+            graph["series"] = graph["series"]()
+        if callable(graph.get("xaxis")):
+            graph["xaxis"] = graph["xaxis"]()
+
     table = config.get("table")
     columnas = None
     filas = None
@@ -1055,7 +1103,8 @@ def colores():
         }
     </style>    
 '''
-    for color in ['-base' , '-sec' , '-contrast']:
+
+    for color in ['-base' , '-sec' , '-thr' , '-contrast']:
         text = f'--color{color}'
         html += f'''
         <div class="color_block">
@@ -1063,6 +1112,16 @@ def colores():
         <div style="height: 100%; width: 100%; background-color: var({text})"></div>
         </div>
     '''
+        
+    for color in ['light-color' , 'dark-color' ]:
+        text = f'--{color}'
+        html += f'''
+        <div class="color_block">
+        <p>{text}</p> 
+        <div style="height: 100%; width: 100%; background-color: var({text})"></div>
+        </div>
+    '''
+        
     for color in range(25):
         text = f'--color{color}'
         html += f'''
@@ -1077,7 +1136,7 @@ def colores():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8000, debug=True)
+    app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=True)
 
 
 
