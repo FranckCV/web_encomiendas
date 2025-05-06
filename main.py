@@ -1165,9 +1165,6 @@ def crud_unactive(tabla):
 
 ###
 
-<<<<<<< HEAD
-
-
 
 
 @app.route("/panel")
@@ -1194,9 +1191,6 @@ def articulos():
 
     return render_template('articulos.html')
 
-
-=======
->>>>>>> 7c8fab98ffd4c0e67e6af4dad7b061865a2db04a
 
 @app.route("/colores")
 def colores():
