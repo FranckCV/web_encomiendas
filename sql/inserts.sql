@@ -2055,7 +2055,7 @@ VALUES
 ('XXL', 1); -- Tamaño extra extra grande
 
 -- Insertar valores en la tabla estado_encomienda
-INSERT INTO estado_encomienda (nombre, descripción, activo)
+INSERT INTO estado_encomienda (nombre, descripcion, activo)
 VALUES 
 ('Pendiente', 'La encomienda está pendiente de ser procesada', 1),
 ('En tránsito', 'La encomienda está en camino hacia el destino', 1),
@@ -4142,7 +4142,7 @@ VALUES
 
 -- Insertar valores en la tabla estado_encomienda
 -- Insertar valores en la tabla estado_encomienda
-INSERT INTO estado_encomienda (nombre, descripción, activo)
+INSERT INTO estado_encomienda (nombre, descripcion, activo)
 VALUES 
 ('En origen', 'El paquete ha salido de su punto de origen', 1),
 ('En tránsito', 'El paquete está en camino a su destino', 1),

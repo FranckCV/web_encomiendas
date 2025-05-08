@@ -25,7 +25,7 @@ CREATE TABLE transaccion_encomienda (
 CREATE TABLE estado_encomienda (
   id          int(10) NOT NULL AUTO_INCREMENT, 
   nombre      varchar(50) NOT NULL, 
-  descripción text NOT NULL, 
+  descripcion text NOT NULL, 
   activo      tinyint(1) DEFAULT 1 NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE usuario (

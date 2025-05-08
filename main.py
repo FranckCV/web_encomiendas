@@ -15,6 +15,9 @@ from controladores import controlador_tipo_documento as controlador_tipo_documen
 from controladores import controlador_tipo_comprobante as controlador_tipo_comprobante
 from controladores import controlador_empleado as controlador_empleado
 from  controladores import controlador_estado_reclamo as controlador_estado_reclamo
+from controladores import controlador_metodo_pago as controlador_metodo_pago
+from controladores import controlador_tipo_indemnizacion as controlador_tipo_indemnizacion
+
 
 
 import configuraciones
@@ -546,6 +549,57 @@ CONTROLADORES = {
         }
     },
 
+    "metodo_pago": {
+        "active": True,
+        "titulo": "métodos de pago",
+        "nombre_tabla": "método de pago",
+        "controlador": controlador_metodo_pago,
+        "icon_page": "fa-solid fa-money-bill-wave",
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active()],
+        ],
+        "fields_form": [
+            #  ID/NAME     LABEL             PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
+            ['id',        'ID',             'ID',          'text',  True,      False,         None],
+            ['nombre',    'Nombre',         'Nombre',      'text',  True,      True,          None],
+            ['activo',    f'{TITLE_STATE}', 'Activo',      'p',     True,      False,         None],
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": True,
+        }
+    },
+    "tipo_indemnizacion": {
+        "active": True,
+        "titulo": "tipos de indemnización",
+        "nombre_tabla": "tipo de indemnización",
+        "controlador": controlador_tipo_indemnizacion,
+        "icon_page": "fa-solid fa-hand-holding-dollar",
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active()],
+        ],
+        "fields_form": [
+            #  ID/NAME     LABEL             PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
+            ['id',        'ID',             'ID',          'text',  True,      False,         None],
+            ['nombre',    'Nombre',         'Nombre',      'text',  True,      True,          None],
+            ['activo',    f'{TITLE_STATE}', 'Activo',      'p',     True,      False,         None],
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": True,
+        }
+    },
+
 }
 
 
@@ -756,7 +810,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : 'fa-solid fa-circle-question',
         'dashboard' : True,
-        'cruds' :     [  ],
+        'cruds' :     [ 'tipo_indemnizacion' ],
         'reports' :   [ ],
     },
     'ventas' : {
@@ -764,7 +818,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : 'fa-solid fa-file-invoice-dollar',
         'dashboard' : True,
-        'cruds' :     ['tamaño_caja' ],
+        'cruds' :     ['tamaño_caja', 'metodo_pago' ],
         'reports' :   [ 'articulos_mas_vendidos'  ],
     },
     'seguridad' : {
@@ -932,19 +986,16 @@ def Faq():
 
 @app.route("/contactanos")
 def contac():
-
     return render_template('contactanos.html')
 
 
 @app.route("/cajas")
 def cajas():
-
     return render_template('cajas.html')
 
 
 @app.route("/articulos")
 def articulos():
-
     return render_template('articulos.html')
 
 
@@ -959,7 +1010,25 @@ def cotizador():
         provincias = provincias,
         distritos = distritos,
     )
+##############erliz rutas####
 
+@app.route('/tipos-envio')
+def tipos_envio():
+    return render_template('tipos_envio.html')
+@app.route('/registro-envio')
+def registro_envio():
+    return render_template('registro_envio.html')
+@app.route('/resumen_envio')
+def mostrar_resumen():
+    return render_template('resumen_envio.html') 
+@app.route('/pagoenvio')
+def mostrar_pagoenvio():
+    return render_template('pago_envio.html') 
+@app.route('/reclamo')
+def mostrar_reclamo():
+    return render_template('reclamo.html') 
+
+#########3
 
 ##################_ ADMIN PAGE _################## 
 

@@ -1,0 +1,92 @@
+{% extends 'MAESTRA_GENERAL.html' %}
+
+{% block titulo %}
+Resumen de Envíos
+{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet" href="/static/css/resumen_envio.css">
+{% endblock %}
+
+{% block contenido %}
+<div class="navigation-links">
+  <a href="{{ url_for('tipos_envio') }}" class="back-link">← Regresar</a>
+</div>
+
+<div class="container">
+  <h1 class="titulo-envio">REGISTRO DE ENVÍOS</h1>
+
+  <div class="steps-container">
+    <div class="step completed">
+      <div class="circle">
+        <img src="/static/img/usuario.png" alt="Datos personales" />
+      </div>
+      <p>Datos personales</p>
+    </div>
+    <div class="line"></div>
+    <div class="step active">
+      <div class="circle">
+        <img src="/static/img/chek.png" alt="Confirma tus datos" />
+      </div>
+      <p>Confirma tus datos</p>
+    </div>
+    <div class="line"></div>
+    <div class="step">
+      <div class="circle">
+        <img src="/static/img/medio.png" alt="Medios de pago" />
+      </div>
+      <p>Medios de pago</p>
+    </div>
+  </div>
+
+
+  <div class="header-resumen">
+    <h2>Resumen de Envíos registrados</h2>
+    <button class="btn-agregar">+ AGREGAR ENVÍOS</button>
+  </div>
+
+  <div class="tabla-scroll">
+    <table class="tabla-envios">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Recibe</th>
+          <th>Tipo de entrega</th>
+          <th>Origen</th>
+          <th>Destino</th>
+          <th>Dirección</th>
+          <th>Retorno de carga</th>
+          <th>Precio envío</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Carlos<br />Manayay Celis</td>
+          <td>Entrega A Domicilio</td>
+          <td>Chiclayo</td>
+          <td>Amazonas - Bagua - Imaza</td>
+          <td>Ersmgih 1563</td>
+          <td>S/ 0.00</td>
+          <td>S/ 60.00</td>
+          <td>
+            <button class="btn-editar">Editar</button>
+            <button class="btn-eliminar">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="paginacion">
+    <button class="btn-paginacion">Anterior</button>
+    <span class="pagina-actual">1</span>
+    <button class="btn-paginacion">Siguiente</button>
+  </div>
+
+  <div class="total-pago">
+    <button class="btn-pagar">IR A PAGAR S/ 60.00</button>
+  </div>
+</div>
+{% endblock %}

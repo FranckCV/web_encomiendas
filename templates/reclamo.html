@@ -1,0 +1,63 @@
+{% extends 'MAESTRA_GENERAL.html' %}
+
+{% block titulo %}
+Presentar Reclamo
+{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet" href="/static/css/reclamo.css">
+{% endblock %}
+
+{% block contenido %}
+<div class="navigation-links">
+  <a href="{{ url_for('tipos_envio') }}" class="back-link">← Regresar</a>
+</div>
+
+<div class="container">
+  <h1 class="titulo-reclamo">Presentar Reclamo</h1>
+
+  <form class="reclamo-form">
+    <div class="form-group">
+      <label for="tipo_indemnizacion">Tipo de Indemnización</label>
+      <select id="tipo_indemnizacion" name="tipo_indemnizacion">
+        <option value="">Seleccione el tipo de indemnización</option>
+        <option value="1">Pérdida total</option>
+        <option value="2">Daños parciales</option>
+        <option value="3">Retraso en entrega</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="estado_reclamo">Estado del Reclamo</label>
+      <select id="estado_reclamo" name="estado_reclamo">
+        <option value="">Seleccione el estado del reclamo</option>
+        <option value="1">En proceso</option>
+        <option value="2">Resuelto</option>
+        <option value="3">Pendiente</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="monto_indemnizado">Monto Indemnizado (S/)</label>
+      <input type="number" id="monto_indemnizado" name="monto_indemnizado" placeholder="Ingrese el monto">
+    </div>
+
+    <div class="form-group">
+      <label for="paquete_tracking">Tracking del Paquete</label>
+      <input type="text" id="paquete_tracking" name="paquete_tracking" placeholder="Ingrese el código de seguimiento">
+    </div>
+
+    <div class="form-group">
+      <label for="cliente">Cliente</label>
+      <select id="cliente" name="cliente">
+        <option value="">Seleccione el cliente</option>
+        <option value="1">Cliente 1</option>
+        <option value="2">Cliente 2</option>
+        <option value="3">Cliente 3</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn-reclamo">Enviar Reclamo</button>
+  </form>
+</div>
+{% endblock %}
