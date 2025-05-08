@@ -25,12 +25,12 @@ def table_fetch_all():
     return resultados
 
 def get_table():
-    sql = f'select codigo, distrito, provincia,departamento, activo from {table_name} order by distrito asc'
+    sql = f'select LPAD(codigo, 6, "0") as codigo, distrito, provincia,departamento, activo from {table_name} order by distrito asc'
     columnas = {
         'codigo': ['Código' , 0.5] , 
-        'distrito' : ['Distrito' , 2.5],
-        'provincia' : ['Provincia' , 2.5] , 
         'departamento' : ['Departamento' , 2.5] , 
+        'provincia' : ['Provincia' , 2.5] , 
+        'distrito' : ['Distrito' , 2.5],
         'activo' : ['Activo',0.5]
         }
     filas = sql_select_fetchall(sql)

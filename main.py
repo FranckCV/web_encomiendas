@@ -959,19 +959,16 @@ def Faq():
 
 @app.route("/contactanos")
 def contac():
-
     return render_template('contactanos.html')
 
 
 @app.route("/cajas")
 def cajas():
-
     return render_template('cajas.html')
 
 
 @app.route("/articulos")
 def articulos():
-
     return render_template('articulos.html')
 
 
