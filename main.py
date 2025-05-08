@@ -986,7 +986,25 @@ def cotizador():
         provincias = provincias,
         distritos = distritos,
     )
+##############erliz rutas####
 
+@app.route('/tipos-envio')
+def tipos_envio():
+    return render_template('tipos_envio.html')
+@app.route('/registro-envio')
+def registro_envio():
+    return render_template('registro_envio.html')
+@app.route('/resumen_envio')
+def mostrar_resumen():
+    return render_template('resumen_envio.html') 
+@app.route('/pagoenvio')
+def mostrar_pagoenvio():
+    return render_template('pago_envio.html') 
+@app.route('/reclamo')
+def mostrar_reclamo():
+    return render_template('reclamo.html') 
+
+#########3
 
 ##################_ ADMIN PAGE _################## 
 

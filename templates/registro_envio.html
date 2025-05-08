@@ -1,0 +1,94 @@
+{% extends 'MAESTRA_GENERAL.html' %}
+
+{% block titulo %}
+  Registro de Envíos
+{% endblock %}
+
+{% block estilos %}
+  <link rel="stylesheet" href="/static/css/registro_envio.css">
+{% endblock %}
+
+{% block contenido %}
+
+
+<div class="navigation-links">
+  <a href="{{ url_for('tipos_envio') }}" class="back-link">← Regresar</a>
+</div>
+
+<div class="container">
+  <h1>REGISTRO DE ENVÍOS</h1>
+
+  <div class="steps-container">
+    <div class="step active">
+      <div class="circle">
+        <img src="/static/img/usuario.png" alt="Datos personales" />
+      </div>
+      <p>Datos personales</p>
+    </div>
+    <div class="line"></div>
+    <div class="step">
+      <div class="circle">
+        <img src="/static/img/chek.png" alt="Confirma tus datos" />
+      </div>
+      <p>Confirma tus datos</p>
+    </div>
+    <div class="line"></div>
+    <div class="step">
+      <div class="circle">
+        <img src="/static/img/medio.png" alt="Medios de pago" />
+      </div>
+      <p>Medios de pago</p>
+    </div>
+  </div>
+
+  <form class="formulario">
+    <h2>¿Quién envía?</h2>
+    <div class="form-group">
+      <select><option>Tipo De Documento</option></select>
+      <input type="text" placeholder="Número">
+      <input type="text" placeholder="Confirma tu teléfono">
+    </div>
+    <div class="form-group">
+      <input type="text" placeholder="Nombre completo">
+      <input type="email" placeholder="Confirma tu email">
+    </div>
+
+    <h2>¿Qué envías?</h2>
+    <div class="form-group">
+      <select><option>Seleccionar artículo</option></select>
+      <input type="text" placeholder="Especificar artículo">
+      <input type="text" placeholder="Valor S/">
+    </div>
+    <div class="form-group">
+      <input type="text" placeholder="Largo (cm)">
+      <input type="text" placeholder="Ancho (cm)">
+      <input type="text" placeholder="Altura (cm)">
+      <input type="text" placeholder="Peso (kg)">
+    </div>
+    <div class="form-group">
+      <div class="form-subgroup">
+        <label for="origen"><strong>Origen</strong></label>
+        <select id="origen"><option>Ingrese el punto de partida</option></select>
+      </div>
+      <div class="form-subgroup">
+        <label for="destino"><strong>Destino</strong></label>
+        <select id="destino"><option>Ingresa el punto de llegada</option></select>
+      </div>
+    </div>
+
+    <h2>¿Quién recibe?</h2>
+    <div class="form-group">
+      <select><option>Tipo De Documento</option></select>
+      <input type="text" placeholder="DNI/RUC/CE">
+      <input type="text" placeholder="Celular/Teléfono">
+    </div>
+    <div class="form-group">
+      <input type="text" placeholder="Nombres">
+      <input type="text" placeholder="Apellido Paterno">
+      <input type="text" placeholder="Apellido Materno">
+    </div>
+
+    <button type="submit" class="btn-continuar">CONTINUAR</button>
+  </form>
+</div>
+{% endblock %}

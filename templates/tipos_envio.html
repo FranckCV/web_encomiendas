@@ -1,0 +1,82 @@
+{% extends 'MAESTRA_GENERAL.html' %}
+
+{% block titulo %}
+  Tipos de Envío
+{% endblock %}
+
+{% block estilos %}
+  <link rel="stylesheet" href="/static/css/tipos_envio.css">
+{% endblock %}
+
+{% block contenido %}
+  <div class="container">
+    <h1>¿Qué deseas realizar hoy?</h1>
+
+    <div class="options">
+      <div class="option">
+        <div class="option-icon">
+          <img src="/static/img/caja-negra.png" alt="Paquete" class="icono" />
+        </div>
+        <div class="option-title">
+          <h3>ENVIAR UN PAQUETE</h3>
+        </div>
+        <div class="option-text">
+          <p>Envío de cajas o paquetes con un peso máximo de <strong>25 kg</strong> y medidas mínimas de: <strong>14cm x 10cm x 10cm</strong></p>
+        </div>
+      </div>
+
+      <div class="option">
+        <div class="option-icon">
+          <img src="/static/img/documento.png" alt="Sobre" class="icono" />
+        </div>
+        <div class="option-title">
+          <h3>ENVIAR UN SOBRE</h3>
+        </div>
+        <div class="option-text">
+          <p>Envío de documentos con un peso máximo de <strong>500 gr</strong></p>
+        </div>
+      </div>
+
+      <div class="option">
+        <div class="option-icon">
+          <img src="/static/img/enviomasivo.png" alt="Masivos" class="icono" />
+        </div>
+        <div class="option-title">
+          <h3>ENVÍOS MASIVOS</h3>
+        </div>
+        <div class="option-text">
+          <p>Registro de 20 o más envíos a través de la carga de un archivo Excel</p>
+        </div>
+      </div>
+
+      <div class="option">
+        <div class="option-icon">
+          <img src="/static/img/carrito.png" alt="Empaque" class="icono" />
+        </div>
+        <div class="option-title">
+          <h3>COMPRAR EMPAQUES</h3>
+        </div>
+        <div class="option-text">
+          <p>Compra nuestros empaques, recibe o recoge en la tienda de tu preferencia.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="checkbox-container">
+      <label>
+        <input type="checkbox" id="termsCheckbox">
+        He leído y acepto los <a href="#">términos de uso</a> y <a href="#">políticas de privacidad</a>
+      </label>
+    </div>
+
+    <button id="continuarBtn" disabled>CONTINUAR</button>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    document.getElementById('termsCheckbox').addEventListener('change', function () {
+      document.getElementById('continuarBtn').disabled = !this.checked;
+    });
+  </script>
+{% endblock %}
