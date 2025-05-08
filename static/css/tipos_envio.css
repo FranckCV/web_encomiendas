@@ -18,7 +18,7 @@ body {
 
 /* Título principal */
 h1 {
-    color: #0E1D63; /* Azul oscuro */
+    color: #0E1D63;
     margin-bottom: 30px;
     font-size: 28px;
 }
@@ -39,16 +39,19 @@ h1 {
     background-color: #ffffff;
     transition: all 0.3s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
 }
 
 .option.selected {
-    background-color: #d9f5f8;
+    background-color: #00E0E0;
     border-color: #0E1D63;
-    box-shadow: 0 4px 12px rgba(14, 29, 99, 0.2);
+    color: #ffffff;
+    box-shadow: 0 8px 20px rgba(14, 29, 99, 0.3);
 }
+
 .option:hover {
     transform: translateY(-5px);
-    background-color: #8cf6fa; /* Celeste en hover */
+    background-color: #8cf6fa;
     border-color: #0E1D63;
     box-shadow: 0 8px 20px rgba(14, 29, 99, 0.3);
 }
@@ -64,6 +67,10 @@ h1 {
     transition: transform 0.3s ease;
 }
 
+.option.selected .option-icon img {
+    filter: invert(1);
+}
+
 .option:hover .option-icon img {
     transform: scale(1.1);
 }
@@ -75,11 +82,19 @@ h1 {
     margin: 0;
 }
 
+.option.selected .option-title h3 {
+    color: #ffffff;
+}
+
 .option-text p {
     font-size: 14px;
     color: #4F4F4F;
     margin-top: 10px;
     line-height: 1.5;
+}
+
+.option.selected .option-text p {
+    color: #ffffff;
 }
 
 /* Checkbox */
@@ -107,12 +122,12 @@ button {
 }
 
 button:enabled {
-    background-color: #163B5F; /* Azul oscuro del botón */
+    background-color: #0E1D63;
     cursor: pointer;
 }
 
 button:enabled:hover {
-    background-color: #1c74c7; /* Un poco más oscuro al hacer hover */
+    background-color: #061142;
 }
 
 /* Responsive para pantallas pequeñas */
@@ -129,4 +144,9 @@ button:enabled:hover {
     button {
         width: 100%;
     }
+}
+
+/* Añadir margen inferior para el footer */
+.container {
+    margin-bottom: 60px;
 }
