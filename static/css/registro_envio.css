@@ -1,0 +1,239 @@
+/* General */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header */
+.header {
+    background-color: #0E1D63;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+}
+
+.logo img {
+    height: 50px;
+}
+
+/* Links navegación */
+.navigation-links {
+    padding: 10px 30px;
+}
+
+.back-link {
+    color: #0E1D63;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* Contenedor principal */
+.container {
+    max-width: 1000px;
+    margin: 10px auto;
+    padding: 10px 20px;
+    text-align: left;
+}
+
+/* Títulos */
+h1 {
+    color: #0E1D63;
+    margin-bottom: 20px;
+    font-weight: 600;
+    text-align: center;
+}
+
+h2 {
+    color: #0E1D63;
+    font-size: 20px;
+    margin: 30px 0 10px;
+    font-weight: 600;
+    border-bottom: 2px solid #dce3f5;
+    padding-bottom: 5px;
+}
+
+/* Pasos */
+.steps-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #4F4F4F;
+}
+
+.step p {
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.circle {
+    background-color: #dce3f5;
+    border-radius: 50%;
+    width: 55px;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.4s, box-shadow 0.4s;
+    box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+}
+
+.circle img {
+    width: 28px;
+    height: 28px;
+}
+
+.circle:hover {
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+}
+
+.step.active .circle {
+    background-color: #0E1D63;
+    box-shadow: 0px 4px 10px rgba(14,29,99,0.5);
+}
+
+.step.active .circle img {
+    filter: invert(1);
+}
+
+.line {
+    height: 2px;
+    background-color: #dce3f5;
+    width: 80px;
+    margin: 0 10px;
+}
+
+/* Formulario */
+.formulario {
+    margin-top: 0;
+}
+
+.form-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.form-group > * {
+    flex: 1 1 calc(33.333% - 10px);
+    min-width: 250px;
+}
+
+.form-group input,
+.form-group select {
+    padding: 12px;
+    border: 2px solid #0E1D63;
+    border-radius: 8px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    box-shadow: 0px 1px 3px rgba(0,0,0,0.1);
+}
+
+.form-group input::placeholder {
+    color: #999999;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #12328f;
+    outline: none;
+    box-shadow: 0px 0px 8px rgba(14,29,99,0.3);
+}
+
+/* Inputs con unidades */
+.input-with-unit {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.input-with-unit .unit {
+    font-weight: 600;
+    color: #0E1D63;
+}
+
+.form-subgroup {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Botón */
+.btn-continuar {
+    background-color: #0A1B2E; /* color de "Agregar al carrito" */
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    display: block;
+    margin: 30px auto 0;
+}
+
+.btn-continuar:hover {
+    background-color: #062035;
+    transform: scale(1.05);
+}
+
+/* Footer */
+footer {
+    background-color: #0A1B2E;
+    color: #ffffff;
+    padding: 40px 20px;
+    font-size: 14px;
+}
+
+footer h4 {
+    color: #ffffff;
+    margin-bottom: 15px;
+}
+
+footer a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-group > * {
+        flex: 1 1 100%;
+    }
+
+    .steps-container {
+        flex-direction: column;
+    }
+
+    .line {
+        width: 40px;
+        margin: 10px 0;
+    }
+
+    .btn-continuar {
+        width: 100%;
+    }
+}

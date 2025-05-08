@@ -1,0 +1,132 @@
+/* Reset básico */
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9;
+}
+
+/* Contenedor general */
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+/* Título principal */
+h1 {
+    color: #0E1D63; /* Azul oscuro */
+    margin-bottom: 30px;
+    font-size: 28px;
+}
+
+/* Grid de opciones */
+.options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+/* Tarjetas */
+.option {
+    border: 2px solid #0E1D63;
+    border-radius: 15px;
+    padding: 20px;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.option.selected {
+    background-color: #d9f5f8;
+    border-color: #0E1D63;
+    box-shadow: 0 4px 12px rgba(14, 29, 99, 0.2);
+}
+.option:hover {
+    transform: translateY(-5px);
+    background-color: #8cf6fa; /* Celeste en hover */
+    border-color: #0E1D63;
+    box-shadow: 0 8px 20px rgba(14, 29, 99, 0.3);
+}
+
+/* Icono */
+.option-icon {
+    margin-bottom: 15px;
+}
+
+.option-icon img {
+    width: 90px;
+    height: 90px;
+    transition: transform 0.3s ease;
+}
+
+.option:hover .option-icon img {
+    transform: scale(1.1);
+}
+
+/* Título y texto */
+.option-title h3 {
+    color: #0E1D63;
+    font-size: 18px;
+    margin: 0;
+}
+
+.option-text p {
+    font-size: 14px;
+    color: #4F4F4F;
+    margin-top: 10px;
+    line-height: 1.5;
+}
+
+/* Checkbox */
+.checkbox-container {
+    font-size: 14px;
+    color: #4F4F4F;
+    margin-bottom: 20px;
+}
+
+.checkbox-container a {
+    color: #0E1D63;
+    text-decoration: underline;
+}
+
+/* Botón */
+button {
+    padding: 12px 30px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    background-color: #ccc;
+    color: white;
+    cursor: not-allowed;
+    transition: background-color 0.3s ease;
+}
+
+button:enabled {
+    background-color: #163B5F; /* Azul oscuro del botón */
+    cursor: pointer;
+}
+
+button:enabled:hover {
+    background-color: #1c74c7; /* Un poco más oscuro al hacer hover */
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 576px) {
+    .option-icon img {
+        width: 70px;
+        height: 70px;
+    }
+
+    h1 {
+        font-size: 22px;
+    }
+
+    button {
+        width: 100%;
+    }
+}

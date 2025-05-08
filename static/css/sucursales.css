@@ -38,6 +38,10 @@ section.general_element {
     }
 } */
 
+.sucursales-container .row {
+    --bs-gutter-x: 0rem;
+}
+
 .filtros-mapa-container {
     flex-direction: row;
 }
