@@ -8,12 +8,13 @@ from controladores import controlador_modelo as controlador_modelo
 from controladores import controlador_ubigeo as controlador_ubigeo
 from controladores import controlador_sucursal as controlador_sucursal
 from controladores import controlador_tamaño_caja as controlador_tamaño_caja
-from controladores import controlador_tipo_cargo as controlador_tipo_cargo
+from controladores import controlador_tipo_rol as controlador_tipo_rol
 from controladores import controlador_tipo_paquete as controlador_tipo_paquete
 from controladores import controlador_estado_encomienda as controlador_estado_encomienda
 from controladores import controlador_tipo_documento as controlador_tipo_documento
 from controladores import controlador_tipo_comprobante as controlador_tipo_comprobante
 from controladores import controlador_empleado as controlador_empleado
+from  controladores import controlador_estado_reclamo as controlador_estado_reclamo
 from controladores import controlador_metodo_pago as controlador_metodo_pago
 from controladores import controlador_tipo_indemnizacion as controlador_tipo_indemnizacion
 
@@ -394,11 +395,11 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-    "tipo_cargo": {
+    "tipo_rol": {
         "active" : True ,
-        "titulo": "tipos de cargos",
-        "nombre_tabla": "tipo de cargo",
-        "controlador": controlador_tipo_cargo,
+        "titulo": "tipos de roles",
+        "nombre_tabla": "tipo de rol",
+        "controlador": controlador_tipo_rol,
         "icon_page": 'ri-file-user-fill',
         "filters": [
             ['activo', f'{TITLE_STATE}', get_options_active() ],
@@ -520,6 +521,31 @@ CONTROLADORES = {
             "crud_update": True,
             "crud_delete": True,
             "crud_unactive": True,
+        }
+    },
+    "estado_reclamo": {
+        "active" : True ,
+        "titulo": "estados de reclamos",
+        "nombre_tabla": "estado de reclamo",
+        "controlador": controlador_estado_reclamo,
+        "icon_page": 'fa-solid fa-circle-exclamation',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
         }
     },
 
@@ -938,7 +964,8 @@ paginas_simples = [
     'sucursales' ,
     'tracking',
     'seguimiento',
-    'recuperar_contrasenia'
+    'recuperar_contrasenia',
+    'libro_reclamaciones'
 ]
 
 
