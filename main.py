@@ -919,7 +919,6 @@ def cajas():
 
 @app.route("/articulos")
 def articulos():
-
     return render_template('articulos.html')
 
 
@@ -938,7 +937,9 @@ def cotizador():
 
 ##################_ ADMIN PAGE _################## 
 
-
+@app.route("/panel")
+def panel():
+    return render_template('panel.html')
 
 
 @app.route("/crud=<tabla>")
