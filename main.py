@@ -1012,7 +1012,7 @@ def panel():
 
 
 @app.route("/crud=<tabla>")
-@validar_admin()
+# @validar_admin()
 def crud_generico(tabla):
     config = CONTROLADORES.get(tabla)
     if not config:
@@ -1074,7 +1074,7 @@ def crud_generico(tabla):
 
 
 @app.route("/dashboard=<module_name>")
-@validar_admin()
+# @validar_admin()
 def dashboard(module_name):
     info_modulo = MENU_ADMIN.get(module_name)
 
@@ -1091,6 +1091,7 @@ def dashboard(module_name):
 
             return render_template(
                 'dashboard.html' , 
+                modulo_actual = module_name ,
                 module_name = module_name , 
                 modulo = modulo ,
                 info_modulo = info_modulo,
@@ -1102,7 +1103,7 @@ def dashboard(module_name):
 
 
 @app.route("/reporte=<report_name>")
-@validar_admin()
+# @validar_admin()
 def reporte(report_name):
     config = REPORTES.get(report_name)
     if not config:
