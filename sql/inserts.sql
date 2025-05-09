@@ -4126,7 +4126,7 @@ INSERT INTO sucursal (
   1
 );
 -- Insertar valores en la tabla tipo_cargo
-INSERT INTO tipo_cargo (nombre, activo)
+INSERT INTO tipo_rol (nombre, activo)
 VALUES 
 ('Gerente', 1),
 ('Operario', 1);

@@ -10,7 +10,6 @@
 
 {% block contenido %}
 
-
 <div class="navigation-links">
   <a href="{{ url_for('tipos_envio') }}" class="back-link">← Regresar</a>
 </div>
@@ -41,54 +40,76 @@
     </div>
   </div>
 
-  <form class="formulario">
-    <h2>¿Quién envía?</h2>
-    <div class="form-group">
-      <select><option>Tipo De Documento</option></select>
-      <input type="text" placeholder="Número">
-      <input type="text" placeholder="Confirma tu teléfono">
-    </div>
-    <div class="form-group">
-      <input type="text" placeholder="Nombre completo">
-      <input type="email" placeholder="Confirma tu email">
-    </div>
-
-    <h2>¿Qué envías?</h2>
-    <div class="form-group">
-      <select><option>Seleccionar artículo</option></select>
-      <input type="text" placeholder="Especificar artículo">
-      <input type="text" placeholder="Valor S/">
-    </div>
-    <div class="form-group">
-      <input type="text" placeholder="Largo (cm)">
-      <input type="text" placeholder="Ancho (cm)">
-      <input type="text" placeholder="Altura (cm)">
-      <input type="text" placeholder="Peso (kg)">
-    </div>
-    <div class="form-group">
-      <div class="form-subgroup">
-        <label for="origen"><strong>Origen</strong></label>
-        <select id="origen"><option>Ingrese el punto de partida</option></select>
+  <form id="formulario-envio" class="formulario">
+    <div id="seccion-quien-envia" class="seccion">
+      <h2>¿Quién envía?</h2>
+      <div class="form-group">
+        <select><option>Tipo De Documento</option></select>
+        <input type="text" placeholder="Número">
+        <input type="text" placeholder="Confirma tu teléfono">
       </div>
-      <div class="form-subgroup">
-        <label for="destino"><strong>Destino</strong></label>
-        <select id="destino"><option>Ingresa el punto de llegada</option></select>
+      <div class="form-group">
+        <input type="text" placeholder="Nombre completo">
+        <input type="email" placeholder="Confirma tu email">
       </div>
     </div>
 
-    <h2>¿Quién recibe?</h2>
-    <div class="form-group">
-      <select><option>Tipo De Documento</option></select>
-      <input type="text" placeholder="DNI/RUC/CE">
-      <input type="text" placeholder="Celular/Teléfono">
-    </div>
-    <div class="form-group">
-      <input type="text" placeholder="Nombres">
-      <input type="text" placeholder="Apellido Paterno">
-      <input type="text" placeholder="Apellido Materno">
+    <div id="seccion-que-envias" class="seccion" style="display:none;">
+      <h2>¿Qué envías?</h2>
+      <div class="form-group">
+        <select><option>Seleccionar artículo</option></select>
+        <input type="text" placeholder="Especificar artículo">
+        <input type="text" placeholder="Valor S/">
+      </div>
+      <div class="form-group">
+        <input type="text" placeholder="Largo (cm)">
+        <input type="text" placeholder="Ancho (cm)">
+        <input type="text" placeholder="Altura (cm)">
+        <input type="text" placeholder="Peso (kg)">
+      </div>
+      <div class="form-group">
+        <select><option>Ingrese el punto de partida</option></select>
+        <select><option>Ingresa el punto de llegada</option></select>
+      </div>
     </div>
 
-    <button type="submit" class="btn-continuar">CONTINUAR</button>
+    <div id="seccion-quien-recibe" class="seccion" style="display:none;">
+      <h2>¿Quién recibe?</h2>
+      <div class="form-group">
+        <select><option>Tipo De Documento</option></select>
+        <input type="text" placeholder="DNI/RUC/CE">
+        <input type="text" placeholder="Celular/Teléfono">
+      </div>
+      <div class="form-group">
+        <input type="text" placeholder="Nombres">
+        <input type="text" placeholder="Apellido Paterno">
+        <input type="text" placeholder="Apellido Materno">
+      </div>
+    </div>
+
+    <button type="button" class="btn-continuar" id="btn-continuar">CONTINUAR</button>
   </form>
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const btnContinuar = document.getElementById('btn-continuar');
+  const seccionQuienEnvia = document.getElementById('seccion-quien-envia');
+  const seccionQueEnvias = document.getElementById('seccion-que-envias');
+  const seccionQuienRecibe = document.getElementById('seccion-quien-recibe');
+
+  btnContinuar.addEventListener('click', function () {
+    if (seccionQueEnvias.style.display === 'none') {
+      seccionQueEnvias.style.display = 'block';
+      btnContinuar.textContent = 'CONTINUAR';
+    } else if (seccionQuienRecibe.style.display === 'none') {
+      seccionQuienRecibe.style.display = 'block';
+      btnContinuar.textContent = 'CONTINUAR';
+    } else {
+      alert('Formulario completo.');
+    }
+  });
+</script>
 {% endblock %}

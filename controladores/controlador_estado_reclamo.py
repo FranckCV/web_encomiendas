@@ -2,7 +2,7 @@ from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select
 import controladores.bd as bd
 #####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####
 
-table_name = 'estado_encomienda'
+table_name = 'estado_reclamo'
 
 def get_info_columns():
     return show_columns(table_name)
@@ -38,15 +38,13 @@ def get_table():
         select 
             est.id ,
             est.nombre,
-            est.descripcion,
             est.activo 
         from {table_name} est
     '''
     columnas = {
         'id': ['ID' , 0.5 ] , 
-        'nombre' : ['Nombre' , 1 ] , 
-        'descripcion' : ['Descripcion' , 5.5] , 
-        'activo' : ['Actividad' , 3.5] , 
+        'nombre' : ['Nombre' , 4.5 ] , 
+        'activo' : ['Actividad' , 0.5] 
         }
     filas = sql_select_fetchall(sql)
     
@@ -59,24 +57,23 @@ def unactive_row( id ):
     unactive_row_table(table_name , id)
 
 
-def insert_row( nombre , descripcion = None ):
+def insert_row( nombre ):
     sql = f'''
         INSERT INTO 
-            {table_name} ( nombre , descripcion , activo )
+            {table_name} ( nombre , activo )
         VALUES 
-            ( %s , %s , 1 )
+            ( %s ,  1 )
     '''
-    sql_execute(sql,( nombre , descripcion ))
+    sql_execute(sql,( nombre ))
 
 
-def update_row( id , nombre , descripcion =None ):
+def update_row( id , nombre ):
     sql = f'''
         update {table_name} set 
-        nombre = %s ,
-        descripcion = %s
+        nombre = %s 
         where {get_primary_key()} = {id}
     '''
-    sql_execute(sql,(nombre , descripcion))
+    sql_execute(sql,(nombre ))
 
 
 #####_ ADICIONALES _#####
