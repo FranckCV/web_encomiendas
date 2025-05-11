@@ -1,6 +1,3 @@
-
-
-
 -- Sucursal en Chiclayo - Central
 INSERT INTO sucursal (
   direccion,

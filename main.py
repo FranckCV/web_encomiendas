@@ -1150,7 +1150,6 @@ def crud_generico(tabla):
             crud_delete = CRUD_FORMS.get("crud_delete")
             crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo
 
-
             return render_template(
                 "CRUD.html" ,
                 tabla          = tabla ,
