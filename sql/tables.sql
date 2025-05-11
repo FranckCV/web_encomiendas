@@ -1,7 +1,7 @@
 CREATE TABLE acceso (
   paginaid int(11) NOT NULL, 
   rolid    int(11) NOT NULL, 
-  access   tinyint(1) NOT NULL, 
+  permiso  tinyint(1) NOT NULL, 
   search   tinyint(1) NOT NULL, 
   consult  tinyint(1) NOT NULL, 
   `insert` tinyint(1) NOT NULL, 
