@@ -13,7 +13,7 @@ CREATE TABLE acceso (
 CREATE TABLE articulo (
   id            int(10) NOT NULL AUTO_INCREMENT, 
   nombre        varchar(100) NOT NULL, 
-  precio        numeric(9, 6) NOT NULL, 
+  precio        numeric(9, 2) NOT NULL, 
   stock         int(11) NOT NULL, 
   activo        tinyint(1) NOT NULL, 
   img           mediumblob NOT NULL, 
@@ -155,11 +155,11 @@ CREATE TABLE pagina (
   PRIMARY KEY (id));
 CREATE TABLE paquete (
   tracking                                  int(11) NOT NULL AUTO_INCREMENT, 
-  valor                                     numeric(9, 6) NOT NULL, 
-  peso                                      numeric(9, 6) NOT NULL, 
-  alto                                      numeric(9, 6) NOT NULL, 
-  largo                                     numeric(9, 6) NOT NULL, 
-  ancho                                     numeric(9, 6) NOT NULL, 
+  valor                                     numeric(9, 2) NOT NULL, 
+  peso                                      numeric(9, 2) NOT NULL, 
+  alto                                      numeric(9, 2) NOT NULL, 
+  largo                                     numeric(9, 2) NOT NULL, 
+  ancho                                     numeric(9, 2) NOT NULL, 
   descripcion                               text NOT NULL, 
   direccion_destinatario                    varchar(255), 
   telefono_destinatario                     int(11), 
@@ -176,11 +176,11 @@ CREATE TABLE paquete (
   PRIMARY KEY (tracking));
 CREATE TABLE reclamo (
   id                   int(10) NOT NULL AUTO_INCREMENT, 
-  monto_indemnizado    numeric(9, 6), 
+  monto_indemnizado    numeric(9, 2), 
   bien_contratado      char(1) NOT NULL comment 'Producto (P)
 Servicio (S)
  ', 
-  monto_reclamado      numeric(9, 6) NOT NULL, 
+  monto_reclamado      numeric(9, 2) NOT NULL, 
   relacion             char(1) NOT NULL comment 'Quien envía
 Quien recibe
  ', 
@@ -219,8 +219,8 @@ CREATE TABLE sucursal (
   direccion     varchar(150) NOT NULL, 
   horario_l_v   varchar(255), 
   horario_s_d   varchar(255), 
-  latitud       numeric(9, 6), 
-  longitud      numeric(9, 6), 
+  latitud       numeric(9, 2), 
+  longitud      numeric(9, 2), 
   teléfono      char(255), 
   referencia    varchar(255), 
   activo        tinyint(1) NOT NULL, 
@@ -305,7 +305,7 @@ CREATE TABLE transaccion_encomienda (
 0 si es un empaque (paquete o sobre)
  ', 
   descripcion        text NOT NULL, 
-  monto_total        numeric(9, 6), 
+  monto_total        numeric(9, 2), 
   recojo_casa        tinyint(1) NOT NULL, 
   id_sucursal_origen int(11) NOT NULL, 
   fecha              date NOT NULL, 
@@ -316,7 +316,7 @@ CREATE TABLE transaccion_encomienda (
 CREATE TABLE transaccion_venta (
   num_serie          int(11) NOT NULL, 
   tipo_comprobanteid int(10) NOT NULL, 
-  monto_total        numeric(9, 6), 
+  monto_total        numeric(9, 2), 
   fecha              date NOT NULL, 
   hora               time NOT NULL, 
   clienteid          int(10) NOT NULL, 
