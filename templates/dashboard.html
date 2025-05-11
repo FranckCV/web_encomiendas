@@ -147,6 +147,7 @@ Dashboard de {{modulo[0]}}
     {% set name = report[0] %}
     {% set info_report = REPORTES.get(name) %}
     {% set r_graph = info_report.get('graph') %}
+    {% set r_graph = info_report.get('graph') %}
 
     <div class="db_card {% if list_reports | length == 1 %} db_card_one {% endif %}">
         <h3 class="title_db_card">Reporte de {{info_report['titulo']}}</h3>
