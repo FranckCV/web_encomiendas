@@ -1931,7 +1931,68 @@ INSERT INTO `modelo` (`id`, `nombre`, `marcaid`, `tipo_unidadid`) VALUES
 (11, 'ProStar', 11, 1),
 (12, 'T680', 12, 3);
 
+INSERT INTO unidad (placa, MTC, TUC, capacidad, volumen, descripcion, estado, modeloid)
+VALUES
+    ('ABC1234', '1519036CNG', '15M25016315E', 10.50, 20.00, 'Unidad para carga pesada', 'A', 1),
+    ('XYZ5678', '1519037DNG', '15M25016316F', 12.00, 25.00, 'Camión de reparto urbano', 'A', 2),
+    ('JKL1234', '1519038ENG', '15M25016317G', 15.00, 30.00, 'Unidad de carga mediana', 'A', 3),
+    ('QRS2345', '1519039FNG', '15M25016318H', 20.00, 35.00, 'Camión de carga pesada', 'A', 4),
+    ('TUV3456', '1519040GNG', '15M25016319I', 18.00, 40.00, 'Camión para transporte internacional', 'A', 5),
+    ('WXY4567', '1519041HNG', '15M25016320J', 25.00, 45.00, 'Unidad para transporte de carga', 'A', 6),
+    ('LMN5678', '1519042ING', '15M25016321K', 12.50, 28.00, 'Unidad para transporte pesado', 'A', 7),
+    ('PQR6789', '1519043JNG', '15M25016322L', 14.00, 30.50, 'Camión para carga ligera', 'A', 8),
+    ('STU7890', '1519044KNG', '15M25016323M', 11.00, 23.00, 'Unidad para transporte urbano', 'A', 9),
+    ('VWX8901', '1519045LNG', '15M25016324N', 16.50, 34.00, 'Unidad de carga mediana', 'A', 10),
+    ('YZA9012', '1519046MNG', '15M25016325O', 22.00, 50.00, 'Unidad para transporte pesado', 'A', 11),
+    ('BCD0123', '1519047NNG', '15M25016326P', 19.00, 40.00, 'Camión para largo alcance', 'A', 12);
 
+
+INSERT INTO tipo_reclamo (nombre, descripcion)
+VALUES ('Queja', 'Es el malestar o descontento por algún acto que está relacionado directamente con el servicio adquirido. Por ejemplo: una mala atención al público, omisión de información, etc.'),
+('Reclamo', 'Es la disconformidad con los servicios prestados o bienes adquiridos. Por ejemplo: demora en el envío, entregas no realizadas, etc.');
+
+INSERT INTO motivo_reclamo (nombre, descripcion, tipo_reclamoid)
+VALUES 
+    ('Demora en Servicio', 'Inconformidad relacionada con la demora en la prestación del servicio.', 2),
+    ('Temas de Facturación', 'Inconformidad relacionada con temas de facturación, cobros incorrectos, etc.', 2),
+    ('Extravio-Robo', 'Inconformidad relacionada con la pérdida o robo de productos o servicios adquiridos.', 2),
+    ('Claves de seguridad', 'Inconformidad relacionada con el manejo, entrega o acceso a claves de seguridad.', 2),
+    ('Atención inadecuada', 'Es la falta de calidad en el servicio proporcionado al cliente, ya sea por parte del personal o del proceso de atención.', 1);
+INSERT INTO causa_reclamo (nombre, descripcion, motivo_reclamoid)
+VALUES 
+    ('Daño', 'El producto o servicio se ve afectado por un daño, lo que causa una demora en la entrega o en el servicio ofrecido.', 1),
+    ('Mercancía Peligrosa', 'La mercancía no puede ser procesada o transportada debido a que es peligrosa, lo que causa demoras en el servicio.', 1),
+    ('Atasco en Máquina', 'Un atasco o fallo en la maquinaria utilizada para el servicio o transporte causa una demora significativa.', 1),
+    ('Envío Incompleto', 'El envío no incluye todos los productos o elementos necesarios, lo que genera una demora adicional en la entrega final.', 1),
+    ('Entrega Incorrecta', 'El producto o servicio no llega al destinatario correcto, causando una demora para corregir el error.', 1),
+    ('Incumplimiento de Lead Time', 'El servicio no se cumple dentro del plazo acordado, generando una demora innecesaria.', 1),
+    ('Demora Devolución de Envío y/o Cargo', 'El proceso de devolución de productos o el manejo de cargos tiene demoras que afectan el tiempo de resolución del servicio.', 1),
+    ('Destrucción', 'Un evento que lleva a la destrucción del producto o servicio, causando una demora significativa en la entrega o reparación.', 1),
+    ('Recogido No Realizado', 'El servicio de recogida de productos no se ha realizado en el tiempo estimado, lo que causa una demora en el proceso.', 1),
+    ('Correctamente Motivado y Dentro del Plazo', 'El servicio está retrasado debido a una falta de motivación o coordinación dentro del plazo estipulado.', 1),
+    ('Problemas en Registro de Envíos', 'Los problemas relacionados con el registro del envío causan una demora en el proceso de entrega.', 1),
+    ('No Brinda Nº de Tracking', 'La falta de información sobre el número de seguimiento retrasa el proceso de entrega o resolución del servicio.', 1),
+    ('Factores Externos', 'Factores fuera del control de la empresa (como condiciones climáticas o imprevistos) que causan una demora en el servicio.', 1),
+    ('Errores Internos', 'Errores dentro del sistema o procesos internos que afectan la puntualidad y causan demoras.', 1),
+    ('Sin Despachar', 'El producto o servicio no se ha enviado, generando una demora sin justificación.', 1),
+    ('Demora en envío de Comprobantes', 'El comprobante de pago o factura no se envía a tiempo, causando inconvenientes con el cliente.', 2),
+    ('Facturas/Boletas mal emitidas', 'La facturación o boleta emitida contiene errores, lo que requiere correcciones y causa demoras en el proceso.', 2),
+    ('Cambios: Dirección fiscal-razón social-correo', 'Errores en la dirección fiscal, razón social o correo del cliente que deben ser corregidos para continuar con la facturación.', 2),
+    ('Rechazo NC', 'El rechazo de la nota de crédito causa demoras en el proceso de facturación y resolución del reclamo.', 2),
+    ('Cliente No realizó pago', 'El cliente no realizó el pago correspondiente, lo que afecta el proceso de facturación y entrega del servicio.', 2),
+    ('Solicitud de dev. de dinero', 'El cliente solicita la devolución del dinero, lo que retrasa el proceso de facturación y resolución del reclamo.', 2),
+    ('Solicitud de envío de NC / ND', 'El cliente solicita el envío de la nota de crédito o nota de débito, lo que causa retrasos en el proceso de facturación.', 2),
+    ('Regularización de Pago', 'El cliente realiza una regularización de pago, lo que genera una demora en la finalización del proceso de facturación.', 2),
+    ('Corte de Crédito', 'El corte de crédito impide que se continúe con el servicio hasta que el cliente resuelva su situación de pago, causando un retraso.', 2),
+    ('Pago de Deducción', 'El cliente realiza un pago por deducción que afecta el proceso de facturación, generando una demora en el cierre de la operación.', 2),
+    ('Extraviado', 'El producto o servicio ha sido extraviado durante el proceso de envío o entrega, generando la inconformidad del cliente.', 3),
+    ('Robado', 'El producto o servicio ha sido sustraído de manera ilícita durante el proceso de envío o entrega, lo que afecta al cliente.', 3),
+    ('Solicita cambio de clave', 'El cliente solicita un cambio de clave de seguridad debido a problemas con el acceso o seguridad.', 4),
+    ('Entregado sin clave', 'El producto o servicio fue entregado sin la clave de seguridad correspondiente, generando inconvenientes al cliente.', 4),
+    ('No cuenta con clave', 'El cliente no tiene acceso a la clave de seguridad requerida para completar el proceso o uso del servicio.', 4),
+    ('Mala Atención', 'La atención al cliente no cumple con los estándares de calidad esperados, con actitudes inadecuadas o falta de empatía.',5),
+    ('Demora en Atención', 'La atención al cliente se demora más de lo esperado, generando inconvenientes y frustración para el usuario.',5),
+    ('Mala Conducción de Unidad', 'El comportamiento inapropiado o deficiente por parte del personal de la unidad encargada del servicio afecta la calidad del mismo.',5);
 
 
 
