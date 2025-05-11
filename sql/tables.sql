@@ -167,7 +167,7 @@ CREATE TABLE paquete (
   sucursal_destino_id                       int(11) NOT NULL, 
   codigo_postal                             char(5) NOT NULL, 
   tipo_documento_destinatario_id            int(11) NOT NULL, 
-  tipo_paqueteid                            int(11) NOT NULL, 
+  contenido_paqueteid                       int(11) NOT NULL, 
   tipo_recepcionid                          int(11) NOT NULL, 
   salidaid                                  int(10) NOT NULL, 
   transaccion_encomienda_num_serie          int(11), 
@@ -362,7 +362,7 @@ ALTER TABLE transaccion_venta ADD CONSTRAINT FKtransaccio293973 FOREIGN KEY (tip
 ALTER TABLE transaccion_encomienda ADD CONSTRAINT FKtransaccio662746 FOREIGN KEY (tipo_comprobanteid) REFERENCES tipo_comprobante (id);
 ALTER TABLE reclamo ADD CONSTRAINT FKreclamo680466 FOREIGN KEY (paquetetracking) REFERENCES paquete (tracking);
 ALTER TABLE pagina ADD CONSTRAINT FKpagina910561 FOREIGN KEY (tipo_paginaid) REFERENCES tipo_pagina (id);
-ALTER TABLE paquete ADD CONSTRAINT FKpaquete833002 FOREIGN KEY (tipo_paqueteid) REFERENCES contenido_paquete (id);
+ALTER TABLE paquete ADD CONSTRAINT FKpaquete329420 FOREIGN KEY (contenido_paqueteid) REFERENCES contenido_paquete (id);
 ALTER TABLE cliente ADD CONSTRAINT FKcliente66106 FOREIGN KEY (tipo_documentoid) REFERENCES tipo_documento (id);
 ALTER TABLE rol ADD CONSTRAINT FKrol677440 FOREIGN KEY (tipo_rolid) REFERENCES tipo_rol (id);
 ALTER TABLE tarifa_ruta ADD CONSTRAINT FKtarifa_rut28234 FOREIGN KEY (sucursal_destino_id) REFERENCES sucursal (id);
