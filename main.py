@@ -186,9 +186,9 @@ CONTROLADORES = {
     "tipo_unidad": {
         "active" : True ,
         "titulo": "tipos de unidades",
+        "icon_page": 'fa-solid fa-truck-plane',
         "nombre_tabla": "tipo de unidad",
         "controlador": controlador_tipo_unidad,
-        "icon_page": 'fa-solid fa-truck-plane',
         "filters": [
             ['activo', f'{TITLE_STATE}', get_options_active() ],
         ] ,
@@ -548,7 +548,6 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-
     "metodo_pago": {
         "active": True,
         "titulo": "métodos de pago",
@@ -599,7 +598,6 @@ CONTROLADORES = {
             "crud_unactive": True,
         }
     },
-
 }
 
 
@@ -775,14 +773,13 @@ REPORTES = {
 
 MENU_ADMIN = {
     'administracion' : {
-        'name' : 'Administración',
         'active': True ,
+        'name' : 'Administración',
         'icon_page' : 'fa-solid fa-user-tie',
         'dashboard' : True,
         'cruds' :     [ 'tipo_unidad' , 'marca' , 'modelo' , 'unidad' , 'sucursal'],
         'reports' :   [ 
             'ingresos_periodo' , 
-            '' ,
         ],
     },
     'logistica' : {
@@ -893,7 +890,11 @@ def validar_admin():
         @wraps(f)
         def wrapper(*args, **kwargs):
             try:
-                return f(*args, **kwargs)
+                page = f(*args, **kwargs)
+                if page:
+                    return page
+                else:
+                    return rdrct_error(redirect_url('panel') , 'Esta pagina no existe') 
             except Exception as e:
                 return rdrct_error(redirect_url('panel') , e) 
         return wrapper
@@ -1042,66 +1043,61 @@ def panel():
 @validar_admin()
 def crud_generico(tabla):
     config = CONTROLADORES.get(tabla)
-    if not config:
-        return None
+    if config:
+        active = config["active"]
+        if active is True:
+            value_search = request.args.get("value_search")
 
-    active = config["active"]
+            icon_page_crud = get_icon_page(config.get("icon_page"))
+            titulo = config["titulo"]
+            controlador = config["controlador"]
+            nombre_tabla = config["nombre_tabla"]
+            filters = config["filters"]
+            fields_form = config["fields_form"]
 
-    if active is False:
-        return None
-    
-    value_search = request.args.get("value_search")
-
-    icon_page_crud = get_icon_page(config.get("icon_page"))
-    titulo = config["titulo"]
-    controlador = config["controlador"]
-    nombre_tabla = config["nombre_tabla"]
-    filters = config["filters"]
-    fields_form = config["fields_form"]
-
-    existe_activo = controlador.exists_Activo()
-    columnas , filas = controlador.get_table()
-    info_columns = controlador.get_info_columns()
-    primary_key = controlador.get_primary_key()
-    table_columns  = list(filas[0].keys()) if filas else []
-    
-    CRUD_FORMS = config["crud_forms"]
-    crud_list = CRUD_FORMS.get("crud_list")
-    crud_search = CRUD_FORMS.get("crud_search")
-    crud_consult = CRUD_FORMS.get("crud_consult")
-    crud_insert = CRUD_FORMS.get("crud_insert")
-    crud_update = CRUD_FORMS.get("crud_update")
-    crud_delete = CRUD_FORMS.get("crud_delete")
-    crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo
+            existe_activo = controlador.exists_Activo()
+            columnas , filas = controlador.get_table()
+            info_columns = controlador.get_info_columns()
+            primary_key = controlador.get_primary_key()
+            table_columns  = list(filas[0].keys()) if filas else []
+            
+            CRUD_FORMS = config["crud_forms"]
+            crud_list = CRUD_FORMS.get("crud_list")
+            crud_search = CRUD_FORMS.get("crud_search")
+            crud_consult = CRUD_FORMS.get("crud_consult")
+            crud_insert = CRUD_FORMS.get("crud_insert")
+            crud_update = CRUD_FORMS.get("crud_update")
+            crud_delete = CRUD_FORMS.get("crud_delete")
+            crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo
 
 
-    return render_template(
-        "CRUD.html" ,
-        tabla          = tabla ,
-        nombre_tabla   = nombre_tabla ,
-        icon_page_crud = icon_page_crud ,
-        titulo         = titulo ,
-        filas          = filas ,
-        primary_key    = primary_key ,
-        filters        = filters,
-        fields_form    = fields_form ,
-        value_search   = value_search,
-        columnas       = columnas ,
-        key_columns    = list(columnas.keys()) ,
-        table_columns  = table_columns ,
-        info_columns   = info_columns,
-        crud_list      = crud_list,
-        crud_search    = crud_search,
-        crud_consult   = crud_consult,
-        crud_insert    = crud_insert,
-        crud_update    = crud_update,
-        crud_delete    = crud_delete,
-        crud_unactive  = crud_unactive,
-    )
+            return render_template(
+                "CRUD.html" ,
+                tabla          = tabla ,
+                nombre_tabla   = nombre_tabla ,
+                icon_page_crud = icon_page_crud ,
+                titulo         = titulo ,
+                filas          = filas ,
+                primary_key    = primary_key ,
+                filters        = filters,
+                fields_form    = fields_form ,
+                value_search   = value_search,
+                columnas       = columnas ,
+                key_columns    = list(columnas.keys()) ,
+                table_columns  = table_columns ,
+                info_columns   = info_columns,
+                crud_list      = crud_list,
+                crud_search    = crud_search,
+                crud_consult   = crud_consult,
+                crud_insert    = crud_insert,
+                crud_update    = crud_update,
+                crud_delete    = crud_delete,
+                crud_unactive  = crud_unactive,
+            )
 
 
 @app.route("/dashboard=<module_name>")
-@validar_admin()
+# @validar_admin()
 def dashboard(module_name):
     info_modulo = MENU_ADMIN.get(module_name)
 
@@ -1112,12 +1108,19 @@ def dashboard(module_name):
 
             for re in modulo[4]:
                 if re[3].get('graph') is True:
-                    # print(re)
-                    list_reports.append(re)
+                    print(re[0])
+                    gr = REPORTES.get(re[0]).get('graph')
+                    if gr :
+                        if callable(gr.get("series")):
+                            gr["series"] = gr["series"]()
+                        if callable(gr.get("xaxis")):
+                            gr["xaxis"] = gr["xaxis"]()
+                        list_reports.append(re)
 
 
             return render_template(
                 'dashboard.html' , 
+                # modulo_actual = module_name ,
                 module_name = module_name , 
                 modulo = modulo ,
                 info_modulo = info_modulo,
@@ -1129,7 +1132,7 @@ def dashboard(module_name):
 
 
 @app.route("/reporte=<report_name>")
-@validar_admin()
+# @validar_admin()
 def reporte(report_name):
     config = REPORTES.get(report_name)
     if not config:
