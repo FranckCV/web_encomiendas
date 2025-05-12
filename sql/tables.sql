@@ -365,17 +365,17 @@ CREATE TABLE ubigeo (
   PRIMARY KEY (codigo)
 );
 CREATE TABLE unidad (
-  id int(10) NOT NULL AUTO_INCREMENT,
-  placa varchar(8) NOT NULL UNIQUE,
-  MTC char(9) NOT NULL UNIQUE,
-  TUC char(12) NOT NULL UNIQUE,
-  capacidad numeric(9, 2) NOT NULL,
-  volumen numeric(9, 2) NOT NULL,
-  descripcion text,
-  estado char(1) NOT NULL,
-  modeloid int(11) NOT NULL,
-  PRIMARY KEY (id)
-);
+  id          int(10) NOT NULL AUTO_INCREMENT, 
+  placa       varchar(6) NOT NULL UNIQUE, 
+  MTC         char(10) NOT NULL UNIQUE, 
+  TUC         char(12) NOT NULL UNIQUE, 
+  capacidad   numeric(9, 2) NOT NULL, 
+  volumen     numeric(9, 2) NOT NULL, 
+  descripcion text, 
+  estado      char(1) NOT NULL, 
+  modeloid    int(11) NOT NULL, 
+  PRIMARY KEY (id));
+
 CREATE TABLE usuario (
   id int(11) NOT NULL AUTO_INCREMENT,
   correo varchar(255) NOT NULL UNIQUE,

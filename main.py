@@ -17,7 +17,9 @@ from controladores import controlador_empleado as controlador_empleado
 from  controladores import controlador_estado_reclamo as controlador_estado_reclamo
 from controladores import controlador_metodo_pago as controlador_metodo_pago
 from controladores import controlador_tipo_indemnizacion as controlador_tipo_indemnizacion
-
+from controladores import controlador_tipo_reclamo as controlador_tipo_reclamo
+from controladores import controlador_motivo_reclamo as controlador_motivo_reclamo
+from controladores import controlador_causa_reclamo as controlador_causa_reclamo
 
 
 import configuraciones
@@ -598,6 +600,84 @@ CONTROLADORES = {
             "crud_unactive": True,
         }
     },
+     "tipo_reclamo": {
+        "active" : True ,
+        "titulo": "tipos de reclamos",
+        "icon_page": 'fa-solid fa-book-open-reader',
+        "nombre_tabla": "tipo de reclamo",
+        "controlador": controlador_tipo_reclamo,
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+     "motivo_reclamo": {
+        "active" : True ,
+        "titulo": "Motivo de reclamo",
+        "nombre_tabla": "motivo_reclamo",
+        "controlador": controlador_motivo_reclamo,
+        "icon_page": '',
+        "filters": [
+            ['tipo_reclamoid', 'Tipo de reclamo', lambda: controlador_tipo_reclamo.get_options() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
+            ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+            ['tipo_reclamoid',  'Nombre de tipo de reclamo', 'Elegir tipo de reclamo', 'select',    True ,     True, [lambda: controlador_tipo_reclamo.get_options() , 'nom_tip' ] ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+     "causa_reclamo": {
+        "active" : True ,
+        "titulo": "Causa de reclamo",
+        "nombre_tabla": "causa_reclamo",
+        "controlador": controlador_causa_reclamo,
+        "icon_page": '',
+        "filters": [
+            ['motivo_reclamoid', 'Motivo de reclamo', lambda: controlador_motivo_reclamo.get_options() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
+            ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+            ['motivo_reclamoid',  'Nombre de motivo de reclamo', 'Elegir motivo de reclamo', 'select', True ,True, [lambda: controlador_motivo_reclamo.get_options() , 'nom_motivo' ] ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
 }
 
 
@@ -807,7 +887,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : 'fa-solid fa-circle-question',
         'dashboard' : True,
-        'cruds' :     [ 'tipo_indemnizacion' ],
+        'cruds' :     [ 'tipo_indemnizacion','tipo_reclamo','motivo_reclamo','causa_reclamo' ],
         'reports' :   [ ],
     },
     'ventas' : {
