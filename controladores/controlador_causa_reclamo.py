@@ -51,7 +51,7 @@ def get_table():
         'id': ['ID' , 0.5 ] , 
         'nombre' : ['Nombre' , 3] , 
         'descripcion' : ['descripcion' , 3] , 
-        'nom_motivo' : ['Motivo de reclamo' , 3],
+        'nom_mot' : ['Motivo de reclamo' , 3],
     }
     filas = sql_select_fetchall(sql)
     
