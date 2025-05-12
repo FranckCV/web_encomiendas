@@ -955,7 +955,7 @@ MENU_ADMIN = {
         'name' : 'Seguridad',
         'active': True,
         'icon_page' : 'fa-solid fa-shield-halved',
-        'dashboard' : False,
+        'dashboard' : True,
         'cruds' :     [  ],
         'reports' :   [  ],
     },
