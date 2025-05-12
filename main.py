@@ -22,6 +22,7 @@ from controladores import controlador_motivo_reclamo as controlador_motivo_recla
 from controladores import controlador_causa_reclamo as controlador_causa_reclamo
 from controladores import controlador_tipo_empaque as controlador_tipo_empaque
 from controladores import controlador_tipo_recepcion as controlador_tipo_recepcion
+from controladores import controlador_tarifa_ruta as controlador_tarifa_ruta
 from controladores import controlador_tipo_cliente as controlador_tipo_cliente
 from controladores import controlador_usuario as controlador_usuario
 from controladores import controlador_cliente as controlador_cliente
@@ -330,18 +331,21 @@ CONTROLADORES = {
         "filters":[
             ],
         "fields_form": [
-        #         ID/NAME         LABEL             PLACEHOLDER        TYPE       REQUIRED   ABLE/DISABLE   DATOS
+    #         ID/NAME         LABEL             PLACEHOLDER        TYPE       REQUIRED   ABLE/DISABLE   DATOS
             ['id',            'ID',              'ID',              'text',      True ,    False,         True ],
-            ['direccion',     'Dirección',       'Dirección',       'text',     True,       True,         None ],
-            ['ubigeocodigo',  'Ubigeo',          'Elegir ubigeo',   'select',     True,       True,         [lambda: controlador_ubigeo.get_options() , 'ubigeo' ] ],
-            ['horario_l_v',   'Horario L-V',     'Ej: 9am - 6pm',   'text',     False,      True,         None ],
-            ['horario_s_d',   'Horario S-D',     'Ej: 9am - 1pm',   'text',     False,      True,         None ],
-            ['latitud',       'Latitud',         'Latitud',         'text',   False,      True,         None ],
-            ['longitud',      'Longitud',        'Longitud',        'text',   False,      True,         None ],
-            ['teléfono',      'Teléfono',        'Teléfono',        'text',     False,      True,         None ],
-            ['referencia',    'Referencia',      'Referencia',      'text',     False,      True,         None ],
-            ['activo',        f'{TITLE_STATE}',  'activo',          'p',         True ,     False,          None ],
+            ['abreviatura',   'Abreviatura',     'Abreviatura',     'text',      True ,    True,          None ],
+            ['codigo_postal', 'Código Postal',   'Código Postal',   'text',      True ,    True,          None ],
+            ['direccion',     'Dirección',       'Dirección',       'text',      True ,    True,          None ],
+            ['ubigeocodigo',  'Ubigeo',          'Elegir ubigeo',   'select',    True ,    True,          [lambda: controlador_ubigeo.get_options(), 'ubigeo'] ],
+            ['horario_l_v',   'Horario L-V',     'Ej: 9am - 6pm',   'text',      False,    True,          None ],
+            ['horario_s_d',   'Horario S-D',     'Ej: 9am - 1pm',   'text',      False,    True,          None ],
+            ['latitud',       'Latitud',         'Latitud',         'text',      False,    True,          None ],
+            ['longitud',      'Longitud',        'Longitud',        'text',      False,    True,          None ],
+            ['teléfono',      'Teléfono',        'Teléfono',        'text',      False,    True,          None ],
+            ['referencia',    'Referencia',      'Referencia',      'text',      False,    True,          None ],
+            ['activo',        f'{TITLE_STATE}',  'activo',          'p',         True ,    False,         None ],
         ],
+
         "crud_forms": {
             "crud_list": True ,
             "crud_search": True ,
@@ -402,7 +406,6 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-
     "tamaño_caja": {
         "active" : True ,
         "titulo": "tamaños de cajas",
@@ -557,7 +560,6 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-
     "empleado": {
         "active": True,
         "titulo": "empleados",
@@ -737,6 +739,30 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
+    "tarifa_ruta": {
+        "active" : True ,
+        "titulo": "Tarifa de ruta",
+        "nombre_tabla": "tarifa_ruta",
+        "controlador": controlador_tarifa_ruta,
+        "icon_page": '',
+        "filters": [
+        ] ,
+        "fields_form": [
+#            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
+            ['tarifa',      'Tarifa',          'Tarifa',      'text',     True ,     True  ,        None ],
+            ['sucursal_origen_id',  'Sucursal de origen', 'Sucursal de origen', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_origen' ] ],
+            ['sucursal_destino_id',  'Sucursal de destino', 'Sucursal de destino', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_destino' ] ],
+],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": False  # Solo si tienes columna 'activo'
+        }
+    },
     "tipo_cliente": {
         "active" : True ,
         "titulo": "tipos de clientes",
@@ -789,7 +815,6 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-
     "cliente": {
         "active": True,
         "titulo": "clientes",
@@ -1028,7 +1053,7 @@ MENU_ADMIN = {
         'name' : 'Administración',
         'icon_page' : 'fa-solid fa-user-tie',
         'dashboard' : True,
-        'cruds' :     [ 'tipo_unidad' , 'marca' , 'modelo' , 'unidad' , 'sucursal'],
+        'cruds' :     [ 'tipo_unidad' , 'marca' , 'modelo' , 'unidad' , 'sucursal','ubigeo','tarifa_ruta'],
         'reports' :   [ 
             'ingresos_periodo' , 
         ],

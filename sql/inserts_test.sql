@@ -137,3 +137,6 @@ VALUES
 ('Valija-documentos', 1),
 ('Utiles de escritorio', 1),
 ('Utiles de oficina', 1);
+
+INSERT INTO `sucursal` (`id`, `abreviatura`, `codigo_postal`, `direccion`, `horario_l_v`, `horario_s_d`, `latitud`, `longitud`, `teléfono`, `referencia`, `activo`, `ubigeocodigo`) 
+VALUES (NULL, 'CIX01', '14001', ' Mariscal Castilla 208', '08:00-19:00', '09:00-18:00', '-6.768790', '-79.834970', '906300962', 'Frente a la cochera \"Puerto del Inka\"', '0', '130101')
