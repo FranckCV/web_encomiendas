@@ -1,0 +1,132 @@
+{% extends "MAESTRA_GENERAL.html" %}
+
+{% block estilos %}
+<link rel="stylesheet" href="/static/css/NoRecibimos.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
+
+{% block titulo %}
+No recibimos - Artículos no aceptados
+{% endblock %}
+
+{% block contenido %}
+<div class="no-recibimos-container">
+    
+    <!-- Banner principal actualizado con el formato del welcome-banner de FAQ -->
+    <div class="welcome-banner">
+        <div class="welcome-content">
+            <h2>No Recibimos</h2>
+            <p>Los siguientes artículos NO son recibidos bajo ninguna circunstancia.</p>
+        </div>
+    </div>
+
+    <!-- Contenedor de productos no recibidos -->
+    <div class="productos-grid">
+        <!-- Vidrio -->
+        <div class="producto-card">
+            <div class="producto-icono">
+                <img src="/static/img/no-recibimos/vidrio.png" alt="Vidrio">
+            </div>
+            <h3 class="producto-titulo">Vidrio</h3>
+            <p class="producto-descripcion">Ej: Vitrinas, estructuras de vidrio.</p>
+        </div>
+
+        <!-- Artefactos mal envueltos -->
+        <div class="producto-card">
+            <div class="producto-icono">
+                <img src="/static/img/no-recibimos/artefactos.png" alt="Artefactos mal envueltos">
+            </div>
+            <h3 class="producto-titulo">Artefactos mal envueltos</h3>
+            <p class="producto-descripcion">Ej: Artefactos envueltos con mantas, colchas, cartón o Stretch Film.</p>
+        </div>
+
+        <!-- Termas solares -->
+        <div class="producto-card">
+            <div class="producto-icono">
+                <img src="/static/img/no-recibimos/termas.png" alt="Termas solares">
+            </div>
+            <h3 class="producto-titulo">Termas solares</h3>
+            <p class="producto-descripcion">Ej: Tubos al vacío o tubos para termas solares.</p>
+        </div>
+
+        <!-- Paneles solares -->
+        <div class="producto-card">
+            <div class="producto-icono">
+                <img src="/static/img/no-recibimos/paneles.png" alt="Paneles solares">
+            </div>
+            <h3 class="producto-titulo">Paneles solares</h3>
+            <p class="producto-descripcion">Ej: Colectores térmicos y paneles solares híbridos.</p>
+        </div>
+
+        <!-- Melamina armada -->
+        <div class="producto-card">
+            <div class="producto-icono">
+                <img src="/static/img/no-recibimos/melamina.png" alt="Melamina armada">
+            </div>
+            <h3 class="producto-titulo">Melamina armada</h3>
+            <p class="producto-descripcion">Ej: Muebles de melamina.</p>
+        </div>
+
+        <!-- Granito -->
+        <div class="producto-card">
+            <div class="producto-icono">
+                <img src="/static/img/no-recibimos/granito.png" alt="Granito">
+            </div>
+            <h3 class="producto-titulo">Granito</h3>
+            <p class="producto-descripcion">Ej: Esculturas, adornos, etc.</p>
+        </div>
+
+        <!-- Marmol -->
+        <div class="producto-card">
+            <div class="producto-icono">
+                <img src="/static/img/no-recibimos/marmol.png" alt="Mármol">
+            </div>
+            <h3 class="producto-titulo">Mármol</h3>
+            <p class="producto-descripcion">Ej: Losetas, esculturas, adornos, etc.</p>
+        </div>
+
+        <!-- Sobre manila sin plastificar -->
+        <div class="producto-card">
+            <div class="producto-icono">
+                <img src="/static/img/no-recibimos/sobre.png" alt="Sobre manila sin plastificar">
+            </div>
+            <h3 class="producto-titulo">Sobre manila sin plastificar</h3>
+            <p class="producto-descripcion">Los sobres manila deben estar plastificados.</p>
+        </div>
+
+        <!-- Tipos de balón -->
+        <div class="producto-card">
+            <div class="producto-icono">
+                <img src="/static/img/no-recibimos/balon.png" alt="Tipos de balón">
+            </div>
+            <h3 class="producto-titulo">Tipos de balón</h3>
+            <p class="producto-descripcion">No recibimos ningún tipo de balón, ya sea de gas u oxígeno.</p>
+        </div>
+
+        <!-- Lápidas -->
+        <div class="producto-card">
+            <div class="producto-icono">
+                <img src="/static/img/no-recibimos/lapidas.png" alt="Lápidas">
+            </div>
+            <h3 class="producto-titulo">Lápidas</h3>
+            <p class="producto-descripcion">De mármol o granito.</p>
+        </div>
+    </div>
+
+    <!-- Banner informativo adicional -->
+    <div class="banner-informacion">
+        <div class="info-icon">
+            <i class="fas fa-info-circle"></i>
+        </div>
+        <div class="info-texto">
+            <h3>¿Necesitas enviar algo?</h3>
+            <p>Consulta nuestras <a href="{{url_for('sucursales')}}">sucursales</a> o <a href="{{url_for('contac')}}">contáctanos</a> para más información.</p>
+        </div>
+    </div>
+    <br>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/NoRecibimos.js"></script>
+{% endblock %}
