@@ -1,0 +1,84 @@
+{% extends "MAESTRA_GENERAL.html" %}
+
+
+{% block titulo %}
+
+{% endblock %}
+
+
+{% block estilos %}
+<link rel="stylesheet" href="/static/css/index.css">
+{% endblock %}
+
+
+{% block contenido %}
+
+<div class="section_tracking">
+    <div class="track_content">
+
+        <div>
+            <h3>Rastrea tu encomienda</h3>
+        </div>
+        <div class="block_tracking">
+            <div class="trk_title">
+                <i class="fa-solid fa-map"></i>
+                <p> Dale seguimiento aquí</p>
+            </div>
+            <div class="trk_form">
+                <input placeholder="Nro de Tracking" class="form_field" type="text">
+                <!-- <select class="form_field" name="" id="">
+                    <option value="">2025</option>
+                    <option value="">2024</option>
+                    <option value="">2023</option>
+                    <option value="">2022</option>
+                    <option value="">2021</option>
+                    <option value="">2020</option>
+                    <option value="">2019</option>
+                </select> -->
+                <button class="button">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="section_cotizacion">
+    <form action="">
+        <h5>Lugar de origen</h5>
+        <div class="cotizacion_forms">
+            <select name="" id=""></select>
+            <select name="" id=""></select>
+            <select name="" id=""></select>
+        </div>
+        <h5>Lugar de destino</h5>
+        <div class="cotizacion_forms">
+            <select name="" id=""></select>
+            <select name="" id=""></select>
+            <select name="" id=""></select>
+        </div>
+        <h5>Datos de envio</h5>
+        <div class="cotizacion_forms">
+            <select name="" id=""></select>
+            <div>
+                <input type="radio" name="tipo_envio" id="">
+                <input type="radio" name="tipo_envio" id="">
+            </div>
+            <input type="number" name="" id="">
+        </div>
+        <div>
+            <div></div>
+            <button></button>
+        </div>
+    </form>
+</div>
+
+
+{% endblock %}
+
+
+
+{% block scripts %}
+
+{% endblock %}

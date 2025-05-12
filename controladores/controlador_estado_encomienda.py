@@ -44,8 +44,8 @@ def get_table():
     '''
     columnas = {
         'id': ['ID' , 0.5 ] , 
-        'nombre' : ['Nombre' , 3.5] , 
-        'descripcion' : ['Descripcion' , 3.5] , 
+        'nombre' : ['Nombre' , 1 ] , 
+        'descripcion' : ['Descripcion' , 5.5] , 
         'activo' : ['Actividad' , 3.5] , 
         }
     filas = sql_select_fetchall(sql)
@@ -59,7 +59,7 @@ def unactive_row( id ):
     unactive_row_table(table_name , id)
 
 
-def insert_row( nombre , descripcion ):
+def insert_row( nombre , descripcion = None ):
     sql = f'''
         INSERT INTO 
             {table_name} ( nombre , descripcion , activo )
@@ -69,7 +69,7 @@ def insert_row( nombre , descripcion ):
     sql_execute(sql,( nombre , descripcion ))
 
 
-def update_row( id , nombre , descripcion ):
+def update_row( id , nombre , descripcion =None ):
     sql = f'''
         update {table_name} set 
         nombre = %s ,

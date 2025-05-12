@@ -1,0 +1,69 @@
+{% extends 'MAESTRA_GENERAL.html' %}
+
+{% block titulo %}
+Medios de Pago
+{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet" href="/static/css/pago_envio.css">
+{% endblock %}
+
+{% block contenido %}
+<div class="navigation-links">
+  <a href="{{ url_for('mostrar_resumen') }}" class="back-link">← Regresar</a>
+</div>
+
+<div class="container metodo-pago">
+  <h1 class="titulo-envio">REGISTRO DE ENVÍOS</h1>
+
+  <div class="steps-container">
+    <div class="step completed">
+      <div class="circle"><img src="/static/img/usuario.png" alt="Paso 1" /></div>
+      <p>Datos personales</p>
+    </div>
+    <div class="line"></div>
+    <div class="step completed">
+      <div class="circle"><img src="/static/img/chek.png" alt="Paso 2" /></div>
+      <p>Confirma tus datos</p>
+    </div>
+    <div class="line"></div>
+    <div class="step active">
+      <div class="circle"><img src="/static/img/medio.png" alt="Paso 3" /></div>
+      <p>Medios de pago</p>
+    </div>
+  </div>
+
+  <h2 class="subtitulo">Elige tu medio de pago</h2>
+
+  <div class="pago-content">
+    <div class="opciones-pago">
+      <label class="opcion">
+        <input type="radio" name="metodo" />
+        <span class="texto">Pago con tarjeta de crédito, débito y Yape.</span>
+        <img src="/static/img/metodo_pago.png" alt="Tarjeta" class="icono" />
+      </label>
+
+      <label class="opcion">
+        <input type="radio" name="metodo" />
+        <span class="texto">Pago en nuestras oficinas.</span>
+        <img src="/static/img/empleado_oficina.png" alt="Oficina" class="icono" />
+      </label>
+    </div>
+
+    <div class="resumen-box">
+      <h3>Resumen de tu registro</h3>
+      <table>
+        <tr><td>Cantidad De Envíos:</td><td>1</td></tr>
+        <tr><td>Sub Total:</td><td>S/ 50.85</td></tr>
+        <tr><td>I.G.V.:</td><td>S/ 9.15</td></tr>
+        <tr class="total"><td><strong>Total:</strong></td><td><strong>S/ 60.00</strong></td></tr>
+      </table>
+
+      <div class="cupon-box">
+        <input type="text" placeholder="AÑADIR CUPÓN DE DESCUENTO" />
+        <button class="btn-validar">VALIDAR</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

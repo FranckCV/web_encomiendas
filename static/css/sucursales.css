@@ -6,7 +6,7 @@
     /* max-width: 1200px; */
     margin: 0 auto;
 }
-
+/* 
 .sucursales-titulo {
     font-size: 28px;
     color: #1a3b69;
@@ -20,7 +20,7 @@
     color: #505050;
     margin-bottom: 20px;
     text-align: center;
-}
+} */
 
 .filtros-mapa-container {
     display: flex;
@@ -28,10 +28,22 @@
     gap: 20px;
 }
 
-@media (min-width: 992px) {
+section.general_element {
+    display: block;
+}
+
+/* @media (min-width: 992px) {
     .filtros-mapa-container {
         flex-direction: row;
     }
+} */
+
+.sucursales-container .row {
+    --bs-gutter-x: 0rem;
+}
+
+.filtros-mapa-container {
+    flex-direction: row;
 }
 
 .filtros-container {
@@ -40,6 +52,10 @@
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     flex: 1;
+}
+
+.filtros-container select {
+    font-size: 95%;
 }
 
 .filtro-label {
@@ -166,25 +182,5 @@
     display: inline-block;
     margin-top: 5px;
     cursor: pointer;
-}
-
-.form_field {
-    width: 100%;
-    /* gap: 5px; */
-    display: flex;
-    flex-direction: column;
-    /* margin-bottom: 10px; */
-}
-
-.form_field select {
-    border: 1px solid #9c9c9c;
-    background-color: white;
-    color: #000;
-    border-radius: var(--border-radius-size);
-    padding-inline: 10px;
-    padding-block: 5px;
-    text-align: left !important;
-    width: 100%;
-    font-size: 95%;
 }
 

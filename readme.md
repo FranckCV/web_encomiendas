@@ -22,39 +22,36 @@
 
 
 Franco Cortez
-- Gestión de tipo de unidades
-- Gestión de marcas
-- Gestión de modelos
-- Gestión de unidades
-- Gestión de empresa
+- tipo_unidad
+- marca
+- modelo
+- unidad
+- empresa
 
 Erliz Díaz
-- Gestión de incidencias y reclamos
-- Gestión de tipo_indemnizacion
-- Gestión de tipo_documento
-- Gestión de tipo_comprobante
-- Gestión de estado_reclamo
+- reclamo
+- tipo_indemnizacion
+- tipo_documento
+- tipo_comprobante
+- estado_reclamo
 
 Leonardo Guzmán
-- Gestión de articulo
-- Gestión de estado_encomienda
-- Gestión de tipo_articulo
-- Gestión de cargo
-- Gestión de tamaño_caja
+- articulo
+- estado_encomienda
+- tamaño_caja
+- tipo_paquete
+- rol
 
 Fabiana Paucar
-- Gestión de horarios
-- Gestión de rutas
-- Gestión de devoluciones
-- Gestión de sucursales
-- Gestión de tipo_recojo
+- sucursal
+- salida
+- tipo_recojo
 
 Junior Pérez
-- Gestión de empleados
-- Gestión de usuarios
-- Gestión de encomiendas
-- Gestión de metodo_pago
-- Gestión de tipo_usuario
+- empleados
+- usuarios
+- encomiendas
+- metodo_pago
 
 
 

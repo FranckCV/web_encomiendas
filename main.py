@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, flash, jsonify, session, make_response,  redirect, url_for , after_this_request
+from flask import Flask, render_template, request, redirect, make_response, url_for #, after_this_request, flash, jsonify, session
 from controladores import bd as bd
 from controladores import controlador_color as controlador_color
 from controladores import controlador_marca as controlador_marca
@@ -8,17 +8,24 @@ from controladores import controlador_modelo as controlador_modelo
 from controladores import controlador_ubigeo as controlador_ubigeo
 from controladores import controlador_sucursal as controlador_sucursal
 from controladores import controlador_tamaño_caja as controlador_tamaño_caja
-from controladores import controlador_tipo_cargo as controlador_tipo_cargo
+from controladores import controlador_tipo_rol as controlador_tipo_rol
 from controladores import controlador_tipo_paquete as controlador_tipo_paquete
 from controladores import controlador_estado_encomienda as controlador_estado_encomienda
-
+from controladores import controlador_tipo_documento as controlador_tipo_documento
+from controladores import controlador_tipo_comprobante as controlador_tipo_comprobante
+from controladores import controlador_empleado as controlador_empleado
+from  controladores import controlador_estado_reclamo as controlador_estado_reclamo
+from controladores import controlador_metodo_pago as controlador_metodo_pago
+from controladores import controlador_tipo_indemnizacion as controlador_tipo_indemnizacion
+from controladores import controlador_tipo_reclamo as controlador_tipo_reclamo
+from controladores import controlador_motivo_reclamo as controlador_motivo_reclamo
+from controladores import controlador_causa_reclamo as controlador_causa_reclamo
 
 
 import configuraciones
-from configuraciones import NOMBRE_BTN_UPDATE , NOMBRE_BTN_UNACTIVE , ACT_STATE_0 , ACT_STATE_1 , FUNCIONES_CRUD , NOMBRE_BTN_CONSULT , NOMBRE_BTN_DELETE , NOMBRE_BTN_INSERT , NOMBRE_BTN_LIST , NOMBRE_BTN_SEARCH , NOMBRE_CRUD_PAGE , NOMBRE_OPTIONS_COL , STATE_0 , STATE_1 , TITLE_STATE, ICON_PAGE_CRUD
 from functools import wraps
 import inspect
-import json
+# import json
 # from flask_jwt import JWT, jwt_required, current_identity
 # import uuid
 # import hashlib
@@ -27,7 +34,26 @@ import json
 
 app = Flask(__name__, template_folder='templates')
 
-SYSTEM_NAME = 'New Olva'
+SYSTEM_NAME          = 'New Olva'
+STATE_0              = configuraciones.STATE_0
+STATE_1              = configuraciones.STATE_1
+TITLE_STATE          = configuraciones.TITLE_STATE
+HABILITAR_ICON_PAGES = configuraciones.HABILITAR_ICON_PAGES
+ACT_STATE_0          = configuraciones.ACT_STATE_0
+ACT_STATE_1          = configuraciones.ACT_STATE_1
+NOMBRE_CRUD_PAGE     = configuraciones.NOMBRE_CRUD_PAGE
+NOMBRE_OPTIONS_COL   = configuraciones.NOMBRE_OPTIONS_COL
+NOMBRE_BTN_INSERT    = configuraciones.NOMBRE_BTN_INSERT
+NOMBRE_BTN_UPDATE    = configuraciones.NOMBRE_BTN_UPDATE
+NOMBRE_BTN_DELETE    = configuraciones.NOMBRE_BTN_DELETE
+NOMBRE_BTN_UNACTIVE  = configuraciones.NOMBRE_BTN_UNACTIVE
+NOMBRE_BTN_LIST      = configuraciones.NOMBRE_BTN_LIST
+NOMBRE_BTN_CONSULT   = configuraciones.NOMBRE_BTN_CONSULT
+NOMBRE_BTN_SEARCH    = configuraciones.NOMBRE_BTN_SEARCH
+ICON_PAGE_CRUD       = configuraciones.ICON_PAGE_CRUD 
+ICON_PAGE_REPORT     = configuraciones.ICON_PAGE_REPORT 
+ICON_PAGE_DASHBOARD  = configuraciones.ICON_PAGE_DASHBOARD 
+
 
 ###########_ TEST FUNCIONES _#############
 
@@ -58,32 +84,19 @@ def articulos_mas_vendidos():
 # ri-function-line
 # ri-layout-4-fill
 
-def datos_usuario():
-    lista = {
-        'id': 1 ,
-        'correo': 'correo@dom.com' ,
-        '': 'Nombre Apepat Apemat' ,
-        '': 'a' ,
-        '': 'Cargo' ,
-    }
+# def datos_usuario():
+#     lista = {
+#         'id': 1 ,
+#         'correo': 'correo@dom.com' ,
+#         '': 'Nombre Apepat Apemat' ,
+#         '': 'a' ,
+#         '': 'Cargo' ,
+#     }
 
-    return lista
+#     return lista
 
 
 ###########_ FUNCIONES _#############
-
-def listar_paginas_crud():
-    table_names = list(CONTROLADORES.keys()) #obtiene todas las claves de ese diccionario
-    pages = []
-    for tabla in table_names:
-        config = CONTROLADORES.get(tabla)
-        active = config["active"]
-        if active is True:
-            titulo = config["titulo"]
-            icon_page = config.get("icon_page")
-            pages.append([ tabla , titulo , get_icon_page(icon_page) ])
-    return pages
-
 
 def listar_admin_pages():
     menu_keys = list(MENU_ADMIN.keys())
@@ -175,9 +188,9 @@ CONTROLADORES = {
     "tipo_unidad": {
         "active" : True ,
         "titulo": "tipos de unidades",
+        "icon_page": 'fa-solid fa-truck-plane',
         "nombre_tabla": "tipo de unidad",
         "controlador": controlador_tipo_unidad,
-        "icon_page": 'fa-solid fa-truck-plane',
         "filters": [
             ['activo', f'{TITLE_STATE}', get_options_active() ],
         ] ,
@@ -231,8 +244,10 @@ CONTROLADORES = {
 #            ID/NAME            LABEL               PLACEHOLDER         TYPE        REQUIRED   ABLE/DISABLE   DATOS
             ['id',              'ID',               'ID',               'text',     False ,    False ,        None ],
             ['nombre',          'Nombre',           'Nombre',           'text',     True ,     True ,         None ],
-            ['marcaid',         'Marca',            'Marca',            'select',   True ,     None,          [controlador_marca.get_options_marca() , 'nom_mar'] ],
-            ['tipo_unidadid',   'Tipo de Unidad',   'Tipo de Unidad',   'select',   True ,     None ,         [controlador_tipo_unidad.get_options() , 'nom_tip'] ],
+            ['marcaid',         'Marca',            'Marca',            'select',   True ,     None,          [lambda: controlador_marca.get_options_marca() , 'nom_mar'] ],
+            ['tipo_unidadid',   'Tipo de Unidad',   'Tipo de Unidad',   'select',   True ,     None ,         [lambda: controlador_tipo_unidad.get_options() , 'nom_tip'] ],
+            # ['marcaid',         'Marca',            'Marca',            'select',   True ,     None,          [controlador_marca.get_options_marca() , 'nom_mar'] ],
+            # ['tipo_unidadid',   'Tipo de Unidad',   'Tipo de Unidad',   'select',   True ,     None ,         [controlador_tipo_unidad.get_options() , 'nom_tip'] ],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -252,7 +267,7 @@ CONTROLADORES = {
         "icon_page": 'fa-solid fa-truck-fast',
         "filters": [
             ['activo', f'{TITLE_STATE}', get_options_active() ],
-            ['modeloid', 'Modelo', controlador_modelo.get_options() ],
+            ['modeloid', 'Modelo', lambda: controlador_modelo.get_options() ],
         ] ,
         "fields_form": [
 #            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
@@ -261,7 +276,7 @@ CONTROLADORES = {
             ['activo',        f'{TITLE_STATE}',   'activo',        'p',         True ,     True,          None ],
             ['capacidad',     'Capacidad',        'Capacidad',     'number',    True ,     True,          True ],
             ['volumen',       'Volumen',          'Volumen',       'number',    True ,     True,          None ],
-            ['modeloid',      'Nombre de Modelo', 'Elegir modelo', 'select',    True ,     True,          [controlador_modelo.get_options() , 'nom_modelo' ] ],
+            ['modeloid',      'Nombre de Modelo', 'Elegir modelo', 'select',    True ,     True,          [lambda: controlador_modelo.get_options() , 'nom_modelo' ] ],
             ['observaciones', 'Observaciones',    'observaciones', 'textarea',  False,     True,          None ],
         ],
         "crud_forms": {
@@ -280,7 +295,9 @@ CONTROLADORES = {
         "nombre_tabla":"ubigeo",
         "controlador": controlador_ubigeo,
         "icon_page" : "ri-map-pin-line",
-        "filters":[],
+        "filters":[
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ],
         "fields_form": [
 #            ID/NAME   LABEL     PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
             ['codigo','Código',     'Código',  'text',   True ,       False ,      None ],
@@ -310,7 +327,7 @@ CONTROLADORES = {
         #         ID/NAME         LABEL             PLACEHOLDER        TYPE       REQUIRED   ABLE/DISABLE   DATOS
             ['id',            'ID',              'ID',              'text',      True ,    False,         True ],
             ['direccion',     'Dirección',       'Dirección',       'text',     True,       True,         None ],
-            ['ubigeocodigo',  'Ubigeo',          'Elegir ubigeo',   'select',     True,       True,         [controlador_ubigeo.get_options() , 'ubigeo' ] ],
+            ['ubigeocodigo',  'Ubigeo',          'Elegir ubigeo',   'select',     True,       True,         [lambda: controlador_ubigeo.get_options() , 'ubigeo' ] ],
             ['horario_l_v',   'Horario L-V',     'Ej: 9am - 6pm',   'text',     False,      True,         None ],
             ['horario_s_d',   'Horario S-D',     'Ej: 9am - 1pm',   'text',     False,      True,         None ],
             ['latitud',       'Latitud',         'Latitud',         'text',   False,      True,         None ],
@@ -380,11 +397,11 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-    "tipo_cargo": {
+    "tipo_rol": {
         "active" : True ,
-        "titulo": "tipos de cargos",
-        "nombre_tabla": "tipo de cargo",
-        "controlador": controlador_tipo_cargo,
+        "titulo": "tipos de roles",
+        "nombre_tabla": "tipo de rol",
+        "controlador": controlador_tipo_rol,
         "icon_page": 'ri-file-user-fill',
         "filters": [
             ['activo', f'{TITLE_STATE}', get_options_active() ],
@@ -431,6 +448,236 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
+    "tipo_documento": {
+        "active" : True ,
+        "titulo": "tipos de documentos",
+        "nombre_tabla": "tipo de documento",
+        "controlador": controlador_tipo_documento,
+        "icon_page": 'fa-solid fa-id-card',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "tipo_comprobante": {
+        "active" : True ,
+        "titulo": "tipos de comprobantes",
+        "nombre_tabla": "tipo de comprobante",
+        "controlador": controlador_tipo_comprobante,
+        "icon_page": 'fa-solid fa-file-lines',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['inicial',          'Inicial',    'Inicial',     'text',     True ,     True ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "empleado": {
+        "active": True,
+        "titulo": "empleados del sistema",
+        "nombre_tabla": "empleado",
+        "controlador": controlador_empleado,
+        "icon_page": "fa-solid fa-user-tie",
+        "filters": [],
+        "fields_form": [
+    #   ID/NAME         LABEL              PLACEHOLDER       TYPE      REQUIRED  ABLE/DISABLE   DATOS
+        ['usuarioid',    'Usuario ID',      'Usuario ID',      'text',   False ,   False ,        None ],
+        ['nombre',       'Nombre',          'Nombre',          'text',   True ,    True ,         None ],
+        ['ape_paterno',  'Apellido Paterno','Apellido Paterno','text',   True ,    True ,         None ],
+        ['ape_materno',  'Apellido Materno','Apellido Materno','text',   True ,    True ,         None ],
+        ['cargoid',      'Cargo',           'Cargo',           'select', True ,    None ,         None],#[controlador_cargo.get_options(), 'nombre'] ],
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": True,
+        }
+    },
+    "estado_reclamo": {
+        "active" : True ,
+        "titulo": "estados de reclamos",
+        "nombre_tabla": "estado de reclamo",
+        "controlador": controlador_estado_reclamo,
+        "icon_page": 'fa-solid fa-circle-exclamation',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "metodo_pago": {
+        "active": True,
+        "titulo": "métodos de pago",
+        "nombre_tabla": "método de pago",
+        "controlador": controlador_metodo_pago,
+        "icon_page": "fa-solid fa-money-bill-wave",
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active()],
+        ],
+        "fields_form": [
+            #  ID/NAME     LABEL             PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
+            ['id',        'ID',             'ID',          'text',  True,      False,         None],
+            ['nombre',    'Nombre',         'Nombre',      'text',  True,      True,          None],
+            ['activo',    f'{TITLE_STATE}', 'Activo',      'p',     True,      False,         None],
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": True,
+        }
+    },
+    "tipo_indemnizacion": {
+        "active": True,
+        "titulo": "tipos de indemnización",
+        "nombre_tabla": "tipo de indemnización",
+        "controlador": controlador_tipo_indemnizacion,
+        "icon_page": "fa-solid fa-hand-holding-dollar",
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active()],
+        ],
+        "fields_form": [
+            #  ID/NAME     LABEL             PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
+            ['id',        'ID',             'ID',          'text',  True,      False,         None],
+            ['nombre',    'Nombre',         'Nombre',      'text',  True,      True,          None],
+            ['activo',    f'{TITLE_STATE}', 'Activo',      'p',     True,      False,         None],
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": True,
+        }
+    },
+     "tipo_reclamo": {
+        "active" : True ,
+        "titulo": "tipos de reclamos",
+        "icon_page": 'fa-solid fa-book-open-reader',
+        "nombre_tabla": "tipo de reclamo",
+        "controlador": controlador_tipo_reclamo,
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+     "motivo_reclamo": {
+        "active" : True ,
+        "titulo": "Motivo de reclamo",
+        "nombre_tabla": "motivo_reclamo",
+        "controlador": controlador_motivo_reclamo,
+        "icon_page": '',
+        "filters": [
+            ['tipo_reclamoid', 'Tipo de reclamo', lambda: controlador_tipo_reclamo.get_options() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
+            ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+            ['tipo_reclamoid',  'Nombre de tipo de reclamo', 'Elegir tipo de reclamo', 'select',    True ,     True, [lambda: controlador_tipo_reclamo.get_options() , 'nom_tip' ] ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+     "causa_reclamo": {
+        "active" : True ,
+        "titulo": "Causa de reclamo",
+        "nombre_tabla": "causa_reclamo",
+        "controlador": controlador_causa_reclamo,
+        "icon_page": '',
+        "filters": [
+            ['motivo_reclamoid', 'Motivo de reclamo', lambda: controlador_motivo_reclamo.get_options() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
+            ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+            ['motivo_reclamoid',  'Nombre de motivo de reclamo', 'Elegir motivo de reclamo', 'select', True ,True, [lambda: controlador_motivo_reclamo.get_options() , 'nom_motivo' ] ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
 }
 
 
@@ -452,11 +699,11 @@ REPORTES = {
                     "enabled": True
                 }
             },
-            "series": [{
+            "series": lambda: [{
                 "name": 'Ingresos',
                 "data": extract_col_row(ingresos_periodo())[1]
             }],
-            "xaxis": {
+            "xaxis": lambda: {
                 "categories": extract_col_row(ingresos_periodo())[0]
             },
             "colors": [' var(--color1) '],
@@ -482,11 +729,11 @@ REPORTES = {
             "chart": {
                 "type": 'bar',
             },
-            "series": [{
+            "series": lambda: [{
                 "name": 'Ingresos',
                 "data": extract_col_row(articulos_mas_vendidos())[1]
             }],
-            "xaxis": {
+            "xaxis": lambda: {
                 "categories": extract_col_row(articulos_mas_vendidos())[0]
             },
             "colors": [' var(--color15) ']
@@ -606,14 +853,13 @@ REPORTES = {
 
 MENU_ADMIN = {
     'administracion' : {
-        'name' : 'Administración',
         'active': True ,
+        'name' : 'Administración',
         'icon_page' : 'fa-solid fa-user-tie',
         'dashboard' : True,
         'cruds' :     [ 'tipo_unidad' , 'marca' , 'modelo' , 'unidad' , 'sucursal'],
         'reports' :   [ 
             'ingresos_periodo' , 
-            '' ,
         ],
     },
     'logistica' : {
@@ -630,14 +876,18 @@ MENU_ADMIN = {
         'icon_page' : 'fa-solid fa-box',
         'dashboard' : True,
         'cruds' :     [ 'estado_encomienda','tipo_paquete' ],
-        'reports' :   [ 'top_envios' , 'envios_tipo' , 'entregado_pendiente' ],
+        'reports' :   [ 
+            'envios_tipo' , 
+            'entregado_pendiente' ,
+            'top_envios' , 
+            ],
     },
     'atencion' : {
         'name' : 'Atención al Cliente',
         'active': True ,
         'icon_page' : 'fa-solid fa-circle-question',
         'dashboard' : True,
-        'cruds' :     [  ],
+        'cruds' :     [ 'tipo_indemnizacion','tipo_reclamo','motivo_reclamo','causa_reclamo' ],
         'reports' :   [ ],
     },
     'ventas' : {
@@ -645,7 +895,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : 'fa-solid fa-file-invoice-dollar',
         'dashboard' : True,
-        'cruds' :     ['tamaño_caja' ],
+        'cruds' :     ['tamaño_caja', 'metodo_pago' ],
         'reports' :   [ 'articulos_mas_vendidos'  ],
     },
     'seguridad' : {
@@ -715,62 +965,76 @@ def validar_error_crud():
         return wrapper
     return decorator
 
-
 def validar_admin():
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
             try:
                 page = f(*args, **kwargs)
-                if page is None:
-                    return redirect_url('panel')
-                else:
+                if page:
                     return page
+                else:
+                    return rdrct_error(redirect_url('panel') , 'Esta pagina no existe') 
             except Exception as e:
                 return rdrct_error(redirect_url('panel') , e) 
         return wrapper
     return decorator
 
+# def validar_admin():
+#     def decorator(f):
+#         @wraps(f)
+#         def wrapper(*args, **kwargs):
+#             try:
+#                 page = f(*args, **kwargs)
+#                 if page is None:
+#                     return redirect_url('panel')
+#                 else:
+#                     return page
+#             except Exception as e:
+#                 return rdrct_error(redirect_url('panel') , e) 
+#         return wrapper
+#     return decorator
+
 ###########_ PAGES _#############
 
 @app.context_processor
 def inject_globals():
-    lista_paginas_crud = listar_paginas_crud()
+    # lista_paginas_crud = listar_paginas_crud()
     listar_pages_admin = listar_admin_pages()
+    # listar_pages_admin = []
     options_pagination_crud , selected_option_crud = get_options_pagination_crud()
     cookie_error = request.cookies.get('error')
-    info_variables_crud = False
-    HABILITAR_ICON_PAGES = True
+    # info_variables_crud = False
     modulo_actual = ''
 
     return dict(
-        info_variables_crud = info_variables_crud,
-        lista_paginas_crud = lista_paginas_crud ,
+        # info_variables_crud = info_variables_crud,
+        # lista_paginas_crud = lista_paginas_crud ,
         listar_pages_admin = listar_pages_admin,
         options_pagination_crud = options_pagination_crud ,
         selected_option_crud = selected_option_crud ,
         cookie_error = cookie_error,
         modulo_actual = modulo_actual ,
 
-        MENU_ADMIN = MENU_ADMIN,
+        MENU_ADMIN           = MENU_ADMIN,
         HABILITAR_ICON_PAGES = HABILITAR_ICON_PAGES,
-        SYSTEM_NAME = SYSTEM_NAME,
-        STATE_0 = STATE_0,   
-        STATE_1 = STATE_1,
-        ACT_STATE_0 = ACT_STATE_0,
-        ACT_STATE_1 = ACT_STATE_1,
-        NOMBRE_CRUD_PAGE    = NOMBRE_CRUD_PAGE,
-        NOMBRE_OPTIONS_COL  = NOMBRE_OPTIONS_COL,
-        NOMBRE_BTN_INSERT   = NOMBRE_BTN_INSERT,
-        NOMBRE_BTN_UPDATE   = NOMBRE_BTN_UPDATE,
-        NOMBRE_BTN_DELETE   = NOMBRE_BTN_DELETE,
-        NOMBRE_BTN_UNACTIVE = NOMBRE_BTN_UNACTIVE,
-        NOMBRE_BTN_LIST     = NOMBRE_BTN_LIST,
-        NOMBRE_BTN_CONSULT  = NOMBRE_BTN_CONSULT,
-        NOMBRE_BTN_SEARCH   = NOMBRE_BTN_SEARCH,
-        ICON_PAGE_CRUD      = configuraciones.ICON_PAGE_CRUD ,
-        ICON_PAGE_REPORT    = configuraciones.ICON_PAGE_REPORT ,
-        ICON_PAGE_DASHBOARD = configuraciones.ICON_PAGE_DASHBOARD ,
+        SYSTEM_NAME          = SYSTEM_NAME,
+        STATE_0              = STATE_0,   
+        STATE_1              = STATE_1,
+        ACT_STATE_0          = ACT_STATE_0,
+        ACT_STATE_1          = ACT_STATE_1,
+        NOMBRE_CRUD_PAGE     = NOMBRE_CRUD_PAGE,
+        NOMBRE_OPTIONS_COL   = NOMBRE_OPTIONS_COL,
+        NOMBRE_BTN_INSERT    = NOMBRE_BTN_INSERT,
+        NOMBRE_BTN_UPDATE    = NOMBRE_BTN_UPDATE,
+        NOMBRE_BTN_DELETE    = NOMBRE_BTN_DELETE,
+        NOMBRE_BTN_UNACTIVE  = NOMBRE_BTN_UNACTIVE,
+        NOMBRE_BTN_LIST      = NOMBRE_BTN_LIST,
+        NOMBRE_BTN_CONSULT   = NOMBRE_BTN_CONSULT,
+        NOMBRE_BTN_SEARCH    = NOMBRE_BTN_SEARCH,
+        ICON_PAGE_CRUD       = ICON_PAGE_CRUD ,
+        ICON_PAGE_REPORT     = ICON_PAGE_REPORT ,
+        ICON_PAGE_DASHBOARD  = ICON_PAGE_DASHBOARD ,
     )
 
 
@@ -780,7 +1044,9 @@ paginas_simples = [
     'sign_up', 
     'sucursales' ,
     'tracking',
-    'seguimiento'
+    'seguimiento',
+    'recuperar_contrasenia',
+    'libro_reclamaciones'
 ]
 
 
@@ -792,73 +1058,125 @@ for pagina in paginas_simples:
     )
 
 
+##################_ CLIENTE PAGE _################## 
+
+@app.route("/faq")
+def Faq():
+    return render_template('Faq.html')
+
+
+@app.route("/contactanos")
+def contac():
+    return render_template('contactanos.html')
+
+
+@app.route("/cajas")
+def cajas():
+    return render_template('cajas.html')
+
+
+@app.route("/articulos")
+def articulos():
+    return render_template('articulos.html')
+
+
+@app.route("/cotizador")
+def cotizador():
+    departamentos = controlador_ubigeo.get_options_departamento()
+    provincias = controlador_ubigeo.get_options_provincia()
+    distritos = controlador_ubigeo.get_options_distrito()
+    return render_template(
+        'cotizador.html' ,
+        departamentos = departamentos,
+        provincias = provincias,
+        distritos = distritos,
+    )
+##############erliz rutas####
+
+@app.route('/tipos-envio')
+def tipos_envio():
+    return render_template('tipos_envio.html')
+@app.route('/registro-envio')
+def registro_envio():
+    return render_template('registro_envio.html')
+@app.route('/resumen_envio')
+def mostrar_resumen():
+    return render_template('resumen_envio.html') 
+@app.route('/pagoenvio')
+def mostrar_pagoenvio():
+    return render_template('pago_envio.html') 
+@app.route('/reclamo')
+def mostrar_reclamo():
+    return render_template('reclamo.html') 
+
+#########3
 
 ##################_ ADMIN PAGE _################## 
 
+# NO JOROBES
+@app.route("/panel")
+def panel():
+    return render_template('panel.html')
+
+
 @app.route("/crud=<tabla>")
-# @validar_admin()
+@validar_admin()
 def crud_generico(tabla):
     config = CONTROLADORES.get(tabla)
-    if not config:
-        return None
+    if config:
+        active = config["active"]
+        if active is True:
+            value_search = request.args.get("value_search")
 
-    active = config["active"]
+            icon_page_crud = get_icon_page(config.get("icon_page"))
+            titulo = config["titulo"]
+            controlador = config["controlador"]
+            nombre_tabla = config["nombre_tabla"]
+            filters = config["filters"]
+            fields_form = config["fields_form"]
 
-    if active is False:
-        return None
-    
-    value_search = request.args.get("value_search")
+            existe_activo = controlador.exists_Activo()
+            columnas , filas = controlador.get_table()
+            info_columns = controlador.get_info_columns()
+            primary_key = controlador.get_primary_key()
+            table_columns  = list(filas[0].keys()) if filas else []
+            
+            CRUD_FORMS = config["crud_forms"]
+            crud_list = CRUD_FORMS.get("crud_list")
+            crud_search = CRUD_FORMS.get("crud_search")
+            crud_consult = CRUD_FORMS.get("crud_consult")
+            crud_insert = CRUD_FORMS.get("crud_insert")
+            crud_update = CRUD_FORMS.get("crud_update")
+            crud_delete = CRUD_FORMS.get("crud_delete")
+            crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo
 
-    icon_page_crud = get_icon_page(config.get("icon_page"))
-    titulo = config["titulo"]
-    controlador = config["controlador"]
-    nombre_tabla = config["nombre_tabla"]
-    filters = config["filters"]
-    fields_form = config["fields_form"]
-
-    existe_activo = controlador.exists_Activo()
-    columnas , filas = controlador.get_table()
-    info_columns = controlador.get_info_columns()
-    primary_key = controlador.get_primary_key()
-    table_columns  = list(filas[0].keys()) if filas else []
-    
-    CRUD_FORMS = config["crud_forms"]
-    crud_list = CRUD_FORMS.get("crud_list")
-    crud_search = CRUD_FORMS.get("crud_search")
-    crud_consult = CRUD_FORMS.get("crud_consult")
-    crud_insert = CRUD_FORMS.get("crud_insert")
-    crud_update = CRUD_FORMS.get("crud_update")
-    crud_delete = CRUD_FORMS.get("crud_delete")
-    crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo
-
-
-    return render_template(
-        "CRUD.html" ,
-        tabla          = tabla ,
-        nombre_tabla   = nombre_tabla ,
-        icon_page_crud = icon_page_crud ,
-        titulo         = titulo ,
-        filas          = filas ,
-        primary_key    = primary_key ,
-        filters        = filters,
-        fields_form    = fields_form ,
-        value_search   = value_search,
-        columnas       = columnas ,
-        key_columns    = list(columnas.keys()) ,
-        table_columns  = table_columns ,
-        info_columns   = info_columns,
-        crud_list      = crud_list,
-        crud_search    = crud_search,
-        crud_consult   = crud_consult,
-        crud_insert    = crud_insert,
-        crud_update    = crud_update,
-        crud_delete    = crud_delete,
-        crud_unactive  = crud_unactive,
-    )
+            return render_template(
+                "CRUD.html" ,
+                tabla          = tabla ,
+                nombre_tabla   = nombre_tabla ,
+                icon_page_crud = icon_page_crud ,
+                titulo         = titulo ,
+                filas          = filas ,
+                primary_key    = primary_key ,
+                filters        = filters,
+                fields_form    = fields_form ,
+                value_search   = value_search,
+                columnas       = columnas ,
+                key_columns    = list(columnas.keys()) ,
+                table_columns  = table_columns ,
+                info_columns   = info_columns,
+                crud_list      = crud_list,
+                crud_search    = crud_search,
+                crud_consult   = crud_consult,
+                crud_insert    = crud_insert,
+                crud_update    = crud_update,
+                crud_delete    = crud_delete,
+                crud_unactive  = crud_unactive,
+            )
 
 
 @app.route("/dashboard=<module_name>")
-@validar_admin()
+# @validar_admin()
 def dashboard(module_name):
     info_modulo = MENU_ADMIN.get(module_name)
 
@@ -869,12 +1187,19 @@ def dashboard(module_name):
 
             for re in modulo[4]:
                 if re[3].get('graph') is True:
-                    print(re)
-                    list_reports.append(re)
+                    print(re[0])
+                    gr = REPORTES.get(re[0]).get('graph')
+                    if gr :
+                        if callable(gr.get("series")):
+                            gr["series"] = gr["series"]()
+                        if callable(gr.get("xaxis")):
+                            gr["xaxis"] = gr["xaxis"]()
+                        list_reports.append(re)
 
 
             return render_template(
                 'dashboard.html' , 
+                # modulo_actual = module_name ,
                 module_name = module_name , 
                 modulo = modulo ,
                 info_modulo = info_modulo,
@@ -882,11 +1207,11 @@ def dashboard(module_name):
                 REPORTES = REPORTES ,
                 )
     return None
-    # return 'No hay dashboard' ,404
+    # return 'No hay dashboa
 
 
 @app.route("/reporte=<report_name>")
-@validar_admin()
+# @validar_admin()
 def reporte(report_name):
     config = REPORTES.get(report_name)
     if not config:
@@ -903,7 +1228,14 @@ def reporte(report_name):
     e_table = elements.get('table')
     e_counter = elements.get('counter')
     icon_page = get_icon_page(config.get("icon_page"))
+
     graph = config.get("graph")
+    if graph:
+        if callable(graph.get("series")):
+            graph["series"] = graph["series"]()
+        if callable(graph.get("xaxis")):
+            graph["xaxis"] = graph["xaxis"]()
+
     table = config.get("table")
     columnas = None
     filas = None
@@ -1027,6 +1359,7 @@ def crud_unactive(tabla):
 
     return redirect(url_for('crud_generico', tabla = tabla))
 
+<<<<<<< HEAD
 
 @app.route("/panel")
 def panel():
@@ -1058,6 +1391,8 @@ def NoRecibimos():
     return render_template('NoRecibimos.html')
 
 
+=======
+>>>>>>> 1fa9a3ddc017ef5b2ab84c0c0a69fd63d5593caf
 @app.route("/colores")
 def colores():
     html = '''
@@ -1081,7 +1416,8 @@ def colores():
         }
     </style>    
 '''
-    for color in ['-base' , '-sec' , '-contrast']:
+
+    for color in ['-base' , '-sec' , '-thr' , '-contrast']:
         text = f'--color{color}'
         html += f'''
         <div class="color_block">
@@ -1089,6 +1425,16 @@ def colores():
         <div style="height: 100%; width: 100%; background-color: var({text})"></div>
         </div>
     '''
+        
+    for color in ['light-color' , 'dark-color' ]:
+        text = f'--{color}'
+        html += f'''
+        <div class="color_block">
+        <p>{text}</p> 
+        <div style="height: 100%; width: 100%; background-color: var({text})"></div>
+        </div>
+    '''
+        
     for color in range(25):
         text = f'--color{color}'
         html += f'''
@@ -1103,7 +1449,7 @@ def colores():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8000, debug=True)
+    app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=True)
 
 
 
