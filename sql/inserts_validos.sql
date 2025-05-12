@@ -1946,7 +1946,34 @@ VALUES
     ('YZA9012', '1519046MNG', '15M25016325O', 22.00, 50.00, 'Unidad para transporte pesado', 'A', 11),
     ('BCD0123', '1519047NNG', '15M25016326P', 19.00, 40.00, 'Camión para largo alcance', 'A', 12);
 
+INSERT INTO estado_reclamo (nombre, activo) VALUES
+('En revisión', 1),
+('Aprobado', 1),
+('Rechazado', 1),
+('En espera', 1),
+('Resuelto', 1);
+INSERT INTO tipo_indemnizacion (nombre, descripcion, activo) VALUES 
+('Pérdida total', 'Indemnización completa en caso de pérdida total del paquete o artículo enviado.', 1),
+('Daños parciales', 'Indemnización por daños parciales al contenido del paquete.', 1),
+('Retraso en la entrega', 'Compensación por demoras significativas en la entrega.', 1),
+('Pérdida parcial', 'Indemnización parcial en caso de pérdida parcial del contenido.', 1),
+('Error en la entrega', 'Compensación por errores en la dirección o destinatario incorrecto.', 1);
 
+INSERT INTO tipo_documento (siglas, nombre, activo) VALUES 
+('DNI', 'Documento Nacional de Identidad', 1),
+('RUC', 'Registro Único de Contribuyente', 1),
+('CE', 'Carné de Extranjería', 1),
+('PAS', 'Pasaporte', 1);
+INSERT INTO tipo_comprobante (inicial, nombre, descripcion, activo) VALUES
+('FT', 'F', 'Factura', 1),
+('BV', 'B', 'Boleta de Venta', 1),
+('NV', 'N', 'Nota de Venta', 1),
+('RC', 'R', 'Recibo', 1),
+('GR', 'G', 'Guía de Remisión', 1),
+('TI', 'T', 'Ticket', 1),
+('NC', 'C', 'Nota de Crédito', 1),
+('ND', 'D', 'Nota de Débito', 1),
+('OT', 'O', 'Otro', 1);
 INSERT INTO tipo_reclamo (nombre, descripcion)
 VALUES ('Queja', 'Es el malestar o descontento por algún acto que está relacionado directamente con el servicio adquirido. Por ejemplo: una mala atención al público, omisión de información, etc.'),
 ('Reclamo', 'Es la disconformidad con los servicios prestados o bienes adquiridos. Por ejemplo: demora en el envío, entregas no realizadas, etc.');

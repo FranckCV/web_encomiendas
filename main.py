@@ -928,7 +928,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : 'fa-solid fa-box',
         'dashboard' : True,
-        'cruds' :     [ 'estado_encomienda','tipo_paquete' ],
+        'cruds' :     [ 'estado_encomienda','tipo_paquete','tipo_documento' ],
         'reports' :   [ 
             'envios_tipo' , 
             'entregado_pendiente' ,
@@ -940,7 +940,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : 'fa-solid fa-circle-question',
         'dashboard' : True,
-        'cruds' :     [ 'tipo_indemnizacion','tipo_reclamo','motivo_reclamo','causa_reclamo' ],
+        'cruds' :     [ 'tipo_indemnizacion','tipo_reclamo','motivo_reclamo','causa_reclamo','estado_reclamo','reclamo' ],
         'reports' :   [ ],
     },
     'ventas' : {
@@ -948,7 +948,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : 'fa-solid fa-file-invoice-dollar',
         'dashboard' : True,
-        'cruds' :     ['tamaño_caja', 'metodo_pago' ],
+        'cruds' :     ['tamaño_caja', 'metodo_pago', 'tipo_comprobante' ],
         'reports' :   [ 'articulos_mas_vendidos'  ],
     },
     'seguridad' : {
@@ -1146,6 +1146,7 @@ def cotizador():
     )
 ##############erliz rutas####
 
+
 @app.route('/tipos-envio')
 def tipos_envio():
     return render_template('tipos_envio.html')
@@ -1158,9 +1159,7 @@ def mostrar_resumen():
 @app.route('/pagoenvio')
 def mostrar_pagoenvio():
     return render_template('pago_envio.html') 
-@app.route('/reclamo')
-def mostrar_reclamo():
-    return render_template('reclamo.html') 
+
 
 #########3
 
