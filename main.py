@@ -1359,40 +1359,6 @@ def crud_unactive(tabla):
 
     return redirect(url_for('crud_generico', tabla = tabla))
 
-<<<<<<< HEAD
-
-@app.route("/panel")
-def panel():
-    return render_template('panel.html')
-
-@app.route("/faq")
-def Faq():
-
-    return render_template('Faq.html')
-
-@app.route("/contactanos")
-def contac():
-
-    return render_template('contactanos.html')
-
-@app.route("/cajas")
-def cajas():
-
-    return render_template('cajas.html')
-
-@app.route("/articulos")
-def articulos():
-
-    return render_template('articulos.html')
-
-@app.route("/NoRecibimos")
-def NoRecibimos():
-
-    return render_template('NoRecibimos.html')
-
-
-=======
->>>>>>> 1fa9a3ddc017ef5b2ab84c0c0a69fd63d5593caf
 @app.route("/colores")
 def colores():
     html = '''
