@@ -39,19 +39,19 @@ def table_fetchall():
 def get_table():
     sql= f'''
         select 
-            mo.id ,
-            mo.nombre ,
-            mo.descripcion,
-            motivo.nombre as nom_mot 
-        from motivo_reclamo mo
-        inner join tipo_reclamo motivo on motivo.id = mo.motivo_reclamoid
-        order by mo.id asc
+            ca.id ,
+            ca.nombre ,
+            ca.descripcion,
+            mot.nombre as nom_mot 
+        from {table_name} ca
+        inner join motivo_reclamo mot on mot.id = ca.motivo_reclamoid
+        order by ca.id asc
     '''
     columnas = {
         'id': ['ID' , 0.5 ] , 
         'nombre' : ['Nombre' , 3] , 
         'descripcion' : ['descripcion' , 3] , 
-        'nom_motivo' : ['Tipo de Reclamo' , 3],
+        'nom_motivo' : ['Motivo de reclamo' , 3],
     }
     filas = sql_select_fetchall(sql)
     

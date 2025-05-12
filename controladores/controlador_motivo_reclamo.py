@@ -43,7 +43,7 @@ def get_table():
             mo.nombre ,
             mo.descripcion,
             tip.nombre as nom_tip 
-        from motivo_reclamo mo
+        from {table_name} mo
         inner join tipo_reclamo tip on tip.id = mo.tipo_reclamoid
         order by mo.id asc
     '''

@@ -666,7 +666,7 @@ CONTROLADORES = {
             ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
             ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
             ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
-            ['motivo_reclamoid',  'Nombre de motivo de reclamo', 'Elegir motivo de reclamo', 'select',    True ,     True, [lambda: controlador_motivo_reclamo.get_options() , 'nom_motivo' ] ],
+            ['motivo_reclamoid',  'Nombre de motivo de reclamo', 'Elegir motivo de reclamo', 'select', True ,True, [lambda: controlador_motivo_reclamo.get_options() , 'nom_motivo' ] ],
         ],
         "crud_forms": {
             "crud_list": True ,
