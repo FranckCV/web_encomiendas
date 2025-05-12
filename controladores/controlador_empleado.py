@@ -21,12 +21,14 @@ def delete_row(id):
 def table_fetchall():
     sql = f'''
         SELECT 
-            usuarioid,
-            nombre,
-            ape_paterno,
-            ape_materno,
-            cargoid
-        FROM {table_name}
+            e.usuarioid,
+            e.nombre,
+            e.apellidos,
+            e.correo,
+            e.rolid,
+            r.nombre AS nom_rol
+        FROM {table_name} e
+        LEFT JOIN rol r ON e.rolid = r.id
     '''
     resultados = sql_select_fetchall(sql)
     return resultados
@@ -34,47 +36,49 @@ def table_fetchall():
 def get_table():
     sql = f'''
         SELECT 
-            emp.usuarioid,
-            emp.nombre,
-            emp.ape_paterno,
-            emp.ape_materno,
-            emp.cargoid
-        FROM {table_name} emp
+            e.usuarioid,
+            e.nombre,
+            e.apellidos,
+            e.correo,
+            e.rolid,
+            r.nombre AS nom_rol
+        FROM {table_name} e
+        INNER JOIN rol r ON e.rolid = r.id
     '''
     columnas = {
         'usuarioid': ['Usuario ID', 1],
-        'nombre': ['Nombre', 2],
-        'ape_paterno': ['Apellido Paterno', 3],
-        'ape_materno': ['Apellido Materno', 3],
-        'cargoid': ['Cargo ID', 1]
+        'nombre': ['Nombre', 1.5],
+        'apellidos': ['Apellidos', 1.5],
+        'correo': ['Correo', 1.5],
+        'nom_rol': ['Rol', 1.5],
     }
     filas = sql_select_fetchall(sql)
     return columnas, filas
 
-######_ CAMBIAR PARAMETROS Y SQL INTERNO _######
+######_ CAMBIAR PARAMETROS Y SQL INTERNO _###### 
 
 def unactive_row(id):
     unactive_row_table(table_name, id)
 
-def insert_row(nombre, ape_paterno, ape_materno, cargoid, usuarioid):
+def insert_row(nombre, apellidos, correo, rolid):
     sql = f'''
         INSERT INTO 
-            {table_name} (usuarioid, nombre, ape_paterno, ape_materno, cargoid)
+            {table_name} (nombre, apellidos, correo, rolid)
         VALUES 
-            (%s, %s, %s, %s, %s)
+            (%s, %s, %s, %s)
     '''
-    sql_execute(sql, (usuarioid, nombre, ape_paterno, ape_materno, cargoid))
+    sql_execute(sql, (nombre, apellidos, correo, rolid))
 
-def update_row(usuarioid, nombre, ape_paterno, ape_materno, cargoid):
+def update_row(usuarioid, nombre, apellidos, correo, rolid):
     sql = f'''
         UPDATE {table_name} SET 
             nombre = %s,
-            ape_paterno = %s,
-            ape_materno = %s,
-            cargoid = %s
-        WHERE {get_primary_key()} = {usuarioid}
+            apellidos = %s,
+            correo = %s,
+            rolid = %s
+        WHERE usuarioid = {usuarioid}
     '''
-    sql_execute(sql, (nombre, ape_paterno, ape_materno, cargoid))
+    sql_execute(sql, (nombre, apellidos, correo, rolid))
 
 #####_ ADICIONALES _#####
 
@@ -82,7 +86,7 @@ def get_options_empleado():
     sql = f'''
         SELECT 
             usuarioid,
-            CONCAT(nombre, ' ', ape_paterno, ' ', ape_materno) AS nombre_completo
+            CONCAT(nombre, ' ', apellidos) AS nombre_completo
         FROM {table_name}
         ORDER BY nombre ASC
     '''

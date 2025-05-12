@@ -38,41 +38,41 @@ def table_fetchall():
 
 
 def get_table():
-    sql =f'''
-            SELECT 
-                s.id,
-                s.direccion,
-                CONCAT(u.distrito, "/", u.provincia, "/", u.departamento) AS ubigeo,
-                s.ubigeocodigo,
-                s.horario_l_v,
-                s.horario_s_d,
-                s.latitud,
-                s.longitud,
-                s.teléfono,
-                s.referencia,
-                s.activo
-            FROM 
-                {table_name} s
-            INNER JOIN 
-                ubigeo u ON u.codigo = s.ubigeocodigo;
-            '''
+    sql = f'''
+        SELECT 
+            s.id,
+            s.abreviatura,
+            s.codigo_postal,
+            s.direccion,
+            CONCAT(u.distrito, "/", u.provincia, "/", u.departamento) AS ubigeo,
+            s.ubigeocodigo,
+            s.horario_l_v,
+            s.horario_s_d,
+            s.latitud,
+            s.longitud,
+            s.teléfono,
+            s.referencia,
+            s.activo
+        FROM 
+            {table_name} s
+        INNER JOIN 
+            ubigeo u ON u.codigo = s.ubigeocodigo;
+    '''
 
     columnas = {
         'id': ['ID', 0.5],
+        'abreviatura': ['Abreviatura', 1],
+        'codigo_postal': ['Cód. Postal', 1.5],
         'direccion': ['Dirección', 2.5],
-        # 'ubigeocodigo': ['Codigo', 2.5],
-        'ubigeo': ['Ubigeo', 2.5], 
+        'ubigeo': ['Ubigeo', 2.5],
         'horario_l_v': ['Horario L-V', 2.5],
         'horario_s_d': ['Horario S-D', 2.5],
-        # 'latitud': ['Latitud', 1],
-        # 'longitud': ['Longitud', 1],
         'teléfono': ['Teléfono', 1.5],
-        # 'referencia': ['Referencia', 2],
         'activo': ['Activo', 0.5]
     }
 
     filas = sql_select_fetchall(sql)
-    return columnas,filas
+    return columnas, filas
 
 
 ######_ CRUD ESPECIFICAS _###### 
@@ -80,19 +80,26 @@ def get_table():
 def unactive_row(id):
     unactive_row_table("sucursal", id)
 
-
-def insert_row(direccion, ubigeocodigo, horario_l_v, horario_s_d, latitud, longitud, teléfono, referencia):
+def insert_row(abreviatura, codigo_postal, direccion, ubigeocodigo, horario_l_v, horario_s_d, latitud, longitud, teléfono, referencia):
     sql = f'''
         INSERT INTO {table_name} 
-        (direccion, ubigeocodigo, horario_l_v, horario_s_d, latitud, longitud, teléfono, referencia, activo)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 1)
+        (abreviatura, codigo_postal, direccion, ubigeocodigo, horario_l_v, horario_s_d, latitud, longitud, teléfono, referencia, activo)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 1)
     '''
-    sql_execute(sql, (direccion, ubigeocodigo, horario_l_v, horario_s_d, latitud, longitud, teléfono, referencia))
 
 
-def update_row(direccion, ubigeocodigo, horario_l_v, horario_s_d, latitud, longitud, teléfono, referencia, id):
+    horario_l_v = str(horario_l_v) if horario_l_v is not None else None
+    horario_s_d = str(horario_s_d) if horario_s_d is not None else None
+
+    sql_execute(sql, (abreviatura, codigo_postal, direccion, ubigeocodigo, horario_l_v, horario_s_d, latitud, longitud, teléfono, referencia))
+
+
+
+def update_row(abreviatura, codigo_postal, direccion, ubigeocodigo, horario_l_v, horario_s_d, latitud, longitud, teléfono, referencia, id):
     sql = f'''
         UPDATE sucursal SET 
+            abreviatura = %s,
+            codigo_postal = %s,
             direccion = %s,
             ubigeocodigo = %s,
             horario_l_v = %s,
@@ -103,8 +110,23 @@ def update_row(direccion, ubigeocodigo, horario_l_v, horario_s_d, latitud, longi
             referencia = %s
         WHERE {get_primary_key()} = %s
     '''
-    sql_execute(sql, (direccion, ubigeocodigo, horario_l_v, horario_s_d, latitud, longitud, teléfono, referencia, id))
+    sql_execute(sql, (abreviatura, codigo_postal, direccion, ubigeocodigo, horario_l_v, horario_s_d, latitud, longitud, teléfono, referencia, id))
+
 
 #####_ ADICIONALES _#####
+def get_options():
+    sql= f'''
+        select 
+            {get_primary_key()} ,
+            direccion
+        from {table_name}
+        where activo = 1
+        order by direccion asc
+    '''
+    filas = sql_select_fetchall(sql)
+    
+    lista = [(fila[get_primary_key()], fila["direccion"]) for fila in filas]
+
+    return lista
 
 
