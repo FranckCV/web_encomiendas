@@ -22,14 +22,11 @@ from controladores import controlador_motivo_reclamo as controlador_motivo_recla
 from controladores import controlador_causa_reclamo as controlador_causa_reclamo
 from controladores import controlador_tipo_empaque as controlador_tipo_empaque
 from controladores import controlador_tipo_recepcion as controlador_tipo_recepcion
-<<<<<<< HEAD
 from controladores import controlador_tarifa_ruta as controlador_tarifa_ruta
-=======
 from controladores import controlador_tipo_cliente as controlador_tipo_cliente
 from controladores import controlador_usuario as controlador_usuario
 from controladores import controlador_cliente as controlador_cliente
 from controladores import controlador_rol as controlador_rol
->>>>>>> 9c4e2cb8a418ccea3a524c3628adca1d1120d553
 
 
 import configuraciones
@@ -563,7 +560,6 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-
     "empleado": {
         "active": True,
         "titulo": "empleados",
@@ -743,7 +739,6 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-<<<<<<< HEAD
     "tarifa_ruta": {
         "active" : True ,
         "titulo": "Tarifa de ruta",
@@ -757,8 +752,17 @@ CONTROLADORES = {
             ['tarifa',      'Tarifa',          'Tarifa',      'text',     True ,     True  ,        None ],
             ['sucursal_origen_id',  'Sucursal de origen', 'Sucursal de origen', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_origen' ] ],
             ['sucursal_destino_id',  'Sucursal de destino', 'Sucursal de destino', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_destino' ] ],
-
-=======
+],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": False  # Solo si tienes columna 'activo'
+        }
+    },
     "tipo_cliente": {
         "active" : True ,
         "titulo": "tipos de clientes",
@@ -773,7 +777,6 @@ CONTROLADORES = {
             ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
             ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
->>>>>>> 9c4e2cb8a418ccea3a524c3628adca1d1120d553
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -785,8 +788,6 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-<<<<<<< HEAD
-=======
     "usuario": {
         "active" : True ,
         "titulo": "Usuarios",
@@ -814,7 +815,6 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-
     "cliente": {
         "active": True,
         "titulo": "clientes",
@@ -874,7 +874,6 @@ CONTROLADORES = {
         }
     },
 
->>>>>>> 9c4e2cb8a418ccea3a524c3628adca1d1120d553
 }
 
 
