@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, make_response, url_for #, after_this_request, flash, jsonify, session
-from controladores import bd as bd
+from controladores import bd as bd 
 from controladores import controlador_color as controlador_color
 from controladores import controlador_marca as controlador_marca
 from controladores import controlador_unidad as controlador_unidad
