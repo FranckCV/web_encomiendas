@@ -2,7 +2,7 @@ from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select
 import controladores.bd as bd
 #####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####
 
-table_name = 'tipo_rol'
+table_name = 'usuario'
 
 def get_info_columns():
     return show_columns(table_name)
@@ -40,17 +40,19 @@ def table_fetchall():
 def get_table():
     sql= f'''
         select 
-            tip.id ,
-            tip.nombre ,
-            tip.descripcion ,
-            tip.activo 
-        from {table_name} tip
+            usu.id ,
+            usu.correo ,
+            usu.contrasenia ,
+            usu.tipo_usuario ,
+            usu.activo 
+        from {table_name} usu
 
     '''
     columnas = {
         'id': ['ID' , 0.5] , 
-        'nombre' : ['Nombre' , 4.5] , 
-        'descripcion' : ['Descripción' , 4.5] , 
+        'correo' : ['Correo' , 4.5] , 
+        'contrasenia' : ['Contraseña' , 4.5] , 
+        'tipo_usuario' : ['Tipo Usuario' , 4.5] , 
         'activo' : ['Actividad' , 1] 
         }
     filas = sql_select_fetchall(sql)
@@ -64,25 +66,24 @@ def unactive_row( id ):
     unactive_row_table(table_name , id)
 
 
-def insert_row( nombre , descripcion=None ):
+def insert_row( nombre ):
     sql = f'''
         INSERT INTO 
             {table_name} 
-            ( nombre , descripcion , activo )
+            ( nombre , activo )
         VALUES 
-            ( %s , %s , 1 )
+            ( %s , 1 )
     '''
-    sql_execute(sql,( nombre , descripcion ))
+    sql_execute(sql,( nombre ))
 
 
-def update_row( id , nombre , descripcion ):
+def update_row( id , nombre ):
     sql = f'''
         update {table_name} set 
-        nombre = %s ,
-        descripcion = %s
+        nombre = %s 
         where {get_primary_key()} = {id}
     '''
-    sql_execute(sql, (nombre , descripcion ))
+    sql_execute(sql, (nombre ))
 
 
 #####_ ADICIONALES _#####
@@ -101,9 +102,6 @@ def get_options():
     lista = [(fila[get_primary_key()], fila["nombre"]) for fila in filas]
 
     return lista
-
-
-
 
 
 
