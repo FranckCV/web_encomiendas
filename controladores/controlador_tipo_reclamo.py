@@ -2,7 +2,7 @@ from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select
 import controladores.bd as bd
 #####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####
 
-table_name = 'modelo'
+table_name = 'tipo_reclamo'
 
 def get_info_columns():
     return show_columns(table_name)
@@ -40,26 +40,15 @@ def table_fetchall():
 def get_table():
     sql= f'''
         select 
-            mo.id ,
-            mo.nombre ,
-            mar.nombre as nom_mar,
-            tip.nombre as nom_tip ,
-            mo.tipo_unidadid ,
-            mo.marcaid ,
-            mo.activo
-        from {table_name} mo
-        inner join marca mar on mar.id = mo.marcaid 
-        inner join tipo_unidad tip on tip.id = mo.tipo_unidadid
+            *
+        from {table_name} 
 
-
-        order by mo.id asc
     '''
     columnas = {
-        'id': ['ID' , 0.5 ] , 
-        'nombre' : ['Nombre' , 3] , 
-        'nom_mar' : ['Marca' , 3 ] , 
-        'nom_tip' : ['Tipo de Unidad' , 3] ,
-        'activo' : ['Actividad' , 1]
+        'id': ['ID' , 0.5] , 
+        'nombre' : ['Nombre' , 4.5] , 
+        'descripcion' : ['Descripción' , 4.5] , 
+        'activo' : ['Actividad' , 1] 
         }
     filas = sql_select_fetchall(sql)
     
@@ -72,36 +61,25 @@ def unactive_row( id ):
     unactive_row_table(table_name , id)
 
 
-# def insert_row( nombre , marcaid , tipo_unidadid ):
-#     sql = f'''
-#         INSERT INTO 
-#             {table_name} 
-#             ( nombre , marcaid , tipo_unidadid )
-#         VALUES 
-#             ( '{nombre}' , '{marcaid}' , '{tipo_unidadid}' )
-#     '''
-#     sql_execute(sql)
-
-
-def insert_row( nombre , marcaid , tipo_unidadid ):
+def insert_row( nombre ,descripcion=None ):
     sql = f'''
         INSERT INTO 
-            {table_name} ( nombre , marcaid , tipo_unidadid ) 
+            {table_name} 
+            ( nombre ,descripcion ,activo)
         VALUES 
-            ( %s ,  %s , %s )
+            ( %s , %s,1 )
     '''
-    sql_execute(sql,( nombre , marcaid , tipo_unidadid ))
+    sql_execute(sql,( nombre, descripcion ))
 
 
-def update_row( nombre , marcaid , tipo_unidadid , id):
+def update_row( id , nombre , inicial ,descripcion ):
     sql = f'''
         update {table_name} set 
-        nombre = %s,
-        marcaid = %s ,
-        tipo_unidadid = %s
+        nombre = %s ,
+        descripcion = %s
         where {get_primary_key()} = {id}
     '''
-    sql_execute(sql,(nombre , marcaid , tipo_unidadid))
+    sql_execute(sql, (nombre, descripcion ))
 
 
 #####_ ADICIONALES _#####
@@ -112,6 +90,7 @@ def get_options():
             {get_primary_key()} ,
             nombre
         from {table_name}
+        where activo = 1
         order by nombre asc
     '''
     filas = sql_select_fetchall(sql)
@@ -119,6 +98,9 @@ def get_options():
     lista = [(fila[get_primary_key()], fila["nombre"]) for fila in filas]
 
     return lista
+
+
+
 
 
 

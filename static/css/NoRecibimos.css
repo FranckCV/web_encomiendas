@@ -1,0 +1,203 @@
+/* Variables de colores */
+:root {
+    --primary-color: #2a3b8f;
+    --secondary-color: #e2f1f8;
+    --accent-color: #2a3b8f;
+    --text-color: #333;
+    --light-text: #666;
+    --border-color: #ddd;
+    --success-color: #2a3b8f;
+    --hover-color: #f8f8f8;
+    --error-color: #e63946;
+}
+
+/* Estilos generales */
+.no-recibimos-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+    color: var(--text-color);
+}
+
+h1, h2, h3 {
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Banner de bienvenida (adaptado del FAQ) */
+.welcome-banner {
+    background-color: var(--secondary-color);
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 35px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-banner::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100%;
+    background-image: url('/static/img/logo.png');
+    background-size: 60%;
+    background-position: center right 30px;
+    background-repeat: no-repeat;
+    opacity: 0.1;
+}
+
+.welcome-content h2 {
+    font-size: 32px;
+    font-weight: bolder;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.welcome-content p {
+    font-size: 16px;
+    color: var(--light-text);
+    max-width: 600px;
+    display: flex;
+    align-items: center;
+}
+
+.welcome-content p::before {
+    content: "\f06a";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 18px;
+    color: var(--primary-color);
+    margin-right: 10px;
+}
+
+/* Estilos del grid de productos */
+.productos-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+@media (max-width: 1100px) {
+    .productos-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .productos-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .productos-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 400px) {
+    .productos-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Estilos de las tarjetas de producto */
+.producto-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+
+.producto-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.producto-icono {
+    width: 100px;
+    height: 100px;
+    background-color: var(--secondary-color);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.producto-icono img {
+    max-width: 60%;
+    max-height: 60%;
+    object-fit: contain;
+}
+
+.producto-titulo {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    margin: 10px 0;
+}
+
+.producto-descripcion {
+    color: var(--light-text);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Estilos del banner informativo */
+.banner-informacion {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 5px solid var(--primary-color);
+}
+
+.info-icon {
+    margin-right: 20px;
+}
+
+.info-icon i {
+    font-size: 2rem;
+    color: var(--primary-color);
+}
+
+.info-texto h3 {
+    margin: 0 0 10px 0;
+    color: var(--primary-color);
+}
+
+.info-texto p {
+    margin: 0;
+    color: var(--light-text);
+}
+
+.info-texto a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.info-texto a:hover {
+    text-decoration: underline;
+}

@@ -2,7 +2,7 @@ from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select
 import controladores.bd as bd
 #####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####
 
-table_name = 'tamaño_caja'
+table_name = 'causa_reclamo'
 
 def get_info_columns():
     return show_columns(table_name)
@@ -36,70 +36,68 @@ def table_fetchall():
     
     return resultados
 
-
 def get_table():
-    table_name = 'tamaño_caja'  # Nombre de la tabla
-    sql = f'''
-        SELECT 
-            *
-        FROM {table_name} 
+    sql= f'''
+        select 
+            ca.id ,
+            ca.nombre ,
+            ca.descripcion,
+            mot.nombre as nom_mot 
+        from {table_name} ca
+        inner join motivo_reclamo mot on mot.id = ca.motivo_reclamoid
+        order by ca.id asc
     '''
     columnas = {
-        'id': ['ID', 0.5],
-        'nombre': ['Nombre', 4.5],
-        'activo': ['Actividad', 1]
+        'id': ['ID' , 0.5 ] , 
+        'nombre' : ['Nombre' , 3] , 
+        'descripcion' : ['descripcion' , 3] , 
+        'nom_motivo' : ['Motivo de reclamo' , 3],
     }
     filas = sql_select_fetchall(sql)
     
-    return columnas, filas
-
+    return columnas , filas
 
 
 ######_ CRUD ESPECIFICAS _###### 
 
-def unactive_row( id ):
-    unactive_row_table(table_name , id)
+def unactive_row(id):
+    unactive_row_table({table_name}, id)
 
 
-def insert_row( nombre):
+def insert_row(nombre, descripcion , motivo_reclamoid):
     sql = f'''
         INSERT INTO 
-            {table_name} 
-            ( nombre , activo )
+            motivo_reclamo (nombre,descripcion,motivo_reclamoid) 
         VALUES 
-            ( UPPER(%s), 1 )
+            (%s, %s, %s)
     '''
-    sql_execute(sql,( nombre ))
+    sql_execute(sql, (nombre, descripcion , motivo_reclamoid))
 
 
-def update_row( id , nombre):
+def update_row(nombre, descripcion, motivo_reclamoid, id):
     sql = f'''
-        update {table_name} set 
-        nombre = UPPER(%s)
+        UPDATE {table_name} SET 
+            nombre = %s,
+            descripcion =%s,
+            motivo_reclamoid = %s
         where {get_primary_key()} = {id}
     '''
-    sql_execute(sql, (nombre ))
+    sql_execute(sql, (nombre, descripcion,motivo_reclamoid))
 
 
 #####_ ADICIONALES _#####
 
 def get_options():
     sql= f'''
-        select 
-            {get_primary_key()} ,
+        SELECT 
+            id,
             nombre
-        from {table_name}
+        FROM {table_name}
         where activo = 1
-        order by nombre asc
+        ORDER BY nombre asc
     '''
     filas = sql_select_fetchall(sql)
     
-    lista = [(fila[get_primary_key()], fila["nombre"]) for fila in filas]
+    lista = [(fila[get_primary_key()], fila['nombre']) for fila in filas]
 
     return lista
-
-
-
-
-
-

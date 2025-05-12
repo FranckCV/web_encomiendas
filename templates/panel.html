@@ -14,21 +14,10 @@ Panel Administrativo
 </style>
 
 <style>
-    .crud_title {
-        margin-bottom: 20px;
-        /* color: white; */
-    }
-
-    .section_content {
-        /* background-color: transparent; */
-        /* background-color: #3c3c3c; */
-    }
-
-    .panel_cell {
-        /* box-shadow: 0px 0px 10px #0000008f; */
-        /* background-color: white; */
-        /* background-color: white; */
-    }
+.b_text {
+    margin-bottom: 20px;
+    font-size: 120%;
+}
 </style>
 
 {% endblock %}
@@ -42,47 +31,19 @@ Panel Administrativo
         Panel Administrativo
     </h3>
 </div>
+<div class="block_crud b_text">
+    Seleccione un modulo:
+</div>
 
 <div class="block_crud block_panel">
+
     {% for modulo in listar_pages_admin %}
-    <div class="panel_cell">
-        <div class="cell_title">
-            <i class="{{ modulo[1] }}"></i>
-            <div>{{ modulo[0] }}</div>
-        </div>
-
-        {% if modulo[2] %}
-        <a class="link_dashboard" href="{{url_for('dashboard',module_name = modulo[5] )}}">
-            <i class="{{ICON_PAGE_DASHBOARD}}"></i>
-        </a>
-        {% endif %}
-
-        <div class="line_separator"></div>
-        <div class="cell_content">
-            {% if modulo[3] or modulo[4] %}
-            {% if modulo[3] %}
-            {% for page in modulo[3] %}
-            <a class="panel_link link_crud" href="{{url_for('crud_generico' , tabla = page[0] )}}">
-                <i class="{{ page[2] }}"></i>
-                <p> {{NOMBRE_CRUD_PAGE}} {{ page[1] }} </p>
-            </a>
-            {% endfor %}
-            {% endif %}
-
-            {% if modulo[4] %}
-            {% for page in modulo[4] %}
-            <a class="panel_link link_report" href="{{url_for('reporte' , report_name = page[0] )}}">
-                <i class="{{ page[2] }}"></i>
-                <p>Reporte de {{ page[1] }} </p>
-            </a>
-            {% endfor %}
-            {% endif %}
-            {% else %}
-            <p class="cell_empty">Sin contenido</p>
-            {% endif %}
-        </div>
-    </div>
+    <a href="{{url_for('dashboard',module_name = modulo[5] )}}" class="panel_cell cell_module">
+        <i class="{{ modulo[1] }}"></i>
+        <div>{{ modulo[0] }}</div>
+    </a>
     {% endfor %}
+
 </div>
 
 {% endblock %}

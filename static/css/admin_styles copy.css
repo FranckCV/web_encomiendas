@@ -906,6 +906,11 @@ label {
 }
 
 
+
+
+
+
+
 .block_report {
     display: grid;
 }
@@ -918,10 +923,9 @@ label {
 
 .block_panel {
     display: grid;
-    gap: 35px;
+    gap: 20px;
     grid-template-columns: repeat(4, 1fr);
     height: 100%;
-    align-content: flex-start;
 }
 
 .panel_cell {
@@ -938,31 +942,12 @@ label {
     position: relative;
 }
 
-.cell_module {
-    font-size: 130%;
-    align-items: center;
-    text-align: center;
-}
-
-.cell_module i {
-    font-size: 175%;
-    color: var(--color-sec);
-}
-
-.cell_module:hover {
-    box-shadow: 0px 0px 15px var(--color-sec);
-    scale: 1.05;
-}
-
-.cell_module:hover i {
-    scale: 1.25;
-}
-
 .panel_cell * {
     display: flex;
     align-items: center;
     justify-content: flex-start;
 }
+
 
 .cell_title {
     gap: 10px;
@@ -970,6 +955,7 @@ label {
     font-size: 115%;
     align-self: flex-start;
     padding-inline: 10px;
+    color: var(--color-sec);
     filter: saturate(195%);
     position: relative;
     /* width: 100%; */

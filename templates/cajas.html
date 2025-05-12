@@ -58,8 +58,11 @@ Producto - Caja Shalom
 
             <div class="selector-cantidad">
                 <button class="qty-btn decrease">-</button>
-                <input type="text" class="qty-input" value="1" readonly>
+                <input type="number" class="qty-input" value="1" min="1">
                 <button class="qty-btn increase">+</button>
+            </div>
+            <div class="quantity-limit-container">
+                <span class="quantity-limit"> Máximo: 100 unidades</span>
             </div>
 
             <button type="button" class="btn-agregar">
@@ -78,32 +81,13 @@ Producto - Caja Shalom
         </div>
     </div>
     
-    <!-- Sección de productos relacionados -->
-    <div class="productos-relacionados">
-        <h2>También te puede interesar</h2>
-        <div class="productos-grid">
-            <div class="producto-item">
-                <img src="/static/img/plumon.png" alt="Plumon Indeleble">
-                <h3>Plumon Indeleble</h3>
-                <p>S/ 3.50</p>
-            </div>
-            <div class="producto-item">
-                <img src="/static/img/cintaEmbalaje.png" alt="Cinta de Empaque">
-                <h3>Cinta de Embalaje</h3>
-                <p>S/ 5.90</p>
-            </div>
-            <div class="producto-item">
-                <img src="/static/img/sobre.png" alt="Sobres Manila">
-                <h3>Sobres A4</h3>
-                <p>S/ 12.00</p>
-            </div>
-            <div class="producto-item">
-                <img src="/static/img/burbupack.png" alt="Burbupack">
-                <h3>Burbupack</h3>
-                <p>S/ 2.50</p>
+        <!-- Miniaturas de navegación -->
+        <div class="producto-thumbs">
+            <h3>Nuestros productos</h3>
+            <div id="thumbs-container" class="thumbs-container">
+                <!-- Las miniaturas se cargarán dinámicamente -->
             </div>
         </div>
-    </div>
 </div>
 {% endblock %}
 

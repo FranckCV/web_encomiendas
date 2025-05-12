@@ -2,7 +2,7 @@ from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select
 import controladores.bd as bd
 #####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####
 
-table_name = 'modelo'
+table_name = 'motivo_reclamo'
 
 def get_info_columns():
     return show_columns(table_name)
@@ -36,31 +36,23 @@ def table_fetchall():
     
     return resultados
 
-
 def get_table():
     sql= f'''
         select 
             mo.id ,
             mo.nombre ,
-            mar.nombre as nom_mar,
-            tip.nombre as nom_tip ,
-            mo.tipo_unidadid ,
-            mo.marcaid ,
-            mo.activo
+            mo.descripcion,
+            tip.nombre as nom_tip 
         from {table_name} mo
-        inner join marca mar on mar.id = mo.marcaid 
-        inner join tipo_unidad tip on tip.id = mo.tipo_unidadid
-
-
+        inner join tipo_reclamo tip on tip.id = mo.tipo_reclamoid
         order by mo.id asc
     '''
     columnas = {
         'id': ['ID' , 0.5 ] , 
         'nombre' : ['Nombre' , 3] , 
-        'nom_mar' : ['Marca' , 3 ] , 
-        'nom_tip' : ['Tipo de Unidad' , 3] ,
-        'activo' : ['Actividad' , 1]
-        }
+        'descripcion' : ['descripcion' , 3] , 
+        'nom_tip' : ['Tipo de Reclamo' , 3],
+    }
     filas = sql_select_fetchall(sql)
     
     return columnas , filas
@@ -68,57 +60,44 @@ def get_table():
 
 ######_ CRUD ESPECIFICAS _###### 
 
-def unactive_row( id ):
-    unactive_row_table(table_name , id)
+def unactive_row(id):
+    unactive_row_table({table_name}, id)
 
 
-# def insert_row( nombre , marcaid , tipo_unidadid ):
-#     sql = f'''
-#         INSERT INTO 
-#             {table_name} 
-#             ( nombre , marcaid , tipo_unidadid )
-#         VALUES 
-#             ( '{nombre}' , '{marcaid}' , '{tipo_unidadid}' )
-#     '''
-#     sql_execute(sql)
-
-
-def insert_row( nombre , marcaid , tipo_unidadid ):
+def insert_row(nombre, descripcion , tipo_reclamoid):
     sql = f'''
         INSERT INTO 
-            {table_name} ( nombre , marcaid , tipo_unidadid ) 
+            motivo_reclamo (nombre,descripcion,tipo_reclamoid) 
         VALUES 
-            ( %s ,  %s , %s )
+            (%s, %s, %s)
     '''
-    sql_execute(sql,( nombre , marcaid , tipo_unidadid ))
+    sql_execute(sql, (nombre, descripcion , tipo_reclamoid))
 
 
-def update_row( nombre , marcaid , tipo_unidadid , id):
+def update_row(nombre, descripcion, tipo_reclamoid, id):
     sql = f'''
-        update {table_name} set 
-        nombre = %s,
-        marcaid = %s ,
-        tipo_unidadid = %s
+        UPDATE {table_name} SET 
+            nombre = %s,
+            descripcion =%s,
+            tipo_reclamoid = %s
         where {get_primary_key()} = {id}
     '''
-    sql_execute(sql,(nombre , marcaid , tipo_unidadid))
+    sql_execute(sql, (nombre, descripcion,tipo_reclamoid))
 
 
 #####_ ADICIONALES _#####
 
 def get_options():
     sql= f'''
-        select 
-            {get_primary_key()} ,
+        SELECT 
+            id,
             nombre
-        from {table_name}
-        order by nombre asc
+        FROM {table_name}
+        where activo = 1
+        ORDER BY nombre asc
     '''
     filas = sql_select_fetchall(sql)
     
-    lista = [(fila[get_primary_key()], fila["nombre"]) for fila in filas]
+    lista = [(fila[get_primary_key()], fila['nombre']) for fila in filas]
 
     return lista
-
-
-

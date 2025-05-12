@@ -226,7 +226,11 @@
   <form class="modal_crud_content" action="{{ url_for('crud_unactive', tabla = tabla) }}" method="POST">
 
     <div class="row">
-      <h3>{{NOMBRE_BTN_UNACTIVE}} {{nombre_tabla}} </h3>
+      <h3>{% if fila['activo'] == 0 %}
+        {{ ACT_STATE_1  }}
+        {% elif fila['activo'] == 1 %}
+        {{ ACT_STATE_0  }}
+        {% endif %} {{nombre_tabla}} </h3>
       <!-- <hr> -->
     </div>
     <input type="hidden" name="{{primary_key}}" id="{{primary_key}}" value="{{fila[primary_key]}}">

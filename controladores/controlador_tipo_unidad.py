@@ -49,7 +49,7 @@ def get_table():
     '''
     columnas = {
         'id': ['ID' , 0.5] , 
-        'nombre' : ['Nombre' , 4.5] , 
+        'nombre' : ['Nombre' , 2] , 
         'descripcion' : ['Descripción' , 4.5] , 
         'activo' : ['Actividad' , 1] 
         }

@@ -21,10 +21,6 @@ Productos de Embalaje
     <div class="producto-detalle">
         <div class="producto-imagen">
             <img id="producto-img" src="/static/img/caja-shalom.jpg" alt="Caja Shalom">
-            <div class="navigation-arrows">
-                <button id="prev-btn" class="nav-arrow"><i class="fa-solid fa-chevron-left"></i></button>
-                <button id="next-btn" class="nav-arrow"><i class="fa-solid fa-chevron-right"></i></button>
-            </div>
             <div id="size-options" class="size-options">
                 <!-- Los botones de tamaño se cargarán dinámicamente si el producto los tiene -->
             </div>
@@ -52,8 +48,11 @@ Productos de Embalaje
 
             <div class="selector-cantidad">
                 <button class="qty-btn decrease">-</button>
-                <input type="text" class="qty-input" value="1" readonly>
+                <input type="number" class="qty-input" value="1" min="1">
                 <button class="qty-btn increase">+</button>
+            </div>
+            <div class="quantity-limit-container">
+                <span class="quantity-limit">Máximo: 100 unidades</span>
             </div>
 
             <button type="button" class="btn-agregar">
@@ -69,14 +68,6 @@ Productos de Embalaje
                     <h3>¡Compra al por mayor y obtén super descuentos!</h3>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- Sección de productos relacionados -->
-    <div class="productos-relacionados">
-        <h2>También te puede interesar</h2>
-        <div id="productos-relacionados-grid" class="productos-grid">
-            <!-- Los productos relacionados se cargarán dinámicamente -->
         </div>
     </div>
 
