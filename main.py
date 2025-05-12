@@ -22,6 +22,10 @@ from controladores import controlador_motivo_reclamo as controlador_motivo_recla
 from controladores import controlador_causa_reclamo as controlador_causa_reclamo
 from controladores import controlador_tipo_empaque as controlador_tipo_empaque
 from controladores import controlador_tipo_recepcion as controlador_tipo_recepcion
+from controladores import controlador_tipo_cliente as controlador_tipo_cliente
+from controladores import controlador_usuario as controlador_usuario
+from controladores import controlador_cliente as controlador_cliente
+from controladores import controlador_rol as controlador_rol
 
 
 import configuraciones
@@ -553,20 +557,22 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
+
     "empleado": {
         "active": True,
-        "titulo": "empleados del sistema",
+        "titulo": "empleados",
         "nombre_tabla": "empleado",
         "controlador": controlador_empleado,
-        "icon_page": "fa-solid fa-user-tie",
-        "filters": [],
+        "icon_page": 'fa-solid fa-id-card',
+        "filters": [
+            ['rolid', 'Rol', lambda: controlador_rol.get_options()],
+        ],
         "fields_form": [
-    #   ID/NAME         LABEL              PLACEHOLDER       TYPE      REQUIRED  ABLE/DISABLE   DATOS
-        ['usuarioid',    'Usuario ID',      'Usuario ID',      'text',   False ,   False ,        None ],
-        ['nombre',       'Nombre',          'Nombre',          'text',   True ,    True ,         None ],
-        ['ape_paterno',  'Apellido Paterno','Apellido Paterno','text',   True ,    True ,         None ],
-        ['ape_materno',  'Apellido Materno','Apellido Materno','text',   True ,    True ,         None ],
-        ['cargoid',      'Cargo',           'Cargo',           'select', True ,    None ,         None],#[controlador_cargo.get_options(), 'nombre'] ],
+            ['usuarioid', 'ID', 'ID', 'text', False, False, True],
+            ['nombre', 'Nombre', 'Nombre', 'text', True, True, True],
+            ['apellidos', 'Apellidos', 'Apellidos', 'text', True, True, True],
+            ['correo', 'Correo electrónico', 'Correo', 'email', True, True, True],
+            ['rolid', 'Rol', 'Seleccionar rol', 'select', True, True, [lambda: controlador_rol.get_options(), 'nombre']],
         ],
         "crud_forms": {
             "crud_list": True,
@@ -575,7 +581,7 @@ CONTROLADORES = {
             "crud_insert": True,
             "crud_update": True,
             "crud_delete": True,
-            "crud_unactive": True,
+            "crud_unactive": False
         }
     },
     "estado_reclamo": {
@@ -731,6 +737,118 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
+    "tipo_cliente": {
+        "active" : True ,
+        "titulo": "tipos de clientes",
+        "nombre_tabla": "tipo de cliente",
+        "controlador": controlador_tipo_cliente,
+        "icon_page": 'fa-solid fa-layer-group',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "usuario": {
+        "active" : True ,
+        "titulo": "Usuarios",
+        "nombre_tabla": "usuario",
+        "controlador": controlador_usuario,
+        "icon_page": 'fa-solid fa-user',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['correo',      'correo',          'Correo',      'text',     True ,     True  ,        None ],
+            ['contrasenia',      'contrasenia',          'Contraseña',      'password',     True ,     True  ,        None ],
+            ['tipo_usuario',      'tipo_usuario',          'Tipo de usuario',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+
+    "cliente": {
+        "active": True,
+        "titulo": "clientes",
+        "nombre_tabla": "cliente",
+        "controlador": controlador_cliente,
+        "icon_page": 'fa-solid fa-user',
+        "filters": [
+            ['tipo_documentoid', 'Tipo de documento', lambda: controlador_tipo_documento.get_options()],
+            ['tipo_clienteid', 'Tipo de cliente', lambda: controlador_tipo_cliente.get_options()],
+        ],
+        "fields_form": [
+            # ID/NAME           LABEL                    PLACEHOLDER          TYPE        REQUIRED  ENABLE      DATOS
+            ['id',       'ID',                    'ID',                'text',     False,    False,      True ],
+            ['nombre_siglas',   'Nombre o Siglas',       'Nombre',            'text',     True,     True,       True ],
+            ['apellidos_razon', 'Apellidos/Razón Social','Apellidos o razón', 'text',     True,     True,       True ],
+            ['correo',          'Correo',                'Correo electrónico','email',    True,     True,       True ],
+            ['telefono',        'Teléfono',              'Teléfono',          'text',     False,    True,       True ],
+            ['num_documento',   'N° Documento',          'Número doc.',       'text',     True,     True,       True ],
+            ['tipo_documentoid','Tipo de Documento',     'Seleccionar',       'select',   True,     True,       [lambda: controlador_tipo_documento.get_options(), 'siglas'] ],
+            ['tipo_clienteid',  'Tipo de Cliente',       'Seleccionar',       'select',   True,     True,       [lambda: controlador_tipo_cliente.get_options(), 'nombre'] ],
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": False  # Solo si tienes columna 'activo'
+        }
+    },
+    "rol": {
+        "active": True,
+        "titulo": "roles",
+        "nombre_tabla": "rol",
+        "controlador": controlador_rol,
+        "icon_page": 'fa-solid fa-user-shield',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active()],
+            ['tipo_rolid', 'Tipo de Rol', lambda: controlador_tipo_rol.get_options()],
+        ],
+        "fields_form": [
+            ['id', 'ID', 'ID', 'text', False, False, True],
+            ['nombre', 'Nombre del Rol', 'Rol', 'text', True, True, True],
+            ['descripcion', 'Descripción', 'Descripción del rol', 'textarea', False, True, None],
+            ['activo', f'{TITLE_STATE}', 'activo', 'p', True, True, None],
+            ['tipo_rolid', 'Tipo de Rol', 'Seleccionar', 'select', True, True, [lambda: controlador_tipo_rol.get_options(), 'nombre']],
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": True
+        }
+    },
+
 }
 
 
@@ -928,7 +1046,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : 'fa-solid fa-box',
         'dashboard' : True,
-        'cruds' :     [ 'estado_encomienda','tipo_paquete','tipo_documento' ],
+        'cruds' :     [ 'estado_encomienda','tipo_paquete', 'tipo_cliente', 'cliente' ],
         'reports' :   [ 
             'envios_tipo' , 
             'entregado_pendiente' ,
@@ -956,7 +1074,7 @@ MENU_ADMIN = {
         'active': True,
         'icon_page' : 'fa-solid fa-shield-halved',
         'dashboard' : False,
-        'cruds' :     [  ],
+        'cruds' :     [ 'usuario' ],
         'reports' :   [  ],
     },
     'personal' : {
