@@ -2,7 +2,7 @@ from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select
 import controladores.bd as bd
 #####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####
 
-table_name = 'tamaño_caja'
+table_name = 'tipo_empaque'
 
 def get_info_columns():
     return show_columns(table_name)
@@ -38,21 +38,26 @@ def table_fetchall():
 
 
 def get_table():
-    table_name = 'tamaño_caja'  # Nombre de la tabla
-    sql = f'''
-        SELECT 
-            *
-        FROM {table_name} 
+    sql= f'''
+        select 
+            tip.id ,
+            tip.nombre ,
+            tip.peso_maximo ,
+            tip.unidad_medida ,
+            tip.activo 
+        from {table_name} tip
+
     '''
     columnas = {
-        'id': ['ID', 0.5],
-        'nombre': ['Nombre', 4.5],
-        'activo': ['Actividad', 1]
-    }
+        'id': ['ID' , 0.5 ] , 
+        'nombre' : ['Nombre' , 5 ] , 
+        'peso_maximo' : ['Peso Máximo' , 2] , 
+        'unidad_medida' : ['Unidad de Medida' , 2] , 
+        'activo' : ['Actividad' , 1] 
+        }
     filas = sql_select_fetchall(sql)
     
-    return columnas, filas
-
+    return columnas , filas
 
 
 ######_ CRUD ESPECIFICAS _###### 
@@ -61,24 +66,25 @@ def unactive_row( id ):
     unactive_row_table(table_name , id)
 
 
-def insert_row( nombre):
+def insert_row( nombre , descripcion=None ):
     sql = f'''
         INSERT INTO 
             {table_name} 
-            ( nombre , activo )
+            ( nombre , descripcion , activo )
         VALUES 
-            ( UPPER(%s), 1 )
+            ( %s , %s , 1 )
     '''
-    sql_execute(sql,( nombre ))
+    sql_execute(sql,( nombre , descripcion ))
 
 
-def update_row( id , nombre):
+def update_row( id , nombre , descripcion ):
     sql = f'''
         update {table_name} set 
-        nombre = UPPER(%s)
+        nombre = %s ,
+        descripcion = %s
         where {get_primary_key()} = {id}
     '''
-    sql_execute(sql, (nombre ))
+    sql_execute(sql, (nombre , descripcion ))
 
 
 #####_ ADICIONALES _#####

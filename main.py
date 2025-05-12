@@ -7,19 +7,21 @@ from controladores import controlador_tipo_unidad as controlador_tipo_unidad
 from controladores import controlador_modelo as controlador_modelo
 from controladores import controlador_ubigeo as controlador_ubigeo
 from controladores import controlador_sucursal as controlador_sucursal
-from controladores import controlador_tamaño_caja as controlador_tamaño_caja
+from controladores import controlador_tamanio_caja as controlador_tamanio_caja
 from controladores import controlador_tipo_rol as controlador_tipo_rol
 from controladores import controlador_tipo_paquete as controlador_tipo_paquete
 from controladores import controlador_estado_encomienda as controlador_estado_encomienda
 from controladores import controlador_tipo_documento as controlador_tipo_documento
 from controladores import controlador_tipo_comprobante as controlador_tipo_comprobante
 from controladores import controlador_empleado as controlador_empleado
-from  controladores import controlador_estado_reclamo as controlador_estado_reclamo
+from controladores import controlador_estado_reclamo as controlador_estado_reclamo
 from controladores import controlador_metodo_pago as controlador_metodo_pago
 from controladores import controlador_tipo_indemnizacion as controlador_tipo_indemnizacion
 from controladores import controlador_tipo_reclamo as controlador_tipo_reclamo
 from controladores import controlador_motivo_reclamo as controlador_motivo_reclamo
 from controladores import controlador_causa_reclamo as controlador_causa_reclamo
+from controladores import controlador_tipo_empaque as controlador_tipo_empaque
+from controladores import controlador_tipo_recepcion as controlador_tipo_recepcion
 
 
 import configuraciones
@@ -346,11 +348,62 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
+    "tipo_empaque": {
+        "active" : True ,
+        "titulo": "tipos de empaques para paquetes",
+        "icon_page": 'fa-solid fa-truck-plane',
+        "nombre_tabla": "tipo de empaque",
+        "controlador": controlador_tipo_empaque,
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "tipo_recepcion": {
+        "active" : True ,
+        "titulo": "tipos de recepción de paquetes",
+        "icon_page": 'fa-solid fa-truck-plane',
+        "nombre_tabla": "tipo de recepción de paquete",
+        "controlador": controlador_tipo_recepcion,
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+
     "tamaño_caja": {
         "active" : True ,
         "titulo": "tamaños de cajas",
         "nombre_tabla": "tamaño de caja",
-        "controlador": controlador_tamaño_caja,
+        "controlador": controlador_tamanio_caja,
         "icon_page": 'fa-solid fa-box-open',
         "filters": [
             ['activo', f'{TITLE_STATE}', get_options_active() ],
@@ -600,59 +653,59 @@ CONTROLADORES = {
             "crud_unactive": True,
         }
     },
-     "tipo_reclamo": {
-        "active" : True ,
-        "titulo": "tipos de reclamos",
-        "icon_page": 'fa-solid fa-book-open-reader',
-        "nombre_tabla": "tipo de reclamo",
-        "controlador": controlador_tipo_reclamo,
-        "filters": [
-            ['activo', f'{TITLE_STATE}', get_options_active() ],
-        ] ,
-        "fields_form": [
+    "tipo_reclamo": {
+    "active" : True ,
+    "titulo": "tipos de reclamos",
+    "icon_page": 'fa-solid fa-book-open-reader',
+    "nombre_tabla": "tipo de reclamo",
+    "controlador": controlador_tipo_reclamo,
+    "filters": [
+        ['activo', f'{TITLE_STATE}', get_options_active() ],
+    ] ,
+    "fields_form": [
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
-     "motivo_reclamo": {
-        "active" : True ,
-        "titulo": "Motivo de reclamo",
-        "nombre_tabla": "motivo_reclamo",
-        "controlador": controlador_motivo_reclamo,
-        "icon_page": '',
-        "filters": [
-            ['tipo_reclamoid', 'Tipo de reclamo', lambda: controlador_tipo_reclamo.get_options() ],
-        ] ,
-        "fields_form": [
+        ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+        ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+        ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+    ],
+    "crud_forms": {
+        "crud_list": True ,
+        "crud_search": True ,
+        "crud_consult": True ,
+        "crud_insert": True ,
+        "crud_update": True ,
+        "crud_delete": True ,
+        "crud_unactive": True ,
+    }
+},
+    "motivo_reclamo": {
+    "active" : True ,
+    "titulo": "Motivo de reclamo",
+    "nombre_tabla": "motivo_reclamo",
+    "controlador": controlador_motivo_reclamo,
+    "icon_page": '',
+    "filters": [
+        ['tipo_reclamoid', 'Tipo de reclamo', lambda: controlador_tipo_reclamo.get_options() ],
+    ] ,
+    "fields_form": [
 #            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
-            ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
-            ['tipo_reclamoid',  'Nombre de tipo de reclamo', 'Elegir tipo de reclamo', 'select',    True ,     True, [lambda: controlador_tipo_reclamo.get_options() , 'nom_tip' ] ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
-     "causa_reclamo": {
+        ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
+        ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+        ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+        ['tipo_reclamoid',  'Nombre de tipo de reclamo', 'Elegir tipo de reclamo', 'select',    True ,     True, [lambda: controlador_tipo_reclamo.get_options() , 'nom_tip' ] ],
+    ],
+    "crud_forms": {
+        "crud_list": True ,
+        "crud_search": True ,
+        "crud_consult": True ,
+        "crud_insert": True ,
+        "crud_update": True ,
+        "crud_delete": True ,
+        "crud_unactive": True ,
+    }
+},
+    "causa_reclamo": {
         "active" : True ,
         "titulo": "Causa de reclamo",
         "nombre_tabla": "causa_reclamo",
@@ -1120,7 +1173,7 @@ def panel():
 
 
 @app.route("/crud=<tabla>")
-@validar_admin()
+# @validar_admin()
 def crud_generico(tabla):
     config = CONTROLADORES.get(tabla)
     if config:

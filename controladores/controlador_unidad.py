@@ -44,11 +44,14 @@ def get_table():
         select 
             ud.id ,
             ud.placa,
+            ud.mtc,
+            ud.tuc,
             ud.capacidad ,
             ud.volumen ,
-            ud.observaciones ,
-            ud.activo ,
+            ud.descripcion ,
+            ud.estado ,
             ud.modeloid ,
+
             mo.nombre as nom_modelo ,
             tip.id ,
             tip.nombre as nom_tipounidad ,
@@ -64,12 +67,13 @@ def get_table():
     columnas = {
         'id':['ID' , 0.5] , 
         'placa' : ['Placa' , 1.5]  , 
-        'nom_modelo' : ['Modelo' , 1.5] ,
+        'mtc' : ['MTC' , 1.5]  , 
+        'tuc' : ['TUC' , 1.5]  , 
         'nom_tipounidad' : ['Tipo de unidad' , 1.5] ,
+        'nom_modelo' : ['Modelo' , 1.5] ,
         'nom_marca' :     ['Marca' , 1.5] ,
         'capacidad' : ['Capacidad (kg)' , 1 ] , 
         'volumen' : ['Volumen (m³)' , 1 ] ,
-        'activo' : ['Actividad', 1 ] ,
         }
     filas = sql_select_fetchall(sql)
     
