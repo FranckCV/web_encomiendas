@@ -1098,13 +1098,10 @@ MENU_ADMIN = {
         'name' : 'Seguridad',
         'active': True,
         'icon_page' : 'fa-solid fa-shield-halved',
-<<<<<<< HEAD
         'dashboard' : True,
         'cruds' :     [  ],
-=======
-        'dashboard' : False,
+    'dashboard' : False,
         'cruds' :     [ 'usuario' ],
->>>>>>> ba89b4d41428adc75890ed9a94ca15efc3bdbea7
         'reports' :   [  ],
     },
     'personal' : {
