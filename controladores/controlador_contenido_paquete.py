@@ -2,7 +2,7 @@ from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select
 import controladores.bd as bd
 #####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####
 
-table_name = 'tipo_paquete'
+table_name = 'contenido_paquete'
 
 def get_info_columns():
     return show_columns(table_name)
