@@ -30,7 +30,6 @@ from controladores import controlador_cliente as controlador_cliente
 from controladores import controlador_rol as controlador_rol
 from controladores import controlador_articulo as controlador_articulo
 
-
 import configuraciones
 from functools import wraps
 import inspect
@@ -1162,9 +1161,9 @@ MENU_ADMIN = {
         'name' : 'Seguridad',
         'active': True,
         'icon_page' : 'fa-solid fa-shield-halved',
+        'dashboard' : True,
+        'cruds' :     [  ],
         'dashboard' : False,
-        'cruds' :     [ 'usuario' ],
-        'reports' :   [  ],
     },
     'personal' : {
         'name' : 'Personal',   
