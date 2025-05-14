@@ -28,10 +28,7 @@ from controladores import controlador_tipo_cliente as controlador_tipo_cliente
 from controladores import controlador_usuario as controlador_usuario
 from controladores import controlador_cliente as controlador_cliente
 from controladores import controlador_rol as controlador_rol
-<<<<<<< HEAD
-=======
 from controladores import controlador_articulo as controlador_articulo
->>>>>>> a03340746bc67cf427659936493a9ee984b7a049
 
 import configuraciones
 from functools import wraps
