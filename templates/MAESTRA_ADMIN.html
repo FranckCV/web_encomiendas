@@ -33,7 +33,7 @@
     </div>
 
     {% for modulo in listar_pages_admin %}
-    {% if modulo_actual == modulo[5] %}  
+    {% if modulo_actual == modulo[5] %}
     <div class="line_separator"></div>
     <div class="menu_option mu_active">
         <div class="menu_title">
@@ -61,7 +61,25 @@
     </div>
     {% endif %}
     {% endfor %}
+    
+    <div class="line_separator"></div>
 
+    <div class="menu_option">
+        <a class="menu_title" href="{{url_for('administrar_paginas')}}">
+            <p>{{NOMBRE_ADMINPAGES_PAGE}}</p>
+            <i class="ri-file-settings-fill"></i>
+        </a>
+    </div>
+    
+    <div class="line_separator"></div>
+
+    <div class="menu_option">
+        <a class="menu_title" href="">
+            <p>Información de la empresa</p>
+            <i class="ri-building-fill"></i>
+        </a>
+    </div>
+    
 
     <div class="menu_user">
         <div class="mu_content">

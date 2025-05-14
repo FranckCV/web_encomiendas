@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 05-05-2025 a las 14:30:17
+-- Tiempo de generación: 13-05-2025 a las 17:10:48
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.1.17
 
@@ -18,22 +18,236 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `color`
+-- Estructura de tabla para la tabla `acceso`
 --
 
-CREATE TABLE `color` (
-  `id` int(11) NOT NULL,
-  `nombre` varchar(200) NOT NULL,
-  `valor` varchar(15) NOT NULL
+CREATE TABLE `acceso` (
+  `paginaid` int(11) NOT NULL,
+  `rolid` int(11) NOT NULL,
+  `permiso` tinyint(1) NOT NULL,
+  `search` tinyint(1) NOT NULL,
+  `consult` tinyint(1) NOT NULL,
+  `insert` tinyint(1) NOT NULL,
+  `update` tinyint(1) NOT NULL,
+  `delete` tinyint(1) NOT NULL,
+  `unactive` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `articulo`
+--
+
+CREATE TABLE `articulo` (
+  `id` int(10) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `precio` decimal(9,2) NOT NULL,
+  `stock` int(11) NOT NULL,
+  `activo` tinyint(1) NOT NULL,
+  `img` mediumblob NOT NULL,
+  `dimensiones` varchar(20) DEFAULT NULL,
+  `tamaño_cajaid` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `color`
+-- Volcado de datos para la tabla `articulo`
 --
 
-INSERT INTO `color` (`id`, `nombre`, `valor`) VALUES
-(1, 'color1', '#370268'),
-(2, 'color2', '#00c552');
+INSERT INTO `articulo` (`id`, `nombre`, `precio`, `stock`, `activo`, `img`, `dimensiones`, `tamaño_cajaid`) VALUES
+(1, 'Accesorios para fiestas - Pack básico', 15.99, 100, 1, '', '20x15x10', 3),
+(2, 'Accesorios electrónicos - Audífonos', 39.90, 50, 1, '', '10x10x5', 2),
+(3, 'Artículos de limpieza - Set hogar', 25.50, 70, 1, '', '30x20x15', 4),
+(4, 'Artículos publicitarios - Llavero logo', 5.00, 200, 1, '', '5x3x1', 1),
+(5, 'Bisutería - Collar artesanal', 12.00, 150, 1, '', '10x10x2', 2),
+(6, 'Caja de cartón reforzada', 8.99, 300, 1, '', '40x30x30', 5),
+(7, 'Tarjetas personales - 100 unidades', 18.00, 80, 1, '', '9x5x1', 1),
+(8, 'Muebles - Mesa pequeña de madera', 120.00, 10, 1, '', '100x50x45', 5),
+(9, 'Ferretería - Juego de destornilladores', 22.90, 60, 1, '', '25x15x5', 3),
+(10, 'Alimentación - Pack snacks saludables', 14.50, 90, 1, '', '30x20x10', 3),
+(11, 'Cosméticos - Set de maquillaje', 35.00, 40, 1, '', '20x15x5', 3),
+(12, 'Electrohogar - Hervidor eléctrico', 75.00, 25, 1, '', '30x25x20', 4),
+(13, 'Juguetes - Muñeca interactiva', 49.99, 30, 1, '', '35x20x15', 4),
+(14, 'Material médico - Guantes (100u)', 9.50, 100, 1, '', '20x10x5', 2),
+(15, 'Medicinas - Kit primeros auxilios', 29.99, 45, 1, '', '25x15x8', 3),
+(16, 'Repuestos - Filtro de aire', 18.75, 60, 1, '', '15x15x5', 2),
+(17, 'Ropa y accesorios - Camiseta básica', 19.00, 120, 1, '', '30x25x2', 3),
+(18, 'Valija documentos - Carpeta reforzada', 11.00, 100, 1, '', '33x25x2', 3),
+(19, 'Útiles de escritorio - Pack escolares', 17.90, 150, 1, '', '25x20x5', 3),
+(20, 'Útiles de oficina - Organizador modular', 27.50, 40, 1, '', '30x20x10', 3);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `causa_reclamo`
+--
+
+CREATE TABLE `causa_reclamo` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(150) NOT NULL,
+  `descripcion` text DEFAULT NULL,
+  `motivo_reclamoid` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `causa_reclamo`
+--
+
+INSERT INTO `causa_reclamo` (`id`, `nombre`, `descripcion`, `motivo_reclamoid`) VALUES
+(1, 'Daño', 'El producto o servicio se ve afectado por un daño, lo que causa una demora en la entrega o en el servicio ofrecido.', 1),
+(2, 'Mercancía Peligrosa', 'La mercancía no puede ser procesada o transportada debido a que es peligrosa, lo que causa demoras en el servicio.', 1),
+(3, 'Atasco en Máquina', 'Un atasco o fallo en la maquinaria utilizada para el servicio o transporte causa una demora significativa.', 1),
+(4, 'Envío Incompleto', 'El envío no incluye todos los productos o elementos necesarios, lo que genera una demora adicional en la entrega final.', 1),
+(5, 'Entrega Incorrecta', 'El producto o servicio no llega al destinatario correcto, causando una demora para corregir el error.', 1),
+(6, 'Incumplimiento de Lead Time', 'El servicio no se cumple dentro del plazo acordado, generando una demora innecesaria.', 1),
+(7, 'Demora Devolución de Envío y/o Cargo', 'El proceso de devolución de productos o el manejo de cargos tiene demoras que afectan el tiempo de resolución del servicio.', 1),
+(8, 'Destrucción', 'Un evento que lleva a la destrucción del producto o servicio, causando una demora significativa en la entrega o reparación.', 1),
+(9, 'Recogido No Realizado', 'El servicio de recogida de productos no se ha realizado en el tiempo estimado, lo que causa una demora en el proceso.', 1),
+(10, 'Correctamente Motivado y Dentro del Plazo', 'El servicio está retrasado debido a una falta de motivación o coordinación dentro del plazo estipulado.', 1),
+(11, 'Problemas en Registro de Envíos', 'Los problemas relacionados con el registro del envío causan una demora en el proceso de entrega.', 1),
+(12, 'No Brinda Nº de Tracking', 'La falta de información sobre el número de seguimiento retrasa el proceso de entrega o resolución del servicio.', 1),
+(13, 'Factores Externos', 'Factores fuera del control de la empresa (como condiciones climáticas o imprevistos) que causan una demora en el servicio.', 1),
+(14, 'Errores Internos', 'Errores dentro del sistema o procesos internos que afectan la puntualidad y causan demoras.', 1),
+(15, 'Sin Despachar', 'El producto o servicio no se ha enviado, generando una demora sin justificación.', 1),
+(16, 'Demora en envío de Comprobantes', 'El comprobante de pago o factura no se envía a tiempo, causando inconvenientes con el cliente.', 2),
+(17, 'Facturas/Boletas mal emitidas', 'La facturación o boleta emitida contiene errores, lo que requiere correcciones y causa demoras en el proceso.', 2),
+(18, 'Cambios: Dirección fiscal-razón social-correo', 'Errores en la dirección fiscal, razón social o correo del cliente que deben ser corregidos para continuar con la facturación.', 2),
+(19, 'Rechazo NC', 'El rechazo de la nota de crédito causa demoras en el proceso de facturación y resolución del reclamo.', 2),
+(20, 'Cliente No realizó pago', 'El cliente no realizó el pago correspondiente, lo que afecta el proceso de facturación y entrega del servicio.', 2),
+(21, 'Solicitud de dev. de dinero', 'El cliente solicita la devolución del dinero, lo que retrasa el proceso de facturación y resolución del reclamo.', 2),
+(22, 'Solicitud de envío de NC / ND', 'El cliente solicita el envío de la nota de crédito o nota de débito, lo que causa retrasos en el proceso de facturación.', 2),
+(23, 'Regularización de Pago', 'El cliente realiza una regularización de pago, lo que genera una demora en la finalización del proceso de facturación.', 2),
+(24, 'Corte de Crédito', 'El corte de crédito impide que se continúe con el servicio hasta que el cliente resuelva su situación de pago, causando un retraso.', 2),
+(25, 'Pago de Deducción', 'El cliente realiza un pago por deducción que afecta el proceso de facturación, generando una demora en el cierre de la operación.', 2),
+(26, 'Extraviado', 'El producto o servicio ha sido extraviado durante el proceso de envío o entrega, generando la inconformidad del cliente.', 3),
+(27, 'Robado', 'El producto o servicio ha sido sustraído de manera ilícita durante el proceso de envío o entrega, lo que afecta al cliente.', 3),
+(28, 'Solicita cambio de clave', 'El cliente solicita un cambio de clave de seguridad debido a problemas con el acceso o seguridad.', 4),
+(29, 'Entregado sin clave', 'El producto o servicio fue entregado sin la clave de seguridad correspondiente, generando inconvenientes al cliente.', 4),
+(30, 'No cuenta con clave', 'El cliente no tiene acceso a la clave de seguridad requerida para completar el proceso o uso del servicio.', 4),
+(31, 'Mala Atención', 'La atención al cliente no cumple con los estándares de calidad esperados, con actitudes inadecuadas o falta de empatía.', 5),
+(32, 'Demora en Atención', 'La atención al cliente se demora más de lo esperado, generando inconvenientes y frustración para el usuario.', 5),
+(33, 'Mala Conducción de Unidad', 'El comportamiento inapropiado o deficiente por parte del personal de la unidad encargada del servicio afecta la calidad del mismo.', 5);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `cliente`
+--
+
+CREATE TABLE `cliente` (
+  `usuarioid` int(10) NOT NULL,
+  `correo` varchar(150) NOT NULL,
+  `telefono` varchar(15) DEFAULT NULL,
+  `num_documento` varchar(20) NOT NULL,
+  `nombre_siglas` varchar(150) NOT NULL,
+  `apellidos_razon` varchar(150) NOT NULL,
+  `tipo_documentoid` int(11) NOT NULL,
+  `tipo_clienteid` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `contenido_paquete`
+--
+
+CREATE TABLE `contenido_paquete` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(150) NOT NULL COMMENT ' \r\nACCESORIOS PARA FIESTAS\r\nACCESORIOS ELECTRÓNICOS\r\nARTÍCULOS DE LIMPIEZA\r\nARTÍCULOS PUBLICITARIOS\r\nBISUTERIA\r\nCAJA\r\nTARJETAS PERSONALES\r\nMUEBLES Y DECOHOGAR\r\nFERRETERÍA Y CONSTRUCCIÓN\r\nALIMENTACION Y BEBIDAS\r\nCOSMETICOS\r\nELECTROHOGAR\r\nJUGUETES\r\nMATERIAL MEDICO\r\nMEDICINAS\r\nREPUESTOS\r\nROPA Y ACCESORIOS\r\nVALIJA-DOCUMENTOS\r\nUTILES DE ESCRITORIO\r\nUTILES DE OFICINA\r\n ',
+  `activo` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `contenido_paquete`
+--
+
+INSERT INTO `contenido_paquete` (`id`, `nombre`, `activo`) VALUES
+(1, 'ACCESORIOS PARA FIESTAS', 1),
+(2, 'ACCESORIOS ELECTRÓNICOS', 1),
+(3, 'ARTÍCULOS DE LIMPIEZA', 1),
+(4, 'ARTÍCULOS PUBLICITARIOS', 1),
+(5, 'BISUTERIA', 1),
+(6, 'CAJA', 1),
+(7, 'TARJETAS PERSONALES', 1),
+(8, 'MUEBLES Y DECOHOGAR', 1),
+(9, 'FERRETERÍA Y CONSTRUCCIÓN', 1),
+(10, 'ALIMENTACION Y BEBIDAS', 1),
+(11, 'COSMETICOS', 1),
+(12, 'ELECTROHOGAR', 1),
+(13, 'JUGUETES', 1),
+(14, 'MATERIAL MEDICO', 1),
+(15, 'MEDICINAS', 1),
+(16, 'REPUESTOS', 1),
+(17, 'ROPA Y ACCESORIOS', 1),
+(18, 'VALIJA-DOCUMENTOS', 1),
+(19, 'UTILES DE ESCRITORIO', 1),
+(20, 'UTILES DE OFICINA', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `detalle_venta`
+--
+
+CREATE TABLE `detalle_venta` (
+  `articuloid` int(10) NOT NULL,
+  `ventanum_serie` int(11) NOT NULL,
+  `ventatipo_comprobanteid` int(10) NOT NULL,
+  `cantidad` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `empleado`
+--
+
+CREATE TABLE `empleado` (
+  `usuarioid` int(10) NOT NULL,
+  `nombre` varchar(150) NOT NULL,
+  `apellidos` varchar(150) NOT NULL,
+  `correo` int(11) DEFAULT NULL,
+  `rolid` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `empleado_salida`
+--
+
+CREATE TABLE `empleado_salida` (
+  `salidaid` int(10) NOT NULL,
+  `empleadousuarioid` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `empresa`
+--
+
+CREATE TABLE `empresa` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(200) NOT NULL,
+  `correo` varchar(200) NOT NULL,
+  `nro_telefono` varchar(20) NOT NULL,
+  `logo` mediumblob NOT NULL,
+  `color_pri` varchar(20) NOT NULL,
+  `color_sec` varchar(20) NOT NULL,
+  `color_ter` varchar(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `escala`
+--
+
+CREATE TABLE `escala` (
+  `sucursalid` int(10) NOT NULL,
+  `salidaid` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -44,22 +258,21 @@ INSERT INTO `color` (`id`, `nombre`, `valor`) VALUES
 CREATE TABLE `estado_encomienda` (
   `id` int(10) NOT NULL,
   `nombre` varchar(50) NOT NULL,
-  `descripcion` text NOT NULL,
+  `descripcion` text DEFAULT NULL,
   `activo` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
 --
--- Volcado de datos para la tabla `estado_encomienda`
+-- Estructura de tabla para la tabla `estado_reclamo`
 --
 
-INSERT INTO `estado_encomienda` (`id`, `nombre`, `descripcion`, `activo`) VALUES
-(1, 'Registrada', 'La encomienda ha sido registrada en el sistema.', 1),
-(2, 'En tránsito', 'La encomienda está siendo transportada al destino.', 1),
-(3, 'En sucursal destino', 'La encomienda llegó a la sucursal de destino y está lista para ser retirada o entregada.', 1),
-(4, 'Entregada', 'La encomienda fue entregada al destinatario.', 1),
-(5, 'Devuelta', 'La encomienda fue devuelta al remitente por motivos diversos.', 1),
-(6, 'Cancelada', 'La encomienda fue cancelada antes del envío.', 1),
-(7, 'Perdido', 'Cuando se pierde la encomienda, con todo y unidad de encomienda', 0);
+CREATE TABLE `estado_reclamo` (
+  `id` int(10) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -69,27 +282,52 @@ INSERT INTO `estado_encomienda` (`id`, `nombre`, `descripcion`, `activo`) VALUES
 
 CREATE TABLE `marca` (
   `id` int(11) NOT NULL,
-  `nombre` varchar(20) NOT NULL
+  `nombre` varchar(20) NOT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `marca`
 --
 
-INSERT INTO `marca` (`id`, `nombre`) VALUES
-(1, 'Volvo'),
-(2, 'Iveco'),
-(3, 'Scania'),
-(4, 'Mercedes-Benz'),
-(5, 'DAF'),
-(6, 'Renault Trucks'),
-(7, 'Hino'),
-(8, 'Mitsubishi'),
-(9, 'Isuzu'),
-(10, 'Hyundai'),
-(11, 'International'),
-(12, 'Kenworth'),
-(14, 'macs');
+INSERT INTO `marca` (`id`, `nombre`, `activo`) VALUES
+(1, 'Volvo', 1),
+(2, 'Iveco', 1),
+(3, 'Scania', 1),
+(4, 'Mercedes-Benz', 1),
+(5, 'DAF', 1),
+(6, 'Renault Trucks', 1),
+(7, 'Hino', 1),
+(8, 'Mitsubishi', 1),
+(9, 'Isuzu', 1),
+(10, 'Hyundai', 1),
+(11, 'International', 1),
+(12, 'Kenworth', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `metodo_pago`
+--
+
+CREATE TABLE `metodo_pago` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `metodo_pago_venta`
+--
+
+CREATE TABLE `metodo_pago_venta` (
+  `id` int(11) NOT NULL,
+  `num_serie` int(11) NOT NULL,
+  `tipo_comprobante` int(11) NOT NULL,
+  `metodo_pagoid` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -99,7 +337,8 @@ INSERT INTO `marca` (`id`, `nombre`) VALUES
 
 CREATE TABLE `modelo` (
   `id` int(11) NOT NULL,
-  `nombre` varchar(100) NOT NULL,
+  `nombre` varchar(20) NOT NULL,
+  `activo` tinyint(1) NOT NULL,
   `marcaid` int(11) NOT NULL,
   `tipo_unidadid` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -108,21 +347,215 @@ CREATE TABLE `modelo` (
 -- Volcado de datos para la tabla `modelo`
 --
 
-INSERT INTO `modelo` (`id`, `nombre`, `marcaid`, `tipo_unidadid`) VALUES
-(1, 'FH16', 1, 1),
-(2, 'Daily', 2, 2),
-(3, 'R-Series', 3, 1),
-(4, 'Actros', 4, 1),
-(5, 'XF', 5, 1),
-(6, 'Premium Lander', 6, 1),
-(7, '500 Series', 7, 4),
-(8, 'Fighter', 8, 1),
-(9, 'N-Series', 9, 2),
-(10, 'HD65', 10, 5),
-(11, 'ProStar', 11, 1),
-(12, 'T680', 12, 3),
-(13, 'modelo nuevecito caosa', 9, 1),
-(14, 'isuzu kuchau', 9, 7);
+INSERT INTO `modelo` (`id`, `nombre`, `activo`, `marcaid`, `tipo_unidadid`) VALUES
+(1, 'FH16', 1, 1, 1),
+(2, 'Daily', 1, 2, 2),
+(3, 'R-Series', 1, 3, 1),
+(4, 'Actros', 1, 4, 1),
+(5, 'XF', 1, 5, 1),
+(6, 'Premium Lander', 1, 6, 1),
+(7, '500 Series', 1, 7, 4),
+(8, 'Fighter', 1, 8, 1),
+(9, 'N-Series', 1, 9, 2),
+(10, 'HD65', 1, 10, 5),
+(11, 'ProStar', 1, 11, 1),
+(12, 'T680', 1, 12, 3);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `modulo`
+--
+
+CREATE TABLE `modulo` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(150) NOT NULL,
+  `icono` varchar(150) NOT NULL,
+  `key` varchar(150) NOT NULL,
+  `color` varchar(150) NOT NULL,
+  `activo` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `modulo`
+--
+
+INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo`) VALUES
+(1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF\n', 1),
+(2, 'Logística', 'fa-solid fa-truck-front', 'logistica', 'green', 1),
+(3, 'Encomiendas', 'fa-solid fa-box', 'encomienda', '#FF5E1A', 1),
+(4, 'Atención al cliente', 'fa-solid fa-circle-question', 'atencion', '#8232D2', 1),
+(5, 'Ventas', 'fa-solid fa-file-invoice-dollar', 'ventas', 'red', 1),
+(6, 'Seguridad', 'fa-solid fa-shield-halved', 'seguridad', '#F0B000', 1),
+(7, 'Personal', 'fa-solid fa-briefcase', 'personal', '#00E0F0', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `motivo_reclamo`
+--
+
+CREATE TABLE `motivo_reclamo` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(150) NOT NULL,
+  `descripcion` text DEFAULT NULL,
+  `tipo_reclamoid` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `motivo_reclamo`
+--
+
+INSERT INTO `motivo_reclamo` (`id`, `nombre`, `descripcion`, `tipo_reclamoid`) VALUES
+(1, 'Demora en Servicio', 'Inconformidad relacionada con la demora en la prestación del servicio.', 2),
+(2, 'Temas de Facturación', 'Inconformidad relacionada con temas de facturación, cobros incorrectos, etc.', 2),
+(3, 'Extravio-Robo', 'Inconformidad relacionada con la pérdida o robo de productos o servicios adquiridos.', 2),
+(4, 'Claves de seguridad', 'Inconformidad relacionada con el manejo, entrega o acceso a claves de seguridad.', 2),
+(5, 'Atención inadecuada', 'Es la falta de calidad en el servicio proporcionado al cliente, ya sea por parte del personal o del proceso de atención.', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `pagina`
+--
+
+CREATE TABLE `pagina` (
+  `id` int(11) NOT NULL,
+  `titulo` varchar(150) NOT NULL,
+  `icono` varchar(150) DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL,
+  `key` varchar(150) NOT NULL,
+  `tipo_paginaid` int(11) NOT NULL,
+  `moduloid` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `pagina`
+--
+
+INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `tipo_paginaid`, `moduloid`) VALUES
+(1, 'tipos de unidades', 'fa-solid fa-truck-plane', 1, 'tipo_unidad', 1, 1),
+(2, 'marcas de unidades', 'fa-solid fa-car-side', 1, 'marca', 1, 1),
+(3, 'modelos de unidades', 'fa-solid fa-cogs', 1, 'modelo', 1, 1),
+(4, 'unidades', 'fa-solid fa-truck-fast', 1, 'unidad', 1, 1),
+(5, 'tipos de empaques para paquetes', 'fa-solid fa-truck-plane', 1, 'tipo_empaque', 1, 3),
+(6, 'tipos de recepción de paquetes', 'fa-solid fa-truck-plane', 1, 'tipo_recepcion', 1, 3),
+(7, 'roles', 'fa-solid fa-user-shield', 1, 'rol', 1, 7),
+(8, 'métodos de pago', 'fa-solid fa-money-bill-wave', 1, 'metodo_pago', 1, 5),
+(9, 'empleados', 'fa-solid fa-id-card', 1, 'empleado', 1, 7),
+(10, 'tipos de clientes', 'fa-solid fa-layer-group', 1, 'tipo_cliente', 1, 3),
+(11, 'usuarios', 'fa-solid fa-user', 1, 'usuario', 1, 6),
+(12, 'clientes', 'fa-solid fa-user', 1, 'cliente', 1, 3),
+(13, 'tipos de documentos', 'fa-solid fa-id-card', 1, 'tipo_documento', 1, 1),
+(14, 'tipos de comprobantes', 'fa-solid fa-file-lines', 1, 'tipo_comprobante', 1, 1),
+(15, 'tipos de indemnización', 'fa-solid fa-hand-holding-dollar', 1, 'tipo_indemnizacion', 1, 4),
+(16, 'estados de reclamos', 'fa-solid fa-circle-exclamation', 1, 'estado_reclamo', 1, 4),
+(17, 'tamaños de cajas', 'fa-solid fa-box-open', 1, 'tamanio_caja', 1, 5),
+(18, 'contenido de paquetes', 'fa-solid fa-box-open', 1, 'contenido_paquete', 1, 3),
+(19, 'articulos para encomiendas', 'fa-solid fa-box-open', 1, 'articulo', 1, 5),
+(20, 'estados de encomiendas', 'fa-solid fa-boxes-packing', 1, 'estado_encomienda', 1, 3),
+(21, 'tipos de roles', 'ri-file-user-fill', 1, 'tipo_rol', 1, 7),
+(22, 'Motivos de reclamo', NULL, 1, 'motivo_reclamo', 1, 4),
+(23, 'Causas de reclamo', NULL, 1, 'causa_reclamo', 1, 4),
+(24, 'Tarifas de ruta', NULL, 1, 'tarifa_ruta', 1, 1),
+(25, 'Sucursales', 'ri-store-3-line', 1, 'sucursal', 1, 1),
+(26, 'tipos de reclamos', 'fa-solid fa-book-open-reader', 1, 'tipo_reclamo', 1, 4);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `paquete`
+--
+
+CREATE TABLE `paquete` (
+  `tracking` int(11) NOT NULL,
+  `valor` decimal(9,2) NOT NULL,
+  `peso` decimal(9,2) NOT NULL,
+  `alto` decimal(9,2) NOT NULL,
+  `largo` decimal(9,2) NOT NULL,
+  `ancho` decimal(9,2) NOT NULL,
+  `descripcion` text NOT NULL,
+  `direccion_destinatario` varchar(255) DEFAULT NULL,
+  `telefono_destinatario` int(11) DEFAULT NULL,
+  `num_documento_destinatario` int(11) DEFAULT NULL,
+  `sucursal_destino_id` int(11) NOT NULL,
+  `codigo_postal` char(5) NOT NULL,
+  `tipo_documento_destinatario_id` int(11) NOT NULL,
+  `contenido_paqueteid` int(11) NOT NULL,
+  `tipo_recepcionid` int(11) NOT NULL,
+  `salidaid` int(10) NOT NULL,
+  `transaccion_encomienda_num_serie` int(11) DEFAULT NULL,
+  `transaccion_encomienda_tipo_comprobanteid` int(10) DEFAULT NULL,
+  `tipo_empaqueid` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `reclamo`
+--
+
+CREATE TABLE `reclamo` (
+  `id` int(10) NOT NULL,
+  `monto_indemnizado` decimal(9,2) DEFAULT NULL,
+  `bien_contratado` char(1) NOT NULL COMMENT 'Producto (P)\r\nServicio (S)\r\n ',
+  `monto_reclamado` decimal(9,2) NOT NULL,
+  `relacion` char(1) NOT NULL COMMENT 'Quien envía\r\nQuien recibe\r\n ',
+  `fecha_recojo` date NOT NULL,
+  `sucursal_id` int(11) NOT NULL,
+  `descripcion` text NOT NULL,
+  `pedido` text NOT NULL,
+  `causa_reclamoid` int(11) NOT NULL,
+  `estado_reclamoid` int(10) NOT NULL,
+  `tipo_indemnizacionid` int(10) DEFAULT NULL,
+  `paquetetracking` int(11) NOT NULL,
+  `ubigeocodigo` varchar(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `rol`
+--
+
+CREATE TABLE `rol` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(250) NOT NULL,
+  `descripcion` text DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL,
+  `tipo_rolid` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `rol`
+--
+
+INSERT INTO `rol` (`id`, `nombre`, `descripcion`, `activo`, `tipo_rolid`) VALUES
+(1, 'Superadmin', NULL, 1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `salida`
+--
+
+CREATE TABLE `salida` (
+  `id` int(10) NOT NULL,
+  `unidadid` int(10) NOT NULL,
+  `fecha` date NOT NULL,
+  `hora` time NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `seguimiento`
+--
+
+CREATE TABLE `seguimiento` (
+  `estado_encomiendaid` int(10) NOT NULL,
+  `paquetetracking` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -132,27 +565,210 @@ INSERT INTO `modelo` (`id`, `nombre`, `marcaid`, `tipo_unidadid`) VALUES
 
 CREATE TABLE `sucursal` (
   `id` int(10) NOT NULL,
+  `abreviatura` char(5) NOT NULL,
+  `codigo_postal` char(5) NOT NULL,
   `direccion` varchar(150) NOT NULL,
-  `ubigeocodigo` varchar(10) NOT NULL,
   `horario_l_v` varchar(255) DEFAULT NULL,
   `horario_s_d` varchar(255) DEFAULT NULL,
   `latitud` decimal(9,6) DEFAULT NULL,
   `longitud` decimal(9,6) DEFAULT NULL,
   `teléfono` char(255) DEFAULT NULL,
   `referencia` varchar(255) DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL,
+  `ubigeocodigo` varchar(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tamanio_caja`
+--
+
+CREATE TABLE `tamanio_caja` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(3) NOT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `tamanio_caja`
+--
+
+INSERT INTO `tamanio_caja` (`id`, `nombre`, `activo`) VALUES
+(1, 'XXS', 1),
+(2, 'XS', 1),
+(3, 'S', 1),
+(4, 'M', 1),
+(5, 'L', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tarifa_ruta`
+--
+
+CREATE TABLE `tarifa_ruta` (
+  `sucursal_origen_id` int(10) NOT NULL,
+  `sucursal_destino_id` int(10) NOT NULL,
+  `tarifa` decimal(9,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tipo_cliente`
+--
+
+CREATE TABLE `tipo_cliente` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `activo` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tipo_comprobante`
+--
+
+CREATE TABLE `tipo_comprobante` (
+  `id` int(10) NOT NULL,
+  `inicial` varchar(3) NOT NULL,
+  `nombre` char(1) NOT NULL,
+  `descripcion` text NOT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tipo_documento`
+--
+
+CREATE TABLE `tipo_documento` (
+  `id` int(11) NOT NULL,
+  `siglas` char(3) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tipo_empaque`
+--
+
+CREATE TABLE `tipo_empaque` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `peso_maximo` int(11) NOT NULL,
+  `unidad_medida` varchar(10) DEFAULT NULL,
   `activo` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `sucursal`
+-- Volcado de datos para la tabla `tipo_empaque`
 --
 
-INSERT INTO `sucursal` (`id`, `direccion`, `ubigeocodigo`, `horario_l_v`, `horario_s_d`, `latitud`, `longitud`, `teléfono`, `referencia`, `activo`) VALUES
-(1, 'Av. Mariscal Castilla 208, Chiclayo', '130101', '08:00-19:00', '09:00-17:00', -6.771400, -79.840900, '074-123456', 'Frente a la cochera \"Puerto del Inka\"', 1),
-(2, 'Av. Miguel Grau 675, Urb. Santa Victoria, Chiclayo', '130101', '09:00-13:00,14:00-18:00', '09:00-13:00', -6.773000, -79.841500, '074-654321', 'A una cuadra de la Av. Balta', 1),
-(3, 'Calle Torres Paz Nro. 224, Interior C, Pimentel', '130110', '09:00-13:00,14:00-18:00', '09:00-13:00', -6.828000, -79.930000, '074-345678', 'Frente al parque principal de Pimentel', 1),
-(4, 'Av. Huamachuco Nro. 809, Lambayeque', '130301', '09:00-14:00,15:00-18:00', '09:00-13:00', -6.702000, -79.906000, '074-987654', 'Frente al parque infantil', 1),
-(5, 'xd', '50410', '3', '8', 999.999999, 999.999999, '577', 'gfh', 0);
+INSERT INTO `tipo_empaque` (`id`, `nombre`, `peso_maximo`, `unidad_medida`, `activo`) VALUES
+(1, 'Caja', 25, 'kg', 1),
+(2, 'Sobre', 500, 'gr', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tipo_indemnizacion`
+--
+
+CREATE TABLE `tipo_indemnizacion` (
+  `id` int(10) NOT NULL,
+  `nombre` varchar(150) NOT NULL,
+  `descripcion` text DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tipo_pagina`
+--
+
+CREATE TABLE `tipo_pagina` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `tipo_pagina`
+--
+
+INSERT INTO `tipo_pagina` (`id`, `nombre`) VALUES
+(1, 'CRUD'),
+(2, 'Reporte');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tipo_recepcion`
+--
+
+CREATE TABLE `tipo_recepcion` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(100) NOT NULL COMMENT 'Recojo en tienda\r\nEnvío a domicilio\r\nCon recojo y pago en tienda\r\n ',
+  `activo` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `tipo_recepcion`
+--
+
+INSERT INTO `tipo_recepcion` (`id`, `nombre`, `activo`) VALUES
+(1, 'Recojo en tienda', 1),
+(2, 'Envío a domicilio', 1),
+(3, 'Con recojo y pago en tienda', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tipo_reclamo`
+--
+
+CREATE TABLE `tipo_reclamo` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(150) NOT NULL,
+  `descripcion` text DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `tipo_reclamo`
+--
+
+INSERT INTO `tipo_reclamo` (`id`, `nombre`, `descripcion`, `activo`) VALUES
+(1, 'Queja', 'Es el malestar o descontento por algún acto que está relacionado directamente con el servicio adquirido. Por ejemplo: una mala atención al público, omisión de información, etc.', 0),
+(2, 'Reclamo', 'Es la disconformidad con los servicios prestados o bienes adquiridos. Por ejemplo: demora en el envío, entregas no realizadas, etc.', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tipo_rol`
+--
+
+CREATE TABLE `tipo_rol` (
+  `id` int(10) NOT NULL,
+  `nombre` varchar(250) NOT NULL,
+  `descripcion` text DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `tipo_rol`
+--
+
+INSERT INTO `tipo_rol` (`id`, `nombre`, `descripcion`, `activo`) VALUES
+(1, 'SuperAdministador', 'Dios', 1),
+(2, 'Administrador', NULL, 1),
+(3, 'Empleado', NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -163,8 +779,8 @@ INSERT INTO `sucursal` (`id`, `direccion`, `ubigeocodigo`, `horario_l_v`, `horar
 CREATE TABLE `tipo_unidad` (
   `id` int(10) NOT NULL,
   `nombre` varchar(20) NOT NULL,
-  `descripcion` text NOT NULL,
-  `activo` tinyint(1) NOT NULL
+  `descripcion` text DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -176,9 +792,41 @@ INSERT INTO `tipo_unidad` (`id`, `nombre`, `descripcion`, `activo`) VALUES
 (2, 'Furgoneta', 'Vehículo de carga medianaa', 0),
 (3, 'Tráiler', 'Vehículo articulado para gran volumen de carga', 1),
 (4, 'Bus', 'Vehículo de transporte de pasajeros', 1),
-(5, 'Camioneta', 'Vehículo mixto de carga y pasajeros', 1),
-(7, 'moto moto', 'chamo, cuidao', 1),
-(8, 'xdxdd', '', 1);
+(5, 'Camioneta', 'Vehículo mixto de carga y pasajeros', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `transaccion_encomienda`
+--
+
+CREATE TABLE `transaccion_encomienda` (
+  `num_serie` int(11) NOT NULL,
+  `tipo_comprobanteid` int(10) NOT NULL,
+  `masivo` tinyint(1) NOT NULL COMMENT ' 1 si es envío masivo\r\n0 si es un empaque (paquete o sobre)\r\n ',
+  `descripcion` text NOT NULL,
+  `monto_total` decimal(9,2) DEFAULT NULL,
+  `recojo_casa` tinyint(1) NOT NULL,
+  `id_sucursal_origen` int(11) NOT NULL,
+  `fecha` date NOT NULL,
+  `hora` time NOT NULL,
+  `clienteid` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `transaccion_venta`
+--
+
+CREATE TABLE `transaccion_venta` (
+  `num_serie` int(11) NOT NULL,
+  `tipo_comprobanteid` int(10) NOT NULL,
+  `monto_total` decimal(9,2) DEFAULT NULL,
+  `fecha` date NOT NULL,
+  `hora` time NOT NULL,
+  `clienteid` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -199,7 +847,6 @@ CREATE TABLE `ubigeo` (
 --
 
 INSERT INTO `ubigeo` (`codigo`, `departamento`, `provincia`, `distrito`, `activo`) VALUES
-('', 'LIMA', 'LIMA', 'SANTA MARIA DE HUACHIPA', 1),
 ('100101', 'ICA', 'ICA', 'ICA', 1),
 ('100102', 'ICA', 'ICA', 'LA TINGUIÑA', 1),
 ('100103', 'ICA', 'ICA', 'LOS AQUIJES', 1),
@@ -1239,9 +1886,9 @@ INSERT INTO `ubigeo` (`codigo`, `departamento`, `provincia`, `distrito`, `activo
 ('21403', 'ANCASH', 'SIHUAS', 'CHINGALPO', 1),
 ('21404', 'ANCASH', 'SIHUAS', 'HUAYLLABAMBA', 1),
 ('21405', 'ANCASH', 'SIHUAS', 'QUICHES', 1),
-('21406', 'ANCASH', 'SIHUAS', 'SICSIBAMBA', 1);
+('21406', 'ANCASH', 'SIHUAS', 'SICSIBAMBA', 1),
+('21407', 'ANCASH', 'SIHUAS', 'ACOBAMBA', 1);
 INSERT INTO `ubigeo` (`codigo`, `departamento`, `provincia`, `distrito`, `activo`) VALUES
-('21407', 'ANCASH', 'SIHUAS', 'ACOBAMBA', 1),
 ('21408', 'ANCASH', 'SIHUAS', 'CASHAPAMPA', 1),
 ('21409', 'ANCASH', 'SIHUAS', 'RAGASH', 1),
 ('21410', 'ANCASH', 'SIHUAS', 'SAN JUAN', 1),
@@ -2102,11 +2749,13 @@ INSERT INTO `ubigeo` (`codigo`, `departamento`, `provincia`, `distrito`, `activo
 
 CREATE TABLE `unidad` (
   `id` int(10) NOT NULL,
-  `placa` varchar(10) NOT NULL,
+  `placa` varchar(8) NOT NULL,
+  `MTC` char(9) NOT NULL,
+  `TUC` char(12) NOT NULL,
   `capacidad` decimal(9,2) NOT NULL,
   `volumen` decimal(9,2) NOT NULL,
-  `observaciones` text DEFAULT NULL,
-  `activo` tinyint(1) NOT NULL,
+  `descripcion` text DEFAULT NULL,
+  `estado` char(1) NOT NULL,
   `modeloid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -2114,30 +2763,120 @@ CREATE TABLE `unidad` (
 -- Volcado de datos para la tabla `unidad`
 --
 
-INSERT INTO `unidad` (`id`, `placa`, `capacidad`, `volumen`, `observaciones`, `activo`, `modeloid`) VALUES
-(1, 'ABC123f', 15000.00, 60.00, 'Unidad en buen estado', 1, 1),
-(2, 'DEF456', 4000.00, 20.00, 'Requiere revisión técnica', 0, 2),
-(3, 'GHI789', 30000.00, 80.00, NULL, 1, 12),
-(4, 'JKL321', 8000.00, 50.00, 'Unidad fuera de servicio', 0, 7),
-(5, 'MNO654', 2500.00, 10.00, 'Unidad nueva', 1, 10),
-(6, 'PQR987', 1500.00, 60.00, 'None', 1, 3),
-(7, 'STU135', 4000.00, 20.00, 'Unidad asignada a ruta norte', 1, 9),
-(8, 'VWX246', 8000.00, 50.00, 'Con aire acondicionado', 1, 4);
+INSERT INTO `unidad` (`id`, `placa`, `MTC`, `TUC`, `capacidad`, `volumen`, `descripcion`, `estado`, `modeloid`) VALUES
+(1, 'ABC1234', '1519036CN', '15M25016315E', 10.50, 20.00, 'Unidad para carga pesada', 'A', 1),
+(2, 'XYZ5678', '1519037DN', '15M25016316F', 12.00, 25.00, 'Camión de reparto urbano', 'A', 2),
+(3, 'JKL1234', '1519038EN', '15M25016317G', 15.00, 30.00, 'Unidad de carga mediana', 'A', 3),
+(4, 'QRS2345', '1519039FN', '15M25016318H', 20.00, 35.00, 'Camión de carga pesada', 'A', 4),
+(5, 'TUV3456', '1519040GN', '15M25016319I', 18.00, 40.00, 'Camión para transporte internacional', 'A', 5),
+(6, 'WXY4567', '1519041HN', '15M25016320J', 25.00, 45.00, 'Unidad para transporte de carga', 'A', 6),
+(7, 'LMN5678', '1519042IN', '15M25016321K', 12.50, 28.00, 'Unidad para transporte pesado', 'A', 7),
+(8, 'PQR6789', '1519043JN', '15M25016322L', 14.00, 30.50, 'Camión para carga ligera', 'A', 8),
+(9, 'STU7890', '1519044KN', '15M25016323M', 11.00, 23.00, 'Unidad para transporte urbano', 'A', 9),
+(10, 'VWX8901', '1519045LN', '15M25016324N', 16.50, 34.00, 'Unidad de carga mediana', 'A', 10),
+(11, 'YZA9012', '1519046MN', '15M25016325O', 22.00, 50.00, 'Unidad para transporte pesado', 'A', 11),
+(12, 'BCD0123', '1519047NN', '15M25016326P', 19.00, 40.00, 'Camión para largo alcance', 'A', 12);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `usuario`
+--
+
+CREATE TABLE `usuario` (
+  `id` int(11) NOT NULL,
+  `correo` varchar(255) NOT NULL,
+  `contrasenia` varchar(255) NOT NULL,
+  `tipo_usuario` char(1) NOT NULL,
+  `activo` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Índices para tablas volcadas
 --
 
 --
--- Indices de la tabla `color`
+-- Indices de la tabla `acceso`
 --
-ALTER TABLE `color`
+ALTER TABLE `acceso`
+  ADD PRIMARY KEY (`paginaid`,`rolid`),
+  ADD KEY `FKacceso650542` (`rolid`);
+
+--
+-- Indices de la tabla `articulo`
+--
+ALTER TABLE `articulo`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FKarticulo307124` (`tamaño_cajaid`);
+
+--
+-- Indices de la tabla `causa_reclamo`
+--
+ALTER TABLE `causa_reclamo`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FKcausa_recl554759` (`motivo_reclamoid`);
+
+--
+-- Indices de la tabla `cliente`
+--
+ALTER TABLE `cliente`
+  ADD PRIMARY KEY (`usuarioid`),
+  ADD UNIQUE KEY `correo` (`correo`),
+  ADD UNIQUE KEY `num_documento` (`num_documento`),
+  ADD KEY `FKcliente404372` (`tipo_clienteid`),
+  ADD KEY `FKcliente66106` (`tipo_documentoid`);
+
+--
+-- Indices de la tabla `contenido_paquete`
+--
+ALTER TABLE `contenido_paquete`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `detalle_venta`
+--
+ALTER TABLE `detalle_venta`
+  ADD PRIMARY KEY (`articuloid`,`ventanum_serie`,`ventatipo_comprobanteid`),
+  ADD KEY `FKdetalle_ve813706` (`ventanum_serie`,`ventatipo_comprobanteid`);
+
+--
+-- Indices de la tabla `empleado`
+--
+ALTER TABLE `empleado`
+  ADD PRIMARY KEY (`usuarioid`),
+  ADD UNIQUE KEY `correo` (`correo`),
+  ADD KEY `FKempleado961716` (`rolid`);
+
+--
+-- Indices de la tabla `empleado_salida`
+--
+ALTER TABLE `empleado_salida`
+  ADD PRIMARY KEY (`salidaid`,`empleadousuarioid`),
+  ADD KEY `FKempleado_s308635` (`empleadousuarioid`);
+
+--
+-- Indices de la tabla `empresa`
+--
+ALTER TABLE `empresa`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `escala`
+--
+ALTER TABLE `escala`
+  ADD PRIMARY KEY (`sucursalid`,`salidaid`),
+  ADD KEY `FKescala650496` (`salidaid`);
 
 --
 -- Indices de la tabla `estado_encomienda`
 --
 ALTER TABLE `estado_encomienda`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `estado_reclamo`
+--
+ALTER TABLE `estado_reclamo`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -2147,17 +2886,165 @@ ALTER TABLE `marca`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indices de la tabla `metodo_pago`
+--
+ALTER TABLE `metodo_pago`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `metodo_pago_venta`
+--
+ALTER TABLE `metodo_pago_venta`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FKmetodo_pag702897` (`metodo_pagoid`);
+
+--
 -- Indices de la tabla `modelo`
 --
 ALTER TABLE `modelo`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `FKmodelo121578` (`marcaid`),
-  ADD KEY `FKmodelo83299` (`tipo_unidadid`);
+  ADD KEY `FKmodelo83299` (`tipo_unidadid`),
+  ADD KEY `FKmodelo121578` (`marcaid`);
+
+--
+-- Indices de la tabla `modulo`
+--
+ALTER TABLE `modulo`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `motivo_reclamo`
+--
+ALTER TABLE `motivo_reclamo`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FKmotivo_rec334818` (`tipo_reclamoid`);
+
+--
+-- Indices de la tabla `pagina`
+--
+ALTER TABLE `pagina`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FKpagina193794` (`moduloid`),
+  ADD KEY `FKpagina910561` (`tipo_paginaid`);
+
+--
+-- Indices de la tabla `paquete`
+--
+ALTER TABLE `paquete`
+  ADD PRIMARY KEY (`tracking`),
+  ADD KEY `FKpaquete94264` (`tipo_empaqueid`),
+  ADD KEY `FKpaquete329420` (`contenido_paqueteid`),
+  ADD KEY `FKpaquete992725` (`tipo_documento_destinatario_id`),
+  ADD KEY `FKpaquete691155` (`salidaid`),
+  ADD KEY `FKpaquete532667` (`tipo_recepcionid`),
+  ADD KEY `FKpaquete395865` (`transaccion_encomienda_num_serie`,`transaccion_encomienda_tipo_comprobanteid`);
+
+--
+-- Indices de la tabla `reclamo`
+--
+ALTER TABLE `reclamo`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FKreclamo820690` (`causa_reclamoid`),
+  ADD KEY `FKreclamo555298` (`ubigeocodigo`),
+  ADD KEY `FKreclamo680466` (`paquetetracking`),
+  ADD KEY `FKreclamo501927` (`tipo_indemnizacionid`),
+  ADD KEY `FKreclamo902505` (`estado_reclamoid`);
+
+--
+-- Indices de la tabla `rol`
+--
+ALTER TABLE `rol`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FKrol677440` (`tipo_rolid`);
+
+--
+-- Indices de la tabla `salida`
+--
+ALTER TABLE `salida`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FKsalida314397` (`unidadid`);
+
+--
+-- Indices de la tabla `seguimiento`
+--
+ALTER TABLE `seguimiento`
+  ADD PRIMARY KEY (`estado_encomiendaid`,`paquetetracking`),
+  ADD KEY `FKseguimient381900` (`paquetetracking`);
 
 --
 -- Indices de la tabla `sucursal`
 --
 ALTER TABLE `sucursal`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `abreviatura` (`abreviatura`),
+  ADD UNIQUE KEY `codigo_postal` (`codigo_postal`),
+  ADD KEY `FKsucursal756715` (`ubigeocodigo`);
+
+--
+-- Indices de la tabla `tamanio_caja`
+--
+ALTER TABLE `tamanio_caja`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `tarifa_ruta`
+--
+ALTER TABLE `tarifa_ruta`
+  ADD PRIMARY KEY (`sucursal_origen_id`,`sucursal_destino_id`),
+  ADD KEY `FKtarifa_rut28234` (`sucursal_destino_id`);
+
+--
+-- Indices de la tabla `tipo_cliente`
+--
+ALTER TABLE `tipo_cliente`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `tipo_comprobante`
+--
+ALTER TABLE `tipo_comprobante`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `tipo_documento`
+--
+ALTER TABLE `tipo_documento`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `tipo_empaque`
+--
+ALTER TABLE `tipo_empaque`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `tipo_indemnizacion`
+--
+ALTER TABLE `tipo_indemnizacion`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `tipo_pagina`
+--
+ALTER TABLE `tipo_pagina`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `tipo_recepcion`
+--
+ALTER TABLE `tipo_recepcion`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `tipo_reclamo`
+--
+ALTER TABLE `tipo_reclamo`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `tipo_rol`
+--
+ALTER TABLE `tipo_rol`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -2165,6 +3052,22 @@ ALTER TABLE `sucursal`
 --
 ALTER TABLE `tipo_unidad`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `transaccion_encomienda`
+--
+ALTER TABLE `transaccion_encomienda`
+  ADD PRIMARY KEY (`num_serie`,`tipo_comprobanteid`),
+  ADD KEY `FKtransaccio902557` (`clienteid`),
+  ADD KEY `FKtransaccio662746` (`tipo_comprobanteid`);
+
+--
+-- Indices de la tabla `transaccion_venta`
+--
+ALTER TABLE `transaccion_venta`
+  ADD PRIMARY KEY (`num_serie`,`tipo_comprobanteid`),
+  ADD KEY `FKtransaccio533784` (`clienteid`),
+  ADD KEY `FKtransaccio293973` (`tipo_comprobanteid`);
 
 --
 -- Indices de la tabla `ubigeo`
@@ -2178,29 +3081,86 @@ ALTER TABLE `ubigeo`
 ALTER TABLE `unidad`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `placa` (`placa`),
+  ADD UNIQUE KEY `MTC` (`MTC`),
+  ADD UNIQUE KEY `TUC` (`TUC`),
   ADD KEY `FKunidad608127` (`modeloid`);
+
+--
+-- Indices de la tabla `usuario`
+--
+ALTER TABLE `usuario`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `correo` (`correo`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
 --
 
 --
--- AUTO_INCREMENT de la tabla `color`
+-- AUTO_INCREMENT de la tabla `articulo`
 --
-ALTER TABLE `color`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+ALTER TABLE `articulo`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT de la tabla `causa_reclamo`
+--
+ALTER TABLE `causa_reclamo`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+
+--
+-- AUTO_INCREMENT de la tabla `cliente`
+--
+ALTER TABLE `cliente`
+  MODIFY `usuarioid` int(10) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `contenido_paquete`
+--
+ALTER TABLE `contenido_paquete`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT de la tabla `empleado`
+--
+ALTER TABLE `empleado`
+  MODIFY `usuarioid` int(10) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `empresa`
+--
+ALTER TABLE `empresa`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `estado_encomienda`
 --
 ALTER TABLE `estado_encomienda`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `estado_reclamo`
+--
+ALTER TABLE `estado_reclamo`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `marca`
 --
 ALTER TABLE `marca`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT de la tabla `metodo_pago`
+--
+ALTER TABLE `metodo_pago`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `metodo_pago_venta`
+--
+ALTER TABLE `metodo_pago_venta`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `modelo`
@@ -2209,10 +3169,112 @@ ALTER TABLE `modelo`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
+-- AUTO_INCREMENT de la tabla `modulo`
+--
+ALTER TABLE `modulo`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT de la tabla `motivo_reclamo`
+--
+ALTER TABLE `motivo_reclamo`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT de la tabla `pagina`
+--
+ALTER TABLE `pagina`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+--
+-- AUTO_INCREMENT de la tabla `paquete`
+--
+ALTER TABLE `paquete`
+  MODIFY `tracking` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `reclamo`
+--
+ALTER TABLE `reclamo`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `rol`
+--
+ALTER TABLE `rol`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de la tabla `salida`
+--
+ALTER TABLE `salida`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `sucursal`
 --
 ALTER TABLE `sucursal`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `tamanio_caja`
+--
+ALTER TABLE `tamanio_caja`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT de la tabla `tipo_cliente`
+--
+ALTER TABLE `tipo_cliente`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `tipo_comprobante`
+--
+ALTER TABLE `tipo_comprobante`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `tipo_documento`
+--
+ALTER TABLE `tipo_documento`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `tipo_empaque`
+--
+ALTER TABLE `tipo_empaque`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT de la tabla `tipo_indemnizacion`
+--
+ALTER TABLE `tipo_indemnizacion`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `tipo_pagina`
+--
+ALTER TABLE `tipo_pagina`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de la tabla `tipo_recepcion`
+--
+ALTER TABLE `tipo_recepcion`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de la tabla `tipo_reclamo`
+--
+ALTER TABLE `tipo_reclamo`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de la tabla `tipo_rol`
+--
+ALTER TABLE `tipo_rol`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `tipo_unidad`
@@ -2224,11 +3286,76 @@ ALTER TABLE `tipo_unidad`
 -- AUTO_INCREMENT de la tabla `unidad`
 --
 ALTER TABLE `unidad`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT de la tabla `usuario`
+--
+ALTER TABLE `usuario`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Restricciones para tablas volcadas
 --
+
+--
+-- Filtros para la tabla `acceso`
+--
+ALTER TABLE `acceso`
+  ADD CONSTRAINT `FKacceso288305` FOREIGN KEY (`paginaid`) REFERENCES `pagina` (`id`),
+  ADD CONSTRAINT `FKacceso650542` FOREIGN KEY (`rolid`) REFERENCES `rol` (`id`);
+
+--
+-- Filtros para la tabla `articulo`
+--
+ALTER TABLE `articulo`
+  ADD CONSTRAINT `FKarticulo307124` FOREIGN KEY (`tamaño_cajaid`) REFERENCES `tamanio_caja` (`id`);
+
+--
+-- Filtros para la tabla `causa_reclamo`
+--
+ALTER TABLE `causa_reclamo`
+  ADD CONSTRAINT `FKcausa_recl554759` FOREIGN KEY (`motivo_reclamoid`) REFERENCES `motivo_reclamo` (`id`);
+
+--
+-- Filtros para la tabla `cliente`
+--
+ALTER TABLE `cliente`
+  ADD CONSTRAINT `FKcliente404372` FOREIGN KEY (`tipo_clienteid`) REFERENCES `tipo_cliente` (`id`),
+  ADD CONSTRAINT `FKcliente66106` FOREIGN KEY (`tipo_documentoid`) REFERENCES `tipo_documento` (`id`);
+
+--
+-- Filtros para la tabla `detalle_venta`
+--
+ALTER TABLE `detalle_venta`
+  ADD CONSTRAINT `FKdetalle_ve532256` FOREIGN KEY (`articuloid`) REFERENCES `articulo` (`id`),
+  ADD CONSTRAINT `FKdetalle_ve813706` FOREIGN KEY (`ventanum_serie`,`ventatipo_comprobanteid`) REFERENCES `transaccion_venta` (`num_serie`, `tipo_comprobanteid`);
+
+--
+-- Filtros para la tabla `empleado`
+--
+ALTER TABLE `empleado`
+  ADD CONSTRAINT `FKempleado961716` FOREIGN KEY (`rolid`) REFERENCES `rol` (`id`);
+
+--
+-- Filtros para la tabla `empleado_salida`
+--
+ALTER TABLE `empleado_salida`
+  ADD CONSTRAINT `FKempleado_s308635` FOREIGN KEY (`empleadousuarioid`) REFERENCES `empleado` (`usuarioid`),
+  ADD CONSTRAINT `FKempleado_s707218` FOREIGN KEY (`salidaid`) REFERENCES `salida` (`id`);
+
+--
+-- Filtros para la tabla `escala`
+--
+ALTER TABLE `escala`
+  ADD CONSTRAINT `FKescala650496` FOREIGN KEY (`salidaid`) REFERENCES `salida` (`id`),
+  ADD CONSTRAINT `FKescala667165` FOREIGN KEY (`sucursalid`) REFERENCES `sucursal` (`id`);
+
+--
+-- Filtros para la tabla `metodo_pago_venta`
+--
+ALTER TABLE `metodo_pago_venta`
+  ADD CONSTRAINT `FKmetodo_pag702897` FOREIGN KEY (`metodo_pagoid`) REFERENCES `metodo_pago` (`id`);
 
 --
 -- Filtros para la tabla `modelo`
@@ -2236,6 +3363,86 @@ ALTER TABLE `unidad`
 ALTER TABLE `modelo`
   ADD CONSTRAINT `FKmodelo121578` FOREIGN KEY (`marcaid`) REFERENCES `marca` (`id`),
   ADD CONSTRAINT `FKmodelo83299` FOREIGN KEY (`tipo_unidadid`) REFERENCES `tipo_unidad` (`id`);
+
+--
+-- Filtros para la tabla `motivo_reclamo`
+--
+ALTER TABLE `motivo_reclamo`
+  ADD CONSTRAINT `FKmotivo_rec334818` FOREIGN KEY (`tipo_reclamoid`) REFERENCES `tipo_reclamo` (`id`);
+
+--
+-- Filtros para la tabla `pagina`
+--
+ALTER TABLE `pagina`
+  ADD CONSTRAINT `FKpagina193794` FOREIGN KEY (`moduloid`) REFERENCES `modulo` (`id`),
+  ADD CONSTRAINT `FKpagina910561` FOREIGN KEY (`tipo_paginaid`) REFERENCES `tipo_pagina` (`id`);
+
+--
+-- Filtros para la tabla `paquete`
+--
+ALTER TABLE `paquete`
+  ADD CONSTRAINT `FKpaquete329420` FOREIGN KEY (`contenido_paqueteid`) REFERENCES `contenido_paquete` (`id`),
+  ADD CONSTRAINT `FKpaquete395865` FOREIGN KEY (`transaccion_encomienda_num_serie`,`transaccion_encomienda_tipo_comprobanteid`) REFERENCES `transaccion_encomienda` (`num_serie`, `tipo_comprobanteid`),
+  ADD CONSTRAINT `FKpaquete532667` FOREIGN KEY (`tipo_recepcionid`) REFERENCES `tipo_recepcion` (`id`),
+  ADD CONSTRAINT `FKpaquete691155` FOREIGN KEY (`salidaid`) REFERENCES `salida` (`id`),
+  ADD CONSTRAINT `FKpaquete94264` FOREIGN KEY (`tipo_empaqueid`) REFERENCES `tipo_empaque` (`id`),
+  ADD CONSTRAINT `FKpaquete992725` FOREIGN KEY (`tipo_documento_destinatario_id`) REFERENCES `tipo_documento` (`id`);
+
+--
+-- Filtros para la tabla `reclamo`
+--
+ALTER TABLE `reclamo`
+  ADD CONSTRAINT `FKreclamo501927` FOREIGN KEY (`tipo_indemnizacionid`) REFERENCES `tipo_indemnizacion` (`id`),
+  ADD CONSTRAINT `FKreclamo555298` FOREIGN KEY (`ubigeocodigo`) REFERENCES `ubigeo` (`codigo`),
+  ADD CONSTRAINT `FKreclamo680466` FOREIGN KEY (`paquetetracking`) REFERENCES `paquete` (`tracking`),
+  ADD CONSTRAINT `FKreclamo820690` FOREIGN KEY (`causa_reclamoid`) REFERENCES `causa_reclamo` (`id`),
+  ADD CONSTRAINT `FKreclamo902505` FOREIGN KEY (`estado_reclamoid`) REFERENCES `estado_reclamo` (`id`);
+
+--
+-- Filtros para la tabla `rol`
+--
+ALTER TABLE `rol`
+  ADD CONSTRAINT `FKrol677440` FOREIGN KEY (`tipo_rolid`) REFERENCES `tipo_rol` (`id`);
+
+--
+-- Filtros para la tabla `salida`
+--
+ALTER TABLE `salida`
+  ADD CONSTRAINT `FKsalida314397` FOREIGN KEY (`unidadid`) REFERENCES `unidad` (`id`);
+
+--
+-- Filtros para la tabla `seguimiento`
+--
+ALTER TABLE `seguimiento`
+  ADD CONSTRAINT `FKseguimient381900` FOREIGN KEY (`paquetetracking`) REFERENCES `paquete` (`tracking`),
+  ADD CONSTRAINT `FKseguimient857034` FOREIGN KEY (`estado_encomiendaid`) REFERENCES `estado_encomienda` (`id`);
+
+--
+-- Filtros para la tabla `sucursal`
+--
+ALTER TABLE `sucursal`
+  ADD CONSTRAINT `FKsucursal756715` FOREIGN KEY (`ubigeocodigo`) REFERENCES `ubigeo` (`codigo`);
+
+--
+-- Filtros para la tabla `tarifa_ruta`
+--
+ALTER TABLE `tarifa_ruta`
+  ADD CONSTRAINT `FKtarifa_rut28234` FOREIGN KEY (`sucursal_destino_id`) REFERENCES `sucursal` (`id`),
+  ADD CONSTRAINT `FKtarifa_rut972797` FOREIGN KEY (`sucursal_origen_id`) REFERENCES `sucursal` (`id`);
+
+--
+-- Filtros para la tabla `transaccion_encomienda`
+--
+ALTER TABLE `transaccion_encomienda`
+  ADD CONSTRAINT `FKtransaccio662746` FOREIGN KEY (`tipo_comprobanteid`) REFERENCES `tipo_comprobante` (`id`),
+  ADD CONSTRAINT `FKtransaccio902557` FOREIGN KEY (`clienteid`) REFERENCES `cliente` (`usuarioid`);
+
+--
+-- Filtros para la tabla `transaccion_venta`
+--
+ALTER TABLE `transaccion_venta`
+  ADD CONSTRAINT `FKtransaccio293973` FOREIGN KEY (`tipo_comprobanteid`) REFERENCES `tipo_comprobante` (`id`),
+  ADD CONSTRAINT `FKtransaccio533784` FOREIGN KEY (`clienteid`) REFERENCES `cliente` (`usuarioid`);
 
 --
 -- Filtros para la tabla `unidad`

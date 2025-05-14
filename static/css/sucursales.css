@@ -5,6 +5,7 @@
     padding: 20px;
     /* max-width: 1200px; */
     margin: 0 auto;
+    justify-content: center;
 }
 /* 
 .sucursales-titulo {
@@ -38,9 +39,9 @@ section.general_element {
     }
 } */
 
-.sucursales-container .row {
-    --bs-gutter-x: 0rem;
-}
+/* .sucursales-container .row {
+    --bs-gutter-x: 1rem;
+} */
 
 .filtros-mapa-container {
     flex-direction: row;
@@ -71,6 +72,7 @@ section.general_element {
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --bs-gutter-x : 0rem;
 }
 
 #map {
@@ -97,11 +99,11 @@ section.general_element {
     gap: 10px;
 }
 
-@media (min-width: 768px) {
+/* @media (min-width: 768px) {
     .agencia-card {
         flex-direction: row;
     }
-}
+} */
 
 .agencia-info {
     flex: 3;

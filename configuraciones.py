@@ -8,6 +8,7 @@ ACT_STATE_1 = 'Activar'
 
 FUNCIONES_CRUD = 'crud'
 NOMBRE_CRUD_PAGE = 'Gestionar'
+NOMBRE_ADMINPAGES_PAGE = 'Administración de Páginas'
 NOMBRE_OPTIONS_COL = 'Acciones'
 
 NOMBRE_BTN_INSERT   = 'Agregar'
