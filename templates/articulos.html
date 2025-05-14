@@ -2,6 +2,52 @@
 
 {% block estilos %}
 <link rel="stylesheet" href="/static/css/articulos.css">
+<!-- Incluir los estilos optimizados -->
+<style>
+    /* Estilos inline para aplicar inmediatamente los cambios críticos */
+    .producto-detalle {
+        display: flex;
+        flex-wrap: wrap;
+        background-color: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        gap: 0;
+    }
+
+    .producto-imagen {
+        flex: 1;
+        min-width: 250px;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .producto-info {
+        flex: 1;
+        min-width: 250px;
+        padding: 15px;
+    }
+
+    .producto-imagen img {
+        max-width: 100%;
+        max-height: 300px;
+        object-fit: contain;
+    }
+
+    @media (max-width: 768px) {
+        .producto-detalle {
+            flex-direction: column;
+        }
+
+        .producto-imagen,
+        .producto-info {
+            width: 100%;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block titulo %}
@@ -9,15 +55,9 @@ Productos de Embalaje
 {% endblock %}
 
 {% block contenido %}
-<div class="productos-container">
-    <!-- Banner de bienvenida -->
-    <div class="welcome-banner">
-        <div class="welcome-content">
-            <h2>¡Adquiere más artículos de embalaje!</h2>
-        </div>
-    </div>
-
-    <!-- Sección del producto -->
+<!-- Contenedor principal con ancho máximo reducido -->
+<div class="producto-container" style="max-width: 1000px; padding: 10px;">
+     <!-- Sección del producto -->
     <div class="producto-detalle">
         <div class="producto-imagen">
             <img id="producto-img" src="/static/img/caja-shalom.jpg" alt="Caja Shalom">
@@ -60,14 +100,6 @@ Productos de Embalaje
                 <i class="fa-solid fa-cart-shopping"></i>
             </button>
 
-            <div class="promo-banner">
-                <div class="promo-icon">
-                    <i class="fa-solid fa-bullhorn"></i>
-                </div>
-                <div class="promo-text">
-                    <h3>¡Compra al por mayor y obtén super descuentos!</h3>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -78,6 +110,9 @@ Productos de Embalaje
             <!-- Las miniaturas se cargarán dinámicamente -->
         </div>
     </div>
+</div>
+
+<div class="productos-container">
 </div>
 {% endblock %}
 

@@ -27,7 +27,6 @@ from controladores import controlador_tipo_cliente as controlador_tipo_cliente
 from controladores import controlador_usuario as controlador_usuario
 from controladores import controlador_cliente as controlador_cliente
 from controladores import controlador_rol as controlador_rol
-from controladores import controlador_contenido_paquete
 
 import configuraciones
 from functools import wraps
@@ -1243,7 +1242,8 @@ paginas_simples = [
     'tracking',
     'seguimiento',
     'recuperar_contrasenia',
-    'libro_reclamaciones'
+    'libro_reclamaciones',
+    'NoRecibimos'
 ]
 
 
