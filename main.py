@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, make_response, url_for #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
+from controladores import acceso as acceso
 from controladores import controlador_color as controlador_color
 from controladores import controlador_marca as controlador_marca
 from controladores import controlador_unidad as controlador_unidad
@@ -9,7 +10,7 @@ from controladores import controlador_ubigeo as controlador_ubigeo
 from controladores import controlador_sucursal as controlador_sucursal
 from controladores import controlador_tamanio_caja as controlador_tamanio_caja
 from controladores import controlador_tipo_rol as controlador_tipo_rol
-from controladores import controlador_tipo_paquete as controlador_tipo_paquete
+from controladores import controlador_contenido_paquete as controlador_contenido_paquete
 from controladores import controlador_estado_encomienda as controlador_estado_encomienda
 from controladores import controlador_tipo_documento as controlador_tipo_documento
 from controladores import controlador_tipo_comprobante as controlador_tipo_comprobante
@@ -27,7 +28,7 @@ from controladores import controlador_tipo_cliente as controlador_tipo_cliente
 from controladores import controlador_usuario as controlador_usuario
 from controladores import controlador_cliente as controlador_cliente
 from controladores import controlador_rol as controlador_rol
-
+from controladores import controlador_articulo as controlador_articulo
 
 import configuraciones
 from functools import wraps
@@ -49,6 +50,7 @@ HABILITAR_ICON_PAGES = configuraciones.HABILITAR_ICON_PAGES
 ACT_STATE_0          = configuraciones.ACT_STATE_0
 ACT_STATE_1          = configuraciones.ACT_STATE_1
 NOMBRE_CRUD_PAGE     = configuraciones.NOMBRE_CRUD_PAGE
+NOMBRE_ADMINPAGES_PAGE = configuraciones.NOMBRE_ADMINPAGES_PAGE 
 NOMBRE_OPTIONS_COL   = configuraciones.NOMBRE_OPTIONS_COL
 NOMBRE_BTN_INSERT    = configuraciones.NOMBRE_BTN_INSERT
 NOMBRE_BTN_UPDATE    = configuraciones.NOMBRE_BTN_UPDATE
@@ -192,18 +194,45 @@ ERRORES = {
 
 
 CONTROLADORES = {
-    "tipo_unidad": {
+# EDQ
+    "tipo_documento": {
         "active" : True ,
-        "titulo": "tipos de unidades",
-        "icon_page": 'fa-solid fa-truck-plane',
-        "nombre_tabla": "tipo de unidad",
-        "controlador": controlador_tipo_unidad,
+        "titulo": "tipos de documentos",
+        "nombre_tabla": "tipo de documento",
+        "controlador": controlador_tipo_documento,
+        "icon_page": 'fa-solid fa-id-card',
         "filters": [
             ['activo', f'{TITLE_STATE}', get_options_active() ],
         ] ,
         "fields_form": [
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
             ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "tipo_comprobante": {
+        "active" : True ,
+        "titulo": "tipos de comprobantes",
+        "nombre_tabla": "tipo de comprobante",
+        "controlador": controlador_tipo_comprobante,
+        "icon_page": 'fa-solid fa-file-lines',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['inicial',          'Inicial',    'Inicial',     'text',     True ,     True ,        None ],
             ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
             ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
@@ -218,150 +247,37 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-    "marca": {
-        "active" : True ,
-        "titulo": "marcas de unidades",
-        "nombre_tabla": "marca",
-        "controlador": controlador_marca,
-        "icon_page": 'fa-solid fa-car-side',
-        "filters": [] ,
-        "fields_form": [
-#            ID/NAME   LABEL     PLACEHOLDER  TYPE     REQUIRED   ABLE/DISABLE   DATOS
-            ['id',     'ID',     'ID',        'text',  True ,     False ,        None ],
-            ['nombre', 'Nombre', 'Nombre',    'text',  True ,     True ,         None ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
-    "modelo": {
-        "active" : True ,
-        "titulo": "modelos de unidades",
-        "nombre_tabla": "modelo",
-        "controlador": controlador_modelo,
-        "icon_page": 'fa-solid fa-cogs',
-        "filters": [] ,
-        "fields_form": [
-#            ID/NAME            LABEL               PLACEHOLDER         TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',              'ID',               'ID',               'text',     False ,    False ,        None ],
-            ['nombre',          'Nombre',           'Nombre',           'text',     True ,     True ,         None ],
-            ['marcaid',         'Marca',            'Marca',            'select',   True ,     None,          [lambda: controlador_marca.get_options_marca() , 'nom_mar'] ],
-            ['tipo_unidadid',   'Tipo de Unidad',   'Tipo de Unidad',   'select',   True ,     None ,         [lambda: controlador_tipo_unidad.get_options() , 'nom_tip'] ],
-            # ['marcaid',         'Marca',            'Marca',            'select',   True ,     None,          [controlador_marca.get_options_marca() , 'nom_mar'] ],
-            # ['tipo_unidadid',   'Tipo de Unidad',   'Tipo de Unidad',   'select',   True ,     None ,         [controlador_tipo_unidad.get_options() , 'nom_tip'] ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
-    "unidad": {
-        "active" : True ,
-        "titulo": "unidades",
-        "nombre_tabla": "unidad",
-        "controlador": controlador_unidad,
-        "icon_page": 'fa-solid fa-truck-fast',
+    "tipo_indemnizacion": {
+        "active": True,
+        "titulo": "tipos de indemnización",
+        "nombre_tabla": "tipo de indemnización",
+        "controlador": controlador_tipo_indemnizacion,
+        "icon_page": "fa-solid fa-hand-holding-dollar",
         "filters": [
-            ['activo', f'{TITLE_STATE}', get_options_active() ],
-            ['modeloid', 'Modelo', lambda: controlador_modelo.get_options() ],
-        ] ,
-        "fields_form": [
-#            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
-            ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
-            ['placa',         'Placa',            'Placa',         'text',      True ,     True,          True ],
-            ['activo',        f'{TITLE_STATE}',   'activo',        'p',         True ,     True,          None ],
-            ['capacidad',     'Capacidad',        'Capacidad',     'number',    True ,     True,          True ],
-            ['volumen',       'Volumen',          'Volumen',       'number',    True ,     True,          None ],
-            ['modeloid',      'Nombre de Modelo', 'Elegir modelo', 'select',    True ,     True,          [lambda: controlador_modelo.get_options() , 'nom_modelo' ] ],
-            ['observaciones', 'Observaciones',    'observaciones', 'textarea',  False,     True,          None ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
-    "ubigeo" : {
-        "active":True,
-        "titulo":"Ubigeo",
-        "nombre_tabla":"ubigeo",
-        "controlador": controlador_ubigeo,
-        "icon_page" : "ri-map-pin-line",
-        "filters":[
-            ['activo', f'{TITLE_STATE}', get_options_active() ],
+            ['activo', f'{TITLE_STATE}', get_options_active()],
         ],
         "fields_form": [
-#            ID/NAME   LABEL     PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
-            ['codigo','Código',     'Código',  'text',   True ,       False ,      None ],
-            ['distrito', 'Distrito', 'Distrito',   'text',  True ,      True ,         None ],
-            ['provincia', 'Provincia', 'Provincia',   'text',  True ,      True ,         None ],
-            ['departamento', 'Departamento', 'Departamento',   'text',  True ,      True ,         None ],
+            #  ID/NAME     LABEL             PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
+            ['id',        'ID',             'ID',          'text',  True,      False,         None],
+            ['nombre',    'Nombre',         'Nombre',      'text',  True,      True,          None],
+            ['activo',    f'{TITLE_STATE}', 'Activo',      'p',     True,      False,         None],
         ],
         "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": False ,
-            "crud_update": False ,
-            "crud_delete": False ,
-            "crud_unactive": False ,
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": True,
         }
     },
-    "sucursal" : {
-        "active":True,
-        "titulo":"Sucursal",
-        "nombre_tabla":"sucursal",
-        "controlador": controlador_sucursal,
-        "icon_page" : "ri-store-3-line",
-        "filters":[
-            ],
-        "fields_form": [
-    #         ID/NAME         LABEL             PLACEHOLDER        TYPE       REQUIRED   ABLE/DISABLE   DATOS
-            ['id',            'ID',              'ID',              'text',      True ,    False,         True ],
-            ['abreviatura',   'Abreviatura',     'Abreviatura',     'text',      True ,    True,          None ],
-            ['codigo_postal', 'Código Postal',   'Código Postal',   'text',      True ,    True,          None ],
-            ['direccion',     'Dirección',       'Dirección',       'text',      True ,    True,          None ],
-            ['ubigeocodigo',  'Ubigeo',          'Elegir ubigeo',   'select',    True ,    True,          [lambda: controlador_ubigeo.get_options(), 'ubigeo'] ],
-            ['horario_l_v',   'Horario L-V',     'Ej: 9am - 6pm',   'text',      False,    True,          None ],
-            ['horario_s_d',   'Horario S-D',     'Ej: 9am - 1pm',   'text',      False,    True,          None ],
-            ['latitud',       'Latitud',         'Latitud',         'text',      False,    True,          None ],
-            ['longitud',      'Longitud',        'Longitud',        'text',      False,    True,          None ],
-            ['teléfono',      'Teléfono',        'Teléfono',        'text',      False,    True,          None ],
-            ['referencia',    'Referencia',      'Referencia',      'text',      False,    True,          None ],
-            ['activo',        f'{TITLE_STATE}',  'activo',          'p',         True ,    False,         None ],
-        ],
-
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
-    "tipo_empaque": {
+    "estado_reclamo": {
         "active" : True ,
-        "titulo": "tipos de empaques para paquetes",
-        "icon_page": 'fa-solid fa-truck-plane',
-        "nombre_tabla": "tipo de empaque",
-        "controlador": controlador_tipo_empaque,
+        "titulo": "estados de reclamos",
+        "nombre_tabla": "estado de reclamo",
+        "controlador": controlador_estado_reclamo,
+        "icon_page": 'fa-solid fa-circle-exclamation',
         "filters": [
             ['activo', f'{TITLE_STATE}', get_options_active() ],
         ] ,
@@ -381,36 +297,63 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-    "tipo_recepcion": {
-        "active" : True ,
-        "titulo": "tipos de recepción de paquetes",
-        "icon_page": 'fa-solid fa-truck-plane',
-        "nombre_tabla": "tipo de recepción de paquete",
-        "controlador": controlador_tipo_recepcion,
-        "filters": [
-            ['activo', f'{TITLE_STATE}', get_options_active() ],
-        ] ,
-        "fields_form": [
-#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
-    "tamaño_caja": {
+  
+# LEO
+    "tamanio_caja": {
         "active" : True ,
         "titulo": "tamaños de cajas",
         "nombre_tabla": "tamaño de caja",
         "controlador": controlador_tamanio_caja,
+        "icon_page": 'fa-solid fa-box-open',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "contenido_paquete": {
+        "active" : True ,
+        "titulo": "contenido de paquetes",
+        "nombre_tabla": "contenido de paquete",
+        "controlador": controlador_contenido_paquete,
+        "icon_page": 'fa-solid fa-box-open',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "articulo": {
+        "active" : True ,
+        "titulo": "articulos para encomiendas",
+        "nombre_tabla": "articulo para encomienda",
+        "controlador": controlador_articulo,
         "icon_page": 'fa-solid fa-box-open',
         "filters": [
             ['activo', f'{TITLE_STATE}', get_options_active() ],
@@ -483,236 +426,34 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-    "tipo_paquete": {
-        "active" : True ,
-        "titulo": "tipos de paquetes",
-        "nombre_tabla": "tipo de paquete",
-        "controlador": controlador_tipo_paquete,
-        "icon_page": 'ri-box-3-fill',
-        "filters": [
-            ['activo', f'{TITLE_STATE}', get_options_active() ],
-        ] ,
-        "fields_form": [
-#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
-    "tipo_documento": {
-        "active" : True ,
-        "titulo": "tipos de documentos",
-        "nombre_tabla": "tipo de documento",
-        "controlador": controlador_tipo_documento,
-        "icon_page": 'fa-solid fa-id-card',
-        "filters": [
-            ['activo', f'{TITLE_STATE}', get_options_active() ],
-        ] ,
-        "fields_form": [
-#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
-    "tipo_comprobante": {
-        "active" : True ,
-        "titulo": "tipos de comprobantes",
-        "nombre_tabla": "tipo de comprobante",
-        "controlador": controlador_tipo_comprobante,
-        "icon_page": 'fa-solid fa-file-lines',
-        "filters": [
-            ['activo', f'{TITLE_STATE}', get_options_active() ],
-        ] ,
-        "fields_form": [
-#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['inicial',          'Inicial',    'Inicial',     'text',     True ,     True ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
-    "empleado": {
-        "active": True,
-        "titulo": "empleados",
-        "nombre_tabla": "empleado",
-        "controlador": controlador_empleado,
-        "icon_page": 'fa-solid fa-id-card',
-        "filters": [
-            ['rolid', 'Rol', lambda: controlador_rol.get_options()],
-        ],
-        "fields_form": [
-            ['usuarioid', 'ID', 'ID', 'text', False, False, True],
-            ['nombre', 'Nombre', 'Nombre', 'text', True, True, True],
-            ['apellidos', 'Apellidos', 'Apellidos', 'text', True, True, True],
-            ['correo', 'Correo electrónico', 'Correo', 'email', True, True, True],
-            ['rolid', 'Rol', 'Seleccionar rol', 'select', True, True, [lambda: controlador_rol.get_options(), 'nombre']],
-        ],
-        "crud_forms": {
-            "crud_list": True,
-            "crud_search": True,
-            "crud_consult": True,
-            "crud_insert": True,
-            "crud_update": True,
-            "crud_delete": True,
-            "crud_unactive": False
-        }
-    },
-    "estado_reclamo": {
-        "active" : True ,
-        "titulo": "estados de reclamos",
-        "nombre_tabla": "estado de reclamo",
-        "controlador": controlador_estado_reclamo,
-        "icon_page": 'fa-solid fa-circle-exclamation',
-        "filters": [
-            ['activo', f'{TITLE_STATE}', get_options_active() ],
-        ] ,
-        "fields_form": [
-#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
-    "metodo_pago": {
-        "active": True,
-        "titulo": "métodos de pago",
-        "nombre_tabla": "método de pago",
-        "controlador": controlador_metodo_pago,
-        "icon_page": "fa-solid fa-money-bill-wave",
-        "filters": [
-            ['activo', f'{TITLE_STATE}', get_options_active()],
-        ],
-        "fields_form": [
-            #  ID/NAME     LABEL             PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
-            ['id',        'ID',             'ID',          'text',  True,      False,         None],
-            ['nombre',    'Nombre',         'Nombre',      'text',  True,      True,          None],
-            ['activo',    f'{TITLE_STATE}', 'Activo',      'p',     True,      False,         None],
-        ],
-        "crud_forms": {
-            "crud_list": True,
-            "crud_search": True,
-            "crud_consult": True,
-            "crud_insert": True,
-            "crud_update": True,
-            "crud_delete": True,
-            "crud_unactive": True,
-        }
-    },
-    "tipo_indemnizacion": {
-        "active": True,
-        "titulo": "tipos de indemnización",
-        "nombre_tabla": "tipo de indemnización",
-        "controlador": controlador_tipo_indemnizacion,
-        "icon_page": "fa-solid fa-hand-holding-dollar",
-        "filters": [
-            ['activo', f'{TITLE_STATE}', get_options_active()],
-        ],
-        "fields_form": [
-            #  ID/NAME     LABEL             PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
-            ['id',        'ID',             'ID',          'text',  True,      False,         None],
-            ['nombre',    'Nombre',         'Nombre',      'text',  True,      True,          None],
-            ['activo',    f'{TITLE_STATE}', 'Activo',      'p',     True,      False,         None],
-        ],
-        "crud_forms": {
-            "crud_list": True,
-            "crud_search": True,
-            "crud_consult": True,
-            "crud_insert": True,
-            "crud_update": True,
-            "crud_delete": True,
-            "crud_unactive": True,
-        }
-    },
-    "tipo_reclamo": {
-    "active" : True ,
-    "titulo": "tipos de reclamos",
-    "icon_page": 'fa-solid fa-book-open-reader',
-    "nombre_tabla": "tipo de reclamo",
-    "controlador": controlador_tipo_reclamo,
-    "filters": [
-        ['activo', f'{TITLE_STATE}', get_options_active() ],
-    ] ,
-    "fields_form": [
-#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-        ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-        ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-        ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-        ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
-    ],
-    "crud_forms": {
-        "crud_list": True ,
-        "crud_search": True ,
-        "crud_consult": True ,
-        "crud_insert": True ,
-        "crud_update": True ,
-        "crud_delete": True ,
-        "crud_unactive": True ,
-    }
-},
+    
+# FAB
     "motivo_reclamo": {
-    "active" : True ,
-    "titulo": "Motivo de reclamo",
-    "nombre_tabla": "motivo_reclamo",
-    "controlador": controlador_motivo_reclamo,
-    "icon_page": '',
-    "filters": [
-        ['tipo_reclamoid', 'Tipo de reclamo', lambda: controlador_tipo_reclamo.get_options() ],
-    ] ,
-    "fields_form": [
-#            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
-        ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
-        ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-        ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
-        ['tipo_reclamoid',  'Nombre de tipo de reclamo', 'Elegir tipo de reclamo', 'select',    True ,     True, [lambda: controlador_tipo_reclamo.get_options() , 'nom_tip' ] ],
-    ],
-    "crud_forms": {
-        "crud_list": True ,
-        "crud_search": True ,
-        "crud_consult": True ,
-        "crud_insert": True ,
-        "crud_update": True ,
-        "crud_delete": True ,
-        "crud_unactive": True ,
-    }
-},
+        "active" : True ,
+        "titulo": "Motivo de reclamo",
+        "nombre_tabla": "motivo_reclamo",
+        "controlador": controlador_motivo_reclamo,
+        "icon_page": '',
+        "filters": [
+            ['tipo_reclamoid', 'Tipo de reclamo', lambda: controlador_tipo_reclamo.get_options() ],
+        ] ,
+        "fields_form": [
+    #            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
+            ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+            ['tipo_reclamoid',  'Nombre de tipo de reclamo', 'Elegir tipo de reclamo', 'select',    True ,     True, [lambda: controlador_tipo_reclamo.get_options() , 'nom_tip' ] ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
     "causa_reclamo": {
         "active" : True ,
         "titulo": "Causa de reclamo",
@@ -761,6 +502,119 @@ CONTROLADORES = {
             "crud_update": True,
             "crud_delete": True,
             "crud_unactive": False  # Solo si tienes columna 'activo'
+        }
+    },
+    "sucursal" : {
+        "active":True,
+        "titulo":"Sucursal",
+        "nombre_tabla":"sucursal",
+        "controlador": controlador_sucursal,
+        "icon_page" : "ri-store-3-line",
+        "filters":[
+            ],
+        "fields_form": [
+    #         ID/NAME         LABEL             PLACEHOLDER        TYPE       REQUIRED   ABLE/DISABLE   DATOS
+            ['id',            'ID',              'ID',              'text',      True ,    False,         True ],
+            ['abreviatura',   'Abreviatura',     'Abreviatura',     'text',      True ,    True,          None ],
+            ['codigo_postal', 'Código Postal',   'Código Postal',   'text',      True ,    True,          None ],
+            ['direccion',     'Dirección',       'Dirección',       'text',      True ,    True,          None ],
+            ['ubigeocodigo',  'Ubigeo',          'Elegir ubigeo',   'select',    True ,    True,          [lambda: controlador_ubigeo.get_options(), 'ubigeo'] ],
+            ['horario_l_v',   'Horario L-V',     'Ej: 9am - 6pm',   'text',      False,    True,          None ],
+            ['horario_s_d',   'Horario S-D',     'Ej: 9am - 1pm',   'text',      False,    True,          None ],
+            ['latitud',       'Latitud',         'Latitud',         'text',      False,    True,          None ],
+            ['longitud',      'Longitud',        'Longitud',        'text',      False,    True,          None ],
+            ['teléfono',      'Teléfono',        'Teléfono',        'text',      False,    True,          None ],
+            ['referencia',    'Referencia',      'Referencia',      'text',      False,    True,          None ],
+            ['activo',        f'{TITLE_STATE}',  'activo',          'p',         True ,    False,         None ],
+        ],
+
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "tipo_reclamo": {
+        "active" : True ,
+        "titulo": "tipos de reclamos",
+        "icon_page": 'fa-solid fa-book-open-reader',
+        "nombre_tabla": "tipo de reclamo",
+        "controlador": controlador_tipo_reclamo,
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+    #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    
+# JPD
+    "metodo_pago": {
+        "active": True,
+        "titulo": "métodos de pago",
+        "nombre_tabla": "método de pago",
+        "controlador": controlador_metodo_pago,
+        "icon_page": "fa-solid fa-money-bill-wave",
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active()],
+        ],
+        "fields_form": [
+            #  ID/NAME     LABEL             PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
+            ['id',        'ID',             'ID',          'text',  True,      False,         None],
+            ['nombre',    'Nombre',         'Nombre',      'text',  True,      True,          None],
+            ['activo',    f'{TITLE_STATE}', 'Activo',      'p',     True,      False,         None],
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": True,
+        }
+    },
+    "empleado": {
+        "active": True,
+        "titulo": "empleados",
+        "nombre_tabla": "empleado",
+        "controlador": controlador_empleado,
+        "icon_page": 'fa-solid fa-id-card',
+        "filters": [
+            ['rolid', 'Rol', lambda: controlador_rol.get_options()],
+        ],
+        "fields_form": [
+            ['usuarioid', 'ID', 'ID', 'text', False, False, True],
+            ['nombre', 'Nombre', 'Nombre', 'text', True, True, True],
+            ['apellidos', 'Apellidos', 'Apellidos', 'text', True, True, True],
+            ['correo', 'Correo electrónico', 'Correo', 'email', True, True, True],
+            ['rolid', 'Rol', 'Seleccionar rol', 'select', True, True, [lambda: controlador_rol.get_options(), 'nombre']],
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": False
         }
     },
     "tipo_cliente": {
@@ -874,6 +728,215 @@ CONTROLADORES = {
         }
     },
 
+# FCV
+    "tipo_unidad": {
+        "active" : True ,
+        "titulo": "tipos de unidades",
+        "icon_page": 'fa-solid fa-truck-plane',
+        "nombre_tabla": "tipo de unidad",
+        "controlador": controlador_tipo_unidad,
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "marca": {
+        "active" : True ,
+        "titulo": "marcas de unidades",
+        "nombre_tabla": "marca",
+        "controlador": controlador_marca,
+        "icon_page": 'fa-solid fa-car-side',
+        "filters": [] ,
+        "fields_form": [
+#            ID/NAME   LABEL     PLACEHOLDER  TYPE     REQUIRED   ABLE/DISABLE   DATOS
+            ['id',     'ID',     'ID',        'text',  True ,     False ,        None ],
+            ['nombre', 'Nombre', 'Nombre',    'text',  True ,     True ,         None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "modelo": {
+        "active" : True ,
+        "titulo": "modelos de unidades",
+        "nombre_tabla": "modelo",
+        "controlador": controlador_modelo,
+        "icon_page": 'fa-solid fa-cogs',
+        "filters": [] ,
+        "fields_form": [
+#            ID/NAME            LABEL               PLACEHOLDER         TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',              'ID',               'ID',               'text',     False ,    False ,        None ],
+            ['nombre',          'Nombre',           'Nombre',           'text',     True ,     True ,         None ],
+            ['marcaid',         'Marca',            'Marca',            'select',   True ,     None,          [lambda: controlador_marca.get_options_marca() , 'nom_mar'] ],
+            ['tipo_unidadid',   'Tipo de Unidad',   'Tipo de Unidad',   'select',   True ,     None ,         [lambda: controlador_tipo_unidad.get_options() , 'nom_tip'] ],
+            # ['marcaid',         'Marca',            'Marca',            'select',   True ,     None,          [controlador_marca.get_options_marca() , 'nom_mar'] ],
+            # ['tipo_unidadid',   'Tipo de Unidad',   'Tipo de Unidad',   'select',   True ,     None ,         [controlador_tipo_unidad.get_options() , 'nom_tip'] ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "unidad": {
+        "active" : True ,
+        "titulo": "unidades",
+        "nombre_tabla": "unidad",
+        "controlador": controlador_unidad,
+        "icon_page": 'fa-solid fa-truck-fast',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+            ['modeloid', 'Modelo', lambda: controlador_modelo.get_options() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
+            ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
+            ['placa',         'Placa',            'Placa',         'text',      True ,     True,          True ],
+            ['activo',        f'{TITLE_STATE}',   'activo',        'p',         True ,     True,          None ],
+            ['capacidad',     'Capacidad',        'Capacidad',     'number',    True ,     True,          True ],
+            ['volumen',       'Volumen',          'Volumen',       'number',    True ,     True,          None ],
+            ['modeloid',      'Nombre de Modelo', 'Elegir modelo', 'select',    True ,     True,          [lambda: controlador_modelo.get_options() , 'nom_modelo' ] ],
+            ['observaciones', 'Observaciones',    'observaciones', 'textarea',  False,     True,          None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "tipo_empaque": {
+        "active" : True ,
+        "titulo": "tipos de empaques para paquetes",
+        "icon_page": 'fa-solid fa-truck-plane',
+        "nombre_tabla": "tipo de empaque",
+        "controlador": controlador_tipo_empaque,
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "tipo_recepcion": {
+        "active" : True ,
+        "titulo": "tipos de recepción de paquetes",
+        "icon_page": 'fa-solid fa-truck-plane',
+        "nombre_tabla": "tipo de recepción de paquete",
+        "controlador": controlador_tipo_recepcion,
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    
+# _BORRAR
+    "ubigeo" : {
+        "active":True,
+        "titulo":"Ubigeo",
+        "nombre_tabla":"ubigeo",
+        "controlador": controlador_ubigeo,
+        "icon_page" : "ri-map-pin-line",
+        "filters":[
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ],
+        "fields_form": [
+#            ID/NAME   LABEL     PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
+            ['codigo','Código',     'Código',  'text',   True ,       False ,      None ],
+            ['distrito', 'Distrito', 'Distrito',   'text',  True ,      True ,         None ],
+            ['provincia', 'Provincia', 'Provincia',   'text',  True ,      True ,         None ],
+            ['departamento', 'Departamento', 'Departamento',   'text',  True ,      True ,         None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": False ,
+            "crud_update": False ,
+            "crud_delete": False ,
+            "crud_unactive": False ,
+        }
+    },
+    "tipo_paquete": {
+        "active" : True ,
+        "titulo": "tipos de paquetes",
+        "nombre_tabla": "tipo de paquete",
+        "controlador": controlador_contenido_paquete,
+        "icon_page": 'ri-box-3-fill',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    
 }
 
 
@@ -1100,9 +1163,7 @@ MENU_ADMIN = {
         'icon_page' : 'fa-solid fa-shield-halved',
         'dashboard' : True,
         'cruds' :     [  ],
-    'dashboard' : False,
-        'cruds' :     [ 'usuario' ],
-        'reports' :   [  ],
+        'dashboard' : False,
     },
     'personal' : {
         'name' : 'Personal',   
@@ -1214,25 +1275,26 @@ def inject_globals():
         cookie_error = cookie_error,
         modulo_actual = modulo_actual ,
 
-        MENU_ADMIN           = MENU_ADMIN,
-        HABILITAR_ICON_PAGES = HABILITAR_ICON_PAGES,
-        SYSTEM_NAME          = SYSTEM_NAME,
-        STATE_0              = STATE_0,   
-        STATE_1              = STATE_1,
-        ACT_STATE_0          = ACT_STATE_0,
-        ACT_STATE_1          = ACT_STATE_1,
-        NOMBRE_CRUD_PAGE     = NOMBRE_CRUD_PAGE,
-        NOMBRE_OPTIONS_COL   = NOMBRE_OPTIONS_COL,
-        NOMBRE_BTN_INSERT    = NOMBRE_BTN_INSERT,
-        NOMBRE_BTN_UPDATE    = NOMBRE_BTN_UPDATE,
-        NOMBRE_BTN_DELETE    = NOMBRE_BTN_DELETE,
-        NOMBRE_BTN_UNACTIVE  = NOMBRE_BTN_UNACTIVE,
-        NOMBRE_BTN_LIST      = NOMBRE_BTN_LIST,
-        NOMBRE_BTN_CONSULT   = NOMBRE_BTN_CONSULT,
-        NOMBRE_BTN_SEARCH    = NOMBRE_BTN_SEARCH,
-        ICON_PAGE_CRUD       = ICON_PAGE_CRUD ,
-        ICON_PAGE_REPORT     = ICON_PAGE_REPORT ,
-        ICON_PAGE_DASHBOARD  = ICON_PAGE_DASHBOARD ,
+        MENU_ADMIN             = MENU_ADMIN,
+        HABILITAR_ICON_PAGES   = HABILITAR_ICON_PAGES,
+        SYSTEM_NAME            = SYSTEM_NAME,
+        STATE_0                = STATE_0,   
+        STATE_1                = STATE_1,
+        ACT_STATE_0            = ACT_STATE_0,
+        ACT_STATE_1            = ACT_STATE_1,
+        NOMBRE_CRUD_PAGE       = NOMBRE_CRUD_PAGE,
+        NOMBRE_ADMINPAGES_PAGE = NOMBRE_ADMINPAGES_PAGE ,
+        NOMBRE_OPTIONS_COL     = NOMBRE_OPTIONS_COL,
+        NOMBRE_BTN_INSERT      = NOMBRE_BTN_INSERT,
+        NOMBRE_BTN_UPDATE      = NOMBRE_BTN_UPDATE,
+        NOMBRE_BTN_DELETE      = NOMBRE_BTN_DELETE,
+        NOMBRE_BTN_UNACTIVE    = NOMBRE_BTN_UNACTIVE,
+        NOMBRE_BTN_LIST        = NOMBRE_BTN_LIST,
+        NOMBRE_BTN_CONSULT     = NOMBRE_BTN_CONSULT,
+        NOMBRE_BTN_SEARCH      = NOMBRE_BTN_SEARCH,
+        ICON_PAGE_CRUD         = ICON_PAGE_CRUD ,
+        ICON_PAGE_REPORT       = ICON_PAGE_REPORT ,
+        ICON_PAGE_DASHBOARD    = ICON_PAGE_DASHBOARD ,
     )
 
 
@@ -1244,7 +1306,8 @@ paginas_simples = [
     'tracking',
     'seguimiento',
     'recuperar_contrasenia',
-    'libro_reclamaciones'
+    'libro_reclamaciones',
+    'NoRecibimos'
 ]
 
 
@@ -1310,7 +1373,7 @@ def mostrar_pagoenvio():
 
 ##################_ ADMIN PAGE _################## 
 
-# NO JOROBES
+
 @app.route("/panel")
 def panel():
     return render_template('panel.html')
@@ -1455,6 +1518,44 @@ def reporte(report_name):
         counter = counter ,
         icon_page = icon_page,
     )
+
+
+
+@app.route("/administrar_paginas")
+@validar_admin()
+def administrar_paginas():
+    modulos = acceso.get_lista_modulos()
+    paginas_cruds = acceso.get_paginas_crud()
+    roles = acceso.get_lista_roles()
+    tipos_rol = acceso.get_lista_tipo_roles()
+
+    return render_template(
+        'administrar_paginas.html' ,
+        modulos = modulos ,
+        paginas_cruds = paginas_cruds , 
+        roles = roles ,
+        tipos_rol = tipos_rol ,
+        )
+
+
+@app.route("/permiso_rol=<int:rolid>")
+@validar_admin()
+def permiso_rol(rolid):
+    modulos = acceso.get_lista_modulos()
+    paginas_cruds = acceso.get_paginas_crud()
+    roles = acceso.get_lista_roles()
+    tipos_rol = acceso.get_lista_tipo_roles()
+    info_rol = acceso.get_info_rol(rolid)
+
+    return render_template(
+        'administrar_paginas.html' ,
+        modulos = modulos ,
+        paginas_cruds = paginas_cruds , 
+        roles = roles ,
+        tipos_rol = tipos_rol ,
+        rolid = rolid ,
+        info_rol = info_rol ,
+        )
 
 
 ##################_ METHOD POST _################## 
@@ -1606,6 +1707,11 @@ def colores():
         <div style="height: 100%; width: 100%; background-color: var({text})"></div>
         </div>
     '''
+    
+    html += '''
+        <input type="color" name="" id="">
+    '''
+
     return html
 
 
