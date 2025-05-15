@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
         'xs': {
             price: 2.00,
             dimensions: '20 x 15 x 15 cm',
-            image: '/static/img/caja-shalom-xs.jpg',
+            image: '/static/img/caja XS.png',
             discounts: {
                 25: 1.70,
                 50: 1.40
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
         's': {
             price: 2.50,
             dimensions: '25 x 20 x 20 cm',
-            image: '/static/img/caja-shalom-s.jpg',
+            image: '/static/img/caja S.png',
             discounts: {
                 25: 2.20,
                 50: 1.90
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
         'm': {
             price: 3.20,
             dimensions: '30 x 25 x 25 cm',
-            image: '/static/img/caja-shalom-m.jpg',
+            image: '/static/img/caja M.png',
             discounts: {
                 25: 2.80,
                 50: 2.50
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
         'l': {
             price: 4.00,
             dimensions: '40 x 30 x 30 cm',
-            image: '/static/img/caja-shalom-l.jpg',
+            image: '/static/img/caja L.png',
             discounts: {
                 25: 3.50,
                 50: 3.00
