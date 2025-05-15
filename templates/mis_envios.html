@@ -1,0 +1,700 @@
+{% extends "MAESTRA_GENERAL.html" %}
+
+{% block titulo %}Mis Envíos | Sistema de Seguimiento{% endblock %}
+
+{% block estilos %}
+<!-- Estilos específicos para la página de envíos -->
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  .tracking-badge {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  
+  .package-card {
+    transition: all 0.3s ease;
+    border-left: 5px solid #0d6efd;
+  }
+  
+  .package-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+  
+  .package-status-delivered {
+    border-left-color: #198754;
+  }
+  
+  .package-status-in-transit {
+    border-left-color: #0dcaf0;
+  }
+  
+  .package-status-pending {
+    border-left-color: #ffc107;
+  }
+  
+  .search-box {
+    border-radius: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  
+  .stats-box {
+    border-radius: 10px;
+    min-height: 100px;
+  }
+  
+  .table-responsive {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .package-detail-row {
+    display: none;
+    background-color: #f8f9fa;
+  }
+  
+  .package-row {
+    cursor: pointer;
+  }
+  
+  .package-row:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+  }
+  
+  .date-filter {
+    max-width: 150px;
+  }
+  
+  .filter-btn {
+    border-radius: 20px;
+    padding: 0.25rem 1rem;
+    margin-right: 0.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .filter-btn.active {
+    background-color: #0d6efd;
+    color: white;
+  }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="container-fluid py-4">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <h1 class="h3 mb-0">Mis Envíos</h1>
+        <button class="btn btn-primary" id="newShipmentBtn">
+          <i class="fas fa-plus-circle me-2"></i>Nuevo Envío
+        </button>
+      </div>
+      <p class="text-muted">Gestiona y monitorea todos tus paquetes desde un solo lugar</p>
+    </div>
+  </div>
+  
+  <!-- Resumen y Estadísticas -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card stats-box bg-primary text-white">
+        <div class="card-body">
+          <h5 class="card-title">Total de Envíos</h5>
+          <h2 class="display-6 mb-0" id="totalShipments">27</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card stats-box bg-success text-white">
+        <div class="card-body">
+          <h5 class="card-title">Entregados</h5>
+          <h2 class="display-6 mb-0" id="deliveredShipments">18</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card stats-box bg-info text-white">
+        <div class="card-body">
+          <h5 class="card-title">En Tránsito</h5>
+          <h2 class="display-6 mb-0" id="inTransitShipments">6</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card stats-box bg-warning text-white">
+        <div class="card-body">
+          <h5 class="card-title">Pendientes</h5>
+          <h2 class="display-6 mb-0" id="pendingShipments">3</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Filtros y Búsqueda -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="input-group search-box">
+                <span class="input-group-text bg-transparent border-end-0">
+                  <i class="fas fa-search"></i>
+                </span>
+                <input type="text" class="form-control border-start-0" id="searchInput" placeholder="Buscar por tracking, descripción, destinatario...">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="d-flex justify-content-md-end">
+                <div class="me-2">
+                  <input type="date" class="form-control date-filter" id="startDate">
+                </div>
+                <div class="me-3">
+                  <input type="date" class="form-control date-filter" id="endDate">
+                </div>
+                <button class="btn btn-outline-secondary filter-btn active" data-filter="all">Todos</button>
+                <button class="btn btn-outline-success filter-btn" data-filter="delivered">Entregados</button>
+                <button class="btn btn-outline-info filter-btn" data-filter="transit">En Tránsito</button>
+                <button class="btn btn-outline-warning filter-btn" data-filter="pending">Pendientes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Tabla de Envíos -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover" id="shipmentsTable">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">#Tracking</th>
+                  <th scope="col">Fecha</th>
+                  <th scope="col">Destinatario</th>
+                  <th scope="col">Destino</th>
+                  <th scope="col">Peso (kg)</th>
+                  <th scope="col">Valor</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Datos se cargarán dinámicamente con JS -->
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <div>
+              <select class="form-select" id="entriesPerPage">
+                <option value="10">10 por página</option>
+                <option value="25">25 por página</option>
+                <option value="50">50 por página</option>
+                <option value="100">100 por página</option>
+              </select>
+            </div>
+            <nav aria-label="Paginación de envíos">
+              <ul class="pagination mb-0" id="pagination">
+                <li class="page-item disabled">
+                  <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                </li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                  <a class="page-link" href="#">Siguiente</a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para detalles del paquete -->
+<div class="modal fade" id="packageDetailModal" tabindex="-1" aria-labelledby="packageDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="packageDetailModalLabel">Detalles del Envío</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="fw-bold">N° de Tracking:</label>
+              <div id="modalTracking" class="fs-4"></div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="fw-bold">Descripción:</label>
+              <div id="modalDescription"></div>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-6">
+                <label class="fw-bold">Valor Declarado:</label>
+                <div id="modalValue"></div>
+              </div>
+              <div class="col-6">
+                <label class="fw-bold">Peso:</label>
+                <div id="modalWeight"></div>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="fw-bold">Dimensiones (cm):</label>
+              <div id="modalDimensions"></div>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label class="fw-bold">Destinatario:</label>
+              <div id="modalRecipient"></div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="fw-bold">Dirección de Entrega:</label>
+              <div id="modalAddress"></div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="fw-bold">Código Postal:</label>
+              <div id="modalPostalCode"></div>
+            </div>
+            
+            <div class="mb-3">
+              <label class="fw-bold">Teléfono:</label>
+              <div id="modalPhone"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="border-top pt-3 mt-3">
+          <h6 class="fw-bold">Historial de Seguimiento</h6>
+          <div class="timeline mt-3" id="modalTimeline">
+            <!-- El seguimiento se cargará dinámicamente -->
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" id="printLabelBtn">Imprimir Etiqueta</button>
+        <button type="button" class="btn btn-success" id="shareTrackingBtn">Compartir Tracking</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Datos de ejemplo para simular la carga de la base de datos
+    const shipments = [
+      {
+        tracking: 10001,
+        date: '2025-05-01',
+        recipient: 'Juan Pérez',
+        recipientDoc: '12345678',
+        destination: 'Lima',
+        weight: 2.5,
+        value: 150.00,
+        description: 'Documentos comerciales y muestras textiles',
+        status: 'delivered',
+        address: 'Av. Arequipa 1235, Lince',
+        postalCode: '15046',
+        phone: '987654321',
+        dimensions: {
+          height: 10,
+          length: 30,
+          width: 20
+        },
+        timeline: [
+          { date: '2025-05-01 09:15', status: 'Paquete recibido en agencia', location: 'Sucursal San Isidro' },
+          { date: '2025-05-02 08:30', status: 'En tránsito', location: 'Centro de distribución' },
+          { date: '2025-05-03 14:45', status: 'En reparto', location: 'Unidad móvil AC-456' },
+          { date: '2025-05-03 17:20', status: 'Entregado', location: 'Recibido por: Juan Pérez' }
+        ]
+      },
+      {
+        tracking: 10002,
+        date: '2025-05-03',
+        recipient: 'María Torres',
+        recipientDoc: '87654321',
+        destination: 'Arequipa',
+        weight: 4.2,
+        value: 320.50,
+        description: 'Equipos electrónicos',
+        status: 'transit',
+        address: 'Calle Mercaderes 450, Arequipa',
+        postalCode: '04001',
+        phone: '951236478',
+        dimensions: {
+          height: 25,
+          length: 40,
+          width: 35
+        },
+        timeline: [
+          { date: '2025-05-03 11:30', status: 'Paquete recibido en agencia', location: 'Sucursal Miraflores' },
+          { date: '2025-05-04 07:45', status: 'En tránsito', location: 'Centro de distribución' },
+          { date: '2025-05-05 06:20', status: 'En ruta a sucursal destino', location: 'Transporte interprovincial' }
+        ]
+      },
+      {
+        tracking: 10003,
+        date: '2025-05-08',
+        recipient: 'Carlos Ruiz',
+        recipientDoc: '45678912',
+        destination: 'Trujillo',
+        weight: 1.8,
+        value: 95.75,
+        description: 'Libros y artículos de oficina',
+        status: 'pending',
+        address: 'Jr. Pizarro 587, Trujillo',
+        postalCode: '13001',
+        phone: '912345678',
+        dimensions: {
+          height: 15,
+          length: 25,
+          width: 20
+        },
+        timeline: [
+          { date: '2025-05-08 15:20', status: 'Paquete registrado en sistema', location: 'Pendiente recepción física' }
+        ]
+      },
+      {
+        tracking: 10004,
+        date: '2025-04-25',
+        recipient: 'Ana López',
+        recipientDoc: '78945612',
+        destination: 'Cusco',
+        weight: 5.6,
+        value: 430.00,
+        description: 'Artesanías y souvenirs regionales',
+        status: 'delivered',
+        address: 'Av. Sol 456, Cusco',
+        postalCode: '08002',
+        phone: '963258741',
+        dimensions: {
+          height: 30,
+          length: 45,
+          width: 35
+        },
+        timeline: [
+          { date: '2025-04-25 10:10', status: 'Paquete recibido en agencia', location: 'Sucursal San Borja' },
+          { date: '2025-04-26 08:30', status: 'En tránsito', location: 'Centro de distribución' },
+          { date: '2025-04-27 14:15', status: 'En ruta a sucursal destino', location: 'Transporte interprovincial' },
+          { date: '2025-04-28 09:30', status: 'Recibido en sucursal destino', location: 'Sucursal Cusco' },
+          { date: '2025-04-29 10:45', status: 'En reparto', location: 'Unidad móvil CU-123' },
+          { date: '2025-04-29 15:20', status: 'Entregado', location: 'Recibido por: Pedro López' }
+        ]
+      },
+      {
+        tracking: 10005,
+        date: '2025-05-06',
+        recipient: 'José García',
+        recipientDoc: '32165498',
+        destination: 'Piura',
+        weight: 3.1,
+        value: 175.25,
+        description: 'Ropa y accesorios',
+        status: 'transit',
+        address: 'Calle Tacna 789, Piura',
+        postalCode: '20001',
+        phone: '945612378',
+        dimensions: {
+          height: 20,
+          length: 30,
+          width: 25
+        },
+        timeline: [
+          { date: '2025-05-06 14:30', status: 'Paquete recibido en agencia', location: 'Sucursal Jesús María' },
+          { date: '2025-05-07 09:45', status: 'En tránsito', location: 'Centro de distribución' },
+          { date: '2025-05-08 13:20', status: 'En ruta a sucursal destino', location: 'Transporte interprovincial' }
+        ]
+      }
+    ];
+
+    // Función para formatear moneda peruana (PEN)
+    function formatCurrency(value) {
+      return 'S/ ' + parseFloat(value).toFixed(2);
+    }
+
+    // Función para cargar la tabla de envíos
+    function loadShipmentsTable(filteredShipments = null) {
+      const tableBody = document.querySelector('#shipmentsTable tbody');
+      tableBody.innerHTML = '';
+      
+      const shipmentsToShow = filteredShipments || shipments;
+      
+      shipmentsToShow.forEach(shipment => {
+        const statusText = getStatusText(shipment.status);
+        const statusClass = getStatusClass(shipment.status);
+        
+        // Crear la fila principal del envío
+        const row = document.createElement('tr');
+        row.className = 'package-row';
+        row.dataset.tracking = shipment.tracking;
+        row.innerHTML = `
+          <td><span class="badge tracking-badge bg-primary">${shipment.tracking}</span></td>
+          <td>${formatDate(shipment.date)}</td>
+          <td>${shipment.recipient}</td>
+          <td>${shipment.destination}</td>
+          <td>${shipment.weight} kg</td>
+          <td>${formatCurrency(shipment.value)}</td>
+          <td><span class="badge ${statusClass}">${statusText}</span></td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary view-details-btn" data-tracking="${shipment.tracking}">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary print-btn" data-tracking="${shipment.tracking}">
+              <i class="fas fa-print"></i>
+            </button>
+          </td>
+        `;
+        
+        tableBody.appendChild(row);
+      });
+      
+      // Añadir eventos a los botones de ver detalles
+      document.querySelectorAll('.view-details-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const tracking = this.dataset.tracking;
+          openPackageDetailModal(tracking);
+        });
+      });
+      
+      // Añadir eventos a los botones de imprimir
+      document.querySelectorAll('.print-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const tracking = this.dataset.tracking;
+          printShippingLabel(tracking);
+        });
+      });
+      
+      // Añadir evento a las filas para abrir el modal
+      document.querySelectorAll('.package-row').forEach(row => {
+        row.addEventListener('click', function() {
+          const tracking = this.dataset.tracking;
+          openPackageDetailModal(tracking);
+        });
+      });
+    }
+    
+    // Funciones de ayuda para el estado del paquete
+    function getStatusText(status) {
+      switch(status) {
+        case 'delivered': return 'Entregado';
+        case 'transit': return 'En Tránsito';
+        case 'pending': return 'Pendiente';
+        default: return 'Desconocido';
+      }
+    }
+    
+    function getStatusClass(status) {
+      switch(status) {
+        case 'delivered': return 'bg-success';
+        case 'transit': return 'bg-info';
+        case 'pending': return 'bg-warning';
+        default: return 'bg-secondary';
+      }
+    }
+    
+    // Formatear fecha
+    function formatDate(dateString) {
+      const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+      return new Date(dateString).toLocaleDateString('es-PE', options);
+    }
+    
+    // Abrir modal con detalles del paquete
+    function openPackageDetailModal(tracking) {
+      const shipment = shipments.find(s => s.tracking.toString() === tracking.toString());
+      
+      if (shipment) {
+        // Llenar los datos del modal
+        document.getElementById('modalTracking').textContent = shipment.tracking;
+        document.getElementById('packageDetailModalLabel').textContent = `Detalles del Envío #${shipment.tracking}`;
+        document.getElementById('modalDescription').textContent = shipment.description;
+        document.getElementById('modalValue').textContent = formatCurrency(shipment.value);
+        document.getElementById('modalWeight').textContent = `${shipment.weight} kg`;
+        document.getElementById('modalDimensions').textContent = 
+          `${shipment.dimensions.length} × ${shipment.dimensions.width} × ${shipment.dimensions.height} cm`;
+        document.getElementById('modalRecipient').textContent = 
+          `${shipment.recipient} (Doc: ${shipment.recipientDoc})`;
+        document.getElementById('modalAddress').textContent = shipment.address;
+        document.getElementById('modalPostalCode').textContent = shipment.postalCode;
+        document.getElementById('modalPhone').textContent = shipment.phone;
+        
+        // Cargar timeline
+        const timelineEl = document.getElementById('modalTimeline');
+        timelineEl.innerHTML = '';
+        
+        // Ordenar la línea de tiempo para mostrar la más reciente primero
+        const timelineEvents = [...shipment.timeline].reverse();
+
+        timelineEvents.forEach((event, index) => {
+          const timelineItem = document.createElement('div');
+          timelineItem.className = 'timeline-item d-flex mb-3';
+          
+          let statusClass = 'bg-primary';
+          if (event.status.toLowerCase().includes('entregado')) {
+            statusClass = 'bg-success';
+          } else if (event.status.toLowerCase().includes('reparto')) {
+            statusClass = 'bg-info';
+          } else if (event.status.toLowerCase().includes('pendiente')) {
+            statusClass = 'bg-warning';
+          }
+          
+          timelineItem.innerHTML = `
+            <div class="timeline-badge me-3">
+              <div class="rounded-circle ${statusClass} text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <i class="fas fa-circle"></i>
+              </div>
+              ${index < timelineEvents.length - 1 ? '<div class="timeline-line" style="position: absolute; width: 2px; background-color: #dee2e6; height: 30px; left: 19px; top: 40px;"></div>' : ''}
+            </div>
+            <div class="timeline-content">
+              <div class="d-flex justify-content-between">
+                <h6 class="mb-1">${event.status}</h6>
+                <small class="text-muted">${event.date}</small>
+              </div>
+              <p class="mb-0 text-muted">${event.location}</p>
+            </div>
+          `;
+          
+          timelineEl.appendChild(timelineItem);
+        });
+        
+        // Abrir el modal
+        const modal = new bootstrap.Modal(document.getElementById('packageDetailModal'));
+        modal.show();
+      }
+    }
+    
+    // Función para imprimir etiqueta
+    function printShippingLabel(tracking) {
+      const shipment = shipments.find(s => s.tracking.toString() === tracking.toString());
+      if (shipment) {
+        // En un caso real, esto generaría un PDF o abriría una ventana de impresión
+        alert(`Preparando impresión de etiqueta para el envío #${tracking}`);
+      }
+    }
+    
+    // Cargar la tabla inicialmente
+    loadShipmentsTable();
+    
+    // Filtros
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        // Quitar clase active de todos los botones
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        
+        // Añadir clase active al botón seleccionado
+        this.classList.add('active');
+        
+        const filter = this.dataset.filter;
+        let filteredShipments;
+        
+        if (filter === 'all') {
+          filteredShipments = shipments;
+        } else {
+          const statusMap = {
+            'delivered': 'delivered',
+            'transit': 'transit',
+            'pending': 'pending'
+          };
+          
+          filteredShipments = shipments.filter(s => s.status === statusMap[filter]);
+        }
+        
+        loadShipmentsTable(filteredShipments);
+      });
+    });
+    
+    // Búsqueda
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      
+      if (searchTerm.trim() === '') {
+        loadShipmentsTable();
+        return;
+      }
+      
+      const filteredShipments = shipments.filter(s => 
+        s.tracking.toString().includes(searchTerm) ||
+        s.recipient.toLowerCase().includes(searchTerm) ||
+        s.description.toLowerCase().includes(searchTerm) ||
+        s.destination.toLowerCase().includes(searchTerm)
+      );
+      
+      loadShipmentsTable(filteredShipments);
+    });
+    
+    // Botón de nuevo envío
+    document.getElementById('newShipmentBtn').addEventListener('click', function() {
+      // Redireccionar a la página de creación de envíos
+      alert('Redirigiendo a la página de creación de envíos...');
+      // window.location.href = '/nuevo-envio';
+    });
+    
+    // Evento para compartir tracking
+    document.getElementById('shareTrackingBtn').addEventListener('click', function() {
+      const tracking = document.getElementById('modalTracking').textContent;
+      
+      // Simulación de compartir el tracking
+      if (navigator.share) {
+        navigator.share({
+          title: 'Seguimiento de Envío',
+          text: `Sigue tu envío #${tracking} en nuestra plataforma`,
+          url: `https://ejemplo.com/seguimiento/${tracking}`
+        })
+        .then(() => console.log('Contenido compartido exitosamente'))
+        .catch((error) => console.log('Error al compartir', error));
+      } else {
+        // Fallback para navegadores que no soportan Web Share API
+        const tempInput = document.createElement('input');
+        document.body.appendChild(tempInput);
+        tempInput.value = `https://ejemplo.com/seguimiento/${tracking}`;
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        
+        alert('Enlace de seguimiento copiado al portapapeles');
+      }
+    });
+    
+    // Evento para imprimir etiqueta desde modal
+    document.getElementById('printLabelBtn').addEventListener('click', function() {
+      const tracking = document.getElementById('modalTracking').textContent;
+      printShippingLabel(tracking);
+    });
+    
+    // Actualizar contadores de estadísticas
+    function updateStatistics() {
+      const totalCount = shipments.length;
+      const deliveredCount = shipments.filter(s => s.status === 'delivered').length;
+      const transitCount = shipments.filter(s => s.status === 'transit').length;
+      const pendingCount = shipments.filter(s => s.status === 'pending').length;
+      
+      document.getElementById('totalShipments').textContent = totalCount;
+      document.getElementById('deliveredShipments').textContent = deliveredCount;
+      document.getElementById('inTransitShipments').textContent = transitCount;
+      document.getElementById('pendingShipments').textContent = pendingCount;
+    }
+    
+    // Inicializar estadísticas
+    updateStatistics();
+  });
+</script>
+{% endblock %}

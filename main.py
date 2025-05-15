@@ -1306,7 +1306,8 @@ paginas_simples = [
     'tracking',
     'seguimiento',
     'recuperar_contrasenia',
-    'libro_reclamaciones'
+    'libro_reclamaciones',
+    'mis_envios'
 ]
 
 
