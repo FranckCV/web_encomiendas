@@ -1,257 +1,289 @@
+// Optimización del script para controlar mejor el tamaño y comportamiento
 document.addEventListener('DOMContentLoaded', function() {
-    // Información de los tamaños de cajas
-    const sizeInfo = {
-        'xxs': { dimensions: '15 x 10 x 10 cm', price: '1.50', image: 'caja XXS.png', maxQuantity: 100 },
-        'xs': { dimensions: '20 x 15 x 10 cm', price: '2.00', image: 'caja XS.png', maxQuantity: 80 },
-        's': { dimensions: '25 x 20 x 15 cm', price: '2.50', image: 'caja S.png', maxQuantity: 60 },
-        'm': { dimensions: '30 x 25 x 20 cm', price: '3.00', image: 'caja M.png', maxQuantity: 40 },
-        'l': { dimensions: '40 x 30 x 25 cm', price: '4.00', image: 'caja L.png', maxQuantity: 30 }
-    };
-
-    // Elementos del DOM
-    const sizeBtns = document.querySelectorAll('.size-btn');
-    const productImage = document.querySelector('.producto-imagen img');
-    const decreaseBtn = document.querySelector('.qty-btn.decrease');
-    const increaseBtn = document.querySelector('.qty-btn.increase');
+    // Referencias a elementos
+    const decreaseBtn = document.querySelector('.decrease');
+    const increaseBtn = document.querySelector('.increase');
     const qtyInput = document.querySelector('.qty-input');
-    const addToCartBtn = document.querySelector('.btn-agregar');
     const quantityLimit = document.querySelector('.quantity-limit');
+    const addToCartBtn = document.querySelector('.btn-agregar');
+    const productImage = document.querySelector('.producto-imagen img');
+    const priceElement = document.querySelector('.precio');
+    const dimensionsElement = document.querySelector('.producto-dimensiones');
+    const maxQuantity = 100;
     
-    // Función para actualizar la información del producto según el tamaño
-    function updateProductInfo(sizeKey) {
-        const dimensionsElem = document.querySelector('.producto-dimensiones');
-        const priceElem = document.querySelector('.precio');
+    // Datos de los productos por tamaño
+    const productSizes = {
+        'xxs': {
+            price: 1.50,
+            dimensions: '15 x 10 x 10 cm',
+            image: '/static/img/caja XXS.png',
+            discounts: {
+                25: 1.20,
+                50: 1.00
+            }
+        },
+        'xs': {
+            price: 2.00,
+            dimensions: '20 x 15 x 15 cm',
+            image: '/static/img/caja-shalom-xs.jpg',
+            discounts: {
+                25: 1.70,
+                50: 1.40
+            }
+        },
+        's': {
+            price: 2.50,
+            dimensions: '25 x 20 x 20 cm',
+            image: '/static/img/caja-shalom-s.jpg',
+            discounts: {
+                25: 2.20,
+                50: 1.90
+            }
+        },
+        'm': {
+            price: 3.20,
+            dimensions: '30 x 25 x 25 cm',
+            image: '/static/img/caja-shalom-m.jpg',
+            discounts: {
+                25: 2.80,
+                50: 2.50
+            }
+        },
+        'l': {
+            price: 4.00,
+            dimensions: '40 x 30 x 30 cm',
+            image: '/static/img/caja-shalom-l.jpg',
+            discounts: {
+                25: 3.50,
+                50: 3.00
+            }
+        }
+    };
+    
+    // Estado actual del producto
+    let currentSize = 'xxs';
+    let currentQuantity = 1;
+    
+    // Inicialización
+    updateQuantity(qtyInput.value);
+    updateProductInfo(currentSize);
+    
+    // Función para actualizar la interfaz según el tamaño seleccionado
+    function updateProductInfo(size) {
+        currentSize = size;
+        const productData = productSizes[size];
         
-        if (sizeInfo[sizeKey]) {
-            // Actualizar dimensiones y precio
-            dimensionsElem.textContent = sizeInfo[sizeKey].dimensions;
-            priceElem.textContent = sizeInfo[sizeKey].price;
-            
-            // Actualizar imagen
-            if (productImage && sizeInfo[sizeKey].image) {
-                // Guarda la ruta base
-                const basePath = '/static/img/';
-                productImage.src = basePath + sizeInfo[sizeKey].image;
+        // Actualizar imagen
+        if (productImage) {
+            productImage.src = productData.image;
+            productImage.alt = `Caja Shalom - Tamaño ${size.toUpperCase()}`;
+        }
+        
+        // Actualizar dimensiones
+        if (dimensionsElement) {
+            dimensionsElement.textContent = productData.dimensions;
+        }
+        
+        // Actualizar precio según la cantidad actual
+        updatePrice();
+    }
+    
+    // Función para actualizar el precio según el tamaño y la cantidad
+    function updatePrice() {
+        const productData = productSizes[currentSize];
+        let finalPrice = productData.price;
+        
+        // Aplicar descuentos según la cantidad
+        if (currentQuantity >= 50 && productData.discounts[50]) {
+            finalPrice = productData.discounts[50];
+        } else if (currentQuantity >= 25 && productData.discounts[25]) {
+            finalPrice = productData.discounts[25];
+        }
+        
+        // Actualizar el precio en la interfaz
+        if (priceElement) {
+            priceElement.textContent = finalPrice.toFixed(2);
+        }
+        
+        // Resaltar descuentos aplicados
+        highlightDiscount(currentQuantity);
+    }
+    
+    // Resaltar el descuento aplicado
+    function highlightDiscount(quantity) {
+        const discountItems = document.querySelectorAll('.precio-volumen-item');
+        
+        discountItems.forEach(item => {
+            item.classList.remove('active-discount');
+        });
+        
+        if (quantity >= 50 && discountItems[1]) {
+            discountItems[1].classList.add('active-discount');
+        } else if (quantity >= 25 && discountItems[0]) {
+            discountItems[0].classList.add('active-discount');
+        }
+    }
+    
+    // Gestión de la cantidad
+    function updateQuantity(value) {
+        let newValue = parseInt(value);
+        
+        // Validar límites
+        if (isNaN(newValue) || newValue < 1) {
+            newValue = 1;
+        } else if (newValue > maxQuantity) {
+            newValue = maxQuantity;
+            highlightLimit();
+        }
+        
+        // Actualizar valor
+        qtyInput.value = newValue;
+        currentQuantity = newValue;
+        
+        // Actualizar estado de botones
+        decreaseBtn.disabled = newValue <= 1;
+        increaseBtn.disabled = newValue >= maxQuantity;
+        
+        // Actualizar precio según la nueva cantidad
+        updatePrice();
+    }
+    
+    function highlightLimit() {
+        quantityLimit.classList.add('active');
+        setTimeout(() => {
+            quantityLimit.classList.remove('active');
+        }, 1500);
+    }
+    
+    // Event listeners para cantidad
+    decreaseBtn.addEventListener('click', () => {
+        updateQuantity(parseInt(qtyInput.value) - 1);
+    });
+    
+    increaseBtn.addEventListener('click', () => {
+        updateQuantity(parseInt(qtyInput.value) + 1);
+    });
+    
+    // Manejar entrada directa en el campo
+    qtyInput.addEventListener('change', () => {
+        updateQuantity(qtyInput.value);
+    });
+    
+    // Validación en tiempo real mientras se escribe
+    qtyInput.addEventListener('input', () => {
+        const value = parseInt(qtyInput.value);
+        if (!isNaN(value)) {
+            if (value > maxQuantity) {
+                qtyInput.value = maxQuantity;
+                highlightLimit();
+            }
+            currentQuantity = parseInt(qtyInput.value);
+            updatePrice();
+        }
+    });
+    
+    // Prevenir caracteres no numéricos y valores mayores que el máximo
+    qtyInput.addEventListener('keydown', (e) => {
+        // Permitir: backspace, delete, tab, escape, enter y .
+        if ([46, 8, 9, 27, 13, 110].indexOf(e.keyCode) !== -1 ||
+            // Permitir: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+            (e.keyCode === 65 && e.ctrlKey === true) ||
+            (e.keyCode === 67 && e.ctrlKey === true) ||
+            (e.keyCode === 86 && e.ctrlKey === true) ||
+            (e.keyCode === 88 && e.ctrlKey === true) ||
+            // Permitir: home, end, left, right
+            (e.keyCode >= 35 && e.keyCode <= 39)) {
+            return;
+        }
+        
+        // Asegurarse de que sea un número
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && 
+            (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+            return;
+        }
+        
+        // Comprobar si excederá el límite máximo
+        const currentValue = qtyInput.value;
+        const selectionStart = qtyInput.selectionStart;
+        const selectionEnd = qtyInput.selectionEnd;
+        const keyValue = e.key;
+        
+        // Si no hay selección (solo se está añadiendo un dígito)
+        if (selectionStart === selectionEnd) {
+            const newValue = currentValue.slice(0, selectionStart) + keyValue + currentValue.slice(selectionEnd);
+            if (parseInt(newValue) > maxQuantity) {
+                e.preventDefault();
+                highlightLimit();
+            }
+        }
+    });
+    
+    // Agregar al carrito con validación
+    if (addToCartBtn) {
+        addToCartBtn.addEventListener('click', () => {
+            const quantity = parseInt(qtyInput.value);
+            if (quantity > 0 && quantity <= maxQuantity) {
+                // Calcular precio final
+                const productData = productSizes[currentSize];
+                let finalPrice = productData.price;
                 
-                // También actualiza el atributo alt para mejor accesibilidad
-                productImage.alt = `Caja Shalom ${sizeKey.toUpperCase()}`;
+                if (quantity >= 50 && productData.discounts[50]) {
+                    finalPrice = productData.discounts[50];
+                } else if (quantity >= 25 && productData.discounts[25]) {
+                    finalPrice = productData.discounts[25];
+                }
+                
+                const totalPrice = (finalPrice * quantity).toFixed(2);
+                
+                // Aquí iría la lógica para agregar al carrito
+                alert(`Se han agregado ${quantity} unidades de caja ${currentSize.toUpperCase()} al carrito\nPrecio unitario: S/ ${finalPrice.toFixed(2)}\nTotal: S/ ${totalPrice}`);
+            } else {
+                highlightLimit();
             }
-            
-            // Actualización de precios por volumen
-            const bulkPrices = document.querySelectorAll('.etiqueta-precio');
-            if (sizeKey === 'xxs') {
-                bulkPrices[0].textContent = 's/. 1.20';
-                bulkPrices[1].textContent = 's/. 1.00';
-            } else if (sizeKey === 'xs') {
-                bulkPrices[0].textContent = 's/. 1.70';
-                bulkPrices[1].textContent = 's/. 1.50';
-            } else if (sizeKey === 's') {
-                bulkPrices[0].textContent = 's/. 2.20';
-                bulkPrices[1].textContent = 's/. 2.00';
-            } else if (sizeKey === 'm') {
-                bulkPrices[0].textContent = 's/. 2.70';
-                bulkPrices[1].textContent = 's/. 2.50';
-            } else if (sizeKey === 'l') {
-                bulkPrices[0].textContent = 's/. 3.70';
-                bulkPrices[1].textContent = 's/. 3.50';
-            }
-            
-            // Actualizar mensaje de límite máximo
-            if (quantityLimit) {
-                quantityLimit.textContent = `Máximo: ${sizeInfo[sizeKey].maxQuantity} unidades`;
-            }
-            
-            // Validar que la cantidad actual no exceda el nuevo límite
-            validateQuantity();
-        }
+        });
     }
-
-    // Función para validar la cantidad
-    function validateQuantity() {
-        const activeSize = document.querySelector('.size-btn.active');
-        if (!activeSize) return;
-        
-        const sizeClass = Array.from(activeSize.classList)
-            .find(cls => ['xxs', 'xs', 's', 'm', 'l'].includes(cls));
-            
-        if (!sizeClass || !sizeInfo[sizeClass]) return;
-        
-        const maxQty = sizeInfo[sizeClass].maxQuantity;
-        let currentQty = parseInt(qtyInput.value);
-        
-        // Si no es un número o es menor que 1, establecer a 1
-        if (isNaN(currentQty) || currentQty < 1) {
-            currentQty = 1;
-        }
-        
-        // Si excede el máximo, establecer al máximo
-        if (currentQty > maxQty) {
-            currentQty = maxQty;
-            
-            // Mostrar mensaje de alerta temporal
-            quantityLimit.classList.add('active');
-            setTimeout(() => {
-                quantityLimit.classList.remove('active');
-            }, 3000);
-        }
-        
-        // Actualizar el input
-        qtyInput.value = currentQty;
-        
-        // Actualizar estado de los botones
-        decreaseBtn.disabled = currentQty <= 1;
-        increaseBtn.disabled = currentQty >= maxQty;
-    }
-
-    // Event listeners para botones de tamaño
+    
+    // Botones de tamaño
+    const sizeBtns = document.querySelectorAll('.size-btn');
     sizeBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            // Remover clase active de todos los botones
+        btn.addEventListener('click', () => {
+            // Eliminar clase activa de todos los botones
             sizeBtns.forEach(b => b.classList.remove('active'));
-            
-            // Añadir clase active al botón clickeado
-            this.classList.add('active');
-            
-            // Actualizar información del producto según tamaño seleccionado
-            const sizeClass = Array.from(this.classList)
-                .find(cls => ['xxs', 'xs', 's', 'm', 'l'].includes(cls));
-                
-            if (sizeClass) {
-                updateProductInfo(sizeClass);
-            }
+            // Añadir clase activa al botón clickeado
+            btn.classList.add('active');
+            // Obtener el tamaño del botón (del texto o de un atributo data)
+            const size = btn.textContent.toLowerCase();
+            // Actualizar la información del producto
+            updateProductInfo(size);
         });
     });
     
-    // Event listeners para selector de cantidad
-    if (decreaseBtn) {
-        decreaseBtn.addEventListener('click', function() {
-            let currentQty = parseInt(qtyInput.value);
-            if (currentQty > 1) {
-                qtyInput.value = currentQty - 1;
-                validateQuantity();
-                updateTotalPrice();
-            }
-        });
-    }
-
-    if (increaseBtn) {
-        increaseBtn.addEventListener('click', function() {
-            let currentQty = parseInt(qtyInput.value);
-            qtyInput.value = currentQty + 1;
-            validateQuantity();
-            updateTotalPrice();
-        });
-    }
+    // Añadir estilos para resaltar el descuento activo
+    const style = document.createElement('style');
+    style.textContent = `
+        .precio-volumen-item.active-discount {
+            border: 2px solid #1a3c5b;
+            transform: scale(1.05);
+            background-color: #e8f4f8;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+    `;
+    document.head.appendChild(style);
     
-    // Hacer que el input sea editable
-    if (qtyInput) {
-        // Eliminar el atributo readonly
-        qtyInput.removeAttribute('readonly');
-        
-        // Manejar cambios en el input
-        qtyInput.addEventListener('input', function() {
-            validateQuantity();
-            updateTotalPrice();
-        });
-        
-        // Manejar el evento blur (cuando pierde el foco)
-        qtyInput.addEventListener('blur', function() {
-            validateQuantity();
-            updateTotalPrice();
-        });
-        
-        // Para evitar valores no numéricos
-        qtyInput.addEventListener('keydown', function(e) {
-            // Permitir: backspace, delete, tab, escape, enter y .
-            if ([46, 8, 9, 27, 13, 110, 190].indexOf(e.keyCode) !== -1 ||
-                // Permitir: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-                (e.keyCode === 65 && e.ctrlKey === true) ||
-                (e.keyCode === 67 && e.ctrlKey === true) ||
-                (e.keyCode === 86 && e.ctrlKey === true) ||
-                (e.keyCode === 88 && e.ctrlKey === true) ||
-                // Permitir: home, end, left, right
-                (e.keyCode >= 35 && e.keyCode <= 39)) {
-                return;
-            }
-            // Asegurarse de que sea un número y detener el keypress
-            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && 
-                (e.keyCode < 96 || e.keyCode > 105)) {
-                e.preventDefault();
-            }
-        });
-    }
-
-    // Función para actualizar el precio total
-    function updateTotalPrice() {
-        const activeSize = document.querySelector('.size-btn.active');
-        if (!activeSize) return;
-        
-        const sizeClass = Array.from(activeSize.classList)
-            .find(cls => ['xxs', 'xs', 's', 'm', 'l'].includes(cls));
-            
-        if (!sizeClass || !sizeInfo[sizeClass]) return;
-        
-        const price = parseFloat(sizeInfo[sizeClass].price);
-        const quantity = parseInt(qtyInput.value);
-        
-        // Si tienes un elemento para mostrar el precio total, puedes descomentar esto
-        // const totalPriceElem = document.querySelector('.precio-total');
-        // if (totalPriceElem) {
-        //     totalPriceElem.textContent = `S/ ${(price * quantity).toFixed(2)}`;
-        // }
-        
-        // También puedes actualizar el texto del botón "Agregar al carrito" para incluir el total
-        if (addToCartBtn) {
-            const originalText = "Agregar al carrito";
-            addToCartBtn.innerHTML = `${originalText} <i class="fa-solid fa-cart-shopping"></i>`;
+    // Ajuste de responsividad dinámica
+    function adjustResponsiveness() {
+        const productContainer = document.querySelector('.producto-detalle');
+        if (window.innerWidth <= 768) {
+            // Ajustes para móviles
+            productContainer.style.flexDirection = 'column';
+        } else {
+            // Ajustes para desktop
+            productContainer.style.flexDirection = 'row';
         }
     }
     
-    // Event listener para botón "Agregar al carrito"
-    if (addToCartBtn) {
-        addToCartBtn.addEventListener('click', function() {
-            const activeSize = document.querySelector('.size-btn.active');
-            if (!activeSize) return;
-            
-            const sizeClass = Array.from(activeSize.classList)
-                .find(cls => ['xxs', 'xs', 's', 'm', 'l'].includes(cls));
-                
-            if (!sizeClass || !sizeInfo[sizeClass]) return;
-            
-            const sizeLabel = activeSize.textContent.toUpperCase();
-            const dimensions = sizeInfo[sizeClass].dimensions;
-            const price = sizeInfo[sizeClass].price;
-            const quantity = parseInt(qtyInput.value);
-            const total = (parseFloat(price) * quantity).toFixed(2);
-            
-            // Muestra mensaje de confirmación
-            alert(`Producto agregado al carrito:
-            - Caja Shalom ${sizeLabel} (${dimensions})
-            - Cantidad: ${quantity}
-            - Precio unitario: S/ ${price}
-            - Total: S/ ${total}`);
-            
-            // Aquí iría el código para realmente agregar al carrito
-            console.log('Producto agregado:', {
-                name: 'Caja Shalom',
-                size: sizeClass,
-                sizeLabel: sizeLabel,
-                dimensions: dimensions,
-                price: price,
-                quantity: quantity,
-                total: total
-            });
-        });
-    }
-    
-    // Inicializar con el tamaño que tenga la clase active al cargar
-    const activeSizeBtn = document.querySelector('.size-btn.active');
-    if (activeSizeBtn) {
-        const activeSize = Array.from(activeSizeBtn.classList)
-            .find(cls => ['xxs', 'xs', 's', 'm', 'l'].includes(cls));
-        if (activeSize) {
-            updateProductInfo(activeSize);
-        }
-    }
-
+    // Ejecutar al cargar y al cambiar tamaño
+    adjustResponsiveness();
+    window.addEventListener('resize', adjustResponsiveness);
 });

@@ -1,7 +1,54 @@
+<!-- HTML Optimizado -->
 {% extends "MAESTRA_GENERAL.html" %}
 
 {% block estilos %}
 <link rel="stylesheet" href="/static/css/cajas.css">
+<!-- Incluir los estilos optimizados -->
+<style>
+    /* Estilos inline para aplicar inmediatamente los cambios críticos */
+    .producto-detalle {
+        display: flex;
+        flex-wrap: wrap;
+        background-color: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        gap: 0;
+    }
+
+    .producto-imagen {
+        flex: 1;
+        min-width: 250px;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .producto-info {
+        flex: 1;
+        min-width: 250px;
+        padding: 15px;
+    }
+
+    .producto-imagen img {
+        max-width: 100%;
+        max-height: 300px;
+        object-fit: contain;
+    }
+
+    @media (max-width: 768px) {
+        .producto-detalle {
+            flex-direction: column;
+        }
+
+        .producto-imagen,
+        .producto-info {
+            width: 100%;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block titulo %}
@@ -9,15 +56,11 @@ Producto - Caja Shalom
 {% endblock %}
 
 {% block contenido %}
-<div class="producto-container">
-    <!-- Banner de bienvenida -->
-    <div class="welcome-banner">
-        <div class="welcome-content">
-            <h2>Encuentra la caja perfecta para tus envíos.</h2>
-        </div>
-    </div>
+<!-- Contenedor principal con ancho máximo reducido -->
+<div class="producto-container" style="max-width: 1000px; padding: 10px;">
 
-    <!-- Sección del producto -->
+
+    <!-- Sección del producto optimizada -->
     <div class="producto-detalle">
         <div class="producto-imagen">
             <img src="/static/img/caja-shalom.jpg" alt="Caja Shalom">
@@ -29,28 +72,28 @@ Producto - Caja Shalom
                 <button class="size-btn l">L</button>
             </div>
         </div>
-        
+
         <div class="producto-info">
-            <h1 class="producto-titulo">Caja Shalom</h1>
+            <h1 class="producto-titulo" style="font-size: 1.8rem;">Caja Shalom</h1>
             <p class="producto-dimensiones">15 x 10 x 10 cm</p>
-            
+
             <div class="precio-seccion">
                 <div class="precio-principal">
-                    <span class="moneda">S/</span>
-                    <span class="precio">1.50</span>
+                    <span class="moneda" style="font-size: 1.6rem;">S/</span>
+                    <span class="precio" style="font-size: 2rem;">1.50</span>
                     <div class="info-icon">
                         <i class="fa-solid fa-info-circle"></i>
                         <div class="tooltip">Precio unitario. Descuentos disponibles por volumen.</div>
                     </div>
                 </div>
-                
-                <div class="precios-volumen">
+
+                <div class="precios-volumen" style="gap: 10px;">
                     <div class="precio-volumen-item">
-                        <span class="etiqueta-precio">s/. 1.20</span>
+                        <span class="etiqueta-precio" style="font-size: 1.2rem;">s/. 1.20</span>
                         <span class="etiqueta-cantidad">a partir de 25 uds.</span>
                     </div>
                     <div class="precio-volumen-item">
-                        <span class="etiqueta-precio">s/. 1.00</span>
+                        <span class="etiqueta-precio" style="font-size: 1.2rem;">s/. 1.00</span>
                         <span class="etiqueta-cantidad">a partir de 50 uds.</span>
                     </div>
                 </div>
@@ -62,7 +105,7 @@ Producto - Caja Shalom
                 <button class="qty-btn increase">+</button>
             </div>
             <div class="quantity-limit-container">
-                <span class="quantity-limit"> Máximo: 100 unidades</span>
+                <span class="quantity-limit">Máximo: 100 unidades</span>
             </div>
 
             <button type="button" class="btn-agregar">
@@ -70,27 +113,35 @@ Producto - Caja Shalom
                 <i class="fa-solid fa-cart-shopping"></i>
             </button>
 
-            <div class="promo-banner">
-                <div class="promo-icon">
-                    <i class="fa-solid fa-bullhorn"></i>
-                </div>
-                <div class="promo-text">
-                    <h3>¡Compra al por mayor y obtén super descuentos!</h3>
-                </div>
-            </div>
+
         </div>
     </div>
-    
-        <!-- Miniaturas de navegación -->
-        <div class="producto-thumbs">
-            <h3>Nuestros productos</h3>
-            <div id="thumbs-container" class="thumbs-container">
-                <!-- Las miniaturas se cargarán dinámicamente -->
-            </div>
-        </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script src="/static/js/cajas.js"></script>
+<!-- Script optimizado can cargarse después -->
+<script>
+    // Script crítico para ajuste inmediato
+    window.addEventListener('load', function () {
+        // Ajuste de responsividad inmediata
+        function adjustContainerSize() {
+            const container = document.querySelector('.producto-container');
+            const windowWidth = window.innerWidth;
+
+            if (windowWidth < 576) {
+                container.style.padding = '5px';
+            } else {
+                container.style.padding = '10px';
+            }
+        }
+
+        // Ejecutar al cargar
+        adjustContainerSize();
+
+        // También ejecutar al cambiar el tamaño de ventana
+        window.addEventListener('resize', adjustContainerSize);
+    });
+</script>
 {% endblock %}

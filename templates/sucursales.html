@@ -9,10 +9,41 @@ Sucursales
 <link rel="stylesheet" href="../static/css/sucursales.css">
 <style>
     .listado-agencias {
-        max-height: 345px; /* Ajusta la altura según tus necesidades */
+        max-height: 345px;
         overflow-y: auto;
     }
 </style>
+<style>
+/* Asegura que el mapa tenga una altura mínima visible */
+#map {
+    width: 100%;
+    aspect-ratio: 16 / 11;
+    max-height: 80vh;
+}
+/* Por defecto en escritorio: mapa al lado derecho */
+.filtros-mapa-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    .mapa-container {
+        order: 2;
+    }
+
+    .filtros-container {
+        order: 1;
+    }
+}
+
+@media (max-width: 900px) {
+    .listado-agencias {
+        max-height: 195px;
+        overflow-y: auto;
+    }
+}
+</style>
+
 
 {% endblock %}
 
@@ -20,7 +51,7 @@ Sucursales
 <div class="sucursales-container row">
     <!-- <h1 class="sucursales-titulo">Nuestras Agencias</h1>
     <p class="sucursales-subtitle">Encuentra la agencia más cercana a tu ubicación</p> -->
-    <div class="filtros-mapa-container row">
+    <div class="filtros-mapa-container row flex-column flex-md-row order-2 order-md-1">
         <div class="filtros-container col-md-9 col-sm-12">
             <div class="row g-3">
                 <div class="col-12 col-lg-4">
