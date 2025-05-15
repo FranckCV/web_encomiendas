@@ -28,7 +28,7 @@ footer {
 
 form {
     color: var(--color-contrast);
-    width: 35vw;
+    width: 30vw;
     background-color: color-mix(in srgb, var(--color-base) 10%, transparent 90%);
     border-radius: var(--border-radius-size);
     border: var(--border-size) solid var(--color-contrast);
