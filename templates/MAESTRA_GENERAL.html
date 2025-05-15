@@ -39,6 +39,11 @@
             <i class="fas fa-plane"></i>
             <span>Sucursales</span>
         </a>
+        <a href="{{url_for('tipos_envio')}}" class="nav-link">
+            <i class="fa-solid fa-boxes-packing"></i>    
+            <span>Registrar encomienda</span>
+        </a>        
+
     </nav>
 
     <a href="{{url_for('login')}}" class="account-area">
@@ -88,7 +93,7 @@
                 <span>Contáctanos</span>
                 <i class="fa-solid fa-chevron-right"></i>
             </a>
-            <a class="secondary-sublink" href="#">
+            <a class="secondary-sublink" href="{{url_for('NoRecibimos')}}">
                 <span>No recibimos</span>
                 <i class="fa-solid fa-chevron-right"></i>
             </a>

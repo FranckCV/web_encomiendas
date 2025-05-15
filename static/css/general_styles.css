@@ -46,7 +46,7 @@ body {
     justify-content: center;
     flex-grow: 1;
     display: grid;
-    grid-template-columns: repeat(4,1fr);
+    grid-template-columns: repeat(5,1fr);
 }
 
 .nav-link {
@@ -55,6 +55,7 @@ body {
     padding: 0.75rem 1.25rem;
     display: flex;
     flex-direction: column;
+    text-align: center;
     align-items: center;
     transition: all 0.15s ease;
 }

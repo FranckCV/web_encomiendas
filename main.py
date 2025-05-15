@@ -1307,7 +1307,8 @@ paginas_simples = [
     'seguimiento',
     'recuperar_contrasenia',
     'libro_reclamaciones',
-    'mis_envios'
+    'mis_envios',
+    'NoRecibimos'
 ]
 
 
