@@ -49,7 +49,7 @@
       max-width: 12%;
       margin-bottom: 15px;
   filter:brightness(0) saturate(100%) 
-          invert(30%) sepia(90%) saturate(570%) 
+          invert(20%) sepia(103%) saturate(694%) 
           hue-rotate(185deg) brightness(92%) contrast(92%);    
         }
 
@@ -59,6 +59,8 @@
       text-align: center;
       font-weight: 600;
       margin: 10px 0;
+      font-size: 1.5rem;
+
     }
 
     .numero-reclamo {
@@ -66,7 +68,7 @@
       padding: 5px 15px;
       background-color:  #f0f7ff;
       border-radius: 20px;
-      font-size: 14px;
+      font-size: 0.8rem;
       position: absolute;
       right: 0;
       top: 0;
@@ -97,7 +99,7 @@
     }
 
     .definition-header h2 {
-      font-size: 18px;
+      font-size: 0.9rem;
       color: var(--primary-color);
       /* font-weight: 900; */
       margin: 0;
@@ -132,17 +134,16 @@
 
     /* Títulos de sección */
 
-.section-title:before {
+/* .section-title:before {
     content: "";
     position: absolute;
     left: 0;
     top: 0;
-    width: 16px;
     height: 100%;
-    background-color:#104375;
-    transform: skewX(-20deg);
-    border-radius: 5px;
-}
+    width: 5px;
+    background-color: var(--primary-color);
+    border-radius: 10px;
+} */
 
     .section-title {
       margin: 30px 0 15px;
@@ -150,10 +151,10 @@
     }
 
     .section-title h2 {
-      font-size: 22px;
       color: #104375;
-      font-weight: 500;
-      margin-left: 25px;
+      font-weight: 900;
+      /* margin-left: 15px; */
+      font-size: 1.3rem;
     }
 
     .form-section {
@@ -163,12 +164,12 @@
       margin: 30px 0 15px;
       border-radius: 4px;
       font-weight: 500;
-      font-size: 18px;
+      font-size: 0.9rem;
     }
 
     /* Nota de campos obligatorios */
     .mandatory-note {
-      font-size: 13px;
+      font-size: 0.8rem;
       color: var(--accent-color);
       margin-bottom: 15px;
       text-align: right;
@@ -197,7 +198,7 @@
       display: block;
       margin-bottom: 5px;
       font-weight: 500;
-      font-size: 14px;
+      font-size: 0.8rem;
     }
 
     label.required::after {
@@ -211,7 +212,7 @@
       border: 1px solid var(--border-color);
       border-radius: 4px;
       font-family: inherit;
-      font-size: 14px;
+      font-size: 0.8rem;
       transition: border-color 0.3s ease;
     }
 
@@ -234,7 +235,7 @@
       padding: 12px 24px;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 0.8rem;
       font-weight: 500;
       transition: background-color 0.3s ease;
     }
@@ -263,7 +264,7 @@
       }
       
       .encabezado h1 {
-        font-size: 24px;
+        font-size: 0.5rem;
       }
       
       .numero-reclamo {
