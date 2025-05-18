@@ -9,274 +9,340 @@
 {% endblock %}
 
 {% block contenido %}
-  <div class="definition-container">
-    <div class="definition-box">
-      <h2>¿Qué es una queja?</h2>
-      <p>Es el malestar o descontento por algún acto que está relacionado directamente con el servicio adquirido. Por ejemplo: una mala atención al público, omisión de información, etc.</p>
+<div class="contenedor">
+<div class="encabezado">
+      <img src="{{url_for('static',filename='/img/libro_reclamaciones.png')}}" alt="Logo de la Empresa" class="libro_img" />
+      <h1>LIBRO DE RECLAMACIONES</h1>
+      <p class="numero-reclamo">RECLAMO N° 001-2025</p>
     </div>
-    <div class="definition-box">
-      <h2>¿Qué es un reclamo?</h2>
-      <p>Es la disconformidad con los servicios prestados o bienes adquiridos. Por ejemplo: demora en el envío, entregas no realizadas, etc.</p>
+    
+    <div class="definition-container">
+      <div class="definition-box">
+        <div class="definition-header">
+          <h2>¿Qué es una queja?</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="definition-content">
+          <p>Es el malestar o descontento por algún acto que está relacionado directamente con el servicio adquirido. Por ejemplo: una mala atención al público, omisión de información, etc.</p>
+        </div>
+      </div>
+      <div class="definition-box">
+        <div class="definition-header">
+          <h2>¿Qué es un reclamo?</h2>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="definition-content">
+          <p>Es la disconformidad con los servicios prestados o bienes adquiridos. Por ejemplo: demora en el envío, entregas no realizadas, etc.</p>
+        </div>
+      </div>
     </div>
+
+    <div class="section-title">
+      <h2>Ingresa tu solicitud</h2>
+    </div>
+
+    <form id="reclamacion-form">
+      <div class="form-section">Información personal</div>
+
+      <p class="mandatory-note">Campos Obligatorios (*)</p>
+
+      <div class="form-row">
+        <div class="form-col">
+          <div class="form-group">
+            <label for="tipoDocumento" class="required">Tipo de Documento</label>
+            <select id="tipoDocumento" required>
+              <option value="">Seleccione...</option>
+              <option value="dni">DNI</option>
+              <option value="pasaporte">Pasaporte</option>
+              <option value="ce">Carné de Extranjería</option>
+              <option value="ruc">RUC</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-col">
+          <div class="form-group">
+            <label for="numDocumento" class="required">Número de Documento</label>
+            <input type="text" id="numDocumento" required />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="nombresCompletos" class="required">Nombres Completos / Razón Social</label>
+        <input type="text" id="nombresCompletos" required />
+      </div>
+
+      <div class="form-row">
+        <div class="form-col">
+          <div class="form-group">
+            <label for="departamento" class="required">Departamento</label>
+            <select id="departamento" required>
+              <option value="">Seleccione...</option>
+              <option value="lima">Lima</option>
+              <option value="arequipa">Arequipa</option>
+              <option value="cusco">Cusco</option>
+              <!-- Más opciones -->
+            </select>
+          </div>
+        </div>
+        <div class="form-col">
+          <div class="form-group">
+            <label for="provincia" class="required">Provincia</label>
+            <select id="provincia" required>
+              <option value="">Seleccione...</option>
+              <!-- Opciones dinámicas según departamento -->
+            </select>
+          </div>
+        </div>
+        <div class="form-col">
+          <div class="form-group">
+            <label for="distrito" class="required">Distrito</label>
+            <select id="distrito" required>
+              <option value="">Seleccione...</option>
+              <!-- Opciones dinámicas según provincia -->
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="direccion" class="required">Dirección</label>
+        <input type="text" id="direccion" required />
+      </div>
+
+      <div class="form-group">
+        <label for="referenciaDireccion" class="required">Referencia de Dirección</label>
+        <input type="text" id="referenciaDireccion" required />
+      </div>
+
+      <div class="form-row">
+        <div class="form-col">
+          <div class="form-group">
+            <label for="telefono" class="required">Teléfono</label>
+            <input type="tel" id="telefono" required />
+          </div>
+        </div>
+        <div class="form-col">
+          <div class="form-group">
+            <label for="correo" class="required">Correo Electrónico</label>
+            <input type="email" id="correo" required />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">Información de la incidencia</div>
+
+      <p class="mandatory-note">Campos Obligatorios (*)</p>
+
+      <div class="form-group">
+        <label for="titulo" class="required">Título</label>
+        <input type="text" id="titulo" required />
+      </div>
+
+      <div class="form-row">
+        <div class="form-col">
+          <div class="form-group">
+            <label for="tipoIncidencia" class="required">Tipo de Incidencia</label>
+            <select id="tipoIncidencia" required>
+              <option value="">Seleccione Tipo</option>
+              <option value="queja">Queja</option>
+              <option value="reclamo">Reclamo</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-col">
+          <div class="form-group">
+            <label for="motivoIncidencia" class="required">Motivo de Incidencia</label>
+            <select id="motivoIncidencia" required>
+              <option value="">Seleccione un tipo</option>
+              <!-- Opciones dinámicas según el tipo -->
+            </select>
+          </div>
+        </div>
+        <div class="form-col">
+          <div class="form-group">
+            <label for="causaIncidencia" class="required">Causa de Incidencia</label>
+            <select id="causaIncidencia" required>
+              <option value="">Seleccione un motivo</option>
+              <!-- Opciones dinámicas según el motivo -->
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="descripcionIncidencia" class="required">Descripción de Incidencia</label>
+        <textarea id="descripcionIncidencia" required></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-col">
+          <div class="form-group">
+            <label for="bienContratado" class="required">Bien Contratado</label>
+            <select id="bienContratado" required>
+              <option value="">Seleccione...</option>
+              <option value="encomienda">Encomienda</option>
+              <option value="paqueteria">Paquetería</option>
+              <option value="mensajeria">Mensajería</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-col">
+          <div class="form-group">
+            <label for="montoReclamado">Monto Reclamado</label>
+            <input type="number" id="montoReclamado" step="0.01" min="0" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="tienda">Tienda</label>
+        <select id="tienda">
+          <option value="">Seleccione...</option>
+          <option value="sede-central">Sede Central</option>
+          <option value="sucursal-norte">Sucursal Norte</option>
+          <option value="sucursal-sur">Sucursal Sur</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="detallesIncidencia" class="required">Detalles de Incidencia</label>
+        <textarea id="detallesIncidencia" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="relacion" class="required">Relación</label>
+        <select id="relacion" required>
+          <option value="">Seleccione...</option>
+          <option value="cliente">Cliente</option>
+          <option value="familiar">Familiar del cliente</option>
+          <option value="representante">Representante legal</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-col">
+          <div class="form-group">
+            <label for="numeroRecojo">Número de tracking</label>
+            <input type="text" id="numeroRecojo" />
+          </div>
+        </div>
+        <div class="form-col">
+          <div class="form-group">
+            <label for="fechaRecojo">Fecha de recojo</label>
+            <input type="date" id="fechaRecojo" placeholder="dd/mm/aaaa" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="pedidoSugerencia" class="required">Pedido / Sugerencia</label>
+        <textarea id="pedidoSugerencia" required></textarea>
+      </div>
+
+      <p class="mandatory-note">Campos Obligatorios (*)</p>
+
+      <div class="form-group" style="text-align: center; margin-top: 30px;">
+        <button type="submit" class="submit-btn">Registrar Incidencia</button>
+      </div>
+    </form>
   </div>
-
-  <div class="section-title">
-    <h2>Ingresa tu solicitud</h2>
-  </div>
-
-  <form id="reclamacion-form">
-    <div class="form-section">Información personal</div>
-
-    <p class="mandatory-note">Campos Obligatorios (*)</p>
-
-    <div class="form-row">
-      <div class="form-col">
-        <div class="form-group">
-          <label for="tipoDocumento" class="required">Tipo de Documento</label>
-          <select id="tipoDocumento" required>
-            <option value="">Seleccione...</option>
-            <option value="dni">DNI</option>
-            <option value="pasaporte">Pasaporte</option>
-            <option value="ce">Carné de Extranjería</option>
-            <option value="ruc">RUC</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-col">
-        <div class="form-group">
-          <label for="numDocumento" class="required">Número de Documento</label>
-          <input type="text" id="numDocumento" required />
-        </div>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="nombresCompletos" class="required">Nombres Completos / Razón Social</label>
-      <input type="text" id="nombresCompletos" required />
-    </div>
-
-
-    <div class="form-row">
-      <div class="form-col">
-        <div class="form-group">
-          <label for="departamento" class="required">Departamento</label>
-          <select id="departamento" required>
-            <option value="">Seleccione...</option>
-            <option value="lima">Lima</option>
-            <option value="arequipa">Arequipa</option>
-            <option value="cusco">Cusco</option>
-            <!-- Más opciones -->
-          </select>
-        </div>
-      </div>
-      <div class="form-col">
-        <div class="form-group">
-          <label for="provincia" class="required">Provincia</label>
-          <select id="provincia" required>
-            <option value="">Seleccione...</option>
-            <!-- Opciones dinámicas según departamento -->
-          </select>
-        </div>
-      </div>
-      <div class="form-col">
-        <div class="form-group">
-          <label for="distrito" class="required">Distrito</label>
-          <select id="distrito" required>
-            <option value="">Seleccione...</option>
-            <!-- Opciones dinámicas según provincia -->
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="direccion" class="required">Dirección</label>
-      <input type="text" id="direccion" required />
-    </div>
-
-    <div class="form-group">
-      <label for="referenciaDireccion" class="required">Referencia de Dirección</label>
-      <input type="text" id="referenciaDireccion" required />
-    </div>
-
-    <div class="form-row">
-      <div class="form-col">
-        <div class="form-group">
-          <label for="telefono" class="required">Teléfono</label>
-          <input type="tel" id="telefono" required />
-        </div>
-      </div>
-      <div class="form-col">
-        <div class="form-group">
-          <label for="correo" class="required">Correo Electrónico</label>
-          <input type="email" id="correo" required />
-        </div>
-      </div>
-    </div>
-
-    <div class="form-section">Información de la incidencia</div>
-
-    <p class="mandatory-note">Campos Obligatorios (*)</p>
-
-    <div class="form-group">
-      <label for="titulo" class="required">Título</label>
-      <input type="text" id="titulo" required />
-    </div>
-
-    <div class="form-row">
-      <div class="form-col">
-        <div class="form-group">
-          <label for="tipoIncidencia" class="required">Tipo de Incidencia</label>
-          <select id="tipoIncidencia" required>
-            <option value="">Seleccione Tipo</option>
-            <option value="queja">Queja</option>
-            <option value="reclamo">Reclamo</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-col">
-        <div class="form-group">
-          <label for="motivoIncidencia" class="required">Motivo de Incidencia</label>
-          <select id="motivoIncidencia" required>
-            <option value="">Seleccione un tipo</option>
-            <!-- Opciones dinámicas según el tipo -->
-          </select>
-        </div>
-      </div>
-      <div class="form-col">
-        <div class="form-group">
-          <label for="causaIncidencia" class="required">Causa de Incidencia</label>
-          <select id="causaIncidencia" required>
-            <option value="">Seleccione un motivo</option>
-            <!-- Opciones dinámicas según el motivo -->
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="descripcionIncidencia" class="required">Descripción de Incidencia</label>
-      <textarea id="descripcionIncidencia" required></textarea>
-    </div>
-
-    <div class="form-row">
-      <div class="form-col">
-        <div class="form-group">
-          <label for="bienContratado" class="required">Bien Contratado</label>
-          <select id="bienContratado" required>
-            <option value="">Seleccione...</option>
-            <option value="encomienda">Encomienda</option>
-            <option value="paqueteria">Paquetería</option>
-            <option value="mensajeria">Mensajería</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-col">
-        <div class="form-group">
-          <label for="montoReclamado">Monto Reclamado</label>
-          <input type="number" id="montoReclamado" step="0.01" min="0" />
-        </div>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="tienda">Tienda</label>
-      <select id="tienda">
-        <option value="">Seleccione...</option>
-        <option value="sede-central">Sede Central</option>
-        <option value="sucursal-norte">Sucursal Norte</option>
-        <option value="sucursal-sur">Sucursal Sur</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="detallesIncidencia" class="required">Detalles de Incidencia</label>
-      <textarea id="detallesIncidencia" required></textarea>
-    </div>
-
-    <div class="form-group">
-      <label for="relacion" class="required">Relación</label>
-      <select id="relacion" required>
-        <option value="">Seleccione...</option>
-        <option value="cliente">Cliente</option>
-        <option value="familiar">Familiar de Cliente</option>
-        <option value="representante">Representante Legal</option>
-      </select>
-    </div>
-
-    <div class="form-row">
-      <div class="form-col">
-        <div class="form-group">
-          <label for="numeroRecojo">Número de tracking</label>
-          <input type="text" id="numeroRecojo" />
-        </div>
-      </div>
-      <div class="form-col">
-        <div class="form-group">
-          <label for="fechaRecojo">Fecha de Recojo</label>
-          <input type="date" id="fechaRecojo" placeholder="dd/mm/aaaa" />
-        </div>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="pedidoSugerencia" class="required">Pedido / Sugerencia</label>
-      <textarea id="pedidoSugerencia" required></textarea>
-    </div>
-
-    <p class="mandatory-note">Campos Obligatorios (*)</p>
-
-    <div class="form-group" style="text-align: center; margin-top: 30px;">
-      <button type="submit" class="submit-btn">Registrar Incidencia</button>
-    </div>
-  </form>
+</div>
 {% endblock %}
 
 {% block scripts %}
   <script>
-    // Activar/desactivar campo de padre/madre según checkbox
-    document.getElementById('menorEdad').addEventListener('change', function () {
-      document.getElementById('nombrePadre').required = this.checked
-    })
-    
-    // Ejemplos de listas dependientes
-    document.getElementById('tipoIncidencia').addEventListener('change', function () {
-      const motivoSelect = document.getElementById('motivoIncidencia')
-      motivoSelect.innerHTML = '<option value="">Seleccione un tipo</option>'
-    
-      if (this.value === 'queja') {
-        const opciones = ['Mala atención', 'Información incorrecta', 'Demora en atención']
-        opciones.forEach((opcion) => {
-          const opt = document.createElement('option')
-          opt.value = opcion.toLowerCase().replace(/\s/g, '-')
-          opt.textContent = opcion
-          motivoSelect.appendChild(opt)
-        })
-      } else if (this.value === 'reclamo') {
-        const opciones = ['Incumplimiento de servicio', 'Producto dañado', 'Retraso en entrega']
-        opciones.forEach((opcion) => {
-          const opt = document.createElement('option')
-          opt.value = opcion.toLowerCase().replace(/\s/g, '-')
-          opt.textContent = opcion
-          motivoSelect.appendChild(opt)
-        })
-      }
-    })
-    
-    document.getElementById('motivoIncidencia').addEventListener('change', function () {
-      const causaSelect = document.getElementById('causaIncidencia')
-      causaSelect.innerHTML = '<option value="">Seleccione un motivo</option>'
-    
-      // Aquí se agregarían opciones dependiendo del motivo seleccionado
-      if (this.value) {
-        const opciones = ['Error humano', 'Problema técnico', 'Falta de capacitación', 'Otro']
-        opciones.forEach((opcion) => {
-          const opt = document.createElement('option')
-          opt.value = opcion.toLowerCase().replace(/\s/g, '-')
-          opt.textContent = opcion
-          causaSelect.appendChild(opt)
-        })
-      }
-    })
+    // Funcionalidad para mostrar/ocultar las definiciones individualmente
+    document.addEventListener('DOMContentLoaded', function() {
+      const definitionHeaders = document.querySelectorAll('.definition-header');
+      
+      definitionHeaders.forEach(header => {
+        header.addEventListener('click', function() {
+          const content = this.nextElementSibling;
+          const icon = this.querySelector('.toggle-icon');
+          
+          // Toggle la clase expanded
+          if (content.classList.contains('expanded')) {
+            content.classList.remove('expanded');
+            content.style.height = '0';
+            icon.classList.remove('rotated');
+          } else {
+            content.classList.add('expanded');
+            content.style.height = content.scrollHeight + 'px';
+            icon.classList.add('rotated');
+          }
+        });
+      });
+      
+      // Opcional: Funcionalidad para las selecciones dependientes (provincia y distrito)
+      const departamentoSelect = document.getElementById('departamento');
+      const provinciaSelect = document.getElementById('provincia');
+      const distritoSelect = document.getElementById('distrito');
+      
+      // Datos simulados (en una aplicación real, estos vendrían de una API)
+      const ubicaciones = {
+        'lima': {
+          provincias: {
+            'lima-provincia': ['Miraflores', 'San Isidro', 'Barranco'],
+            'callao': ['Bellavista', 'La Perla', 'Ventanilla']
+          }
+        },
+        'arequipa': {
+          provincias: {
+            'arequipa-provincia': ['Cercado', 'Cayma', 'Yanahuara'],
+            'caylloma': ['Chivay', 'Madrigal', 'Tuti']
+          }
+        }
+      };
+      
+      departamentoSelect.addEventListener('change', function() {
+        // Limpiamos las opciones actuales
+        provinciaSelect.innerHTML = '<option value="">Seleccione...</option>';
+        distritoSelect.innerHTML = '<option value="">Seleccione...</option>';
+        
+        const departamento = this.value;
+        if (departamento && ubicaciones[departamento]) {
+          const provincias = Object.keys(ubicaciones[departamento].provincias);
+          
+          // Agregamos las nuevas opciones
+          provincias.forEach(provincia => {
+            const option = document.createElement('option');
+            option.value = provincia;
+            option.textContent = provincia.charAt(0).toUpperCase() + provincia.slice(1).replace('-', ' ');
+            provinciaSelect.appendChild(option);
+          });
+        }
+      });
+      
+      provinciaSelect.addEventListener('change', function() {
+        // Limpiamos las opciones actuales
+        distritoSelect.innerHTML = '<option value="">Seleccione...</option>';
+        
+        const departamento = departamentoSelect.value;
+        const provincia = this.value;
+        
+        if (departamento && provincia && ubicaciones[departamento] && ubicaciones[departamento].provincias[provincia]) {
+          const distritos = ubicaciones[departamento].provincias[provincia];
+          
+          // Agregamos las nuevas opciones
+          distritos.forEach(distrito => {
+            const option = document.createElement('option');
+            option.value = distrito.toLowerCase();
+            option.textContent = distrito;
+            distritoSelect.appendChild(option);
+          });
+        }
+      });
+      
+      // También podemos agregar lógica similar para el tipoIncidencia, motivoIncidencia y causaIncidencia
+      
+      // Validación del formulario
+      const form = document.getElementById('reclamacion-form');
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        // Aquí iría la lógica de validación y envío del formulario
+        alert('Formulario enviado correctamente');
+      });
+    });
   </script>
 {% endblock %}
