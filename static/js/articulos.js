@@ -1,4 +1,32 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // Referencias a elementos del DOM
+    const productoImg = document.querySelector('.producto-imagen img');
+    const productoTitulo = document.getElementById('producto-titulo');
+    const productoDescripcion = document.getElementById('producto-descripcion');
+    const productoDimensiones = document.getElementById('producto-dimensiones');
+    const precioPrincipal = document.getElementById('precio');
+    const preciosVolumen = document.getElementById('precios-volumen');
+    const sizeOptions = document.getElementById('size-options');
+    const decreaseBtn = document.querySelector('.qty-btn.decrease');
+    const increaseBtn = document.querySelector('.qty-btn.increase');
+    const qtyInput = document.querySelector('.qty-input');
+    const quantityLimit = document.querySelector('.quantity-limit') || createQuantityLimit();
+    const addToCartBtn = document.querySelector('.btn-agregar');
+    const thumbsContainer = document.getElementById('thumbs-container');
+    const productosRelacionadosGrid = document.getElementById('productos-relacionados-grid');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    // Función para crear el elemento de límite de cantidad si no existe
+    function createQuantityLimit() {
+        const limitElement = document.createElement('div');
+        limitElement.classList.add('quantity-limit');
+        if (qtyInput && qtyInput.parentNode) {
+            qtyInput.parentNode.insertAdjacentElement('afterend', limitElement);
+        }
+        return limitElement;
+    }
+
     // Datos de productos
     const productos = [
         {
@@ -9,11 +37,11 @@ document.addEventListener('DOMContentLoaded', function () {
             precio: 3.00,
             imagen: "/static/img/plumon.png",
             preciosVolumen: [
-                { precio: 2.80, cantidad: 12 },
-                { precio: 2.50, cantidad: 24 }
+                { precio: 2.50, cantidad: 12 },
+                { precio: 2.80, cantidad: 24 }
             ],
             tamanios: [],
-            maxQuantity: 50 // Cantidad máxima para este producto
+            maxQuantity: 50
         },
         {
             id: 2,
@@ -27,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 { precio: 0.80, cantidad: 100 }
             ],
             tamanios: [],
-            maxQuantity: 200 // Cantidad máxima para este producto
+            maxQuantity: 200
         },
         {
             id: 3,
@@ -41,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 { precio: 5.00, cantidad: 12 }
             ],
             tamanios: [],
-            maxQuantity: 30 // Cantidad máxima para este producto
+            maxQuantity: 30
         },
         {
             id: 4,
@@ -50,30 +78,25 @@ document.addEventListener('DOMContentLoaded', function () {
             dimensiones: "Varios tamaños",
             precio: 12.00,
             imagen: "/static/img/stretchfilm.png",
-            preciosVolumen: [
-                { precio: 11.00, cantidad: 5 },
-                { precio: 10.00, cantidad: 10 }
-            ],
             tamanios: ["9''", "15''"],
-                 // Agregar precios específicos por tamaño
-                 preciosPorTamanio: {
-                    "9''": {
-                        precio: 12.00,
-                        preciosVolumen: [
-                            { precio: 11.00, cantidad: 5 },
-                            { precio: 10.00, cantidad: 10 }
-                        ]
-                    },
-                    "15''": {
-                        precio: 18.00,
-                        preciosVolumen: [
-                            { precio: 16.50, cantidad: 5 },
-                            { precio: 15.00, cantidad: 10 }
-                        ]
-                    }
+            preciosPorTamanio: {
+                "9''": {
+                    precio: 12.00,
+                    preciosVolumen: [
+                        { precio: 11.00, cantidad: 5 },
+                        { precio: 10.00, cantidad: 10 }
+                    ]
                 },
-                tamanioActivo: "9''", // Establecer el tamaño por defecto
-                maxQuantity: 20 // Cantidad máxima para este producto
+                "15''": {
+                    precio: 18.00,
+                    preciosVolumen: [
+                        { precio: 16.50, cantidad: 5 },
+                        { precio: 15.00, cantidad: 10 }
+                    ]
+                }
+            },
+            tamanioActivo: "9''",
+            maxQuantity: 20
         },
         {
             id: 5,
@@ -82,12 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
             dimensiones: "1m x 1m",
             precio: 2.50,
             imagen: "/static/img/burbupack.png",
-            preciosVolumen: [
-                { precio: 2.30, cantidad: 10 },
-                { precio: 2.00, cantidad: 20 }
-            ],
             tamanios: ["1m x 1m", "1m x 2m", "2m x 2m"],
-            // Agregar precios específicos por tamaño
             preciosPorTamanio: {
                 "1m x 1m": {
                     precio: 2.50,
@@ -111,44 +129,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     ]
                 }
             },
-            tamanioActivo: "1m x 1m", // Establecer el tamaño por defecto
-            maxQuantity: 40 // Cantidad máxima para este producto
+            tamanioActivo: "1m x 1m",
+            maxQuantity: 40
         }
     ];
 
-    // Elementos del DOM
-    const productoImg = document.getElementById('producto-img');
-    const productoTitulo = document.getElementById('producto-titulo');
-    const productoDescripcion = document.getElementById('producto-descripcion');
-    const productoDimensiones = document.getElementById('producto-dimensiones');
-    const precioPrincipal = document.getElementById('precio');
-    const preciosVolumen = document.getElementById('precios-volumen');
-    const sizeOptions = document.getElementById('size-options');
-    const thumbsContainer = document.getElementById('thumbs-container');
-    const productosRelacionadosGrid = document.getElementById('productos-relacionados-grid');
-
-    // Control de cantidad - FIX: Asegurarse de que estos elementos existan
-    const decreaseBtn = document.querySelector('.qty-btn.decrease');
-    const increaseBtn = document.querySelector('.qty-btn.increase');
-    const qtyInput = document.querySelector('.qty-input');
-    
-    // Mensaje para límite de cantidad
-    let quantityLimit = document.querySelector('.quantity-limit');
-    if (!quantityLimit) {
-        quantityLimit = document.createElement('div');
-        quantityLimit.classList.add('quantity-limit');
-        // Insertar después del input de cantidad
-        if (qtyInput && qtyInput.parentNode) {
-            qtyInput.parentNode.insertAdjacentElement('afterend', quantityLimit);
-        }
-    }
-
-    // Índice del producto actual
+    // Estado actual
     let productoActualIndex = 0;
+    let currentQuantity = 1;
 
-    // Inicializar la página
+    // Inicialización
     function inicializarPagina() {
-        // Crear miniaturas de productos
+        // Crear miniaturas para navegación
         crearMiniaturas();
 
         // Cargar producto inicial
@@ -161,18 +153,54 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Configurar eventos
         configurarEventos();
-        
-        // FIX: Asegurarse de que este elemento exista
-        if (qtyInput) {
-            // Inicializar el control de cantidad
-            initializeQuantityControl();
+
+        // Inicializar control de cantidad
+        inicializarControlCantidad();
+
+        // Añadir estilos para descuentos activos
+        añadirEstilosDescuentos();
+
+        // Ajustar responsividad
+        ajustarResponsividad();
+        window.addEventListener('resize', ajustarResponsividad);
+    }
+
+    // Añadir estilos para resaltar los descuentos activos
+    function añadirEstilosDescuentos() {
+        const style = document.createElement('style');
+        style.textContent = `
+            .precio-volumen-item.active-discount {
+                border: 2px solid #1a3c5b;
+                transform: scale(1.05);
+                background-color: #e8f4f8;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+            .quantity-limit.active {
+                color: #e74c3c;
+                font-weight: bold;
+                transform: scale(1.05);
+                transition: all 0.3s ease;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // Ajustar responsividad según el tamaño de la ventana
+    function ajustarResponsividad() {
+        const productoDetalle = document.querySelector('.producto-detalle');
+        if (productoDetalle) {
+            if (window.innerWidth <= 768) {
+                productoDetalle.style.flexDirection = 'column';
+            } else {
+                productoDetalle.style.flexDirection = 'row';
+            }
         }
     }
 
-    // Crear miniaturas de navegación
+    // Crear miniaturas para navegación
     function crearMiniaturas() {
         if (!thumbsContainer) return;
-        
+
         thumbsContainer.innerHTML = '';
 
         productos.forEach((producto, index) => {
@@ -191,6 +219,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 productoActualIndex = index;
                 cargarProducto(index);
                 actualizarMiniaturaActiva();
+                if (productosRelacionadosGrid) {
+                    cargarProductosRelacionados();
+                }
             });
 
             thumbsContainer.appendChild(thumbItem);
@@ -213,18 +244,15 @@ document.addEventListener('DOMContentLoaded', function () {
     function cargarProducto(index) {
         const producto = productos[index];
 
-        // Verificar que los elementos existan antes de actualizar
+        // Actualizar información básica del producto
         if (productoImg) {
             productoImg.src = producto.imagen;
             productoImg.alt = producto.nombre;
         }
-        
+
         if (productoTitulo) productoTitulo.textContent = producto.nombre;
         if (productoDescripcion) productoDescripcion.textContent = producto.descripcion;
         if (productoDimensiones) productoDimensiones.textContent = producto.dimensiones;
-        
-        // Actualizar precio según tamaño si existe
-        actualizarPrecioSegunTamanio(producto);
 
         // Actualizar opciones de tamaño
         if (sizeOptions) {
@@ -234,179 +262,19 @@ document.addEventListener('DOMContentLoaded', function () {
         // Resetear cantidad y actualizar límite
         if (qtyInput) {
             qtyInput.value = 1;
-            updateQuantityLimit(producto.maxQuantity);
-            validateQuantity();
+            currentQuantity = 1;
+            actualizarLimiteQuantidad(producto.maxQuantity);
+            validarCantidad();
         }
-    }
 
-    // Nueva función: Actualizar precio según el tamaño seleccionado
-    function actualizarPrecioSegunTamanio(producto) {
-        if (!precioPrincipal) return;
-        
-        // Si el producto tiene precios por tamaño y un tamaño activo
-        if (producto.preciosPorTamanio && producto.tamanioActivo) {
-            const precioInfo = producto.preciosPorTamanio[producto.tamanioActivo];
-            if (precioInfo) {
-                // Actualizar precio principal
-                precioPrincipal.textContent = precioInfo.precio.toFixed(2);
-                
-                // Actualizar precios por volumen
-                if (preciosVolumen) {
-                    cargarPreciosVolumen(precioInfo.preciosVolumen);
-                }
-                return;
-            }
-        }
-        
-        // Si no tiene precios por tamaño o no se encontró el tamaño activo, usar el precio normal
-        precioPrincipal.textContent = producto.precio.toFixed(2);
-        
-        // Actualizar precios por volumen
-        if (preciosVolumen) {
-            cargarPreciosVolumen(producto.preciosVolumen);
-        }
-    }
-
-    // Actualizar mensaje de límite de cantidad
-    function updateQuantityLimit(maxQty) {
-        if (quantityLimit) {
-            quantityLimit.textContent = `Máximo: ${maxQty} unidades`;
-        }
-    }
-
-    // Función para validar la cantidad
-    function validateQuantity() {
-        if (!qtyInput) return;
-        
-        const producto = productos[productoActualIndex];
-        if (!producto) return;
-        
-        const maxQty = producto.maxQuantity;
-        let currentQty = parseInt(qtyInput.value);
-        
-        // Si no es un número o es menor que 1, establecer a 1
-        if (isNaN(currentQty) || currentQty < 1) {
-            currentQty = 1;
-        }
-        
-        // Si excede el máximo, establecer al máximo
-        if (currentQty > maxQty) {
-            currentQty = maxQty;
-            
-            // Mostrar mensaje de alerta temporal
-            if (quantityLimit) {
-                quantityLimit.classList.add('active');
-                setTimeout(() => {
-                    quantityLimit.classList.remove('active');
-                }, 3000);
-            }
-        }
-        
-        // Actualizar el input
-        qtyInput.value = currentQty;
-        
-        // Actualizar estado de los botones
-        if (decreaseBtn) decreaseBtn.disabled = currentQty <= 1;
-        if (increaseBtn) increaseBtn.disabled = currentQty >= maxQty;
-        
-        // Actualizar precio total si existe esa función
-        updateTotalPrice();
-    }
-
-    // Función para actualizar el precio total
-    function updateTotalPrice() {
-        const producto = productos[productoActualIndex];
-        if (!producto) return;
-        
-        // Determinar el precio correcto según el tamaño
-        let price = producto.precio;
-        if (producto.preciosPorTamanio && producto.tamanioActivo) {
-            const precioInfo = producto.preciosPorTamanio[producto.tamanioActivo];
-            if (precioInfo) {
-                price = precioInfo.precio;
-            }
-        }
-        
-        const quantity = parseInt(qtyInput.value);
-        
-        // Si tienes un elemento para mostrar el precio total, puedes descomentar esto
-        // const totalPriceElem = document.querySelector('.precio-total');
-        // if (totalPriceElem) {
-        //     totalPriceElem.textContent = `S/ ${(price * quantity).toFixed(2)}`;
-        // }
-        
-        // También puedes actualizar el texto del botón "Agregar al carrito" para incluir el total
-        const addToCartBtn = document.querySelector('.btn-agregar');
-        if (addToCartBtn) {
-            const originalText = "Agregar al carrito";
-            addToCartBtn.innerHTML = `${originalText} <i class="fa-solid fa-cart-shopping"></i>`;
-        }
-    }
-
-    // Inicializar control de cantidad
-    function initializeQuantityControl() {
-        if (!qtyInput) return;
-        
-        // Eliminar el atributo readonly si existe
-        qtyInput.removeAttribute('readonly');
-        
-        // Asegurarse de que la entrada sea un número
-        qtyInput.type = 'number';
-        
-        // Manejar cambios en el input
-        qtyInput.addEventListener('input', function() {
-            validateQuantity();
-        });
-        
-        // Manejar el evento blur (cuando pierde el foco)
-        qtyInput.addEventListener('blur', function() {
-            validateQuantity();
-        });
-        
-        // Para evitar valores no numéricos
-        qtyInput.addEventListener('keydown', function(e) {
-            // Permitir: backspace, delete, tab, escape, enter y .
-            if ([46, 8, 9, 27, 13, 110, 190].indexOf(e.keyCode) !== -1 ||
-                // Permitir: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-                (e.keyCode === 65 && e.ctrlKey === true) ||
-                (e.keyCode === 67 && e.ctrlKey === true) ||
-                (e.keyCode === 86 && e.ctrlKey === true) ||
-                (e.keyCode === 88 && e.ctrlKey === true) ||
-                // Permitir: home, end, left, right
-                (e.keyCode >= 35 && e.keyCode <= 39)) {
-                return;
-            }
-            // Asegurarse de que sea un número y detener el keypress
-            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && 
-                (e.keyCode < 96 || e.keyCode > 105)) {
-                e.preventDefault();
-            }
-        });
-    }
-
-    // Cargar precios por volumen
-    function cargarPreciosVolumen(precios) {
-        if (!preciosVolumen) return;
-        
-        preciosVolumen.innerHTML = '';
-
-        precios.forEach(precio => {
-            const precioItem = document.createElement('div');
-            precioItem.classList.add('precio-volumen-item');
-
-            precioItem.innerHTML = `
-                <span class="etiqueta-precio">S/ ${precio.precio.toFixed(2)}</span>
-                <span class="etiqueta-cantidad">a partir de ${precio.cantidad} uds.</span>
-            `;
-
-            preciosVolumen.appendChild(precioItem);
-        });
+        // Actualizar precios según tamaño
+        actualizarPrecio();
     }
 
     // Cargar opciones de tamaño
     function cargarOpcionesTamanio(tamanios, tamanioActivo) {
         if (!sizeOptions) return;
-        
+
         sizeOptions.innerHTML = '';
 
         if (tamanios.length === 0) {
@@ -434,29 +302,216 @@ document.addEventListener('DOMContentLoaded', function () {
                     btn.classList.remove('active');
                 });
                 sizeBtn.classList.add('active');
-                
+
                 // Actualizar precio según el tamaño seleccionado
-                actualizarPrecioSegunTamanio(productos[productoActualIndex]);
-                
-                // Actualizar precio total si existe
-                updateTotalPrice();
+                actualizarPrecio();
             });
 
             sizeOptions.appendChild(sizeBtn);
         });
     }
 
+    // Actualizar precio según el tamaño y la cantidad (FUNCIÓN MODIFICADA)
+    function actualizarPrecio() {
+        const producto = productos[productoActualIndex];
+        if (!producto) return;
+
+        // Determinar el precio base según el tamaño
+        let precioBase = producto.precio;
+        let preciosVol = producto.preciosVolumen || [];
+
+        // Si tiene precios por tamaño y un tamaño activo
+        if (producto.preciosPorTamanio && producto.tamanioActivo) {
+            const precioInfo = producto.preciosPorTamanio[producto.tamanioActivo];
+            if (precioInfo) {
+                precioBase = precioInfo.precio;
+                preciosVol = precioInfo.preciosVolumen || [];
+            }
+        }
+
+        // Ordenar descuentos de menor a mayor cantidad
+        preciosVol.sort((a, b) => a.cantidad - b.cantidad);
+        
+        // Aplicar el descuento más alto que sea menor o igual a la cantidad
+        let precioFinal = precioBase;
+        for (const descuento of preciosVol) {
+            if (currentQuantity >= descuento.cantidad) {
+                precioFinal = descuento.precio;
+            } else {
+                break; // Los descuentos están ordenados, podemos salir del bucle
+            }
+        }
+
+        // Actualizar precio en la interfaz
+        if (precioPrincipal) {
+            precioPrincipal.textContent = precioFinal.toFixed(2);
+        }
+
+        // Actualizar precios volumen
+        if (preciosVolumen) {
+            cargarPreciosVolumen(preciosVol);
+            resaltarDescuentoActivo(currentQuantity, preciosVol);
+        }
+    }
+
+    // Cargar precios por volumen (función modificada para mantener el orden correcto)
+    function cargarPreciosVolumen(precios) {
+        if (!preciosVolumen) return;
+
+        preciosVolumen.innerHTML = '';
+
+        // Ordenar de menor a mayor cantidad para mostrar en la UI
+        const preciosOrdenados = [...precios].sort((a, b) => a.cantidad - b.cantidad);
+
+        preciosOrdenados.forEach(precio => {
+            const precioItem = document.createElement('div');
+            precioItem.classList.add('precio-volumen-item');
+
+            precioItem.innerHTML = `
+            <span class="etiqueta-precio">S/ ${precio.precio.toFixed(2)}</span>
+            <span class="etiqueta-cantidad">a partir de ${precio.cantidad} uds.</span>
+        `;
+
+            preciosVolumen.appendChild(precioItem);
+        });
+    }
+
+    // Resaltar el descuento activo según la cantidad (FUNCIÓN MODIFICADA)
+    function resaltarDescuentoActivo(cantidad, preciosVol) {
+        const discountItems = document.querySelectorAll('.precio-volumen-item');
+        
+        // Quitar resaltado de todos los items
+        discountItems.forEach(item => {
+            item.classList.remove('active-discount');
+        });
+
+        // Si no hay descuentos o no hay elementos visuales, salir
+        if (!preciosVol.length || !discountItems.length) return;
+
+        // Encontrar el descuento activo más alto
+        let descuentoActivoIndex = -1;
+        for (let i = 0; i < preciosVol.length; i++) {
+            if (cantidad >= preciosVol[i].cantidad) {
+                descuentoActivoIndex = i;
+            } else {
+                break;
+            }
+        }
+
+        // Resaltar el descuento activo si se encontró
+        if (descuentoActivoIndex !== -1) {
+            discountItems[descuentoActivoIndex].classList.add('active-discount');
+        }
+    }
+
+    // Actualizar mensaje de límite de cantidad
+    function actualizarLimiteQuantidad(maxQty) {
+        if (quantityLimit) {
+            quantityLimit.textContent = `Máximo: ${maxQty} unidades`;
+        }
+    }
+
+    // Mostrar alerta de límite
+    function mostrarAlertaLimite() {
+        quantityLimit.classList.add('active');
+        setTimeout(() => {
+            quantityLimit.classList.remove('active');
+        }, 1500);
+    }
+
+    // Validar la cantidad
+    function validarCantidad() {
+        if (!qtyInput) return;
+
+        const producto = productos[productoActualIndex];
+        if (!producto) return;
+
+        const maxQty = producto.maxQuantity;
+        let cantidad = parseInt(qtyInput.value);
+
+        // Validar valor
+        if (isNaN(cantidad) || cantidad < 1) {
+            cantidad = 1;
+        } else if (cantidad > maxQty) {
+            cantidad = maxQty;
+            mostrarAlertaLimite();
+        }
+
+        // Actualizar input y estado
+        qtyInput.value = cantidad;
+        currentQuantity = cantidad;
+
+        // Actualizar estado de botones
+        if (decreaseBtn) decreaseBtn.disabled = cantidad <= 1;
+        if (increaseBtn) increaseBtn.disabled = cantidad >= maxQty;
+
+        // Actualizar precio según cantidad
+        actualizarPrecio();
+    }
+
+    // Inicializar control de cantidad
+    function inicializarControlCantidad() {
+        if (!qtyInput) return;
+
+        // Eliminar readonly si existe
+        qtyInput.removeAttribute('readonly');
+        qtyInput.type = 'number';
+
+        // Manejar cambios en el input
+        qtyInput.addEventListener('input', validarCantidad);
+        qtyInput.addEventListener('blur', validarCantidad);
+
+        // Para evitar valores no numéricos
+        qtyInput.addEventListener('keydown', function (e) {
+            // Permitir: backspace, delete, tab, escape, enter
+            if ([46, 8, 9, 27, 13].indexOf(e.keyCode) !== -1 ||
+                // Permitir: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+                (e.keyCode === 65 && e.ctrlKey === true) ||
+                (e.keyCode === 67 && e.ctrlKey === true) ||
+                (e.keyCode === 86 && e.ctrlKey === true) ||
+                (e.keyCode === 88 && e.ctrlKey === true) ||
+                // Permitir: home, end, left, right
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                return;
+            }
+
+            // Asegurarse de que sea un número
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) &&
+                (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+                return;
+            }
+
+            // Comprobar si excederá el límite máximo
+            const currentValue = qtyInput.value;
+            const selectionStart = qtyInput.selectionStart;
+            const selectionEnd = qtyInput.selectionEnd;
+            const keyValue = e.key;
+
+            // Si no hay selección (solo se está añadiendo un dígito)
+            if (selectionStart === selectionEnd) {
+                const newValue = currentValue.slice(0, selectionStart) + keyValue + currentValue.slice(selectionEnd);
+                const producto = productos[productoActualIndex];
+
+                if (parseInt(newValue) > producto.maxQuantity) {
+                    e.preventDefault();
+                    mostrarAlertaLimite();
+                }
+            }
+        });
+    }
+
     // Cargar productos relacionados
     function cargarProductosRelacionados() {
         if (!productosRelacionadosGrid) return;
-        
+
         productosRelacionadosGrid.innerHTML = '';
 
-        // Mostrar 4 productos aleatorios diferentes al actual
+        // Mostrar productos aleatorios diferentes al actual
         const productosDisponibles = [...productos];
         productosDisponibles.splice(productoActualIndex, 1);
 
-        // Mezclar el array para mostrar productos aleatorios
+        // Mezclar el array para productos aleatorios
         const productosAleatorios = mezclarArray(productosDisponibles).slice(0, 4);
 
         productosAleatorios.forEach(producto => {
@@ -472,20 +527,22 @@ document.addEventListener('DOMContentLoaded', function () {
             productoItem.addEventListener('click', () => {
                 // Encontrar índice del producto seleccionado
                 const nuevoIndex = productos.findIndex(p => p.id === producto.id);
-                productoActualIndex = nuevoIndex;
-                cargarProducto(nuevoIndex);
-                actualizarMiniaturaActiva();
+                if (nuevoIndex !== -1) {
+                    productoActualIndex = nuevoIndex;
+                    cargarProducto(nuevoIndex);
+                    actualizarMiniaturaActiva();
 
-                // Hacer scroll hacia arriba para mostrar el producto
-                const productoDetalle = document.querySelector('.producto-detalle');
-                if (productoDetalle) {
-                    productoDetalle.scrollIntoView({
-                        behavior: 'smooth'
-                    });
+                    // Hacer scroll hacia arriba para mostrar el producto
+                    const productoDetalle = document.querySelector('.producto-detalle');
+                    if (productoDetalle) {
+                        productoDetalle.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+
+                    // Recargar productos relacionados
+                    cargarProductosRelacionados();
                 }
-
-                // Recargar productos relacionados
-                cargarProductosRelacionados();
             });
 
             productosRelacionadosGrid.appendChild(productoItem);
@@ -502,12 +559,9 @@ document.addEventListener('DOMContentLoaded', function () {
         return newArray;
     }
 
-    // Configurar eventos
+    // Configurar eventos principales
     function configurarEventos() {
-        // Botones de navegación
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        
+        // Navegación entre productos
         if (prevBtn) {
             prevBtn.addEventListener('click', () => {
                 productoActualIndex = (productoActualIndex - 1 + productos.length) % productos.length;
@@ -530,46 +584,78 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        // Event listeners para selector de cantidad
+        // Control de cantidad
         if (decreaseBtn) {
-            decreaseBtn.addEventListener('click', function() {
+            decreaseBtn.addEventListener('click', () => {
                 if (!qtyInput) return;
-                
-                let currentQty = parseInt(qtyInput.value);
-                if (currentQty > 1) {
-                    qtyInput.value = currentQty - 1;
-                    validateQuantity();
+
+                let cantidad = parseInt(qtyInput.value);
+                if (cantidad > 1) {
+                    qtyInput.value = cantidad - 1;
+                    validarCantidad();
                 }
             });
         }
 
         if (increaseBtn) {
-            increaseBtn.addEventListener('click', function() {
+            increaseBtn.addEventListener('click', () => {
                 if (!qtyInput) return;
-                
-                let currentQty = parseInt(qtyInput.value);
-                qtyInput.value = currentQty + 1;
-                validateQuantity();
+
+                let cantidad = parseInt(qtyInput.value);
+                qtyInput.value = cantidad + 1;
+                validarCantidad();
             });
         }
 
         // Botón de agregar al carrito
-        const addToCartBtn = document.querySelector('.btn-agregar');
         if (addToCartBtn) {
             addToCartBtn.addEventListener('click', () => {
                 const producto = productos[productoActualIndex];
-                const cantidad = parseInt(qtyInput.value);
-                let tamanioSeleccionado = '';
+                if (!producto) return;
 
-                if (producto.tamanios && producto.tamanios.length > 0) {
+                const cantidad = parseInt(qtyInput.value);
+                if (isNaN(cantidad) || cantidad < 1 || cantidad > producto.maxQuantity) {
+                    mostrarAlertaLimite();
+                    return;
+                }
+
+                // Determinar tamaño seleccionado
+                let tamanioSeleccionado = '';
+                if (producto.tamanios && producto.tamanios.length > 0 && producto.tamanioActivo) {
                     tamanioSeleccionado = producto.tamanioActivo;
                 }
 
-                // Aquí se implementaría la lógica para agregar al carrito
-                console.log(`Agregando al carrito: ${cantidad} ${producto.nombre} ${tamanioSeleccionado ? '- ' + tamanioSeleccionado : ''}`);
+                // Determinar precio unitario
+                let precioUnitario = producto.precio;
+                let preciosVol = producto.preciosVolumen || [];
 
-                // Mostrar mensaje de confirmación
-                alert(`¡${cantidad} ${producto.nombre} ${tamanioSeleccionado ? '- ' + tamanioSeleccionado : ''} agregado al carrito!`);
+                if (producto.preciosPorTamanio && producto.tamanioActivo) {
+                    const precioInfo = producto.preciosPorTamanio[producto.tamanioActivo];
+                    if (precioInfo) {
+                        precioUnitario = precioInfo.precio;
+                        preciosVol = precioInfo.preciosVolumen || [];
+                    }
+                }
+
+                // Ordenar descuentos de menor a mayor cantidad
+                preciosVol.sort((a, b) => a.cantidad - b.cantidad);
+                
+                // Calcular precio con descuento por volumen si aplica
+                for (const descuento of preciosVol) {
+                    if (cantidad >= descuento.cantidad) {
+                        precioUnitario = descuento.precio;
+                    } else {
+                        break;
+                    }
+                }
+
+                // Calcular precio total
+                const precioTotal = (precioUnitario * cantidad).toFixed(2);
+
+                // Mensaje de confirmación
+                alert(`Se han agregado ${cantidad} unidades de ${producto.nombre} ${tamanioSeleccionado ? '- ' + tamanioSeleccionado : ''} al carrito
+Precio unitario: S/ ${precioUnitario.toFixed(2)}
+Total: S/ ${precioTotal}`);
             });
         }
     }

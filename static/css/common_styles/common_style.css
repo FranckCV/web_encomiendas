@@ -47,6 +47,13 @@
     --color0: rgb(33, 37, 41);
 
     --color-background: color-mix(in srgb, var(--color-contrast) 30%, var(--color-contrast) 100%);
+    --primary-color: #0066cc;
+      --accent-color: #ff6600;
+      --text-color: #333333;
+      --light-gray: #f5f5f5;
+      --border-color: #dddddd;
+      --success-color: #28a745;
+      --error-color: #dc3545;
 }
 
 *:not(i) {

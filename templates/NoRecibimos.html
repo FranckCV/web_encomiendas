@@ -11,12 +11,13 @@ No recibimos - Artículos no aceptados
 
 {% block contenido %}
 <div class="no-recibimos-container">
-    
+
     <!-- Banner principal actualizado con el formato del welcome-banner de FAQ -->
     <div class="welcome-banner">
         <div class="welcome-content">
             <h2>No Recibimos</h2>
-            <p>Los siguientes artículos NO son recibidos bajo ninguna circunstancia.</p>
+            <span>Los siguientes artículos <b style="color: red;">NO</b> son recibidos bajo ninguna
+                circunstancia.</span>
         </div>
     </div>
 
@@ -120,10 +121,39 @@ No recibimos - Artículos no aceptados
         </div>
         <div class="info-texto">
             <h3>¿Necesitas enviar algo?</h3>
-            <p>Consulta nuestras <a href="{{url_for('sucursales')}}">sucursales</a> o <a href="{{url_for('contac')}}">contáctanos</a> para más información.</p>
+            <p>Consulta nuestras <a href="{{url_for('sucursales')}}">sucursales</a> o <a
+                    href="{{url_for('contac')}}">contáctanos</a> para más información.</p>
         </div>
     </div>
     <br>
+
+    <!-- HTML para el modal preexistente en el documento -->
+    <div id="producto-modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <h3 class="modal-title">No recibimos: <span id="modal-producto-titulo"></span></h3>
+            <p class="modal-description" id="modal-producto-descripcion"></p>
+
+            <div class="modal-section">
+                <h4>¿Por qué no recibimos este artículo?</h4>
+                <p>Estos artículos representan un riesgo durante el transporte o requieren condiciones especiales que no
+                    podemos garantizar. Nuestro objetivo es asegurar que todos los envíos lleguen en perfectas
+                    condiciones.</p>
+            </div>
+
+            <div class="modal-section">
+                <h4>¿Alternativas?</h4>
+                <p>Para este tipo de artículo existen servicios especializados que cuentan con el equipo y las medidas
+                    de seguridad necesarias para su transporte adecuado.</p>
+            </div>
+
+            <div class="modal-contact">
+                <p>Para más información sobre alternativas de envío, por favor:</p>
+                <br>
+                <a href="{{url_for('contac')}}" class="contact-btn">Contactar con atención al cliente</a>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 

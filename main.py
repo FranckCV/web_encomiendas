@@ -1344,7 +1344,11 @@ paginas_simples = [
     'tracking',
     'seguimiento',
     'recuperar_contrasenia',
-    'libro_reclamaciones'
+    'libro_reclamaciones',
+    'mis_envios',
+    'NoRecibimos',
+    'pagina_reclamo',
+    'seguimiento_reclamo'
 ]
 
 
@@ -1376,6 +1380,10 @@ def cajas():
 @app.route("/articulos")
 def articulos():
     return render_template('articulos.html')
+
+@app.route("/carrito")
+def carrito():
+    return render_template('carrito.html')
 
 
 @app.route("/cotizador")
