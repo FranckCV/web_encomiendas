@@ -86,9 +86,9 @@ def unactive_row( id ):
 def insert_row( nombre , marcaid , tipo_unidadid ):
     sql = f'''
         INSERT INTO 
-            {table_name} ( nombre , marcaid , tipo_unidadid ) 
+            {table_name} ( nombre , marcaid , tipo_unidadid , activo ) 
         VALUES 
-            ( %s ,  %s , %s )
+            ( %s ,  %s , %s , 1)
     '''
     sql_execute(sql,( nombre , marcaid , tipo_unidadid ))
 
@@ -109,14 +109,14 @@ def update_row( nombre , marcaid , tipo_unidadid , id):
 def get_options():
     sql= f'''
         select 
-            {get_primary_key()} ,
+            id ,
             nombre
         from {table_name}
         order by nombre asc
     '''
     filas = sql_select_fetchall(sql)
     
-    lista = [(fila[get_primary_key()], fila["nombre"]) for fila in filas]
+    lista = [(fila["id"], fila["nombre"]) for fila in filas]
 
     return lista
 

@@ -8,10 +8,8 @@ def get_lista_modulos():
             mdl.icono ,
             mdl.key ,
             mdl.color ,
-            mdl.activo ,
-            count(pag.id) as cant
+            mdl.activo 
         from modulo mdl
-        left join pagina pag on pag.moduloid = mdl.id
         group by mdl.id
         order by 2 asc 
     '''
@@ -53,6 +51,8 @@ def get_lista_roles():
         from rol 
         left join tipo_rol tip on tip.id = rol.tipo_rolid
         where tip.activo = 1 and rol.activo = 1
+        order by rol.nombre
+
     '''
 
     filas = bd.sql_select_fetchall(sql)
@@ -62,12 +62,16 @@ def get_lista_roles():
 
 def get_lista_tipo_roles():
     sql= f'''
-        select
-            tip.id ,
-            tip.nombre ,
-            tip.activo
-        from tipo_rol tip
-        where activo = 1 and tip.id != 1
+        SELECT
+            tip.id,
+            tip.nombre,
+            tip.activo,
+            COUNT(rol.id) AS cant
+        FROM tipo_rol tip
+        LEFT JOIN rol ON rol.tipo_rolid = tip.id
+        WHERE tip.activo = 1 AND tip.id != 1
+        GROUP BY tip.id
+        HAVING COUNT(rol.id) != 0;
     '''
 
     filas = bd.sql_select_fetchall(sql)
@@ -93,6 +97,49 @@ def get_info_rol(rolid):
     a = bd.sql_select_fetchone(sql)
     
     return  a
+
+def get_cants_modulos():
+    sql= f'''
+        SELECT 
+            m.id ,
+            m.nombre ,
+            tp.id AS tip_id,
+            tp.nombre AS tip_nombre,
+            COUNT(p.id) AS cant
+        FROM tipo_pagina tp
+        CROSS JOIN modulo m
+        LEFT JOIN pagina p ON p.tipo_paginaid = tp.id AND p.moduloid = m.id
+        GROUP BY m.id, tp.id;
+    '''
+
+    filas = bd.sql_select_fetchall(sql)
+    
+    return  filas
+
+
+def update_modulo( id , titulo , icono , color ):
+    sql = f'''
+        update modulo set 
+            nombre = %s , 
+            icono = %s , 
+            color = %s
+        where id = {id}
+    '''
+    bd.sql_execute(sql,( titulo , icono , color ))
+
+
+def update_pagina( id , titulo , icono , moduloid ):
+    sql = f'''
+        update pagina set 
+            titulo = %s , 
+            icono = %s , 
+            moduloid = %s
+        where id = {id}
+    '''
+    bd.sql_execute(sql,( titulo , icono , moduloid ))
+
+
+
 
 
 # #####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####

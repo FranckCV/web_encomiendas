@@ -56,7 +56,7 @@ def sql_execute_lastrowid(sql , args = None):
 
 def show_columns(table_name):
     sql= f'''
-        SHOW COLUMNS FROM
+        SHOW COLUMNS FROM 
         {table_name}
     '''
     columnas = sql_select_fetchall(sql)
@@ -67,8 +67,8 @@ def show_columns(table_name):
 def show_primary_key(tabla):
     for row in show_columns(tabla):
         if row['Key'] == 'PRI' and row['Null'] == 'NO':
-            column = row['Field']
-    return column
+            return row['Field']
+    return None
 
 
 def find_column_table(column_name, tabla):

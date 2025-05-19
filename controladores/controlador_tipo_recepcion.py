@@ -62,25 +62,24 @@ def unactive_row( id ):
     unactive_row_table(table_name , id)
 
 
-def insert_row( nombre , descripcion=None ):
+def insert_row( nombre  ):
     sql = f'''
         INSERT INTO 
             {table_name} 
-            ( nombre , descripcion , activo )
+            ( nombre , activo )
         VALUES 
-            ( %s , %s , 1 )
+            ( %s  , 1 )
     '''
-    sql_execute(sql,( nombre , descripcion ))
+    sql_execute(sql,( nombre ))
 
 
-def update_row( id , nombre , descripcion ):
+def update_row( id , nombre ):
     sql = f'''
         update {table_name} set 
-        nombre = %s ,
-        descripcion = %s
+        nombre = %s 
         where {get_primary_key()} = {id}
     '''
-    sql_execute(sql, (nombre , descripcion ))
+    sql_execute(sql, (nombre ))
 
 
 #####_ ADICIONALES _#####
