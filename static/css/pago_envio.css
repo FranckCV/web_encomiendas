@@ -1,3 +1,4 @@
+/* Estilos generales */
 body {
     font-family: 'Poppins', sans-serif;
     background-color: #ffffff;
@@ -6,6 +7,7 @@ body {
     padding: 0;
 }
 
+/* Links de navegación */
 .navigation-links {
     padding: 10px 30px;
 }
@@ -22,19 +24,28 @@ body {
     color: #061142;
 }
 
+/* Título principal */
 .titulo-envio {
     font-size: 32px;
     color: #0E1D63;
     text-align: center;
     font-weight: 700;
-    margin: 30px 0;
+    margin: 1px 0 30px 0;
 }
 
+/* Contenedor principal */
+.container {
+    max-width: 1200px;
+    margin: 0 auto 60px auto;
+    padding: 0 20px;
+}
+
+/* Estilos para pasos */
 .steps-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .step {
@@ -77,35 +88,29 @@ body {
     margin: 0 10px;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-/* Medios de pago */
+/* Pago */
 .pago-content {
     display: flex;
     gap: 30px;
-    margin-top: 40px;
+    margin-top: 20px;
     flex-wrap: wrap;
     justify-content: space-between;
 }
 
+/* Opciones de pago */
 .opciones-pago {
-    flex: 1;
-    min-width: 300px;
+    flex: 0 0 60%;
+    min-width: 350px;
 }
 
+/* Recuadro de opción */
 .opcion {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px 20px;
+    flex-direction: column;
     border: 2px solid #dce3f5;
     border-radius: 10px;
+    padding: 15px 20px;
     margin-bottom: 15px;
-    font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -115,12 +120,47 @@ body {
     background-color: #f0f5ff;
 }
 
+/* Encabezado de la opción */
+.cabecera-opcion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.cabecera-opcion .texto {
+    flex: 1;
+    font-weight: 600;
+    text-align: center;
+    font-size: 15px;
+}
+
+.icono {
+    width: 30px;
+    height: auto;
+}
+
+/* Iconos de métodos de pago */
+.iconos-pago {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.icono-tarjeta {
+    width: 50px;
+    height: auto;
+    border-radius: 4px;
+}
+
+/* Resumen del pedido */
 .resumen-box {
+    flex: 0 0 38%;
     border: 1px solid #dce3f5;
     border-radius: 8px;
     padding: 20px;
-    flex: 1;
-    min-width: 280px;
+    min-width: 300px;
     max-width: 400px;
 }
 
@@ -147,10 +187,12 @@ body {
     color: #0E1D63;
 }
 
+/* Cuadro para cupón */
 .cupon-box {
     display: flex;
     gap: 10px;
     flex-wrap: nowrap;
+    margin-bottom: 15px;
 }
 
 .cupon-box input {
@@ -173,4 +215,46 @@ body {
 
 .cupon-box button:hover {
     background-color: #061142;
+}
+
+/* Botón PAGAR */
+.boton-pagar-container {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.btn-pagar {
+  background-color: #00E0E0;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.3s ease;
+}
+
+.btn-pagar:hover {
+  background-color: #00caca;
+}
+
+.btn-pagar:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Oculto */
+.oculto {
+    display: none;
+}
+
+/* Footer */
+.footer {
+    margin-top: 60px;
+}
+
+.metodo-pago {
+    margin-bottom: 40px;
 }
