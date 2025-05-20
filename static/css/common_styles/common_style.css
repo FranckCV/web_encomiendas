@@ -60,6 +60,7 @@
     font-family: Poppins, sans-serif !important;
     /* font-weight: bold; */
     transition: 0.15s ease-in-out;
+    /* text-transform: uppercase; */
 }
 
 header.general_element {
@@ -122,10 +123,16 @@ p {
     margin: 0;
 }
 
+.button,
 button {
     border: 0;
     cursor: pointer;
+    background-color: var(--color1);
+    border-radius: 5px;
 }
+
+
+
 
 
 /* Esto es para que vean cuales son los enlaces que no llevan a nada */

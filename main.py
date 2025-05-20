@@ -761,11 +761,14 @@ CONTROLADORES = {
         "nombre_tabla": "marca",
         "controlador": controlador_marca,
         "icon_page": 'fa-solid fa-car-side',
-        "filters": [] ,
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
         "fields_form": [
 #            ID/NAME   LABEL     PLACEHOLDER  TYPE     REQUIRED   ABLE/DISABLE   DATOS
             ['id',     'ID',     'ID',        'text',  True ,     False ,        None ],
             ['nombre', 'Nombre', 'Nombre',    'text',  True ,     True ,         None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -783,11 +786,13 @@ CONTROLADORES = {
         "nombre_tabla": "modelo",
         "controlador": controlador_modelo,
         "icon_page": 'fa-solid fa-cogs',
-        "filters": [] ,
+        "filters": [
+        ] ,
         "fields_form": [
 #            ID/NAME            LABEL               PLACEHOLDER         TYPE        REQUIRED   ABLE/DISABLE   DATOS
             ['id',              'ID',               'ID',               'text',     False ,    False ,        None ],
             ['nombre',          'Nombre',           'Nombre',           'text',     True ,     True ,         None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
             ['marcaid',         'Marca',            'Marca',            'select',   True ,     None,          [lambda: controlador_marca.get_options_marca() , 'nom_mar'] ],
             ['tipo_unidadid',   'Tipo de Unidad',   'Tipo de Unidad',   'select',   True ,     None ,         [lambda: controlador_tipo_unidad.get_options() , 'nom_tip'] ],
             # ['marcaid',         'Marca',            'Marca',            'select',   True ,     None,          [controlador_marca.get_options_marca() , 'nom_mar'] ],
@@ -810,17 +815,18 @@ CONTROLADORES = {
         "controlador": controlador_unidad,
         "icon_page": 'fa-solid fa-truck-fast',
         "filters": [
-            ['activo', f'{TITLE_STATE}', get_options_active() ],
-            ['modeloid', 'Modelo', lambda: controlador_modelo.get_options() ],
+            # ['modeloid', 'Modelo', lambda: controlador_modelo.get_options() ],
         ] ,
         "fields_form": [
 #            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
             ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
+            ['modeloid',      'Nombre de Modelo', 'Elegir modelo', 'select',    True ,     True,          [lambda: controlador_modelo.get_options() , 'nom_modelo' ] ],
+            ['estado',        'Estado',           'Elegir estado', 'select',    True ,    True,           [lambda: controlador_unidad.get_options_estado() , 'estado' ]  ],
             ['placa',         'Placa',            'Placa',         'text',      True ,     True,          True ],
-            ['activo',        f'{TITLE_STATE}',   'activo',        'p',         True ,     True,          None ],
+            ['mtc',           'MTC',              'MTC',           'text',      True ,     True,          True ],
+            ['tuc',           'TUC',              'TUC',           'text',      True ,     True,          True ],
             ['capacidad',     'Capacidad',        'Capacidad',     'number',    True ,     True,          True ],
             ['volumen',       'Volumen',          'Volumen',       'number',    True ,     True,          None ],
-            ['modeloid',      'Nombre de Modelo', 'Elegir modelo', 'select',    True ,     True,          [lambda: controlador_modelo.get_options() , 'nom_modelo' ] ],
             ['observaciones', 'Observaciones',    'observaciones', 'textarea',  False,     True,          None ],
         ],
         "crud_forms": {
@@ -844,9 +850,11 @@ CONTROLADORES = {
         ] ,
         "fields_form": [
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['id',           'ID',               'ID',          'text',     True ,     False ,        None ],
+            ['nombre',       'Nombre',           'Nombre',      'text',     True ,     True  ,        None ],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['peso_maximo',  'Peso Máximo',      'Peso Máximo',      'number',     True ,     True  ,        None ],
+            ['unidad_medida','Unidad de Medida', 'Unidad de Medida',      'text',     True ,     True  ,        None ],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -884,6 +892,35 @@ CONTROLADORES = {
         }
     },
     
+
+# PERMISOS (SIN CRUD)
+    "tipo_unidad": {
+        "active" : True ,
+        "titulo": "tipos de unidades",
+        "icon_page": 'fa-solid fa-truck-plane',
+        "nombre_tabla": "tipo de unidad",
+        "controlador": controlador_tipo_unidad,
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+        #    ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+
 # _BORRAR
     "ubigeo" : {
         "active":True,
@@ -1260,6 +1297,7 @@ def validar_admin():
 def inject_globals():
     # lista_paginas_crud = listar_paginas_crud()
     listar_pages_admin = listar_admin_pages()
+    modulos = acceso.get_lista_modulos()
     # listar_pages_admin = []
     options_pagination_crud , selected_option_crud = get_options_pagination_crud()
     cookie_error = request.cookies.get('error')
@@ -1274,7 +1312,7 @@ def inject_globals():
         selected_option_crud = selected_option_crud ,
         cookie_error = cookie_error,
         modulo_actual = modulo_actual ,
-
+        modulos= modulos ,
         MENU_ADMIN             = MENU_ADMIN,
         HABILITAR_ICON_PAGES   = HABILITAR_ICON_PAGES,
         SYSTEM_NAME            = SYSTEM_NAME,
@@ -1404,7 +1442,6 @@ def crud_generico(tabla):
 
             existe_activo = controlador.exists_Activo()
             columnas , filas = controlador.get_table()
-            info_columns = controlador.get_info_columns()
             primary_key = controlador.get_primary_key()
             table_columns  = list(filas[0].keys()) if filas else []
             
@@ -1431,7 +1468,7 @@ def crud_generico(tabla):
                 columnas       = columnas ,
                 key_columns    = list(columnas.keys()) ,
                 table_columns  = table_columns ,
-                info_columns   = info_columns,
+                # info_columns   = info_columns,
                 crud_list      = crud_list,
                 crud_search    = crud_search,
                 crud_consult   = crud_consult,
@@ -1535,13 +1572,23 @@ def administrar_paginas():
     paginas_cruds = acceso.get_paginas_crud()
     roles = acceso.get_lista_roles()
     tipos_rol = acceso.get_lista_tipo_roles()
-
+    cants_mod = acceso.get_cants_modulos()
+    fields_form = [
+#        ID/NAME          LABEL         PLACEHOLDER  TYPE    REQUIRED   ABLE/DISABLE   DATOS
+        ['nombre', 'Nombre del módulo', 'Nombre', 'text',    True ,     True,          None ],
+        ['activo', 'Actividad',         'Color',  'p',    True,      True,          None ],
+        ['icono',  'Icono',             'Icono',  'icon',    True ,     True,          None ],
+        ['color',  'Color',             'color',  'color',    True,      True,          None ],
+    ]
+    
     return render_template(
         'administrar_paginas.html' ,
         modulos = modulos ,
         paginas_cruds = paginas_cruds , 
         roles = roles ,
         tipos_rol = tipos_rol ,
+        cants_mod = cants_mod ,
+        fields_form = fields_form ,
         )
 
 
@@ -1552,6 +1599,8 @@ def permiso_rol(rolid):
     paginas_cruds = acceso.get_paginas_crud()
     roles = acceso.get_lista_roles()
     tipos_rol = acceso.get_lista_tipo_roles()
+    cants_mod = acceso.get_cants_modulos()
+
     info_rol = acceso.get_info_rol(rolid)
 
     return render_template(
@@ -1562,6 +1611,8 @@ def permiso_rol(rolid):
         tipos_rol = tipos_rol ,
         rolid = rolid ,
         info_rol = info_rol ,
+        cants_mod = cants_mod ,
+
         )
 
 

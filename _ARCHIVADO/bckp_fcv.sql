@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-05-2025 a las 17:10:48
+-- Tiempo de generación: 14-05-2025 a las 08:38:32
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.1.17
 
@@ -353,13 +353,14 @@ INSERT INTO `modelo` (`id`, `nombre`, `activo`, `marcaid`, `tipo_unidadid`) VALU
 (3, 'R-Series', 1, 3, 1),
 (4, 'Actros', 1, 4, 1),
 (5, 'XF', 1, 5, 1),
-(6, 'Premium Lander', 1, 6, 1),
+(6, 'Premium Lander', 1, 6, 4),
 (7, '500 Series', 1, 7, 4),
 (8, 'Fighter', 1, 8, 1),
 (9, 'N-Series', 1, 9, 2),
 (10, 'HD65', 1, 10, 5),
 (11, 'ProStar', 1, 11, 1),
-(12, 'T680', 1, 12, 3);
+(12, 'T680', 1, 12, 3),
+(15, 'papaleta camioneta  ', 0, 5, 5);
 
 -- --------------------------------------------------------
 
@@ -382,7 +383,7 @@ CREATE TABLE `modulo` (
 
 INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo`) VALUES
 (1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF\n', 1),
-(2, 'Logística', 'fa-solid fa-truck-front', 'logistica', 'green', 1),
+(2, 'Logística', 'fa-solid fa-truck-front', 'logistica', '#00F068', 1),
 (3, 'Encomiendas', 'fa-solid fa-box', 'encomienda', '#FF5E1A', 1),
 (4, 'Atención al cliente', 'fa-solid fa-circle-question', 'atencion', '#8232D2', 1),
 (5, 'Ventas', 'fa-solid fa-file-invoice-dollar', 'ventas', 'red', 1),
@@ -459,7 +460,8 @@ INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `tipo_paginaid`,
 (23, 'Causas de reclamo', NULL, 1, 'causa_reclamo', 1, 4),
 (24, 'Tarifas de ruta', NULL, 1, 'tarifa_ruta', 1, 1),
 (25, 'Sucursales', 'ri-store-3-line', 1, 'sucursal', 1, 1),
-(26, 'tipos de reclamos', 'fa-solid fa-book-open-reader', 1, 'tipo_reclamo', 1, 4);
+(26, 'tipos de reclamos', 'fa-solid fa-book-open-reader', 1, 'tipo_reclamo', 1, 4),
+(27, 'Reporte', NULL, 1, 'aa', 2, 2);
 
 -- --------------------------------------------------------
 
@@ -531,7 +533,21 @@ CREATE TABLE `rol` (
 --
 
 INSERT INTO `rol` (`id`, `nombre`, `descripcion`, `activo`, `tipo_rolid`) VALUES
-(1, 'Superadmin', NULL, 1, 1);
+(1, 'Superadmin', 'El patrón', 1, 1),
+(2, 'Coordinador logístico', 'Responsable de gestionar los horarios de unidades, artículos para encomiendas, y reportes de viajes.', 1, 9),
+(3, 'Conductor', 'Encargado de gestionar los horarios de las unidades y reportar los viajes realizados.', 1, 9),
+(4, 'Empleado de almacén', 'Responsable de gestionar los artículos para las encomiendas.', 1, 6),
+(5, 'Empleado de atención al cliente', 'Gestión de encomiendas, devoluciones, seguimiento, y reportes de encomiendas entregadas y pendientes.', 1, 10),
+(6, 'Agente de devoluciones', 'Responsable de gestionar devoluciones de encomiendas no recogidas.', 1, 10),
+(7, 'Repartidor', 'Encargado de reportar encomiendas entregadas y pendientes.', 1, 6),
+(8, 'Recepcionista de sucursal', 'Encargado de gestionar encomiendas en la sucursal.', 1, 6),
+(9, 'Encargado de reclamos', 'Responsable de gestionar incidencias y reclamos, así como reembolsos e indemnizaciones.', 1, 10),
+(10, 'Responsable de gestión financiera', 'Encargado de verificar y autorizar reembolsos e indemnizaciones, además de generar reportes financieros.', 1, 5),
+(11, 'Administrador de la empresa', 'Responsable de gestionar las sucursales, rutas, unidades, y reportes financieros y operativos.', 1, 2),
+(12, 'Vendedor', 'Encargado de la venta de artículos para encomiendas y generación de reportes de ventas.', 1, 4),
+(13, 'Administrador de personal', 'Gestión de los aspectos administrativos de los empleados, horarios y personal.', 1, 2),
+(14, 'Administrador de usuarios', 'Responsable de la gestión de usuarios, inicio de sesión, registro, recuperación de contraseña y reportes.', 1, 2),
+(15, 'Gestor de unidades', NULL, 1, 3);
 
 -- --------------------------------------------------------
 
@@ -767,8 +783,14 @@ CREATE TABLE `tipo_rol` (
 
 INSERT INTO `tipo_rol` (`id`, `nombre`, `descripcion`, `activo`) VALUES
 (1, 'SuperAdministador', 'Dios', 1),
-(2, 'Administrador', NULL, 1),
-(3, 'Empleado', NULL, 1);
+(2, 'Administrador', 'Roles relacionados con la administración de la empresa y gestión de usuarios.', 1),
+(3, 'Empleado general', NULL, 1),
+(4, 'Ventas', 'Roles enfocados en la venta de productos o servicios, y el seguimiento de ventas.', 1),
+(5, 'Finanzas', 'Roles relacionados con la gestión financiera, reembolsos, e informes financieros.', 1),
+(6, 'Almacén y Encomiendas', 'Roles encargados de la gestión de artículos y encomiendas dentro de la empresa.', 1),
+(7, 'Personal', 'Roles administrativos relacionados con la gestión de empleados y recursos humanos.', 1),
+(9, 'Logística y Operativos', 'Roles enfocados en la gestión de unidades y logística de los viajes.', 1),
+(10, 'Atención al Cliente', 'Roles encargados de la atención al cliente y la gestión de reclamos e incidencias.', 1);
 
 -- --------------------------------------------------------
 
@@ -2775,7 +2797,9 @@ INSERT INTO `unidad` (`id`, `placa`, `MTC`, `TUC`, `capacidad`, `volumen`, `desc
 (9, 'STU7890', '1519044KN', '15M25016323M', 11.00, 23.00, 'Unidad para transporte urbano', 'A', 9),
 (10, 'VWX8901', '1519045LN', '15M25016324N', 16.50, 34.00, 'Unidad de carga mediana', 'A', 10),
 (11, 'YZA9012', '1519046MN', '15M25016325O', 22.00, 50.00, 'Unidad para transporte pesado', 'A', 11),
-(12, 'BCD0123', '1519047NN', '15M25016326P', 19.00, 40.00, 'Camión para largo alcance', 'A', 12);
+(12, 'BCD0123', '1519047NN', '15M25016326P', 19.00, 40.00, 'Camión para largo alcance', 'A', 12),
+(13, 'AABBCC', '9876543z1', '987654321012', 3.00, 4.00, NULL, 'M', 4),
+(14, 'PQR9891', '98s654321', '987z54321012', 3.00, 3.00, NULL, 'M', 8);
 
 -- --------------------------------------------------------
 
@@ -3148,7 +3172,7 @@ ALTER TABLE `estado_reclamo`
 -- AUTO_INCREMENT de la tabla `marca`
 --
 ALTER TABLE `marca`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `metodo_pago`
@@ -3166,7 +3190,7 @@ ALTER TABLE `metodo_pago_venta`
 -- AUTO_INCREMENT de la tabla `modelo`
 --
 ALTER TABLE `modelo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de la tabla `modulo`
@@ -3184,7 +3208,7 @@ ALTER TABLE `motivo_reclamo`
 -- AUTO_INCREMENT de la tabla `pagina`
 --
 ALTER TABLE `pagina`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT de la tabla `paquete`
@@ -3202,7 +3226,7 @@ ALTER TABLE `reclamo`
 -- AUTO_INCREMENT de la tabla `rol`
 --
 ALTER TABLE `rol`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT de la tabla `salida`
@@ -3244,7 +3268,7 @@ ALTER TABLE `tipo_documento`
 -- AUTO_INCREMENT de la tabla `tipo_empaque`
 --
 ALTER TABLE `tipo_empaque`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `tipo_indemnizacion`
@@ -3256,13 +3280,13 @@ ALTER TABLE `tipo_indemnizacion`
 -- AUTO_INCREMENT de la tabla `tipo_pagina`
 --
 ALTER TABLE `tipo_pagina`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `tipo_recepcion`
 --
 ALTER TABLE `tipo_recepcion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `tipo_reclamo`
@@ -3274,19 +3298,19 @@ ALTER TABLE `tipo_reclamo`
 -- AUTO_INCREMENT de la tabla `tipo_rol`
 --
 ALTER TABLE `tipo_rol`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `tipo_unidad`
 --
 ALTER TABLE `tipo_unidad`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `unidad`
 --
 ALTER TABLE `unidad`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `usuario`

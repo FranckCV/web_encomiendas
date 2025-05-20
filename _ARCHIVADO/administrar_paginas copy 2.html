@@ -21,7 +21,7 @@ Permisos para {{info_rol.get('nombre')}}
 
     .block_admin {
         display: grid;
-        grid-template-columns: 4fr 1fr;
+        grid-template-columns: 3.5fr 1fr;
         gap: 20px;
     }
 
@@ -381,8 +381,7 @@ Permisos para {{info_rol.get('nombre')}}
         } */
 
         .block_access {
-            /* position: relative; */
-            grid-template-columns: 90%;
+            position: relative;
         }
 
         /* .mod_block:hover {
@@ -440,7 +439,7 @@ Permisos para {{info_rol.get('nombre')}}
                 <button class="clickable-modal mod_opt text_access" id="">
                     <i class="fa-solid fa-unlock"></i>
                 </button>
-
+                
                 {% endif %}
 
                 <div class="mod_cant">
@@ -631,14 +630,6 @@ Permisos para {{info_rol.get('nombre')}}
                         %}</p>
                     {% endif %}
                 </div>
-                {% elif campo[3] == 'icon' %}
-                <input type="text" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif %} value="{{modulo[campo[0]]}}" disabled>
-                <i class="{{modulo[campo[0]]}}"></i>
-                {% elif campo[3] == 'color' %}
-                <input type="text" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if
-                    campo[4] %}required{% endif %} value="{{modulo[campo[0]]}}" disabled>
-                <input type="{{campo[3]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif %}
-                    value="{{ modulo[campo[0]]}}" disabled>
                 {% else %}
                 {% if modulo[campo[0]] == None or modulo[campo[0]] == '' %}
                 <input class="input_vacio" type="{{campo[3]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4]

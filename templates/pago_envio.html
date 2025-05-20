@@ -37,26 +37,37 @@ Medios de Pago
 
   <div class="pago-content">
     <div class="opciones-pago">
-      <label class="opcion">
-        <input type="radio" name="metodo" />
-        <span class="texto">Pago con tarjeta de crédito, débito y Yape.</span>
-        <img src="/static/img/metodo_pago.png" alt="Tarjeta" class="icono" />
+      <!-- Opción 1 -->
+      <label class="opcion" onclick="toggleIcons(this)">
+        <div class="cabecera-opcion">
+          <input type="radio" name="metodo" onchange="habilitarBotonPagar()" />
+          <span class="texto">Pago con tarjeta de crédito, débito y Yape.</span>
+          <img src="/static/img/metodo_pago.png" alt="Tarjeta" class="icono" />
+        </div>
+        <div class="iconos-pago oculto">
+          <img src="/static/img/visa.webp" alt="Visa" class="icono-tarjeta" />
+          <img src="/static/img/mastercard.jpg" alt="Mastercard" class="icono-tarjeta" />
+          <img src="/static/img/Yape-v2.webp" alt="Yape" class="icono-tarjeta" />
+        </div>
       </label>
 
-      <label class="opcion">
-        <input type="radio" name="metodo" />
-        <span class="texto">Pago en nuestras oficinas.</span>
-        <img src="/static/img/empleado_oficina.png" alt="Oficina" class="icono" />
+      <!-- Opción 2 -->
+      <label class="opcion" onclick="hideAllIcons()">
+        <div class="cabecera-opcion">
+          <input type="radio" name="metodo" onchange="habilitarBotonPagar()" />
+          <span class="texto">Pago en bancos y banca por internet.</span>
+          <img src="/static/img/empleado_oficina.png" alt="Banco" class="icono" />
+        </div>
       </label>
     </div>
 
     <div class="resumen-box">
       <h3>Resumen de tu registro</h3>
       <table>
-        <tr><td>Cantidad De Envíos:</td><td>1</td></tr>
-        <tr><td>Sub Total:</td><td>S/ 50.85</td></tr>
-        <tr><td>I.G.V.:</td><td>S/ 9.15</td></tr>
-        <tr class="total"><td><strong>Total:</strong></td><td><strong>S/ 60.00</strong></td></tr>
+        <tr><td>Cantidad De Envíos:</td><td>2</td></tr>
+        <tr><td>Sub Total:</td><td>S/ 15.76</td></tr>
+        <tr><td>I.G.V.:</td><td>S/ 2.84</td></tr>
+        <tr class="total"><td><strong>Total:</strong></td><td><strong>S/ 18.60</strong></td></tr>
       </table>
 
       <div class="cupon-box">
@@ -65,5 +76,30 @@ Medios de Pago
       </div>
     </div>
   </div>
+
+  <!-- Botón PAGAR centrado -->
+  <div class="boton-pagar-container">
+    <button id="btn-pagar" class="btn-pagar oculto" disabled>PAGAR S/ 18.60</button>
+  </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function toggleIcons(label) {
+    document.querySelectorAll('.iconos-pago').forEach(group => group.classList.add('oculto'));
+    const iconos = label.querySelector('.iconos-pago');
+    if (iconos) iconos.classList.remove('oculto');
+  }
+
+  function hideAllIcons() {
+    document.querySelectorAll('.iconos-pago').forEach(group => group.classList.add('oculto'));
+  }
+
+  function habilitarBotonPagar() {
+    const boton = document.getElementById("btn-pagar");
+    boton.classList.remove("oculto");
+    boton.disabled = false;
+  }
+</script>
 {% endblock %}
