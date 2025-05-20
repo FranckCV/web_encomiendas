@@ -42,9 +42,6 @@
         <span>Registrar encomienda</span>
       </a>
 
-      <a href="{{ url_for('tipos_envio') }}" class="nav-link">
-        <i class="fa-solid fa-cart-shopping"></i> 
-        <span>Carrito</span></a>
     </nav>
 
     <a href="{{ url_for('login') }}" class="account-area">
@@ -73,6 +70,12 @@
           <span>Más Productos</span>
           <i class="fa-solid fa-chevron-right"></i>
         </a>
+
+         <a class="secondary-sublink" href="{{ url_for('carrito') }}">
+          <span>Carrito</span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </a>
+
       </div>
     </div>
 
