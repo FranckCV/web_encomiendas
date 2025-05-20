@@ -106,88 +106,94 @@
 {% endblock %}
 {% block script %}
   <script>
+    const TAX_RATE = 0.18;
+
     // Datos iniciales de los productos
     const products = [
       { id: 1, name: 'Caja pequeña', price: 5.5, quantity: 2 },
       { id: 2, name: 'Caja mediana', price: 8.75, quantity: 1 },
       { id: 3, name: 'Plástico de burbujas (1m²)', price: 3.25, quantity: 3 },
       { id: 4, name: 'Cinta de embalaje', price: 4.5, quantity: 2 }
-    ]
-    
-    // Tasa de impuestos
-    const TAX_RATE = 0.16
-    
-    // Actualizar la cantidad de un producto
+    ];
+
+    // Actualizar cantidad de un producto
     function updateQuantity(productId, change) {
-      const product = products.find((p) => p.id === productId)
+      const product = products.find(p => p.id === productId);
       if (product) {
-        const newQuantity = product.quantity + change
+        const newQuantity = product.quantity + change;
         if (newQuantity >= 1) {
-          product.quantity = newQuantity
-          document.getElementById(`qty-${productId}`).textContent = newQuantity
-          updateTotals()
+          product.quantity = newQuantity;
+          document.getElementById(`qty-${productId}`).textContent = newQuantity;
+
+          // Actualizar el total del producto
+          const totalElement = document.getElementById(`total-${productId}`);
+          totalElement.textContent = `$${(product.price * newQuantity).toFixed(2)}`;
+
+          updateTotals();
         }
       }
     }
-    
+
     // Eliminar un producto del carrito
     function removeItem(productId) {
-      const index = products.findIndex((p) => p.id === productId)
+      const index = products.findIndex(p => p.id === productId);
       if (index !== -1) {
-        products.splice(index, 1)
-        const itemElement = document.getElementById(`qty-${productId}`).closest('.cart-item')
-        itemElement.style.height = `${itemElement.offsetHeight}px`
-        itemElement.style.opacity = '1'
-    
+        products.splice(index, 1);
+        const itemElement = document.getElementById(`item-${productId}`);
+
+        // Animación de salida
+        itemElement.style.transition = 'all 0.3s ease';
+        itemElement.style.opacity = '0';
+        itemElement.style.height = '0';
+        itemElement.style.overflow = 'hidden';
+
         setTimeout(() => {
-          itemElement.style.height = '0'
-          itemElement.style.opacity = '0'
-          itemElement.style.overflow = 'hidden'
-          itemElement.style.transition = 'all 0.3s ease'
-        }, 10)
-    
-        setTimeout(() => {
-          itemElement.remove()
+          itemElement.remove();
           if (products.length === 0) {
-            showEmptyCart()
+            showEmptyCart();
           }
-        }, 300)
-    
-        updateTotals()
+          updateTotals();
+        }, 300);
       }
     }
-    
-    // Mostrar mensaje de carrito vacío
+
+    // Mostrar carrito vacío
     function showEmptyCart() {
-      const cartItems = document.querySelector('.cart-items')
-      const cartHeader = document.querySelector('.cart-header')
-    
-      // Mantener el encabezado
-      cartItems.innerHTML = ''
-      cartItems.appendChild(cartHeader)
-    
-      const emptyMessage = document.createElement('div')
-      emptyMessage.className = 'empty-cart'
-      emptyMessage.innerHTML = `
-                        <h3>Tu carrito está vacío</h3>
-                        <p>Agrega productos de embalaje para continuar</p>
-                    `
-    
-      cartItems.appendChild(emptyMessage)
+      const cartItems = document.querySelector('.cart-items');
+      cartItems.innerHTML = `
+        <div class="cart-grid cart-header">
+          <div style="grid-area: 1/1/1/3;">Artículos</div>
+          <div>Precio unitario</div>
+          <div>Cantidad</div>
+          <div>Total</div>
+        </div>
+        <div class="empty-cart">
+          <h3>Tu carrito está vacío</h3>
+          <p>Agrega productos de embalaje para continuar</p>
+        </div>
+      `;
     }
-    
-    // Actualizar los totales
+
+    // Actualizar totales generales
     function updateTotals() {
-      const subtotal = products.reduce((sum, product) => {
-        return sum + product.price * product.quantity
-      }, 0)
-    
-      const taxes = subtotal * TAX_RATE
-      const total = subtotal + taxes
-    
-      document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`
-      document.getElementById('taxes').textContent = `$${taxes.toFixed(2)}`
-      document.getElementById('total').textContent = `$${total.toFixed(2)}`
+      const subtotal = products.reduce((sum, p) => sum + p.price * p.quantity, 0);
+      const taxes = subtotal * TAX_RATE;
+      const total = subtotal + taxes;
+
+      document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+      document.getElementById('taxes').textContent = `$${taxes.toFixed(2)}`;
+      document.getElementById('total').textContent = `$${total.toFixed(2)}`;
     }
+
+    // Llamado inicial para asegurar consistencia
+    window.onload = () => {
+      products.forEach(p => {
+        const totalElement = document.getElementById(`total-${p.id}`);
+        if (totalElement) {
+          totalElement.textContent = `$${(p.price * p.quantity).toFixed(2)}`;
+        }
+      });
+      updateTotals();
+    };
   </script>
 {% endblock %}
