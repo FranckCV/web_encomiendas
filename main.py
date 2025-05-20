@@ -1353,7 +1353,8 @@ paginas_simples = [
     'mis_envios',
     'NoRecibimos',
     'pagina_reclamo',
-    'seguimiento_reclamo'
+    'seguimiento_reclamo',
+    'Metodo_pago'
 ]
 
 
