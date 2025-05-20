@@ -1,0 +1,424 @@
+/********************************************
+*    ESTILOS PARA LA PÁGINA DE MÉTODO DE PAGO   *
+*********************************************/
+
+:root {
+    --color-primary: #1a3c5b;
+    --color-secondary: #2a3b8f;
+    --color-accent: #00c3ff;
+    --color-light-bg: #e8f4f8;
+    --color-border: #e0e0e0;
+    --color-text: #333;
+    --color-text-light: #666;
+    --border-radius: 10px;
+    --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Contenedor principal */
+.pago-container {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    gap: 30px;
+    font-family: Arial, sans-serif;
+}
+/* Agregar estos estilos nuevos */
+.resumen-pagar {
+    margin-top: 25px;
+    width: 100%;
+}
+.pago-content {
+    flex: 1;
+    min-width: 300px;
+}
+
+.pago-header h1 {
+    color: var(--color-primary);
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+/* Opciones de pago */
+.pago-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.pago-option {
+    width: 100%;
+}
+
+.option-container {
+    display: block;
+    cursor: pointer;
+    width: 100%;
+}
+
+.option-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.option-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+    background-color: #fff;
+    position: relative;
+}
+
+.option-container input:checked ~ .option-content {
+    border-color: var(--color-primary);
+    box-shadow: var(--box-shadow);
+    background-color: var(--color-light-bg);
+}
+
+.option-container input:checked ~ .option-content::before {
+    content: '';
+    position: absolute;
+    left: -2px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 80%;
+    width: 4px;
+    background-color: var(--color-primary);
+    border-radius: 0 2px 2px 0;
+}
+
+.option-text {
+    flex: 1;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.payment-icons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: 15px;
+}
+
+.payment-icons img {
+    height: 30px;
+    object-fit: contain;
+}
+
+.payment-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--color-primary);
+}
+
+.option-container input:checked ~ .option-content .payment-icon {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+/* Formularios de pago */
+.payment-form {
+    display: none;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    background-color: #fff;
+    box-shadow: var(--box-shadow);
+    margin-bottom: 30px;
+}
+
+.payment-form.active {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.form-group.half {
+    flex: 1;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(26, 60, 91, 0.1);
+}
+
+/* Información bancaria */
+.bank-info {
+    padding: 15px;
+}
+
+.bank-info h3 {
+    color: var(--color-primary);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.bank-detail {
+    background-color: var(--color-light-bg);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.bank-detail p {
+    margin: 8px 0;
+    font-size: 0.95rem;
+}
+
+.bank-instructions {
+    border-left: 3px solid var(--color-primary);
+    padding-left: 15px;
+}
+
+.bank-instructions p {
+    margin: 10px 0;
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+}
+
+.bank-instructions a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* Resumen de compra */
+.resumen-compra {
+    flex: 0 0 350px;
+    background-color: #fff;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    align-self: flex-start;
+    position: sticky;
+    top: 20px;
+}
+
+.resumen-header {
+    background-color: var(--color-primary);
+    color: #fff;
+    padding: 15px 20px;
+}
+
+.resumen-header h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.resumen-content {
+    padding: 20px;
+}
+
+.resumen-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+.resumen-divider {
+    height: 1px;
+    background-color: var(--color-border);
+    margin: 15px 0;
+}
+
+.resumen-item.total {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: var(--color-primary);
+}
+
+.cupon-container {
+    display: flex;
+    margin-top: 25px;
+    gap: 10px;
+}
+
+.cupon-container input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.cupon-container input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.cupon-container button {
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 0 15px;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 0.85rem;
+}
+
+.cupon-container button:hover {
+    background-color: var(--color-secondary);
+}
+
+/* Botón de pago fijo */
+
+.pago-container {
+    padding-bottom: 30px; /* Agregar padding inferior para compensar la eliminación del botón fijo */
+}
+.pago-button-container {
+    width: 100%;
+    padding: 20px;
+    margin-top: 20px;
+    border-top: 1px solid var(--color-border);
+} 
+.btn-pagar {
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    width: 100%;
+    text-align: center;
+}
+
+.btn-pagar:hover {
+    background-color: var(--color-secondary);
+    transform: translateY(-2px);
+}
+
+.btn-pagar:active {
+    transform: translateY(0);
+}
+
+
+
+
+/* Estilos para estados de validación */
+.form-group.error input {
+    border-color: #e74c3c;
+}
+
+.form-group.error .error-message {
+    color: #e74c3c;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+.form-group.success input {
+    border-color: #27ae60;
+}
+
+/* Animación de carga para el botón validar */
+@keyframes loading {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading::after {
+    content: "";
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: loading 0.8s linear infinite;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .pago-container {
+        flex-direction: column;
+    }
+    
+    .resumen-compra {
+        flex: 1;
+        width: 100%;
+        position: static;
+    }
+}
+
+@media (max-width: 576px) {
+    .pago-container {
+        padding: 10px;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .option-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .payment-icons {
+        margin-right: 0;
+    }
+    
+    .cupon-container {
+        flex-direction: column;
+    }
+    
+    .btn-pagar {
+        width: 100%;
+    }
+}
