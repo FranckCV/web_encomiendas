@@ -2100,3 +2100,31 @@ INSERT INTO articulo (nombre, precio, stock, activo, img, dimensiones, tamaño_c
 ('Útiles de escritorio - Pack escolares',         17.90, 150, 1, NULL, '25x20x5',  3), -- S
 ('Útiles de oficina - Organizador modular',       27.50,  40, 1, NULL, '30x20x10', 3); -- S
 
+insert INTO `tipo_cliente` (nombre, activo) VALUES ('Persona Natural',1);
+insert INTO `tipo_cliente` (nombre, activo) VALUES ('Persona Jurídica',1);
+
+INSERT INTO tipo_rol (nombre, descripcion, activo)
+VALUES ('Administrador', 'Tiene acceso total al sistema.', 1);
+
+INSERT INTO tipo_rol (nombre, descripcion, activo)
+VALUES ('Usuario', 'Acceso limitado a funciones básicas.', 1);
+
+INSERT INTO rol (nombre, descripcion, activo, tipo_rolid)
+VALUES ('Superadmin', 'Rol con acceso total al sistema, incluyendo configuración y seguridad.', 1, 1);
+
+INSERT INTO rol (nombre, descripcion, activo, tipo_rolid)
+VALUES ('ClienteWeb', 'Rol de usuario con acceso solo al portal de clientes.', 1, 2);
+
+INSERT INTO empleado (nombre, apellidos, correo, rolid)
+VALUES ('Carlos', 'Ramírez López', 'carlos.ramirez@example.com', 1);
+
+INSERT INTO empleado (nombre, apellidos, correo, rolid)
+VALUES ('Laura', 'González Torres', 'laura.gonzalez@example.com', 1);
+
+insert INTO `metodo_pago` (nombre, activo) VALUES ('Efectivo',1);
+
+INSERT INTO usuario (correo, contrasenia, tipo_usuario, activo)
+VALUES ('ana.mendez@example.com', 'hashed_password_1', 'A', 1);
+
+INSERT INTO usuario (correo, contrasenia, tipo_usuario, activo)
+VALUES ('jose.perez@example.com', 'hashed_password_2', 'E', 1);

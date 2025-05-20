@@ -60,4 +60,27 @@ Junior Pérez
 
 
 
+Administración
+- [ir a modulo]
+- [Consultar modulo]
+- [editar modulo]
+- [activar / desactivar modulo]
+- [ir a pagina]
+- [Consultar pagina]
+- [editar pagina]
+- [activar / desactivar pagina]
+- mejorar diseño
+- 
 
+Permisos
+- [access page]
+- [search]
+- [insert]
+- [consult]
+- [active/unactive]
+- [update]
+- [delete] 
+- [access modulo]
+- mejorar diseño
+- 
+- 

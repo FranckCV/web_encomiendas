@@ -38,12 +38,14 @@ def get_table():
     sql= f'''
         select 
             mar.id ,
-            mar.nombre
+            mar.nombre ,
+            mar.activo 
         from {table_name} mar
     '''
     columnas = {
         'id': ['ID' , 0.5 ] , 
         'nombre' : ['Nombre' , 9.5] , 
+        'activo' : ['Actividad' , 1] 
         }
     filas = sql_select_fetchall(sql)
     

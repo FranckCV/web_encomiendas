@@ -1,0 +1,580 @@
+/* Estilos para la página de Mis Envíos */
+
+:root {
+    --primary-color: var(--color4);
+    --secondary-color: var(--color-sec);
+    --light-gray: #f5f5f5;
+    --medium-gray: #e0e0e0;
+    --dark-gray: #888;
+    --border-color: #ddd;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
+    --border-radius: 8px;
+    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+/* Contenedor principal */
+.mis-envios-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* Encabezado de página */
+.page-header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.page-header h1 {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    color: var(--dark-gray);
+    font-size: 1rem;
+}
+
+/* Sección de filtros */
+.filtros-container {
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.filtros-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: var(--light-gray);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.filtros-header h2 {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.btn-toggle {
+    background-color: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+}
+
+.btn-toggle:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.filtros-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.filtros-content.expanded {
+    max-height: 300px; /* Altura máxima para la animación */
+    padding: 1rem;
+}
+
+.filtros-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    color: var(--dark-gray);
+    font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.buttons-group {
+    display: flex;
+    gap: 1rem;
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+/* Sección de búsqueda */
+.busqueda-container {
+    margin-bottom: 1.5rem;
+}
+
+.search-box {
+    display: flex;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+}
+
+.search-box input {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    font-size: 1rem;
+}
+
+.search-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0 1.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.search-btn:hover {
+    background-color: var(--secondary-color);
+}
+
+/* Pestañas */
+.tabs-container {
+    display: flex;
+    background-color: white;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    overflow: hidden;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tab {
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 500;
+    text-align: center;
+    flex: 1;
+}
+
+.tab:hover {
+    background-color: var(--light-gray);
+}
+
+.tab.active {
+    color: var(--primary-color);
+    border-bottom: 3px solid var(--primary-color);
+    font-weight: 600;
+}
+
+/* Contenedor de envíos */
+.envios-container {
+    background-color: white;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    padding: 1rem;
+}
+
+/* Mensaje sin resultados */
+.no-results {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    text-align: center;
+}
+
+.no-results i {
+    font-size: 3rem;
+    color: var(--dark-gray);
+    margin-bottom: 1rem;
+}
+
+.no-results p {
+    color: var(--dark-gray);
+    margin-bottom: 1.5rem;
+}
+
+/* Lista de envíos */
+.envios-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Tarjeta de envío */
+.envio-card {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: var(--transition);
+    position: relative;
+}
+
+.envio-card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Efecto de actualización */
+.envio-card.actualizado {
+    animation: pulseUpdate 3s ease;
+}
+
+@keyframes pulseUpdate {
+    0% { box-shadow: 0 0 0 0 rgba(23, 162, 184, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(23, 162, 184, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(23, 162, 184, 0); }
+}
+
+.envio-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: var(--light-gray);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tracking-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tracking-label {
+    font-weight: 600;
+    color: var(--dark-gray);
+}
+
+.tracking-number {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.envio-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 100px;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.envio-status.entregado {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--success-color);
+}
+
+.envio-status.en-transito {
+    background-color: rgba(23, 162, 184, 0.1);
+    color: var(--info-color);
+}
+
+.envio-status.pendiente {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: var(--warning-color);
+}
+
+.envio-body {
+    padding: 1rem;
+}
+
+.envio-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.detail-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.detail-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-label {
+    font-size: 0.85rem;
+    color: var(--dark-gray);
+    margin-bottom: 0.25rem;
+}
+
+.detail-value {
+    font-weight: 500;
+}
+
+/* Timeline de seguimiento */
+.tracking-timeline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 2rem;
+    padding: 0 1rem;
+}
+
+.timeline-point {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.point-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: white;
+    border: 2px solid var(--dark-gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dark-gray);
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.point-label {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--dark-gray);
+    text-align: center;
+    max-width: 80px;
+    transition: var(--transition);
+}
+
+.timeline-line {
+    flex: 1;
+    height: 3px;
+    background-color: var(--dark-gray);
+    position: relative;
+    z-index: 1;
+    transition: var(--transition);
+}
+
+/* Estados del timeline */
+.timeline-point.active .point-icon {
+    border-color: var(--info-color);
+    color: var(--info-color);
+    transform: scale(1.2);
+}
+
+.timeline-point.active .point-label {
+    color: var(--info-color);
+    font-weight: 600;
+}
+
+.timeline-point.completed .point-icon {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+}
+
+.timeline-point.completed .point-label {
+    color: var(--success-color);
+}
+
+.timeline-line.active {
+    background-color: var(--info-color);
+}
+
+.timeline-line.completed {
+    background-color: var(--success-color);
+}
+
+.envio-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--light-gray);
+}
+
+/* Botones */
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.btn-tracking {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: var(--transition);
+    font-size: 0.9rem;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary-color);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+}
+
+.btn-secondary:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-danger {
+    background-color: transparent;
+    color: var(--danger-color);
+    border: 1px solid var(--danger-color);
+}
+
+.btn-danger:hover {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.btn-tracking {
+    background-color: var(--info-color);
+    color: white;
+    border: none;
+}
+
+.btn-tracking:hover {
+    background-color: #138496;
+}
+
+.btn-tracking.disabled {
+    background-color: var(--dark-gray);
+    cursor: not-allowed;
+}
+
+/* Paginación */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    margin-top: 1.5rem;
+}
+
+.pagination-info {
+    color: var(--dark-gray);
+    font-size: 0.9rem;
+}
+
+.pagination-controls {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.pagination-btn {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.pagination-btn:hover:not(:disabled) {
+    background-color: var(--light-gray);
+}
+
+.pagination-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.pagination-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Media queries */
+@media (max-width: 992px) {
+    .detail-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .tracking-timeline {
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+    }
+    
+    .timeline-line {
+        width: 50px;
+        flex: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .envio-footer {
+        flex-direction: column;
+    }
+    
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger,
+    .btn-tracking {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .pagination-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .filtros-form {
+        grid-template-columns: 1fr;
+    }
+    
+    .buttons-group {
+        flex-direction: column;
+    }
+}

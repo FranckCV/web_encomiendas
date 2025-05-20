@@ -1,0 +1,180 @@
+.contenedor_grande {
+  margin: 20px auto;
+}
+
+.encabezado {
+  background-color: #c8e5eb;
+  border-radius: 20px;
+  padding: 25px 30px;
+  margin-bottom: 30px;
+  max-width: 900px;
+}
+
+.encabezado h1 {
+  font-weight: 700;
+  font-size: 22px;
+  margin: 0 0 6px 0;
+}
+
+.encabezado h1 b {
+  font-weight: 900;
+}
+
+.encabezado p {
+  color: #666;
+  margin: 0;
+  font-size: 14px;
+}
+
+.link {
+  color: rgb(23, 7, 93);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.link:hover {
+  text-decoration: none;
+}
+
+.contenedor {
+  display: flex;
+  max-width: 900px;
+  gap: 20px;
+}
+
+.card {
+  border-radius: 15px;
+  flex: 1;
+  padding: 30px 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  background-color: #fff; 
+  color: #293e6a; 
+  border: 1px solid #ddd; 
+  transition: background-color 0.3s ease, color 0.3s ease;
+  text-align: center;
+}
+
+.card svg {
+  width: 55px;
+  height: 55px;
+  margin-bottom: 20px;
+  stroke-width: 2;
+  stroke: #293e6a;
+  fill: none;
+}
+
+.icono {
+  font-size: 55px;
+  /* margin-bottom: 20px; */
+  color: #293e6a;
+  transition: color 0.3s ease;
+}
+
+.card button {
+  margin-top: auto;
+  background-color: #293e6a;
+  border: none;
+  border-radius: 25px;
+  width: 65px;
+  height: 35px;
+  color: white;
+  font-size: 22px;
+  line-height: 35px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease;
+}
+
+.card:hover {
+  background-color: #1e258e;
+  color: white;
+}
+
+.card:hover a {
+  color: rgb(11, 11, 100);
+  text-decoration: none;
+  background-color: white;
+}
+
+.card:hover .icono {
+  color: white;
+}
+
+.card:hover svg {
+  stroke: white;
+}
+
+.card:hover button {
+  background-color: white;
+  color: #3842d9;
+  border: 2px solid #3842d9;
+}
+
+.help {
+  max-width: 300px;
+  color: #293e6a;
+  font-weight: 700;
+}
+
+.help h2 {
+  font-size: 16px;
+}
+
+.help-item {
+  display: flex;
+  align-items: flex-start;
+  margin-top: 25px;
+  font-weight: 400;
+  font-size: 14px;
+  color: #666;
+}
+
+.help-item svg {
+  background-color: #a7c8d1;
+  border-radius: 10px;
+  padding: 10px;
+  margin-right: 15px;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  stroke: white;
+  stroke-width: 2;
+  fill: none;
+}
+
+.help-item b {
+  font-weight: 700;
+  color: #293e6a;
+}
+
+.help-item a {
+  font-weight: 700;
+  color: #666;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.help-item a:hover {
+  color: #293e6a;
+}
+
+.btn-link {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: auto;
+  background-color: #293e6a; /* azul oscuro */
+  border-radius: 25px;
+  width: 65px;
+  height: 35px;
+  color: white;
+  font-size: 22px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+

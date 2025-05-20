@@ -183,10 +183,12 @@ body {
 }
 
 .total-pago {
-    text-align: right;
-    margin-top: 20px;
-    margin-bottom: 60px; /* <-- Esto agrega espacio con el footer */
+  display: flex;
+  justify-content: center; /* centra el botón */
+  margin-top: 30px;
+  margin-bottom: 60px;
 }
+
 
 .btn-pagar {
     background-color: #00E0E0;

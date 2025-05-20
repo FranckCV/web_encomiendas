@@ -69,11 +69,12 @@ def get_table():
         'placa' : ['Placa' , 1.5]  , 
         'mtc' : ['MTC' , 1.5]  , 
         'tuc' : ['TUC' , 1.5]  , 
+        'estado' : ['Estado' , 1]  , 
         'nom_tipounidad' : ['Tipo de unidad' , 1.5] ,
         'nom_modelo' : ['Modelo' , 1.5] ,
         'nom_marca' :     ['Marca' , 1.5] ,
-        'capacidad' : ['Capacidad (kg)' , 1 ] , 
-        'volumen' : ['Volumen (m³)' , 1 ] ,
+        # 'capacidad' : ['Capacidad (kg)' , 1 ] , 
+        # 'volumen' : ['Volumen (m³)' , 1 ] ,
         }
     filas = sql_select_fetchall(sql)
     
@@ -86,28 +87,31 @@ def unactive_row( id ):
     unactive_row_table(table_name , id)
 
 
-def insert_row( placa , capacidad ,volumen  , modeloid , observaciones = None):
+def insert_row( placa , mtc , tuc , capacidad , volumen , modeloid , estado , descripcion):
     sql = f'''
         INSERT INTO 
             {table_name} 
-            ( placa , capacidad , volumen , modeloid , activo , observaciones )
+            ( placa , mtc , tuc , capacidad , volumen , modeloid , estado , descripcion )
         VALUES 
-            ( %s ,  %s , %s , %s , 1 ,  %s )
+            ( %s , %s , %s , %s , %s , %s , %s , %s )
     '''
-    sql_execute(sql,( placa , capacidad ,volumen  , modeloid , observaciones))
+    sql_execute(sql,( placa , mtc , tuc , float(capacidad) , float(volumen) , modeloid , estado , descripcion ))
 
 
-def update_row( id , placa , capacidad ,volumen , modeloid  , observaciones):
+def update_row( id , placa , mtc , tuc , capacidad , volumen , modeloid , estado , descripcion):
     sql = f'''
         Update {table_name} set 
             placa = %s , 
+            mtc = %s , 
+            tuc = %s , 
             capacidad = %s ,
             volumen = %s ,
-            observaciones = %s ,
-            modeloid = %s
+            modeloid = %s,
+            estado = %s ,
+            descripcion = %s 
         where id = {id}
     '''
-    sql_execute(sql,( placa , capacidad ,volumen , modeloid  , observaciones))
+    sql_execute(sql,( placa , mtc , tuc , float(capacidad) , float(volumen) , modeloid , estado , descripcion ))
 
 
 
@@ -149,3 +153,13 @@ def get_report_test():
     
     return columnas , filas
 
+
+
+def get_options_estado():
+    lista= [
+        [ 'A' , 'Activo' ],
+        [ 'M' , 'En mantenimiento' ],
+        [ 'I' , 'Inactivo' ],
+    ]
+
+    return lista

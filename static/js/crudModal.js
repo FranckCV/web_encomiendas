@@ -3,6 +3,9 @@ function openModal(idmodal) {
     const overlay = document.getElementById('overlayModal');
     const enlargedModal = document.getElementById('enlargedModal');
     const modalDiv = document.querySelector(elementModal);
+    // console.log(enlargedModal);
+    // console.log(modalDiv);
+
     enlargedModal.innerHTML = modalDiv.outerHTML;
     enlargedModal.querySelector(elementModal).style.display = 'flex';
     overlay.style.display = 'flex';
@@ -16,7 +19,6 @@ function closeModal() {
 
 document.querySelectorAll('.clickable-modal').forEach(button => {
     button.addEventListener('click', function (event) {
-        // openModal(event.target.id);
         openModal(button.id);
     });
 });
