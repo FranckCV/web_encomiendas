@@ -1354,7 +1354,8 @@ paginas_simples = [
     'NoRecibimos',
     'pagina_reclamo',
     'seguimiento_reclamo',
-    'Metodo_pago'
+    'Metodo_pago',
+    'perfil'
 ]
 
 
