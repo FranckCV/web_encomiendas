@@ -39,11 +39,6 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   }
   
-  .stats-box {
-    border-radius: 10px;
-    min-height: 100px;
-  }
-  
   .table-responsive {
     border-radius: 8px;
     overflow: hidden;
@@ -66,70 +61,45 @@
     max-width: 150px;
   }
   
-  .filter-btn {
-    border-radius: 20px;
-    padding: 0.25rem 1rem;
-    margin-right: 0.5rem;
-    font-size: 0.85rem;
+  /* Estilos para la paginación */
+  .pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
   }
   
-  .filter-btn.active {
+  .page-numbers {
+    display: flex;
+    align-items: center;
+  }
+  
+  .page-number {
+    margin: 0 5px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #0d6efd;
+  }
+  
+  .page-number.active {
     background-color: #0d6efd;
     color: white;
+  }
+  
+  .disable {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  
+  .dots {
+    margin: 0 5px;
   }
 </style>
 {% endblock %}
 
 {% block contenido %}
 <div class="container-fluid py-4">
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center">
-        <h1 class="h3 mb-0">Mis Envíos</h1>
-        <button class="btn btn-primary" id="newShipmentBtn">
-          <i class="fas fa-plus-circle me-2"></i>Nuevo Envío
-        </button>
-      </div>
-      <p class="text-muted">Gestiona y monitorea todos tus paquetes desde un solo lugar</p>
-    </div>
-  </div>
-  
-  <!-- Resumen y Estadísticas -->
-  <div class="row mb-4">
-    <div class="col-md-3">
-      <div class="card stats-box bg-primary text-white">
-        <div class="card-body">
-          <h5 class="card-title">Total de Envíos</h5>
-          <h2 class="display-6 mb-0" id="totalShipments">27</h2>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card stats-box bg-success text-white">
-        <div class="card-body">
-          <h5 class="card-title">Entregados</h5>
-          <h2 class="display-6 mb-0" id="deliveredShipments">18</h2>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card stats-box bg-info text-white">
-        <div class="card-body">
-          <h5 class="card-title">En Tránsito</h5>
-          <h2 class="display-6 mb-0" id="inTransitShipments">6</h2>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="card stats-box bg-warning text-white">
-        <div class="card-body">
-          <h5 class="card-title">Pendientes</h5>
-          <h2 class="display-6 mb-0" id="pendingShipments">3</h2>
-        </div>
-      </div>
-    </div>
-  </div>
-  
   <!-- Filtros y Búsqueda -->
   <div class="row mb-4">
     <div class="col-12">
@@ -141,21 +111,28 @@
                 <span class="input-group-text bg-transparent border-end-0">
                   <i class="fas fa-search"></i>
                 </span>
-                <input type="text" class="form-control border-start-0" id="searchInput" placeholder="Buscar por tracking, descripción, destinatario...">
+                <input type="text" class="form-control border-start-0" id="value_search" placeholder="Buscar por tracking, descripción, destinatario...">
               </div>
             </div>
             <div class="col-md-6">
-              <div class="d-flex justify-content-md-end">
+              <div class="d-flex justify-content-end align-items-center">
                 <div class="me-2">
                   <input type="date" class="form-control date-filter" id="startDate">
                 </div>
                 <div class="me-3">
                   <input type="date" class="form-control date-filter" id="endDate">
                 </div>
-                <button class="btn btn-outline-secondary filter-btn active" data-filter="all">Todos</button>
-                <button class="btn btn-outline-success filter-btn" data-filter="delivered">Entregados</button>
-                <button class="btn btn-outline-info filter-btn" data-filter="transit">En Tránsito</button>
-                <button class="btn btn-outline-warning filter-btn" data-filter="pending">Pendientes</button>
+                <div class="me-3">
+                  <select class="form-select filterSelect" id="status">
+                    <option value="default">Todos los estados</option>
+                    <option value="delivered">Entregados</option>
+                    <option value="transit">En Tránsito</option>
+                    <option value="pending">Pendientes</option>
+                  </select>
+                </div>
+                <button class="btn btn-primary" id="newShipmentBtn">
+                  <i class="fas fa-plus-circle me-2"></i>Nuevo Envío
+                </button>
               </div>
             </div>
           </div>
@@ -183,34 +160,26 @@
                   <th scope="col">Acciones</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="shipmentsTableBody">
                 <!-- Datos se cargarán dinámicamente con JS -->
               </tbody>
             </table>
           </div>
           
-          <div class="d-flex justify-content-between align-items-center mt-3">
+          <div class="pagination-container mt-3">
             <div>
-              <select class="form-select" id="entriesPerPage">
+              <select class="form-select" id="cant_pag">
                 <option value="10">10 por página</option>
                 <option value="25">25 por página</option>
                 <option value="50">50 por página</option>
                 <option value="100">100 por página</option>
               </select>
             </div>
-            <nav aria-label="Paginación de envíos">
-              <ul class="pagination mb-0" id="pagination">
-                <li class="page-item disabled">
-                  <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
-                </li>
-                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                  <a class="page-link" href="#">Siguiente</a>
-                </li>
-              </ul>
-            </nav>
+            <div class="page-numbers">
+              <a href="javascript:void(0)" class="previous-page">Anterior</a>
+              <div id="pageNumbers" class="d-flex"></div>
+              <a href="javascript:void(0)" class="next-page">Siguiente</a>
+            </div>
           </div>
         </div>
       </div>
@@ -431,13 +400,12 @@
     }
 
     // Función para cargar la tabla de envíos
-    function loadShipmentsTable(filteredShipments = null) {
-      const tableBody = document.querySelector('#shipmentsTable tbody');
+    function loadShipmentsTable() {
+      const tableBody = document.querySelector('#shipmentsTableBody');
       tableBody.innerHTML = '';
       
-      const shipmentsToShow = filteredShipments || shipments;
-      
-      shipmentsToShow.forEach(shipment => {
+      // Asegurarse de que todas las filas tengan los atributos data necesarios para el filtrado
+      shipments.forEach(shipment => {
         const statusText = getStatusText(shipment.status);
         const statusClass = getStatusClass(shipment.status);
         
@@ -445,14 +413,16 @@
         const row = document.createElement('tr');
         row.className = 'package-row';
         row.dataset.tracking = shipment.tracking;
+        row.dataset.status = shipment.status; // Añadir atributo data para filtrado
+        
         row.innerHTML = `
-          <td><span class="badge tracking-badge bg-primary">${shipment.tracking}</span></td>
-          <td>${formatDate(shipment.date)}</td>
-          <td>${shipment.recipient}</td>
-          <td>${shipment.destination}</td>
-          <td>${shipment.weight} kg</td>
-          <td>${formatCurrency(shipment.value)}</td>
-          <td><span class="badge ${statusClass}">${statusText}</span></td>
+          <td><p><span class="badge tracking-badge bg-primary">${shipment.tracking}</span></p></td>
+          <td><p>${formatDate(shipment.date)}</p></td>
+          <td><p>${shipment.recipient}</p></td>
+          <td><p>${shipment.destination}</p></td>
+          <td><p>${shipment.weight} kg</p></td>
+          <td><p>${formatCurrency(shipment.value)}</p></td>
+          <td><p><span class="badge ${statusClass}">${statusText}</span></p></td>
           <td>
             <button class="btn btn-sm btn-outline-primary view-details-btn" data-tracking="${shipment.tracking}">
               <i class="fas fa-eye"></i>
@@ -594,53 +564,6 @@
     // Cargar la tabla inicialmente
     loadShipmentsTable();
     
-    // Filtros
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        // Quitar clase active de todos los botones
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        
-        // Añadir clase active al botón seleccionado
-        this.classList.add('active');
-        
-        const filter = this.dataset.filter;
-        let filteredShipments;
-        
-        if (filter === 'all') {
-          filteredShipments = shipments;
-        } else {
-          const statusMap = {
-            'delivered': 'delivered',
-            'transit': 'transit',
-            'pending': 'pending'
-          };
-          
-          filteredShipments = shipments.filter(s => s.status === statusMap[filter]);
-        }
-        
-        loadShipmentsTable(filteredShipments);
-      });
-    });
-    
-    // Búsqueda
-    document.getElementById('searchInput').addEventListener('input', function() {
-      const searchTerm = this.value.toLowerCase();
-      
-      if (searchTerm.trim() === '') {
-        loadShipmentsTable();
-        return;
-      }
-      
-      const filteredShipments = shipments.filter(s => 
-        s.tracking.toString().includes(searchTerm) ||
-        s.recipient.toLowerCase().includes(searchTerm) ||
-        s.description.toLowerCase().includes(searchTerm) ||
-        s.destination.toLowerCase().includes(searchTerm)
-      );
-      
-      loadShipmentsTable(filteredShipments);
-    });
-    
     // Botón de nuevo envío
     document.getElementById('newShipmentBtn').addEventListener('click', function() {
       // Redireccionar a la página de creación de envíos
@@ -679,22 +602,153 @@
       const tracking = document.getElementById('modalTracking').textContent;
       printShippingLabel(tracking);
     });
-    
-    // Actualizar contadores de estadísticas
-    function updateStatistics() {
-      const totalCount = shipments.length;
-      const deliveredCount = shipments.filter(s => s.status === 'delivered').length;
-      const transitCount = shipments.filter(s => s.status === 'transit').length;
-      const pendingCount = shipments.filter(s => s.status === 'pending').length;
-      
-      document.getElementById('totalShipments').textContent = totalCount;
-      document.getElementById('deliveredShipments').textContent = deliveredCount;
-      document.getElementById('inTransitShipments').textContent = transitCount;
-      document.getElementById('pendingShipments').textContent = pendingCount;
+  });
+</script>
+
+<!-- Incluir el script de paginación -->
+<script> //borrar
+  document.addEventListener("DOMContentLoaded", function () {
+    const allRows = Array.from(document.querySelectorAll("#shipmentsTableBody tr"));
+    const prevBtn = document.querySelector(".previous-page");
+    const nextBtn = document.querySelector(".next-page");
+    const pageNumbersContainer = document.getElementById("pageNumbers");
+    const selectCantidad = document.getElementById("cant_pag");
+    const filters = document.querySelectorAll(".filterSelect");
+    const FILTER_VALUE_DEFAULT = "default";
+    const searchInput = document.getElementById("value_search");
+
+    let currentPage = 1;
+    let rowsPerPage = parseInt(selectCantidad.value);
+    let filteredRows = [...allRows]; // Esta lista se actualiza con los filtros
+
+    function applyFilters() {
+      const activeFilters = {};
+      filters.forEach(filter => {
+        activeFilters[filter.id] = filter.value;
+      });
+
+      const searchTerm = searchInput.value.trim().toLowerCase();
+
+      filteredRows = allRows.filter(row => {
+        const matchesFilters = Object.entries(activeFilters).every(([key, value]) => {
+          return value === FILTER_VALUE_DEFAULT || row.getAttribute(`data-${key}`) === value;
+        });
+
+        const matchesSearch = Array.from(row.querySelectorAll("p"))
+          .some(cell => cell.textContent.toLowerCase().includes(searchTerm));
+
+        return matchesFilters && matchesSearch;
+      });
+
+      currentPage = 1;
+      showPage(currentPage);
     }
-    
-    // Inicializar estadísticas
-    updateStatistics();
+
+    function showPage(page) {
+      rowsPerPage = parseInt(selectCantidad.value);
+      const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+
+      if (page < 1) page = 1;
+      if (page > totalPages) page = totalPages;
+
+      allRows.forEach(row => row.style.display = "none"); // Ocultamos todas
+
+      const start = (page - 1) * rowsPerPage;
+      const end = start + rowsPerPage;
+
+      filteredRows.slice(start, end).forEach(row => {
+        row.style.display = "";
+      });
+
+      currentPage = page;
+      updatePageButtons(totalPages);
+      updateNumberButtons(totalPages);
+    }
+
+    function updatePageButtons(totalPages) {
+      prevBtn.classList.toggle("disable", currentPage === 1);
+      nextBtn.classList.toggle("disable", currentPage === totalPages || totalPages === 0);
+    }
+
+    function updateNumberButtons(totalPages) {
+      pageNumbersContainer.innerHTML = "";
+      const maxVisible = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+      let endPage = startPage + maxVisible - 1;
+
+      if (endPage > totalPages) {
+        endPage = totalPages;
+        startPage = Math.max(1, endPage - maxVisible + 1);
+      }
+
+      if (startPage > 1) {
+        createPageButton(1);
+        if (startPage > 2) {
+          createDots();
+        }
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        createPageButton(i);
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          createDots();
+        }
+        createPageButton(totalPages);
+      }
+
+      function createPageButton(i) {
+        const btn = document.createElement("a");
+        btn.href = "javascript:void(0)";
+        btn.textContent = i;
+        btn.className = "page-number";
+        if (i === currentPage) btn.classList.add("active");
+
+        btn.addEventListener("click", () => showPage(i));
+        pageNumbersContainer.appendChild(btn);
+      }
+
+      function createDots() {
+        const dots = document.createElement("span");
+        dots.textContent = "...";
+        dots.className = "dots";
+        pageNumbersContainer.appendChild(dots);
+      }
+    }
+
+    // Eventos
+    filters.forEach(filter => {
+      filter.addEventListener("change", () => {
+        applyFilters();
+      });
+    });
+
+    selectCantidad.addEventListener("change", () => {
+      rowsPerPage = parseInt(selectCantidad.value);
+      currentPage = 1;
+      showPage(currentPage);
+    });
+
+    prevBtn.addEventListener("click", () => {
+      if (currentPage > 1) showPage(currentPage - 1);
+    });
+
+    nextBtn.addEventListener("click", () => {
+      const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+      if (currentPage < totalPages) showPage(currentPage + 1);
+    });
+
+    searchInput.addEventListener("input", () => {
+      applyFilters();
+    });
+
+    // Aplicar filtros al cargar la página
+    // Pequeño retraso para asegurar que las filas estén cargadas
+    setTimeout(() => {
+      applyFilters();
+    }, 100);
   });
 </script>
 {% endblock %}

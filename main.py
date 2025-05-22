@@ -1345,7 +1345,6 @@ paginas_simples = [
     "index" , 
     'login' , 
     'sign_up', 
-    'sucursales' ,
     'tracking',
     'seguimiento',
     'recuperar_contrasenia',
@@ -1420,7 +1419,23 @@ def mostrar_pagoenvio():
     return render_template('pago_envio.html') 
 
 
-#########3
+#########
+
+################# Sucursales ######################
+@app.route("/sucursales")
+def sucursales():
+    departamentos = controlador_ubigeo.get_options_departamento()
+    provincias = controlador_ubigeo.get_options_provincia()
+    distritos = controlador_ubigeo.get_options_distrito()
+    # sucursal = controlador_sucursal.get_
+    return render_template(
+        'sucursales.html' ,
+        departamentos = departamentos,
+        provincias = provincias,
+        distritos = distritos,
+    )
+
+###################################
 
 ##################_ ADMIN PAGE _################## 
 
