@@ -124,16 +124,13 @@ def get_report_test():
         select 
             ud.id ,
             ud.placa,
-            ud.capacidad ,
-            ud.volumen ,
-            ud.observaciones ,
-            ud.activo ,
+            ud.estado ,
             ud.modeloid ,
             mo.nombre as nom_modelo ,
-            tip.id ,
+            tip.id as tip_id,
             tip.nombre as nom_tipounidad ,
             mar.nombre as nom_marca,
-            mar.id
+            mar.id as mar_id
         from {table_name} ud
         inner join modelo mo on ud.modeloid = mo.id
         inner join tipo_unidad tip on mo.tipo_unidadid = tip.id
@@ -147,7 +144,7 @@ def get_report_test():
         'nom_modelo'    : ['Modelo' , 1.5] ,
         'nom_tipounidad': ['Tipo de unidad' , 1.5] ,
         'nom_marca'     : ['Marca' , 1.5] ,
-        'activo'        : ['Actividad', 1 ] ,
+        # 'activo'        : ['Actividad', 1 ] ,
         }
     filas = sql_select_fetchall(sql)
     
