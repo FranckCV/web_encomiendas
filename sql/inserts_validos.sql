@@ -78,8 +78,6 @@ INSERT INTO `rol` (`id`, `nombre`, `descripcion`, `activo`, `tipo_rolid`) VALUES
 
 
 
------
-
 INSERT INTO `ubigeo` (`codigo`, `departamento`, `provincia`, `distrito`, `activo`) VALUES
 -- ('', 'LIMA', 'LIMA', 'SANTA MARIA DE HUACHIPA', 1),
 ('100101', 'ICA', 'ICA', 'ICA', 1),
