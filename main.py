@@ -1592,7 +1592,6 @@ def informacion_empresa():
 
 
 
-
 # @app.route("/grafico=<report_name>")
 # # @validar_admin()
 # def grafico(report_name):
