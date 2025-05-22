@@ -137,7 +137,7 @@ Dashboard de {{modulo[0]}}
 <div class="block_crud dashboard_title">
     <h3 class="crud_title">
         <i class="{{ICON_PAGE_DASHBOARD}}"></i>
-        Módulo {{modulo[0]}}
+        Módulo de {{modulo['nombre'] | lower}}
     </h3>
 </div>
 
@@ -168,7 +168,7 @@ Dashboard de {{modulo[0]}}
     {% endif %}
 </div>
 
-<div class="panel_cell panel_options">
+<!-- <div class="panel_cell panel_options">
     <div class="cell_title">
         Mantenimientos
     </div>
@@ -206,7 +206,7 @@ Dashboard de {{modulo[0]}}
         {% endif %}
     </div>
 
-</div>
+</div> -->
 
 
 {% endblock %}

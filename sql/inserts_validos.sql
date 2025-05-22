@@ -1,16 +1,18 @@
-
 INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo`) VALUES
-(1, 'Administración', 'fa-solid fa-user-tie', 'administracion', 'blue', 1),
-(2, 'Logística', 'fa-solid fa-truck-front', 'logistica', 'green', 1),
-(3, 'Encomiendas', 'fa-solid fa-box', 'encomienda', 'orange', 1),
-(4, 'Atención', 'fa-solid fa-circle-question', 'atencion', 'purple', 1),
+(1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF\n', 1),
+(2, 'Logística', 'fa-solid fa-truck-front', 'logistica', '#00F068', 1),
+(3, 'Encomiendas', 'fa-solid fa-box', 'encomienda', '#FF5E1A', 1),
+(4, 'Atención al cliente', 'fa-solid fa-circle-question', 'atencion', '#8232D2', 1),
 (5, 'Ventas', 'fa-solid fa-file-invoice-dollar', 'ventas', 'red', 1),
-(6, 'Seguridad', 'fa-solid fa-shield-halved', 'seguridad', 'yellow', 1),
-(7, 'Personal', 'fa-solid fa-briefcase', 'personal', 'cyan', 1);
+(6, 'Seguridad', 'fa-solid fa-shield-halved', 'seguridad', '#F0B000', 1),
+(7, 'Personal', 'fa-solid fa-briefcase', 'personal', '#00E0F0', 1);
 
 INSERT INTO `tipo_pagina` (`id`, `nombre`) VALUES
-(1, 'CRUD'),
-(2, 'Reporte');
+(1, 'Mantenimientos'),
+(2, 'Funcionalidades'),
+(3, 'Transacciones'),
+(4, 'Reportes'),
+(5, 'Gráficos');
 
 INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `tipo_paginaid`, `moduloid`) VALUES
 (1, 'tipos de unidades', 'fa-solid fa-truck-plane', 1, 'tipo_unidad', 1, 1),
@@ -18,10 +20,61 @@ INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `tipo_paginaid`,
 (3, 'modelos de unidades', 'fa-solid fa-cogs', 1, 'modelo', 1, 1),
 (4, 'unidades', 'fa-solid fa-truck-fast', 1, 'unidad', 1, 1),
 (5, 'tipos de empaques para paquetes', 'fa-solid fa-truck-plane', 1, 'tipo_empaque', 1, 3),
-(6, 'tipos de recepción de paquetes', 'fa-solid fa-truck-plane', 1, 'tipo_recepcion', 1, 3);
+(6, 'tipos de recepción de paquetes', 'fa-solid fa-truck-plane', 1, 'tipo_recepcion', 1, 3),
+(7, 'roles', 'fa-solid fa-user-shield', 1, 'rol', 1, 7),
+(8, 'métodos de pago', 'fa-solid fa-money-bill-wave', 1, 'metodo_pago', 1, 5),
+(9, 'empleados', 'fa-solid fa-id-card', 1, 'empleado', 1, 7),
+(10, 'tipos de clientes', 'fa-solid fa-layer-group', 1, 'tipo_cliente', 1, 3),
+(11, 'usuarios', 'fa-solid fa-user', 1, 'usuario', 1, 6),
+(12, 'clientes', 'fa-solid fa-user', 1, 'cliente', 1, 3),
+(13, 'tipos de documentos', 'fa-solid fa-id-card', 1, 'tipo_documento', 1, 1),
+(14, 'tipos de comprobantes', 'fa-solid fa-file-lines', 1, 'tipo_comprobante', 1, 1),
+(15, 'tipos de indemnización', 'fa-solid fa-hand-holding-dollar', 1, 'tipo_indemnizacion', 1, 4),
+(16, 'estados de reclamos', 'fa-solid fa-circle-exclamation', 1, 'estado_reclamo', 1, 4),
+(17, 'tamaños de cajas', 'fa-solid fa-box-open', 1, 'tamanio_caja', 1, 5),
+(18, 'contenido de paquetes', 'fa-solid fa-box-open', 1, 'contenido_paquete', 1, 3),
+(19, 'articulos para encomiendas', 'fa-solid fa-box-open', 1, 'articulo', 1, 5),
+(20, 'estados de encomiendas', 'fa-solid fa-boxes-packing', 1, 'estado_encomienda', 1, 3),
+(21, 'tipos de roles', 'ri-file-user-fill', 1, 'tipo_rol', 1, 7),
+(22, 'Motivos de reclamo', NULL, 1, 'motivo_reclamo', 1, 4),
+(23, 'Causas de reclamo', NULL, 1, 'causa_reclamo', 1, 4),
+(24, 'Tarifas de ruta', NULL, 1, 'tarifa_ruta', 1, 1),
+(25, 'Sucursales', 'ri-store-3-line', 1, 'sucursal', 1, 1),
+(26, 'tipos de reclamos', 'fa-solid fa-book-open-reader', 1, 'tipo_reclamo', 1, 4),
+(27, 'Reporte', NULL, 1, 'aa', 4, 2),
+(28, 'Administración de páginas', 'ri-file-settings-fill', 1, 'administrar_paginas', 2, 6),
+(29, 'Información de la empresa', 'ri-file-lock-fill', 1, 'informacion_empresa', 2, 1);
 
 
 
+INSERT INTO `tipo_rol` (`id`, `nombre`, `descripcion`, `activo`) VALUES
+(1, 'SuperAdministador', 'Dios', 1),
+(2, 'Administrador', 'Roles relacionados con la administración de la empresa y gestión de usuarios.', 1),
+(3, 'Empleado general', NULL, 1),
+(4, 'Ventas', 'Roles enfocados en la venta de productos o servicios, y el seguimiento de ventas.', 1),
+(5, 'Finanzas', 'Roles relacionados con la gestión financiera, reembolsos, e informes financieros.', 1),
+(6, 'Almacén y Encomiendas', 'Roles encargados de la gestión de artículos y encomiendas dentro de la empresa.', 1),
+(7, 'Personal', 'Roles administrativos relacionados con la gestión de empleados y recursos humanos.', 1),
+(9, 'Logística y Operativos', 'Roles enfocados en la gestión de unidades y logística de los viajes.', 1),
+(10, 'Atención al Cliente', 'Roles encargados de la atención al cliente y la gestión de reclamos e incidencias.', 1);
+
+
+INSERT INTO `rol` (`id`, `nombre`, `descripcion`, `activo`, `tipo_rolid`) VALUES
+(1, 'Superadmin', 'El patrón', 1, 1),
+(2, 'Coordinador logístico', 'Responsable de gestionar los horarios de unidades, artículos para encomiendas, y reportes de viajes.', 1, 9),
+(3, 'Conductor', 'Encargado de gestionar los horarios de las unidades y reportar los viajes realizados.', 1, 9),
+(4, 'Empleado de almacén', 'Responsable de gestionar los artículos para las encomiendas.', 1, 6),
+(5, 'Empleado de atención al cliente', 'Gestión de encomiendas, devoluciones, seguimiento, y reportes de encomiendas entregadas y pendientes.', 1, 10),
+(6, 'Agente de devoluciones', 'Responsable de gestionar devoluciones de encomiendas no recogidas.', 1, 10),
+(7, 'Repartidor', 'Encargado de reportar encomiendas entregadas y pendientes.', 1, 6),
+(8, 'Recepcionista de sucursal', 'Encargado de gestionar encomiendas en la sucursal.', 1, 6),
+(9, 'Encargado de reclamos', 'Responsable de gestionar incidencias y reclamos, así como reembolsos e indemnizaciones.', 1, 10),
+(10, 'Responsable de gestión financiera', 'Encargado de verificar y autorizar reembolsos e indemnizaciones, además de generar reportes financieros.', 1, 5),
+(11, 'Administrador de la empresa', 'Responsable de gestionar las sucursales, rutas, unidades, y reportes financieros y operativos.', 1, 2),
+(12, 'Vendedor', 'Encargado de la venta de artículos para encomiendas y generación de reportes de ventas.', 1, 4),
+(13, 'Administrador de personal', 'Gestión de los aspectos administrativos de los empleados, horarios y personal.', 1, 2),
+(14, 'Administrador de usuarios', 'Responsable de la gestión de usuarios, inicio de sesión, registro, recuperación de contraseña y reportes.', 1, 2),
+(15, 'Gestor de unidades', NULL, 1, 3);
 
 
 
@@ -2103,17 +2156,17 @@ INSERT INTO articulo (nombre, precio, stock, activo, img, dimensiones, tamaño_c
 insert INTO `tipo_cliente` (nombre, activo) VALUES ('Persona Natural',1);
 insert INTO `tipo_cliente` (nombre, activo) VALUES ('Persona Jurídica',1);
 
-INSERT INTO tipo_rol (nombre, descripcion, activo)
-VALUES ('Administrador', 'Tiene acceso total al sistema.', 1);
+-- INSERT INTO tipo_rol (nombre, descripcion, activo)
+-- VALUES ('Administrador', 'Tiene acceso total al sistema.', 1);
 
-INSERT INTO tipo_rol (nombre, descripcion, activo)
-VALUES ('Usuario', 'Acceso limitado a funciones básicas.', 1);
+-- INSERT INTO tipo_rol (nombre, descripcion, activo)
+-- VALUES ('Usuario', 'Acceso limitado a funciones básicas.', 1);
 
-INSERT INTO rol (nombre, descripcion, activo, tipo_rolid)
-VALUES ('Superadmin', 'Rol con acceso total al sistema, incluyendo configuración y seguridad.', 1, 1);
+-- INSERT INTO rol (nombre, descripcion, activo, tipo_rolid)
+-- VALUES ('Superadmin', 'Rol con acceso total al sistema, incluyendo configuración y seguridad.', 1, 1);
 
-INSERT INTO rol (nombre, descripcion, activo, tipo_rolid)
-VALUES ('ClienteWeb', 'Rol de usuario con acceso solo al portal de clientes.', 1, 2);
+-- INSERT INTO rol (nombre, descripcion, activo, tipo_rolid)
+-- VALUES ('ClienteWeb', 'Rol de usuario con acceso solo al portal de clientes.', 1, 2);
 
 INSERT INTO empleado (nombre, apellidos, correo, rolid)
 VALUES ('Carlos', 'Ramírez López', 'carlos.ramirez@example.com', 1);
@@ -2128,3 +2181,7 @@ VALUES ('ana.mendez@example.com', 'hashed_password_1', 'A', 1);
 
 INSERT INTO usuario (correo, contrasenia, tipo_usuario, activo)
 VALUES ('jose.perez@example.com', 'hashed_password_2', 'E', 1);
+
+
+
+

@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, make_response, url_for #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import acceso as acceso
+from controladores import controlador_empresa as controlador_empresa
 from controladores import controlador_color as controlador_color
 from controladores import controlador_marca as controlador_marca
 from controladores import controlador_unidad as controlador_unidad
@@ -820,7 +821,7 @@ CONTROLADORES = {
         "controlador": controlador_unidad,
         "icon_page": 'fa-solid fa-truck-fast',
         "filters": [
-            # ['modeloid', 'Modelo', lambda: controlador_modelo.get_options() ],
+            ['modeloid', 'Modelo', lambda: controlador_modelo.get_options() ],
         ] ,
         "fields_form": [
 #            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
@@ -898,33 +899,7 @@ CONTROLADORES = {
     },
     
 
-# PERMISOS (SIN CRUD)
-    "tipo_unidad": {
-        "active" : True ,
-        "titulo": "tipos de unidades",
-        "icon_page": 'fa-solid fa-truck-plane',
-        "nombre_tabla": "tipo de unidad",
-        "controlador": controlador_tipo_unidad,
-        "filters": [
-            ['activo', f'{TITLE_STATE}', get_options_active() ],
-        ] ,
-        "fields_form": [
-        #    ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
+# ADICIONAL (NO CRUD)
 
 # _BORRAR
     "ubigeo" : {
@@ -983,9 +958,23 @@ CONTROLADORES = {
 
 
 REPORTES = {
+    "lista_unidades": {
+        "active" : True ,
+        'icon_page' : 'fa-solid fa-truck' ,
+        "titulo": "Listado de unidades",
+        "table" : controlador_unidad.get_report_test(),
+        "filters": [
+            ['modeloid', 'Modelo', lambda: controlador_modelo.get_options() ],
+        ] ,
+        
+    },
+}
+
+
+GRAFICOS = {
     # LINEA
     "ingresos_periodo": {
-        "active": True,
+        "active": False,
         'icon_page' : 'fa-solid fa-dollar-sign' ,
         "titulo": "ingresos por mes",
         "elements": {
@@ -1018,7 +1007,7 @@ REPORTES = {
     },
     # BARRA VERTICAL
     "articulos_mas_vendidos": {
-        "active" : True ,
+        "active" : False ,
         'icon_page' : 'fa-solid fa-dollar-sign' ,
         "titulo": "artículos más vendidos",
         "elements": {
@@ -1042,7 +1031,7 @@ REPORTES = {
     },
     # BARRA HORIZONTAL
     "top_envios": {
-        "active" : True ,
+        "active" : False ,
         'icon_page' : 'fa-solid fa-dollar-sign' ,
         "titulo": "top de envios de encomiendas",
         "elements": {
@@ -1071,7 +1060,7 @@ REPORTES = {
     },
     # PASTEL
     "envios_tipo": {
-        "active" : True ,
+        "active" : False ,
         'icon_page' : 'fa-solid fa-dollar-sign' ,
         "titulo": "envios por tipo de articulo",
         "elements": {
@@ -1105,7 +1094,7 @@ REPORTES = {
     },
     # DONUT
     "entregado_pendiente": {
-        "active" : True ,
+        "active" : False ,
         'icon_page' : 'fa-solid fa-dollar-sign' ,
         "titulo": "encomiendas entregadas vs pendientes",
         "elements": {
@@ -1137,18 +1126,6 @@ REPORTES = {
             }]
         },
     },
-    # LISTADO
-    "lista_unidades": {
-        "active" : True ,
-        'icon_page' : 'fa-solid fa-dollar-sign' ,
-        "titulo": "unidades",
-        "elements" : {
-            'graph'  : False ,
-            'table'  : True,
-            'counter': False ,
-        } ,
-        "table" : controlador_unidad.get_report_test(),
-    },
 }
 
 
@@ -1160,7 +1137,7 @@ MENU_ADMIN = {
         'dashboard' : True,
         'cruds' :     [ 'tipo_unidad' , 'marca' , 'modelo' , 'unidad' , 'sucursal','ubigeo','tarifa_ruta'],
         'reports' :   [ 
-            'ingresos_periodo' , 
+            'lista_unidades' , 
         ],
     },
     'logistica' : {
@@ -1300,14 +1277,16 @@ def validar_admin():
 
 @app.context_processor
 def inject_globals():
-    # lista_paginas_crud = listar_paginas_crud()
     listar_pages_admin = listar_admin_pages()
     modulos = acceso.get_lista_modulos()
+    tipos_paginas = acceso.get_lista_tipo_paginas()
+    paginas = acceso.get_paginas()
     # listar_pages_admin = []
     options_pagination_crud , selected_option_crud = get_options_pagination_crud()
     cookie_error = request.cookies.get('error')
     # info_variables_crud = False
-    modulo_actual = ''
+    current_modulo_id = None
+    main_information = controlador_empresa.get_information()
 
     return dict(
         # info_variables_crud = info_variables_crud,
@@ -1316,8 +1295,11 @@ def inject_globals():
         options_pagination_crud = options_pagination_crud ,
         selected_option_crud = selected_option_crud ,
         cookie_error = cookie_error,
-        modulo_actual = modulo_actual ,
+        current_modulo_id = current_modulo_id ,
         modulos= modulos ,
+        main_information = main_information ,
+        tipos_paginas = tipos_paginas ,
+        paginas = paginas ,
         MENU_ADMIN             = MENU_ADMIN,
         HABILITAR_ICON_PAGES   = HABILITAR_ICON_PAGES,
         SYSTEM_NAME            = SYSTEM_NAME,
@@ -1345,7 +1327,6 @@ paginas_simples = [
     "index" , 
     'login' , 
     'sign_up', 
-    'sucursales' ,
     'tracking',
     'seguimiento',
     'recuperar_contrasenia',
@@ -1354,7 +1335,9 @@ paginas_simples = [
     'NoRecibimos',
     'pagina_reclamo',
     'seguimiento_reclamo',
-    'Metodo_pago'
+    'Metodo_pago',
+    'perfil',
+    'prueba_seguimiento'
 ]
 
 
@@ -1420,7 +1403,23 @@ def mostrar_pagoenvio():
     return render_template('pago_envio.html') 
 
 
-#########3
+#########
+
+################# Sucursales ######################
+@app.route("/sucursales")
+def sucursales():
+    departamentos = controlador_ubigeo.get_options_departamento()
+    provincias = controlador_ubigeo.get_options_provincia()
+    distritos = controlador_ubigeo.get_options_distrito()
+    # sucursal = controlador_sucursal.get_
+    return render_template(
+        'sucursales.html' ,
+        departamentos = departamentos,
+        provincias = provincias,
+        distritos = distritos,
+    )
+
+###################################
 
 ##################_ ADMIN PAGE _################## 
 
@@ -1430,6 +1429,44 @@ def panel():
     return render_template('panel.html')
 
 
+@app.route("/dashboard=<module_name>")
+# @validar_admin()
+def dashboard(module_name):
+    # info_modulo = MENU_ADMIN.get(module_name)
+    modulo = acceso.get_modulo_key(module_name)
+    cur_modulo_id = modulo['id']
+    # print(modulo)
+    # for page in listar_admin_pages():
+    #     if module_name == page[5] and page[2] is True:
+    #         modulo = page
+    #         list_reports = []
+
+            # for re in modulo[4]:
+            #     if re[3].get('graph') is True:
+            #         print(re[0])
+            #         gr = REPORTES.get(re[0]).get('graph')
+            #         if gr :
+            #             if callable(gr.get("series")):
+            #                 gr["series"] = gr["series"]()
+            #             if callable(gr.get("xaxis")):
+            #                 gr["xaxis"] = gr["xaxis"]()
+            #             list_reports.append(re)
+
+
+    return render_template(
+        'dashboard.html' , 
+        # modulo_actual = module_name ,
+        module_name = module_name , 
+        modulo = modulo ,
+        # info_modulo = info_modulo,
+        # list_reports = list_reports ,
+        REPORTES = REPORTES ,
+        cur_modulo_id = cur_modulo_id ,
+        )
+    # return None
+    # return 'No hay dashboa
+
+
 @app.route("/crud=<tabla>")
 # @validar_admin()
 def crud_generico(tabla):
@@ -1437,8 +1474,6 @@ def crud_generico(tabla):
     if config:
         active = config["active"]
         if active is True:
-            value_search = request.args.get("value_search")
-
             icon_page_crud = get_icon_page(config.get("icon_page"))
             titulo = config["titulo"]
             controlador = config["controlador"]
@@ -1470,7 +1505,7 @@ def crud_generico(tabla):
                 primary_key    = primary_key ,
                 filters        = filters,
                 fields_form    = fields_form ,
-                value_search   = value_search,
+                # value_search   = value_search,
                 columnas       = columnas ,
                 key_columns    = list(columnas.keys()) ,
                 table_columns  = table_columns ,
@@ -1485,94 +1520,40 @@ def crud_generico(tabla):
             )
 
 
-@app.route("/dashboard=<module_name>")
-# @validar_admin()
-def dashboard(module_name):
-    info_modulo = MENU_ADMIN.get(module_name)
-
-    for page in listar_admin_pages():
-        if module_name == page[5] and page[2] is True:
-            modulo = page
-            list_reports = []
-
-            for re in modulo[4]:
-                if re[3].get('graph') is True:
-                    print(re[0])
-                    gr = REPORTES.get(re[0]).get('graph')
-                    if gr :
-                        if callable(gr.get("series")):
-                            gr["series"] = gr["series"]()
-                        if callable(gr.get("xaxis")):
-                            gr["xaxis"] = gr["xaxis"]()
-                        list_reports.append(re)
-
-
-            return render_template(
-                'dashboard.html' , 
-                # modulo_actual = module_name ,
-                module_name = module_name , 
-                modulo = modulo ,
-                info_modulo = info_modulo,
-                list_reports = list_reports ,
-                REPORTES = REPORTES ,
-                )
-    return None
-    # return 'No hay dashboa
-
-
 @app.route("/reporte=<report_name>")
 # @validar_admin()
 def reporte(report_name):
     config = REPORTES.get(report_name)
-    if not config:
-        return "Reporte no encontrado", 404
-
-    active = config["active"]
-
-    if active is False:
-        return "Reporte no encontrado", 404
-        
-    titulo = 'Reporte de ' + config.get("titulo")
-    elements = config.get("elements")
-    e_graph = elements.get('graph')
-    e_table = elements.get('table')
-    e_counter = elements.get('counter')
-    icon_page = get_icon_page(config.get("icon_page"))
-
-    graph = config.get("graph")
-    if graph:
-        if callable(graph.get("series")):
-            graph["series"] = graph["series"]()
-        if callable(graph.get("xaxis")):
-            graph["xaxis"] = graph["xaxis"]()
-
-    table = config.get("table")
-    columnas = None
-    filas = None
-    if table is not None and e_table is True:
-        columnas , filas = table
-
-    counter = config.get("counter")
-
-    return render_template(
-        "REPORTE.html" ,
-        titulo = titulo ,
-        elements = elements ,
-        e_graph = e_graph,
-        e_table = e_table,
-        e_counter = e_counter,
-        graph = graph ,
-        table = table ,
-        columnas = columnas,
-        filas = filas,
-        counter = counter ,
-        icon_page = icon_page,
-    )
-
+    if config:
+        active = config["active"]
+        if active is True:
+            titulo = config["titulo"]
+            icon_page_crud = get_icon_page(config.get("icon_page"))
+            filters = config["filters"]
+            columnas , filas = config["table"]
+            table_columns  = list(filas[0].keys()) if filas else []
+            
+            return render_template(
+                "CRUD.html" ,
+                icon_page_crud = icon_page_crud ,
+                titulo         = titulo ,
+                filas          = filas ,
+                filters        = filters,
+                columnas       = columnas ,
+                key_columns    = list(columnas.keys()) ,
+                table_columns  = table_columns ,
+                crud_search    = True,
+                # crud_consult   = True,
+                # crud_insert    = True,
+                # crud_update    = True,
+                # crud_delete    = True,
+                # crud_unactive  = True,
+                esReporte      = True ,
+            )
 
 
 @app.route("/administrar_paginas")
-@validar_admin()
+# @validar_admin()
 def administrar_paginas():
     modulos = acceso.get_lista_modulos()
     paginas_cruds = acceso.get_paginas_crud()
@@ -1599,7 +1580,7 @@ def administrar_paginas():
 
 
 @app.route("/permiso_rol=<int:rolid>")
-@validar_admin()
+# @validar_admin()
 def permiso_rol(rolid):
     modulos = acceso.get_lista_modulos()
     paginas_cruds = acceso.get_paginas_crud()
@@ -1620,6 +1601,71 @@ def permiso_rol(rolid):
         cants_mod = cants_mod ,
 
         )
+
+
+@app.route("/informacion_empresa")
+# @validar_admin()
+def informacion_empresa():
+    information = controlador_empresa.get_information()
+    
+    return render_template(
+        'informacion_empresa.html' ,
+        information = information ,
+        )
+
+
+
+# @app.route("/grafico=<report_name>")
+# # @validar_admin()
+# def grafico(report_name):
+#     config = REPORTES.get(report_name)
+#     if not config:
+#         return "Reporte no encontrado", 404
+
+#     active = config["active"]
+
+#     if active is False:
+#         return "Reporte no encontrado", 404
+        
+#     titulo = 'Reporte de ' + config.get("titulo")
+#     elements = config.get("elements")
+#     e_graph = elements.get('graph')
+#     e_table = elements.get('table')
+#     e_counter = elements.get('counter')
+#     icon_page = get_icon_page(config.get("icon_page"))
+
+#     graph = config.get("graph")
+#     if graph:
+#         if callable(graph.get("series")):
+#             graph["series"] = graph["series"]()
+#         if callable(graph.get("xaxis")):
+#             graph["xaxis"] = graph["xaxis"]()
+
+#     table = config.get("table")
+#     columnas = None
+#     filas = None
+#     if table is not None and e_table is True:
+#         columnas , filas = table
+
+#     counter = config.get("counter")
+
+#     return render_template(
+#         "REPORTE.html" ,
+#         titulo = titulo ,
+#         elements = elements ,
+#         e_graph = e_graph,
+#         e_table = e_table,
+#         e_counter = e_counter,
+#         graph = graph ,
+#         table = table ,
+#         columnas = columnas,
+#         filas = filas,
+#         counter = counter ,
+#         icon_page = icon_page,
+#     )
+
+
+
 
 
 ##################_ METHOD POST _################## 
@@ -1720,6 +1766,45 @@ def crud_unactive(tabla):
         controlador.unactive_row( request.form.get(primary_key) )
 
     return redirect(url_for('crud_generico', tabla = tabla))
+
+
+
+@app.route("/update_empresa", methods=["POST"])
+# @validar_error_crud()
+def update_empresa():
+    # try:
+        # config = CONTROLADORES.get(tabla)
+        # if not config:
+        #     return "Tabla no soportada", 404
+
+        # active = config["active"]
+
+        # if active is False:
+        #     return "Tabla no soportada", 404
+
+        controlador = controlador_empresa
+        firma = inspect.signature(controlador.update_row)
+
+        valores = []
+        for nombre, parametro in firma.parameters.items():
+            valor = request.form.get(nombre)
+            valores.append(valor)
+
+        controlador.update_row( *valores )
+
+        return redirect(url_for('informacion_empresa'))
+    # except Exception as e:
+    #     return f"No se aceptan carácteres especiales", 400
+
+
+
+
+
+
+
+
+
+
 
 @app.route("/colores")
 def colores():

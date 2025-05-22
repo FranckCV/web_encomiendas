@@ -1,0 +1,187 @@
+{% extends 'MAESTRA_GENERAL.html' %}
+{% block estilos %}
+  <link rel="stylesheet" href="/static/css/perfil.css" />
+{% endblock %}
+{% block contenido %}
+  <div class="container">
+    <section class="profile-section">
+      <div class="profile-header">
+        <div class="profile-info">
+          <h1>Fabiana Paucar</h1>
+          <p>fabianapm060@gmail.com</p>
+          <p>Cliente desde: Enero 2023</p>
+        </div>
+      </div>
+
+      <div class="profile-stats">
+        <div class="stat-item">
+          <div class="stat-number">24</div>
+          <div class="stat-label">Envíos totales</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">21</div>
+          <div class="stat-label">Entregados</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">2</div>
+          <div class="stat-label">En tránsito</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">1</div>
+          <div class="stat-label">Pendientes</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">3</div>
+          <div class="stat-label">Reclamos</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navegación por pestañas -->
+    <div class="tabs">
+      <button class="tab-button active" data-tab="shipments">Mis Envíos</button>
+      <button class="tab-button" data-tab="claims">Mis Reclamos</button>
+    </div>
+
+    <!-- Contenido de pestaña: Mis Envíos -->
+    <div class="tab-content active" id="shipments">
+      <h2>Mis Envíos</h2>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nº Seguimiento</th>
+            <th>Origen</th>
+            <th>Destino</th>
+            <th>Fecha envío</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ENV-20250501-3782</td>
+            <td>Santiago</td>
+            <td>Valparaíso</td>
+            <td>01/05/2025</td>
+            <td>
+              <span class="status status-transit">En tránsito</span>
+            </td>
+            <td>
+              <button class="action-button">Ver detalles</button>
+            </td>
+          </tr>
+          <tr>
+            <td>ENV-20250418-2945</td>
+            <td>Santiago</td>
+            <td>Concepción</td>
+            <td>18/04/2025</td>
+            <td>
+              <span class="status status-delivered">Entregado</span>
+            </td>
+            <td>
+              <button class="action-button">Ver detalles</button>
+            </td>
+          </tr>
+          <tr>
+            <td>ENV-20250405-1278</td>
+            <td>Santiago</td>
+            <td>La Serena</td>
+            <td>05/04/2025</td>
+            <td>
+              <span class="status status-problem">Problema</span>
+            </td>
+            <td>
+              <button class="action-button">Ver detalles</button>
+            </td>
+          </tr>
+          <tr>
+            <td>ENV-20250328-9654</td>
+            <td>Santiago</td>
+            <td>Arica</td>
+            <td>28/03/2025</td>
+            <td>
+              <span class="status status-pending">Pendiente</span>
+            </td>
+            <td>
+              <button class="action-button">Ver detalles</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Contenido de pestaña: Mis Reclamos -->
+    <div class="tab-content" id="claims">
+      <h2>Mis Reclamos</h2>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID Reclamo</th>
+            <th>Nº Seguimiento</th>
+            <th>Fecha reclamo</th>
+            <th>Motivo</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>REC-20250406-123</td>
+            <td>ENV-20250405-1278</td>
+            <td>06/04/2025</td>
+            <td>Paquete dañado</td>
+            <td>
+              <span class="status status-transit">En revisión</span>
+            </td>
+            <td>
+              <button class="action-button">Ver detalles</button>
+            </td>
+          </tr>
+          <tr>
+            <td>REC-20250315-087</td>
+            <td>ENV-20250309-6542</td>
+            <td>15/03/2025</td>
+            <td>Entrega tardía</td>
+            <td>
+              <span class="status status-delivered">Resuelto</span>
+            </td>
+            <td>
+              <button class="action-button">Ver detalles</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+        <a href="{{url_for('libro_reclamaciones')}}"  class="action-button">Registrar nuevo reclamo</a>
+
+
+    </div>
+  </div>
+
+  <!-- Pie de página -->
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2025 ExpressEnvíos. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const tabButtons = document.querySelectorAll('.tab-button')
+      const tabContents = document.querySelectorAll('.tab-content')
+    
+      tabButtons.forEach((button) => {
+        button.addEventListener('click', function () {
+          tabButtons.forEach((btn) => btn.classList.remove('active'))
+          tabContents.forEach((content) => content.classList.remove('active'))
+    
+          this.classList.add('active')
+          const tabId = this.getAttribute('data-tab')
+          document.getElementById(tabId).classList.add('active')
+        })
+      })
+    })
+  </script>
+{% endblock %}

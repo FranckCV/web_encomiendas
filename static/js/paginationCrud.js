@@ -16,9 +16,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const activeFilters = {};
     filters.forEach(filter => {
       activeFilters[filter.id] = filter.value;
+      // console.log(filter.value);
     });
 
-    const searchTerm = searchInput.value.trim().toLowerCase();
+    const searchTerm = searchInput.value.trim().toLowerCase() || '';
 
     filteredRows = allRows.filter(row => {
       const matchesFilters = Object.entries(activeFilters).every(([key, value]) => {

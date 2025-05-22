@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguimiento de Encomienda</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+
+
+
+        .header {
+            padding: 30px;
+            text-align: center;
+            background: white;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+        }
+
+        .tracking-code {
+            background: #f0f8ff;
+            border: 1px solid #e6f3ff;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .tracking-code-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .tracking-code-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2563eb;
+            letter-spacing: 1px;
+        }
+
+        .timeline {
+            padding: 0 30px 30px;
+        }
+
+        .status-section {
+            margin-bottom: 0;
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .status-header:hover {
+            background-color: #fafafa;
+            margin: 0 -20px;
+            padding-left: 20px;
+            padding-right: 20px;
+            border-radius: 8px;
+        }
+
+        .status-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .status-icon.completed {
+            background-color: #22c55e;
+        }
+
+        .status-icon.current {
+            background-color: #3b82f6;
+        }
+
+        .status-icon.pending {
+            background-color: #d1d5db;
+        }
+
+        .status-icon::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .status-icon.completed::after {
+            content: '✓';
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            width: auto;
+            height: auto;
+        }
+
+        .status-content {
+            flex: 1;
+        }
+
+        .status-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .status-subtitle {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .chevron {
+            width: 20px;
+            height: 20px;
+            color: #d1d5db;
+        }
+
+        .status-details {
+            margin-left: 39px;
+            padding: 0 0 20px;
+            display: none;
+        }
+
+        .status-section.expanded .status-details {
+            display: block;
+        }
+
+        .status-section.expanded .chevron {
+            transform: rotate(90deg);
+        }
+
+        .detail-item {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-time {
+            font-size: 14px;
+            color: #2563eb;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .detail-status {
+            font-size: 14px;
+            color: #1a1a1a;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .detail-location {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .detail-timestamp {
+            font-size: 12px;
+            color: #999;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .status-section:first-child .status-details {
+            display: block;
+        }
+
+        .status-section:first-child .chevron {
+            transform: rotate(90deg);
+        }
+
+        .timeline-line {
+            position: relative;
+        }
+
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 44px;
+            bottom: -20px;
+            width: 2px;
+            background: #f0f0f0;
+            z-index: 0;
+        }
+
+        .status-section:last-child .timeline-line::before {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Seguimiento de Encomienda</h1>
+            <div class="tracking-code">
+                <div class="tracking-code-label">Código de seguimiento:</div>
+                <div class="tracking-code-value">ENC-2025-001234</div>
+            </div>
+        </div>
+
+        <div class="timeline">
+            <!-- Origen -->
+            <div class="status-section expanded">
+                <div class="timeline-line">
+                    <div class="status-header" onclick="toggleSection(this)">
+                        <div class="status-icon completed"></div>
+                        <div class="status-content">
+                            <div class="status-title">📦 Origen</div>
+                        </div>
+                        <svg class="chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                    <div class="status-details">
+                        <div class="detail-item">
+                            <div>
+                                <div class="detail-time">10/05/25</div>
+                                <div class="detail-status">Recepcionado por almacén</div>
+                                <div class="detail-location">Centro de Distribución Lima</div>
+                            </div>
+                            <div class="detail-timestamp">08:30</div>
+                        </div>
+                        <div class="detail-item">
+                            <div>
+                                <div class="detail-time">10/05/25</div>
+                                <div class="detail-status">En espera del conductor</div>
+                                <div class="detail-location">Área de despacho</div>
+                            </div>
+                            <div class="detail-timestamp">14:45</div>
+                        </div>
+                        <div class="detail-item">
+                            <div>
+                                <div class="detail-time">10/05/25</div>
+                                <div class="detail-status">En unidad de transporte</div>
+                                <div class="detail-location">Vehículo LAM-456</div>
+                            </div>
+                            <div class="detail-timestamp">16:20</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- En Tránsito -->
+            <div class="status-section">
+                <div class="timeline-line">
+                    <div class="status-header" onclick="toggleSection(this)">
+                        <div class="status-icon current"></div>
+                        <div class="status-content">
+                            <div class="status-title">🚛 En Tránsito</div>
+                        </div>
+                        <svg class="chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                    <div class="status-details">
+                        <div class="detail-item">
+                            <div>
+                                <div class="detail-time">11/05/25</div>
+                                <div class="detail-status">En ruta hacia destino</div>
+                                <div class="detail-location">Carretera Central Km 45</div>
+                            </div>
+                            <div class="detail-timestamp">09:15</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- En Destino -->
+            <div class="status-section">
+                <div class="timeline-line">
+                    <div class="status-header" onclick="toggleSection(this)">
+                        <div class="status-icon pending"></div>
+                        <div class="status-content">
+                            <div class="status-title">📍 En Destino</div>
+                        </div>
+                        <svg class="chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                    <div class="status-details">
+                        <div style="padding: 20px; text-align: center; color: #666; font-style: italic;">
+                            Pendiente de llegada
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entregado -->
+            <div class="status-section">
+                <div class="timeline-line">
+                    <div class="status-header" onclick="toggleSection(this)">
+                        <div class="status-icon pending"></div>
+                        <div class="status-content">
+                            <div class="status-title">✅ Entregado</div>
+                        </div>
+                        <svg class="chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                    <div class="status-details">
+                        <div style="padding: 20px; text-align: center; color: #666; font-style: italic;">
+                            Pendiente de entrega
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSection(header) {
+            const section = header.closest('.status-section');
+            const isExpanded = section.classList.contains('expanded');
+            
+            // Cerrar todas las secciones
+            document.querySelectorAll('.status-section').forEach(s => {
+                s.classList.remove('expanded');
+            });
+            
+            // Si no estaba expandida, expandir esta sección
+            if (!isExpanded) {
+                section.classList.add('expanded');
+            }
+        }
+
+        // Expandir la primera sección por defecto
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.status-section').classList.add('expanded');
+        });
+    </script>
+</body>
+</html>

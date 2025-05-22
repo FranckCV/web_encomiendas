@@ -10,12 +10,73 @@ def get_lista_modulos():
             mdl.color ,
             mdl.activo 
         from modulo mdl
-        group by mdl.id
         order by 2 asc 
     '''
 
     filas = bd.sql_select_fetchall(sql)
-    
+    return  filas
+
+
+def get_modulo_key(key):
+    sql= f'''
+        select 
+            mdl.id ,
+            mdl.nombre ,
+            mdl.icono ,
+            mdl.key ,
+            mdl.color ,
+            mdl.activo 
+        from modulo mdl
+        where mdl.key = %s
+    '''
+    filas = bd.sql_select_fetchone(sql,(key))
+    return  filas
+
+
+def get_lista_tipo_paginas():
+    sql= f'''
+        select 
+            tip.id ,
+            tip.nombre 
+        from tipo_pagina tip
+        order by 1 asc 
+    '''
+
+    filas = bd.sql_select_fetchall(sql)
+    return  filas
+
+
+def get_paginas():
+    sql= f'''
+        SELECT 
+            pag.id , 
+            pag.titulo , 
+            pag.icono , 
+            pag.activo, 
+            pag.key , 
+            pag.tipo_paginaid , 
+            pag.moduloid 
+        from pagina pag
+        order by pag.titulo
+    '''
+    filas = bd.sql_select_fetchall(sql)
+    return  filas
+
+def get_paginas_moduloid(moduloid):
+    sql= f'''
+        SELECT 
+            pag.id , 
+            pag.titulo , 
+            pag.icono , 
+            pag.activo, 
+            pag.key , 
+            pag.tipo_paginaid , 
+            pag.moduloid 
+        from pagina pag
+        where moduloid = {moduloid}
+        order by pag.titulo
+    '''
+    filas = bd.sql_select_fetchall(sql)
     return  filas
 
 
@@ -32,7 +93,6 @@ def get_paginas_crud():
         from pagina pag
         order by pag.titulo
     '''
-
     filas = bd.sql_select_fetchall(sql)
     
     return  filas
