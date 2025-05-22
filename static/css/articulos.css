@@ -18,30 +18,21 @@
     font-family: Arial, sans-serif;
 }
 
-/* Banner de bienvenida */
-.welcome-banner {
-    background-color: var(--color-light-bg);
-    border-radius: var(--border-radius);
-    padding: 25px;
-    margin-bottom: 30px;
+/* Título artículos */
+.titulo-articulos {
+    font-size: 32px;
+    color: #0E1D63;
     text-align: center;
-}
-
-.welcome-content h2 {
-    color: #2a3b8f;
-    font-size: 1.8rem;
-    font-weight: 600;
-    margin: 0;
+    font-weight: 700;
+   margin-top: 20px;
+   margin-bottom: 20px;
 }
 
 /* Sección de detalles del producto */
 .producto-detalle {
     display: flex;
     flex-wrap: wrap;
-    background-color: #fff;
-    border-radius: var(--border-radius);
     overflow: hidden;
-    box-shadow: var(--box-shadow);
     margin-bottom: 40px;
 }
 
@@ -93,7 +84,6 @@
     flex: 1;
     min-width: 300px;
     padding: 30px;
-    background-color: #fff;
 }
 
 .producto-titulo {
@@ -163,19 +153,32 @@
     visibility: visible;
 }
 
+/* PRECIOS DE VOLUMEN OPTIMIZADOS PARA ALINEACIÓN CORRECTA */
 .precios-volumen {
     display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
+    flex-direction: column; /* Cambiar a columna para apilar verticalmente */
+    gap: 10px;
+    width: 100%; /* Ocupar todo el ancho disponible como el botón agregar */
 }
 
 .precio-volumen-item {
-    background-color: #f5f5f5;
-    padding: 8px 12px;
-    border-radius: 5px;
+    background-color: #d5edff;
+    padding: 12px 20px; /* Aumentar padding para consistencia con botón agregar */
+    border-radius: 8px; /* Consistente con botón agregar */
     display: flex;
-    flex-direction: column;
-    text-align: center;
+    flex-direction: row; /* Alinear precio y cantidad horizontalmente */
+    justify-content: space-between; /* Distribuir contenido */
+    align-items: center;
+    width: 100%; /* Ocupar todo el ancho como el botón agregar */
+    box-sizing: border-box;
+    border: 2px solid transparent; /* Para efecto hover */
+    transition: all 0.3s ease;
+}
+
+.precio-volumen-item:hover {
+    border-color: #1a3c5b;
+    background-color: #f0f8ff;
+    transform: translateY(-1px);
 }
 
 .etiqueta-precio {
@@ -190,6 +193,7 @@
     border-radius: 5px;
     font-size: 1.0rem;
 }
+
 
 .selector-cantidad {
     display: flex;
@@ -472,10 +476,7 @@
 .producto-detalle {
     display: flex;
     flex-wrap: wrap;
-    background-color: #fff;
-    border-radius: var(--border-radius);
     overflow: hidden;
-    box-shadow: var(--box-shadow);
     margin-bottom: 40px;
 }
 
@@ -522,7 +523,6 @@
     flex: 1;
     min-width: 300px;
     padding: 30px;
-    background-color: #fff;
 }
 
 .producto-titulo {
@@ -594,31 +594,26 @@
 
 .precios-volumen {
     display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
+    flex-direction: column; /* Cambiar a columna para apilar verticalmente */
+    gap: 10px;
+    width: 100%; /* Ocupar todo el ancho disponible como el botón agregar */
 }
+
 
 .precio-volumen-item {
-    background-color: #f5f5f5;
-    padding: 8px 12px;
-    border-radius: 5px;
+    background-color: #d5edff;
+    padding: 12px 20px; /* Aumentar padding para consistencia con botón agregar */
+    border-radius: 8px; /* Consistente con botón agregar */
     display: flex;
-    flex-direction: column;
-    text-align: center;
+    flex-direction: row; /* Alinear precio y cantidad horizontalmente */
+    justify-content: space-between; /* Distribuir contenido */
+    align-items: center;
+    width: 100%; /* Ocupar todo el ancho como el botón agregar */
+    box-sizing: border-box;
+    border: 2px solid transparent; /* Para efecto hover */
+    transition: all 0.3s ease;
 }
 
-.etiqueta-precio {
-    font-weight: bolder;
-    font-size: 1.5rem;
-}
-
-.etiqueta-cantidad {
-    background-color: var(--color-primary);
-    color: white;
-    padding: 2px 8px;
-    border-radius: 5px;
-    font-size: 1.0rem;
-}
 
 .selector-cantidad {
     display: flex;
