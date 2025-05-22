@@ -1,19 +1,102 @@
-<div class="mapa-container col-md-3 col-sm-12">
-    <div id="map"></div>
+{% extends "MAESTRA_GENERAL.html" %}
+
+{% block titulo %}
+Sucursales
+{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<link rel="stylesheet" href="../static/css/sucursales.css">
+<style>
+    .listado-agencias {
+        max-height: 345px;
+        overflow-y: auto;
+    }
+</style>
+<style>
+    #map {
+        width: 100%;
+        aspect-ratio: 16 / 11;
+        max-height: 80vh;
+    }
+
+    .filtros-mapa-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+        .mapa-container {
+            order: 2;
+        }
+
+        .filtros-container {
+            order: 1;
+        }
+    }
+
+    @media (max-width: 900px) {
+        .listado-agencias {
+            max-height: 195px;
+            overflow-y: auto;
+        }
+    }
+</style>
+
+
+{% endblock %}
+
+{% block contenido %}
+<div class="sucursales-container row">
+    <!-- <h1 class="sucursales-titulo">Nuestras Agencias</h1>
+    <p class="sucursales-subtitle">Encuentra la agencia más cercana a tu ubicación</p> -->
+    <div class="filtros-mapa-container row flex-column flex-md-row order-2 order-md-1">
+        <div class="filtros-container col-md-9 col-sm-12">
+            <div class="row g-3">
+                <div class="col-12 col-lg-4">
+                    <label class="form-label filtro-label" for="departamento">Departamento</label>
+                    <select id="departamento" class="form-select filtro-select">
+                        <option value="">Seleccionar</option>
+                    </select>
+                </div>
+                <div class="col-12 col-lg-4">
+                    <label class="form-label filtro-label" for="provincia">Provincia</label>
+                    <select id="provincia" class="form-select filtro-select" disabled>
+                        <option value="">Seleccionar</option>
+                    </select>
+                </div>
+                <div class="col-12 col-lg-4">
+                    <label class="form-label filtro-label" for="distrito">Distrito</label>
+                    <select id="distrito" class="form-select filtro-select" disabled>
+                        <option value="">Seleccionar</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- <button id="btn-buscar" class="btn-buscar">Buscar agencias</button> -->
+            <div class="listado-agencias">
+                <div id="agencias-list">
+                    <div class="sin-resultados">
+                        Selecciona una ubicación para ver las agencias disponibles
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mapa-container col">
+            <div id="map"></div>
+        </div>
+    </div>
+
 </div>
+{% endblock %}
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+{% block scripts %}
+<script src="../static/js/mapita.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Inicializar el mapa
-        const map = L.map('map').setView([-9.1900, -75.0152], 5); // Vista centrada en Perú
-        
-        // Agregar capa de mapa base
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
 
-        // Datos de ejemplo
+    document.addEventListener('DOMContentLoaded', function () {
+         // Datos de ejemplo
         const departamentos = [
             "Lima", "Arequipa", "Cusco", "La Libertad", "Piura", "Lambayeque", "Junín", "Áncash"
         ];
@@ -164,7 +247,6 @@
                 horario: "Lun-Vier: 8:30am-6:30pm, Sáb: 9am-2pm"
             }
         ];
-
         // Llenar select de departamentos
         const departamentoSelect = document.getElementById('departamento');
         departamentos.forEach(depa => {
@@ -178,15 +260,15 @@
         let markers = [];
 
         // Función para actualizar provincias según departamento
-        departamentoSelect.addEventListener('change', function() {
+        departamentoSelect.addEventListener('change', function () {
             const provinciaSelect = document.getElementById('provincia');
             const distritoSelect = document.getElementById('distrito');
-            
+
             // Limpiar selects
             provinciaSelect.innerHTML = '<option value="">Todas</option>';
             distritoSelect.innerHTML = '<option value="">Todos</option>';
             distritoSelect.disabled = true;
-            
+
             if (this.value) {
                 // Llenar provincias
                 const provs = provincias[this.value] || [];
@@ -203,12 +285,12 @@
             actualizarAgencias();
         });
 
-        document.getElementById('provincia').addEventListener('change', function() {
+        document.getElementById('provincia').addEventListener('change', function () {
             const distritoSelect = document.getElementById('distrito');
-            
+
             // Limpiar select de distritos
             distritoSelect.innerHTML = '<option value="">Todos</option>';
-            
+
             if (this.value) {
                 // Llenar distritos
                 const dists = distritos[this.value] || [];
@@ -226,29 +308,29 @@
         });
 
         document.getElementById('distrito').addEventListener('change', actualizarAgencias);
-        
+
 
         // Función para buscar agencias según filtros
         function actualizarAgencias() {
             const departamento = document.getElementById('departamento').value;
             const provincia = document.getElementById('provincia').value;
             const distrito = document.getElementById('distrito').value;
-            
+
             // Filtrar agencias
             let agenciasFiltradas = agenciasData;
-            
+
             if (departamento) {
                 agenciasFiltradas = agenciasFiltradas.filter(a => a.departamento === departamento);
-                
+
                 if (provincia) {
                     agenciasFiltradas = agenciasFiltradas.filter(a => a.provincia === provincia);
-                    
+
                     if (distrito) {
                         agenciasFiltradas = agenciasFiltradas.filter(a => a.distrito === distrito);
                     }
                 }
             }
-            
+
             // Actualizar mapa y listado
             actualizarMapa(agenciasFiltradas);
             actualizarListado(agenciasFiltradas);
@@ -260,17 +342,17 @@
             // Limpiar marcadores existentes
             markers.forEach(marker => map.removeLayer(marker));
             markers = [];
-            
+
             if (agencias.length === 0) {
                 // Si no hay agencias, centrar en Perú
                 map.setView([-9.1900, -75.0152], 5);
                 return;
             }
-            
+
             // Crear marcadores para cada agencia
             agencias.forEach(agencia => {
                 const marker = L.marker([agencia.lat, agencia.lng]).addTo(map);
-                
+
                 // Crear popup con info
                 const popupContent = `
                     <div class="marker-popup">
@@ -279,11 +361,11 @@
                         <a href="#agencia-${agencia.id}" class="btn-ver-detalle">Ver detalles</a>
                     </div>
                 `;
-                
+
                 marker.bindPopup(popupContent);
                 markers.push(marker);
             });
-            
+
             // Ajustar la vista del mapa para mostrar todos los marcadores
             if (agencias.length > 0) {
                 const bounds = L.latLngBounds(agencias.map(a => [a.lat, a.lng]));
@@ -294,7 +376,7 @@
         // Función para actualizar listado de agencias
         function actualizarListado(agencias) {
             const listContainer = document.getElementById('agencias-list');
-            
+
             if (agencias.length === 0) {
                 listContainer.innerHTML = `
                     <div class="sin-resultados">
@@ -303,7 +385,7 @@
                 `;
                 return;
             }
-            
+
             // Crear HTML para cada agencia
             let html = '';
             agencias.forEach(agencia => {
@@ -333,79 +415,35 @@
                     </div>
                 `;
             });
-            
+
             listContainer.innerHTML = html;
         }
     });
 
 
-    departamentoSelect.addEventListener('change', function() {
-            const provinciaSelect = document.getElementById('provincia');
-            const distritoSelect = document.getElementById('distrito');
-            
-            // Limpiar selects
-            provinciaSelect.innerHTML = '<option value="">Todas</option>';
-            distritoSelect.innerHTML = '<option value="">Todos</option>';
-            distritoSelect.disabled = true;
-            
-            if (this.value) {
-                // Llenar provincias
-                const provs = provincias[this.value] || [];
-                provs.forEach(prov => {
-                    const option = document.createElement('option');
-                    option.value = prov;
-                    option.textContent = prov;
-                    provinciaSelect.appendChild(option);
-                });
-                provinciaSelect.disabled = false;
-            } else {
-                provinciaSelect.disabled = true;
-            }
-        });
+    departamentoSelect.addEventListener('change', function () {
+        const provinciaSelect = document.getElementById('provincia');
+        const distritoSelect = document.getElementById('distrito');
 
-        // Función para actualizar distritos según provincia
-        // document.getElementById('provincia').addEventListener('change', function() {
-        //     const distritoSelect = document.getElementById('distrito');
-            
-        //     // Limpiar select de distritos
-        //     distritoSelect.innerHTML = '<option value="">Todos</option>';
-            
-        //     if (this.value) {
-        //         // Llenar distritos
-        //         const dists = distritos[this.value] || [];
-        //         dists.forEach(dist => {
-        //             const option = document.createElement('option');
-        //             option.value = dist;
-        //             option.textContent = dist;
-        //             distritoSelect.appendChild(option);
-        //         });
-        //         distritoSelect.disabled = false;
-        //     } else {
-        //         distritoSelect.disabled = true;
-        //     }
-        // });
-    // document.getElementById('btn-buscar').addEventListener('click', function() {
-        //     const departamento = document.getElementById('departamento').value;
-        //     const provincia = document.getElementById('provincia').value;
-        //     const distrito = document.getElementById('distrito').value;
-            
-        //     // Filtrar agencias
-        //     let agenciasFiltradas = agenciasData;
-            
-        //     if (departamento) {
-        //         agenciasFiltradas = agenciasFiltradas.filter(a => a.departamento === departamento);
-                
-        //         if (provincia) {
-        //             agenciasFiltradas = agenciasFiltradas.filter(a => a.provincia === provincia);
-                    
-        //             if (distrito) {
-        //                 agenciasFiltradas = agenciasFiltradas.filter(a => a.distrito === distrito);
-        //             }
-        //         }
-        //     }
-            
-        //     // Actualizar mapa y listado
-        //     actualizarMapa(agenciasFiltradas);
-        //     actualizarListado(agenciasFiltradas);
-        // });
+        // Limpiar selects
+        provinciaSelect.innerHTML = '<option value="">Todas</option>';
+        distritoSelect.innerHTML = '<option value="">Todos</option>';
+        distritoSelect.disabled = true;
+
+        if (this.value) {
+            // Llenar provincias
+            const provs = provincias[this.value] || [];
+            provs.forEach(prov => {
+                const option = document.createElement('option');
+                option.value = prov;
+                option.textContent = prov;
+                provinciaSelect.appendChild(option);
+            });
+            provinciaSelect.disabled = false;
+        } else {
+            provinciaSelect.disabled = true;
+        }
+    })
+
 </script>
+{% endblock %}

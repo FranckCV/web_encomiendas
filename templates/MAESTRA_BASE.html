@@ -12,18 +12,36 @@
     <link rel="stylesheet" href="/static/css/common_styles/fonts.css" />
     <link rel="stylesheet" href="/static/css/common_styles/common_style.css" />
     <link rel="stylesheet" href="/static/css/common_styles/fontawesome.min.css" />
+    {% set emp_color_pri = main_information.get('color_pri') %}
+    {% set emp_color_sec = main_information.get('color_sec') %}
+    {% set emp_color_ter = main_information.get('color_ter') %}
+
     <style>
-        
+        :root {
+            --color-contrast: #ffffff;
+            /* --color-base: #18076e; */
+            /* --color-base: #8a5105; */
+            /* --color-base: #107444; */
+            /* --color-sec: #00cee9; */
+            /* --color-sec: #f07305; */
+            /* --color-sec: #a20eff; */
+            /* --color-contrast: #fff; */
+            --color-base: {{ emp_color_pri }};
+            --color-sec: {{ emp_color_sec }};
+            --color-thr: {{ emp_color_ter }};
+            /* #1d4c82 #13e2da #1b98e0 */
+        }
     </style>
     {% block estilos_html %}
     {% endblock %}
-    
+
 </head>
 
 <body class="general_body">
+    
     {% block body_html %}
     {% endblock %}
-    
+
     {% if cookie_error %}
     <div id="modalError" class="modal modalMsg modalError ver_modalMsg">
         <div class="modal-dialog">
@@ -43,7 +61,7 @@
         </div>
     </div>
     {% endif %}
-    
+
     <script src="/static/js/common_scripts/bootstrap.bundle.min.js"></script>
     <script src="/static/js/common_scripts/bootstrap.min.js"></script>
     <script src="/static/js/common_scripts/common_script.js"></script>
@@ -67,7 +85,7 @@
             });
         }
     </script>
-    
+
     {% block scripts_html %}
     {% endblock %}
 

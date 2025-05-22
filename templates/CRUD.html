@@ -2,11 +2,22 @@
 
 
 {% block titulo %}
-{{NOMBRE_CRUD_PAGE}} {{titulo}}
+{% if esReporte %}
+{{titulo }}
+{% else %}
+{{NOMBRE_CRUD_PAGE}} {{titulo | lower}}
+{% endif %}
 {% endblock %}
 
 
 {% block estilos %}
+{% if esReporte %}
+<style>
+  .td_content {
+    height: 30px;
+  }
+</style>
+{% endif %}
 {% endblock %}
 
 
@@ -17,7 +28,12 @@
     {% if HABILITAR_ICON_PAGES %}
     <i class="{{icon_page_crud}}"></i>
     {% endif %}
+
+    {% if esReporte %}
+    {{titulo }}
+    {% else %}
     {{NOMBRE_CRUD_PAGE}} {{titulo | lower}}
+    {% endif %}
   </h3>
 </div>
 
@@ -25,20 +41,19 @@
 <div class="block_crud">
   <div class="panel_row row">
     {% if crud_search %}
-    {% if value_search %}
+    <!-- {% if value_search %}
     <div class="col-3">
       <a class="button" href="{{ url_for('crud_generico', tabla = tabla) }}">
         <i class="fa-solid fa-left-long"></i>
         <p>Volver al listado principal</p>
       </a>
     </div>
-    <!-- <div class="col-1"></div> -->
-    {% endif %}
+    {% endif %} -->
 
     <div class="col">
       <div class="input_search">
         <div class="input-group">
-          <input required type="text" class="form-control" placeholder="Buscar {{ titulo }}"
+          <input required type="text" class="form-control" placeholder="Buscar {{ titulo | lower }}"
             aria-label="Recipient's username" aria-describedby="button-addon2" id="value_search" name="value_search" />
 
           <button class="btn" type="submit" id="button-addon2">
@@ -67,7 +82,6 @@
     {% endfor %}
     {% endif %}
 
-    {% if not value_search %}
     {% if crud_insert %}
     <!-- <div class="col-1"></div> -->
     <div class="col-2">
@@ -76,7 +90,6 @@
         <p>{{NOMBRE_BTN_INSERT}}</p>
       </button>
     </div>
-    {% endif %}
     {% endif %}
 
   </div>
@@ -112,8 +125,11 @@
       <tbody id="productTableBody">
         {% for fila in filas %}
 
-        <tr {% for resultado in filas %} {% if resultado[primary_key]==fila[primary_key] %} {% for col in table_columns
-          %} data-{{col}}="{{resultado[col]}}" {% endfor %} {% endif %} {% endfor %}>
+        <tr 
+          {% for col in table_columns %} 
+            data-{{col}}="{{fila[col]}}" 
+          {% endfor %} 
+          >
           {% for col_name in key_columns %}
           <td class="{% if primary_key == col_name %} td_primary_key {% endif %}" td_name="{{col_name}}">
             <div
@@ -219,6 +235,9 @@
   </div>
 </div>
 
+
+{% if crud_consult or crud_unactive or crud_update or crud_delete %}
+
 {% for fila in filas %}
 
 {% if crud_unactive %}
@@ -227,9 +246,9 @@
 
     <div class="row">
       <h3>{% if fila['activo'] == 0 %}
-        {{ ACT_STATE_1  }}
+        {{ ACT_STATE_1 }}
         {% elif fila['activo'] == 1 %}
-        {{ ACT_STATE_0  }}
+        {{ ACT_STATE_0 }}
         {% endif %} {{nombre_tabla}} </h3>
       <!-- <hr> -->
     </div>
@@ -302,7 +321,7 @@
 
         <input id="{{campo[0]}}" name="{{campo[0]}}" placeholder="{{campo[2]}}" type="text" {% if campo[4] %}required{%
           endif %} {% if campo[5]==False %}disabled{% endif %} value="{{ fila[campo[6][1]] }}" disabled>
-        
+
         {% elif campo[3] == 'textarea' %}
         <textarea id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif %}
           disabled>{% if fila[campo[0]] != None  %} {{fila[campo[0]]}} {% endif %}</textarea>
@@ -409,7 +428,10 @@
   </form>
 </div>
 {% endif %}
+
 {% endfor %}
+
+{% endif %}
 
 
 {% if crud_insert %}
@@ -470,6 +492,7 @@
 {% endif %}
 
 
+
 <div id="overlayModal" class="overlayModal">
   <div id="enlargedModal">
   </div>
@@ -502,10 +525,10 @@
     }
   });
 </script>
+
 <script src="/static/js/crudModal.js"></script>
 <script src="/static/js/orderHeadTable.js"></script>
 <script src="/static/js/paginationCrud.js"></script>
-<!-- <script src="/static/js/paginationCrud_4.js"></script> -->
 
 
 

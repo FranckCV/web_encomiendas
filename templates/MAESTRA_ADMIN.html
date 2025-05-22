@@ -32,39 +32,68 @@
         </a>
     </div>
 
-    {% for modulo in listar_pages_admin %}
-    {% if modulo_actual == modulo[5] %}
-    <div class="line_separator"></div>
-    <div class="menu_option mu_active">
-        <div class="menu_title">
-            <p>{{ modulo[0] }}</p>
-            <i class="{{ modulo[1] }}"></i>
-        </div>
-        {% if modulo[2] or modulo[3] or modulo[4] %}
-        <div class="menu_content">
+    {% for modulo in modulos %}
+    {% if modulo['id'] == cur_modulo_id %}
 
-            {% for page in modulo[3] %}
-            <a class="mu_page mu_crud" href="{{url_for('crud_generico',tabla = page[0] )}}">
-                <i class="{{ page[2] }}"></i>
-                <p>{{NOMBRE_CRUD_PAGE}} {{ page[1] }}</p>
-            </a>
-            {% endfor %}
-            {% for page in modulo[4] %}
-            <a class="mu_page mu_rprt" href="{{url_for('reporte', report_name = page[0] )}}">
-                <i class="{{ page[2] }}"></i>
-                <p>Reporte de {{ page[1] }}</p>
-            </a>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-    </div>
-    {% endif %}
-    {% endfor %}
-    
     <div class="line_separator"></div>
 
     <div class="menu_option">
+        <a class="menu_title" href="{{url_for('dashboard', module_name = modulo['key'] )}}">
+            <p>{{ modulo['nombre'] }}</p>
+            <i class="{{ modulo['icono'] }}"></i>
+        </a>
+        <div class="menu_content">
+
+            {% for tipo_pag in tipos_paginas %}
+            <p>{{ tipo_pag['nombre'] }}</p>
+
+            {% for page in paginas %}
+
+            {% if page['tipo_paginaid'] == tipo_pag['id'] and page['moduloid'] == cur_modulo_id %}
+
+            {% if page['tipo_paginaid'] == 1 %}
+            <a class="mu_page" href="{{url_for('crud_generico',tabla = page['key'] )}}">
+                <i class="{{ page['icono'] or ICON_PAGE_CRUD }}"></i>
+                <p>{{NOMBRE_CRUD_PAGE}} {{ page['titulo'] | lower }}</p>
+            </a>
+            {% elif page['tipo_paginaid'] == 2 %}
+            <a class="mu_page" href="{{url_for(page['key'])}}">
+                <i class="{{ page['icono'] }}"></i>
+                <p>{{ page['titulo'] }}</p>
+            </a>
+            {% elif page['tipo_paginaid'] == 3 %}
+
+            {% elif page['tipo_paginaid'] == 4 %}
+            <a class="mu_page" href="{{url_for('reporte',report_name = page['key'] )}}">
+                <i class="{{ page['icono'] or ICON_PAGE_CRUD }}"></i>
+                <p>{{ page['titulo'] }}</p>
+            </a>
+            {% elif page['tipo_paginaid'] == 5 %}
+
+            {% endif %}
+
+            {% endif %}
+
+            {% endfor %}
+
+
+
+            {% endfor %}
+
+
+
+
+
+
+        </div>
+    </div>
+    {% endif %}
+
+    {% endfor %}
+
+    <!-- <div class="line_separator"></div> -->
+
+    <!-- <div class="menu_option">
         <a class="menu_title" href="{{url_for('administrar_paginas')}}">
             <p>{{NOMBRE_ADMINPAGES_PAGE}}</p>
             <i class="ri-file-settings-fill"></i>
@@ -78,28 +107,28 @@
             <p>Información de la empresa</p>
             <i class="ri-building-fill"></i>
         </a>
-    </div>
-    
+    </div> -->
 
-    <div class="menu_user">
-        <div class="mu_content">
-            <div class="mu_option">
-                <div class="user_icon">
-                    <i class="fa-solid fa-user"></i>
-                </div>
 
-                <p class="user_name">Nombre de usuario</p>
-                <p class="user_type">Cargo de usuario</p>
 
-                <div class="user_out">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                </div>
+</aside>
+
+<div class="menu_user">
+    <div class="mu_content">
+        <div class="mu_option">
+            <div class="user_icon">
+                <i class="fa-solid fa-user"></i>
+            </div>
+
+            <p class="user_name">Nombre de usuario</p>
+            <p class="user_type">Cargo de usuario</p>
+
+            <div class="user_out">
+                <i class="fa-solid fa-right-from-bracket"></i>
             </div>
         </div>
     </div>
-</aside>
-
-
+</div>
 
 <section class="general_element">
     <div class="section_content">
@@ -117,18 +146,18 @@
 
 {% block scripts_html %}
 <script>
-    // MENU OPTION
-    const menuButton = document.querySelector("#menu_button");
-    const aside = document.querySelector("#menu_aside");
-    function toggleMenu() {
-        aside.classList.toggle("desplegar");
-    }
+    // // MENU OPTION
+    // const menuButton = document.querySelector("#menu_button");
+    // const aside = document.querySelector("#menu_aside");
+    // function toggleMenu() {
+    //     aside.classList.toggle("desplegar");
+    // }
 
-    if (menuButton && aside) {
-        menuButton.addEventListener("click", () => {
-            aside.classList.toggle("desplegar");
-        });
-    }
+    // if (menuButton && aside) {
+    //     menuButton.addEventListener("click", () => {
+    //         aside.classList.toggle("desplegar");
+    //     });
+    // }
 </script>
 {% block scripts %}
 {% endblock %}
