@@ -46,7 +46,7 @@ body {
     justify-content: center;
     flex-grow: 1;
     display: grid;
-    grid-template-columns: repeat(6,1fr);
+    grid-template-columns: repeat(5,1fr);
 }
 
 .nav-link {

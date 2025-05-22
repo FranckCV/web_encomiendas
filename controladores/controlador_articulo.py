@@ -47,6 +47,7 @@ def get_table():
             art.dimensiones ,
             tam.nombre as tam_nombre,
             art.tamaño_cajaid ,
+            art.img,
             art.activo 
         from {table_name} art
         left join tamanio_caja tam on tam.id = art.tamaño_cajaid 
@@ -72,24 +73,29 @@ def unactive_row( id ):
     unactive_row_table(table_name , id)
 
 
-def insert_row( nombre ):
+def insert_row( nombre, precio, stock, img, dimensiones,tamaño_cajaid ):
     sql = f'''
         INSERT INTO 
             {table_name} 
-            ( nombre , activo )
+            ( nombre, precio, stock, img, dimensiones,tamaño_cajaid , activo)
         VALUES 
-            ( %s , 1 )
+            ( %s ,%s ,%s ,%s ,%s ,%s , 1)
     '''
-    sql_execute(sql,( nombre ))
+    sql_execute(sql,( nombre, precio, stock, img, dimensiones,tamaño_cajaid ))
 
 
-def update_row( id , nombre ):
+def update_row( id ,nombre, precio, stock, img, dimensiones,tamaño_cajaid ):
     sql = f'''
         update {table_name} set 
-        nombre = %s 
+        nombre = %s,
+        precio = %s,
+        stock = %s,
+        img= %s,
+        dimensiones = %s,
+        tamaño_cajaid= %s
         where {get_primary_key()} = {id}
     '''
-    sql_execute(sql, (nombre ))
+    sql_execute(sql, (nombre, precio, stock, img, dimensiones,tamaño_cajaid ))
 
 
 #####_ ADICIONALES _#####

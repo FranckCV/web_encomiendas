@@ -363,6 +363,11 @@ CONTROLADORES = {
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
             ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
             ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['precio',      'Precio',          'Precio',      'number',     True ,     True  ,        None ],
+            ['stock',       'Stock',           'Stock',       'number',     True ,     True  ,        None ],
+            ['dimensiones', 'Dimensiones',     'Dimensiones', 'text',     True ,     True  ,        None ],
+            ['tamaño_cajaid','Tamaño Caja',    'Tamaño Caja', 'select',     True ,     True  ,        [lambda: controlador_tamanio_caja.get_options() , 'tam_nombre' ]  ],
+            ['img',         'Imagen',          'Imagen',      'text',     True ,     True  ,        None ],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
         ],
         "crud_forms": {
@@ -1330,7 +1335,9 @@ paginas_simples = [
     'mis_envios',
     'NoRecibimos',
     'pagina_reclamo',
-    'seguimiento_reclamo'
+    'seguimiento_reclamo',
+    'Metodo_pago',
+    'perfil'
 ]
 
 
