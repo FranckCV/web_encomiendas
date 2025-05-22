@@ -69,6 +69,10 @@ header.general_element {
     background-color: var(--color2);
 }
 
+
+
+
+
 aside.general_element {
     padding: 15px;
     background-color: var(--color-bg-admin);
@@ -137,11 +141,28 @@ aside .line_separator {
     width: 100%;
     gap: 10px;
     padding-bottom: 0;
-    max-height: 0;
-    overflow: hidden;
+    /* max-height: 0; */
+    overflow-y: auto;
     transition: max-height 0.10s ease-in-out, opacity 0.10s ease-in-out;
-    opacity: 0;
+    /* opacity: 0; */
 }
+
+.menu_content::-webkit-scrollbar {
+    width: 3px;
+    height: 8px;
+}
+
+.menu_content::-webkit-scrollbar-thumb {
+    background-color: #ffffffbb;
+    border-radius: var(--border-radius-size);
+}
+
+.menu_content::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+
+
 
 .menu_option {
     display: flex;
@@ -151,9 +172,9 @@ aside .line_separator {
     max-height: min-content;
 }
 
-.menu_option.mu_active,
-.menu_option:hover {
-    gap: 5px;
+.menu_content p{
+    color: white;
+    /* padding-inline: 20px; */
 }
 
 
@@ -239,19 +260,21 @@ aside .line_separator {
 }
 
 .menu_user {
-    position: sticky;
-    left: 0;
-    bottom: 0;
-    /* height: 100px; */
-    background: linear-gradient(to top, var(--color-bg-admin) 80%, transparent 100%);
+    /* left: 0; */
+    /* bottom: 0; */
+    /* background: linear-gradient(to top, var(--color-bg-admin) 80%, transparent 100%); */
     /* background: linear-gradient(to top, #00b467 80%, transparent 100%); */
+    position: fixed;
+    right: 5px;
+    top: -10px;
     width: calc(var(--width-aside) - 5px);
     z-index: 99999;
-    padding-inline: 10px;
-    padding-block: 5px;
-    /* padding-top: 30px; */
-    font-size: 140%;
     color: white;
+    height: fit-content;
+    /* padding-inline: 10px; */
+    /* padding-block: 5px; */
+    /* padding-top: 30px; */
+    /* font-size: 140%; */
 }
 
 .mu_content {
@@ -263,19 +286,18 @@ aside .line_separator {
 }
 
 .mu_option {
-    /* backdrop-filter: blur(20px); */
-    background-color: color-mix(in srgb, var(--color14) 100%, black 30%);
-    border: 1px solid white;
-    border-radius: 10px;
+    background-color: var(--color-bg-admin);
     display: grid;
     grid-template-areas:
-        ' mu_i mu_n mu_o'
-        ' mu_i mu_t mu_o'
+    ' mu_i mu_n mu_o'
+    ' mu_i mu_t mu_o'
     ;
     justify-items: flex-start;
     align-items: center;
     width: 100%;
     padding-block: 10px;
+
+    border-bottom-left-radius: 15px;
 }
 
 .user_icon {
@@ -308,6 +330,7 @@ aside .line_separator {
 
 .mu_option:hover .user_out i {
     color: var(--color-back);
+    filter: brightness(1.7);
     /* cursor: pointer; */
 }
 
@@ -316,8 +339,10 @@ aside .line_separator {
 }
 
 .mu_option:hover {
-    color: var(--color-bg-admin);
-    background-color: white;
+    /* background-color: color-mix(in srgb, var(--color14) 100%, black 30%); */
+
+    color: var(--color-sec);
+    /* background-color: white; */
     cursor: pointer;
 }
 
@@ -1035,6 +1060,8 @@ label {
 .cell_module i {
     font-size: 175%;
     color: var(--color-sec);
+    transition: 0.1s ease;
+
 }
 
 .cell_module:hover {
