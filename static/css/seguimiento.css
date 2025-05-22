@@ -1,10 +1,6 @@
-.container {
-    /* width: 80%;
-    margin: 0 auto; */
-    padding: 20px;
+.contenedor {
     background-color: white;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     
 }
 
@@ -16,7 +12,6 @@
     align-items: center;
     padding-left: 200px;
     justify-content: flex-start;
-    border-radius: 5px;
 }
 
 .search-img {
@@ -58,11 +53,11 @@
 .status-detail{
   display: flex;
   align-items: center;
-  gap:10px;
+  gap:20px;
 }
 .img_estado{
-  width: 30%;
-  height: 30%;
+  width: 10%;
+  height: 10%;
 }
 
 .card {
@@ -76,7 +71,8 @@
 .status-card {
   display: flex;
   align-items: center;
-  margin-top: 20px;
+padding: 11px 20px;
+border-radius: 0px;
 }
 /* .status-img {
   width: 100px;
@@ -119,6 +115,7 @@ h1 {
 .order-number {
   text-align: right;
   color: #666;
+      width: 100%;
 }
 .delivery-info {
   margin-bottom: 20px;
@@ -130,6 +127,7 @@ h1 {
 .progress-tracker {
   display: flex;
   justify-content: space-between;
+width: 100%;
   position: relative;
   margin-top: 40px;
 }
@@ -288,7 +286,7 @@ h1 {
 
 .timeline {
   margin-left: 10px;
-  display: none;
+  /* display: none; */
 }
 
 .timeline-item {

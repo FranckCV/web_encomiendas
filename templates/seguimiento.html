@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block contenido %}
-  <div class="container">
+  <div class="contenedor">
     <div class="header">
       <div class="order-search">
         <input type="text" placeholder="Nº de Orden" class="order-input" />
@@ -17,9 +17,12 @@
         <button class="search-btn">Buscar <i class="ri-arrow-right-line"></i></button>
       </div>
     </div>
+    
     <div class="container_estado">
-      <!-- Tarjeta de estado -->
       <div class="card status-card">
+                      <div class="order-number">
+                <p>N° DE ORDEN: 45106974</p>
+              </div>
         <div class="status-detail">
           <img class="img_estado" src="{{ url_for('static', filename='img/entregado.png') }}" alt="Persona con paquete entregado" />
 
@@ -29,96 +32,213 @@
                 <h1>Entregado</h1>
                 <button class="grt-btn">GRT<i class="fa-solid fa-download"></i></button>
               </div>
-              <div class="order-number">
-                <p>N° DE ORDEN: 45106974</p>
-              </div>
+
             </div>
             <div class="delivery-info">
               <p>Entregado a FABIANA LUCIA PAUCAR MEJIA</p>
               <p>con DNI 72428857, el día 29/04/25 a las 14:57.</p>
             </div>
-            <!--             
+            <!--                   
             <div class="delivery-time">
               <p>Desde el 25/04/25 a las 09:27</p>
-            </div>          -->
+            </div>                -->
             <!-- Tracker de progreso -->
-            <div class="progress-tracker">
-              <div class="progress-line"></div>
-
-              <div class="progress-step">
-                <div class="step-icon">
-                  <span class="check-icon">✓</span>
-                </div>
-                <div class="step-label">En origen</div>
-              </div>
-
-              <div class="progress-step">
-                <div class="step-icon">
-                  <span class="check-icon">✓</span>
-                </div>
-                <div class="step-label">En tránsito</div>
-              </div>
-
-              <div class="progress-step">
-                <div class="step-icon">
-                  <span class="check-icon">✓</span>
-                </div>
-                <div class="step-label">En destino</div>
-              </div>
-
-              <div class="progress-step">
-                <div class="step-icon">
-                  <span class="check-icon">✓</span>
-                </div>
-                <div class="step-label">Entregado</div>
-              </div>
-            </div>
           </div>
         </div>
-        <div class="details-container">
-          <div class="details-header">
-            <h3>Detalles del envío</h3>
-            <div class="details-toggle">Ver más</div>
+        <div class="progress-tracker">
+          <div class="progress-line"></div>
+
+          <div class="progress-step">
+            <div class="step-icon">
+              <span class="check-icon">✓</span>
+            </div>
+            <div class="step-label">En origen</div>
+
+            <div class="timeline">
+              <div class="timeline-item active">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">En origen</div>
+                  <div class="timeline-date">25/04/25 - 09:27</div>
+                  <div class="timeline-location">Recibido en agencia Arequipa</div>
+                </div>
+              </div>
+
+              <div class="timeline-item active">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">En tránsito</div>
+                  <div class="timeline-date">26/04/25 - 07:35</div>
+                  <div class="timeline-location">En ruta hacia destino</div>
+                </div>
+              </div>
+
+              <div class="timeline-item active">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">En destino</div>
+                  <div class="timeline-date">28/04/25 - 18:20</div>
+                  <div class="timeline-location">Agencia Lima Centro</div>
+                </div>
+              </div>
+
+              <div class="timeline-item active">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">Entregado</div>
+                  <div class="timeline-date">29/04/25 - 14:57</div>
+                  <div class="timeline-location">Entregado a FABIANA LUCIA PAUCAR MEJIA con DNI 7242857</div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div class="timeline">
-            <div class="timeline-item active">
-              <div class="timeline-dot"></div>
-              <div class="timeline-line"></div>
-              <div class="timeline-content">
-                <div class="timeline-title">En origen</div>
-                <div class="timeline-date">25/04/25 - 09:27</div>
-                <div class="timeline-location">Recibido en agencia Arequipa</div>
+          <div class="progress-step">
+            <div class="step-icon">
+              <span class="check-icon">✓</span>
+            </div>
+            <div class="step-label">En tránsito</div>
+
+            <div class="timeline">
+              <div class="timeline-item active">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">En origen</div>
+                  <div class="timeline-date">25/04/25 - 09:27</div>
+                  <div class="timeline-location">Recibido en agencia Arequipa</div>
+                </div>
+              </div>
+
+              <div class="timeline-item active">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">En tránsito</div>
+                  <div class="timeline-date">26/04/25 - 07:35</div>
+                  <div class="timeline-location">En ruta hacia destino</div>
+                </div>
+              </div>
+
+              <div class="timeline-item active">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">En destino</div>
+                  <div class="timeline-date">28/04/25 - 18:20</div>
+                  <div class="timeline-location">Agencia Lima Centro</div>
+                </div>
+              </div>
+
+              <div class="timeline-item active">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">Entregado</div>
+                  <div class="timeline-date">29/04/25 - 14:57</div>
+                  <div class="timeline-location">Entregado a FABIANA LUCIA PAUCAR MEJIA con DNI 7242857</div>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div class="timeline-item active">
-              <div class="timeline-dot"></div>
-              <div class="timeline-line"></div>
-              <div class="timeline-content">
-                <div class="timeline-title">En tránsito</div>
-                <div class="timeline-date">26/04/25 - 07:35</div>
-                <div class="timeline-location">En ruta hacia destino</div>
+          <div class="progress-step">
+            <div class="step-icon">
+              <span class="check-icon">✓</span>
+            </div>
+            <div class="step-label">En destino</div>
+             <div class="timeline">
+              <div class="timeline-item active">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">En origen</div>
+                  <div class="timeline-date">25/04/25 - 09:27</div>
+                  <div class="timeline-location">Recibido en agencia Arequipa</div>
+                </div>
+              </div>
+
+              <div class="timeline-item active">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">En tránsito</div>
+                  <div class="timeline-date">26/04/25 - 07:35</div>
+                  <div class="timeline-location">En ruta hacia destino</div>
+                </div>
+              </div>
+
+              <div class="timeline-item active">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">En destino</div>
+                  <div class="timeline-date">28/04/25 - 18:20</div>
+                  <div class="timeline-location">Agencia Lima Centro</div>
+                </div>
+              </div>
+
+              <div class="timeline-item active">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">Entregado</div>
+                  <div class="timeline-date">29/04/25 - 14:57</div>
+                  <div class="timeline-location">Entregado a FABIANA LUCIA PAUCAR MEJIA con DNI 7242857</div>
+                </div>
               </div>
             </div>
+          </div>
 
-            <div class="timeline-item active">
-              <div class="timeline-dot"></div>
-              <div class="timeline-line"></div>
-              <div class="timeline-content">
-                <div class="timeline-title">En destino</div>
-                <div class="timeline-date">28/04/25 - 18:20</div>
-                <div class="timeline-location">Agencia Lima Centro</div>
-              </div>
+          <div class="progress-step">
+            <div class="step-icon">
+              <span class="check-icon">✓</span>
             </div>
+            <div class="step-label">Entregado</div>
 
-            <div class="timeline-item active">
-              <div class="timeline-dot"></div>
-              <div class="timeline-line"></div>
-              <div class="timeline-content">
-                <div class="timeline-title">Entregado</div>
-                <div class="timeline-date">29/04/25 - 14:57</div>
-                <div class="timeline-location">Entregado a FABIANA LUCIA PAUCAR MEJIA con DNI 7242857</div>
+            <div class="timeline">
+              <div class="timeline-item active">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">En origen</div>
+                  <div class="timeline-date">25/04/25 - 09:27</div>
+                  <div class="timeline-location">Recibido en agencia Arequipa</div>
+                </div>
+              </div>
+
+              <div class="timeline-item active">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">En tránsito</div>
+                  <div class="timeline-date">26/04/25 - 07:35</div>
+                  <div class="timeline-location">En ruta hacia destino</div>
+                </div>
+              </div>
+
+              <div class="timeline-item active">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">En destino</div>
+                  <div class="timeline-date">28/04/25 - 18:20</div>
+                  <div class="timeline-location">Agencia Lima Centro</div>
+                </div>
+              </div>
+
+              <div class="timeline-item active">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div>
+                <div class="timeline-content">
+                  <div class="timeline-title">Entregado</div>
+                  <div class="timeline-date">29/04/25 - 14:57</div>
+                  <div class="timeline-location">Entregado a FABIANA LUCIA PAUCAR MEJIA con DNI 7242857</div>
+                </div>
               </div>
             </div>
           </div>
@@ -160,7 +280,6 @@
           <i class="fa-solid fa-dollar-sign icono"></i>
           <div class="detail-title">Pago cancelado</div>
           <div class="payment-status">
-            <!-- <span>PDF</span> -->
             <button class="download-link">
               <i class="fa-solid fa-download"></i>
               Comprobante
