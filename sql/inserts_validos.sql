@@ -78,8 +78,6 @@ INSERT INTO `rol` (`id`, `nombre`, `descripcion`, `activo`, `tipo_rolid`) VALUES
 
 
 
------
-
 INSERT INTO `ubigeo` (`codigo`, `departamento`, `provincia`, `distrito`, `activo`) VALUES
 -- ('', 'LIMA', 'LIMA', 'SANTA MARIA DE HUACHIPA', 1),
 ('100101', 'ICA', 'ICA', 'ICA', 1),
@@ -2157,18 +2155,6 @@ INSERT INTO articulo (nombre, precio, stock, activo, img, dimensiones, tamaño_c
 
 insert INTO `tipo_cliente` (nombre, activo) VALUES ('Persona Natural',1);
 insert INTO `tipo_cliente` (nombre, activo) VALUES ('Persona Jurídica',1);
-
--- INSERT INTO tipo_rol (nombre, descripcion, activo)
--- VALUES ('Administrador', 'Tiene acceso total al sistema.', 1);
-
--- INSERT INTO tipo_rol (nombre, descripcion, activo)
--- VALUES ('Usuario', 'Acceso limitado a funciones básicas.', 1);
-
--- INSERT INTO rol (nombre, descripcion, activo, tipo_rolid)
--- VALUES ('Superadmin', 'Rol con acceso total al sistema, incluyendo configuración y seguridad.', 1, 1);
-
--- INSERT INTO rol (nombre, descripcion, activo, tipo_rolid)
--- VALUES ('ClienteWeb', 'Rol de usuario con acceso solo al portal de clientes.', 1, 2);
 
 INSERT INTO empleado (nombre, apellidos, correo, rolid)
 VALUES ('Carlos', 'Ramírez López', 'carlos.ramirez@example.com', 1);
