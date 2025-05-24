@@ -12,11 +12,12 @@ CREATE TABLE transaccion_encomienda (
   clienteid          int(10) NOT NULL, 
   tipo_comprobanteid int(10) NOT NULL, 
   PRIMARY KEY (num_serie));
-CREATE TABLE estado_encomienda (
-  id          int(10) NOT NULL AUTO_INCREMENT, 
-  nombre      varchar(50) NOT NULL, 
-  descripcion text, 
-  activo      tinyint(1) DEFAULT 1 NOT NULL, 
+CREATE TABLE detalle_estado (
+  id                  int(10) NOT NULL AUTO_INCREMENT, 
+  nombre              varchar(50) NOT NULL, 
+  descripcion         text, 
+  activo              tinyint(1) DEFAULT 1 NOT NULL, 
+  estado_encomiendaid int(4) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE cliente (
   usuarioid        int(10) NOT NULL AUTO_INCREMENT, 
@@ -222,10 +223,12 @@ CREATE TABLE tipo_documento (
   PRIMARY KEY (id));
 CREATE TABLE paquete (
   tracking                         int(11) NOT NULL AUTO_INCREMENT, 
+  clave                            char(4) NOT NULL, 
   valor                            numeric(9, 2) NOT NULL, 
   peso                             numeric(9, 2) NOT NULL, 
   alto                             numeric(9, 2) NOT NULL, 
   largo                            numeric(9, 2) NOT NULL, 
+  precio_ruta                      numeric(9, 2) NOT NULL, 
   ancho                            numeric(9, 2) NOT NULL, 
   descripcion                      text NOT NULL, 
   direccion_destinatario           varchar(255), 
@@ -293,14 +296,15 @@ CREATE TABLE tipo_cliente (
   activo tinyint(1) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE empresa (
-  id           int(11) NOT NULL AUTO_INCREMENT, 
-  nombre       varchar(200) NOT NULL, 
-  correo       varchar(200) NOT NULL, 
-  nro_telefono varchar(20) NOT NULL, 
-  logo         mediumblob NOT NULL, 
-  color_pri    varchar(20) NOT NULL, 
-  color_sec    varchar(20) NOT NULL, 
-  color_ter    varchar(20) NOT NULL, 
+  id                  int(11) NOT NULL AUTO_INCREMENT, 
+  nombre              varchar(200) NOT NULL, 
+  correo              varchar(200) NOT NULL, 
+  nro_telefono        varchar(20) NOT NULL, 
+  logo                mediumblob NOT NULL, 
+  color_pri           varchar(20) NOT NULL, 
+  color_sec           varchar(20) NOT NULL, 
+  color_ter           varchar(20) NOT NULL, 
+  porcentaje_garantia numeric(9, 2) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE acceso (
   paginaid int(11) NOT NULL, 
@@ -342,7 +346,7 @@ CREATE TABLE causa_reclamo (
 CREATE TABLE sucursal (
   id            int(10) NOT NULL AUTO_INCREMENT, 
   abreviatura   char(5) NOT NULL UNIQUE, 
-  codigo_postal char(5) NOT NULL UNIQUE, 
+  codigo_postal char(5), 
   direccion     varchar(150) NOT NULL, 
   horario_l_v   varchar(255), 
   horario_s_d   varchar(255), 
@@ -353,13 +357,37 @@ CREATE TABLE sucursal (
   activo        tinyint(1) DEFAULT 1 NOT NULL, 
   ubigeocodigo  varchar(10) NOT NULL, 
   PRIMARY KEY (id));
+CREATE TABLE DESCUENTO (
+  id           int(4) NOT NULL AUTO_INCREMENT, 
+  nombre       varchar(100) NOT NULL, 
+  descripcion  text, 
+  fecha_inicio date NOT NULL, 
+  fecha_fin    date NOT NULL, 
+  activo       tinyint(1) DEFAULT 1 NOT NULL, 
+  PRIMARY KEY (id));
+CREATE TABLE DESCUENTO_articulo (
+  DESCUENTOid int(4) NOT NULL, 
+  articuloid  int(10) NOT NULL, 
+  PRIMARY KEY (DESCUENTOid, 
+  articuloid));
+CREATE TABLE paquete_DESCUENTO (
+  paquetetracking int(11) NOT NULL, 
+  DESCUENTOid     int(4) NOT NULL, 
+  PRIMARY KEY (paquetetracking, 
+  DESCUENTOid));
+CREATE TABLE estado_encomienda (
+  id          int(4) NOT NULL AUTO_INCREMENT, 
+  nombre      varchar(200) NOT NULL, 
+  descripcion text NOT NULL, 
+  activo      tinyint(1) NOT NULL, 
+  PRIMARY KEY (id));
 ALTER TABLE sucursal ADD CONSTRAINT FKsucursal756715 FOREIGN KEY (ubigeocodigo) REFERENCES ubigeo (codigo);
 ALTER TABLE escala ADD CONSTRAINT FKescala667165 FOREIGN KEY (sucursalid) REFERENCES sucursal (id);
 ALTER TABLE escala ADD CONSTRAINT FKescala650496 FOREIGN KEY (salidaid) REFERENCES salida (id);
 ALTER TABLE empleado_salida ADD CONSTRAINT FKempleado_s308635 FOREIGN KEY (empleadousuarioid) REFERENCES empleado (usuarioid);
 ALTER TABLE empleado_salida ADD CONSTRAINT FKempleado_s707218 FOREIGN KEY (salidaid) REFERENCES salida (id);
 ALTER TABLE salida ADD CONSTRAINT FKsalida314397 FOREIGN KEY (unidadid) REFERENCES unidad (id);
-ALTER TABLE seguimiento ADD CONSTRAINT FKseguimient857034 FOREIGN KEY (estado_encomiendaid) REFERENCES estado_encomienda (id);
+ALTER TABLE seguimiento ADD CONSTRAINT FKseguimient915034 FOREIGN KEY (estado_encomiendaid) REFERENCES detalle_estado (id);
 ALTER TABLE detalle_venta ADD CONSTRAINT FKdetalle_ve532256 FOREIGN KEY (articuloid) REFERENCES articulo (id);
 ALTER TABLE detalle_venta ADD CONSTRAINT FKdetalle_ve813706 FOREIGN KEY (ventanum_serie, ventatipo_comprobanteid) REFERENCES transaccion_venta (num_serie, tipo_comprobanteid);
 ALTER TABLE reclamo ADD CONSTRAINT FKreclamo902505 FOREIGN KEY (estado_reclamoid) REFERENCES estado_reclamo (id);
@@ -396,3 +424,8 @@ ALTER TABLE motivo_reclamo ADD CONSTRAINT FKmotivo_rec334818 FOREIGN KEY (tipo_r
 ALTER TABLE causa_reclamo ADD CONSTRAINT FKcausa_recl554759 FOREIGN KEY (motivo_reclamoid) REFERENCES motivo_reclamo (id);
 ALTER TABLE reclamo ADD CONSTRAINT FKreclamo820690 FOREIGN KEY (causa_reclamoid) REFERENCES causa_reclamo (id);
 ALTER TABLE reclamo ADD CONSTRAINT FKreclamo970308 FOREIGN KEY (tipo_documentoid) REFERENCES tipo_documento (id);
+ALTER TABLE DESCUENTO_articulo ADD CONSTRAINT FKDESCUENTO_871737 FOREIGN KEY (DESCUENTOid) REFERENCES DESCUENTO (id);
+ALTER TABLE DESCUENTO_articulo ADD CONSTRAINT FKDESCUENTO_10309 FOREIGN KEY (articuloid) REFERENCES articulo (id);
+ALTER TABLE paquete_DESCUENTO ADD CONSTRAINT FKpaquete_DE769291 FOREIGN KEY (paquetetracking) REFERENCES paquete (tracking);
+ALTER TABLE paquete_DESCUENTO ADD CONSTRAINT FKpaquete_DE774817 FOREIGN KEY (DESCUENTOid) REFERENCES DESCUENTO (id);
+ALTER TABLE detalle_estado ADD CONSTRAINT FKdetalle_es814073 FOREIGN KEY (estado_encomiendaid) REFERENCES estado_encomienda (id);

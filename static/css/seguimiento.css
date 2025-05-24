@@ -71,7 +71,7 @@
 .status-card {
   display: flex;
   align-items: center;
-padding: 11px 20px;
+padding: 11px 50px;
 border-radius: 0px;
 }
 /* .status-img {
@@ -80,6 +80,12 @@ border-radius: 0px;
 } */
 .status-content {
   flex-grow: 1;
+  display: flex;
+  gap:200px;
+}
+#selection-document{
+  font-size: 12px;
+  color: #5f5959;
 }
 .status-header {
   display: flex;
@@ -89,7 +95,12 @@ border-radius: 0px;
 }
 .status-title {
   display: flex;
-  align-items: center;
+  gap:10px;
+  flex-direction: column;
+}
+.documents{
+  display: flex;
+  gap: 10px;
 }
 h1 {
   color: rgb(4, 36, 69); 
@@ -116,7 +127,9 @@ h1 {
   text-align: right;
   color: #666;
       width: 100%;
+      margin-bottom: 15px;
 }
+
 .delivery-info {
   margin-bottom: 20px;
 }
