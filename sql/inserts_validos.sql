@@ -2171,7 +2171,6 @@ INSERT INTO usuario (correo, contrasenia, tipo_usuario, activo)
 VALUES ('jose.perez@example.com', 'hashed_password_2', 'E', 1);
 
 
----Sucursales
 INSERT INTO `sucursal`(`abreviatura`, `codigo_postal`, `direccion`, `horario_l_v`, `horario_s_d`, `latitud`, `longitud`, `teléfono`, `referencia`, `activo`, `ubigeocodigo`) 
 VALUES 
 ('AMA01', '01001', 'Jr. Octavio Ortiz Arrieta 270, Chachapoyas', '8:30am a 1pm y de 3pm a 6pm', '9am a 2pm', -6.232460, -77.872700, '', '', 1, '10101');
