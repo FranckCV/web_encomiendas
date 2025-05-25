@@ -207,30 +207,15 @@
 .precios-volumen {
     display: flex;
     flex-direction: column;
-<<<<<<< HEAD
-    gap: 10px;
-    width: 100%;
-=======
     /* Cambiar a columna para apilar verticalmente */
     gap: 10px;
     width: 100%;
     /* Ocupar todo el ancho disponible como el botón agregar */
->>>>>>> f03f79907e4430281c918be1626a223a6c152b2d
 }
 
 .precio-volumen-item {
     background-color: #d5edff;
     padding: 12px 20px;
-<<<<<<< HEAD
-    border-radius: 8px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    box-sizing: border-box;
-    border: 2px solid transparent;
-=======
     /* Aumentar padding para consistencia con botón agregar */
     border-radius: 8px;
     /* Consistente con botón agregar */
@@ -245,7 +230,6 @@
     box-sizing: border-box;
     border: 2px solid transparent;
     /* Para efecto hover */
->>>>>>> f03f79907e4430281c918be1626a223a6c152b2d
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -270,9 +254,6 @@
     font-size: 1.0rem;
 }
 
-<<<<<<< HEAD
-/* Efecto cuando el descuento está activo */
-=======
 
 .selector-cantidad {
     display: flex;
@@ -964,7 +945,6 @@
     overflow: hidden;
 }
 
->>>>>>> f03f79907e4430281c918be1626a223a6c152b2d
 .precio-volumen-item.active-discount {
     border: 2px solid #1a3c5b;
     transform: scale(1.02);
@@ -1007,9 +987,6 @@
     position: relative;
 }
 
-<<<<<<< HEAD
-.selector-cantidad-interno:focus-within {
-=======
 .size-btn::after {
     content: "";
     position: absolute;
@@ -1059,7 +1036,6 @@
 }
 
 .selector-cantidad:focus-within {
->>>>>>> f03f79907e4430281c918be1626a223a6c152b2d
     box-shadow: 0 0 0 2px rgba(26, 60, 91, 0.3);
 }
 
@@ -1202,83 +1178,6 @@
     }
 }
 
-<<<<<<< HEAD
-/* Banner promocional */
-.promo-banner {
-    display: flex;
-    align-items: center;
-    background-color: var(--color-light-bg);
-    padding: 15px;
-    border-radius: var(--border-radius);
-}
-
-.promo-icon {
-    background-color: var(--color-primary);
-    color: white;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    margin-right: 15px;
-}
-
-.promo-text h3 {
-    color: var(--color-secondary);
-    font-size: 1.1rem;
-    line-height: 1.4;
-    margin: 2px 0;
-}
-
-/* Productos relacionados */
-.productos-relacionados {
-    margin-top: 40px;
-}
-
-.productos-relacionados h2 {
-    color: var(--color-secondary);
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.productos-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-}
-
-.producto-item {
-    background-color: #fff;
-    border-radius: var(--border-radius);
-    padding: 15px;
-    box-shadow: var(--box-shadow);
-    text-align: center;
-    transition: transform 0.3s;
-}
-
-.producto-item:hover {
-    transform: translateY(-5px);
-}
-
-.producto-item img {
-    max-width: 100%;
-    height: auto;
-    margin-bottom: 10px;
-}
-
-.producto-item h3 {
-    color: var(--color-secondary);
-    margin: 10px 0 5px;
-}
-
-.producto-item p {
-    color: var(--color-primary);
-    font-weight: bold;
-    margin: 5px 0;
-=======
 
 
 /* Responsive */
@@ -1385,7 +1284,6 @@
 .etiqueta-precio {
     font-size: 1.2rem;
     /* Reducido de 1.5rem */
->>>>>>> f03f79907e4430281c918be1626a223a6c152b2d
 }
 
 /* Miniaturas de navegación */
@@ -1499,24 +1397,6 @@
     .precio {
         font-size: 1.5rem;
     }
-<<<<<<< HEAD
-    
-    .btn-agregar {
-        padding: 12px 20px;
-    }
-    
-    /* En pantallas muy pequeñas, ajustar el gap */
-    .cantidad-section {
-        gap: 8px;
-    }
-    
-    .quantity-limit {
-        font-size: 0.75rem;
-    }
-    
-=======
-
->>>>>>> f03f79907e4430281c918be1626a223a6c152b2d
     .precios-volumen {
         flex-direction: column;
         gap: 5px;
@@ -1525,19 +1405,8 @@
     .precio-volumen-item {
         width: 100%;
     }
-<<<<<<< HEAD
-}
-
-/* CORRECCIÓN ADICIONAL: Para pantallas muy pequeñas donde podría no caber */
-@media (max-width: 400px) {
-    .cantidad-section {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-=======
 
     .btn-agregar {
         padding: 12px 20px;
->>>>>>> f03f79907e4430281c918be1626a223a6c152b2d
     }
 }
