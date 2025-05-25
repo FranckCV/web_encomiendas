@@ -85,6 +85,10 @@ INSERT INTO `rol` (`id`, `nombre`, `descripcion`, `activo`, `tipo_rolid`) VALUES
 
 
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> bb0e1b4c9d7d4b44bd03a1c4a30be01ebbd5fa2e
 INSERT INTO `ubigeo` (`codigo`, `departamento`, `provincia`, `distrito`, `activo`) VALUES
 ('100101', 'ICA', 'ICA', 'ICA', 1),
 ('100102', 'ICA', 'ICA', 'LA TINGUIÑA', 1),
@@ -2175,9 +2179,6 @@ VALUES (1, 'Ana' , 'Ramírez', 'ana@gmail.com', 1),
 INSERT INTO `sucursal`(`abreviatura`, `codigo_postal`, `direccion`, `horario_l_v`, `horario_s_d`, `latitud`, `longitud`, `teléfono`, `referencia`, `activo`, `ubigeocodigo`) 
 VALUES 
 ('AMA01', '01001', 'Jr. Octavio Ortiz Arrieta 270, Chachapoyas', '8:30am a 1pm y de 3pm a 6pm', '9am a 2pm', -6.232460, -77.872700, '', '', 1, '10101');
-
-
-
 INSERT INTO `sucursal`(`abreviatura`, `codigo_postal`, `direccion`, `horario_l_v`, `horario_s_d`, `latitud`, `longitud`, `teléfono`, `referencia`, `activo`, `ubigeocodigo`) VALUES
 ('AMA02', '', 'Av. CAHUIDE S/N, CAMPORREDONDO, LUYA - AMAZONAS', '8am a 1pm y de 3pm a 6pm', '8am a 12pm', '-6.213162', '-78.319717', '', '', 1, '10402'),
 ('AMA03', '', 'JR. MIGUEL GRAU NRO. 275, OCALLI, LUYA - AMAZONAS', '8am a 1pm y de 3pm a 6pm', '8am a 12pm', '-6.235146', '-78.266227', '', '', 1, '10402'),
@@ -2276,3 +2277,19 @@ VALUES (
   1,
   2
 );
+INSERT INTO descuento (id, nombre, descripcion, fecha_inicio, fecha_fin, activo) VALUES
+(1, 'Descuento Volumen 25', 'Descuento para compras a partir de 25 unidades', '2024-01-01', '2025-01-01', 1),
+(2, 'Descuento Volumen 50', 'Descuento para compras a partir de 50 unidades', '2024-01-01', '2025-01-01', 1),
+(3, 'Descuento Promocional Verano', 'Descuento especial verano 2024', '2024-06-01', '2024-08-31', 1);
+
+INSERT INTO DESCUENTO_articulo (DESCUENTOid, articuloid, cantidad_descuento) VALUES
+(1, 1, 1.5),  
+(1, 2, 1.8), 
+(1, 3, 2.0), 
+(1, 4, 2.2), 
+(1, 5, 2.5), 
+(2, 1, 3.5),  
+(2, 2, 3.8),  
+(2, 3, 4.0),  
+(2, 4, 4.3),  
+(2, 5, 4.5);  

@@ -1,21 +1,40 @@
-<!-- HTML Optimizado -->
-{% extends "MAESTRA_GENERAL.html" %}
+{% extends 'MAESTRA_GENERAL.html' %}
 
 {% block estilos %}
-<link rel="stylesheet" href="/static/css/cajas.css">
+  <link rel="stylesheet" href="/static/css/cajas.css" />
 {% endblock %}
 
 {% block titulo %}
-Producto - Caja
+  Producto - Caja
 {% endblock %}
 
 {% block contenido %}
-<!-- Contenedor principal optimizado -->
-<div class="producto-container">
+  <div class="producto-container">
     <h1 class="titulo-cajas">CAJAS PARA ENCOMIENDAS</h1>
 
-    <!-- Sección del producto optimizada -->
     <div class="producto-detalle">
+      <div class="producto-imagen">
+        <img id="product-image" src="" alt="Caja" />
+        <div class="size-options">
+          <button class="size-btn xxs active">XXS</button>
+          <button class="size-btn xs">XS</button>
+          <button class="size-btn s">S</button>
+          <button class="size-btn m">M</button>
+          <button class="size-btn l">L</button>
+        </div>
+      </div>
+
+      <div class="producto-info">
+        <h1 class="producto-titulo" style="font-size:1.8rem;"></h1>
+        <p class="producto-dimensiones"></p>
+
+        <div class="precio-seccion">
+          <div class="precio-principal">
+            <span class="moneda" style="font-size:1.6rem;">S/</span>
+            <span class="precio" style="font-size:2rem;"></span>
+            <div class="info-icon">
+              <i class="fa-solid fa-info-circle"></i>
+              <div class="tooltip">Precio unitario. Descuentos disponibles por volumen.</div>
         <div class="producto-imagen">
             <img src="/api/placeholder/280/300" alt="Caja">
             <div class="size-options">
@@ -25,7 +44,24 @@ Producto - Caja
                 <button class="size-btn m">M</button>
                 <button class="size-btn l">L</button>
             </div>
+          </div>
+
+          <div class="precios-volumen">
+            <div class="precio-volumen-item">
+              <span class="etiqueta-precio"></span>
+              <span class="etiqueta-cantidad">a partir de 25 uds.</span>
+            </div>
+            <div class="precio-volumen-item">
+              <span class="etiqueta-precio"></span>
+              <span class="etiqueta-cantidad">a partir de 50 uds.</span>
+            </div>
+          </div>
         </div>
+
+        <div class="selector-cantidad">
+          <button class="qty-btn decrease">−</button>
+          <input type="number" class="qty-input" value="1" min="1" />
+          <button class="qty-btn increase">+</button>
 
         <div class="producto-info">
             <h1 class="producto-titulo" style="font-size: 1.8rem;">Caja</h1>
@@ -70,10 +106,16 @@ Producto - Caja
                 <i class="fa-solid fa-cart-shopping"></i>
             </button>
         </div>
+        <div class="quantity-limit-container">
+          <span class="quantity-limit">Máximo: 100 unidades</span>
+        </div>
+
+        <button type="button" class="btn-agregar">Agregar al carrito <i class="fa-solid fa-cart-shopping"></i></button>
+      </div>
     </div>
-</div>
+  </div>
 {% endblock %}
 
 {% block scripts %}
-<script src="/static/js/cajas.js"></script>
+  <script src="/static/js/cajas_prueba.js"></script>
 {% endblock %}

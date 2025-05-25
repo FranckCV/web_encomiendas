@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, make_response, url_for , g  #, after_this_request, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify  #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import acceso as acceso
 from controladores import controlador_modulo as controlador_modulo
@@ -31,6 +31,10 @@ from controladores import controlador_usuario as controlador_usuario
 from controladores import controlador_cliente as controlador_cliente
 from controladores import controlador_rol as controlador_rol
 from controladores import controlador_articulo as controlador_articulo
+from controladores import controlador_descuento as controlador_descuento
+from controladores import controlador_descuento_articulo as controlador_descuento_articulo
+
+
 
 import configuraciones
 from functools import wraps
@@ -921,7 +925,60 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-    
+     "descuento": {
+        "active" : True ,
+        "titulo": "Descuentos",
+        "icon_page": 'fa-solid fa-percent',
+        "nombre_tabla": "Descuentos",
+        "controlador": controlador_descuento,
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['descripcion', 'Descripcion',      'Descripcion','text',     True ,     True  ,  None ],
+            ['fecha_inicio',   'Fecha de inicio',    'Fecha de inicio',      'date',     True ,     True  ,        None ],
+            ['fecha_fin',   'Fecha de fin',    'Fecha de fin',      'date',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+         "descuento_articulo": {
+        "active" : True ,
+        "titulo": "Descuentos de artículos",
+        "icon_page": 'fa-solid fa-percent',
+        "nombre_tabla": "Descuentos",
+        "controlador": controlador_descuento_articulo,
+        "filters": [
+            ['articuloid', 'Articulo', lambda: controlador_articulo.get_options() ],
+                        ['descuentoid', 'Descuento', lambda: controlador_descuento.get_options()]
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['descuentoid', 'Descuento',    'Seleccione un descuento',    'select',     True ,     True ,         [lambda: controlador_descuento.get_options() , 'nom_descuento' ] ],
+            ['articuloid', 'Articulo',    'Seleccione un articulo',    'select',     True ,     True ,         [lambda: controlador_articulo.get_options() , 'nom_articulo' ] ],
+            ['cantidad_descuento',      'Cantidad descontada',          '30%',      'number',     True ,     True  ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
 
 # ADICIONAL (NO CRUD)
     "modulo": {
@@ -1245,7 +1302,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : 'fa-solid fa-file-invoice-dollar',
         'dashboard' : True,
-        'cruds' :     ['tamaño_caja', 'metodo_pago', 'tipo_comprobante' ],
+        'cruds' :     ['tamaño_caja', 'metodo_pago', 'tipo_comprobante','descuento','descuento_articulo' ],
         'reports' :   [ 'articulos_mas_vendidos'  ],
     },
     'seguridad' : {
@@ -1521,7 +1578,8 @@ paginas_simples = [
     'Metodo_pago',
     'perfil',
     'prueba_seguimiento',
-    'envio_masivo'
+    'envio_masivo',
+    'cajas'
 ]
 
 
@@ -1569,10 +1627,29 @@ def Faq():
 def contac():
     return render_template('contactanos.html')
 
+@app.route("/api/cajas")
+def api_cajas():
+    columnas, filas = controlador_articulo.get_table()
 
-@app.route("/cajas")
-def cajas():
-    return render_template('cajas.html')
+    productSizes = {}
+    for fila in filas:
+        if not fila['activo'] or not fila['tamaño_cajaid']:
+            continue
+
+        key = fila['tam_nombre'].lower() 
+        precio = float(fila['precio'])
+        img = fila['img']
+
+        productSizes[key] = {
+            "price":      precio,
+            "dimensions": fila['dimensiones'],
+            "image":      img,
+            "discounts": {25: 1.20, 50: 1.00}
+        }
+    # print(productSizes)
+
+    return jsonify(productSizes)
+
 
 
 @app.route("/articulos")
@@ -1974,9 +2051,10 @@ def procesar_login():
     except Exception as e:
         return rdrct_error(redirect_url('login')  , e)
 
-
-
-
+###################################CARRITO###########################
+# @app.route('/agregar_carrito', methods = ['POST'])
+# def agregar_carrito():
+    
 
 
 

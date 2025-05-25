@@ -368,6 +368,7 @@ CREATE TABLE DESCUENTO (
 CREATE TABLE DESCUENTO_articulo (
   DESCUENTOid int(4) NOT NULL, 
   articuloid  int(10) NOT NULL, 
+  cantidad_descuento  numeric(9,2) not null,
   PRIMARY KEY (DESCUENTOid, 
   articuloid));
 CREATE TABLE paquete_DESCUENTO (

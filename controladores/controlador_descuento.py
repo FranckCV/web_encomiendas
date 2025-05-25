@@ -1,0 +1,112 @@
+from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select_fetchone , sql_execute , sql_execute_lastrowid , show_columns , show_primary_key , exists_column_Activo , unactive_row_table
+import controladores.bd as bd
+#####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####
+
+table_name = 'descuento'
+
+def get_info_columns():
+    return show_columns(table_name)
+
+
+def get_primary_key():
+    return show_primary_key(table_name)
+
+
+def exists_Activo():
+    return exists_column_Activo(table_name)
+
+
+def delete_row( id ):
+    sql = f'''
+        delete from {table_name}
+        where id = {id}
+    '''
+    sql_execute(sql)
+
+
+#####_ CAMBIAR SQL y DICT INTERNO _#####
+
+def table_fetchall():
+    sql= f'''
+        select 
+            *
+        from {table_name}
+    '''
+    resultados = sql_select_fetchall(sql)
+    
+    return resultados
+
+
+def get_table():
+    sql = f'''
+        SELECT 
+            *
+        FROM {table_name} 
+    '''
+    columnas = {
+        'id': ['ID', 0.5],
+        'nombre': ['Nombre', 3],
+        'descripcion':['Descripción',4.5],
+        'fecha_inicio':['Inicio',1],
+        'fecha_fin':['Fin',1],        
+        'activo': ['Actividad', 1]
+    }
+    filas = sql_select_fetchall(sql)
+    
+    return columnas, filas
+
+
+
+######_ CRUD ESPECIFICAS _###### 
+
+def unactive_row( id ):
+    unactive_row_table(table_name , id)
+
+
+def insert_row( nombre,descripcion,fecha_inicio,fecha_fin):
+    sql = f'''
+        INSERT INTO 
+            {table_name} 
+            ( nombre , descripcion,fecha_inicio,fecha_fin,activo )
+        VALUES 
+            ( %s, %s, %s , %s ,1 )
+    '''
+    sql_execute(sql,( nombre,descripcion,fecha_inicio,fecha_fin ))
+
+
+def update_row(id, nombre, descripcion, fecha_inicio, fecha_fin):
+    sql = f'''
+        UPDATE {table_name} SET 
+            nombre = %s,
+            descripcion = %s,
+            fecha_inicio = %s,
+            fecha_fin = %s
+        WHERE {get_primary_key()} = %s
+    '''
+    params = (nombre, descripcion, fecha_inicio, fecha_fin, id)
+    sql_execute(sql, params)
+
+
+
+#####_ ADICIONALES _#####
+
+def get_options():
+    sql= f'''
+        select 
+            {get_primary_key()} ,
+            nombre
+        from {table_name}
+        where activo = 1
+        order by nombre asc
+    '''
+    filas = sql_select_fetchall(sql)
+    
+    lista = [(fila[get_primary_key()], fila["nombre"]) for fila in filas]
+
+    return lista
+
+
+
+
+
+
