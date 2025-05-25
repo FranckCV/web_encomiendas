@@ -968,6 +968,28 @@ REPORTES = {
         ] ,
         
     },
+        "lista_empleados": {
+        "active" : True ,
+        'icon_page' : 'fa-solid fa-clipboard-user' ,
+        "titulo": "Listado de empleados",
+        "table" : controlador_empleado.get_report_test(),
+        "filters": [
+            ['rol_id', 'Rol', lambda: controlador_rol.get_options() ],
+        ] ,
+        
+    },
+
+    "ventas_periodo": {
+        "active" : True ,
+        'icon_page' : 'fa-solid fa-sack-dollar' ,
+        "titulo": "Ventas",
+        "table" : controlador_cliente.get_reporte_ventas(),
+        "filters": [
+            # ['rol_id', 'Rol', lambda: controlador_rol.get_options() , 'select' ],
+            ['fecha', 'Fecha', None, 'date' ],
+            ['fecha', 'Fecha', None, 'date' ],
+        ] ,
+    },
 }
 
 
