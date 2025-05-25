@@ -1,3 +1,6 @@
+INSERT INTO empresa (id, nombre, correo, nro_telefono, logo, color_pri, color_sec, color_ter) VALUES
+(1, 'New Olva', 'info@newolva.com', '+123 456 789', 'a', '#1d4c82', '#13e2da', '#1b98e0');
+
 INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo`) VALUES
 (1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF\n', 1),
 (2, 'Logística', 'fa-solid fa-truck-front', 'logistica', '#00F068', 1),
@@ -78,8 +81,11 @@ INSERT INTO `rol` (`id`, `nombre`, `descripcion`, `activo`, `tipo_rolid`) VALUES
 
 
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> c84db4abef8e82c964b1fb23c79994b782096a63
 INSERT INTO `ubigeo` (`codigo`, `departamento`, `provincia`, `distrito`, `activo`) VALUES
--- ('', 'LIMA', 'LIMA', 'SANTA MARIA DE HUACHIPA', 1),
 ('100101', 'ICA', 'ICA', 'ICA', 1),
 ('100102', 'ICA', 'ICA', 'LA TINGUIÑA', 1),
 ('100103', 'ICA', 'ICA', 'LOS AQUIJES', 1),
@@ -2131,57 +2137,142 @@ INSERT INTO contenido_paquete (nombre, activo) VALUES
 ('UTILES DE ESCRITORIO', 1),
 ('UTILES DE OFICINA', 1);
 
-INSERT INTO articulo (nombre, precio, stock, activo, img, dimensiones, tamaño_cajaid) VALUES
-('Accesorios para fiestas - Pack básico',         15.99, 100, 1, NULL, '20x15x10', 3), -- S
-('Accesorios electrónicos - Audífonos',           39.90,  50, 1, NULL, '10x10x5',  2), -- XS
-('Artículos de limpieza - Set hogar',             25.50,  70, 1, NULL, '30x20x15', 4), -- M
-('Artículos publicitarios - Llavero logo',         5.00, 200, 1, NULL, '5x3x1',    1), -- XXS
-('Bisutería - Collar artesanal',                  12.00, 150, 1, NULL, '10x10x2',  2), -- XS
-('Caja de cartón reforzada',                       8.99, 300, 1, NULL, '40x30x30', 5), -- L
-('Tarjetas personales - 100 unidades',            18.00,  80, 1, NULL, '9x5x1',    1), -- XXS
-('Muebles - Mesa pequeña de madera',             120.00,  10, 1, NULL, '100x50x45', 5),-- L
-('Ferretería - Juego de destornilladores',        22.90,  60, 1, NULL, '25x15x5',  3), -- S
-('Alimentación - Pack snacks saludables',         14.50,  90, 1, NULL, '30x20x10', 3), -- S
-('Cosméticos - Set de maquillaje',                35.00,  40, 1, NULL, '20x15x5',  3), -- S
-('Electrohogar - Hervidor eléctrico',             75.00,  25, 1, NULL, '30x25x20', 4), -- M
-('Juguetes - Muñeca interactiva',                 49.99,  30, 1, NULL, '35x20x15', 4), -- M
-('Material médico - Guantes (100u)',               9.50, 100, 1, NULL, '20x10x5',  2), -- XS
-('Medicinas - Kit primeros auxilios',             29.99,  45, 1, NULL, '25x15x8',  3), -- S
-('Repuestos - Filtro de aire',                    18.75,  60, 1, NULL, '15x15x5',  2), -- XS
-('Ropa y accesorios - Camiseta básica',           19.00, 120, 1, NULL, '30x25x2',  3), -- S
-('Valija documentos - Carpeta reforzada',         11.00, 100, 1, NULL, '33x25x2',  3), -- S
-('Útiles de escritorio - Pack escolares',         17.90, 150, 1, NULL, '25x20x5',  3), -- S
-('Útiles de oficina - Organizador modular',       27.50,  40, 1, NULL, '30x20x10', 3); -- S
+INSERT INTO articulo 
+  (nombre, precio, stock, activo, img, dimensiones, tamaño_cajaid) 
+VALUES
+  ('Caja XXS', 1.5,100, 1, '/static/img/caja XXS.png', '10×15×10', 1),
+  ('Caja XS', 2,100,  1, '/static/img/caja XS.png',  '15×20×12', 2),
+  ('Caja S',  2.5,100,1, '/static/img/caja S.png',   '20×30×12', 3),
+  ('Caja M', 3.2,100,1, '/static/img/caja M.png',   '24×30×20', 4),
+  ('Caja L',  4,100,1, '/static/img/caja L.png',   '30×42×23', 5);
+INSERT INTO articulo 
+  (nombre, precio, stock, activo, img, dimensiones, tamaño_cajaid) 
+VALUES
+  ('Plumón Indeleble',      3.00, 100, 1, '/static/img/plumon.png', NULL,             NULL),
+  ('Sobre A4',               1.00, 100, 1, '/static/img/sobre.png',         '21×29.7 cm',     NULL),
+  ('Cinta de Embalaje',      5.90, 100, 1, '/static/img/cintaEmbalaje.png',   '48 mm × 40 m',   NULL),
+  ('Stretch Film',          12.00, 100, 1, '/static/img/stretchfilm.png',      'Varios tamaños', NULL),
+  ('Burbupack',              2.50, 100, 1, '/static/img/burbupack.png',         '1 m × 1 m',      NULL);
+
+
 
 insert INTO `tipo_cliente` (nombre, activo) VALUES ('Persona Natural',1);
 insert INTO `tipo_cliente` (nombre, activo) VALUES ('Persona Jurídica',1);
 
--- INSERT INTO tipo_rol (nombre, descripcion, activo)
--- VALUES ('Administrador', 'Tiene acceso total al sistema.', 1);
-
--- INSERT INTO tipo_rol (nombre, descripcion, activo)
--- VALUES ('Usuario', 'Acceso limitado a funciones básicas.', 1);
-
--- INSERT INTO rol (nombre, descripcion, activo, tipo_rolid)
--- VALUES ('Superadmin', 'Rol con acceso total al sistema, incluyendo configuración y seguridad.', 1, 1);
-
--- INSERT INTO rol (nombre, descripcion, activo, tipo_rolid)
--- VALUES ('ClienteWeb', 'Rol de usuario con acceso solo al portal de clientes.', 1, 2);
-
-INSERT INTO empleado (nombre, apellidos, correo, rolid)
-VALUES ('Carlos', 'Ramírez López', 'carlos.ramirez@example.com', 1);
-
-INSERT INTO empleado (nombre, apellidos, correo, rolid)
-VALUES ('Laura', 'González Torres', 'laura.gonzalez@example.com', 1);
 
 insert INTO `metodo_pago` (nombre, activo) VALUES ('Efectivo',1);
 
-INSERT INTO usuario (correo, contrasenia, tipo_usuario, activo)
-VALUES ('ana.mendez@example.com', 'hashed_password_1', 'A', 1);
 
-INSERT INTO usuario (correo, contrasenia, tipo_usuario, activo)
-VALUES ('jose.perez@example.com', 'hashed_password_2', 'E', 1);
+INSERT INTO usuario (id, correo, contrasenia, tipo_usuario, activo)
+VALUES (1 , 'ana@gmail.com'  , '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+ (2 , 'perez@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1);
+
+INSERT INTO empleado (usuarioid , nombre, apellidos, correo, rolid)
+VALUES (1, 'Ana' , 'Ramírez', 'ana@gmail.com', 1),
+ (2, 'Juan', 'Perez', 'perez@gmail.com', 1);
+
+
+INSERT INTO `sucursal`(`abreviatura`, `codigo_postal`, `direccion`, `horario_l_v`, `horario_s_d`, `latitud`, `longitud`, `teléfono`, `referencia`, `activo`, `ubigeocodigo`) 
+VALUES 
+('AMA01', '01001', 'Jr. Octavio Ortiz Arrieta 270, Chachapoyas', '8:30am a 1pm y de 3pm a 6pm', '9am a 2pm', -6.232460, -77.872700, '', '', 1, '10101');
 
 
 
+INSERT INTO `sucursal`(`abreviatura`, `codigo_postal`, `direccion`, `horario_l_v`, `horario_s_d`, `latitud`, `longitud`, `teléfono`, `referencia`, `activo`, `ubigeocodigo`) VALUES
+('AMA02', '', 'Av. CAHUIDE S/N, CAMPORREDONDO, LUYA - AMAZONAS', '8am a 1pm y de 3pm a 6pm', '8am a 12pm', '-6.213162', '-78.319717', '', '', 1, '10402'),
+('AMA03', '', 'JR. MIGUEL GRAU NRO. 275, OCALLI, LUYA - AMAZONAS', '8am a 1pm y de 3pm a 6pm', '8am a 12pm', '-6.235146', '-78.266227', '', '', 1, '10402'),
+('AMA05', '', 'Jr. Mesones Muro 394, BAGUA GRANDE. Ref. Frente a la PNP', '8am a 6pm', '8am a 6pm', NULL, NULL, '', '', 1, '10701'),
+('AMA07', '', 'JR. SAN MARTIN 199 - EL MILAGRO', '9am - 7:00pm', '9am - 7:00pm', NULL, NULL, '', '', 1, '10703'),
+('ANC01', '', 'Av. Magdalena 240, Casma', '9am a 1pm y de 3pm a 7pm', '9am a 5pm', NULL, NULL, '', '', 1, '20501'),
+('ANC02', '', 'Av. Alberto Reyes 239, Huarmey', '9am a 1:30pm y de 4:30pm a 8:30pm', '9am a 2pm', NULL, NULL, '', '', 1, '21901'),
+('ANC03', '', 'JR. INDEPENDENCIA NRO. 310, AIJA - ANCASH', '8am a 1pm y 4pm a 6pm', '8am a 1pm y 4pm a 6pm', NULL, NULL, '', '', 1, '20201'),
+('ANC11', '', 'Av. Ramón Castilla S/N, Cdra 8 - Caraz', '9am a 1pm y 3pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '20701'),
+('ANC12', '', 'Av. Arias Graziani S/N Yungay', '9am a 1pm y de 3pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '21501'),
+('ANC13', '', 'Jr. Manuel Alvarez -1065, Barrio San Bartolomé - Huari.', '9am a 12:30pm y de 2:30pm a 7pm', '9am a 1pm', NULL, NULL, '', '', 1, '140806'),
+('ANC14', '', 'Av. Agustín Gamarra Nro. 743, Soledad Baja - Huaraz', '9am a 6:30pm', '9am a 3pm', NULL, NULL, '', '', 1, '20101'),
+('ANC15', '', 'Av Jose Pardo 456, Chimbote', 'Central: 8:30am a 10pm', 'Central: 8:30am a 9pm', NULL, NULL, 'Frente A Plaza De Armas', '', 1, '21301'),
+('ANC16', '', 'AV. Pacifico Mz. S3 Lt. 36 Urb José Mariátegui, Nuevo Chimbote. Ref: Frente A La Ferretería Becor.', 'Central: 8:30am a 8pm', 'Central: 8:30am a 7pm', NULL, NULL, '', '', 1, '21309'),
+('ANC17', '', 'Av. 28 De Julio 330, Sihuas', '8am a 1pm y de 3pm a 7pm', '9am a 1pm', NULL, NULL, '', '', 1, '21410'),
+('APU01', '', 'Jr. Elias N° 118, Abancay', '8am a 1pm y de 3pm a 5:30pm', '8am a 1pm y de 3pm a 5:30pm', NULL, NULL, '', '', 1, '30101'),
+('APU02', '', 'Av. Panamericana Nro. 503, Curahuasi. Ref: A media cuadra del semáforo.', '9am a 12:30pm y de 3pm a 6pm', '9am a 12:30pm', NULL, NULL, '', '', 1, '30103'),
+('APU03', '', 'Jr. Juan Francisco Ramos 559, Andahuaylas', '8:30am a 5pm', '8:30am a 1pm', NULL, NULL, '', '', 1, '30301'),
+('APU04', '', 'Av. Panamericana # 528, Chalhuanca', '9am a 3pm', 'NO HAY ATENCIÓN', NULL, NULL, '', '', 1, '30201'),
+('APU05', '', 'Av. Los Incas S/N, Uripa, Chincheros.', '9am a 5pm', '9am a 1pm', NULL, NULL, 'Frente a la comisaría de Uripa - Anco Huallo', '', 1, '30705'),
+('APU06', '', 'Av. Grau 117, Chuquibambilla.', '9am a 1pm y de 3pm a 5pm', '9am a 1pm', NULL, NULL, '', '', 1, '30601'),
+('ARE01', '', 'Av. San José N.º 103-A, Cercado - Arequipa.', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '40102'),
+('ARE02', '', 'Av. Parra Nro. 388, Cercado - Arequipa.', '9am a 6:30pm', '9am a 6pm', NULL, NULL, '', '', 1, '40102'),
+('ARE03', '', 'CALLE MAYTA CAPAC 601 IV CENTENARIO, CERCADO, AREQUIPA', '8:30am a 6pm', '9:30am a 3pm', NULL, NULL, '', '', 1, '40102'),
+('ARE04', '', 'Av. Panamericana - Pueblo joven El Triunfo ZN B MZ A Lote 12', '8:30am a 1pm y de 2pm a 6pm', '8:30am a 2pm', NULL, NULL, '', '', 1, '40106');
+INSERT INTO `sucursal`(`abreviatura`, `ubigeocodigo`, `direccion`, `horario_l_v`, `horario_s_d`, `latitud`, `longitud`, `teléfono`, `referencia`, `activo`, `codigo_postal`) VALUES
+('ARE05', '40105', 'Calle Miguel Grau 214  Plaza De Las Americas, Cerro Colorado. Arequipa', '9am a 7pm', '9:30am a 3pm', NULL, NULL, '', '', 1, ''),
+('ARE06', '40110', 'Av. Daniel Alcides Carrión N° 269, José Luis Bustamante Rivero, Arequipa.', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, ''),
+('LIM01', '150701', 'Av. Primavera 275, Barranca', '9am a 7pm', '9am a 5pm', NULL, NULL, '', '', 1, ''),
+('LIM02', '150107', 'AV.- 26 DE JUNIO 405, Canta.', '8am a 6pm', 'NO HAY ATENCION', NULL, NULL, '', '', 1, ''),
+('LIM03', '150502', 'Jr. 2 De Mayo 601-D San Vicente, Cañete', '9am a 7pm', '9am a 1pm', NULL, NULL, '', '', 1, ''),
+('LIM04', '150505', 'Av. Antigua Pan. Sur 243, Mala', '9am a 1pm y 2pm a 6pm', '9am a 2pm', NULL, NULL, '', '', 1, ''),
+('LIM05', '150701', 'Jr. Mariscal Castilla 117, Huacho', '9am a 8pm', '9am a 5pm', NULL, NULL, '', '', 1, ''),
+('LIM06', '150603', 'Av. Chancay Nro. 245 - Huaral. Ref. Al frente del Restaurant la Estacion.', '8:30am a 7pm', '8:30am a 6:30pm', NULL, NULL, '', '', 1, ''),
+('LIM07', '150602', 'Calle Mariscal Sucre Nro. 104, Chancay. Ref: Frente a Panadería El Tanta.', '9am a 1pm y de 3pm a 7pm', '9am a 5pm', NULL, NULL, '', '', 1, ''),
+('LIM08', '150603', 'Jr. Bolognesi 398, Lurin', '8am a 5pm', '9am a 2pm', NULL, NULL, '', '', 1, ''),
+('LIM09', '150603', 'Plaza de armas S/N, al frente del hotel Inga, Yauyos-Lima', '8am a 5pm', 'NO HAY ATENCION', NULL, NULL, '', '', 1, ''),
+('CAJ01', '60101', 'Jr. Los Nogales N° 426, Villa Universitaria, Cajamarca.', '9:00 am a 7:00pm', '9:00am a 7:00 pm', NULL, NULL, '', '', 1, ''),
+('CAJ02', '60201', 'Jr. Bolognesi 117, Cajabamba. Ref: Esquina del Jr. Zavala y Bologensi, a una cuadra de la RENIEC.', '11:00am a 1:30pm - 4:00pm a 7:30pm', '9am a 1pm', NULL, NULL, '', '', 1, ''),
+('CAJ03', '60301', 'Esquina entre Bolognesi y Pedro Ortiz Montoya, Celendin.', '9am a 12pm y de 2:30pm a 6pm', '9am a 12pm', NULL, NULL, '', '', 1, ''),
+('CAJ04', '60401', 'JR. GREGORIO MALCA N° 625, Chota', '8:30am a 7:00 pm', '9:00 am a 1:00pm', NULL, NULL, '', '', 1, ''),
+('CAJ05', '60501', 'Jr. José Galvez S/N, Contumaza.', '9am a 12pm y de 3pm a 5pm', '9am a 12pm', NULL, NULL, '', '', 1, ''),
+('CAJ06', '60601', 'Jr. Contumazá 318, Chilete', '8am a 1pm y de 3pm a 7:30pm', '9am a 12pm', NULL, NULL, '', '', 1, ''),
+('CAJ07', '60701', 'Jr. Ramón Castilla 353, Cutervo', '9am a 1pm y de 3pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, ''),
+('CAJ08', '60801', 'Jr. San Carlos 1015, Bambamarca', '9am a 1pm y de 3pm a 7:30pm', '9am a 1pm', NULL, NULL, '', '', 1, ''),
+('CAJ09', '60901', 'Jr. Miguel Grau 338, San Miguel.', '9am a 12:30pm y de 2:30pm a 7pm', '9am a 1pm', NULL, NULL, '', '', 1, ''),
+('CAJ10', '61001', 'Jr. Néstor Batanero Nro. 478, San Pablo.', '8am a 8pm', 'NO HAY ATENCIÓN', NULL, NULL, '', '', 1, ''),
+('CAJ11', '61101', 'Entre Jr. Miguel Grau y Jr. Túpac Amaru, San Marcos.', '7am a 2pm / 2pm a 5pm', '9am a 12pm', NULL, NULL, '', '', 1, ''),
+('CAJ12', '61201', 'Jr. Cajamarca 484, Tembladera.', '8am a 7pm', '9am a 1pm', NULL, NULL, '', '', 1, ''),
+('CAJ13', '60801', 'Calle San Martín 1255, Jaen', '9am a 1 pm / 3pm a 7 pm', '9am a 1 pm / 3pm a 7 pm', NULL, NULL, '', '', 1, ''),
+('CAJ14', '60110', 'Av. Lindo Nro. 150, Pucará', '8am a 2pm y de 4pm a 6pm', '8am a 2pm y de 4pm a 6pm', NULL, NULL, '', '', 1, ''),
+('CAJ15', '60102', 'JR.SAN MARTIN #456 - Ref.Frente al parque principal, costado de la agencia agraria.', '9am a 1pm y de 3pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, ''),
+('CAJ16', '60802', 'JR. CAUTIVO S/N, NAMBALLE, SAN IGNACIO', '8am a 1pm y de 3pm a 5pm', '8am a 1pm y de 3pm a 5pm', NULL, NULL, '', '', 1, ''),
+('CAJ17', '60111', 'Jr. Zarrumillas 150, Santa Cruz.', '8am a 12pm y de 5pm a 6pm', '8am a 12pm', NULL, NULL, '', '', 1, ''),
+('CHI01', '140101', 'Mariscal Castilla 208, Chiclayo', '8am a 7pm', '9am a 7pm', NULL, NULL, '', '', 1, ''),
+('CHI02', '140102', 'AV. Miguel Grau 675, Urb. Santa Victoria, Chiclayo', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, ''),
+('CHI03', '140103', 'Av. Tacna 164, Chiclayo', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, ''),
+('CHI04', '140113', 'Calle Torres Paz Nro. 224, Interior C, Pimentel', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, ''),
+('CHI05', '140108', 'Av. Huamachuco Nro. 809, Lambayeque. Frente al parque infantil.', '9am a 2pm y de 3pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, ''),
+('TRU01', '130101', 'Av. Tupac Amaru 1675 Urb Alto Mochica, Trujillo', '9am a 1pm y 1:45pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, ''),
+('TRU02', '130102', 'Av. Santa 1260, Trujillo Ref. A media cuadra del cruce con Av. América', '8am a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, ''),
+('TRU03', '130103', 'Av. España 1234, Trujillo', '8am a 5pm', '9am a 1pm', NULL, NULL, '', '', 1, ''),
+('TRU04', '130104', 'Calle San Martín 234, Trujillo', '9am a 5pm', '9am a 1pm', NULL, NULL, '', '', 1, ''),
+('TRU05', '130105', 'Jr. Los Pinos 567, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, ''),
+('TRU06', '130106', 'Av. América 900, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, ''),
+('TRU07', '130107', 'Jr. Francisco Pizarro 876, Trujillo', '8am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, ''),
+('TRU08', '130108', 'Av. Larco 123, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, ''),
+('TRU09', '130109', 'Calle Grau 321, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, ''),
+('TRU10', '130110', 'Av. España 789, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, ''),
+('TRU11', '130111', 'Jr. San Juan 456, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, ''),
+('TRU12', '130112', 'Av. Perú 123, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, ''),
+('TRU13', '130113', 'Jr. Libertad 890, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, ''),
+('TRU14', '130114', 'Av. Bolívar 456, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, ''),
+('TRU15', '130115', 'Calle Huamachuco 123, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, ''),
+('TRU16', '130116', 'Av. La Marina 789, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, ''),
+('TRU17', '130117', 'Jr. Cajamarca 456, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, ''),
+('TRU18', '130118', 'Av. Brasil 123, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, ''),
+('TRU19', '130119', 'Calle San Martín 789, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, ''),
+('TRU20', '130120', 'Av. 28 de Julio 456, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '');
 
+INSERT INTO cliente (
+  correo,
+  telefono,
+  num_documento,
+  nombre_siglas,
+  apellidos_razon,
+  tipo_documentoid,
+  tipo_clienteid
+)
+VALUES (
+  'fabs@correo.com',
+  '987654321',
+  '12345678',
+  'Fabiola',
+  'Mejía',
+  1,
+  2
+);

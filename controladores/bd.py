@@ -11,7 +11,7 @@ def obtener_conexion():
                                 cursorclass=DictCursor
                                 )
 
-#
+
 def sql_select_fetchall(sql , args = None):
     conexion = obtener_conexion()
     try:

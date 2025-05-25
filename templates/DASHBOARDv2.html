@@ -1,0 +1,180 @@
+{% extends "MAESTRA_ADMIN.html" %}
+
+
+{% block titulo %}
+
+Módulo de {{modulo['nombre'] | lower}}
+
+{% endblock %}
+
+
+{% block estilos %}
+
+<!-- <style>
+    .section_content {
+        display: grid;
+        grid-template-columns: 3fr 1fr;
+        grid-template-rows: 1fr 17.5fr;
+        grid-template-areas:
+            'db_t db_o'
+            'db_r db_o'
+        ;
+        background-color: #f1f1f1;
+        gap: 10px;
+        padding: 25px;
+        width: 100%;
+    }
+
+    .cell_title {
+        color: white;
+    }
+
+    .cell_content {
+        height: auto;
+    }
+
+    .dashboard_title {
+        grid-area: db_t;
+    }
+
+    .panel_options {
+        background-color: var(--color8);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 89vh;
+        grid-area: db_o;
+        font-size: 100%;
+    }
+
+    .reports_grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        background-color: #f1f1f1;
+        gap: 10px;
+        padding: 10px;
+        width: 100%;
+        height: 100%;
+        max-height: 100vh;
+        grid-area: db_r;
+    }
+
+    .db_card {
+        background-color: #f5f5f5;
+        box-shadow: 0px 0px 5px #00000057;
+        border-radius: 5px;
+        height: 100%;
+        height: min-content;
+        align-items: center;
+        display: grid;
+        justify-items: center;
+        font-family: Poppins, sans-serif;
+        padding: 5px;
+        grid-template-rows: min-content min-content;
+        width: 100%;
+    }
+
+    .db_card > * {
+        color: black;
+    }
+
+    .title_db_card {
+        font-size: 120%;
+        margin-block: 10px;
+        text-align: center;
+        font-weight: bold;
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: 90%;
+    }
+
+    .db_graph {
+        width: 90%;
+        font-size: 10px !important;
+        /* height: 100%; */
+        min-height: auto !important;
+        justify-self: center;
+        display: flex;
+        justify-content: center;
+        /* height: 60% !important; */
+    }
+
+    .db_graph > * {
+        height: 60% !important;
+    }
+
+    .db_card:last-of-type {
+        grid-column: 1 / -1;
+    }
+
+    .db_card_one {
+        height: 95%;
+        margin-top: 2.5vh;
+        width: 100%;
+        justify-content: normal;
+    }
+
+    .db_card_one .db_graph {
+        min-height: 65vh !important;
+        width: 175%;
+        justify-self: center;
+    }
+
+    .db_card_one .db_graph>* {
+        margin: 0 auto;
+    }
+
+</style> -->
+
+<style>
+
+    .dashboard_title {
+        margin-bottom: 15px;
+    }
+
+    .block_banner {
+        opacity: 0.85;
+        background-color: color-mix(in srgb, {{modulo['color']}} 80%, white 80%) ;
+        height: 80vh;
+        background-image: url('/static/img/img_module/{{modulo["key"]}}.jpg');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        border-radius: 15px;
+        background-blend-mode: luminosity;
+        
+    }
+
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+{% endblock %}
+
+
+{% block contenido %}
+
+<div class="block_crud dashboard_title">
+    <h3 class="crud_title">
+        <i class="{{ICON_PAGE_DASHBOARD}}" style="color: {{modulo['color']}};"></i>
+        Módulo de {{modulo['nombre'] | lower}}
+    </h3>
+</div>
+
+<div class="block_crud block_banner">
+    <!-- <img class="module_banner" src="/static/img/img_module/{{modulo['key']}}.jpg" alt=""> -->
+</div>
+
+
+{% endblock %}
+
+
+
+{% block scripts %}
+
+
+
+
+{% endblock %}

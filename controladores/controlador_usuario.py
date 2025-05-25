@@ -104,4 +104,103 @@ def get_options():
     return lista
 
 
+def get_usuario_por_correo(correo):
+    sql= f'''
+        select 
+            usu.id ,
+            usu.correo ,
+            usu.contrasenia ,
+            usu.tipo_usuario ,
+            usu.activo ,
+            emp.usuarioid as emp_id ,
+            emp.nombre,
+            emp.apellidos ,
+            emp.rolid ,
+            cli.usuarioid as cli_id ,
+            cli.telefono ,
+            cli.num_documento ,
+            cli.nombre_siglas ,
+            cli.apellidos_razon ,
+            cli.tipo_documentoid ,
+            cli.tipo_clienteid
+        from usuario usu
+        left join cliente cli on cli.correo = usu.correo
+        left join empleado emp on emp.correo = usu.correo
+        where usu.correo = %s and usu.activo
+    '''
+
+    info = sql_select_fetchone(sql , (correo))
+    return info
+
+
+def get_usuario_por_id(user_id):
+    sql= f'''
+        select 
+            usu.id ,
+            usu.correo ,
+            usu.contrasenia ,
+            usu.tipo_usuario ,
+            usu.activo ,
+            emp.usuarioid as emp_id ,
+            emp.nombre,
+            emp.apellidos ,
+            emp.rolid ,
+            cli.usuarioid as cli_id ,
+            cli.telefono ,
+            cli.num_documento ,
+            cli.nombre_siglas ,
+            cli.apellidos_razon ,
+            cli.tipo_documentoid ,
+            cli.tipo_clienteid
+        from usuario usu
+        left join cliente cli on cli.correo = usu.correo
+        left join empleado emp on emp.correo = usu.correo
+        where usu.id = %s and usu.activo = 1
+    '''
+
+    info = sql_select_fetchone(sql , (user_id))
+    return info
+
+
+def get_usuario_cliente_por_id(user_id):
+    sql= f'''
+        select 
+            usu.id ,
+            usu.correo ,
+            usu.contrasenia ,
+            usu.tipo_usuario ,
+            usu.activo 
+        from usuario usu
+        inner join cliente cli on cli.correo = usu.correo
+        where usu.tipo_usuario = 'C' and usu.id = %s and usu.activo =1
+    '''
+
+    info = sql_select_fetchone(sql , (user_id))
+    return info
+
+
+def get_usuario_empleado_por_id(user_id):
+    sql= f'''
+        select 
+            usu.id ,
+            usu.correo ,
+            usu.contrasenia ,
+            usu.tipo_usuario ,
+            usu.activo ,
+            emp.usuarioid as emp_id ,
+            emp.nombre,
+            emp.apellidos ,
+            emp.rolid ,
+            rol.nombre as rol_nombre ,
+            tip.nombre as tip_nombre 
+        from usuario usu
+        inner join empleado emp on emp.correo = usu.correo
+        inner join rol on rol.id = emp.rolid
+        inner join tipo_rol tip on tip.id = rol.tipo_rolid
+        where usu.tipo_usuario = 'E' and usu.id = %s 
+        and usu.activo = 1 and rol.activo = 1 and tip.activo = 1
+    '''
+
+    info = sql_select_fetchone(sql , (user_id))
+    return info
 

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="shortcut icon" href="/static/img/logo.png">
+    <link rel="shortcut icon" href="{{URL_IMG_LOGO}}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css" crossorigin="">
     <link rel="stylesheet" href="/static/css/common_styles/bootstrap.min.css" />
     <link rel="stylesheet" href="/static/css/common_styles/all.min.css" />
@@ -27,11 +27,16 @@
             /* --color-sec: #a20eff; */
             /* --color-contrast: #fff; */
             --color-base: {{ emp_color_pri }};
-            --color-sec: {{ emp_color_sec }};
-            --color-thr: {{ emp_color_ter }};
+            --color-sec:  {{ emp_color_sec }};
+            --color-thr:  {{ emp_color_ter }};
             /* #1d4c82 #13e2da #1b98e0 */
+
+            /* --color-base: #1d4c82;
+            --color-sec:  #13e2da ;
+            --color-thr:  #1b98e0; */
         }
     </style>
+
     {% block estilos_html %}
     {% endblock %}
 

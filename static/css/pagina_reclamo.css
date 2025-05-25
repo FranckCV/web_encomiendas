@@ -36,7 +36,7 @@
   text-decoration: none;
 }
 
-.contenedor {
+.contenido {
   display: flex;
   max-width: 900px;
   gap: 20px;
@@ -114,9 +114,10 @@
 }
 
 .help {
-  max-width: 300px;
-  color: #293e6a;
-  font-weight: 700;
+     max-width: 504px;
+    color: #293e6a;
+    font-weight: 700;
+    text-align: justify;
 }
 
 .help h2 {
