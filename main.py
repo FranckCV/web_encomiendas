@@ -1488,7 +1488,6 @@ def inject_globals():
 paginas_simples = [ 
     "index" , 
     'sign_up', 
-    'sucursales' ,
     'tracking',
     'seguimiento',
     'recuperar_contrasenia',
@@ -1498,7 +1497,8 @@ paginas_simples = [
     'pagina_reclamo',
     'seguimiento_reclamo',
     'Metodo_pago',
-    'perfil'
+    'perfil',
+    'prueba_seguimiento'
 ]
 
 
@@ -1595,6 +1595,23 @@ def mostrar_pagoenvio():
     return render_template('pago_envio.html') 
 
 
+#########
+
+################# Sucursales ######################
+@app.route("/sucursales")
+def sucursales():
+    departamentos = controlador_ubigeo.get_options_departamento()
+    provincias = controlador_ubigeo.get_options_provincia()
+    distritos = controlador_ubigeo.get_options_distrito()
+    # sucursal = controlador_sucursal.get_
+    return render_template(
+        'sucursales.html' ,
+        departamentos = departamentos,
+        provincias = provincias,
+        distritos = distritos,
+    )
+
+###################################
 
 ##################_ ADMIN PAGE _################## 
 
