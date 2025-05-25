@@ -1337,7 +1337,8 @@ paginas_simples = [
     'seguimiento_reclamo',
     'Metodo_pago',
     'perfil',
-    'prueba_seguimiento'
+    'prueba_seguimiento',
+    'envio_masivo'
 ]
 
 

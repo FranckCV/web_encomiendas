@@ -24,8 +24,8 @@
     color: #0E1D63;
     text-align: center;
     font-weight: 700;
-   margin-top: 20px;
-   margin-bottom: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 /* Sección de detalles del producto */
@@ -59,7 +59,8 @@
 .size-btn {
     width: 50px;
     height: 50px;
-    border-radius: 4px; /* Cambiado de 50% (circular) a 4px para hacerlo rectangular */
+    border-radius: 4px;
+    /* Cambiado de 50% (circular) a 4px para hacerlo rectangular */
     border: 2px solid var(--color-border);
     background: #fff;
     color: var(--color-text);
@@ -70,11 +71,14 @@
 
 /* También hay que actualizar el efecto de la pseudo-clase after para que coincida con la forma */
 .size-btn::after {
-    border-radius: 4px; /* Cambiado de 50% a 4px para mantener consistencia */
+    border-radius: 4px;
+    /* Cambiado de 50% a 4px para mantener consistencia */
 }
 
-.size-btn.active, .size-btn:hover{
-    background-color: #1a3c5b;;
+.size-btn.active,
+.size-btn:hover {
+    background-color: #1a3c5b;
+    ;
     color: white;
     border-color: var(--color-primary);
 }
@@ -156,22 +160,30 @@
 /* PRECIOS DE VOLUMEN OPTIMIZADOS PARA ALINEACIÓN CORRECTA */
 .precios-volumen {
     display: flex;
-    flex-direction: column; /* Cambiar a columna para apilar verticalmente */
+    flex-direction: column;
+    /* Cambiar a columna para apilar verticalmente */
     gap: 10px;
-    width: 100%; /* Ocupar todo el ancho disponible como el botón agregar */
+    width: 100%;
+    /* Ocupar todo el ancho disponible como el botón agregar */
 }
 
 .precio-volumen-item {
     background-color: #d5edff;
-    padding: 12px 20px; /* Aumentar padding para consistencia con botón agregar */
-    border-radius: 8px; /* Consistente con botón agregar */
+    padding: 12px 20px;
+    /* Aumentar padding para consistencia con botón agregar */
+    border-radius: 8px;
+    /* Consistente con botón agregar */
     display: flex;
-    flex-direction: row; /* Alinear precio y cantidad horizontalmente */
-    justify-content: space-between; /* Distribuir contenido */
+    flex-direction: row;
+    /* Alinear precio y cantidad horizontalmente */
+    justify-content: space-between;
+    /* Distribuir contenido */
     align-items: center;
-    width: 100%; /* Ocupar todo el ancho como el botón agregar */
+    width: 100%;
+    /* Ocupar todo el ancho como el botón agregar */
     box-sizing: border-box;
-    border: 2px solid transparent; /* Para efecto hover */
+    border: 2px solid transparent;
+    /* Para efecto hover */
     transition: all 0.3s ease;
 }
 
@@ -237,7 +249,8 @@
     font-weight: bold;
     cursor: text;
     transition: all 0.3s ease;
-    -moz-appearance: textfield; /* Firefox */
+    -moz-appearance: textfield;
+    /* Firefox */
 }
 
 /* Estilos para el límite de cantidad */
@@ -262,9 +275,17 @@
 }
 
 @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 /* Estilos adicionales para el input de cantidad editable */
@@ -276,11 +297,12 @@
     background-color: transparent;
     font-size: 1.2rem;
     font-weight: bold;
-    
+
     /* Estilos adicionales para la edición */
     cursor: text;
     transition: all 0.3s ease;
-    -moz-appearance: textfield; /* Firefox */
+    -moz-appearance: textfield;
+    /* Firefox */
 }
 
 /* Ocultar flechas incremento/decremento en Chrome y Safari */
@@ -425,11 +447,12 @@
     .producto-detalle {
         flex-direction: column;
     }
-    
-    .producto-imagen, .producto-info {
+
+    .producto-imagen,
+    .producto-info {
         width: 100%;
     }
-    
+
     .productos-grid {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
@@ -512,8 +535,10 @@
     transition: all 0.3s ease;
 }
 
-.size-btn.active, .size-btn:hover{
-    background-color: #1a3c5b;;
+.size-btn.active,
+.size-btn:hover {
+    background-color: #1a3c5b;
+    ;
     color: white;
     border-color: var(--color-primary);
 }
@@ -594,23 +619,31 @@
 
 .precios-volumen {
     display: flex;
-    flex-direction: column; /* Cambiar a columna para apilar verticalmente */
+    flex-direction: column;
+    /* Cambiar a columna para apilar verticalmente */
     gap: 10px;
-    width: 100%; /* Ocupar todo el ancho disponible como el botón agregar */
+    width: 100%;
+    /* Ocupar todo el ancho disponible como el botón agregar */
 }
 
 
 .precio-volumen-item {
     background-color: #d5edff;
-    padding: 12px 20px; /* Aumentar padding para consistencia con botón agregar */
-    border-radius: 8px; /* Consistente con botón agregar */
+    padding: 12px 20px;
+    /* Aumentar padding para consistencia con botón agregar */
+    border-radius: 8px;
+    /* Consistente con botón agregar */
     display: flex;
-    flex-direction: row; /* Alinear precio y cantidad horizontalmente */
-    justify-content: space-between; /* Distribuir contenido */
+    flex-direction: row;
+    /* Alinear precio y cantidad horizontalmente */
+    justify-content: space-between;
+    /* Distribuir contenido */
     align-items: center;
-    width: 100%; /* Ocupar todo el ancho como el botón agregar */
+    width: 100%;
+    /* Ocupar todo el ancho como el botón agregar */
     box-sizing: border-box;
-    border: 2px solid transparent; /* Para efecto hover */
+    border: 2px solid transparent;
+    /* Para efecto hover */
     transition: all 0.3s ease;
 }
 
@@ -657,7 +690,8 @@
     font-weight: bold;
     cursor: text;
     transition: all 0.3s ease;
-    -moz-appearance: textfield; /* Firefox */
+    -moz-appearance: textfield;
+    /* Firefox */
 }
 
 /* Estilos para el límite de cantidad */
@@ -682,9 +716,17 @@
 }
 
 @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 /* Estilos adicionales para el input de cantidad editable */
@@ -696,11 +738,12 @@
     background-color: transparent;
     font-size: 1.2rem;
     font-weight: bold;
-    
+
     /* Estilos adicionales para la edición */
     cursor: text;
     transition: all 0.3s ease;
-    -moz-appearance: textfield; /* Firefox */
+    -moz-appearance: textfield;
+    /* Firefox */
 }
 
 /* Ocultar flechas incremento/decremento en Chrome y Safari */
@@ -900,9 +943,18 @@
 
 /* Animación para cambio de precio */
 @keyframes priceChange {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); color: #1a3c5b; }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+        color: #1a3c5b;
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 .precio {
@@ -951,6 +1003,7 @@
         transform: scale(0, 0);
         opacity: 0.5;
     }
+
     100% {
         transform: scale(20, 20);
         opacity: 0;
@@ -964,11 +1017,12 @@
     .producto-detalle {
         flex-direction: column;
     }
-    
-    .producto-imagen, .producto-info {
+
+    .producto-imagen,
+    .producto-info {
         width: 100%;
     }
-    
+
     .productos-grid {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
@@ -979,69 +1033,89 @@
 /* Ajustar el contenedor principal */
 .producto-container {
     width: 100%;
-    max-width: 1000px; /* Reducido de 1200px */
+    max-width: 1000px;
+    /* Reducido de 1200px */
     margin: 0 auto;
-    padding: 10px; /* Reducido de 20px */
+    padding: 10px;
+    /* Reducido de 20px */
     font-family: Arial, sans-serif;
 }
 
 /* Hacer el banner más compacto */
 .welcome-banner {
-    padding: 15px; /* Reducido de 25px */
-    margin-bottom: 20px; /* Reducido de 30px */
+    padding: 15px;
+    /* Reducido de 25px */
+    margin-bottom: 20px;
+    /* Reducido de 30px */
 }
 
 .welcome-content h2 {
-    font-size: 1.5rem; /* Reducido de 1.8rem */
+    font-size: 1.5rem;
+    /* Reducido de 1.8rem */
 }
 
 /* Optimizar la sección de detalles del producto */
 .producto-detalle {
-    gap: 0; /* Eliminar espacio entre columnas */
-    margin-bottom: 20px; /* Reducido de 40px */
+    gap: 0;
+    /* Eliminar espacio entre columnas */
+    margin-bottom: 20px;
+    /* Reducido de 40px */
 }
 
 .producto-imagen {
-    padding: 15px; /* Reducido de 30px */
-    min-width: 250px; /* Reducido de 300px */
+    padding: 15px;
+    /* Reducido de 30px */
+    min-width: 250px;
+    /* Reducido de 300px */
 }
 
 .producto-imagen img {
-    margin-bottom: 15px; /* Reducido de 30px */
-    max-height: 300px; /* Limitar altura de la imagen */
+    margin-bottom: 15px;
+    /* Reducido de 30px */
+    max-height: 300px;
+    /* Limitar altura de la imagen */
     object-fit: contain;
 }
 
 .producto-info {
-    padding: 15px; /* Reducido de 30px */
-    min-width: 250px; /* Reducido de 300px */
+    padding: 15px;
+    /* Reducido de 30px */
+    min-width: 250px;
+    /* Reducido de 300px */
 }
 
 .producto-titulo {
-    font-size: 1.8rem; /* Reducido de 2.2rem */
-    margin-bottom: 2px; /* Reducido de 5px */
+    font-size: 1.8rem;
+    /* Reducido de 2.2rem */
+    margin-bottom: 2px;
+    /* Reducido de 5px */
 }
 
 /* Ajustar sección de precios */
 .precio-principal {
-    margin-bottom: 10px; /* Reducido de 15px */
+    margin-bottom: 10px;
+    /* Reducido de 15px */
 }
 
 .moneda {
-    font-size: 1.6rem; /* Reducido de 2.0rem */
+    font-size: 1.6rem;
+    /* Reducido de 2.0rem */
 }
 
 .precio {
-    font-size: 2rem; /* Reducido de 2.5rem */
+    font-size: 2rem;
+    /* Reducido de 2.5rem */
 }
 
 /* Hacer los elementos de precio de volumen más compactos */
 .precios-volumen {
-    gap: 10px; /* Reducido de 15px */
+    gap: 10px;
+    /* Reducido de 15px */
 }
 
 .etiqueta-precio {
-    font-size: 1.2rem; /* Reducido de 1.5rem */
+    font-size: 1.2rem;
+    /* Reducido de 1.5rem */
 }
 
 /* Miniaturas de navegación */
@@ -1061,6 +1135,7 @@
     overflow-x: auto;
     gap: 15px;
     padding-bottom: 10px;
+    justify-content: space-around;
 }
 
 .thumb-item {
@@ -1098,8 +1173,9 @@
     .producto-detalle {
         flex-direction: column;
     }
-    
-    .producto-imagen, .producto-info {
+
+    .producto-imagen,
+    .producto-info {
         width: 100%;
     }
 }
@@ -1108,20 +1184,21 @@
     .producto-titulo {
         font-size: 1.5rem;
     }
-    
-    .moneda, .precio {
+
+    .moneda,
+    .precio {
         font-size: 1.5rem;
     }
-    
+
     .precios-volumen {
         flex-direction: column;
         gap: 5px;
     }
-    
+
     .precio-volumen-item {
         width: 100%;
     }
-    
+
     .btn-agregar {
         padding: 12px 20px;
     }
