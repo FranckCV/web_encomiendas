@@ -93,3 +93,29 @@ def get_options_empleado():
     filas = sql_select_fetchall(sql)
     lista = [(fila["usuarioid"], fila["nombre_completo"]) for fila in filas]
     return lista
+
+
+def get_report_test():
+    sql = f'''
+        SELECT 
+            emp.usuarioid,
+            emp.nombre,
+            emp.apellidos,
+            emp.correo,
+            rol.id AS rol_id,
+            rol.nombre AS nombre_rol
+        FROM {table_name} emp
+        INNER JOIN rol ON emp.rolid = rol.id
+    '''
+    
+    columnas = {
+        'usuarioid'   : ['ID', 0.5],
+        'nombre'      : ['Nombre', 1.5],
+        'apellidos'   : ['Apellidos', 1.5],
+        'correo'      : ['Correo Electrónico', 2],
+        'nombre_rol'  : ['Rol', 1.5],
+    }
+    
+    filas = sql_select_fetchall(sql)
+    
+    return columnas, filas

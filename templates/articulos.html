@@ -2,49 +2,6 @@
 
 {% block estilos %}
 <link rel="stylesheet" href="/static/css/articulos.css">
-<!-- Incluir los estilos optimizados -->
-<style>
-    /* Estilos inline para aplicar inmediatamente los cambios críticos */
-    .producto-detalle {
-        display: flex;
-        flex-wrap: wrap;
-        overflow: hidden;
-        margin-bottom: 20px;
-        gap: 0;
-    }
-
-    .producto-imagen {
-        flex: 1;
-        min-width: 250px;
-        padding: 15px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .producto-info {
-        flex: 1;
-        min-width: 250px;
-        padding: 15px;
-    }
-
-    .producto-imagen img {
-        max-width: 100%;
-        max-height: 300px;
-        object-fit: contain;
-    }
-
-    @media (max-width: 768px) {
-        .producto-detalle {
-            flex-direction: column;
-        }
-
-        .producto-imagen,
-        .producto-info {
-            width: 100%;
-        }
-    }
-</style>
 {% endblock %}
 
 {% block titulo %}
@@ -52,10 +9,11 @@ Productos de Embalaje
 {% endblock %}
 
 {% block contenido %}
-<!-- Contenedor principal con ancho máximo reducido -->
-<div class="producto-container" style="max-width: 1000px; padding: 10px;">
+<!-- Contenedor principal optimizado -->
+<div class="producto-container">
     <h1 class="titulo-articulos">ARTÍCULOS PARA ENCOMIENDAS</h1>
-     <!-- Sección del producto -->
+
+    <!-- Sección del producto optimizada -->
     <div class="producto-detalle">
         <div class="producto-imagen">
             <img id="producto-img" src="/static/img/caja-shalom.jpg" alt="Caja Shalom">
@@ -63,33 +21,37 @@ Productos de Embalaje
                 <!-- Los botones de tamaño se cargarán dinámicamente si el producto los tiene -->
             </div>
         </div>
-        
+
         <div class="producto-info">
-            <h1 id="producto-titulo" class="producto-titulo">Caja Shalom</h1>
+            <h1 id="producto-titulo" class="producto-titulo" style="font-size: 1.8rem;">Caja Shalom</h1>
             <p id="producto-descripcion" class="producto-descripcion">Ideal para envíos pequeños y seguros.</p>
             <p id="producto-dimensiones" class="producto-dimensiones">15 x 10 x 10 cm</p>
-            
+
             <div class="precio-seccion">
                 <div class="precio-principal">
-                    <span class="moneda">S/</span>
-                    <span id="precio" class="precio">1.50</span>
+                    <span class="moneda" style="font-size: 1.6rem;">S/</span>
+                    <span id="precio" class="precio" style="font-size: 2rem;">1.50</span>
                     <div class="info-icon">
                         <i class="fa-solid fa-info-circle"></i>
-                        <div id="precio-tooltip" class="tooltip">Precio unitario. Descuentos disponibles por volumen.</div>
+                        <div id="precio-tooltip" class="tooltip">Precio unitario. Descuentos disponibles por volumen.
+                        </div>
                     </div>
                 </div>
-                
+
+                <!-- Botones de descuento optimizados para alineación correcta -->
                 <div id="precios-volumen" class="precios-volumen">
                     <!-- Los precios por volumen se cargarán dinámicamente -->
                 </div>
             </div>
 
-            <div class="selector-cantidad">
-                <button class="qty-btn decrease">-</button>
-                <input type="number" class="qty-input" value="1" min="1">
-                <button class="qty-btn increase">+</button>
-            </div>
-            <div class="quantity-limit-container">
+            <!-- CORRECCIÓN: Estructura corregida para cantidad y límite -->
+            <div class="cantidad-section">
+                <div class="selector-cantidad-interno">
+                    <button class="qty-btn decrease">-</button>
+                    <input type="number" class="qty-input" value="1" min="1">
+                    <button class="qty-btn increase">+</button>
+                </div>
+
                 <span class="quantity-limit">Máximo: 100 unidades</span>
             </div>
 
@@ -97,7 +59,6 @@ Productos de Embalaje
                 Agregar al carrito
                 <i class="fa-solid fa-cart-shopping"></i>
             </button>
-
         </div>
     </div>
 

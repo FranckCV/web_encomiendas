@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Agregar al carrito con validación
+   /*  // Agregar al carrito con validación
     if (addToCartBtn) {
         addToCartBtn.addEventListener('click', () => {
             const quantity = parseInt(qtyInput.value);
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 highlightLimit();
             }
         });
-    }
+    } */
     
     // Botones de tamaño
     const sizeBtns = document.querySelectorAll('.size-btn');

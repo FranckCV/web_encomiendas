@@ -14,6 +14,7 @@
     <h1 class="titulo-cajas">CAJAS PARA ENCOMIENDAS</h1>
 
     <div class="producto-detalle">
+<<<<<<< HEAD
       <div class="producto-imagen">
         <img id="product-image" src="" alt="Caja" />
         <div class="size-options">
@@ -36,6 +37,16 @@
             <div class="info-icon">
               <i class="fa-solid fa-info-circle"></i>
               <div class="tooltip">Precio unitario. Descuentos disponibles por volumen.</div>
+=======
+        <div class="producto-imagen">
+            <img src="/api/placeholder/280/300" alt="Caja">
+            <div class="size-options">
+                <button class="size-btn xxs active">XXS</button>
+                <button class="size-btn xs">XS</button>
+                <button class="size-btn s">S</button>
+                <button class="size-btn m">M</button>
+                <button class="size-btn l">L</button>
+>>>>>>> bb0e1b4c9d7d4b44bd03a1c4a30be01ebbd5fa2e
             </div>
           </div>
 
@@ -51,10 +62,55 @@
           </div>
         </div>
 
+<<<<<<< HEAD
         <div class="selector-cantidad">
           <button class="qty-btn decrease">−</button>
           <input type="number" class="qty-input" value="1" min="1" />
           <button class="qty-btn increase">+</button>
+=======
+        <div class="producto-info">
+            <h1 class="producto-titulo" style="font-size: 1.8rem;">Caja</h1>
+            <p class="producto-descripciones">Dimensiones</p>
+            <p class="producto-dimensiones">15 x 10 x 10 cm</p>
+            <div class="precio-seccion">
+                <div class="precio-principal">
+                    <span class="moneda" style="font-size: 1.6rem;">S/</span>
+                    <span class="precio" style="font-size: 2rem;">1.50</span>
+                    <div class="info-icon">
+                        <i class="fa-solid fa-info-circle"></i>
+                        <div class="tooltip">Precio unitario. Descuentos disponibles por volumen.</div>
+                    </div>
+                </div>
+
+                <!-- Botones de descuento optimizados para alineación correcta -->
+                <div class="precios-volumen">
+                    <div class="precio-volumen-item">
+                        <span class="etiqueta-precio" style="font-size: 1.2rem;">s/. 1.20</span>
+                        <span class="etiqueta-cantidad">a partir de 25 uds.</span>
+                    </div>
+                    <div class="precio-volumen-item">
+                        <span class="etiqueta-precio" style="font-size: 1.2rem;">s/. 1.00</span>
+                        <span class="etiqueta-cantidad">a partir de 50 uds.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CORRECCIÓN: Estructura corregida para cantidad y límite -->
+            <div class="cantidad-section">
+                <div class="selector-cantidad-interno">
+                    <button class="qty-btn decrease">-</button>
+                    <input type="number" class="qty-input" value="1" min="1">
+                    <button class="qty-btn increase">+</button>
+                </div>
+
+                <span class="quantity-limit">Máximo: 100 unidades</span>
+            </div>
+
+            <button type="button" class="btn-agregar" href="{{ url_for('carrito') }}">
+                Agregar al carrito
+                <i class="fa-solid fa-cart-shopping"></i>
+            </button>
+>>>>>>> bb0e1b4c9d7d4b44bd03a1c4a30be01ebbd5fa2e
         </div>
         <div class="quantity-limit-container">
           <span class="quantity-limit">Máximo: 100 unidades</span>

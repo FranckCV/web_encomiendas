@@ -1,6 +1,10 @@
 INSERT INTO empresa (id, nombre, correo, nro_telefono, logo, color_pri, color_sec, color_ter) VALUES
 (1, 'New Olva', 'info@newolva.com', '+123 456 789', 'a', '#1d4c82', '#13e2da', '#1b98e0');
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> f03f79907e4430281c918be1626a223a6c152b2d
 INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo`) VALUES
 (1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF\n', 1),
 (2, 'Logística', 'fa-solid fa-truck-front', 'logistica', '#00F068', 1),
@@ -81,7 +85,10 @@ INSERT INTO `rol` (`id`, `nombre`, `descripcion`, `activo`, `tipo_rolid`) VALUES
 
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> bb0e1b4c9d7d4b44bd03a1c4a30be01ebbd5fa2e
 INSERT INTO `ubigeo` (`codigo`, `departamento`, `provincia`, `distrito`, `activo`) VALUES
 ('100101', 'ICA', 'ICA', 'ICA', 1),
 ('100102', 'ICA', 'ICA', 'LA TINGUIÑA', 1),
