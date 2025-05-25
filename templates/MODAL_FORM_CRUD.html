@@ -1,0 +1,115 @@
+<div class="space_modal modal_crud_base" id="modal_crud_{{modo_modal}}_{{fila[primary_key] if fila else ''}}">
+  <form class="modal_crud_content"
+        {% if modo_modal in ['insert', 'update', 'delete', 'unactive'] %}
+        action="{{ url_for('crud_' + modo_modal, tabla=tabla) }}"
+        method="POST"
+        {% endif %}>
+        
+    <input type="hidden" name="{{ primary_key }}" value="{{ fila[primary_key] if fila else '' }}">
+
+    <div class="row">
+      <h3>
+        {% if modo_modal == 'insert' %} {{ NOMBRE_BTN_INSERT }}
+        {% elif modo_modal == 'update' %} {{ NOMBRE_BTN_UPDATE }}
+        {% elif modo_modal == 'delete' %} {{ NOMBRE_BTN_DELETE }}
+        {% elif modo_modal == 'unactive' %}
+          {% if fila['activo'] == 0 %} {{ ACT_STATE_1 }}
+          {% elif fila['activo'] == 1 %} {{ ACT_STATE_0 }}
+          {% endif %}
+        {% elif modo_modal == 'consult' %} {{ NOMBRE_BTN_CONSULT }}
+        {% endif %}
+        {{ nombre_tabla }}
+      </h3>
+    </div>
+
+    {% if modo_modal in ['delete', 'unactive'] %}
+      <p>
+        ¿Está seguro de que desea 
+        {% if modo_modal == 'delete' %}
+          eliminar este {{nombre_tabla}} (ID: {{fila[primary_key]}})?
+        {% elif modo_modal == 'unactive' %}
+          {% if fila['activo'] == 0 %}
+            {{ ACT_STATE_1 | lower }}
+          {% else %}
+            {{ ACT_STATE_0 | lower }}
+          {% endif %}
+          este {{nombre_tabla}} (ID: {{fila[primary_key]}})?
+        {% endif %}
+      </p>
+    {% endif %}
+
+    {% if modo_modal in ['insert', 'update', 'consult'] %}
+    <div class="row form_fields">
+      {% for campo in fields_form %}
+      <div class="form_field form_{{campo[3]}}">
+        <label for="{{campo[0]}}">{{campo[1]}}:</label>
+
+        {% if campo[3] == 'select' %}
+            {% if modo_modal == 'consult' %}
+             <input id="{{campo[0]}}" name="{{campo[0]}}" placeholder="{{campo[2]}}" type="text" {% if campo[4] %}required{%
+            endif %} {% if campo[5]==False %}disabled{% endif %} value="{{ fila[campo[6][1]] }}" disabled>
+            {% else %}
+                {% set datos = campo[6][0]() if campo[6] and campo[6][0] is callable else campo[6][0] %}
+                <select id="{{campo[0]}}" name="{{campo[0]}}"
+                {% if modo_modal == 'consult' %} disabled {% endif %}>
+                {% if modo_modal == 'insert' %}
+                <option value="-1" disabled selected>{{campo[2]}}</option>
+                {% endif %}
+                {% for option in datos %}
+                <option value="{{option[0]}}"
+                    {% if modo_modal != 'insert' and fila[campo[0]]==option[0] %}selected{% endif %}>
+                    {{option[1]}}
+                </option>
+                {% endfor %}
+
+            {% endif %}
+
+          </select>
+
+        {% elif campo[3] == 'textarea' %}
+          <textarea id="{{campo[0]}}" name="{{campo[0]}}"
+            {% if campo[4] %}required{% endif %}
+            {% if modo_modal == 'consult' %}disabled{% endif %}>{{ fila[campo[0]] if fila else '' }}</textarea>
+
+        {% elif campo[3] == 'p' %}
+          <div class="form_p_content">
+            {% if campo[0] == 'activo' %}
+              <p class="activo {{'btn_active' if fila[campo[0]] or modo_modal == 'insert' else 'btn_unactive'}}">
+                {{ STATE_1 if fila[campo[0]] or modo_modal == 'insert' else STATE_0 }}
+              </p>
+            {% else %}
+              <p id="{{campo[0]}}" name="{{campo[0]}}">{{ fila[campo[0]] if fila[campo[0]] else '' }}</p>
+            {% endif %}
+          </div>
+
+        {% else %}
+          <input id="{{campo[0]}}" name="{{campo[0]}}"
+            type="{{campo[3]}}" placeholder="{{campo[2]}}"
+            {% if campo[4] %}required{% endif %}
+            {% if campo[5] == False or modo_modal == 'consult' %}disabled{% endif %}
+            value="{% if fila and fila[campo[0]] != None %}{{fila[campo[0]]}}{% endif %}">
+
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row">
+      <div class="col">
+        <div class="button btn_back" onclick="closeModal()">Cancelar</div>
+      </div>
+      <div class="col-1"></div>
+      <div class="col">
+        <button class="button btn_acept"
+          {% if modo_modal in ['consult'] %}
+          type="button" onclick="closeModal()"
+          {% else %}
+          type="submit"
+          {% endif %}>
+          Aceptar
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
