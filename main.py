@@ -35,7 +35,7 @@ from controladores import controlador_descuento as controlador_descuento
 from controladores import controlador_descuento_articulo as controlador_descuento_articulo
 
 
-
+import re
 import configuraciones
 from functools import wraps
 import inspect
@@ -1579,7 +1579,8 @@ paginas_simples = [
     'perfil',
     'prueba_seguimiento',
     'envio_masivo',
-    'cajas'
+    'cajas',
+    'cajas_prueba'
 ]
 
 
@@ -1629,26 +1630,35 @@ def contac():
 
 @app.route("/api/cajas")
 def api_cajas():
-    columnas, filas = controlador_articulo.get_table()
+    filas = controlador_articulo.get_table_with_discount()
 
     productSizes = {}
+
     for fila in filas:
         if not fila['activo'] or not fila['tamaño_cajaid']:
             continue
 
-        key = fila['tam_nombre'].lower() 
+        key = fila['tam_nombre'].lower()
+        nombre = fila['nom_articulo']
         precio = float(fila['precio'])
         img = fila['img']
 
-        productSizes[key] = {
-            "price":      precio,
-            "dimensions": fila['dimensiones'],
-            "image":      img,
-            "discounts": {25: 1.20, 50: 1.00}
-        }
-    # print(productSizes)
+        if key not in productSizes:
+            productSizes[key] = {
+                "name_product":nombre,
+                "price": precio,
+                "dimensions": fila['dimensiones'],
+                "image": img,
+                "discounts": []  
+            }
 
+        if fila.get('cantidad_descuento') and fila.get('nombre'):
+            productSizes[key]["discounts"].append({
+                "name": fila['nom_descuento'],  
+                "value": float(fila['cantidad_descuento'])
+            })
     return jsonify(productSizes)
+
 
 
 

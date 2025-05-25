@@ -120,14 +120,14 @@ def get_table_with_discount():
     sql= f'''
         select 
             art.id ,
-            art.nombre ,
+            art.nombre as nom_articulo,
             art.precio ,
             art.stock ,
             art.dimensiones ,
             tam.nombre as tam_nombre,
             art.tamaño_cajaid ,
             art.img,
-            des.nombre,
+            des.nombre as nom_descuento,
             des_art.cantidad_descuento,
             art.activo 
         from articulo art

@@ -9,62 +9,52 @@
 {% endblock %}
 
 {% block contenido %}
-<div class="producto-container">
-  <h1 class="titulo-cajas">CAJAS PARA ENCOMIENDAS</h1>
+  <div class="producto-container">
+    <h1 class="titulo-cajas">CAJAS PARA ENCOMIENDAS</h1>
 
-  <div class="producto-detalle">
-    <div class="producto-imagen">
-      <img id="product-image" src="" alt="Caja">
-      <div class="size-options">
-        <button class="size-btn xxs active">XXS</button>
-        <button class="size-btn xs">XS</button>
-        <button class="size-btn s">S</button>
-        <button class="size-btn m">M</button>
-        <button class="size-btn l">L</button>
-      </div>
-    </div>
-
-    <div class="producto-info">
-      <h1 class="producto-titulo" style="font-size:1.8rem;"></h1>
-      <p class="producto-dimensiones"></p>
-
-      <div class="precio-seccion">
-        <div class="precio-principal">
-          <span class="moneda" style="font-size:1.6rem;">S/</span>
-          <span class="precio" style="font-size:2rem;"></span>
-          <div class="info-icon">
-            <i class="fa-solid fa-info-circle"></i>
-            <div class="tooltip">Precio unitario. Descuentos disponibles por volumen.</div>
-          </div>
-        </div>
-
-        <div class="precios-volumen">
-          <div class="precio-volumen-item">
-            <span class="etiqueta-precio"></span>
-            <span class="etiqueta-cantidad">a partir de 25 uds.</span>
-          </div>
-          <div class="precio-volumen-item">
-            <span class="etiqueta-precio"></span>
-            <span class="etiqueta-cantidad">a partir de 50 uds.</span>
-          </div>
+    <div class="producto-detalle">
+      <div class="producto-imagen">
+        <img id="product-image" src="" alt="Caja" />
+        <div class="size-options">
+          <button class="size-btn xxs active" data-size="xxs">XXS</button>
+          <button class="size-btn xs" data-size="xs">XS</button>
+          <button class="size-btn s" data-size="s">S</button>
+          <button class="size-btn m" data-size="m">M</button>
+          <button class="size-btn l" data-size="l">L</button>
         </div>
       </div>
 
-      <div class="selector-cantidad">
-        <button class="qty-btn decrease">−</button>
-        <input type="number" class="qty-input" value="1" min="1">
-        <button class="qty-btn increase">+</button>
-      </div>
-      <div class="quantity-limit-container">
-        <span class="quantity-limit">Máximo: 100 unidades</span>
-      </div>
+      <div class="producto-info">
+        <h1 id="product-title" class="producto-titulo" style="font-size:1.8rem;"></h1>
+        <p id="product-dimensions" class="producto-dimensiones"></p>
 
-      <button type="button" class="btn-agregar">
-        Agregar al carrito <i class="fa-solid fa-cart-shopping"></i>
-      </button>
+        <div class="precio-seccion">
+          <div class="precio-principal">
+            <span class="moneda" style="font-size:1.6rem;">S/</span>
+            <span id="product-price" class="precio" style="font-size:2rem;"></span>
+            <div class="info-icon">
+              <i class="fa-solid fa-info-circle"></i>
+              <div class="tooltip">Precio unitario. Descuentos disponibles por volumen.</div>
+            </div>
+          </div>
+
+          <div class="precios-volumen" id="discount-container">
+          </div>
+        </div>
+
+        <div class="selector-cantidad">
+          <button class="qty-btn decrease">−</button>
+          <input type="number" class="qty-input" value="1" min="1" max="100" />
+          <button class="qty-btn increase">+</button>
+        </div>
+        <div class="quantity-limit-container">
+          <span class="quantity-limit">Máximo: 100 unidades</span>
+        </div>
+
+        <button type="button" class="btn-agregar">Agregar al carrito <i class="fa-solid fa-cart-shopping"></i></button>
+      </div>
     </div>
   </div>
-</div>
 {% endblock %}
 
 {% block scripts %}
