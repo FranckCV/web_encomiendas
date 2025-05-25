@@ -1,3 +1,7 @@
+INSERT INTO empresa (id, nombre, correo, nro_telefono, logo, color_pri, color_sec, color_ter) VALUES
+(1, 'New Olva', 'info@newolva.com', '+123 456 789', 'a', '#1d4c82', '#13e2da', '#1b98e0');
+
+
 INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo`) VALUES
 (1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF\n', 1),
 (2, 'Logística', 'fa-solid fa-truck-front', 'logistica', '#00F068', 1),
