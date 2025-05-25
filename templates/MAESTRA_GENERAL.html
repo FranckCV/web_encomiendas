@@ -2,7 +2,6 @@
 
 {% block estilos_html %}
   <link rel="stylesheet" href="/static/css/general_styles.css" />
-  <link rel="shortcut icon" href="/static/img/logo.png" />
   {% block estilos %}
 
   {% endblock %}
@@ -15,16 +14,16 @@
 
 {% block body_html %}
   <header class="general_element top-header">
-    <div class="logo-container">
-      <img class="logo" src="/static/img/logo.png" alt="" />
+    <a class="logo-container" href="{{ url_for('main_page') }}">
+      <img class="logo" src="{{URL_IMG_LOGO}}" alt="" />
       <div class="logo-text">{{ SYSTEM_NAME }}</div>
-    </div>
+    </a>
 
     <nav class="main-nav">
-      <a href="{{ url_for('main_page') }}" class="nav-link">
+      <!-- <a href="{{ url_for('main_page') }}" class="nav-link">
         <i class="fas fa-home"></i>
         <span>Inicio</span>
-      </a>
+      </a> -->
       <a href="{{ url_for('tracking') }}" class="nav-link">
         <i class="fas fa-search"></i>
         <span>Seguimiento</span>
@@ -46,10 +45,28 @@
 
     <a href="{{ url_for('login') }}" class="account-area">
       <div class="user-icon">
-        <i class="fas fa-user"></i>
+        <!-- <i class="fa-regular fa-user"></i> -->
+        <i class="
+        {% if tipoUsuario == 'E' %}
+          {{ICON_PAGE_PANEL}}
+        {% elif tipoUsuario == 'C' %}
+          fa-solid fa-user
+        {% else %}
+          fa-solid fa-user
+        {% endif %}
+        
+        "></i>
       </div>
       <div class="user-text">
-        <p>Iniciar sesión</p>
+        <p>
+        {% if tipoUsuario == 'E' %}
+          Panel Administrativo
+        {% elif tipoUsuario == 'C' %}
+          Mi perfil
+        {% else %}
+          Iniciar sesión
+        {% endif %}
+      </p>
       </div>
     </a>
   </header>
@@ -126,10 +143,10 @@
         <h3 class="footer-title">{{ SYSTEM_NAME }}</h3>
         <p>Soluciones de logística y envío confiables desde 2005. Comprometidos con la calidad y eficiencia en cada entrega.</p>
         <div class="social-links">
-          <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-          <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-          <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+          <a href="https://www.facebook.com/" class="social-link"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://www.twitter.com/" class="social-link"><i class="fab fa-twitter"></i></a>
+          <a href="https://www.instagram.com/" class="social-link"><i class="fab fa-instagram"></i></a>
+          <a href="https://www.linkedin.com/" class="social-link"><i class="fab fa-linkedin-in"></i></a>
         </div>
       </div>
 
@@ -163,13 +180,16 @@
           <!-- <li class="footer-link"><a href="#">Logística e-commerce</a></li> -->
           <!-- <li class="footer-link"><a href="#">Servicios especiales</a></li> -->
           <li class="footer-link">
-            <a href="#">Registro de envíos</a>
+            <a href="{{ url_for('registro_envio') }}">Envios de paquetes</a>
           </li>
           <li class="footer-link">
-            <a href="#">Programación de recojos</a>
+            <a href="{{ url_for('registro_envio') }}">Envios de sobres</a>
           </li>
           <li class="footer-link">
             <a href="#">Envios masivos</a>
+          </li>
+          <li class="footer-link">
+            <a href="{{ url_for('cajas') }}">Compra de empaques</a>
           </li>
         </ul>
       </div>
@@ -177,18 +197,18 @@
       <div class="footer-column">
         <h3 class="footer-title">Contáctanos</h3>
         <ul class="footer-links">
-          <li class="footer-link">
+          <!-- <li class="footer-link">
             <i class="fas fa-map-marker-alt"></i> Av. Principal #123
+          </li> -->
+          <li class="footer-link">
+            <i class="fas fa-phone"></i> {{main_information['nro_telefono']}}
           </li>
           <li class="footer-link">
-            <i class="fas fa-phone"></i> +123 456 789
+            <i class="fas fa-envelope"></i> {{main_information['correo']}}
           </li>
-          <li class="footer-link">
-            <i class="fas fa-envelope"></i> info@expressenvios.com
-          </li>
-          <li class="footer-link">
+          <!-- <li class="footer-link">
             <i class="fas fa-clock"></i> Lun-Vie: 8:00 - 18:00
-          </li>
+          </li> -->
         </ul>
       </div>
     </div>

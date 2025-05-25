@@ -33,13 +33,51 @@ def get_modulo_key(key):
     return  filas
 
 
-def get_lista_tipo_paginas():
+def get_tipos_pagina_moduloid(id):
     sql= f'''
         select 
             tip.id ,
-            tip.nombre 
+            tip.nombre ,
+            pag.moduloid ,
+            count(pag.id) as cant
         from tipo_pagina tip
-        order by 1 asc 
+        left join pagina pag on pag.tipo_paginaid = tip.id
+        where pag.moduloid = %s
+        group by tip.id  , pag.moduloid  
+        order by 1 asc
+    '''
+    filas = bd.sql_select_fetchall(sql,(id))
+    return  filas
+
+
+def get_pagina_key(key):
+    sql= f'''
+        select 
+            pag.id ,
+            pag.titulo ,
+            pag.icono ,
+            pag.activo ,
+            pag.key ,
+            pag.tipo_paginaid , 
+            pag.moduloid 
+        from pagina pag
+        where pag.key = %s
+    '''
+    filas = bd.sql_select_fetchone(sql,(key))
+    return  filas
+
+
+def get_lista_tipo_paginas():
+    sql= f'''
+        SELECT 
+            tp.id ,
+            tp.nombre ,
+            m.id as moduloid,
+            COUNT(p.id) AS cant
+        FROM tipo_pagina tp
+        CROSS JOIN modulo m
+        LEFT JOIN pagina p ON p.tipo_paginaid = tp.id AND p.moduloid = m.id
+        GROUP BY m.id, tp.id
     '''
 
     filas = bd.sql_select_fetchall(sql)
@@ -61,6 +99,7 @@ def get_paginas():
     '''
     filas = bd.sql_select_fetchall(sql)
     return  filas
+
 
 def get_paginas_moduloid(moduloid):
     sql= f'''
@@ -199,6 +238,14 @@ def update_pagina( id , titulo , icono , moduloid ):
     bd.sql_execute(sql,( titulo , icono , moduloid ))
 
 
+def unable_permiso_pagina(column , paginaid , rolid):
+    sql = f'''
+        update acceso set 
+        {column} = NOT {column}
+        where paginaid = {paginaid} and rolid = {rolid}
+    '''
+    bd.sql_execute(sql)
+    # return 0
 
 
 
