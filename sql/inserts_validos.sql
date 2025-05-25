@@ -2255,3 +2255,21 @@ INSERT INTO `sucursal`(`abreviatura`, `ubigeocodigo`, `direccion`, `horario_l_v`
 ('TRU19', '130119', 'Calle San Martín 789, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, ''),
 ('TRU20', '130120', 'Av. 28 de Julio 456, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '');
 
+INSERT INTO cliente (
+  correo,
+  telefono,
+  num_documento,
+  nombre_siglas,
+  apellidos_razon,
+  tipo_documentoid,
+  tipo_clienteid
+)
+VALUES (
+  'fabs@correo.com',
+  '987654321',
+  '12345678',
+  'Fabiola',
+  'Mejía',
+  1,
+  2
+);
