@@ -1,0 +1,27 @@
+
+    <div class="row">
+      <h3>{% if fila['activo'] == 0 %}
+        {{ ACT_STATE_1 }}
+        {% elif fila['activo'] == 1 %}
+        {{ ACT_STATE_0 }}
+        {% endif %} {{nombre_tabla}} </h3>
+      <!-- <hr> -->
+    </div>
+    <input type="hidden" name="{{primary_key}}" id="{{primary_key}}" value="{{fila[primary_key]}}">
+    <p>¿Está seguro de que desea {% if fila['activo'] == 0 %}
+      {{ ACT_STATE_1 | lower }}
+      {% elif fila['activo'] == 1 %}
+      {{ ACT_STATE_0 | lower }}
+      {% endif %} este {{nombre_tabla}} (ID: {{fila[primary_key]}}) ?</p>
+
+    <div class="row">
+      <div class="col">
+        <div class="button btn_back" onclick="closeModal()">Cancelar</div>
+      </div>
+      <div class="col-1"></div>
+      <div class="col">
+        <button class="button btn_acept" type="submit">
+          Aceptar
+        </button>
+      </div>
+    </div>

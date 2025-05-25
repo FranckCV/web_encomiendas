@@ -1,3 +1,6 @@
+INSERT INTO empresa (id, nombre, correo, nro_telefono, logo, color_pri, color_sec, color_ter) VALUES
+(1, 'New Olva', 'info@newolva.com', '+123 456 789', 'a', '#1d4c82', '#13e2da', '#1b98e0');
+
 INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo`) VALUES
 (1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF\n', 1),
 (2, 'Logística', 'fa-solid fa-truck-front', 'logistica', '#00F068', 1),
@@ -78,10 +81,8 @@ INSERT INTO `rol` (`id`, `nombre`, `descripcion`, `activo`, `tipo_rolid`) VALUES
 
 
 
------
 
 INSERT INTO `ubigeo` (`codigo`, `departamento`, `provincia`, `distrito`, `activo`) VALUES
--- ('', 'LIMA', 'LIMA', 'SANTA MARIA DE HUACHIPA', 1),
 ('100101', 'ICA', 'ICA', 'ICA', 1),
 ('100102', 'ICA', 'ICA', 'LA TINGUIÑA', 1),
 ('100103', 'ICA', 'ICA', 'LOS AQUIJES', 1),
@@ -2155,35 +2156,21 @@ INSERT INTO articulo (nombre, precio, stock, activo, img, dimensiones, tamaño_c
 ('Útiles de escritorio - Pack escolares',         17.90, 150, 1, NULL, '25x20x5',  3), -- S
 ('Útiles de oficina - Organizador modular',       27.50,  40, 1, NULL, '30x20x10', 3); -- S
 
+
 insert INTO `tipo_cliente` (nombre, activo) VALUES ('Persona Natural',1);
 insert INTO `tipo_cliente` (nombre, activo) VALUES ('Persona Jurídica',1);
 
--- INSERT INTO tipo_rol (nombre, descripcion, activo)
--- VALUES ('Administrador', 'Tiene acceso total al sistema.', 1);
-
--- INSERT INTO tipo_rol (nombre, descripcion, activo)
--- VALUES ('Usuario', 'Acceso limitado a funciones básicas.', 1);
-
--- INSERT INTO rol (nombre, descripcion, activo, tipo_rolid)
--- VALUES ('Superadmin', 'Rol con acceso total al sistema, incluyendo configuración y seguridad.', 1, 1);
-
--- INSERT INTO rol (nombre, descripcion, activo, tipo_rolid)
--- VALUES ('ClienteWeb', 'Rol de usuario con acceso solo al portal de clientes.', 1, 2);
-
-INSERT INTO empleado (nombre, apellidos, correo, rolid)
-VALUES ('Carlos', 'Ramírez López', 'carlos.ramirez@example.com', 1);
-
-INSERT INTO empleado (nombre, apellidos, correo, rolid)
-VALUES ('Laura', 'González Torres', 'laura.gonzalez@example.com', 1);
 
 insert INTO `metodo_pago` (nombre, activo) VALUES ('Efectivo',1);
 
-INSERT INTO usuario (correo, contrasenia, tipo_usuario, activo)
-VALUES ('ana.mendez@example.com', 'hashed_password_1', 'A', 1);
 
-INSERT INTO usuario (correo, contrasenia, tipo_usuario, activo)
-VALUES ('jose.perez@example.com', 'hashed_password_2', 'E', 1);
+INSERT INTO usuario (id, correo, contrasenia, tipo_usuario, activo)
+VALUES (1 , 'ana@gmail.com'  , '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+ (2 , 'perez@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1);
 
 
+INSERT INTO empleado (usuarioid , nombre, apellidos, correo, rolid)
+VALUES (1, 'Ana' , 'Ramírez', 'ana@gmail.com', 1),
+ (2, 'Juan', 'Perez', 'perez@gmail.com', 1);
 
 

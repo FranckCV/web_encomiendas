@@ -3,7 +3,6 @@
 {% block estilos_html %}
 
 <link rel="stylesheet" href="/static/css/admin_styles.css">
-<link rel="shortcut icon" href="/static/img/logo.png">
 {% block estilos %}
 {% endblock %}
 <title>
@@ -22,12 +21,15 @@
 
 <aside class="general_element" id="menu_aside" class="">
     <div class="menu_img">
-        <img src="/static/img/logo.png" class="logo_admin">
+        <a class="" href="{{ url_for('main_page') }}">
+            <img src="{{URL_IMG_LOGO}}" class="logo_admin">
+        </a>
     </div>
 
     <div class="menu_option">
         <a class="menu_title" href="{{url_for('panel')}}">
             <p>Panel</p>
+            
             <i class="ri-dashboard-line"></i>
         </a>
     </div>
@@ -35,49 +37,106 @@
     {% for modulo in modulos %}
     {% if modulo['id'] == cur_modulo_id %}
 
+    <style>
+        .tip_title {
+            color: color-mix(in srgb, {{modulo['color']}} 80%, white 45%) ;
+        }
+
+        .{{modulo['key']}}.menu_title:hover {
+            color: color-mix(in srgb , {{modulo['color']}} 95% , white 65%)  ;
+            /* color: color-mix(in srgb , {{modulo['color']}} 95% , white 05%)  ; */
+            /* filter: brightness(1.5); */
+        }
+
+        :root {
+            --color-page : color-mix(in srgb , {{modulo['color']}} 95% , white 65%) ;
+        }
+
+        .mod_title {
+            display: flex;
+            align-items: center;
+            border: 1px solid #8c8c8c29;
+            font-size: 120%;
+            padding-block: 7px;
+            padding-inline: 12px;
+            border-radius: 5px;
+            justify-self: flex-start;
+            gap: 10px;
+            cursor: pointer;
+            background-color: color-mix(in srgb, {{ modulo.get('color') }} 10%, transparent 30%) ; 
+            color: color-mix(in srgb, {{ modulo.get('color') }} 100%, white 30%)  ;
+        }
+
+        .mod_title:hover {
+            /* color: color-mix(in srgb, {{ modulo.get('color') }} 15%, white 10%) ;  */
+            background-color: color-mix(in srgb, {{ modulo.get('color') }} 100%, white 0%)  ;
+            /* color: var(--color-bg-admin); */
+            color: white;
+        }
+
+        .mod_title i {
+            font-size: 150%;
+        }
+
+    </style>
+
     <div class="line_separator"></div>
 
     <div class="menu_option">
-        <a class="menu_title" href="{{url_for('dashboard', module_name = modulo['key'] )}}">
+
+        <!-- <a class="menu_title {{modulo['key']}}" href="{{url_for('dashboard', module_name = modulo['key'] )}}">
             <p>{{ modulo['nombre'] }}</p>
             <i class="{{ modulo['icono'] }}"></i>
+        </a> -->
+
+        <a class="mod_title" href="{{url_for('dashboard', module_name = modulo['key'] )}}">
+            <i class="{{ modulo.get('icono') }}"></i>
+            <p> {{ modulo.get('nombre') }} </p>
         </a>
+
         <div class="menu_content">
-
             {% for tipo_pag in tipos_paginas %}
-            <p>{{ tipo_pag['nombre'] }}</p>
 
-            {% for page in paginas %}
+            {% if tipo_pag['moduloid'] == cur_modulo_id and tipo_pag['cant'] > 0 %}
+            <div class="tip_block">
+                <p class="tip_title">{{ tipo_pag['nombre'] }} - {{ tipo_pag['cant'] }}  </p>
 
-            {% if page['tipo_paginaid'] == tipo_pag['id'] and page['moduloid'] == cur_modulo_id %}
+                <div class="tip_content">
+                    {% for page in paginas %}
 
-            {% if page['tipo_paginaid'] == 1 %}
-            <a class="mu_page" href="{{url_for('crud_generico',tabla = page['key'] )}}">
-                <i class="{{ page['icono'] or ICON_PAGE_CRUD }}"></i>
-                <p>{{NOMBRE_CRUD_PAGE}} {{ page['titulo'] | lower }}</p>
-            </a>
-            {% elif page['tipo_paginaid'] == 2 %}
-            <a class="mu_page" href="{{url_for(page['key'])}}">
-                <i class="{{ page['icono'] }}"></i>
-                <p>{{ page['titulo'] }}</p>
-            </a>
-            {% elif page['tipo_paginaid'] == 3 %}
+                    {% if page['tipo_paginaid'] == tipo_pag['id'] and page['moduloid'] == cur_modulo_id %}
 
-            {% elif page['tipo_paginaid'] == 4 %}
-            <a class="mu_page" href="{{url_for('reporte',report_name = page['key'] )}}">
-                <i class="{{ page['icono'] or ICON_PAGE_CRUD }}"></i>
-                <p>{{ page['titulo'] }}</p>
-            </a>
-            {% elif page['tipo_paginaid'] == 5 %}
+                    {% if page['tipo_paginaid'] == 1 %}
+                    <a class="mu_page" href="{{url_for('crud_generico',tabla = page['key'] )}}">
+                        <i class="{{ page['icono'] or ICON_PAGE_CRUD }}"></i>
+                        <p>{{NOMBRE_CRUD_PAGE}} {{ page['titulo'] | lower }}</p>
+                    </a>
+                    {% elif page['tipo_paginaid'] == 2 %}
+                    <a class="mu_page" href="{{url_for(page['key'])}}">
+                        <i class="{{ page['icono'] }}"></i>
+                        <p>{{ page['titulo'] }}</p>
+                    </a>
+                    {% elif page['tipo_paginaid'] == 3 %}
 
+                    {% elif page['tipo_paginaid'] == 4 %}
+                    <a class="mu_page" href="{{url_for('reporte',report_name = page['key'] )}}">
+                        <i class="{{ page['icono'] or ICON_PAGE_CRUD }}"></i>
+                        <p>{{ page['titulo'] }}</p>
+                    </a>
+                    {% elif page['tipo_paginaid'] == 5 %}
+
+                    {% endif %}
+
+                    {% endif %}
+
+                    {% endfor %}
+
+                    {% if tipo_pag['cant'] == 0 %}
+                    <p class="text_none">Sin contenido</p>
+                    {% endif %}
+                </div>
+            </div>
             {% endif %}
-
-            {% endif %}
-
-            {% endfor %}
-
-
-
             {% endfor %}
 
 
@@ -91,43 +150,19 @@
 
     {% endfor %}
 
-    <!-- <div class="line_separator"></div> -->
-
-    <!-- <div class="menu_option">
-        <a class="menu_title" href="{{url_for('administrar_paginas')}}">
-            <p>{{NOMBRE_ADMINPAGES_PAGE}}</p>
-            <i class="ri-file-settings-fill"></i>
-        </a>
-    </div>
-    
-    <div class="line_separator"></div>
-
-    <div class="menu_option">
-        <a class="menu_title" href="">
-            <p>Información de la empresa</p>
-            <i class="ri-building-fill"></i>
-        </a>
-    </div> -->
-
-
-
 </aside>
 
 <div class="menu_user">
-    <div class="mu_content">
-        <div class="mu_option">
-            <div class="user_icon">
-                <i class="fa-solid fa-user"></i>
-            </div>
-
-            <p class="user_name">Nombre de usuario</p>
-            <p class="user_type">Cargo de usuario</p>
-
-            <div class="user_out">
-                <i class="fa-solid fa-right-from-bracket"></i>
-            </div>
-        </div>
+    <div class="user_icon">
+        <i class="fa-solid fa-user"></i>
     </div>
+
+    <p class="user_name">{{datosUsuario['nombre']}} {{datosUsuario['apellidos']}} </p>
+    <p class="user_type">{{datosUsuario['tip_nombre']}} | {{datosUsuario['rol_nombre']}}</p>
+
+    <a class="user_out" href="{{url_for('logout')}}">
+        <i class="fa-solid fa-right-from-bracket"></i>
+    </a>
 </div>
 
 <section class="general_element">

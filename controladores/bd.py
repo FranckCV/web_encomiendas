@@ -3,15 +3,15 @@ from pymysql.cursors import DictCursor
 #Establecemos la conexión
 def obtener_conexion():
     return pymysql.connect(host='localhost',
-                                # port=3306,
-                                port=3307,
+                                port=3306,
+                                # port=3307,
                                 user='root',
                                 password='',
                                 db='bd_encomiendas' ,
                                 cursorclass=DictCursor
                                 )
 
-#
+
 def sql_select_fetchall(sql , args = None):
     conexion = obtener_conexion()
     try:
