@@ -525,8 +525,8 @@ CONTROLADORES = {
         "fields_form": [
 #            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
             ['tarifa',      'Tarifa',          'Tarifa',      'text',     True ,     True  ,        None ],
-            ['sucursal_origen_id',  'Sucursal de origen', 'Sucursal de origen', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_origen' ] ],
-            ['sucursal_destino_id',  'Sucursal de destino', 'Sucursal de destino', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_destino' ] ],
+            ['sucursal_origen_id',  'Sucursal de origen', 'Sucursal de origen', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_origen_id' ] ],
+            ['sucursal_destino_id',  'Sucursal de destino', 'Sucursal de destino', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_destino_id' ] ],
 ],
         "crud_forms": {
             "crud_list": True,
@@ -965,8 +965,8 @@ CONTROLADORES = {
         ] ,
         "fields_form": [
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['descuentoid', 'Descuento',    'Seleccione un descuento',    'select',     True ,     True ,         [lambda: controlador_descuento.get_options() , 'nom_descuento' ] ],
-            ['articuloid', 'Articulo',    'Seleccione un articulo',    'select',     True ,     True ,         [lambda: controlador_articulo.get_options() , 'nom_articulo' ] ],
+            ['descuentoid', 'Descuento',    'Seleccione un descuento',    'select',     True ,     False ,         [lambda: controlador_descuento.get_options() , 'nom_descuento' ] ],
+            ['articuloid', 'Articulo',    'Seleccione un articulo',    'select',     True ,     False ,         [lambda: controlador_articulo.get_options() , 'nom_articulo' ] ],
             ['cantidad_descuento',      'Cantidad descontada',          '30%',      'number',     True ,     True  ,        None ],
         ],
         "crud_forms": {
@@ -1631,7 +1631,7 @@ def contac():
 @app.route("/api/cajas")
 def api_cajas():
     filas = controlador_articulo.get_table_with_discount()
-
+    print(filas)
     productSizes = {}
 
     for fila in filas:
@@ -1652,11 +1652,12 @@ def api_cajas():
                 "discounts": []  
             }
 
-        if fila.get('cantidad_descuento') and fila.get('nombre'):
+        if fila['cantidad_descuento'] and fila['nom_descuento']:
             productSizes[key]["discounts"].append({
                 "name": fila['nom_descuento'],  
                 "value": float(fila['cantidad_descuento'])
             })
+    print(productSizes)
     return jsonify(productSizes)
 
 
