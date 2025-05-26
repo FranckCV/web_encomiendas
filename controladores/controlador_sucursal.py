@@ -130,3 +130,43 @@ def get_options():
     return lista
 
 
+def get_agencias_data():
+    sql = '''
+        SELECT 
+            s.id,
+            s.abreviatura,
+            s.direccion,
+            s.latitud,
+            s.longitud,
+            s.teléfono,
+            s.horario_l_v,
+            s.horario_s_d,
+            u.departamento,
+            u.provincia,
+            u.distrito
+        FROM 
+            sucursal s
+        INNER JOIN 
+            ubigeo u ON u.codigo = s.ubigeocodigo
+        WHERE 
+            s.activo = 1 AND u.activo = 1  AND latitud is not null and longitud is not null
+    '''
+    resultados = sql_select_fetchall(sql)
+
+    # Convertimos los resultados a un formato similar al de agenciasData
+    agencias = []
+    for fila in resultados:
+        agencias.append({
+            "id": fila["id"],
+            "nombre": f"Sucursal {fila["departamento"]} - {fila["abreviatura"][-2:]}",  # Puedes cambiar esto si tienes un campo específico para nombre
+            "departamento": fila["departamento"],
+            "provincia": fila["provincia"],
+            "distrito": fila["distrito"],
+            "direccion": fila["direccion"],
+            "lat": float(fila["latitud"]),
+            "lng": float(fila["longitud"]),
+            "telefono": fila["teléfono"],
+            "horario": f"Lun-Vier: {fila['horario_l_v']}, Sáb-Dom: {fila['horario_s_d']}"
+        })
+
+    return agencias
