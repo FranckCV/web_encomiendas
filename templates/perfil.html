@@ -4,184 +4,378 @@
 {% endblock %}
 {% block contenido %}
   <div class="container">
-    <section class="profile-section">
-      <div class="profile-header">
-        <div class="profile-info">
+    <!-- Header del Perfil -->
+    <div class="profile-header">
+      <div class="floating-shapes">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+      </div>
+      <div class="profile-info">
+        <div class="profile-avatar">FP</div>
+        <div class="profile-details">
           <h1>Fabiana Paucar</h1>
-          <p>fabianapm060@gmail.com</p>
-          <p>Cliente desde: Enero 2023</p>
+          <div class="profile-meta">
+            fabianapm060@gmail.com<br />
+            Cliente desde: Enero 2023
+          </div>
+          <div class="action-buttons">
+            <button class="btn btn-primary" onclick="toggleEditMode()">✏️ Editar datos</button>
+            <a href="#" class="btn btn-primary">🔒 Cambiar contraseña</a>
+            <a href="#" class="btn btn-primary">🏠 Registrar recojo en casa</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-number">24</div>
+        <div class="stat-label">Envíos Totales</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">21</div>
+        <div class="stat-label">Entregados</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">2</div>
+        <div class="stat-label">En Tránsito</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">1</div>
+        <div class="stat-label">Pendientes</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">3</div>
+        <div class="stat-label">Reclamos</div>
+      </div>
+    </div>
+
+    <!-- Información del Usuario -->
+    <div class="user-info-section">
+      <div class="info-card">
+        <h3>Datos Personales</h3>
+        <div id="user-info-display">
+          <div class="info-item">
+            <span class="info-label">Nombre:</span>
+            <span class="info-value" id="display-nombre">Fabiana</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Apellidos:</span>
+            <span class="info-value" id="display-apellidos">Paucar Mendoza</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Tipo Documento:</span>
+            <span class="info-value" id="display-tipo-doc">DNI</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">N° Documento:</span>
+            <span class="info-value" id="display-num-doc">12345678</span>
+          </div>
+        </div>
+        <div class="edit-form" id="personal-edit-form">
+          <div class="form-group">
+            <label>Nombre / Siglas:</label>
+            <input type="text" id="edit-nombre" value="Fabiana" />
+          </div>
+          <div class="form-group">
+            <label>Apellidos / Razón Social:</label>
+            <input type="text" id="edit-apellidos" value="Paucar Mendoza" />
+          </div>
+          <div class="form-group">
+            <label>Tipo de Documento:</label>
+            <select id="edit-tipo-doc">
+              <option value="1">DNI</option>
+              <option value="2">RUC</option>
+              <option value="3">Pasaporte</option>
+              <option value="4">Carnet de Extranjería</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>N° Documento:</label>
+            <input type="text" id="edit-num-doc" value="12345678" />
+          </div>
         </div>
       </div>
 
-      <div class="profile-stats">
-        <div class="stat-item">
-          <div class="stat-number">24</div>
-          <div class="stat-label">Envíos totales</div>
+      <div class="info-card">
+        <h3>Datos de Contacto</h3>
+        <div id="contact-info-display">
+          <div class="info-item">
+            <span class="info-label">Correo:</span>
+            <span class="info-value" id="display-correo">fabianapm060@gmail.com</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Teléfono:</span>
+            <span class="info-value" id="display-telefono">+51 987 654 321</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Tipo Cliente:</span>
+            <span class="info-value" id="display-tipo-cliente">Personal</span>
+          </div>
         </div>
-        <div class="stat-item">
-          <div class="stat-number">21</div>
-          <div class="stat-label">Entregados</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">2</div>
-          <div class="stat-label">En tránsito</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">1</div>
-          <div class="stat-label">Pendientes</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">3</div>
-          <div class="stat-label">Reclamos</div>
+        <div class="edit-form" id="contact-edit-form">
+          <div class="form-group">
+            <label>Correo Electrónico:</label>
+            <input type="email" id="edit-correo" value="fabianapm060@gmail.com" />
+          </div>
+          <div class="form-group">
+            <label>Teléfono:</label>
+            <input type="tel" id="edit-telefono" value="+51 987 654 321" />
+          </div>
+          <div class="form-group">
+            <label>Tipo de Cliente:</label>
+            <select id="edit-tipo-cliente">
+              <option value="1">Personal</option>
+              <option value="2">Empresarial</option>
+              <option value="3">Corporativo</option>
+            </select>
+          </div>
         </div>
       </div>
-    </section>
-
-    <!-- Navegación por pestañas -->
-    <div class="tabs">
-      <button class="tab-button active" data-tab="shipments">Mis Envíos</button>
-      <button class="tab-button" data-tab="claims">Mis Reclamos</button>
     </div>
 
-    <!-- Contenido de pestaña: Mis Envíos -->
-    <div class="tab-content active" id="shipments">
-      <h2>Mis Envíos</h2>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Nº Seguimiento</th>
-            <th>Origen</th>
-            <th>Destino</th>
-            <th>Fecha envío</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>ENV-20250501-3782</td>
-            <td>Santiago</td>
-            <td>Valparaíso</td>
-            <td>01/05/2025</td>
-            <td>
-              <span class="status status-transit">En tránsito</span>
-            </td>
-            <td>
-              <button class="action-button">Ver detalles</button>
-            </td>
-          </tr>
-          <tr>
-            <td>ENV-20250418-2945</td>
-            <td>Santiago</td>
-            <td>Concepción</td>
-            <td>18/04/2025</td>
-            <td>
-              <span class="status status-delivered">Entregado</span>
-            </td>
-            <td>
-              <button class="action-button">Ver detalles</button>
-            </td>
-          </tr>
-          <tr>
-            <td>ENV-20250405-1278</td>
-            <td>Santiago</td>
-            <td>La Serena</td>
-            <td>05/04/2025</td>
-            <td>
-              <span class="status status-problem">Problema</span>
-            </td>
-            <td>
-              <button class="action-button">Ver detalles</button>
-            </td>
-          </tr>
-          <tr>
-            <td>ENV-20250328-9654</td>
-            <td>Santiago</td>
-            <td>Arica</td>
-            <td>28/03/2025</td>
-            <td>
-              <span class="status status-pending">Pendiente</span>
-            </td>
-            <td>
-              <button class="action-button">Ver detalles</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="form-actions" id="edit-actions" style="display: none;">
+      <button class="btn btn-success" onclick="saveChanges()">💾 Guardar Cambios</button>
+      <button class="btn btn-secondary" onclick="cancelEdit()">❌ Cancelar</button>
     </div>
 
-    <!-- Contenido de pestaña: Mis Reclamos -->
-    <div class="tab-content" id="claims">
-      <h2>Mis Reclamos</h2>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>ID Reclamo</th>
-            <th>Nº Seguimiento</th>
-            <th>Fecha reclamo</th>
-            <th>Motivo</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>REC-20250406-123</td>
-            <td>ENV-20250405-1278</td>
-            <td>06/04/2025</td>
-            <td>Paquete dañado</td>
-            <td>
-              <span class="status status-transit">En revisión</span>
-            </td>
-            <td>
-              <button class="action-button">Ver detalles</button>
-            </td>
-          </tr>
-          <tr>
-            <td>REC-20250315-087</td>
-            <td>ENV-20250309-6542</td>
-            <td>15/03/2025</td>
-            <td>Entrega tardía</td>
-            <td>
-              <span class="status status-delivered">Resuelto</span>
-            </td>
-            <td>
-              <button class="action-button">Ver detalles</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Contenido Principal con Tabs -->
+    <div class="content-section">
+      <div class="tab-container">
+        <button class="tab-button active" onclick="switchTab('envios')">Mis Envíos</button>
+        <button class="tab-button" onclick="switchTab('reclamos')">Mis Reclamos</button>
+      </div>
 
-        <a href="{{url_for('libro_reclamaciones')}}"  class="action-button">Registrar nuevo reclamo</a>
+      <!-- Tab: Mis Envíos -->
+      <div id="envios-tab" class="tab-content active">
+        <h2>Mis Envíos</h2>
+        <table class="shipment-table">
+          <thead>
+            <tr>
+              <th>N° Seguimiento</th>
+              <th>Origen</th>
+              <th>Destino</th>
+              <th>Fecha Envío</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <strong>ENV-20250501-3782</strong>
+              </td>
+              <td>Santiago</td>
+              <td>Valparaíso</td>
+              <td>01/05/2025</td>
+              <td>
+                <span class="status-badge status-transit">En tránsito</span>
+              </td>
+              <td>
+                <a href="#" class="btn-details">Ver detalles</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>ENV-20250418-2945</strong>
+              </td>
+              <td>Santiago</td>
+              <td>Concepción</td>
+              <td>18/04/2025</td>
+              <td>
+                <span class="status-badge status-delivered">Entregado</span>
+              </td>
+              <td>
+                <a href="#" class="btn-details">Ver detalles</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>ENV-20250410-1876</strong>
+              </td>
+              <td>Valparaíso</td>
+              <td>Santiago</td>
+              <td>10/04/2025</td>
+              <td>
+                <span class="status-badge status-delivered">Entregado</span>
+              </td>
+              <td>
+                <a href="#" class="btn-details">Ver detalles</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>ENV-20250405-5621</strong>
+              </td>
+              <td>Santiago</td>
+              <td>La Serena</td>
+              <td>05/04/2025</td>
+              <td>
+                <span class="status-badge status-pending">Pendiente</span>
+              </td>
+              <td>
+                <a href="#" class="btn-details">Ver detalles</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-
+      <!-- Tab: Mis Reclamos -->
+      <div id="reclamos-tab" class="tab-content">
+        <h2>Mis Reclamos</h2>
+        <table class="complaint-table">
+          <thead>
+            <tr>
+              <th>N° Reclamo</th>
+              <th>N° Envío</th>
+              <th>Motivo</th>
+              <th>Fecha Reclamo</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <strong>REC-2025-001</strong>
+              </td>
+              <td>ENV-20250418-2945</td>
+              <td>Retraso en la entrega</td>
+              <td>20/04/2025</td>
+              <td>
+                <span class="status-badge status-delivered">Resuelto</span>
+              </td>
+              <td>
+                <a href="#" class="btn-details">Ver detalles</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>REC-2025-002</strong>
+              </td>
+              <td>ENV-20250410-1876</td>
+              <td>Daño en el paquete</td>
+              <td>12/04/2025</td>
+              <td>
+                <span class="status-badge status-transit">En proceso</span>
+              </td>
+              <td>
+                <a href="#" class="btn-details">Ver detalles</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>REC-2025-003</strong>
+              </td>
+              <td>ENV-20250405-5621</td>
+              <td>Información incorrecta</td>
+              <td>08/04/2025</td>
+              <td>
+                <span class="status-badge status-pending">Pendiente</span>
+              </td>
+              <td>
+                <a href="#" class="btn-details">Ver detalles</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
-
-  <!-- Pie de página -->
-  <footer>
-    <div class="footer-content">
-      <p>&copy; 2025 ExpressEnvíos. Todos los derechos reservados.</p>
-    </div>
-  </footer>
 {% endblock %}
 
 {% block scripts %}
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const tabButtons = document.querySelectorAll('.tab-button')
-      const tabContents = document.querySelectorAll('.tab-content')
+    let isEditMode = false
     
-      tabButtons.forEach((button) => {
-        button.addEventListener('click', function () {
-          tabButtons.forEach((btn) => btn.classList.remove('active'))
-          tabContents.forEach((content) => content.classList.remove('active'))
-    
-          this.classList.add('active')
-          const tabId = this.getAttribute('data-tab')
-          document.getElementById(tabId).classList.add('active')
-        })
+    function switchTab(tabName) {
+      // Ocultar todos los tabs
+      document.querySelectorAll('.tab-content').forEach((tab) => {
+        tab.classList.remove('active')
       })
+    
+      // Remover clase activa de todos los botones
+      document.querySelectorAll('.tab-button').forEach((btn) => {
+        btn.classList.remove('active')
+      })
+    
+      // Mostrar tab seleccionado
+      document.getElementById(tabName + '-tab').classList.add('active')
+    
+      // Activar botón correspondiente
+      event.target.classList.add('active')
+    }
+    
+    function toggleEditMode() {
+      isEditMode = !isEditMode
+    
+      const displaySections = document.querySelectorAll('#user-info-display, #contact-info-display')
+      const editForms = document.querySelectorAll('.edit-form')
+      const editActions = document.getElementById('edit-actions')
+    
+      if (isEditMode) {
+        displaySections.forEach((section) => (section.style.display = 'none'))
+        editForms.forEach((form) => (form.style.display = 'grid'))
+        editActions.style.display = 'flex'
+      } else {
+        displaySections.forEach((section) => (section.style.display = 'block'))
+        editForms.forEach((form) => (form.style.display = 'none'))
+        editActions.style.display = 'none'
+      }
+    }
+    
+    function saveChanges() {
+      // Actualizar valores mostrados
+      document.getElementById('display-nombre').textContent = document.getElementById('edit-nombre').value
+      document.getElementById('display-apellidos').textContent = document.getElementById('edit-apellidos').value
+      document.getElementById('display-num-doc').textContent = document.getElementById('edit-num-doc').value
+      document.getElementById('display-correo').textContent = document.getElementById('edit-correo').value
+      document.getElementById('display-telefono').textContent = document.getElementById('edit-telefono').value
+    
+      // Actualizar tipo de documento
+      const tipoDocSelect = document.getElementById('edit-tipo-doc')
+      document.getElementById('display-tipo-doc').textContent = tipoDocSelect.options[tipoDocSelect.selectedIndex].text
+    
+      // Actualizar tipo de cliente
+      const tipoClienteSelect = document.getElementById('edit-tipo-cliente')
+      document.getElementById('display-tipo-cliente').textContent = tipoClienteSelect.options[tipoClienteSelect.selectedIndex].text
+    
+      // Salir del modo edición
+      toggleEditMode()
+    
+      // Mostrar mensaje de confirmación
+      alert('Datos actualizados correctamente')
+    }
+    
+    function cancelEdit() {
+      // Restaurar valores originales
+      document.getElementById('edit-nombre').value = document.getElementById('display-nombre').textContent
+      document.getElementById('edit-apellidos').value = document.getElementById('display-apellidos').textContent
+      document.getElementById('edit-num-doc').value = document.getElementById('display-num-doc').textContent
+      document.getElementById('edit-correo').value = document.getElementById('display-correo').textContent
+      document.getElementById('edit-telefono').value = document.getElementById('display-telefono').textContent
+    
+      // Salir del modo edición
+      toggleEditMode()
+    }
+    
+    // Inicializar valores de los selects
+    document.addEventListener('DOMContentLoaded', function () {
+      // Configurar valores por defecto de los selects
+      document.getElementById('edit-tipo-doc').value = '1' // DNI
+      document.getElementById('edit-tipo-cliente').value = '1' // Personal
     })
   </script>
 {% endblock %}
