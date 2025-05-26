@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, make_response, url_for , g  #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
-from controladores import acceso as acceso
+from controladores import permiso as permiso
+from controladores import controlador_tipo_pagina as controlador_tipo_pagina
 from controladores import controlador_modulo as controlador_modulo
 from controladores import controlador_empresa as controlador_empresa
 from controladores import controlador_color as controlador_color
@@ -543,19 +544,19 @@ CONTROLADORES = {
         "filters":[
             ],
         "fields_form": [
-    #         ID/NAME         LABEL             PLACEHOLDER        TYPE       REQUIRED   ABLE/DISABLE   DATOS
-            ['id',            'ID',              'ID',              'text',      True ,    False,         True ],
-            ['abreviatura',   'Abreviatura',     'Abreviatura',     'text',      True ,    True,          None ],
-            ['codigo_postal', 'Código Postal',   'Código Postal',   'text',      True ,    True,          None ],
-            ['direccion',     'Dirección',       'Dirección',       'text',      True ,    True,          None ],
-            ['ubigeocodigo',  'Ubigeo',          'Elegir ubigeo',   'select',    True ,    True,          [lambda: controlador_ubigeo.get_options(), 'ubigeo'] ],
-            ['horario_l_v',   'Horario L-V',     'Ej: 9am - 6pm',   'text',      False,    True,          None ],
-            ['horario_s_d',   'Horario S-D',     'Ej: 9am - 1pm',   'text',      False,    True,          None ],
-            ['latitud',       'Latitud',         'Latitud',         'text',      False,    True,          None ],
-            ['longitud',      'Longitud',        'Longitud',        'text',      False,    True,          None ],
-            ['teléfono',      'Teléfono',        'Teléfono',        'text',      False,    True,          None ],
-            ['referencia',    'Referencia',      'Referencia',      'text',      False,    True,          None ],
-            ['activo',        f'{TITLE_STATE}',  'activo',          'p',         True ,    False,         None ],
+    #         ID/NAME         LABEL              PLACEHOLDER        TYPE       REQUIRED   ABLE/DISABLE   DATOS
+            ['id',            'ID',              'ID',              'text',      True ,    False,      True ],
+            ['abreviatura',   'Abreviatura',     'Abreviatura',     'text',      True ,    True,       None ],
+            ['codigo_postal', 'Código Postal',   'Código Postal',   'text',      True ,    True,       None ],
+            ['direccion',     'Dirección',       'Dirección',       'text',      True ,    True,       None ],
+            ['ubigeocodigo',  'Ubigeo',          'Elegir ubigeo',   'select',    True ,    True,       [lambda: controlador_ubigeo.get_options(), 'ubigeo'] ],
+            ['horario_l_v',   'Horario L-V',     'Ej: 9am - 6pm',   'text',      False,    True,       None ],
+            ['horario_s_d',   'Horario S-D',     'Ej: 9am - 1pm',   'text',      False,    True,       None ],
+            ['latitud',       'Latitud',         'Latitud',         'text',      False,    True,       None ],
+            ['longitud',      'Longitud',        'Longitud',        'text',      False,    True,       None ],
+            ['teléfono',      'Teléfono',        'Teléfono',        'text',      False,    True,       None ],
+            ['referencia',    'Referencia',      'Referencia',      'text',      False,    True,       None ],
+            ['activo',        f'{TITLE_STATE}',  'activo',          'p',         True ,    False,      None ],
         ],
 
         "crud_forms": {
@@ -925,7 +926,7 @@ CONTROLADORES = {
 
 # ADICIONAL (NO CRUD)
     "modulo": {
-        "active" : False ,
+        "active" : True ,
         "no_crud" : True ,
         # "titulo": "marcas de unidades",
         # "nombre_tabla": "marca",
@@ -1393,11 +1394,11 @@ def inject_cur_modulo_id():
         key = parts[-1] 
         page = parts[0]
         if page == 'dashboard':
-            dataPage = acceso.get_modulo_key(key)
+            dataPage = permiso.get_modulo_key(key)
             if dataPage:
                 return dict(cur_modulo_id=dataPage['id'])
         else:
-            dataPage = acceso.get_pagina_key(key)
+            dataPage = permiso.get_pagina_key(key)
             if dataPage:
                 return dict(cur_modulo_id=dataPage['moduloid'])
 
@@ -1410,9 +1411,9 @@ def inject_cur_modulo_id():
 @app.context_processor
 def inject_globals():
     listar_pages_admin = listar_admin_pages()
-    modulos = acceso.get_lista_modulos()
-    tipos_paginas = acceso.get_lista_tipo_paginas()
-    paginas = acceso.get_paginas()
+    modulos = permiso.get_lista_modulos()
+    tipos_paginas = permiso.get_lista_tipo_paginas()
+    paginas = permiso.get_paginas()
     options_pagination_crud , selected_option_crud = get_options_pagination_crud()
     cookie_error = request.cookies.get('error')
     user_id = request.cookies.get('user_id')
@@ -1625,8 +1626,8 @@ def panel():
 @app.route("/dashboard=<module_name>")
 @validar_empleado()
 def dashboard(module_name):
-    modulo = acceso.get_modulo_key(module_name)
-    tipos_pag = acceso.get_tipos_pagina_moduloid(modulo['id'])
+    modulo = permiso.get_modulo_key(module_name)
+    tipos_pag = permiso.get_tipos_pagina_moduloid(modulo['id'])
     return render_template(
         'dashboard.html' , 
         module_name = module_name , 
@@ -1642,7 +1643,8 @@ def crud_generico(tabla):
     config = CONTROLADORES.get(tabla)
     if config:
         active = config["active"]
-        if active is True:
+        no_crud = config.get('no_crud')
+        if active is True and (no_crud is None or no_crud is False):
             icon_page_crud = get_icon_page(config.get("icon_page"))
             titulo = config["titulo"]
             controlador = config["controlador"]
@@ -1722,28 +1724,29 @@ def reporte(report_name):
 
 
 @app.route("/administrar_paginas")
-@validar_empleado()
+# @validar_empleado()
 def administrar_paginas():
-    modulos = acceso.get_lista_modulos()
-    paginas = acceso.get_paginas_crud()
-    roles = acceso.get_lista_roles()
-    tipos_rol = acceso.get_lista_tipo_roles()
-    cants_mod = acceso.get_cants_modulos()
-    fields_form = [
-#        ID/NAME          LABEL         PLACEHOLDER  TYPE    REQUIRED   ABLE/DISABLE   DATOS
-        ['nombre', 'Nombre del módulo', 'Nombre', 'text',    True ,     True,          None ],
-        ['activo', 'Actividad',         'Color',  'p',    True,      True,          None ],
-        ['icono',  'Icono',             'Icono',  'icon',    True ,     True,          None ],
-        ['color',  'Color',             'color',  'color',    True,      True,          None ],
+    modulos = permiso.get_lista_modulos()
+    paginas = permiso.get_paginas()
+    roles = permiso.get_lista_roles()
+    tipos_rol = permiso.get_lista_tipo_roles()
+    cants_mod = permiso.get_cants_modulos()
+    fields_form_modulo = [
+#        ID/NAME   LABEL              PLACEHOLDER    TYPE       REQUIRED   ABLE/DISABLE   DATOS
+        # ['id',     'ID',                'ID',       'text',    True ,     True,          None ],
+        ['nombre', 'Nombre del módulo', 'Nombre',   'text',    True ,     True,          None ],
+        ['activo', 'Actividad',         'Color',    'p',       True,      True,          None ],
+        ['icono',  'Icono',             'Icono',    'icon',    True ,     True,          None ],
+        ['color',  'Color',             'color',    'color',   True,      True,          None ],
     ]
 
     fields_form_page = [
-#        ID/NAME          LABEL         PLACEHOLDER     TYPE    REQUIRED   ABLE/DISABLE   DATOS
-        ['titulo',        'Nombre del módulo', 'Nombre',  'text',    True ,   True   ,      None ],
-        ['activo',        'Actividad',         'Color',   'p',       True,    True   ,      None ],
-        ['icono',         'Icono',             'Icono',   'icon',    True ,   True   ,      None ],
-        ['moduloid',      'Módulo',            'Nombre',  'text',    True ,   True   ,      None ],
-        ['tipo_paginaid', 'Tipo de página',    'Nombre',  'text',    True ,   True   ,      None ],
+#        ID/NAME          LABEL               PLACEHOLDER    TYPE    REQUIRED   ABLE/DISABLE   DATOS
+        ['titulo',         'Nombre del módulo', 'Nombre',     'text',    True ,   True   ,      None ],
+        ['activo',         'Actividad',         'Color',      'p',       True,    True   ,      None ],
+        ['moduloid',       'Módulo',           'Módulo',      'select',  True ,   None   ,   [lambda: controlador_modulo.get_options() , 'nom_modulo'] ],
+        ['tipo_paginaid',  'Tipo de página',   'Tipo de página',      'select',  True ,   None   ,   [lambda: controlador_tipo_pagina.get_options() , 'nom_tipo'] ],
+        ['icono',         'Icono',             'Icono',      'icon',    True ,   True   ,      None ],
     ]
     
     return render_template(
@@ -1753,8 +1756,8 @@ def administrar_paginas():
         roles = roles ,
         tipos_rol = tipos_rol ,
         cants_mod = cants_mod ,
-        fields_form = fields_form ,
-        fields_form_page =     fields_form_page  ,
+        fields_form_modulo = fields_form_modulo ,
+        fields_form_page = fields_form_page  ,
  
         )
 
@@ -1762,13 +1765,13 @@ def administrar_paginas():
 @app.route("/permiso_rol=<int:rolid>")
 @validar_empleado()
 def permiso_rol(rolid):
-    modulos = acceso.get_lista_modulos()
-    paginas_cruds = acceso.get_paginas_crud()
-    roles = acceso.get_lista_roles()
-    tipos_rol = acceso.get_lista_tipo_roles()
-    cants_mod = acceso.get_cants_modulos()
+    modulos = permiso.get_lista_modulos()
+    paginas_cruds = permiso.get_paginas_crud()
+    roles = permiso.get_lista_roles()
+    tipos_rol = permiso.get_lista_tipo_roles()
+    cants_mod = permiso.get_cants_modulos()
 
-    info_rol = acceso.get_info_rol(rolid)
+    info_rol = permiso.get_info_rol(rolid)
 
     return render_template(
         'administrar_paginas.html' ,
@@ -1779,7 +1782,7 @@ def permiso_rol(rolid):
         rolid = rolid ,
         info_rol = info_rol ,
         cants_mod = cants_mod ,
-        cur_modulo_id = acceso.get_pagina_key('administrar_paginas')['moduloid'] ,
+        cur_modulo_id = permiso.get_pagina_key('administrar_paginas')['moduloid'] ,
         )
 
 
@@ -1826,8 +1829,8 @@ def crud_insert(tabla):
 
 
 @app.route("/update_row=<tabla>", methods=["POST"])
-@validar_empleado()
-@validar_error_crud()
+# @validar_empleado()
+# @validar_error_crud()
 def crud_update(tabla):
     # try:
         config = CONTROLADORES.get(tabla)
@@ -1877,8 +1880,8 @@ def crud_delete(tabla):
 
 
 @app.route("/unactive_row=<tabla>", methods=["POST"])
-@validar_empleado()
-@validar_error_crud()
+# @validar_empleado()
+# @validar_error_crud()
 def crud_unactive(tabla):
     config = CONTROLADORES.get(tabla)
     if not config:
