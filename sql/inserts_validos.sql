@@ -81,10 +81,7 @@ INSERT INTO `rol` (`id`, `nombre`, `descripcion`, `activo`, `tipo_rolid`) VALUES
 
 
 
-<<<<<<< HEAD
 
-=======
->>>>>>> c84db4abef8e82c964b1fb23c79994b782096a63
 INSERT INTO `ubigeo` (`codigo`, `departamento`, `provincia`, `distrito`, `activo`) VALUES
 ('100101', 'ICA', 'ICA', 'ICA', 1),
 ('100102', 'ICA', 'ICA', 'LA TINGUIÑA', 1),

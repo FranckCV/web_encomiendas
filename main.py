@@ -1621,18 +1621,22 @@ def mostrar_pagoenvio():
 #########
 
 ################# Sucursales ######################
+
 @app.route("/sucursales")
 def sucursales():
     departamentos = controlador_ubigeo.get_options_departamento()
     provincias = controlador_ubigeo.get_options_provincia()
     distritos = controlador_ubigeo.get_options_distrito()
-    # sucursal = controlador_sucursal.get_
+    agencias = controlador_sucursal.get_agencias_data()
+
     return render_template(
-        'sucursales.html' ,
-        departamentos = departamentos,
-        provincias = provincias,
-        distritos = distritos,
+        'sucursales.html',
+        departamentos=departamentos,
+        provincias=provincias,
+        distritos=distritos,
+        agencias=agencias
     )
+
 
 ###################################
 
