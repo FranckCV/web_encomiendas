@@ -1580,7 +1580,8 @@ paginas_simples = [
     'prueba_seguimiento',
     'envio_masivo',
     'cajas',
-    'cajas_prueba'
+    'cajas_prueba',
+    'sobre_nosotros'
 ]
 
 
