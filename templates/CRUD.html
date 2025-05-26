@@ -111,7 +111,7 @@
     {% if crud_insert %}
     <!-- <div class="col-1"></div> -->
     <div class="col-2">
-      <button class="button clickable-modal btn_crud btn_insert" id="modal_crud_insert_">
+      <button class="button clickable-modal btn_crud btn_insert" id="modal_crud_insert_{{tabla}}_">
         <i class="{{ICON_INSERT}}"></i>
         <p>{{NOMBRE_BTN_INSERT}}</p>
       </button>
@@ -179,7 +179,7 @@
 
               {% if crud_consult %}
               <div class="opciones_fila">
-                <button class="clickable-modal btn_consult" id="modal_crud_consult_{{fila[primary_key]}}">
+                <button class="clickable-modal btn_consult" id="modal_crud_consult_{{tabla}}_{{fila[primary_key]}}">
                   <i class="{{ICON_CONSULT}}"></i>
                 </button>
               </div>
@@ -188,13 +188,13 @@
               {% if crud_unactive %}
               {% if fila['activo'] == 1 %}
               <div class="opciones_fila">
-                <button class="clickable-modal btn_active" id="modal_crud_unactive_{{fila[primary_key]}}">
+                <button class="clickable-modal btn_active" id="modal_crud_unactive_{{tabla}}_{{fila[primary_key]}}">
                   <i class="{{ICON_ACTIVE}}"></i>
                 </button>
               </div>
               {% else %}
               <div class="opciones_fila">
-                <button class="clickable-modal btn_unactive" id="modal_crud_unactive_{{fila[primary_key]}}">
+                <button class="clickable-modal btn_unactive" id="modal_crud_unactive_{{tabla}}_{{fila[primary_key]}}">
                   <i class="{{ICON_UNACTIVE}}"></i>
                 </button>
               </div>
@@ -203,7 +203,7 @@
 
               {% if crud_update %}
               <div class="opciones_fila">
-                <button class="clickable-modal btn_update" id="modal_crud_update_{{fila[primary_key]}}">
+                <button class="clickable-modal btn_update" id="modal_crud_update_{{tabla}}_{{fila[primary_key]}}">
                   <i class="{{ICON_UPDATE}}"></i>
                 </button>
               </div>
@@ -211,7 +211,7 @@
 
               {% if crud_delete %}
               <div class="opciones_fila">
-                <button class="clickable-modal btn_delete" id="modal_crud_delete_{{fila[primary_key]}}">
+                <button class="clickable-modal btn_delete" id="modal_crud_delete_{{tabla}}_{{fila[primary_key]}}">
                   <i class="{{ICON_DELETE}}"></i>
                 </button>
               </div>
@@ -309,6 +309,20 @@
 
 {% block scripts %}
 
+<script>
+
+  const SELECT_OPTIONS = {
+    {% for campo in fields_form if campo[3] == 'select' %}
+    "{{campo[0]}}": [
+        {% for option in campo[6][0]() %}
+        { value: "{{option[0]}}", label: "{{option[1]}}" }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]{% if not loop.last %},{% endif %}
+    {% endfor %}
+  };
+  // console.log(SELECT_OPTIONS);
+
+</script>
 
 <script>
   const divs = document.querySelectorAll('.td_content:not(.td_primary_key)');
@@ -331,7 +345,6 @@
   });
 </script>
 
-<script src="/static/js/crudModal.js"></script>
 <script src="/static/js/orderHeadTable.js"></script>
 <script src="/static/js/paginationCrud.js"></script>
 

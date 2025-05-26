@@ -93,8 +93,12 @@ def get_paginas():
             pag.activo, 
             pag.key , 
             pag.tipo_paginaid , 
-            pag.moduloid 
+            pag.moduloid ,
+            mdl.nombre as nom_modulo , 
+            tip.nombre as nom_tipo
         from pagina pag
+        inner join modulo mdl on mdl.id = pag.moduloid
+        inner join tipo_pagina tip on tip.id = pag.tipo_paginaid
         order by pag.titulo
     '''
     filas = bd.sql_select_fetchall(sql)

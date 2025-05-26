@@ -181,6 +181,12 @@
             transition: all 0.3s ease;
         }
 
+        .selector-cantidad{
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
         .precio-volumen-item:hover {
             border-color: #1a3c5b;
             background-color: #f0f8ff;
