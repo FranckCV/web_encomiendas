@@ -1582,7 +1582,8 @@ paginas_simples = [
     'envio_masivo',
     'cajas',
     'cajas_prueba',
-    'sobre_nosotros'
+    'sobre_nosotros',
+    'salidas_programadas'
 ]
 
 
@@ -1633,7 +1634,6 @@ def contac():
 @app.route("/api/cajas")
 def api_cajas():
     filas = controlador_articulo.get_table_with_discount()
-    print(filas)
     productSizes = {}
 
     for fila in filas:
@@ -1659,7 +1659,6 @@ def api_cajas():
                 "name": fila['nom_descuento'],  
                 "value": float(fila['cantidad_descuento'])
             })
-    print(productSizes)
     return jsonify(productSizes)
 
 
