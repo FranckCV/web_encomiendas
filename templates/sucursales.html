@@ -94,139 +94,20 @@ Sucursales
 {% block scripts %}
 <script src="../static/js/mapita.js"></script>
 <script>
-
     document.addEventListener('DOMContentLoaded', function () {
-        // Datos de ejemplo de agencias
-        const agenciasData = [
-            {
-                id: 1,
-                nombre: "Agencia Principal Miraflores",
-                departamento: "Lima",
-                provincia: "Lima Metropolitana",
-                distrito: "Miraflores",
-                direccion: "Av. Benavides 1234, Miraflores",
-                lat: -12.1278,
-                lng: -77.0278,
-                telefono: "01-555-7890",
-                horario: "Lun-Vier: 8am-8pm, Sáb: 9am-5pm"
-            },
-            {
-                id: 2,
-                nombre: "Agencia San Isidro",
-                departamento: "Lima",
-                provincia: "Lima Metropolitana",
-                distrito: "San Isidro",
-                direccion: "Av. Javier Prado 567, San Isidro",
-                lat: -12.0908,
-                lng: -77.0302,
-                telefono: "01-422-3566",
-                horario: "Lun-Vier: 9am-7pm, Sáb: 9am-2pm"
-            },
-            {
-                id: 3,
-                nombre: "Agencia Los Olivos",
-                departamento: "Lima",
-                provincia: "Lima Metropolitana",
-                distrito: "Los Olivos",
-                direccion: "Av. Carlos Izaguirre 890, Los Olivos",
-                lat: -11.9882,
-                lng: -77.0747,
-                telefono: "01-523-9088",
-                horario: "Lun-Vier: 8am-7pm, Sáb: 9am-3pm"
-            },
-            {
-                id: 4,
-                nombre: "Agencia Central Arequipa",
-                departamento: "Arequipa",
-                provincia: "Arequipa",
-                distrito: "Arequipa",
-                direccion: "Calle Mercaderes 120, Arequipa",
-                lat: -16.4009,
-                lng: -71.5374,
-                telefono: "054-284-500",
-                horario: "Lun-Vier: 8am-7pm, Sáb: 9am-3pm"
-            },
-            {
-                id: 5,
-                nombre: "Agencia Cayma",
-                departamento: "Arequipa",
-                provincia: "Arequipa",
-                distrito: "Cayma",
-                direccion: "Av. Ejército 1050, Cayma",
-                lat: -16.3847,
-                lng: -71.5498,
-                telefono: "054-255-800",
-                horario: "Lun-Vier: 9am-7pm, Sáb: 9am-2pm"
-            },
-            {
-                id: 6,
-                nombre: "Agencia Plaza de Armas Cusco",
-                departamento: "Cusco",
-                provincia: "Cusco",
-                distrito: "Cusco",
-                direccion: "Portal Espinar 124, Plaza de Armas",
-                lat: -13.5163,
-                lng: -71.9789,
-                telefono: "084-234-567",
-                horario: "Lun-Dom: 8am-7pm"
-            },
-            {
-                id: 7,
-                nombre: "Agencia Centro Trujillo",
-                departamento: "La Libertad",
-                provincia: "Trujillo",
-                distrito: "Trujillo",
-                direccion: "Jr. Pizarro 458, Centro Histórico",
-                lat: -8.1124,
-                lng: -79.0295,
-                telefono: "044-293-800",
-                horario: "Lun-Vier: 8am-7pm, Sáb: 9am-3pm"
-            },
-            {
-                id: 8,
-                nombre: "Agencia Piura",
-                departamento: "Piura",
-                provincia: "Piura",
-                distrito: "Piura",
-                direccion: "Av. Sánchez Cerro 234, Piura",
-                lat: -5.1970,
-                lng: -80.6323,
-                telefono: "073-304-500",
-                horario: "Lun-Vier: 8am-7pm, Sáb: 9am-3pm"
-            },
-            {
-                id: 9,
-                nombre: "Agencia Chiclayo",
-                departamento: "Lambayeque",
-                provincia: "Chiclayo",
-                distrito: "Chiclayo",
-                direccion: "Av. Balta 315, Chiclayo",
-                lat: -6.7720,
-                lng: -79.8370,
-                telefono: "074-227-400",
-                horario: "Lun-Vier: 8am-7pm, Sáb: 9am-3pm"
-            },
-            {
-                id: 10,
-                nombre: "Agencia Huancayo",
-                departamento: "Junín",
-                provincia: "Huancayo",
-                distrito: "Huancayo",
-                direccion: "Calle Real 340, Huancayo",
-                lat: -12.0660,
-                lng: -75.2054,
-                telefono: "064-234-500",
-                horario: "Lun-Vier: 8:30am-6:30pm, Sáb: 9am-2pm"
-            }
-        ];
-        // Llenar select de departamentos
-
-        const DEPARTAMENTOS = {{ departamentos | tojson
-    }};
+        const DEPARTAMENTOS = {{ departamentos | tojson }};
     const PROVINCIAS = {{ provincias | tojson }};
     const DISTRITOS = {{ distritos | tojson }};
+    const agenciasData = {{ agencias | tojson }};
 
     const departamentoSelect = document.getElementById('departamento');
+    const provinciaSelect = document.getElementById('provincia');
+    const distritoSelect = document.getElementById('distrito');
+    const listContainer = document.getElementById('agencias-list');
+
+    let markers = [];
+
+    // Llenar select de departamentos
     DEPARTAMENTOS.forEach(depa => {
         const option = document.createElement('option');
         option.value = depa.departamento;
@@ -234,15 +115,8 @@ Sucursales
         departamentoSelect.appendChild(option);
     });
 
-
-    // Variables para almacenar marcadores
-    let markers = [];
-
-    // Función para actualizar provincias según departamento
+    // Evento: cambio de departamento
     departamentoSelect.addEventListener('change', function () {
-        const provinciaSelect = document.getElementById('provincia');
-        const distritoSelect = document.getElementById('distrito');
-
         provinciaSelect.innerHTML = '<option value="">Todas</option>';
         distritoSelect.innerHTML = '<option value="">Todos</option>';
         distritoSelect.disabled = true;
@@ -263,182 +137,128 @@ Sucursales
         actualizarAgencias();
     });
 
-    document.getElementById('provincia').addEventListener('change', function () {
-        const distritoSelect = document.getElementById('distrito');
-
-        // Limpiar select de distritos
+    // Evento: cambio de provincia
+    provinciaSelect.addEventListener('change', function () {
         distritoSelect.innerHTML = '<option value="">Todos</option>';
 
         if (this.value) {
-            // Llenar distritos
-            const dists = distritos[this.value] || [];
+            const dists = DISTRITOS.filter(d => d.provincia === this.value);
             dists.forEach(dist => {
                 const option = document.createElement('option');
-                option.value = dist;
-                option.textContent = dist;
+                option.value = dist.distrito;
+                option.textContent = dist.distrito;
                 distritoSelect.appendChild(option);
             });
             distritoSelect.disabled = false;
         } else {
             distritoSelect.disabled = true;
         }
+
         actualizarAgencias();
     });
 
-    document.getElementById('provincia').addEventListener('change', function () {
-    const distritoSelect = document.getElementById('distrito');
-    distritoSelect.innerHTML = '<option value="">Todos</option>';
+    // Evento: cambio de distrito
+    distritoSelect.addEventListener('change', actualizarAgencias);
 
-    if (this.value) {
-        const dists = DISTRITOS.filter(d => d.provincia === this.value);
-        dists.forEach(dist => {
-            const option = document.createElement('option');
-            option.value = dist.distrito;
-            option.textContent = dist.distrito;
-            distritoSelect.appendChild(option);
-        });
-        distritoSelect.disabled = false;
-    } else {
-        distritoSelect.disabled = true;
-    }
-
-    actualizarAgencias();
-});
-
-    // Función para buscar agencias según filtros
+    // Función para filtrar agencias
     function actualizarAgencias() {
-        const departamento = document.getElementById('departamento').value;
-        const provincia = document.getElementById('provincia').value;
-        const distrito = document.getElementById('distrito').value;
+        const departamento = departamentoSelect.value;
+        const provincia = provinciaSelect.value;
+        const distrito = distritoSelect.value;
 
-        // Filtrar agencias
         let agenciasFiltradas = agenciasData;
 
         if (departamento) {
             agenciasFiltradas = agenciasFiltradas.filter(a => a.departamento === departamento);
-
             if (provincia) {
                 agenciasFiltradas = agenciasFiltradas.filter(a => a.provincia === provincia);
-
                 if (distrito) {
                     agenciasFiltradas = agenciasFiltradas.filter(a => a.distrito === distrito);
                 }
             }
         }
 
-        // Actualizar mapa y listado
         actualizarMapa(agenciasFiltradas);
         actualizarListado(agenciasFiltradas);
     }
 
-
-    // Función para actualizar marcadores en el mapa
+    // Función para actualizar el mapa
     function actualizarMapa(agencias) {
-        // Limpiar marcadores existentes
+        if (typeof map === 'undefined') return;
+
         markers.forEach(marker => map.removeLayer(marker));
         markers = [];
 
         if (agencias.length === 0) {
-            // Si no hay agencias, centrar en Perú
             map.setView([-9.1900, -75.0152], 5);
             return;
         }
 
-        // Crear marcadores para cada agencia
         agencias.forEach(agencia => {
             const marker = L.marker([agencia.lat, agencia.lng]).addTo(map);
-
-            // Crear popup con info
             const popupContent = `
-                    <div class="marker-popup">
-                        <div class="agencia-nombre">${agencia.nombre}</div>
-                        <div class="agencia-direccion">${agencia.direccion}</div>
-                        <a href="#agencia-${agencia.id}" class="btn-ver-detalle">Ver detalles</a>
-                    </div>
-                `;
-
+                <div class="marker-popup">
+                    <div class="agencia-nombre">${agencia.nombre}</div>
+                    <div class="agencia-direccion">${agencia.direccion}</div>
+                    <a href="#agencia-${agencia.id}" class="btn-ver-detalle">Ver detalles</a>
+                </div>
+            `;
             marker.bindPopup(popupContent);
             markers.push(marker);
         });
 
-        // Ajustar la vista del mapa para mostrar todos los marcadores
-        if (agencias.length > 0) {
-            const bounds = L.latLngBounds(agencias.map(a => [a.lat, a.lng]));
-            map.fitBounds(bounds, { padding: [50, 50] });
-        }
+        const bounds = L.latLngBounds(agencias.map(a => [a.lat, a.lng]));
+        map.fitBounds(bounds, { padding: [50, 50] });
     }
 
     // Función para actualizar listado de agencias
     function actualizarListado(agencias) {
-        const listContainer = document.getElementById('agencias-list');
+        if (!listContainer) return;
 
         if (agencias.length === 0) {
             listContainer.innerHTML = `
-                    <div class="sin-resultados">
-                        No se encontraron agencias con los filtros seleccionados
-                    </div>
-                `;
+                <div class="sin-resultados">
+                    No se encontraron agencias con los filtros seleccionados
+                </div>
+            `;
             return;
         }
 
-        // Crear HTML para cada agencia
         let html = '';
         agencias.forEach(agencia => {
             html += `
-                    <div class="agencia-card" id="agencia-${agencia.id}">
-                        <div class="agencia-info">
-                            <div class="agencia-nombre">${agencia.nombre}</div>
-                            <div class="agencia-direccion">
-                                <i class="fa-solid fa-location-dot"></i> 
-                                ${agencia.direccion}, ${agencia.distrito}, ${agencia.provincia}
-                            </div>
-                            <div class="agencia-telefono">
-                                <i class="fa-solid fa-phone"></i> 
-                                ${agencia.telefono}
-                            </div>
-                            <div class="agencia-horario">
-                                <i class="fa-regular fa-clock"></i> 
-                                ${agencia.horario}
-                            </div>
+                <div class="agencia-card" id="agencia-${agencia.id}">
+                    <div class="agencia-info">
+                        <div class="agencia-nombre">${agencia.nombre}</div>
+                        <div class="agencia-direccion">
+                            <i class="fa-solid fa-location-dot"></i> 
+                            ${agencia.direccion}, ${agencia.distrito}, ${agencia.provincia}
                         </div>
-                        <div class="agencia-actions">
-                            <a href="https://www.google.com/maps/dir/?api=1&destination=${agencia.lat},${agencia.lng}" 
-                               target="_blank" class="btn-como-llegar">
-                                <i class="fa-solid fa-route"></i> Cómo llegar
-                            </a>
+                        <div class="agencia-telefono">
+                            <i class="fa-solid fa-phone"></i> 
+                            ${agencia.telefono}
+                        </div>
+                        <div class="agencia-horario">
+                            <i class="fa-regular fa-clock"></i> 
+                            ${agencia.horario}
                         </div>
                     </div>
-                `;
+                    <div class="agencia-actions">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=${agencia.lat},${agencia.lng}" 
+                           target="_blank" class="btn-como-llegar">
+                            <i class="fa-solid fa-route"></i> Cómo llegar
+                        </a>
+                    </div>
+                </div>
+            `;
         });
 
         listContainer.innerHTML = html;
     }
+
+    // Inicializar con todos los datos
+    actualizarAgencias();
     });
-
-
-    departamentoSelect.addEventListener('change', function () {
-        const provinciaSelect = document.getElementById('provincia');
-        const distritoSelect = document.getElementById('distrito');
-
-        // Limpiar selects
-        provinciaSelect.innerHTML = '<option value="">Todas</option>';
-        distritoSelect.innerHTML = '<option value="">Todos</option>';
-        distritoSelect.disabled = true;
-
-        if (this.value) {
-            // Llenar provincias
-            const provs = provincias[this.value] || [];
-            provs.forEach(prov => {
-                const option = document.createElement('option');
-                option.value = prov;
-                option.textContent = prov;
-                provinciaSelect.appendChild(option);
-            });
-            provinciaSelect.disabled = false;
-        } else {
-            provinciaSelect.disabled = true;
-        }
-    })
-
 </script>
+
 {% endblock %}

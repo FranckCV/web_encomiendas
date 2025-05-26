@@ -16,15 +16,15 @@
 {% block body_html %}
   <header class="general_element top-header">
     <a class="logo-container" href="{{ url_for('main_page') }}">
-      <img class="logo" src="{{URL_IMG_LOGO}}" alt="" />
+      <img class="logo" src="{{ URL_IMG_LOGO }}" alt="" />
       <div class="logo-text">{{ SYSTEM_NAME }}</div>
     </a>
 
     <nav class="main-nav">
-      <!-- <a href="{{ url_for('main_page') }}" class="nav-link">
+      <!--  <a href="{{ url_for('main_page') }}" class="nav-link">
         <i class="fas fa-home"></i>
         <span>Inicio</span>
-      </a> -->
+      </a>  -->
       <a href="{{ url_for('tracking') }}" class="nav-link">
         <i class="fas fa-search"></i>
         <span>Seguimiento</span>
@@ -43,12 +43,10 @@
       </a>
 
       <a href="{{ url_for('carrito') }}" class="nav-link">
-        <i class="fa-solid fa-cart-shopping carrito"> <div id="cantidad_carrito">4</div></i>
-       
+        <i class="fa-solid fa-cart-shopping carrito"><div id="cantidad_carrito">4</div></i>
+
         <span>Carrito</span>
       </a>
-
-
     </nav>
 
     <a href="{{ url_for('login') }}" class="account-area">
@@ -56,25 +54,31 @@
         <!-- <i class="fa-regular fa-user"></i> -->
         <i class="
         {% if tipoUsuario == 'E' %}
-          {{ICON_PAGE_PANEL}}
-        {% elif tipoUsuario == 'C' %}
+            {{ ICON_PAGE_PANEL }}
+          {% elif tipoUsuario == 'C' %}
+            
           fa-solid fa-user
-        {% else %}
+
+          {% else %}
+            
           fa-solid fa-user
-        {% endif %}
+
+          {% endif %}
         
-        "></i>
+        ">
+
+        </i>
       </div>
       <div class="user-text">
         <p>
-        {% if tipoUsuario == 'E' %}
-          Panel Administrativo
-        {% elif tipoUsuario == 'C' %}
-          Mi perfil
-        {% else %}
-          Iniciar sesión
-        {% endif %}
-      </p>
+          {% if tipoUsuario == 'E' %}
+            Panel Administrativo
+          {% elif tipoUsuario == 'C' %}
+            Mi perfil
+          {% else %}
+            Iniciar sesión
+          {% endif %}
+        </p>
       </div>
     </a>
   </header>
@@ -95,8 +99,6 @@
           <span>Más Productos</span>
           <i class="fa-solid fa-chevron-right"></i>
         </a>
-
-
       </div>
     </div>
 
@@ -127,11 +129,11 @@
     </div>
 
     <div class="secondary-block">
-      <div class="secondary-link">
+      <a class="secondary-link" href="{{ url_for('sobre_nosotros') }}">
         <i class="fa-solid fa-circle-info"></i>
         <span>Sobre nosotros</span>
         <!-- <i class="fa-solid fa-angle-down"></i> -->
-      </div>
+      </a>
     </div>
   </div>
 
@@ -170,7 +172,7 @@
             <a href="{{ url_for('sucursales') }}">Sucursales</a>
           </li>
           <li class="footer-link">
-            <a href="#">Sobre nosotros</a>
+            <a href="{{url_for('sobre_nosotros')}}">Sobre nosotros</a>
           </li>
         </ul>
       </div>
@@ -201,18 +203,18 @@
       <div class="footer-column">
         <h3 class="footer-title">Contáctanos</h3>
         <ul class="footer-links">
-          <!-- <li class="footer-link">
+          <!--  <li class="footer-link">
             <i class="fas fa-map-marker-alt"></i> Av. Principal #123
-          </li> -->
+          </li>  -->
           <li class="footer-link">
-            <i class="fas fa-phone"></i> {{main_information['nro_telefono']}}
+            <i class="fas fa-phone"></i> {{ main_information.nro_telefono }}
           </li>
           <li class="footer-link">
-            <i class="fas fa-envelope"></i> {{main_information['correo']}}
+            <i class="fas fa-envelope"></i> {{ main_information.correo }}
           </li>
-          <!-- <li class="footer-link">
+          <!--  <li class="footer-link">
             <i class="fas fa-clock"></i> Lun-Vie: 8:00 - 18:00
-          </li> -->
+          </li>  -->
         </ul>
       </div>
     </div>
