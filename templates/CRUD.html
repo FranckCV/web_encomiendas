@@ -67,10 +67,30 @@
 
     {% if filters != [] %}
     {% for filter in filters %}
+    <!-- <div class="col-2">
+      <div class="form_field"> -->
+    {% if filter[3] == 'date' %}
+    <div class="col-2">
+      <div class="form_field">
+        <input type="date" data-type="date" name="{{filter[0]}}" id="{{filter[0]}}" class="filterSelect">
+      </div>
+    </div>
+    {% elif filter[3] == 'interval_date' %}
+    <div class="col-2">
+      <div class="form_field">
+        <input type="date" data-type="date_ini" name="{{filter[0]}}" id="{{filter[0]}}" class="filterSelect">
+      </div>
+    </div>
+    <div class="col-2">
+      <div class="form_field">
+        <input type="date" data-type="date_fin" name="{{filter[0]}}" id="{{filter[0]}}" class="filterSelect">
+      </div>
+    </div>
+    {% else %}
     <div class="col-2">
       <div class="form_field">
         <select name="{{filter[0]}}" id="{{filter[0]}}" class="filterSelect">
-          <option value="default" selected>{{filter[1]}}</option>
+          <option value="" selected>{{filter[1]}}</option>
           {% set datos = filter[2]() if filter[2] is callable else filter[2] %}
 
           {% for option in datos %}
@@ -79,9 +99,15 @@
         </select>
       </div>
     </div>
+    {% endif %}
+
+
+
     {% endfor %}
     {% endif %}
 
+    <!-- <div class="col-2">
+    </div> -->
     {% if crud_insert %}
     <!-- <div class="col-1"></div> -->
     <div class="col-2">
@@ -125,11 +151,7 @@
       <tbody id="productTableBody">
         {% for fila in filas %}
 
-        <tr 
-          {% for col in table_columns %} 
-            data-{{col}}="{{fila[col]}}" 
-          {% endfor %} 
-          >
+        <tr {% for col in table_columns %} data-{{col}}="{{fila[col]}}" {% endfor %}>
           {% for col_name in key_columns %}
           <td class="{% if primary_key == col_name %} td_primary_key {% endif %}" td_name="{{col_name}}">
             <div
@@ -326,8 +348,16 @@
 <script src="/static/js/orderHeadTable.js"></script>
 <script src="/static/js/paginationCrud.js"></script>
 
-
-
-
+<script>
+  const today = new Date().toISOString().split('T')[0];
+  const date_solo = document.querySelector('input[type="date"][data-type="date"]')
+  if (date_solo) {
+    date_solo.value = today;
+  } else {
+    document.querySelector('input[type="date"][data-type="date_ini"]').value = today;
+    document.querySelector('input[type="date"][data-type="date_fin"]').value = today;
+  }
+  // document.getElementById('fecha_fin').value = today;
+</script>
 
 {% endblock %}

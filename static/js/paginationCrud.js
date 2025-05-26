@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const pageNumbersContainer = document.getElementById("pageNumbers");
   const selectCantidad = document.getElementById("cant_pag");
   const filters = document.querySelectorAll(".filterSelect");
-  const FILTER_VALUE_DEFAULT = "default";
+  const FILTER_VALUE_DEFAULT = "";
   const searchInput = document.getElementById("value_search");
 
   let currentPage = 1;

@@ -127,3 +127,35 @@ def get_report_test():
     filas = sql_select_fetchall(sql)
     return columnas, filas
 
+
+def get_reporte_ventas():
+    sql = '''
+        SELECT 
+            tv.num_serie,
+            DATE_FORMAT(tv.fecha, '%d/%m/%Y') AS fecha_txt,
+            tv.fecha AS fecha,
+            tv.hora,
+            CONCAT(cl.nombre_siglas, ' ', cl.apellidos_razon) AS cliente,
+            GROUP_CONCAT(art.nombre SEPARATOR ', ') AS articulos,
+            tv.monto_total
+        FROM transaccion_venta tv
+        INNER JOIN cliente cl ON tv.clienteid = cl.usuarioid
+        INNER JOIN detalle_venta dv ON tv.num_serie = dv.ventanum_serie AND tv.tipo_comprobanteid = dv.ventatipo_comprobanteid
+        INNER JOIN articulo art ON dv.articuloid = art.id
+        GROUP BY tv.num_serie, tv.fecha, tv.hora, cliente, tv.monto_total
+        ORDER BY tv.fecha DESC, tv.hora DESC
+    '''
+    
+    columnas = {
+        'num_serie'   : ['Serie', 0.7],
+        'fecha_txt'       : ['Fecha', 1],
+        'hora'        : ['Hora', 0.8],
+        'cliente'     : ['Cliente', 1.8],
+        'articulos'   : ['Artículos Comprados', 2],
+        'monto_total' : ['Total Transacción', 1.2],
+    }
+
+    filas = sql_select_fetchall(sql)
+    
+    return columnas, filas
+

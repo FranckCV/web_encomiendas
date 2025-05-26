@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, make_response, url_for , g  #, after_this_request, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify  #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import permiso as permiso
 from controladores import controlador_tipo_pagina as controlador_tipo_pagina
@@ -32,7 +32,11 @@ from controladores import controlador_usuario as controlador_usuario
 from controladores import controlador_cliente as controlador_cliente
 from controladores import controlador_rol as controlador_rol
 from controladores import controlador_articulo as controlador_articulo
+from controladores import controlador_descuento as controlador_descuento
+from controladores import controlador_descuento_articulo as controlador_descuento_articulo
 
+
+import re
 import configuraciones
 from functools import wraps
 import inspect
@@ -522,8 +526,8 @@ CONTROLADORES = {
         "fields_form": [
 #            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
             ['tarifa',      'Tarifa',          'Tarifa',      'text',     True ,     True  ,        None ],
-            ['sucursal_origen_id',  'Sucursal de origen', 'Sucursal de origen', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_origen' ] ],
-            ['sucursal_destino_id',  'Sucursal de destino', 'Sucursal de destino', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_destino' ] ],
+            ['sucursal_origen_id',  'Sucursal de origen', 'Sucursal de origen', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_origen_id' ] ],
+            ['sucursal_destino_id',  'Sucursal de destino', 'Sucursal de destino', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_destino_id' ] ],
 ],
         "crud_forms": {
             "crud_list": True,
@@ -922,7 +926,60 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-    
+     "descuento": {
+        "active" : True ,
+        "titulo": "Descuentos",
+        "icon_page": 'fa-solid fa-percent',
+        "nombre_tabla": "Descuentos",
+        "controlador": controlador_descuento,
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['descripcion', 'Descripcion',      'Descripcion','text',     True ,     True  ,  None ],
+            ['fecha_inicio',   'Fecha de inicio',    'Fecha de inicio',      'date',     True ,     True  ,        None ],
+            ['fecha_fin',   'Fecha de fin',    'Fecha de fin',      'date',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+         "descuento_articulo": {
+        "active" : True ,
+        "titulo": "Descuentos de artículos",
+        "icon_page": 'fa-solid fa-percent',
+        "nombre_tabla": "Descuentos",
+        "controlador": controlador_descuento_articulo,
+        "filters": [
+            ['articuloid', 'Articulo', lambda: controlador_articulo.get_options() ],
+                        ['descuentoid', 'Descuento', lambda: controlador_descuento.get_options()]
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['descuentoid', 'Descuento',    'Seleccione un descuento',    'select',     True ,     False ,         [lambda: controlador_descuento.get_options() , 'nom_descuento' ] ],
+            ['articuloid', 'Articulo',    'Seleccione un articulo',    'select',     True ,     False ,         [lambda: controlador_articulo.get_options() , 'nom_articulo' ] ],
+            ['cantidad_descuento',      'Cantidad descontada',          '30%',      'number',     True ,     True  ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
 
 # ADICIONAL (NO CRUD)
     "modulo": {
@@ -1018,6 +1075,28 @@ REPORTES = {
             ['modeloid', 'Modelo', lambda: controlador_modelo.get_options() ],
         ] ,
         
+    },
+        "lista_empleados": {
+        "active" : True ,
+        'icon_page' : 'fa-solid fa-clipboard-user' ,
+        "titulo": "Listado de empleados",
+        "table" : controlador_empleado.get_report_test(),
+        "filters": [
+            ['rol_id', 'Rol', lambda: controlador_rol.get_options() ],
+        ] ,
+        
+    },
+
+    "ventas_periodo": {
+        "active" : True ,
+        'icon_page' : 'fa-solid fa-sack-dollar' ,
+        "titulo": "Ventas",
+        "table" : controlador_cliente.get_reporte_ventas(),
+        "filters": [
+            # ['rol_id', 'Rol', lambda: controlador_rol.get_options() , 'select' ],
+            ['fecha', 'Fecha', None, 'date' ],
+            ['fecha', 'Fecha', None, 'date' ],
+        ] ,
     },
 }
 
@@ -1224,7 +1303,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : 'fa-solid fa-file-invoice-dollar',
         'dashboard' : True,
-        'cruds' :     ['tamaño_caja', 'metodo_pago', 'tipo_comprobante' ],
+        'cruds' :     ['tamaño_caja', 'metodo_pago', 'tipo_comprobante','descuento','descuento_articulo' ],
         'reports' :   [ 'articulos_mas_vendidos'  ],
     },
     'seguridad' : {
@@ -1499,7 +1578,10 @@ paginas_simples = [
     'seguimiento_reclamo',
     'Metodo_pago',
     'perfil',
-    'prueba_seguimiento'
+    'prueba_seguimiento',
+    'envio_masivo',
+    'cajas',
+    'cajas_prueba'
 ]
 
 
@@ -1547,10 +1629,39 @@ def Faq():
 def contac():
     return render_template('contactanos.html')
 
+@app.route("/api/cajas")
+def api_cajas():
+    filas = controlador_articulo.get_table_with_discount()
+    print(filas)
+    productSizes = {}
 
-@app.route("/cajas")
-def cajas():
-    return render_template('cajas.html')
+    for fila in filas:
+        if not fila['activo'] or not fila['tamaño_cajaid']:
+            continue
+
+        key = fila['tam_nombre'].lower()
+        nombre = fila['nom_articulo']
+        precio = float(fila['precio'])
+        img = fila['img']
+
+        if key not in productSizes:
+            productSizes[key] = {
+                "name_product":nombre,
+                "price": precio,
+                "dimensions": fila['dimensiones'],
+                "image": img,
+                "discounts": []  
+            }
+
+        if fila['cantidad_descuento'] and fila['nom_descuento']:
+            productSizes[key]["discounts"].append({
+                "name": fila['nom_descuento'],  
+                "value": float(fila['cantidad_descuento'])
+            })
+    print(productSizes)
+    return jsonify(productSizes)
+
+
 
 
 @app.route("/articulos")
@@ -1954,9 +2065,10 @@ def procesar_login():
     except Exception as e:
         return rdrct_error(redirect_url('login')  , e)
 
-
-
-
+###################################CARRITO###########################
+# @app.route('/agregar_carrito', methods = ['POST'])
+# def agregar_carrito():
+    
 
 
 

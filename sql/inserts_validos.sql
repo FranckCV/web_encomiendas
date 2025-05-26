@@ -1,6 +1,7 @@
 INSERT INTO empresa (id, nombre, correo, nro_telefono, logo, color_pri, color_sec, color_ter) VALUES
 (1, 'New Olva', 'info@newolva.com', '+123 456 789', 'a', '#1d4c82', '#13e2da', '#1b98e0');
 
+
 INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo`) VALUES
 (1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF\n', 1),
 (2, 'Logística', 'fa-solid fa-truck-front', 'logistica', '#00F068', 1),
@@ -81,10 +82,6 @@ INSERT INTO `rol` (`id`, `nombre`, `descripcion`, `activo`, `tipo_rolid`) VALUES
 
 
 
-<<<<<<< HEAD
-
-=======
->>>>>>> c84db4abef8e82c964b1fb23c79994b782096a63
 INSERT INTO `ubigeo` (`codigo`, `departamento`, `provincia`, `distrito`, `activo`) VALUES
 ('100101', 'ICA', 'ICA', 'ICA', 1),
 ('100102', 'ICA', 'ICA', 'LA TINGUIÑA', 1),
@@ -2137,27 +2134,23 @@ INSERT INTO contenido_paquete (nombre, activo) VALUES
 ('UTILES DE ESCRITORIO', 1),
 ('UTILES DE OFICINA', 1);
 
-INSERT INTO articulo (nombre, precio, stock, activo, img, dimensiones, tamaño_cajaid) VALUES
-('Accesorios para fiestas - Pack básico',         15.99, 100, 1, NULL, '20x15x10', 3), -- S
-('Accesorios electrónicos - Audífonos',           39.90,  50, 1, NULL, '10x10x5',  2), -- XS
-('Artículos de limpieza - Set hogar',             25.50,  70, 1, NULL, '30x20x15', 4), -- M
-('Artículos publicitarios - Llavero logo',         5.00, 200, 1, NULL, '5x3x1',    1), -- XXS
-('Bisutería - Collar artesanal',                  12.00, 150, 1, NULL, '10x10x2',  2), -- XS
-('Caja de cartón reforzada',                       8.99, 300, 1, NULL, '40x30x30', 5), -- L
-('Tarjetas personales - 100 unidades',            18.00,  80, 1, NULL, '9x5x1',    1), -- XXS
-('Muebles - Mesa pequeña de madera',             120.00,  10, 1, NULL, '100x50x45', 5),-- L
-('Ferretería - Juego de destornilladores',        22.90,  60, 1, NULL, '25x15x5',  3), -- S
-('Alimentación - Pack snacks saludables',         14.50,  90, 1, NULL, '30x20x10', 3), -- S
-('Cosméticos - Set de maquillaje',                35.00,  40, 1, NULL, '20x15x5',  3), -- S
-('Electrohogar - Hervidor eléctrico',             75.00,  25, 1, NULL, '30x25x20', 4), -- M
-('Juguetes - Muñeca interactiva',                 49.99,  30, 1, NULL, '35x20x15', 4), -- M
-('Material médico - Guantes (100u)',               9.50, 100, 1, NULL, '20x10x5',  2), -- XS
-('Medicinas - Kit primeros auxilios',             29.99,  45, 1, NULL, '25x15x8',  3), -- S
-('Repuestos - Filtro de aire',                    18.75,  60, 1, NULL, '15x15x5',  2), -- XS
-('Ropa y accesorios - Camiseta básica',           19.00, 120, 1, NULL, '30x25x2',  3), -- S
-('Valija documentos - Carpeta reforzada',         11.00, 100, 1, NULL, '33x25x2',  3), -- S
-('Útiles de escritorio - Pack escolares',         17.90, 150, 1, NULL, '25x20x5',  3), -- S
-('Útiles de oficina - Organizador modular',       27.50,  40, 1, NULL, '30x20x10', 3); -- S
+INSERT INTO articulo 
+  (nombre, precio, stock, activo, img, dimensiones, tamaño_cajaid) 
+VALUES
+  ('Caja XXS', 1.5,100, 1, '/static/img/caja XXS.png', '10×15×10', 1),
+  ('Caja XS', 2,100,  1, '/static/img/caja XS.png',  '15×20×12', 2),
+  ('Caja S',  2.5,100,1, '/static/img/caja S.png',   '20×30×12', 3),
+  ('Caja M', 3.2,100,1, '/static/img/caja M.png',   '24×30×20', 4),
+  ('Caja L',  4,100,1, '/static/img/caja L.png',   '30×42×23', 5);
+INSERT INTO articulo 
+  (nombre, precio, stock, activo, img, dimensiones, tamaño_cajaid) 
+VALUES
+  ('Plumón Indeleble',      3.00, 100, 1, '/static/img/plumon.png', NULL,             NULL),
+  ('Sobre A4',               1.00, 100, 1, '/static/img/sobre.png',         '21×29.7 cm',     NULL),
+  ('Cinta de Embalaje',      5.90, 100, 1, '/static/img/cintaEmbalaje.png',   '48 mm × 40 m',   NULL),
+  ('Stretch Film',          12.00, 100, 1, '/static/img/stretchfilm.png',      'Varios tamaños', NULL),
+  ('Burbupack',              2.50, 100, 1, '/static/img/burbupack.png',         '1 m × 1 m',      NULL);
+
 
 
 insert INTO `tipo_cliente` (nombre, activo) VALUES ('Persona Natural',1);
@@ -2179,9 +2172,6 @@ VALUES (1, 'Ana' , 'Ramírez', 'ana@gmail.com', 1),
 INSERT INTO `sucursal`(`abreviatura`, `codigo_postal`, `direccion`, `horario_l_v`, `horario_s_d`, `latitud`, `longitud`, `teléfono`, `referencia`, `activo`, `ubigeocodigo`) 
 VALUES 
 ('AMA01', '01001', 'Jr. Octavio Ortiz Arrieta 270, Chachapoyas', '8:30am a 1pm y de 3pm a 6pm', '9am a 2pm', -6.232460, -77.872700, '', '', 1, '10101');
-
-
-
 INSERT INTO `sucursal`(`abreviatura`, `codigo_postal`, `direccion`, `horario_l_v`, `horario_s_d`, `latitud`, `longitud`, `teléfono`, `referencia`, `activo`, `ubigeocodigo`) VALUES
 ('AMA02', '', 'Av. CAHUIDE S/N, CAMPORREDONDO, LUYA - AMAZONAS', '8am a 1pm y de 3pm a 6pm', '8am a 12pm', '-6.213162', '-78.319717', '', '', 1, '10402'),
 ('AMA03', '', 'JR. MIGUEL GRAU NRO. 275, OCALLI, LUYA - AMAZONAS', '8am a 1pm y de 3pm a 6pm', '8am a 12pm', '-6.235146', '-78.266227', '', '', 1, '10402'),
@@ -2280,3 +2270,19 @@ VALUES (
   1,
   2
 );
+INSERT INTO descuento (id, nombre, descripcion, fecha_inicio, fecha_fin, activo) VALUES
+(1, 'Descuento Volumen 25', 'Descuento para compras a partir de 25 unidades', '2024-01-01', '2025-01-01', 1),
+(2, 'Descuento Volumen 50', 'Descuento para compras a partir de 50 unidades', '2024-01-01', '2025-01-01', 1),
+(3, 'Descuento Promocional Verano', 'Descuento especial verano 2024', '2024-06-01', '2024-08-31', 1);
+
+INSERT INTO DESCUENTO_articulo (DESCUENTOid, articuloid, cantidad_descuento) VALUES
+(1, 1, 1.5),  
+(1, 2, 1.8), 
+(1, 3, 2.0), 
+(1, 4, 2.2), 
+(1, 5, 2.5), 
+(2, 1, 3.5),  
+(2, 2, 3.8),  
+(2, 3, 4.0),  
+(2, 4, 4.3),  
+(2, 5, 4.5);  

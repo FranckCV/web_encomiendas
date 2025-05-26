@@ -2,6 +2,7 @@
 
 {% block estilos_html %}
   <link rel="stylesheet" href="/static/css/general_styles.css" />
+
   {% block estilos %}
 
   {% endblock %}
@@ -41,6 +42,13 @@
         <span>Registrar encomienda</span>
       </a>
 
+      <a href="{{ url_for('carrito') }}" class="nav-link">
+        <i class="fa-solid fa-cart-shopping carrito"> <div id="cantidad_carrito">4</div></i>
+       
+        <span>Carrito</span>
+      </a>
+
+
     </nav>
 
     <a href="{{ url_for('login') }}" class="account-area">
@@ -79,7 +87,7 @@
         <i class="fa-solid fa-angle-down"></i>
       </div>
       <div class="secondary-content">
-        <a class="secondary-sublink" href="{{ url_for('cajas') }}">
+        <a class="secondary-sublink" href="{{ url_for('cajas_prueba') }}">
           <span>Cajas</span>
           <i class="fa-solid fa-chevron-right"></i>
         </a>
@@ -88,10 +96,6 @@
           <i class="fa-solid fa-chevron-right"></i>
         </a>
 
-         <a class="secondary-sublink" href="{{ url_for('carrito') }}">
-          <span>Carrito</span>
-          <i class="fa-solid fa-chevron-right"></i>
-        </a>
 
       </div>
     </div>

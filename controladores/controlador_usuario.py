@@ -145,7 +145,7 @@ def get_usuario_por_id(user_id):
             emp.nombre,
             emp.apellidos ,
             emp.rolid ,
-            cli.usuarioid as cli_id ,
+            cli.id as cli_id ,
             cli.telefono ,
             cli.num_documento ,
             cli.nombre_siglas ,
