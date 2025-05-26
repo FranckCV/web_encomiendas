@@ -2,7 +2,7 @@ from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select
 import controladores.bd as bd
 #####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####
 
-table_name = 'modulo'
+table_name = 'tipo_pagina'
 
 def get_info_columns():
     return show_columns(table_name)
@@ -73,15 +73,13 @@ def unactive_row( id ):
 #     sql_execute(sql,( titulo , icono , color ))
 
 
-def update_row( id , nombre , icono , color ):
+def update_row( id , nombre ):
     sql = f'''
         update modulo set 
-            nombre = %s , 
-            icono = %s , 
-            color = %s
+            nombre = %s 
         where id = %s
     '''
-    bd.sql_execute(sql,( nombre , icono , color , id ))
+    bd.sql_execute(sql,( nombre , id ))
 
 
 #####_ ADICIONALES _#####

@@ -147,6 +147,10 @@ Permisos para {{info_rol.get('nombre')}}
         justify-self: flex-start;
         grid-area: mod_t;
     }
+    
+    .mod_head .mod_title {
+        cursor: auto ;
+    }
 
     .mod_title p {
         display: block;
@@ -163,6 +167,7 @@ Permisos para {{info_rol.get('nombre')}}
     .mod_opts {
         grid-area: mod_o;
         padding-inline: 0;
+        justify-self: flex-end;
         /* gap: 5px; */
     }
 
@@ -234,6 +239,7 @@ Permisos para {{info_rol.get('nombre')}}
         background-color: var(--color4);
         border-radius: 25px;
         padding-inline: 5px;
+        padding-block: 3px;
     }
 
     .pag_options {
@@ -267,10 +273,13 @@ Permisos para {{info_rol.get('nombre')}}
     .pag_title {
         height: 100%;
         color: white;
-        padding-inline: 5px;
+        padding-left: 5px;
+        padding-right: 0;
+        padding-block: 0px;
         border: 0;
         display: grid;
-        grid-template-columns: 10% auto;
+        grid-template-columns: 30px auto;
+        gap: 5px;
     }
 
     .pag_title p {
@@ -387,6 +396,7 @@ Permisos para {{info_rol.get('nombre')}}
                 <div class="mod_title" style="
                     background-color: color-mix(in srgb, {{ modulo.get('color') }} 15%, transparent 90%) ; 
                     color: color-mix(in srgb, {{ modulo.get('color') }} 100%, black 30%)  ;
+                    border: 1px solid color-mix(in srgb, {{ modulo.get('color') }} 40%, #dadada 80%) ;
                     ">
                     <i class="{{ modulo.get('icono') }}"></i>
                     <p> {{ modulo.get('nombre') }} </p>
@@ -394,20 +404,20 @@ Permisos para {{info_rol.get('nombre')}}
 
                 <div class="mod_opts">
                     {% if not rolid %}
-                    <button class="clickable-modal mod_opt text_consult" id="modal_crud_consult_{{ modulo.get('id') }}">
+                    <button class="clickable-modal mod_opt text_consult" id="modal_crud_consult_modulo_{{ modulo.get('id') }}">
                         <i class="{{ICON_CONSULT}}"></i>
                     </button>
 
-                    <button class="clickable-modal mod_opt text_update" id="modal_crud_update_{{ modulo.get('id') }}">
+                    <button class="clickable-modal mod_opt text_update" id="modal_crud_update_modulo_{{ modulo.get('id') }}">
                         <i class="{{ICON_UPDATE}}"></i>
                     </button>
 
                     {% if modulo.get('activo') == 1 %}
-                    <button class="clickable-modal mod_opt text_active" id="modal_crud_unactive_{{ modulo.get('id') }}">
+                    <button class="clickable-modal mod_opt text_active" id="modal_crud_unactive_modulo_{{ modulo.get('id') }}">
                         <i class="{{ICON_ACTIVE}}"></i>
                     </button>
                     {% else %}
-                    <button class="clickable-modal mod_opt text_unactive" id="modal_crud_unactive_{{ modulo.get('id') }}">
+                    <button class="clickable-modal mod_opt text_unactive" id="modal_crud_unactive_modulo_{{ modulo.get('id') }}">
                         <i class="{{ICON_UNACTIVE}}"></i>
                     </button>
                     {% endif %}
@@ -502,20 +512,20 @@ Permisos para {{info_rol.get('nombre')}}
                     {% else %}
 
                     <div class="pag_options">
-                        <button class="clickable-modal btn_opt text_consult" id="modal_crud_consult_page_{{ page.get('id') }}">
+                        <button class="clickable-modal btn_opt text_consult" id="modal_crud_consult_pagina_{{ page.get('id') }}">
                             <i class="{{ICON_CONSULT}}"></i>
                         </button>
 
-                        <button class="clickable-modal btn_opt text_update" id="modal_crud_update_page_{{ page.get('id') }}">
+                        <button class="clickable-modal btn_opt text_update" id="modal_crud_update_pagina_{{ page.get('id') }}">
                             <i class="{{ICON_UPDATE}}"></i>
                         </button>
 
                         {% if page.get('activo') == 1 %}
-                        <button class="btn_opt text_active" id="">
+                        <button class="clickable-modal btn_opt text_active" id="modal_crud_unactive_pagina_{{ page.get('id') }}">
                             <i class="{{ICON_ACTIVE}}"></i>
                         </button>
                         {% else %}
-                        <button class="btn_opt text_unactive" id="">
+                        <button class="clickable-modal btn_opt text_unactive" id="modal_crud_unactive_pagina_{{ page.get('id') }}">
                             <i class="{{ICON_UNACTIVE}}"></i>
                         </button>
                         {% endif %}
@@ -574,311 +584,49 @@ Permisos para {{info_rol.get('nombre')}}
 
 {% for modulo in modulos %}
 
-<div class="space_modal modal_crud_consult" id="modal_crud_consult_{{ modulo.get('id') }}">
-    <div class="modal_crud_content">
-        <div class="row">
-            <h3>{{NOMBRE_BTN_CONSULT}} módulo</h3>
-        </div>
+{% set fila = modulo %}
+{% set tabla = 'modulo' %}
+{% set primary_key = 'id' %}
+{% set nombre_tabla = 'módulo' %}
+{% set fields_form = fields_form_modulo %}
 
-        <div class="row form_fields">
 
-            {% for campo in fields_form %}
+{% set modo_modal = 'unactive' %}
+{% include 'MODAL_FORM_CRUD.html' %}
 
-            <div class="form_field form_{{campo[3]}}">
-                <label for="{{campo[0]}}">{{campo[1]}}:</label>
-                {% if campo[3] == 'select' %}
-                {% set datos = campo[6][0]() if campo[6] and campo[6][0] is callable else campo[6][0] %}
+{% set modo_modal = 'consult' %}
+{% include 'MODAL_FORM_CRUD.html' %}
 
-                <input id="{{campo[0]}}" name="{{campo[0]}}" placeholder="{{campo[2]}}" type="text" {% if campo[4]
-                    %}required{% endif %} {% if campo[5]==False %}disabled{% endif %} value="{{ modulo[campo[6][1]] }}"
-                    disabled>
+{% set modo_modal = 'update' %}
+{% include 'MODAL_FORM_CRUD.html' %}
 
-                {% elif campo[3] == 'textarea' %}
-                <textarea id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif %}
-                    disabled>{% if modulo[campo[0]] != None  %} {{modulo[campo[0]]}} {% endif %}</textarea>
-                {% elif campo[3] == 'p' %}
-                <div class="form_p_content">
-                    {% if campo[0] == 'activo' %}
-                    {% if modulo[campo[0]] == 0 %}
-                    <p class="activo btn_unactive">{{STATE_0}}</p>
-                    {% else %}
-                    <p class="activo btn_active">{{STATE_1}}</p>
-                    {% endif %}
-                    {% else %}
-                    <p id="{{campo[0]}}" name="{{campo[0]}}">{% if modulo[campo[0]] != None %} {{modulo[campo[0]]}} {%
-                        endif
-                        %}</p>
-                    {% endif %}
-                </div>
-                {% elif campo[3] == 'icon' %}
-                <input type="text" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4]
-                    %}required{% endif %} value="{{modulo[campo[0]]}}" disabled>
-                <i class="{{modulo[campo[0]]}}"></i>
-                {% elif campo[3] == 'color' %}
-                <input type="text" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4]
-                    %}required{% endif %} value="{{modulo[campo[0]]}}" disabled>
-                <input type="{{campo[3]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif %}
-                    value="{{ modulo[campo[0]]}}" disabled>
-                {% else %}
-                {% if modulo[campo[0]] == None or modulo[campo[0]] == '' %}
-                <input class="input_vacio" type="{{campo[3]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4]
-                    %}required{% endif %} placeholder="Sin {{columnas[campo[0]] | lower }}" disabled>
-                {% else %}
-                <input type="{{campo[3]}}" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if
-                    campo[4] %}required{% endif %} value="{{modulo[campo[0]]}}" disabled>
-                {% endif %}
-                {% endif %}
-            </div>
 
-            {% endfor %}
 
-        </div>
 
-        <div class="row">
-            <div class="col">
-                <div class="button btn_back" onclick="closeModal()">Cancelar</div>
-            </div>
-            <div class="col-1"></div>
-            <div class="col">
-                <button class="button btn_acept" onclick="closeModal()">Aceptar</button>
-            </div>
-        </div>
-    </div>
-</div>
+{% for pagina in paginas %}
+{% if pagina.get('moduloid') == modulo.get('id') %}
 
-<div class="space_modal modal_crud_update" id="modal_crud_update_{{ modulo.get('id') }}">
-  <form class="modal_crud_content" action="{{ url_for('crud_update', tabla = 'modulo') }}" method="POST">
 
-    <div class="row">
-      <h3>{{NOMBRE_BTN_UPDATE}} móoulo </h3>
-    </div>
+{% set fila = pagina %}
+{% set tabla = 'pagina' %}
+{% set primary_key = 'id' %}
+{% set nombre_tabla = 'página' %}
+{% set fields_form = fields_form_page %}
 
-    <div class="row form_fields">
-      <input type="hidden" id="{{primary_key}}" name="{{primary_key}}" value="{{ modulo.get('id') }}">
 
-      {% for campo in fields_form %}
+{% set modo_modal = 'consult' %}
+{% include 'MODAL_FORM_CRUD.html' %}
 
-      <div class="form_field form_{{campo[3]}}">
-        <label for="">{{campo[1]}}:</label>
-        {% if campo[3] == 'select' %}
-        {% set datos = campo[6][0]() if campo[6] and campo[6][0] is callable else campo[6][0] %}
-        <select id="{{campo[0]}}" name="{{campo[0]}}">
-          {% for option in datos %}
-          <option value="{{option[0]}}" {% if modulo[campo[0]]==option[0] %}selected{% endif %}>{{option[1]}}</option>
-          {% endfor %}
-        </select>
-        {% elif campo[3] == 'p' %}
-        <div class="form_p_content">
-          {% if campo[0] == 'activo' %}
-          {% if modulo[campo[0]] == 0 %}
-          <p class="activo btn_unactive">{{STATE_0}}</p>
-          {% else %}
-          <p class="activo btn_active">{{STATE_1}}</p>
-          {% endif %}
-          {% else %}
-          <p id="{{campo[0]}}" name="{{campo[0]}}">{% if modulo[campo[0]] != None %} {{modulo[campo[0]]}} {% endif %}</p>
-          {% endif %}
-        </div>
-        {% elif campo[3] == 'textarea' %}
-        <textarea id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif
-          %}>{{modulo[campo[0]]}}</textarea>
-        {% else %}
-        <input {% if primary_key==campo[0] %} id="_{{campo[0]}}" name="_{{campo[0]}}" disabled {% else %}
-          id="{{campo[0]}}" name="{{campo[0]}}" {% endif %} type="{{campo[3]}}" placeholder="{{campo[2]}}" {% if
-          campo[4] %}required{% endif %} value="{{modulo[campo[0]]}}" {% if campo[5]==False %}disabled{% endif %}>
-        {% endif %}
-      </div>
+{% set modo_modal = 'update' %}
+{% include 'MODAL_FORM_CRUD.html' %}
 
-      {% endfor %}
+{% set modo_modal = 'unactive' %}
+{% include 'MODAL_FORM_CRUD.html' %}
 
-    </div>
-    <!-- <p class="error_form"></p> -->
-
-    <div class="row">
-      <div class="col">
-        <div class="button btn_back" onclick="closeModal()">Cancelar</div>
-      </div>
-      <div class="col-1"></div>
-      <div class="col">
-        <button class="button btn_acept" type="submit">Aceptar</button>
-      </div>
-    </div>
-
-  </form>
-</div>
-
-<div class="space_modal modal_crud_unactive" id="modal_crud_unactive_{{modulo.get('id')}}">
-  <form class="modal_crud_content" action="{{ url_for('crud_unactive', tabla = tabla) }}" method="POST">
-
-    <div class="row">
-      <h3>{% if modulo['activo'] == 0 %}
-        {{ ACT_STATE_1 }}
-        {% elif modulo['activo'] == 1 %}
-        {{ ACT_STATE_0 }}
-        {% endif %} módulo </h3>
-      <!-- <hr> -->
-    </div>
-    <input type="hidden" name="{{primary_key}}" id="{{primary_key}}" value="{{modulo.get('id')}}">
-    <p>¿Está seguro de que desea {% if modulo['activo'] == 0 %}
-      {{ ACT_STATE_1 | lower }}
-      {% elif modulo['activo'] == 1 %}
-      {{ ACT_STATE_0 | lower }}
-      {% endif %} este módulo (ID: {{modulo['id']}}) ?</p>
-
-    <div class="row">
-      <div class="col">
-        <div class="button btn_back" onclick="closeModal()">Cancelar</div>
-      </div>
-      <div class="col-1"></div>
-      <div class="col">
-        <button class="button btn_acept" type="submit">
-          Aceptar
-        </button>
-      </div>
-    </div>
-
-  </form>
-</div>
-
-{% for page in paginas %}
-
-{% if page.get('moduloid') == modulo.get('id') %}
-<div class="space_modal modal_crud_consult" id="modal_crud_consult_page_{{ page.get('id') }}">
-    <div class="modal_crud_content">
-        <div class="row">
-            <h3>{{NOMBRE_BTN_CONSULT}} módulo</h3>
-        </div>
-
-        <div class="row form_fields">
-
-            {% for campo in fields_form_page %}
-
-            <div class="form_field form_{{campo[3]}}">
-                <label for="{{campo[0]}}">{{campo[1]}}:</label>
-                {% if campo[3] == 'select' %}
-                {% set datos = campo[6][0]() if campo[6] and campo[6][0] is callable else campo[6][0] %}
-
-                <input id="{{campo[0]}}" name="{{campo[0]}}" placeholder="{{campo[2]}}" type="text" {% if campo[4]
-                    %}required{% endif %} {% if campo[5]==False %}disabled{% endif %} value="{{ page[campo[6][1]] }}"
-                    disabled>
-
-                {% elif campo[3] == 'textarea' %}
-                <textarea id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif %}
-                    disabled>{% if page[campo[0]] != None  %} {{page[campo[0]]}} {% endif %}</textarea>
-                {% elif campo[3] == 'p' %}
-                <div class="form_p_content">
-                    {% if campo[0] == 'activo' %}
-                    {% if page[campo[0]] == 0 %}
-                    <p class="activo btn_unactive">{{STATE_0}}</p>
-                    {% else %}
-                    <p class="activo btn_active">{{STATE_1}}</p>
-                    {% endif %}
-                    {% else %}
-                    <p id="{{campo[0]}}" name="{{campo[0]}}">{% if page[campo[0]] != None %} {{page[campo[0]]}} {%
-                        endif
-                        %}</p>
-                    {% endif %}
-                </div>
-                {% elif campo[3] == 'icon' %}
-                <input type="text" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4]
-                    %}required{% endif %} value="{{page[campo[0]]}}" disabled>
-                <i class="{{page[campo[0]]}}"></i>
-                {% elif campo[3] == 'color' %}
-                <input type="text" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4]
-                    %}required{% endif %} value="{{page[campo[0]]}}" disabled>
-                <input type="{{campo[3]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif %}
-                    value="{{ page[campo[0]]}}" disabled>
-                {% else %}
-                {% if page[campo[0]] == None or page[campo[0]] == '' %}
-                <input class="input_vacio" type="{{campo[3]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4]
-                    %}required{% endif %} placeholder="Sin {{columnas[campo[0]] | lower }}" disabled>
-                {% else %}
-                <input type="{{campo[3]}}" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" {% if
-                    campo[4] %}required{% endif %} value="{{page[campo[0]]}}" disabled>
-                {% endif %}
-                {% endif %}
-            </div>
-
-            {% endfor %}
-
-        </div>
-
-        <div class="row">
-            <div class="col">
-                <div class="button btn_back" onclick="closeModal()">Cancelar</div>
-            </div>
-            <div class="col-1"></div>
-            <div class="col">
-                <button class="button btn_acept" onclick="closeModal()">Aceptar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="space_modal modal_crud_update" id="modal_crud_update_page_{{ page.get('id') }}">
-  <form class="modal_crud_content" action="{{ url_for('crud_update', tabla = 'modulo') }}" method="POST">
-
-    <div class="row">
-      <h3>{{NOMBRE_BTN_UPDATE}} {{nombre_tabla}} </h3>
-    </div>
-
-    <div class="row form_fields">
-      <input type="hidden" id="{{primary_key}}" name="{{primary_key}}" value="{{ modulo.get('id') }}">
-
-      {% for campo in fields_form_page %}
-
-      <div class="form_field form_{{campo[3]}}">
-        <label for="">{{campo[1]}}:</label>
-        {% if campo[3] == 'select' %}
-        {% set datos = campo[6][0]() if campo[6] and campo[6][0] is callable else campo[6][0] %}
-        <select id="{{campo[0]}}" name="{{campo[0]}}">
-          {% for option in datos %}
-          <option value="{{option[0]}}" {% if page[campo[0]]==option[0] %}selected{% endif %}>{{option[1]}}</option>
-          {% endfor %}
-        </select>
-        {% elif campo[3] == 'p' %}
-        <div class="form_p_content">
-          {% if campo[0] == 'activo' %}
-          {% if page[campo[0]] == 0 %}
-          <p class="activo btn_unactive">{{STATE_0}}</p>
-          {% else %}
-          <p class="activo btn_active">{{STATE_1}}</p>
-          {% endif %}
-          {% else %}
-          <p id="{{campo[0]}}" name="{{campo[0]}}">{% if page[campo[0]] != None %} {{page[campo[0]]}} {% endif %}</p>
-          {% endif %}
-        </div>
-        {% elif campo[3] == 'textarea' %}
-        <textarea id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif
-          %}>{{page[campo[0]]}}</textarea>
-        {% else %}
-        <input {% if primary_key==campo[0] %} id="_{{campo[0]}}" name="_{{campo[0]}}" disabled {% else %}
-          id="{{campo[0]}}" name="{{campo[0]}}" {% endif %} type="{{campo[3]}}" placeholder="{{campo[2]}}" {% if
-          campo[4] %}required{% endif %} value="{{page[campo[0]]}}" {% if campo[5]==False %}disabled{% endif %}>
-        {% endif %}
-      </div>
-
-      {% endfor %}
-
-    </div>
-    <!-- <p class="error_form"></p> -->
-
-    <div class="row">
-      <div class="col">
-        <div class="button btn_back" onclick="closeModal()">Cancelar</div>
-      </div>
-      <div class="col-1"></div>
-      <div class="col">
-        <button class="button btn_acept" type="submit">Aceptar</button>
-      </div>
-    </div>
-
-  </form>
-</div>
 
 {% endif %}
-
 {% endfor %}
+
 
 
 {% endfor %}
@@ -896,7 +644,6 @@ Permisos para {{info_rol.get('nombre')}}
 
 {% block scripts %}
 
-<script src="/static/js/crudModal.js"></script>
 
 <script>
     const options = document.querySelectorAll('.opciones_fila ');
