@@ -7,18 +7,11 @@
     <!-- Header del Perfil -->
     <div class="profile-header">
       <div class="floating-shapes">
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
-        <div class="bubble"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
       </div>
       <div class="profile-info">
         <div class="profile-avatar">FP</div>
@@ -30,7 +23,7 @@
           </div>
           <div class="action-buttons">
             <button class="btn btn-primary" onclick="toggleEditMode()">✏️ Editar datos</button>
-            <a href="#" class="btn btn-primary">🔒 Cambiar contraseña</a>
+            <a href="{{url_for('cambiar_contrasenia')}}" class="btn btn-primary">🔒 Cambiar contraseña</a>
             <a href="#" class="btn btn-primary">🏠 Registrar recojo en casa</a>
           </div>
         </div>
@@ -159,7 +152,6 @@
 
       <!-- Tab: Mis Envíos -->
       <div id="envios-tab" class="tab-content active">
-        <h2>Mis Envíos</h2>
         <table class="shipment-table">
           <thead>
             <tr>
@@ -183,7 +175,7 @@
                 <span class="status-badge status-transit">En tránsito</span>
               </td>
               <td>
-                <a href="#" class="btn-details">Ver detalles</a>
+                <a href="{{url_for('seguimiento')}}" class="btn-details">Ver detalles</a>
               </td>
             </tr>
             <tr>
@@ -197,7 +189,7 @@
                 <span class="status-badge status-delivered">Entregado</span>
               </td>
               <td>
-                <a href="#" class="btn-details">Ver detalles</a>
+                <a href="{{url_for('seguimiento')}}" class="btn-details">Ver detalles</a>
               </td>
             </tr>
             <tr>
@@ -211,7 +203,7 @@
                 <span class="status-badge status-delivered">Entregado</span>
               </td>
               <td>
-                <a href="#" class="btn-details">Ver detalles</a>
+                <a href="{{url_for('seguimiento')}}" class="btn-details">Ver detalles</a>
               </td>
             </tr>
             <tr>
@@ -225,7 +217,7 @@
                 <span class="status-badge status-pending">Pendiente</span>
               </td>
               <td>
-                <a href="#" class="btn-details">Ver detalles</a>
+                <a href="{{url_for('seguimiento')}}" class="btn-details">Ver detalles</a>
               </td>
             </tr>
           </tbody>
@@ -234,7 +226,6 @@
 
       <!-- Tab: Mis Reclamos -->
       <div id="reclamos-tab" class="tab-content">
-        <h2>Mis Reclamos</h2>
         <table class="complaint-table">
           <thead>
             <tr>
@@ -272,7 +263,7 @@
                 <span class="status-badge status-transit">En proceso</span>
               </td>
               <td>
-                <a href="#" class="btn-details">Ver detalles</a>
+                <a href="{{url_for('seguimiento')}}" class="btn-details">Ver detalles</a>
               </td>
             </tr>
             <tr>
