@@ -8,9 +8,9 @@
  <div class="container">
         <div class="cart-section">
             <div class="cart-header">
-                <h1 class="cart-title">🚚 Carrito de Encomiendas</h1>
+                <h1 class="cart-title"><i class="fa-solid fa-cart-shopping"></i> Carrito de Encomiendas</h1>
                 <div class="bulk-actions">
-                    <button class="btn btn-warning" onclick="deleteSelected()">Eliminar Seleccionados</button>
+                    <button class="btn btn-primary" onclick="deleteSelected()">Eliminar Seleccionados</button>
                     <button class="btn btn-danger" onclick="clearCart()">Vaciar Carrito</button>
                 </div>
             </div>
@@ -57,14 +57,14 @@
             </div>
 
             <button class="checkout-btn" onclick="proceedToPayment()">
-                🔒 Proceder al Pago
+                <i class="fa-solid fa-money-bill-wave"></i>  Proceder al Pago
             </button>
         </div>
     </div>
 
 
 {% endblock %}
-{% block script %}
+{% block scripts %}
 <script>
         // Datos de ejemplo del carrito
         let cartData = [
@@ -125,7 +125,6 @@
             
             cartContainer.innerHTML = cartData.map(item => `
                 <div class="cart-item ${item.selected ? 'selected' : ''}" data-id="${item.id}">
-                    <button class="delete-btn" onclick="deleteItem(${item.id})" title="Eliminar producto">×</button>
                     
                     <div class="item-header">
                         <div class="item-info">
@@ -144,7 +143,11 @@
                                 <input type="number" class="quantity-input" value="${item.quantity}" 
                                        onchange="setQuantity(${item.id}, this.value)" min="1">
                                 <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                              
                             </div>
+
+                                                    <i class="fa-solid fa-trash icon_trash"></i>
+
                         </div>
                     </div>
                     
