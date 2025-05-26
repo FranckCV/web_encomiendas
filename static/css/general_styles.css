@@ -57,7 +57,7 @@ body {
     justify-content: center;
     flex-grow: 1;
     display: grid;
-    grid-template-columns: repeat(4,1fr);
+    grid-template-columns: repeat(5,1fr);
 }
 
 .nav-link {
@@ -328,6 +328,25 @@ section.general_element {
     text-align: center;
     color: #ccc;
     font-size: 0.9rem;
+}
+
+.carrito {
+    position: relative; /* Contenedor relativo */
+}
+
+#cantidad_carrito {
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    border-radius: 50%;
+    position: absolute;
+        top: -15px;
+    right: -10px;   
+    color: white;
+    font-size: 12px;
+    text-align: center;
+    line-height: 20px;
+    font-weight: bold;
 }
 
 /* Media queries */
