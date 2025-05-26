@@ -676,7 +676,7 @@ p.text_none {
 }
 
 .btn_back {
-    background-color: var(--color-back);
+    background-color: var(--color-back) !important;
     color: white;
 }
 
