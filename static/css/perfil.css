@@ -1,6 +1,7 @@
  .container {
-            margin: 0 auto;
-            padding: 20px;
+            margin: 0;
+            padding: 10px 40px;
+            max-width: 100%;
         }
 
         .profile-header {
@@ -170,7 +171,7 @@
             font-size: 1.1rem;
             opacity: 0.9;
             margin-bottom: 20px;
-            color: #bbdefb;
+                color: #ffffff;
         }
 
         .action-buttons {
@@ -402,7 +403,7 @@
         }
 
         .info-value {
-            color: #0d47a1;
+            /* color: #0d47a1; */
             font-weight: 400;
         }
 
@@ -446,7 +447,7 @@
             grid-column: 1 / -1;
             display: flex;
             gap: 15px;
-            margin-top: 20px;
+            margin: 30px 0px;
         }
 
         .btn-success {

@@ -23,7 +23,7 @@
           </div>
           <div class="action-buttons">
             <button class="btn btn-primary" onclick="toggleEditMode()">✏️ Editar datos</button>
-            <a href="{{url_for('cambiar_contrasenia')}}" class="btn btn-primary">🔒 Cambiar contraseña</a>
+            <a href="{{ url_for('recuperar_contrasenia') }}" class="btn btn-primary">🔒 Cambiar contraseña</a>
             <a href="#" class="btn btn-primary">🏠 Registrar recojo en casa</a>
           </div>
         </div>
@@ -155,6 +155,7 @@
         <table class="shipment-table">
           <thead>
             <tr>
+              <th>N° Comprobante</th>
               <th>N° Seguimiento</th>
               <th>Origen</th>
               <th>Destino</th>
@@ -164,7 +165,11 @@
             </tr>
           </thead>
           <tbody>
+            <!-- Grupo 1 - Misma comprobante -->
             <tr>
+              <td rowspan="2">
+                <strong>COM-20250501</strong>
+              </td>
               <td>
                 <strong>ENV-20250501-3782</strong>
               </td>
@@ -175,10 +180,29 @@
                 <span class="status-badge status-transit">En tránsito</span>
               </td>
               <td>
-                <a href="{{url_for('seguimiento')}}" class="btn-details">Ver detalles</a>
+                <a href="{{ url_for('seguimiento') }}" class="btn-details">Ver detalles</a>
               </td>
             </tr>
             <tr>
+              <td>
+                <strong>ENV-20250501-4890</strong>
+              </td>
+              <td>Valparaíso</td>
+              <td>La Serena</td>
+              <td>01/05/2025</td>
+              <td>
+                <span class="status-badge status-transit">En tránsito</span>
+              </td>
+              <td>
+                <a href="{{ url_for('seguimiento') }}" class="btn-details">Ver detalles</a>
+              </td>
+            </tr>
+
+            <!-- Grupo 2 - Otro comprobante -->
+            <tr>
+              <td rowspan="3">
+                <strong>COM-20250418</strong>
+              </td>
               <td>
                 <strong>ENV-20250418-2945</strong>
               </td>
@@ -189,10 +213,43 @@
                 <span class="status-badge status-delivered">Entregado</span>
               </td>
               <td>
-                <a href="{{url_for('seguimiento')}}" class="btn-details">Ver detalles</a>
+                <a href="{{ url_for('seguimiento') }}" class="btn-details">Ver detalles</a>
               </td>
             </tr>
             <tr>
+              <td>
+                <strong>ENV-20250418-3067</strong>
+              </td>
+              <td>Concepción</td>
+              <td>Temuco</td>
+              <td>18/04/2025</td>
+              <td>
+                <span class="status-badge status-delivered">Entregado</span>
+              </td>
+              <td>
+                <a href="{{ url_for('seguimiento') }}" class="btn-details">Ver detalles</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <strong>ENV-20250418-3189</strong>
+              </td>
+              <td>Temuco</td>
+              <td>Santiago</td>
+              <td>18/04/2025</td>
+              <td>
+                <span class="status-badge status-delivered">Entregado</span>
+              </td>
+              <td>
+                <a href="{{ url_for('seguimiento') }}" class="btn-details">Ver detalles</a>
+              </td>
+            </tr>
+
+            <!-- Grupo 3 - Otro comprobante -->
+            <tr>
+              <td>
+                <strong>COM-20250410</strong>
+              </td>
               <td>
                 <strong>ENV-20250410-1876</strong>
               </td>
@@ -203,10 +260,13 @@
                 <span class="status-badge status-delivered">Entregado</span>
               </td>
               <td>
-                <a href="{{url_for('seguimiento')}}" class="btn-details">Ver detalles</a>
+                <a href="{{ url_for('seguimiento') }}" class="btn-details">Ver detalles</a>
               </td>
             </tr>
             <tr>
+              <td>
+                <strong>COM-20250405</strong>
+              </td>
               <td>
                 <strong>ENV-20250405-5621</strong>
               </td>
@@ -217,7 +277,7 @@
                 <span class="status-badge status-pending">Pendiente</span>
               </td>
               <td>
-                <a href="{{url_for('seguimiento')}}" class="btn-details">Ver detalles</a>
+                <a href="{{ url_for('seguimiento') }}" class="btn-details">Ver detalles</a>
               </td>
             </tr>
           </tbody>
@@ -249,7 +309,7 @@
                 <span class="status-badge status-delivered">Resuelto</span>
               </td>
               <td>
-                <a href="#" class="btn-details">Ver detalles</a>
+                <a href="{{ url_for('seguimiento_reclamo') }}" class="btn-details">Ver detalles</a>
               </td>
             </tr>
             <tr>
@@ -263,7 +323,7 @@
                 <span class="status-badge status-transit">En proceso</span>
               </td>
               <td>
-                <a href="{{url_for('seguimiento')}}" class="btn-details">Ver detalles</a>
+                <a href="{{ url_for('seguimiento_reclamo') }}" class="btn-details">Ver detalles</a>
               </td>
             </tr>
             <tr>
@@ -277,7 +337,7 @@
                 <span class="status-badge status-pending">Pendiente</span>
               </td>
               <td>
-                <a href="#" class="btn-details">Ver detalles</a>
+                <a href="{{ url_for('seguimiento_reclamo') }}" class="btn-details">Ver detalles</a>
               </td>
             </tr>
           </tbody>
