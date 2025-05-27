@@ -10,7 +10,7 @@
     <div class="block_crud block_title" style="padding: 20px 10px 30px 10px; font-size: 1rem;">
   <h3 class="crud_title">
     <i class="fa-solid fa-car-side"></i>
-    Salidas programadas
+    Salidas de unidades programadas
   </h3>
 </div>
 
@@ -211,12 +211,12 @@
                                 <div class="vehicle-info">
                                     <span class="vehicle-name">${departure.vehicle}</span>
                                 </div>
-                                <button class="btn btn-secondary btn-small" onclick="trackVehicle('${departure.vehicle}')">
+                                <a href="{{url_for('seguimiento_empleado')}}" class="btn btn-secondary btn-small">
                                     <svg class="icon" viewBox="0 0 24 24">
                                         <path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z" />
                                     </svg>
                                     Seguir
-                                </button>
+                                </a>
                             </div>
                             ${getCapacityProgress(departure.capacity)}
                         </div>

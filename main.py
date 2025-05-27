@@ -1579,12 +1579,13 @@ paginas_simples = [
     'Metodo_pago',
     'perfil',
     'prueba_seguimiento',
-    'envio_masivo',
     'cajas',
     'cajas_prueba',
     'sobre_nosotros',
     'salidas_programadas',
-    'mapa_curds'
+    'mapa_curds',
+    'seguimiento_empleado',
+    'envio_masivo'
 ]
 
 
@@ -2074,6 +2075,11 @@ def procesar_login():
 # @app.route('/agregar_carrito', methods = ['POST'])
 # def agregar_carrito():
     
+
+# @app.route('/seguimiento_empleado')
+# def seguimiento_empleado():
+#     vehicle_id = request.args.get('vehicle_id')
+#     return render_template('seguimiento.html', selected_vehicle_id=vehicle_id)
 
 
 
