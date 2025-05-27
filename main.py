@@ -1583,7 +1583,8 @@ paginas_simples = [
     'cajas',
     'cajas_prueba',
     'sobre_nosotros',
-    'salidas_programadas'
+    'salidas_programadas',
+    'mapa_curds'
 ]
 
 
