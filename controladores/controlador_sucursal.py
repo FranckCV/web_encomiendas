@@ -158,7 +158,7 @@ def get_agencias_data():
     for fila in resultados:
         agencias.append({
             "id": fila["id"],
-            "nombre": f"Sucursal {fila["departamento"]} - {fila["abreviatura"][-2:]}",  # Puedes cambiar esto si tienes un campo específico para nombre
+            "nombre": f"Sucursal {fila['departamento']} - {fila['abreviatura'][-2:]}",  # Puedes cambiar esto si tienes un campo específico para nombre
             "departamento": fila["departamento"],
             "provincia": fila["provincia"],
             "distrito": fila["distrito"],
