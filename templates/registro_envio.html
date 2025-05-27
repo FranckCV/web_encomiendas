@@ -1,11 +1,11 @@
 {% extends 'MAESTRA_GENERAL.html' %}
 
 {% block titulo %}
-  Registro de Envíos
+Registro de Envíos
 {% endblock %}
 
 {% block estilos %}
-  <link rel="stylesheet" href="/static/css/registro_envio.css">
+<link rel="stylesheet" href="/static/css/registro_envio.css">
 {% endblock %}
 
 {% block contenido %}
@@ -44,7 +44,9 @@
     <div id="seccion-quien-envia" class="seccion">
       <h2 class="titulo-seccion">¿Quién envía?</h2>
       <div class="form-group">
-        <select><option>Tipo De Documento</option></select>
+        <select>
+          <option>Tipo De Documento</option>
+        </select>
         <input type="text" placeholder="Número">
         <input type="text" placeholder="Confirma tu teléfono">
       </div>
@@ -57,7 +59,9 @@
     <div id="seccion-que-envias" class="seccion" style="display:none;">
       <h2 class="titulo-seccion">¿Qué envías?</h2>
       <div class="form-group">
-        <select><option>Seleccionar artículo</option></select>
+        <select>
+          <option>Seleccionar artículo</option>
+        </select>
         <input type="text" placeholder="Especificar artículo">
         <input type="text" placeholder="Valor S/">
       </div>
@@ -68,15 +72,55 @@
         <input type="text" placeholder="Peso (kg)">
       </div>
       <div class="form-group">
-        <select><option>Ingrese el punto de partida</option></select>
-        <select><option>Ingresa el punto de llegada</option></select>
+        <div style="flex: 1 1 calc(50% - 10px); min-width: 250px;">
+          <label for="origen" style="font-weight: 600; color: #0E1D63;">Origen</label>
+          <select id="origen">
+            <option>Ingrese el punto de partida</option>
+          </select>
+        </div>
+
+        <div style="flex: 1 1 calc(50% - 10px); min-width: 250px;">
+          <label for="destino" style="font-weight: 600; color: #0E1D63;">Destino</label>
+          <select id="destino">
+            <option>Ingresa el punto de llegada</option>
+          </select>
+        </div>
       </div>
+
+      <div class="form-group">
+        <select id="tipoEntrega">
+          <option >Seleccione tipo de recepción</option>
+          <option value="tienda">Recojo en tienda </option>
+          <option value="tienda">Con recojo y pago en tienda</option>
+          <option value="domicilio">Envio a domicilio</option>
+        </select>
+        <div class="form-group" id="contenedor-tienda" style="display: none;">
+          <select id="tienda" name="tienda">
+            <option value="tienda">Seleccione tienda</option>
+            <option value="tienda1">Tienda Trujillo</option>
+            <option value="tienda2">Tienda Chiclayo</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Dirección de entrega -->
+      <div class="form-group" id="contenedor-direccion" style="display: none;">
+        <div class="input-con-icono" style="flex:1 1 100%; min-width: 250px;">
+          <input type="text" placeholder="Dirección de entrega">
+        </div>
+        <div style="flex:1 1 100%; min-width: 250px;">
+          <input type="text" placeholder="Referencias">
+        </div>
+      </div>
+
     </div>
 
     <div id="seccion-quien-recibe" class="seccion" style="display:none;">
       <h2 class="titulo-seccion">¿Quién recibe?</h2>
       <div class="form-group">
-        <select><option>Tipo De Documento</option></select>
+        <select>
+          <option>Tipo De Documento</option>
+        </select>
         <input type="text" placeholder="DNI/RUC/CE">
         <input type="text" placeholder="Celular/Teléfono">
       </div>
@@ -110,6 +154,33 @@
     } else {
       alert('Formulario completo.');
     }
+  });
+
+  // Funcionalidad para mostrar tienda o dirección
+  const tipoEntrega = document.getElementById('tipoEntrega');
+  const contenedorTienda = document.getElementById('contenedor-tienda');
+  const contenedorDireccion = document.getElementById('contenedor-direccion');
+
+  tipoEntrega.addEventListener('change', function () {
+    if (this.value === 'tienda') {
+      contenedorTienda.style.display = 'flex';
+      contenedorDireccion.style.display = 'none';
+    } else if (this.value === 'domicilio') {
+      contenedorTienda.style.display = 'none';
+      contenedorDireccion.style.display = 'flex';
+    } else {
+      contenedorTienda.style.display = 'none';
+      contenedorDireccion.style.display = 'none';
+    }
+  });
+</script>
+<script>
+  // Esperar a que todo el DOM esté completamente cargado
+  document.addEventListener("DOMContentLoaded", function () {
+    // Forzar el scroll al tope con un retardo leve
+    setTimeout(function () {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }, 100); // Puedes subir a 300ms si hay contenido que se carga dinámicamente
   });
 </script>
 {% endblock %}
