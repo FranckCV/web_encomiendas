@@ -3,13 +3,14 @@ INSERT INTO empresa (id, nombre, correo, nro_telefono, logo, color_pri, color_se
 
 
 INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo`) VALUES
-(1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF\n', 1),
+(1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF', 0),
 (2, 'Logística', 'fa-solid fa-truck-front', 'logistica', '#00F068', 1),
 (3, 'Encomiendas', 'fa-solid fa-box', 'encomienda', '#FF5E1A', 1),
 (4, 'Atención al cliente', 'fa-solid fa-circle-question', 'atencion', '#8232D2', 1),
-(5, 'Ventas', 'fa-solid fa-file-invoice-dollar', 'ventas', 'red', 1),
+(5, 'Ventas', 'fa-solid fa-file-invoice-dollar', 'ventas', '#ff0000', 1),
 (6, 'Seguridad', 'fa-solid fa-shield-halved', 'seguridad', '#F0B000', 1),
 (7, 'Personal', 'fa-solid fa-briefcase', 'personal', '#00E0F0', 1);
+
 
 INSERT INTO `tipo_pagina` (`id`, `nombre`) VALUES
 (1, 'Mantenimientos'),
@@ -17,6 +18,8 @@ INSERT INTO `tipo_pagina` (`id`, `nombre`) VALUES
 (3, 'Transacciones'),
 (4, 'Reportes'),
 (5, 'Gráficos');
+
+
 
 INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `tipo_paginaid`, `moduloid`) VALUES
 (1, 'tipos de unidades', 'fa-solid fa-truck-plane', 1, 'tipo_unidad', 1, 1),
@@ -40,12 +43,12 @@ INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `tipo_paginaid`,
 (19, 'articulos para encomiendas', 'fa-solid fa-box-open', 1, 'articulo', 1, 5),
 (20, 'estados de encomiendas', 'fa-solid fa-boxes-packing', 1, 'estado_encomienda', 1, 3),
 (21, 'tipos de roles', 'ri-file-user-fill', 1, 'tipo_rol', 1, 7),
-(22, 'Motivos de reclamo', NULL, 1, 'motivo_reclamo', 1, 4),
-(23, 'Causas de reclamo', NULL, 1, 'causa_reclamo', 1, 4),
-(24, 'Tarifas de ruta', NULL, 1, 'tarifa_ruta', 1, 1),
+(22, 'Motivos de reclamo', '', 1, 'motivo_reclamo', 1, 4),
+(23, 'Causas de reclamo', '', 1, 'causa_reclamo', 1, 4),
+(24, 'Tarifas de ruta', '', 1, 'tarifa_ruta', 1, 1),
 (25, 'Sucursales', 'ri-store-3-line', 1, 'sucursal', 1, 1),
 (26, 'tipos de reclamos', 'fa-solid fa-book-open-reader', 1, 'tipo_reclamo', 1, 4),
-(27, 'Reporte', NULL, 1, 'aa', 4, 2),
+(27, 'Reporte', '', 1, 'aa', 4, 2),
 (28, 'Administración de páginas', 'ri-file-settings-fill', 1, 'administrar_paginas', 2, 6),
 (29, 'Información de la empresa', 'ri-file-lock-fill', 1, 'informacion_empresa', 2, 1);
 
@@ -2048,6 +2051,7 @@ INSERT INTO tipo_documento (siglas, nombre, activo) VALUES
 ('RUC', 'Registro Único de Contribuyente', 1),
 ('CE', 'Carné de Extranjería', 1),
 ('PAS', 'Pasaporte', 1);
+
 INSERT INTO tipo_comprobante (inicial, nombre, descripcion, activo) VALUES
 ('FT', 'F', 'Factura', 1),
 ('BV', 'B', 'Boleta de Venta', 1),
@@ -2058,6 +2062,17 @@ INSERT INTO tipo_comprobante (inicial, nombre, descripcion, activo) VALUES
 ('NC', 'C', 'Nota de Crédito', 1),
 ('ND', 'D', 'Nota de Débito', 1),
 ('OT', 'O', 'Otro', 1);
+
+INSERT INTO `tipo_recepcion` (`id`, `nombre`, `activo`) VALUES
+(1, 'Recepción en sucursal', 1),
+(2, 'Recepción en domicilio', 1);
+
+
+INSERT INTO `tipo_empaque` (`id`, `nombre`, `peso_maximo`, `unidad_medida`, `activo`) VALUES
+(1, 'Caja', 30, 'kg', 1),
+(2, 'Sobre', 5, 'gr', 1);
+
+
 INSERT INTO tipo_reclamo (nombre, descripcion)
 VALUES ('Queja', 'Es el malestar o descontento por algún acto que está relacionado directamente con el servicio adquirido. Por ejemplo: una mala atención al público, omisión de información, etc.'),
 ('Reclamo', 'Es la disconformidad con los servicios prestados o bienes adquiridos. Por ejemplo: demora en el envío, entregas no realizadas, etc.');
@@ -2153,7 +2168,6 @@ VALUES
   ('Burbupack',              2.50, 100, 1, '/static/img/burbupack.png',         '1 m × 1 m',      NULL);
 
 
-
 insert INTO `tipo_cliente` (nombre, activo) VALUES ('Persona Natural',1);
 insert INTO `tipo_cliente` (nombre, activo) VALUES ('Persona Jurídica',1);
 
@@ -2165,7 +2179,8 @@ INSERT INTO usuario (id, correo, contrasenia, tipo_usuario, activo)
 VALUES (1 , 'ana@gmail.com'  , '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
  (2 , 'perez@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1);
 
-INSERT INTO empleado (usuarioid , nombre, apellidos, correo, rolid)
+
+INSERT INTO empleado (id , nombre, apellidos, correo, rolid)
 VALUES (1, 'Ana' , 'Ramírez', 'ana@gmail.com', 1),
  (2, 'Juan', 'Perez', 'perez@gmail.com', 1);
 
@@ -2287,3 +2302,35 @@ INSERT INTO DESCUENTO_articulo (DESCUENTOid, articuloid, cantidad_descuento) VAL
 (2, 3, 4.0),  
 (2, 4, 4.3),  
 (2, 5, 4.5);  
+INSERT INTO tarifa_ruta (sucursal_origen_id, sucursal_destino_id, tarifa) VALUES
+(1, 2, 12.50),
+(1, 3, 9.75),
+(1, 4, 14.20),
+(2, 3, 10.30),
+(2, 5, 19.00),
+(3, 6, 11.50),
+(4, 5, 17.00),
+(4, 7, 15.75),
+(5, 8, 13.25),
+(6, 9, 8.95),
+(7, 10, 18.00),
+(8, 11, 12.10),
+(9, 12, 16.50),
+(10, 13, 9.90),
+(11, 14, 14.40),
+(12, 15, 10.80),
+(13, 16, 19.75),
+(14, 17, 8.50),
+(15, 18, 13.95),
+(16, 19, 11.25),
+(17, 20, 18.50),
+(18, 21, 16.10),
+(19, 22, 14.75),
+(20, 23, 9.60),
+(21, 24, 12.85),
+(22, 25, 15.30),
+(23, 26, 10.15),
+(24, 27, 8.75),
+(25, 28, 17.90),
+(26, 29, 13.60),
+(27, 30, 14.95);

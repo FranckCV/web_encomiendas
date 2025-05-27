@@ -242,6 +242,10 @@ Permisos para {{info_rol.get('nombre')}}
         padding-block: 3px;
     }
 
+    .pag_block:hover {
+        background-color: var(--color1);
+    }
+
     .pag_options {
         justify-self: center;
         padding-inline: 0;
@@ -299,10 +303,15 @@ Permisos para {{info_rol.get('nombre')}}
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 80%;
-        height: 23px;
-        width: 23px;
+        font-size: 85%;
+        height: 22.5px;
+        width:  22.5px;
         padding: 0;
+    }
+
+    .opciones_fila button i {
+        display: flex;
+        
     }
 
     .opciones_fila button.unable {
@@ -354,11 +363,6 @@ Permisos para {{info_rol.get('nombre')}}
         <i class="ri-file-lock-fill"></i>
         Permisos para {{info_rol.get('nombre')}}
     </h3>
-
-    <a class="back_to_page btn_back" href="{{url_for('administrar_paginas')}}">
-        <i class="fa-solid fa-arrow-left"></i>
-        <p>Volver a {{NOMBRE_ADMINPAGES_PAGE}}</p>
-    </a>
 
     <style>
         .pag_block {

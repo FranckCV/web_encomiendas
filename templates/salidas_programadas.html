@@ -1,0 +1,300 @@
+{% extends 'MAESTRA_ADMIN.html' %}
+{% block estilos %}
+<link rel = "stylesheet" href="/static/css/salidas_programadas.css">
+{% endblock estilos %}
+
+{% block contenido %}
+
+<div class="container">
+  
+    <div class="block_crud block_title" style="padding: 20px 10px 30px 10px; font-size: 1rem;">
+  <h3 class="crud_title">
+    <i class="fa-solid fa-car-side"></i>
+    Salidas programadas
+  </h3>
+</div>
+
+  <div class="cards-grid" id="cardsContainer">
+    <!-- Las tarjetas se generarán dinámicamente -->
+  </div>
+
+  <div class="pagination" id="pagination">
+    <!-- La paginación se generará dinámicamente -->
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+        // Datos de ejemplo para las salidas programadas
+        const departures = [
+            {
+                id: "SAL-001",
+                date: "2025-05-27",
+                time: "08:30",
+                vehicle: "Unidad 101 - ABC-123",
+                destination: "Lima Centro",
+                status: "pendiente",
+                capacity: { used: 45, max: 50 }
+            },
+            {
+                id: "SAL-002",
+                date: "2025-05-27",
+                time: "09:15",
+                vehicle: "Unidad 205 - DEF-456",
+                destination: "Miraflores",
+                status: "en-curso",
+                capacity: { used: 50, max: 50 }
+            },
+            {
+                id: "SAL-003",
+                date: "2025-05-27",
+                time: "10:00",
+                vehicle: "Unidad 103 - GHI-789",
+                destination: "San Isidro",
+                status: "completada",
+                capacity: { used: 42, max: 48 }
+            },
+            {
+                id: "SAL-004",
+                date: "2025-05-27",
+                time: "10:45",
+                vehicle: "Unidad 207 - JKL-012",
+                destination: "Barranco",
+                status: "cancelada",
+                capacity: { used: 0, max: 50 }
+            },
+            {
+                id: "SAL-005",
+                date: "2025-05-27",
+                time: "11:30",
+                vehicle: "Unidad 104 - MNO-345",
+                destination: "Surco",
+                status: "pendiente",
+                capacity: { used: 38, max: 45 }
+            },
+            {
+                id: "SAL-006",
+                date: "2025-05-27",
+                time: "12:15",
+                vehicle: "Unidad 301 - PQR-678",
+                destination: "La Molina",
+                status: "en-curso",
+                capacity: { used: 44, max: 44 }
+            },
+            {
+                id: "SAL-007",
+                date: "2025-05-27",
+                time: "13:00",
+                vehicle: "Unidad 105 - STU-901",
+                destination: "San Borja",
+                status: "pendiente",
+                capacity: { used: 30, max: 48 }
+            },
+            {
+                id: "SAL-008",
+                date: "2025-05-27",
+                time: "13:45",
+                vehicle: "Unidad 302 - VWX-234",
+                destination: "Magdalena",
+                status: "completada",
+                capacity: { used: 46, max: 50 }
+            },
+            {
+                id: "SAL-009",
+                date: "2025-05-27",
+                time: "14:30",
+                vehicle: "Unidad 106 - YZA-567",
+                destination: "Jesús María",
+                status: "pendiente",
+                capacity: { used: 25, max: 40 }
+            },
+            {
+                id: "SAL-010",
+                date: "2025-05-27",
+                time: "15:15",
+                vehicle: "Unidad 208 - BCD-890",
+                destination: "Pueblo Libre",
+                status: "en-curso",
+                capacity: { used: 35, max: 45 }
+            },
+            {
+                id: "SAL-011",
+                date: "2025-05-27",
+                time: "16:00",
+                vehicle: "Unidad 107 - EFG-123",
+                destination: "Lince",
+                status: "pendiente",
+                capacity: { used: 40, max: 40 }
+            },
+            {
+                id: "SAL-012",
+                date: "2025-05-27",
+                time: "16:45",
+                vehicle: "Unidad 303 - HIJ-456",
+                destination: "Breña",
+                status: "completada",
+                capacity: { used: 32, max: 48 }
+            }
+        ];
+
+        const itemsPerPage = 8;
+        let currentPage = 1;
+        const totalPages = Math.ceil(departures.length / itemsPerPage);
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-PE', {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function getCapacityProgress(capacity) {
+            const percentage = (capacity.used / capacity.max) * 100;
+            const isFull = capacity.used >= capacity.max;
+            const isWarning = percentage >= 90 && !isFull;
+            
+            let progressClass = 'progress-available';
+            let statusText = 'DISPONIBLE';
+            
+            if (isFull) {
+                progressClass = 'progress-full';
+                statusText = 'COMPLETO';
+            } else if (isWarning) {
+                progressClass = 'progress-warning';
+                statusText = 'CASI LLENO';
+            }
+            
+            return `
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span class="progress-text">Capacidad de carga:</span>
+                        <span class="progress-text">${capacity.used}/${capacity.max}kg</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill ${progressClass}" style="width: ${percentage}%"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createDepartureCard(departure) {
+            return `
+                <div class="departure-card">
+                    <div class="card-header">
+                        <div class="departure-id">${departure.id}</div>
+                        <div class="status ${departure.status}">${departure.status.replace('-', ' ')}</div>
+                    </div>
+                    
+                    <div class="card-info">
+                        <div class="info-row">
+                            <div class="info-label">Fecha:</div>
+                            <div class="info-value">${formatDate(departure.date)}</div>
+                        </div>
+                        
+                        <div class="info-row">
+                            <div class="info-label">Hora:</div>
+                            <div class="info-value">${departure.time}</div>
+                        </div>
+                        
+                        <div class="vehicle-section">
+                            <div class="info-row">
+                                <div class="info-label">Vehículo:</div>
+                            </div>
+                            <div class="vehicle-header">
+                                <div class="vehicle-info">
+                                    <span class="vehicle-name">${departure.vehicle}</span>
+                                </div>
+                                <button class="btn btn-secondary btn-small" onclick="trackVehicle('${departure.vehicle}')">
+                                    <svg class="icon" viewBox="0 0 24 24">
+                                        <path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z" />
+                                    </svg>
+                                    Seguir
+                                </button>
+                            </div>
+                            ${getCapacityProgress(departure.capacity)}
+                        </div>
+                        
+                        <div class="info-row">
+                            <div class="info-label">Destino:</div>
+                            <div class="info-value">${departure.destination}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="editDeparture('${departure.id}')">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" />
+                            </svg>
+                            Editar Salida
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCards() {
+            const container = document.getElementById('cardsContainer');
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const currentDepartures = departures.slice(startIndex, endIndex);
+            
+            container.innerHTML = currentDepartures.map(createDepartureCard).join('');
+        }
+
+        function renderPagination() {
+            const pagination = document.getElementById('pagination');
+            const startItem = (currentPage - 1) * itemsPerPage + 1;
+            const endItem = Math.min(currentPage * itemsPerPage, departures.length);
+            
+            let paginationHTML = `
+                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    ← Anterior
+                </button>
+            `;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHTML += `
+                    <button onclick="changePage(${i})" ${i === currentPage ? 'class="active"' : ''}>
+                        ${i}
+                    </button>
+                `;
+            }
+            
+            paginationHTML += `
+                <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    Siguiente →
+                </button>
+            `;
+            
+            paginationHTML += `
+                <div class="pagination-info">
+                    Mostrando ${startItem}-${endItem} de ${departures.length} salidas
+                </div>
+            `;
+            
+            pagination.innerHTML = paginationHTML;
+        }
+
+        function changePage(page) {
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderCards();
+                renderPagination();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Inicializar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCards();
+            renderPagination();
+        });
+</script>
+{% endblock scripts %}
