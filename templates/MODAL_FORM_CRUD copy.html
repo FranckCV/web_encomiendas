@@ -40,12 +40,8 @@
     {% endif %}
 
     {% if modo_modal in ['insert', 'update', 'consult'] %}
-    <div class="form_content">
-
     <div class="row form_fields">
       {% for campo in fields_form %}
-      {# campo[6] != 'map' #}
-
       <div class="form_field form_{{campo[3]}}">
         <label for="{{campo[0]}}">{{campo[1]}}:</label>
 
@@ -98,25 +94,25 @@
 
         {% elif campo[3] == 'color' %}
 
-          <input 
-          type="text" 
-          class="input_color_sync"
-          data-name="{{campo[0]}}"
-          name="{{campo[0]}}" 
-          value="{{modulo[campo[0]]}}" 
-          placeholder="Valor hexadecimal" 
-          {% if campo[4] %}required{% endif %} 
-          {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}
-          >
-          <input 
-          type="color" 
-          class="input_color_sync"
-          data-name="{{campo[0]}}"
-          name="{{campo[0]}}" 
-          value="{{ modulo[campo[0]]}}" 
-          {% if campo[4] %}required{% endif %}
-          {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}
-          >
+        <input 
+        type="text" 
+        class="input_color_sync"
+        data-name="{{campo[0]}}"
+        name="{{campo[0]}}" 
+        value="{{modulo[campo[0]]}}" 
+        placeholder="Valor hexadecimal" 
+        {% if campo[4] %}required{% endif %} 
+        {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}
+        >
+        <input 
+        type="color" 
+        class="input_color_sync"
+        data-name="{{campo[0]}}"
+        name="{{campo[0]}}" 
+        value="{{ modulo[campo[0]]}}" 
+        {% if campo[4] %}required{% endif %}
+        {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}
+        >
 
         {% elif campo[3] == 'img' %}
         
@@ -126,7 +122,7 @@
             id="{{campo[0]}}" 
             name="{{campo[0]}}" 
             accept="image/*" 
-            {% if campo[5] == False %}disabled{% endif %}
+            {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}
           >
           <div class="form_img_container" id="">
             <img id="" class="clickable-image" src="" alt="Imagen {{tabla}}">
@@ -154,43 +150,9 @@
 
         {% endif %}
       </div>
-      
-      {# endif #}
       {% endfor %}
     </div>
-
-    {% if 'map' in fields_form | map(attribute=6) | list %}
-      <style>
-        .space_modal {
-          width: auto;
-        }
-        .form_fields {
-          width: 600px;
-        }
-      </style>
-
-      {% if modo_modal == 'consult' %}
-      <!-- <style>
-        .map_space::before {
-          content: '';
-          position: absolute;
-        }
-        </style> -->
-      {% endif %}
-
-      <div class="map_content" >
-        <label for="">Seleccione una ubicación del mapa</label>
-
-        <div class="map_space" data-has-map="true">
-        </div>
-
-      </div>
     {% endif %}
-
-    </div>
-
-    {% endif %}
-
 
     <div class="row">
       <div class="col">
