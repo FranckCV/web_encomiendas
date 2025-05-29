@@ -61,13 +61,13 @@ def get_table():
 
     columnas = {
         'id': ['ID', 0.5],
-        'abreviatura': ['Abreviatura', 1],
-        'codigo_postal': ['Cód. Postal', 1.5],
-        'direccion': ['Dirección', 2.5],
+        'abreviatura': ['Abreviatura', 0.75],
+        'codigo_postal': ['C. Postal', 0.5],
+        'direccion': ['Dirección', 3],
         'ubigeo': ['Ubigeo', 2.5],
-        'horario_l_v': ['Horario L-V', 2.5],
-        'horario_s_d': ['Horario S-D', 2.5],
-        'teléfono': ['Teléfono', 1.5],
+        # 'horario_l_v': ['Horario L-V', 2.5],
+        # 'horario_s_d': ['Horario S-D', 2.5],
+        # 'teléfono': ['Teléfono', 1.5],
         'activo': ['Activo', 0.5]
     }
 
@@ -158,7 +158,7 @@ def get_agencias_data():
     for fila in resultados:
         agencias.append({
             "id": fila["id"],
-            "nombre": f"Sucursal {fila["departamento"]} - {fila["abreviatura"][-2:]}",  # Puedes cambiar esto si tienes un campo específico para nombre
+            "nombre": f"Sucursal {fila['departamento']} - {fila['abreviatura'][-2:]}",  # Puedes cambiar esto si tienes un campo específico para nombre
             "departamento": fila["departamento"],
             "provincia": fila["provincia"],
             "distrito": fila["distrito"],

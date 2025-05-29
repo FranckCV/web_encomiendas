@@ -1,66 +1,139 @@
-{% set is_consult = modo_modal == 'consult' %}
-{% set is_update = modo_modal == 'update' %}
-{% set is_insert = modo_modal == 'insert' %}
-
-<div class="space_modal modal_crud_{{modo_modal}}" id="modal_crud_{{modo_modal}}{% if not is_insert %}_{{fila[primary_key]}}{% endif %}">
-  {% if not is_consult %}
-  <form class="modal_crud_content" action="{{ url_for('crud_' + modo_modal, tabla=tabla) }}" method="POST">
-  {% else %}
-  <div class="modal_crud_content">
-  {% endif %}
+<div class="space_modal modal_crud_{{modo_modal}} modal_crud_base" id="modal_crud_{{modo_modal}}_{{tabla}}_{{fila[primary_key] if fila else ''}}">
+  <form class="modal_crud_content"
+        {% if modo_modal in ['insert', 'update', 'delete', 'unactive']  %}
+        action="{{ url_for('crud_' + modo_modal, tabla=tabla) }}"
+        method="POST"
+        
+        {% endif %}>
+        
+    <input type="hidden" name="{{ primary_key }}" value="{{ fila[primary_key] if fila else '' }}">
 
     <div class="row">
-      <h3>{{ NOMBRE_BTN_INSERT if is_insert else (NOMBRE_BTN_UPDATE if is_update else NOMBRE_BTN_CONSULT) }} {{nombre_tabla}}</h3>
+      <h3>
+        {% if modo_modal == 'insert' %} {{ NOMBRE_BTN_INSERT }}
+        {% elif modo_modal == 'update' %} {{ NOMBRE_BTN_UPDATE }}
+        {% elif modo_modal == 'delete' %} {{ NOMBRE_BTN_DELETE }}
+        {% elif modo_modal == 'unactive' %}
+          {% if fila['activo'] == 0 %} {{ ACT_STATE_1 }}
+          {% elif fila['activo'] == 1 %} {{ ACT_STATE_0 }}
+          {% endif %}
+        {% elif modo_modal == 'consult' %} {{ NOMBRE_BTN_CONSULT }}
+        {% endif %}
+        {{ nombre_tabla }}
+      </h3>
     </div>
 
-    <div class="row form_fields">
-      {% if not is_insert %}
-      <input type="hidden" id="{{primary_key}}" name="{{primary_key}}" value="{{fila[primary_key]}}">
-      {% endif %}
+    {% if modo_modal in ['delete', 'unactive'] %}
+      <p>
+        ¿Está seguro de que desea 
+        {% if modo_modal == 'delete' %}
+          eliminar este {{nombre_tabla}} ({{primary_key | upper}}: {{fila[primary_key]}})?
+        {% elif modo_modal == 'unactive' %}
+          {% if fila['activo'] == 0 %}
+            {{ ACT_STATE_1 | lower }}
+          {% else %}
+            {{ ACT_STATE_0 | lower }}
+          {% endif %}
+          este {{nombre_tabla}} ({{primary_key | upper}}: {{fila[primary_key]}})?
+        {% endif %}
+      </p>
+    {% endif %}
 
+    {% if modo_modal in ['insert', 'update', 'consult'] %}
+    <div class="row form_fields">
       {% for campo in fields_form %}
       <div class="form_field form_{{campo[3]}}">
         <label for="{{campo[0]}}">{{campo[1]}}:</label>
 
         {% if campo[3] == 'select' %}
-          {% set datos = campo[6][0]() if campo[6] and campo[6][0] is callable else campo[6][0] %}
-          {% if is_consult %}
-            <input id="{{campo[0]}}" name="{{campo[0]}}" type="text" value="{{ fila[campo[6][1]] }}" disabled>
-          {% else %}
-            <select id="{{campo[0]}}" name="{{campo[0]}}" {% if is_consult or campo[5]==False %}disabled{% endif %}>
-              {% if is_insert %}
-              <option value="-1" disabled selected>{{campo[2]}}</option>
-              {% endif %}
-              {% for option in datos %}
-              <option value="{{option[0]}}" {% if not is_insert and fila[campo[0]]==option[0] %}selected{% endif %}>{{option[1]}}</option>
-              {% endfor %}
-            </select>
-          {% endif %}
-        
-        {% elif campo[3] == 'textarea' %}
-          <textarea id="{{campo[0]}}" name="{{campo[0]}}" {% if campo[4] %}required{% endif %} {% if is_consult or campo[5]==False %}disabled{% endif %}>
-            {% if not is_insert %}{{ fila[campo[0]] }}{% endif %}
-          </textarea>
-        
-        {% elif campo[3] == 'p' %}
-          <div class="form_p_content">
-            {% if campo[0] == 'activo' %}
-              <p class="activo {% if fila[campo[0]] == 0 %}btn_unactive{% else %}btn_active{% endif %}">{{ STATE_0 if fila[campo[0]] == 0 else STATE_1 }}</p>
+            {% if modo_modal == 'consult' %}
+            <input 
+            id="{{campo[0]}}" 
+            type="text" 
+            class="select_{{campo[0]}}" 
+            name="{{campo[0]}}" 
+            placeholder="{{campo[2]}}" 
+            value="{{ fila[campo[6][1]] }}"
+            disabled
+            {% if campo[4] %}required{% endif %} 
+            >
             {% else %}
-              <p id="{{campo[0]}}" name="{{campo[0]}}">{{ fila[campo[0]] if not is_insert }}</p>
+                {% set datos = campo[6][0]() if campo[6] and campo[6][0] is callable else campo[6][0] %}
+                <select 
+                id="{{campo[0]}}" 
+                name="{{campo[0]}}"
+                {% if modo_modal == 'consult' or campo[5] == False %} disabled {% endif %}
+                >
+                    {% if modo_modal == 'insert' %}
+                    <option value="-1" disabled selected>{{campo[2]}}</option>
+                    {% endif %}
+                    {% for option in datos %}
+                    <option value="{{option[0]}}"
+                        {% if modo_modal != 'insert' and fila[campo[0]]==option[0] %}selected{% endif %}>
+                        {{option[1]}}
+                    </option>
+                    {% endfor %}
+
             {% endif %}
-          </div>
-        
+
+          </select>
+
+        {% elif campo[3] == 'textarea' %}
+          <textarea id="{{campo[0]}}" name="{{campo[0]}}"
+            {% if campo[4] %}required{% endif %}
+            {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}>{{ fila[campo[0]] if fila else '' }}</textarea>
+
+        {% elif campo[3] == 'p' %}
+            <div class="form_p_content">
+                {% if campo[0] == 'activo' %}
+                <p class="activo {{'btn_active' if fila[campo[0]] or modo_modal == 'insert' else 'btn_unactive'}}">
+                    {{ STATE_1 if fila[campo[0]] or modo_modal == 'insert' else STATE_0 }}
+                </p>
+                {% else %}
+                <p id="{{campo[0]}}" name="{{campo[0]}}">{{ fila[campo[0]] if fila[campo[0]] else '' }}</p>
+                {% endif %}
+            </div>
+
+        {% elif campo[3] == 'icon' %}
+            <input type="text" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" 
+            {% if campo[4] %}required{% endif %} value="{{modulo[campo[0]]}}" 
+             {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}>
+            <i class="{{modulo[campo[0]]}}"></i>
+
+        {% elif campo[3] == 'color' %}
+
+        <input 
+        type="text" 
+        class="input_color_sync"
+        data-name="{{campo[0]}}"
+        name="{{campo[0]}}" 
+        value="{{modulo[campo[0]]}}" 
+        placeholder="Valor hexadecimal" 
+        {% if campo[4] %}required{% endif %} 
+        {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}
+        >
+        <input 
+        type="color" 
+        class="input_color_sync"
+        data-name="{{campo[0]}}"
+        name="{{campo[0]}}" 
+        value="{{ modulo[campo[0]]}}" 
+        {% if campo[4] %}required{% endif %}
+        {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}
+        >
+
         {% else %}
-          {% set valor = fila[campo[0]] if not is_insert else '' %}
-          {% set clase_extra = 'input_vacio' if valor == None or valor == '' else '' %}
-          <input class="{{clase_extra}}" id="{{campo[0]}}" name="{{campo[0]}}" type="{{campo[3]}}" placeholder="{{campo[2]}}"
-            value="{{valor}}" {% if campo[4] %}required{% endif %}
-            {% if is_consult or campo[5]==False %}disabled{% endif %}>
+          <input id="{{campo[0]}}" name="{{campo[0]}}"
+            type="{{campo[3]}}" placeholder="{{campo[2]}}"
+            {% if campo[4] %}required{% endif %}
+            {% if campo[5] == False or modo_modal == 'consult' %}disabled{% endif %}
+            value="{% if fila and fila[campo[0]] != None %}{{fila[campo[0]]}}{% endif %}">
+
         {% endif %}
       </div>
       {% endfor %}
     </div>
+    {% endif %}
 
     <div class="row">
       <div class="col">
@@ -68,17 +141,15 @@
       </div>
       <div class="col-1"></div>
       <div class="col">
-        {% if is_consult %}
-        <button class="button btn_acept" onclick="closeModal()">Aceptar</button>
-        {% else %}
-        <button class="button btn_acept" type="submit">Aceptar</button>
-        {% endif %}
+        <button class="button btn_acept"
+          {% if modo_modal in ['consult'] %}
+          type="button" onclick="closeModal()"
+          {% else %}
+          type="submit"
+          {% endif %}>
+          Aceptar
+        </button>
       </div>
     </div>
-
-  {% if not is_consult %}
   </form>
-  {% else %}
-  </div>
-  {% endif %}
 </div>

@@ -12,10 +12,12 @@ Información de la empresa
         --color-primary: var(--color-base);
         --color-secondary: var(--color-sec);
         --color-tertiary: var(--color-thr);
+        --size-img: 225px;
     }
 
     .block_title {
         margin-bottom: 20px;
+        /* margin-bottom: 200px; */
     }
 
     .container {
@@ -37,12 +39,12 @@ Información de la empresa
         margin-bottom: 20px;
     }
 
-    .form-group-texts {
+    .form-groups {
         /* margin-bottom: 20px; */
         display: grid;
         /* justify-content: space-between; */
         justify-content: center;
-        grid-template-columns: repeat(3,1fr);
+        grid-template-columns: repeat(4,1fr);
         gap: 15px;
 
     }
@@ -57,16 +59,33 @@ Información de la empresa
     input,
     select {
         width: 100%;
-        padding: 10px;
+        padding-block: 5px;
+        padding-inline: 10px;
         border: 1px solid #ddd;
         border-radius: 5px;
         /* font-size: 16px; */
         box-sizing: border-box;
     }
 
+    .iframe-container  {
+        width: 100%;
+        height: 350px;
+        overflow: hidden;
+        /* border: 1px solid #ccc; */
+    }
+
+    iframe {
+        width: 1500px; /* tamaño real del iframe */
+        height: 800px;
+        transform: scale(0.325); /* escala para que quepa */
+        transform-origin: 0 0;
+    }
+
     .color-inputs {
         display: flex;
+        flex-direction: column;
         gap: 15px;
+        padding-inline: 15px;
     }
 
     .color-input-group {
@@ -81,26 +100,26 @@ Información de la empresa
 
     .logo-container {
         display: flex;
-        /* flex-direction: column; */
+        flex-direction: column;
         justify-content: center;
         gap: 15px;
         align-items: center;
-        margin-bottom: 20px;
+        /* margin-bottom: 20px; */
     }
 
     .logo-container input {
-        width: 60%;
+        width: 100%;
     }
 
     .logo-preview {
-        width: 150px;
-        height: 150px;
+        width: var(--size-img);
+        height: var(--size-img);
         border: 2px dashed #ddd;
         border-radius: 10px;
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-bottom: 15px;
+        /* margin-bottom: 15px; */
         background-color: #b6b6b6;
         overflow: hidden;
         background-image: url(/static/img/transparent.jpg);
@@ -178,63 +197,80 @@ Información de la empresa
         enctype="multipart/form-data">
         <input type="hidden" id="id" name="id" value="1">
 
-        <div class="form-group-texts">
+        <div class="form-groups">
             <div class="form-group">
-            <label for="nombre">Nombre de la Empresa</label>
-            <input type="text" id="nombre" name="nombre" required value="{{information['nombre']}}">
-        </div>
+                <label for="nombre">Nombre de la Empresa</label>
+                <input type="text" id="nombre" name="nombre" required value="{{information['nombre']}}">
+            </div>
 
-        <div class="form-group">
-            <label for="correo">Correo Electrónico</label>
-            <input type="email" id="correo" name="correo" required value="{{information['correo']}}">
-        </div>
+            <div class="form-group">
+                <label for="correo">Correo Electrónico</label>
+                <input type="email" id="correo" name="correo" required value="{{information['correo']}}">
+            </div>
 
-        <div class="form-group">
-            <label for="nro_telefono">Número de Teléfono</label>
-            <input type="tel" id="nro_telefono" name="nro_telefono" required value="{{information['nro_telefono']}}">
-        </div>
-        </div>
-
-        <div class="form-group">
-            <label>Logo de la Empresa</label>
-
-            <div class="logo-container">
-                <div class="logo-preview" id="logoPreview">
-                    <!-- <img id="logoImage" src="data:image/png;base64,{{information['logo']}}" alt="Logo empresa"> -->
-                    <img id="logoImage" src="/static/img/logo.png" alt="Logo empresa">
-                </div>
-                <input type="file" id="logo" name="logo" accept="image/*">
+            <div class="form-group">
+                <label for="nro_telefono">Número de Teléfono</label>
+                <input type="tel" id="nro_telefono" name="nro_telefono" required value="{{information['nro_telefono']}}">
+            </div>
+            
+            <div class="form-group">
+                <label for="porcentaje_garantia">Porcentaje de garantia</label>
+                <input type="number" id="porcentaje_garantia" name="porcentaje_garantia" required value="{{information['porcentaje_garantia']}}">
             </div>
         </div>
 
-        <div class="form-group">
-            <label>Colores Corporativos</label>
-            <div class="color-inputs">
-                <div class="color-input-group">
-                    <label for="color_pri">Color Primario</label>
-                    <input type="color" id="color_pri" name="color_pri" required value="{{information['color_pri']}}">
-                    <div class="color-preview" id="previewPrimary"></div>
-                </div>
 
-                <div class="color-input-group">
-                    <label for="color_sec">Color Secundario</label>
-                    <input type="color" id="color_sec" name="color_sec" required value="{{information['color_sec']}}">
-                    <div class="color-preview" id="previewSecondary"></div>
-                </div>
+        <div class="form-groups">
+            <div class="form-group" >
+                <label>Logo de la Empresa</label>
 
-                <div class="color-input-group">
-                    <label for="color_ter">Color Terciario</label>
-                    <input type="color" id="color_ter" name="color_ter" required value="{{information['color_ter']}}">
-                    <div class="color-preview" id="previewTertiary"></div>
+                <div class="logo-container">
+                    <div class="logo-preview" id="logoPreview">
+                        <img class="clickable-image" id="logoImage" src="{{URL_IMG_LOGO}}" alt="Logo empresa">
+                    </div>
+                    <input type="file" id="logo" name="logo" accept="image/*">
+                    <input type="hidden" name="logo_actual" value="{{information['logo']}}">
                 </div>
             </div>
+
+            <div class="form-group">
+                <label>Colores Corporativos</label>
+                <div class="color-inputs">
+                    <div class="color-input-group">
+                        <label for="color_pri">Color Primario</label>
+                        <input type="color" id="color_pri" name="color_pri" required value="{{information['color_pri']}}">
+                        <input class="color-preview" id="previewPrimary" disabled>
+                    </div>
+
+                    <div class="color-input-group">
+                        <label for="color_sec">Color Secundario</label>
+                        <input type="color" id="color_sec" name="color_sec" required value="{{information['color_sec']}}">
+                        <input class="color-preview" id="previewSecondary" disabled>
+                    </div>
+
+                    <div class="color-input-group">
+                        <label for="color_ter">Color Terciario</label>
+                        <input type="color" id="color_ter" name="color_ter" required value="{{information['color_ter']}}">
+                        <input class="color-preview" id="previewTertiary" disabled>
+                    </div>
+                </div>
+            </div>
+
+            <div class="iframe-container" style="grid-column: span 2;">
+                <label>Vista previa de colores</label>
+                <iframe id="preview_iframe" src="/" frameborder="0"></iframe>
+            </div>
         </div>
+
+
 
         <div class="button-group">
             <button type="submit" class="btn">Guardar Cambios</button>
             <button type="button" id="btnReset" class="btn"
                 style="background-color: var(--color-secondary); color: var(--color4);">Restablecer</button>
         </div>
+
+
     </form>
 </div>
 </div>
@@ -274,6 +310,23 @@ Información de la empresa
             document.documentElement.style.setProperty('--color-base', colorPri.value);
             document.documentElement.style.setProperty('--color-sec', colorSec.value);
             document.documentElement.style.setProperty('--color-thr', colorTer.value);
+
+            updateColorIframe();
+        }
+
+        function updateColorIframe() {
+            const prevIframe = document.getElementById('preview_iframe');
+            prevIframe.contentDocument.documentElement.style.setProperty('--color-base', colorPri.value);
+            prevIframe.contentDocument.documentElement.style.setProperty('--color-sec', colorSec.value);
+            prevIframe.contentDocument.documentElement.style.setProperty('--color-thr', colorTer.value);
+            
+            prevIframe.addEventListener('load', function() {
+            // console.log(prevIframe.contentDocument.documentElement.style);
+            // if (prevIframe && prevIframe.contentDocument) {
+                prevIframe.contentDocument.documentElement.style.setProperty('--color-base', colorPri.value);
+                prevIframe.contentDocument.documentElement.style.setProperty('--color-sec', colorSec.value);
+                prevIframe.contentDocument.documentElement.style.setProperty('--color-thr', colorTer.value);
+            });
         }
 
         // Event listeners para los inputs de color
@@ -287,50 +340,12 @@ Información de la empresa
                 const reader = new FileReader();
                 reader.onload = function (event) {
                     logoPreview.src = event.target.result;
+                    logoPreview.classList.add('clickable-image');
                 }
                 reader.readAsDataURL(e.target.files[0]);
             }
         });
 
-        // Cargar datos de empresa al iniciar
-        // async function cargarDatosEmpresa() {
-        //     try {
-        //         const response = await fetch('api/empresa', {
-        //             method: 'GET',
-        //             headers: {
-        //                 'Content-Type': 'application/json',
-        //             }
-        //         });
-
-        //         if (response.ok) {
-        //             const data = await response.json();
-        //             if (data && data.length > 0) {
-        //                 const empresa = data[0]; // Siempre usamos el único registro
-
-        //                 // Llenar formulario
-        //                 document.getElementById('id').value = empresa.id;
-        //                 document.getElementById('nombre').value = empresa.nombre;
-        //                 document.getElementById('correo').value = empresa.correo;
-        //                 document.getElementById('nro_telefono').value = empresa.nro_telefono;
-
-        //                 // Colores
-        //                 colorPri.value = empresa.color_pri;
-        //                 colorSec.value = empresa.color_sec;
-        //                 colorTer.value = empresa.color_ter;
-        //                 updateColorPreviews();
-
-        //                 // Logo (si existe)
-        //                 if (empresa.logo) {
-        //                     logoPreview.src = `data:image/png;base64,${empresa.logo}`;
-        //                 }
-        //             }
-        //         } else {
-        //             console.error('Error al cargar datos de empresa');
-        //         }
-        //     } catch (error) {
-        //         console.error('Error:', error);
-        //     }
-        // }
         function cargarDatosEmpresa() {
             const empresa = {{ information  | tojson}} ;
 
@@ -339,6 +354,7 @@ Información de la empresa
             document.getElementById('nombre').value = empresa.nombre;
             document.getElementById('correo').value = empresa.correo;
             document.getElementById('nro_telefono').value = empresa.nro_telefono;
+            document.getElementById('porcentaje_garantia').value = empresa.porcentaje_garantia;
 
             // Colores
             colorPri.value = empresa.color_pri;
@@ -348,65 +364,14 @@ Información de la empresa
 
             // Logo (si existe)
             if (empresa.logo) {
-                logoPreview.src = `data:image/png;base64,${empresa.logo}`;
+                logoPreview.src = `/static/img/img_empresa/${empresa.logo}`;
+                document.getElementById('logo').value = null;
             }
         }
-
-        // }
-
 
         // Llamar a cargar datos al iniciar
         cargarDatosEmpresa();
         updateColorPreviews();
-
-        // form.addEventListener('submit', async function (e) {
-        //     e.preventDefault();
-
-        //     // Crear FormData para manejar el archivo de imagen
-        //     const formData = new FormData();
-        //     formData.append('id', document.getElementById('id').value);
-        //     formData.append('nombre', document.getElementById('nombre').value);
-        //     formData.append('correo', document.getElementById('correo').value);
-        //     formData.append('nro_telefono', document.getElementById('nro_telefono').value);
-        //     formData.append('color_pri', colorPri.value);
-        //     formData.append('color_sec', colorSec.value);
-        //     formData.append('color_ter', colorTer.value);
-
-        //     // Añadir logo solo si se ha seleccionado un nuevo archivo
-        //     if (logoInput.files && logoInput.files[0]) {
-        //         formData.append('logo', logoInput.files[0]);
-        //     }
-
-        //     try {
-        //         const response = await fetch('api/empresa/update', {
-        //             method: 'POST',
-        //             body: formData
-        //         });
-
-        //         if (response.ok) {
-        //             // Mostrar mensaje de éxito
-        //             alertSuccess.style.display = 'block';
-        //             setTimeout(() => {
-        //                 alertSuccess.style.display = 'none';
-        //             }, 3000);
-
-        //             // Recargar datos
-        //             cargarDatosEmpresa();
-        //         } else {
-        //             // Mostrar mensaje de error
-        //             alertError.style.display = 'block';
-        //             setTimeout(() => {
-        //                 alertError.style.display = 'none';
-        //             }, 3000);
-        //         }
-        //     } catch (error) {
-        //         console.error('Error:', error);
-        //         alertError.style.display = 'block';
-        //         setTimeout(() => {
-        //             alertError.style.display = 'none';
-        //         }, 3000);
-        //     }
-        // });
 
         // Botón de reset
         btnReset.addEventListener('click', function () {

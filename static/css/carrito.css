@@ -1,8 +1,9 @@
 .container {
-    margin: 0 auto;
+    padding: 20px;
     display: grid;
     grid-template-columns: 1fr 350px;
     gap: 30px;
+    max-width: 100%;
 }
 .icon_trash{
 font-size: 1.5rem;
@@ -89,7 +90,7 @@ font-size: 1.5rem;
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 15px;
-    border: 2px solid transparent;
+    border: 2px solid rgba(128, 128, 128, 0.1);;
     transition: all 0.3s ease;
     position: relative;
 }
@@ -282,7 +283,6 @@ font-size: 1.5rem;
     border: none;
     border-radius: 10px;
     font-size: 16px;
-    font-weight: 600;
     cursor: pointer;
     margin-top: 20px;
     transition: all 0.3s ease;

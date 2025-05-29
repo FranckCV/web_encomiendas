@@ -114,6 +114,20 @@
         {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}
         >
 
+        {% elif campo[3] == 'img' %}
+
+        <input type="hidden" name="{{campo[0]}}_actual" value="{{fila[campo[0]]}}">
+        <input 
+        type="file" 
+        id="{{campo[0]}}" 
+        name="{{campo[0]}}" 
+        accept="image/*" 
+        {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}
+        >
+        <div class="form_img_container" id="">
+          <img id="" class="clickable-image" src="/static/img/img_{{tabla}}/{{fila[campo[0]]}}" alt="Imagen {{tabla}}">
+        </div>
+
         {% else %}
           <input id="{{campo[0]}}" name="{{campo[0]}}"
             type="{{campo[3]}}" placeholder="{{campo[2]}}"

@@ -1,0 +1,742 @@
+{% extends "MAESTRA_ADMIN.html" %}
+
+{% block estilos %}
+<link rel="stylesheet" href="/static/css/salida_informacion.css">
+{% endblock estilos %}
+
+{% block contenido %}
+ <div class="container">
+
+
+            <div class="block_crud block_title" style="padding: 20px 10px 30px 10px; font-size: 1rem;">
+            <h3 class="crud_title"><i class="fa-solid fa-truck-fast"></i> Programar nueva salida</h3>
+        </div>
+
+
+        <div class="content">
+            <!-- Fecha y Hora -->
+            <div class="section">
+                <h2 class="section-title">📅 Datos generales de salida</h2>
+                <div class="form-group">
+                    <div class="form-field">
+                        <label for="fecha">Fecha de salida:</label>
+                        <input type="date" id="fecha" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="hora">Hora de salida:</label>
+                        <input type="time" id="hora" required>
+                    </div>
+                      <div class="form-field">
+                        <label for="destinoSelect">Seleccionar destino final:</label>
+                        <select id="destinoSelect" onchange="seleccionarDestino()" required>
+                            <option value="">-- Seleccione el destino final --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Selección de Vehículo -->
+            <div class="section">
+                <h2 class="section-title">🚚 Selección de vehículo</h2>
+                <div class="alert alert-error" id="errorVehiculo"></div>
+                
+                <table id="vehiculosTabla">
+                    <thead>
+                        <tr>
+                            <th>Vehículo</th>
+                            <th>Capacidad Máxima (kg)</th>
+                            <th>Capacidad Usada (kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <div class="assigned-items" id="vehiculoSeleccionado" style="display: none;">
+                    <h4>🚚 Vehículo Seleccionado:</h4>
+                    <div id="vehiculoInfo"></div>
+                    <div class="capacity-bar" style="margin-top: 10px;">
+                        <div id="capacityFill" class="capacity-fill" style="width: 0%"></div>
+                    </div>
+                    <div id="capacityText" style="margin-top: 5px; font-size: 0.9rem; color: #666;">0 kg / 0 kg (0%)</div>
+                </div>
+            </div>
+
+            <!-- Gestión de Empleados -->
+            <div class="section">
+                <h2 class="section-title">👥 Gestión de Empleados</h2>
+                
+                <table id="empleadosTabla">
+                    <thead>
+                        <tr>
+                            <th>Empleado</th>
+                            <th>Rol</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <div class="assigned-items">
+                    <h4>👥 Empleados Asignados:</h4>
+                    <div id="empleadosAsignados">
+                        <span style="color: #666; font-style: italic;">No hay empleados asignados</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gestión de Paquetes -->
+            <div class="section">
+                <h2 class="section-title">📦 Gestión de Paquetes</h2>
+                <div class="alert alert-error" id="errorPaquetes"></div>
+                
+                <table id="paquetesTabla">
+                    <thead>
+                        <tr>
+                            <th>Tracking</th>
+                            <th>Descripción</th>
+                            <th>Peso (kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <div class="assigned-items">
+                    <h4>📦 Paquetes Asignados:</h4>
+                    <div id="paquetesAsignados">
+                        <span style="color: #666; font-style: italic;">No hay paquetes asignados</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Escalas -->
+            <div class="section">
+                <h2 class="section-title">🗺️ Escalas de ruta</h2>
+                <div class="form-group">
+                    <div class="form-field">
+                        <label for="sucursalSelect">Seleccionar sucursal:</label>
+                        <select id="sucursalSelect">
+                            <option value="">-- Seleccione una sucursal --</option>
+                        </select>
+                    </div>
+                    <div class="form-field" style="display: flex; align-items: end;">
+                        <button class="btn" onclick="agregarEscala()">+ Agregar escala</button>
+                    </div>
+                </div>
+                
+                <div class="escalas-container">
+                    <h4>📍 Escalas programadas:</h4>
+                    <div id="escalasLista">
+                        <span style="color: #666; font-style: italic;">No hay escalas programadas</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recojos en Casa -->
+            <div class="section">
+                <h2 class="section-title">🏠 Recojos en casa</h2>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="recojoCheckbox" onchange="toggleRecojoSection()">
+                    <label for="recojoCheckbox">¿Incluir recojos en casa?</label>
+                </div>
+                
+                <div class="recojo-section" id="recojoSection">
+                    <h4 style="color: #f39c12; margin-bottom: 15px;">📋 Transacciones disponibles para recojo:</h4>
+                    <div id="transaccionesRecojo">
+                        <!-- Las transacciones se cargan aquí dinámicamente -->
+                    </div>
+                    
+                    <div class="assigned-items" style="margin-top: 20px;">
+                        <h4>🏠 Recojos seleccionados:</h4>
+                        <div id="recojosAsignados">
+                            <span style="color: #666; font-style: italic;">No hay recojos seleccionados</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen -->
+            <div class="section">
+                <h2 class="section-title">📊 Resumen de la salida</h2>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalEmpleados">0</div>
+                        <div class="stat-label">Empleados</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalPaquetes">0</div>
+                        <div class="stat-label">Paquetes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="pesoTotalStat">0</div>
+                        <div class="stat-label">Peso total (kg)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalEscalas">0</div>
+                        <div class="stat-label">Escalas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalRecojos">0</div>
+                        <div class="stat-label">Recojos</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón Guardar -->
+            <div style="text-align: center;">
+                <button class="btn btn-success" onclick="guardarSalida()"> Guardar salida</button>
+                <div class="alert" id="mensajeGuardado" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+    </div>
+
+{% endblock contenido %}
+
+
+{% block scripts %}
+ <script>
+        // Datos de muestra - Vehículos con más ejemplos
+        const vehiculos = [
+            { id: 1, nombre: "Camión Mercedes Actros - ABC123", capacidadMaxima: 5000, capacidadUsada: 0 },
+            { id: 2, nombre: "Furgoneta Ford Transit - DEF456", capacidadMaxima: 2000, capacidadUsada: 300 },
+            { id: 3, nombre: "Camioneta Toyota Hilux - GHI789", capacidadMaxima: 1500, capacidadUsada: 0 },
+            { id: 4, nombre: "Camión Volvo FH - JKL012", capacidadMaxima: 8000, capacidadUsada: 1200 },
+            { id: 5, nombre: "Furgón Hyundai H350 - MNO345", capacidadMaxima: 1800, capacidadUsada: 0 },
+            { id: 6, nombre: "Camión Scania R450 - PQR678", capacidadMaxima: 6500, capacidadUsada: 500 },
+            { id: 7, nombre: "Van Iveco Daily - STU901", capacidadMaxima: 3500, capacidadUsada: 2100 },
+            { id: 8, nombre: "Camioneta Nissan NP300 - VWX234", capacidadMaxima: 1200, capacidadUsada: 800 }
+        ];
+
+        // Datos de muestra - Empleados con más ejemplos
+        const empleados = [
+            { id: 1, nombre: "Juan Carlos Pérez", rol: "Conductor" },
+            { id: 2, nombre: "María Elena García", rol: "Auxiliar" },
+            { id: 3, nombre: "Carlos Alberto López", rol: "Conductor" },
+            { id: 4, nombre: "Ana Patricia Martínez", rol: "Supervisor" },
+            { id: 5, nombre: "Luis Fernando Rodríguez", rol: "Auxiliar" },
+            { id: 6, nombre: "Elena Victoria Sánchez", rol: "Conductor" },
+            { id: 7, nombre: "Roberto Miguel Silva", rol: "Auxiliar" },
+            { id: 8, nombre: "Carmen Rosa Vega", rol: "Supervisor" },
+            { id: 9, nombre: "Diego Alejandro Torres", rol: "Conductor" },
+            { id: 10, nombre: "Sofía Isabel Morales", rol: "Auxiliar" }
+        ];
+
+        // Datos de muestra - Paquetes con más ejemplos
+        const paquetes = [
+            { id: 1, tracking: "TRK001234", descripcion: "Documentos legales urgentes", peso: 2},
+            { id: 2, tracking: "TRK001235", descripcion: "Equipos electrónicos - Laptops", peso: 15},
+            { id: 3, tracking: "TRK001236", descripcion: "Ropa y textiles - Pedido Lima", peso: 8},
+            { id: 4, tracking: "TRK001237", descripcion: "Libros universitarios", peso: 12},
+            { id: 5, tracking: "TRK001238", descripcion: "Medicamentos especiales", peso: 5},
+            { id: 6, tracking: "TRK001239", descripcion: "Herramientas industriales", peso: 25},
+            { id: 7, tracking: "TRK001240", descripcion: "Alimentos enlatados", peso: 18},
+            { id: 8, tracking: "TRK001241", descripcion: "Equipos deportivos", peso: 22},
+            { id: 9, tracking: "TRK001242", descripcion: "Repuestos automotrices", peso: 35},
+            { id: 10, tracking: "TRK001243", descripcion: "Productos cosméticos", peso: 6}
+        ];
+
+        // Datos de muestra - Sucursales con más ejemplos
+        const sucursales = [
+            { id: 1, nombre: "Sucursal Centro Histórico", direccion: "Jr. de la Unión 123, Cercado de Lima" },
+            { id: 2, nombre: "Sucursal San Isidro", direccion: "Av. Javier Prado Este 456, San Isidro" },
+            { id: 3, nombre: "Sucursal Miraflores", direccion: "Av. Larco 789, Miraflores" },
+            { id: 4, nombre: "Sucursal La Molina", direccion: "Av. La Molina 321, La Molina" },
+            { id: 5, nombre: "Sucursal San Borja", direccion: "Av. San Borja Norte 654, San Borja" },
+            { id: 6, nombre: "Sucursal Surco", direccion: "Av. Benavides 987, Santiago de Surco" },
+            { id: 7, nombre: "Sucursal Callao", direccion: "Av. Argentina 147, Callao" },
+            { id: 8, nombre: "Sucursal Villa El Salvador", direccion: "Av. Pastor Sevilla 258, Villa El Salvador" }
+        ];
+
+        // Datos de transacciones de recojo en casa con más ejemplos
+        const transaccionesRecojo = [
+            { 
+                id: 1, 
+                numeroTransaccion: "RC-2024-001", 
+                direccion: "Av. Los Jardines 245, Urb. San Martín", 
+                cliente: "María González Ruiz",
+                telefono: "987654321",
+                estado: "Pendiente"
+            },
+            { 
+                id: 2, 
+                numeroTransaccion: "RC-2024-002", 
+                direccion: "Jr. Las Flores 678, Pueblo Libre", 
+                cliente: "Carlos Mendoza Silva",
+                telefono: "976543210",
+                estado: "Pendiente"
+            },
+            { 
+                id: 3, 
+                numeroTransaccion: "RC-2024-003", 
+                direccion: "Calle Los Pinos 123, San Isidro", 
+                cliente: "Ana Torres Vega",
+                telefono: "965432109",
+                estado: "Pendiente"
+            },
+            { 
+                id: 4, 
+                numeroTransaccion: "RC-2024-004", 
+                direccion: "Av. Industrial 987, Callao", 
+                cliente: "Roberto Silva Morales",
+                telefono: "954321098",
+                estado: "Pendiente"
+            },
+            { 
+                id: 5, 
+                numeroTransaccion: "RC-2024-005", 
+                direccion: "Jr. Comercio 456, Miraflores", 
+                cliente: "Lucía Vargas Castro",
+                telefono: "943210987",
+                estado: "Pendiente"
+            },
+            { 
+                id: 6, 
+                numeroTransaccion: "RC-2024-006", 
+                direccion: "Av. Universitaria 741, Los Olivos", 
+                cliente: "Pedro Ramírez López",
+                telefono: "932109876",
+                estado: "Pendiente"
+            },
+            { 
+                id: 7, 
+                numeroTransaccion: "RC-2024-007", 
+                direccion: "Jr. Ayacucho 852, Breña", 
+                cliente: "Carmen Delgado Ramos",
+                telefono: "921098765",
+                estado: "Pendiente"
+            },
+            { 
+                id: 8, 
+                numeroTransaccion: "RC-2024-008", 
+                direccion: "Av. El Sol 963, San Juan de Miraflores", 
+                cliente: "José Hernández Paz",
+                telefono: "910987654",
+                estado: "Pendiente"
+            }
+        ];
+
+        // Variables de estado
+        let vehiculoSeleccionado = null;
+        let empleadosAsignados = [];
+        let paquetesAsignados = [];
+        let escalas = [];
+        let recojosAsignados = [];
+        let pesoTotal = 0;
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            const ahora = new Date();
+            document.getElementById('fecha').value = ahora.toISOString().split('T')[0];
+            document.getElementById('hora').value = ahora.toTimeString().split(' ')[0].substring(0, 5);
+            
+            cargarSucursales();
+            renderizarVehiculos();
+            renderizarEmpleados();
+            renderizarPaquetes();
+            cargarTransaccionesRecojo();
+            actualizarEstadisticas();
+        });
+
+        function cargarSucursales() {
+            const select = document.getElementById('sucursalSelect');
+            sucursales.forEach(sucursal => {
+                const option = document.createElement('option');
+                option.value = sucursal.id;
+                option.textContent = `${sucursal.nombre} - ${sucursal.direccion}`;
+                select.appendChild(option);
+            });
+        }
+
+        function cargarTransaccionesRecojo() {
+            const contenedor = document.getElementById('transaccionesRecojo');
+            contenedor.innerHTML = transaccionesRecojo.map(transaccion => `
+                <div class="recojo-item" onclick="toggleRecojoItem(${transaccion.id})">
+                    <input type="checkbox" class="recojo-checkbox" id="recojo_${transaccion.id}" onchange="toggleRecojoItem(${transaccion.id})">
+                    <div class="recojo-info">
+                        <div class="recojo-numero">${transaccion.numeroTransaccion}</div>
+                        <div class="recojo-direccion">
+                            <strong>📍 ${transaccion.direccion}</strong><br>
+                            👤 Cliente: ${transaccion.cliente} | 📞 ${transaccion.telefono}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderizarVehiculos() {
+            const tbody = document.querySelector('#vehiculosTabla tbody');
+            tbody.innerHTML = vehiculos.map(vehiculo => {
+                const porcentaje = vehiculo.capacidadMaxima > 0 ? (vehiculo.capacidadUsada / vehiculo.capacidadMaxima) * 100 : 0;
+                const isSelected = vehiculoSeleccionado === vehiculo.id;
+                
+                return `
+                    <tr class="vehicle-row ${isSelected ? 'selected' : ''}" onclick="seleccionarVehiculo(${vehiculo.id})">
+                        <td>${vehiculo.nombre}</td>
+                        <td>${vehiculo.capacidadMaxima}</td>
+                        <td>
+                            <div class="capacity-bar">
+                                <div class="capacity-fill ${porcentaje >= 90 ? 'danger' : porcentaje >= 70 ? 'warning' : ''}" 
+                                     style="width: ${Math.min(porcentaje, 100)}%"></div>
+                            </div>
+                            ${vehiculo.capacidadUsada} / ${vehiculo.capacidadMaxima} kg (${porcentaje.toFixed(1)}%)
+                        </td>
+
+                    </tr>
+                `;
+            }).join('');
+        }
+function renderizarEmpleados() {
+    const tbody = document.querySelector('#empleadosTabla tbody');
+    tbody.innerHTML = empleados.map(empleado => {
+        const yaAsignado = empleadosAsignados.some(e => e.id === empleado.id);
+        
+        return `
+            <tr class="employee-row ${yaAsignado ? 'selected' : ''}" 
+                onclick="toggleEmpleado(${empleado.id})">
+                <td>${empleado.nombre}</td>
+                <td>
+                    <span style="padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">
+                        ${empleado.rol}
+                    </span>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+
+        function renderizarPaquetes() {
+            const tbody = document.querySelector('#paquetesTabla tbody');
+            tbody.innerHTML = paquetes.map(paquete => {
+                const yaAsignado = paquetesAsignados.some(p => p.id === paquete.id);
+                
+                return `
+                    <tr class="package-row ${yaAsignado ? 'selected' : ''}" onclick="togglePaquete(${paquete.id})">
+                        <td>
+                            <strong style="color: #2c3e50;">${paquete.tracking}</strong>
+                        </td>
+                        <td>${paquete.descripcion}</td>
+                        <td>
+                            <span style="background: #ecf0f1; padding: 4px 8px; border-radius: 8px; font-weight: 600;">
+                                ${paquete.peso} kg
+                            </span>
+                        </td>
+
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function seleccionarVehiculo(vehiculoId) {
+            vehiculoSeleccionado = vehiculoId;
+            const vehiculo = vehiculos.find(v => v.id === vehiculoId);
+            
+            document.getElementById('vehiculoSeleccionado').style.display = 'block';
+            document.getElementById('vehiculoInfo').innerHTML = `
+                <span class="item-tag">${vehiculo.nombre} - Capacidad: ${vehiculo.capacidadMaxima}kg</span>
+            `;
+            
+            actualizarCapacidadVehiculo();
+            renderizarVehiculos();
+            hideAlert('errorVehiculo');
+        }
+
+function toggleEmpleado(empleadoId) {
+    const empleado = empleados.find(e => e.id === empleadoId);
+    
+    
+    const index = empleadosAsignados.findIndex(e => e.id === empleadoId);
+    
+    if (index === -1) {
+        empleadosAsignados.push(empleado);
+    } else {
+        empleadosAsignados.splice(index, 1);
+    }
+    
+    actualizarEmpleadosAsignados();
+    renderizarEmpleados();
+    actualizarEstadisticas();
+}
+
+        function togglePaquete(paqueteId) {
+            if (!vehiculoSeleccionado) {
+                showAlert('errorPaquetes', 'Debe seleccionar un vehículo antes de agregar paquetes', 'error');
+                return;
+            }
+
+            const paquete = paquetes.find(p => p.id === paqueteId);
+            const vehiculo = vehiculos.find(v => v.id === vehiculoSeleccionado);
+            const index = paquetesAsignados.findIndex(p => p.id === paqueteId);
+            
+            if (index === -1) {
+                const nuevoPesoTotal = pesoTotal + paquete.peso;
+                
+                if (nuevoPesoTotal > vehiculo.capacidadMaxima) {
+                    showAlert('errorPaquetes', 
+                        `No se puede agregar el paquete. Excedería la capacidad máxima del vehículo (${vehiculo.capacidadMaxima} kg). Peso actual: ${pesoTotal} kg, peso del paquete: ${paquete.peso} kg`, 'error');
+                    return;
+                }
+                
+                paquetesAsignados.push(paquete);
+                pesoTotal = nuevoPesoTotal;
+            } else {
+                pesoTotal -= paquete.peso;
+                paquetesAsignados.splice(index, 1);
+            }
+            
+            actualizarPaquetesAsignados();
+            actualizarCapacidadVehiculo();
+            renderizarPaquetes();
+            actualizarEstadisticas();
+            hideAlert('errorPaquetes');
+        }
+
+        function toggleRecojoItem(transaccionId) {
+            const transaccion = transaccionesRecojo.find(t => t.id === transaccionId);
+            const index = recojosAsignados.findIndex(r => r.id === transaccionId);
+            const checkbox = document.getElementById(`recojo_${transaccionId}`);
+            const item = document.querySelector(`#recojo_${transaccionId}`).closest('.recojo-item');
+            
+            if (index === -1) {
+                recojosAsignados.push(transaccion);
+                checkbox.checked = true;
+                item.classList.add('selected');
+            } else {
+                recojosAsignados.splice(index, 1);
+                checkbox.checked = false;
+                item.classList.remove('selected');
+            }
+            
+            actualizarRecojosAsignados();
+            actualizarEstadisticas();
+        }
+
+        function actualizarEmpleadosAsignados() {
+            const contenedor = document.getElementById('empleadosAsignados');
+            if (empleadosAsignados.length === 0) {
+                contenedor.innerHTML = '<span style="color: #666; font-style: italic;">No hay empleados asignados</span>';
+            } else {
+                contenedor.innerHTML = empleadosAsignados.map(empleado => 
+                    `<span class="item-tag">
+                        ${empleado.nombre} (${empleado.rol})
+                        <button class="remove-btn" onclick="toggleEmpleado(${empleado.id})">×</button>
+                    </span>`
+                ).join('');
+            }
+        }
+
+        function actualizarPaquetesAsignados() {
+            const contenedor = document.getElementById('paquetesAsignados');
+            if (paquetesAsignados.length === 0) {
+                contenedor.innerHTML = '<span style="color: #666; font-style: italic;">No hay paquetes asignados</span>';
+            } else {
+                contenedor.innerHTML = paquetesAsignados.map(paquete => 
+                    `<span class="item-tag">
+                        ${paquete.tracking} - ${paquete.peso}kg
+                        <button class="remove-btn" onclick="togglePaquete(${paquete.id})">×</button>
+                    </span>`
+                ).join('');
+            }
+        }
+
+        function actualizarRecojosAsignados() {
+            const contenedor = document.getElementById('recojosAsignados');
+            if (recojosAsignados.length === 0) {
+                contenedor.innerHTML = '<span style="color: #666; font-style: italic;">No hay recojos seleccionados</span>';
+            } else {
+                contenedor.innerHTML = recojosAsignados.map(recojo => 
+                    `<span class="item-tag">
+                        ${recojo.numeroTransaccion} - ${recojo.cliente}
+                        <button class="remove-btn" onclick="toggleRecojoItem(${recojo.id})">×</button>
+                    </span>`
+                ).join('');
+            }
+        }
+
+        function actualizarCapacidadVehiculo() {
+            if (!vehiculoSeleccionado) return;
+            
+            const vehiculo = vehiculos.find(v => v.id === vehiculoSeleccionado);
+            vehiculo.capacidadUsada = pesoTotal;
+            
+            const porcentaje = (pesoTotal / vehiculo.capacidadMaxima) * 100;
+            
+            document.getElementById('capacityText').textContent = 
+                `${pesoTotal} kg / ${vehiculo.capacidadMaxima} kg (${porcentaje.toFixed(1)}%)`;
+            
+            const fill = document.getElementById('capacityFill');
+            fill.style.width = `${Math.min(porcentaje, 100)}%`;
+            
+            fill.className = 'capacity-fill';
+            if (porcentaje >= 90) fill.classList.add('danger');
+            else if (porcentaje >= 70) fill.classList.add('warning');
+            
+            renderizarVehiculos();
+        }
+
+        function agregarEscala() {
+            const select = document.getElementById('sucursalSelect');
+            const sucursalId = parseInt(select.value);
+            
+            if (!sucursalId) {
+                alert('Por favor seleccione una sucursal');
+                return;
+            }
+            
+            const sucursal = sucursales.find(s => s.id === sucursalId);
+            
+            // Verificar si ya está agregada
+            if (escalas.some(e => e.id === sucursalId)) {
+                alert('Esta sucursal ya está agregada como escala');
+                return;
+            }
+            
+            escalas.push(sucursal);
+            actualizarEscalas();
+            actualizarEstadisticas();
+            
+            // Resetear el select
+            select.value = '';
+        }
+
+        function removerEscala(sucursalId) {
+            escalas = escalas.filter(e => e.id !== sucursalId);
+            actualizarEscalas();
+            actualizarEstadisticas();
+        }
+
+        function actualizarEscalas() {
+            const contenedor = document.getElementById('escalasLista');
+            if (escalas.length === 0) {
+                contenedor.innerHTML = '<span style="color: #666; font-style: italic;">No hay escalas programadas</span>';
+            } else {
+                contenedor.innerHTML = escalas.map((escala, index) => 
+                    `<div class="escala-item">
+                        <div class="escala-number">${index + 1}</div>
+                        <div style="flex: 1;">
+                            <strong>${escala.nombre}</strong><br>
+                            <small style="color: #666;">${escala.direccion}</small>
+                        </div>
+                        <button class="btn btn-danger" onclick="removerEscala(${escala.id})" style="padding: 5px 10px; font-size: 0.8rem;">
+                            🗑️ Quitar
+                        </button>
+                    </div>`
+                ).join('');
+            }
+        }
+
+        function toggleRecojoSection() {
+            const checkbox = document.getElementById('recojoCheckbox');
+            const section = document.getElementById('recojoSection');
+            
+            if (checkbox.checked) {
+                section.classList.add('show');
+            } else {
+                section.classList.remove('show');
+                // Limpiar recojos seleccionados
+                recojosAsignados = [];
+                // Desmarcar todos los checkboxes
+                transaccionesRecojo.forEach(transaccion => {
+                    const checkbox = document.getElementById(`recojo_${transaccion.id}`);
+                    const item = document.querySelector(`#recojo_${transaccion.id}`).closest('.recojo-item');
+                    if (checkbox) checkbox.checked = false;
+                    if (item) item.classList.remove('selected');
+                });
+                actualizarRecojosAsignados();
+                actualizarEstadisticas();
+            }
+        }
+
+        function actualizarEstadisticas() {
+            document.getElementById('totalEmpleados').textContent = empleadosAsignados.length;
+            document.getElementById('totalPaquetes').textContent = paquetesAsignados.length;
+            document.getElementById('pesoTotalStat').textContent = pesoTotal;
+            document.getElementById('totalEscalas').textContent = escalas.length;
+            document.getElementById('totalRecojos').textContent = recojosAsignados.length;
+        }
+
+        function showAlert(elementId, mensaje, tipo) {
+            const elemento = document.getElementById(elementId);
+            elemento.textContent = mensaje;
+            elemento.className = `alert alert-${tipo} show`;
+            setTimeout(() => {
+                elemento.classList.remove('show');
+            }, 5000);
+        }
+
+        function hideAlert(elementId) {
+            const elemento = document.getElementById(elementId);
+            elemento.classList.remove('show');
+        }
+
+        function validarFormulario() {
+            const fecha = document.getElementById('fecha').value;
+            const hora = document.getElementById('hora').value;
+            
+            if (!fecha) {
+                showAlert('mensajeGuardado', 'Por favor, seleccione una fecha', 'error');
+                return false;
+            }
+            
+            if (!hora) {
+                showAlert('mensajeGuardado', 'Por favor, seleccione una hora', 'error');
+                return false;
+            }
+            
+            if (!vehiculoSeleccionado) {
+                showAlert('mensajeGuardado', 'Por favor, seleccione un vehículo', 'error');
+                return false;
+            }
+            
+            if (empleadosAsignados.length === 0) {
+                showAlert('mensajeGuardado', 'Debe asignar al menos un empleado', 'error');
+                return false;
+            }
+            
+            if (paquetesAsignados.length === 0) {
+                showAlert('mensajeGuardado', 'Debe asignar al menos un paquete', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+
+        function guardarSalida() {
+            if (!validarFormulario()) {
+                return;
+            }
+            
+            const fecha = document.getElementById('fecha').value;
+            const hora = document.getElementById('hora').value;
+            const vehiculo = vehiculos.find(v => v.id === vehiculoSeleccionado);
+            const recojoCheckbox = document.getElementById('recojoCheckbox').checked;
+            
+            const salidaEncomienda = {
+                fecha: fecha,
+                hora: hora,
+                vehiculo: vehiculo,
+                empleados: empleadosAsignados,
+                paquetes: paquetesAsignados,
+                escalas: escalas,
+                pesoTotal: pesoTotal,
+                recojoEnCasa: recojoCheckbox,
+                recojosAsignados: recojoCheckbox ? recojosAsignados : [],
+                fechaCreacion: new Date().toISOString()
+            };
+            
+            console.log('Salida de encomienda guardada:', salidaEncomienda);
+            
+            let mensajeRecojos = '';
+            if (recojoCheckbox && recojosAsignados.length > 0) {
+                mensajeRecojos = `, Con ${recojosAsignados.length} recojo(s) en casa: ${recojosAsignados.map(r => r.numeroTransaccion).join(', ')}`;
+            }
+            
+            showAlert('mensajeGuardado', 
+                `✅ Salida guardada exitosamente para el ${fecha} a las ${hora}. 
+                Vehículo: ${vehiculo.nombre}, 
+                Empleados: ${empleadosAsignados.length}, 
+                Paquetes: ${paquetesAsignados.length}, 
+                Escalas: ${escalas.length}, 
+                Peso total: ${pesoTotal}kg${mensajeRecojos}`, 
+                'success');
+        }
+    </script>
+{% endblock scripts %}

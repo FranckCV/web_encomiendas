@@ -29,7 +29,7 @@ Módulo de {{modulo['nombre'] | lower}}
     .block_banner {
         opacity: 0.85;
         background-color: color-mix(in srgb, {{modulo['color']}} 80%, white 80%) ;
-        background-image: url('/static/img/img_modulo/{{modulo["key"]}}.jpg');
+        background-image: url('/static/img/img_modulo/{{modulo["img"]}}');
         background-position: center;
         background-repeat: no-repeat;
         background-size: cover;
@@ -126,23 +126,16 @@ Módulo de {{modulo['nombre'] | lower}}
 </div> -->
 
 <div class="block_crud block_banner">
-    <!-- <img class="module_banner" src="/static/img/img_module/{{modulo['key']}}.jpg" alt=""> -->
     <h3 class="crud_title">
-        <!-- <i class="{{ICON_PAGE_DASHBOARD}}" ></i> -->
         <i class="{{ modulo['icono'] }}"></i>
         Módulo de {{modulo['nombre'] | lower}}
     </h3>
 </div>
 
-<!-- <div class="block_crud" style="background-color: {{modulo['color']}};">
-a
-</div> -->
 
 <div class="block_crud mod_cant">
     {% for tipo_pag in tipos_pag %}
 
-    <!-- <p>{{ tipo_pag['nombre'] }}</p>
-    <p>{{ tipo_pag['cant'] }}</p> -->
     <div class="cant_block">
         <div class="cant_content"> {{ tipo_pag.get('cant') }} </div>
         <div class="cant_title"> {{ tipo_pag.get('nombre') }} </div>

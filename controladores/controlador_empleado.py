@@ -21,7 +21,7 @@ def delete_row(id):
 def table_fetchall():
     sql = f'''
         SELECT 
-            e.usuarioid,
+            e.id,
             e.nombre,
             e.apellidos,
             e.correo,
@@ -36,7 +36,7 @@ def table_fetchall():
 def get_table():
     sql = f'''
         SELECT 
-            e.usuarioid,
+            e.id,
             e.nombre,
             e.apellidos,
             e.correo,
@@ -46,7 +46,7 @@ def get_table():
         INNER JOIN rol r ON e.rolid = r.id
     '''
     columnas = {
-        'usuarioid': ['Usuario ID', 1],
+        'id': ['Usuario ID', 1],
         'nombre': ['Nombre', 1.5],
         'apellidos': ['Apellidos', 1.5],
         'correo': ['Correo', 1.5],
@@ -69,14 +69,14 @@ def insert_row(nombre, apellidos, correo, rolid):
     '''
     sql_execute(sql, (nombre, apellidos, correo, rolid))
 
-def update_row(usuarioid, nombre, apellidos, correo, rolid):
+def update_row(id, nombre, apellidos, correo, rolid):
     sql = f'''
         UPDATE {table_name} SET 
             nombre = %s,
             apellidos = %s,
             correo = %s,
             rolid = %s
-        WHERE usuarioid = {usuarioid}
+        WHERE id = {id}
     '''
     sql_execute(sql, (nombre, apellidos, correo, rolid))
 
@@ -85,20 +85,20 @@ def update_row(usuarioid, nombre, apellidos, correo, rolid):
 def get_options_empleado():
     sql = f'''
         SELECT 
-            usuarioid,
+            id,
             CONCAT(nombre, ' ', apellidos) AS nombre_completo
         FROM {table_name}
         ORDER BY nombre ASC
     '''
     filas = sql_select_fetchall(sql)
-    lista = [(fila["usuarioid"], fila["nombre_completo"]) for fila in filas]
+    lista = [(fila["id"], fila["nombre_completo"]) for fila in filas]
     return lista
 
 
 def get_report_test():
     sql = f'''
         SELECT 
-            emp.usuarioid,
+            emp.id,
             emp.nombre,
             emp.apellidos,
             emp.correo,
@@ -109,7 +109,7 @@ def get_report_test():
     '''
     
     columnas = {
-        'usuarioid'   : ['ID', 0.5],
+        'id'   : ['ID', 0.5],
         'nombre'      : ['Nombre', 1.5],
         'apellidos'   : ['Apellidos', 1.5],
         'correo'      : ['Correo Electrónico', 2],
