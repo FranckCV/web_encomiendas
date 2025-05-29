@@ -476,7 +476,7 @@ CONTROLADORES = {
             ['stock',       'Stock',           'Stock',       'number',     True ,     True  ,        None ],
             ['dimensiones', 'Dimensiones',     'Dimensiones', 'text',     True ,     True  ,        None ],
             ['tamaño_cajaid','Tamaño Caja',    'Tamaño Caja', 'select',     True ,     True  ,        [lambda: controlador_tamanio_caja.get_options() , 'tam_nombre' ]  ],
-            ['img',         'Imagen',          'Imagen',      'text',     True ,     True  ,        None ],
+            ['img',         'Imagen',          'Imagen',      'img',     True ,     True  ,        None ],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
         ],
         "crud_forms": {
@@ -946,7 +946,7 @@ CONTROLADORES = {
         ],
         "crud_forms": {
             "crud_list": True ,
-            "crud_search": False ,
+            "crud_search": True ,
             "crud_consult": True ,
             "crud_insert": True ,
             "crud_update": True ,
@@ -2002,7 +2002,7 @@ def administrar_paginas():
         ['icono',  'Icono',             'Icono',    'icon',    True ,     True,          None ],
         ['color',  'Color',             'color',    'color',   True,      True,          None ],
         ['img',  'Imagen',             'Imagen',    'img',   True,      True,          None ],
-    ],
+    ]
 
     fields_form_page = [
 #        ID/NAME          LABEL               PLACEHOLDER    TYPE    REQUIRED   ABLE/DISABLE   DATOS
@@ -2074,6 +2074,7 @@ def crud_insert(tabla):
             return "Tabla no soportada", 404
 
         active = config["active"]
+        no_crud = config.get('no_crud')
 
         if active is False:
             return "Tabla no soportada", 404
@@ -2083,12 +2084,26 @@ def crud_insert(tabla):
 
         valores = []
         for nombre, parametro in firma.parameters.items():
-            valor = request.form.get(nombre)
-            valores.append(valor)
+            # valor = request.form.get(nombre)
+            # valores.append(valor)
+            if nombre in request.files:
+                archivo = request.files[nombre]
+                if archivo.filename != "":
+                    nuevo_nombre = guardar_imagen_bd('empresa' ,archivo)
+                    valores.append(nuevo_nombre)
+                else:
+                    # Si no se selecciona una nueva imagen, mantener la actual
+                    valores.append(request.form.get(f"{nombre}_actual"))
+            else:
+                valor = request.form.get(nombre)
+                valores.append(valor)
 
         controlador.insert_row( *valores )
 
-        return redirect(url_for('crud_generico', tabla = tabla))
+        if no_crud :
+            return redirect(url_for(no_crud))
+        else:
+            return redirect(url_for('crud_generico', tabla = tabla))
     # except Exception as e:
     #     return f"No se aceptan carácteres especiales", 400
 
