@@ -35,6 +35,11 @@ from controladores import controlador_rol as controlador_rol
 from controladores import controlador_articulo as controlador_articulo
 from controladores import controlador_descuento as controlador_descuento
 from controladores import controlador_descuento_articulo as controlador_descuento_articulo
+from controladores import controlador_salida as controlador_salida
+from controladores import controlador_reclamo as controlador_reclamo
+from controladores import controlador_preguntas_frecuentes as controlador_pregunta_frecuente
+
+
 
 import hashlib
 import os
@@ -346,6 +351,62 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
+ "reclamo": {
+    "active": True,
+    "id": "reclamo",
+    "titulo": "Reclamos",
+    "nombre_tabla": "reclamo",
+    "controlador": controlador_reclamo,  # Asegúrate de importar esto arriba
+    "icon_page": "fa-solid fa-file",  # Puedes cambiar el ícono
+    "filters": [],
+    "fields_form": [
+        ['id', 'ID', 'ID', 'text', True, False, None],
+        ['nombres_razon', 'Cliente', 'Cliente', 'text', True, True, None],
+        ['direccion', 'Dirección', 'Dirección', 'text', True, True, None],
+        ['correo', 'Correo', 'Correo', 'email', True, True, None],
+        ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
+        ['titulo_incidencia', 'Incidencia', 'Incidencia', 'text', True, True, None],
+        ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
+        ['fecha_recojo', 'Fecha de recojo', 'Fecha', 'date', True, True, None],
+        ['estado_reclamoid', 'Estado', 'Estado', 'select', True, True, [lambda: controlador_estado_reclamo.get_options(), 'nombre']],
+        ['sucursal_id', 'Sucursal', 'Sucursal', 'select', True, True, [lambda: controlador_sucursal.get_options(), 'direccion']]
+    ],
+    "crud_forms": {
+        "crud_list": True,
+        "crud_search": True,
+        "crud_consult": True,
+        "crud_insert": True,
+        "crud_update": True,
+        "crud_delete": True,
+        "crud_unactive": False
+    }
+},
+"pregunta_frecuente": {
+    "active": True,
+    "titulo": "preguntas frecuentes",
+    "nombre_tabla": "pregunta frecuente",
+    "controlador": controlador_pregunta_frecuente,
+    "icon_page": 'fa-solid fa-circle-question',
+    "filters": [
+        ['activo', f'{TITLE_STATE}', get_options_active()],
+    ],
+    "fields_form": [
+        #  ID/NAME          LABEL              PLACEHOLDER            TYPE      REQUIRED  ABLE/DISABLE  DATOS
+        ['id',              'ID',              'ID',                  'text',     True,     False,       None],
+        ['titulo',          'Título',          'Título',              'text',     True,     True,        None],
+        ['descripcion',     'Descripción',     'Descripción',         'textarea', True,     True,        None],
+        ['activo',          f'{TITLE_STATE}',  'Activo',              'p',        True,     False,       None],
+    ],
+    "crud_forms": {
+        "crud_list": True,
+        "crud_search": True,
+        "crud_consult": True,
+        "crud_insert": True,
+        "crud_update": True,
+        "crud_delete": True,
+        "crud_unactive": True,
+    }
+},
   
 # LEO
     "tamanio_caja": {
@@ -1082,7 +1143,7 @@ CONTROLADORES = {
             "crud_delete": True ,
             "crud_unactive": True ,
         }
-    },
+    }
     
 }
 
@@ -1325,7 +1386,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : 'fa-solid fa-circle-question',
         'dashboard' : True,
-        'cruds' :     [ 'tipo_indemnizacion','tipo_reclamo','motivo_reclamo','causa_reclamo','estado_reclamo','reclamo' ],
+        'cruds' :     [ 'tipo_indemnizacion','tipo_reclamo','motivo_reclamo','causa_reclamo','estado_reclamo','reclamo','pregunta_frecuente' ],
         'reports' :   [ ],
     },
     'ventas' : {
@@ -1355,6 +1416,40 @@ MENU_ADMIN = {
 }
 
 
+
+TRANSACCIONES = {
+    "salida": {
+        "active" : True ,
+        "titulo": "salidas",
+        "nombre_tabla": "salida",
+        "controlador": controlador_salida,
+        "icon_page": 'fa-solid fa-van-shuttle',
+        "filters": [
+            
+        ] ,
+       "fields_form" : [
+            ['id',          'ID',            'ID',             'text',   True,   False,   None],
+            ['nom_conductor','Conductor',    'Nombre del conductor', 'text', True, False,   None],
+            ['placa',       'Placa de unidad','Placa de unidad', 'text',   True,   True,    None],
+            ['destino',     'Destino',       'Destino',         'text',   True,   True,    None],
+            ['fecha',       'Fecha',         'YYYY-MM-DD',      'date',   True,   True,    None],
+            ['hora',        'Hora',          'HH:MM',           'time',   True,   True,    None],
+            ['capacidad',   'Capacidad',     'Capacidad en kg', 'number', True,  False,   None],
+            ['estado',      'Estado',        'Estado actual',   'text',   True,   False,   None],
+       ],
+
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": False ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": False ,
+        }
+    },
+    
+}
 ###########_ REDIRECT _#############
 
 @app.route("/")
@@ -1579,10 +1674,11 @@ paginas_simples = [
     'cajas',
     'cajas_prueba',
     'sobre_nosotros',
-    'salidas_programadas',
+    'TerminosCondiciones',
+    'salidas_programadas', #para eliminar
     'mapa_curds',
-    'seguimiento_empleado',
-    'envio_masivo'
+    'envio_masivo',
+    'salida_informacion'
 ]
 
 
@@ -1837,6 +1933,58 @@ def reporte(report_name):
                 esReporte      = True ,
             )
 
+@app.route("/transaccion=<tabla>")
+@validar_empleado()
+def crud_transaccion(tabla):
+    config = TRANSACCIONES.get(tabla)
+    if config:
+        active = config["active"]
+        no_crud = config.get('no_crud')
+        if active is True and (no_crud is None or no_crud is False):
+            icon_page_crud = get_icon_page(config.get("icon_page"))
+            titulo = config["titulo"]
+            controlador = config["controlador"]
+            nombre_tabla = config["nombre_tabla"]
+            filters = config["filters"]
+            fields_form = config["fields_form"]
+
+            existe_activo = controlador.exists_Activo()
+            columnas , filas = controlador.get_table()
+            primary_key = controlador.get_primary_key()
+            table_columns  = list(filas[0].keys()) if filas else []
+            
+            CRUD_FORMS = config["crud_forms"]
+            crud_list = CRUD_FORMS.get("crud_list")
+            crud_search = CRUD_FORMS.get("crud_search")
+            crud_consult = CRUD_FORMS.get("crud_consult")
+            crud_insert = CRUD_FORMS.get("crud_insert")
+            crud_update = CRUD_FORMS.get("crud_update")
+            crud_delete = CRUD_FORMS.get("crud_delete")
+            crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo
+
+            return render_template(
+                "CRUD_prueba.html" ,
+                tabla          = tabla ,
+                nombre_tabla   = nombre_tabla ,
+                icon_page_crud = icon_page_crud ,
+                titulo         = titulo ,
+                filas          = filas ,
+                primary_key    = primary_key ,
+                filters        = filters,
+                fields_form    = fields_form ,
+                columnas       = columnas ,
+                key_columns    = list(columnas.keys()) ,
+                table_columns  = table_columns ,
+                crud_list      = crud_list,
+                crud_search    = crud_search,
+                crud_consult   = crud_consult,
+                crud_insert    = crud_insert,
+                crud_update    = crud_update,
+                crud_delete    = crud_delete,
+                crud_unactive  = crud_unactive,
+                esTransaccion = True
+            )
+
 
 @app.route("/administrar_paginas")
 # @validar_empleado()
@@ -2088,6 +2236,12 @@ def procesar_login():
             return rdrct_error(redirect_url('login') ,'LOGIN_INVALIDO')
     except Exception as e:
         return rdrct_error(redirect_url('login')  , e)
+    
+    
+@app.route("/seguimiento_empleado_prueba=<placa>")
+@validar_empleado()
+def seguimiento_empleado_prueba(placa):
+    return render_template('seguimiento_empleado_prueba.html', placa=placa)
 
 ###################################CARRITO###########################
 # @app.route('/agregar_carrito', methods = ['POST'])

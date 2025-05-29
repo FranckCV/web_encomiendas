@@ -1,10 +1,9 @@
- .container {
-            margin: 0;
-            padding: 10px 40px;
-            max-width: 100%;
-        }
+.container{
+    max-width: 98%;
+    
+}
 
-        .profile-header {
+.profile-header {
             background: linear-gradient(135deg, #1e88e5 0%, #1565c0 50%, #0d47a1 100%);
             color: white;
             padding: 30px;
@@ -13,6 +12,7 @@
             box-shadow: 0 15px 35px rgba(13, 71, 161, 0.3);
             position: relative;
             overflow: hidden;
+            margin-top: 20px;
         }
 
         .profile-header::before {
@@ -161,17 +161,17 @@
         }
 
         .profile-details h1 {
-            font-size: 2.5rem;
+            font-size: 2rem;
             margin-bottom: 10px;
             font-weight: 300;
             color: #e3f2fd;
         }
 
         .profile-meta {
-            font-size: 1.1rem;
+            font-size: 1rem;
             opacity: 0.9;
             margin-bottom: 20px;
-                color: #ffffff;
+            color: #ffffff;
         }
 
         .action-buttons {
@@ -259,10 +259,12 @@
             display: flex;
             background: linear-gradient(135deg, #e3f2fd 0%, #f3f8ff 100%);
             border-bottom: 1px solid rgba(144, 202, 249, 0.2);
+            overflow-x: auto;
         }
 
         .tab-button {
             flex: 1;
+            min-width: 150px;
             padding: 20px;
             background: none;
             border: none;
@@ -272,6 +274,7 @@
             transition: all 0.3s ease;
             border-bottom: 3px solid transparent;
             color: #1565c0;
+            white-space: nowrap;
         }
 
         .tab-button.active {
@@ -293,28 +296,20 @@
             display: block;
         }
 
-        .tab-content h2 {
-            /* color: #1565c0; */
-            margin-bottom: 20px;
-        }
-
-        .shipment-table, .complaint-table {
+        .data-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
 
-        .shipment-table th,
-        .shipment-table td,
-        .complaint-table th,
-        .complaint-table td {
+        .data-table th,
+        .data-table td {
             padding: 15px;
             text-align: left;
             border-bottom: 1px solid rgba(144, 202, 249, 0.2);
         }
 
-        .shipment-table th,
-        .complaint-table th {
+        .data-table th {
             background: linear-gradient(135deg, #e3f2fd 0%, #f3f8ff 100%);
             font-weight: 600;
             color: #0d47a1;
@@ -344,23 +339,71 @@
             color: #856404;
         }
 
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
 
-
-        .btn-details {
+        .btn-action {
             background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
             color: white;
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 6px;
             text-decoration: none;
             font-size: 12px;
             transition: all 0.3s ease;
             border: 1px solid rgba(25, 118, 210, 0.3);
+            margin: 2px;
+            display: inline-block;
         }
 
-        .btn-details:hover {
+        .btn-action:hover {
             background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        }
+
+        .btn-action.btn-download {
+            background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+            border-color: rgba(56, 142, 60, 0.3);
+        }
+
+        .btn-action.btn-download:hover {
+            background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%);
+            box-shadow: 0 4px 12px rgba(56, 142, 60, 0.3);
+        }
+
+        .btn-action.btn-edit {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            border-color: rgba(245, 124, 0, 0.3);
+        }
+
+        .btn-action.btn-edit:hover {
+            background: linear-gradient(135deg, #f57c00 0%, #ef6c00 100%);
+            box-shadow: 0 4px 12px rgba(245, 124, 0, 0.3);
+        }
+
+        .btn-action.btn-cancel {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            border-color: rgba(211, 47, 47, 0.3);
+        }
+
+        .btn-action.btn-cancel:hover {
+            background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+        }
+
+        .package-list {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .package-item {
+            background: rgba(144, 202, 249, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin: 2px 0;
+            display: inline-block;
         }
 
         .user-info-section {
@@ -403,7 +446,6 @@
         }
 
         .info-value {
-            /* color: #0d47a1; */
             font-weight: 400;
         }
 
@@ -489,18 +531,25 @@
             }
 
             .tab-container {
-                flex-direction: column;
+                flex-wrap: wrap;
             }
 
-            .shipment-table,
-            .complaint-table {
+            .tab-button {
+                min-width: 120px;
+                font-size: 14px;
+            }
+
+            .data-table {
                 font-size: 12px;
             }
 
-            .shipment-table th,
-            .shipment-table td,
-            .complaint-table th,
-            .complaint-table td {
+            .data-table th,
+            .data-table td {
                 padding: 8px;
+            }
+
+            .btn-action {
+                font-size: 10px;
+                padding: 4px 8px;
             }
         }

@@ -94,7 +94,7 @@ CREATE TABLE empleado (
   rolid     int(11) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE empleado_salida (
-  salidaid   int(10) NOT NULL, 
+  salidaid   int(10), 
   empleadoid int(10) NOT NULL, 
   PRIMARY KEY (salidaid, 
   empleadoid));

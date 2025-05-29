@@ -1202,19 +1202,15 @@
 .producto-container {
     width: 100%;
     max-width: 1000px;
-    /* Reducido de 1200px */
     margin: 0 auto;
     padding: 10px;
-    /* Reducido de 20px */
     font-family: Arial, sans-serif;
 }
 
 /* Hacer el banner más compacto */
 .welcome-banner {
     padding: 15px;
-    /* Reducido de 25px */
     margin-bottom: 20px;
-    /* Reducido de 30px */
 }
 
 .welcome-content h2 {

@@ -11,29 +11,6 @@
 
 
 {% block estilos %}
-
-<style>
-  @import url("https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css");
-  @import url("../static/css/sucursales.css");
-  @import url("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css");
-
-  .map {
-    width: 100%;
-    height: 275px;
-    /* aspect-ratio: 1 / 1; */
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    cursor: crosshair;
-    border: 1px solid #9c9c9c;
-
-  }
-
-  .map_space {
-    border: 1px solid #9c9c9c;
-    border-radius: 8px;
-
-  }
-</style>
 {% if esReporte %}
 <style>
   .td_content {
@@ -64,7 +41,15 @@
 <div class="block_crud">
   <div class="panel_row row">
     {% if crud_search %}
-    
+    <!-- {% if value_search %}
+    <div class="col-3">
+      <a class="button" href="{{ url_for('crud_generico', tabla = tabla) }}">
+        <i class="fa-solid fa-left-long"></i>
+        <p>Volver al listado principal</p>
+      </a>
+    </div>
+    {% endif %} -->
+
     <div class="col">
       <div class="input_search">
         <div class="input-group">
@@ -93,12 +78,12 @@
     {% elif filter[3] == 'interval_date' %}
     <div class="col-2">
       <div class="form_field">
-        <input type="date" data-type="date_ini" name="{{filter[0]}}_ini" id="{{filter[0]}}_ini" class="filterSelect" placeholder="Desde">
+        <input type="date" data-type="date_ini" name="{{filter[0]}}" id="{{filter[0]}}" class="filterSelect">
       </div>
     </div>
     <div class="col-2">
       <div class="form_field">
-        <input type="date" data-type="date_fin" name="{{filter[0]}}_fin" id="{{filter[0]}}_fin" class="filterSelect" placeholder="Hasta">
+        <input type="date" data-type="date_fin" name="{{filter[0]}}" id="{{filter[0]}}" class="filterSelect">
       </div>
     </div>
     {% else %}
@@ -116,27 +101,36 @@
     </div>
     {% endif %}
 
+
+
     {% endfor %}
     {% endif %}
 
     <!-- <div class="col-2">
     </div> -->
     {% if crud_insert %}
-    <!-- <div class="col-1"></div> -->
-    <div class="col-2">
-      <button class="button clickable-modal btn_crud btn_insert" id="modal_crud_insert_{{tabla}}_">
-        <i class="{{ICON_INSERT}}"></i>
-        <p>{{NOMBRE_BTN_INSERT}}</p>
-      </button>
-    </div>
-    {% endif %}
+<div class="col-2">
+  {% if esTransaccion %}
+    <a href="{{ url_for('salida_informacion') }}" class="button btn_crud btn_insert">
+      <i class="{{ICON_INSERT}}"></i>
+      <p>{{NOMBRE_BTN_INSERT}}</p>
+    </a>
+  {% else %}
+    <button class="button clickable-modal btn_crud btn_insert" id="modal_crud_insert_{{tabla}}_">
+      <i class="{{ICON_INSERT}}"></i>
+      <p>{{NOMBRE_BTN_INSERT}}</p>
+    </button>
+  {% endif %}
+</div>
+{% endif %}
+
 
   </div>
 </div>
 
 <!--Tabla-->
 <div class="block_crud block_table">
-  <div class="table-container" style="overflow-x: auto;">
+  <div class="table-container">
     <table cellspacing="0" class="table_listado">
       <thead>
         <tr>
@@ -191,12 +185,17 @@
             <div class="acciones">
 
               {% if crud_consult %}
-              <div class="opciones_fila">
-                <button class="clickable-modal btn_consult" id="modal_crud_consult_{{tabla}}_{{fila[primary_key]}}">
-                  <i class="{{ICON_CONSULT}}"></i>
-                </button>
-              </div>
+                {% if esTransaccion %}
+                  <a href="{{ url_for('salida_informacion') }}" class="btn_consult">
+                    <i class="{{ICON_CONSULT}}"></i>
+                  </a>
+                {% else %}
+                  <button class="clickable-modal btn_consult" id="modal_crud_consult_{{tabla}}_{{fila[primary_key]}}">
+                    <i class="{{ICON_CONSULT}}"></i>
+                  </button>
+                {% endif %}
               {% endif %}
+
 
               {% if crud_unactive %}
               {% if fila['activo'] == 1 %}
@@ -215,11 +214,15 @@
               {% endif %}
 
               {% if crud_update %}
-              <div class="opciones_fila">
-                <button class="clickable-modal btn_update" id="modal_crud_update_{{tabla}}_{{fila[primary_key]}}">
-                  <i class="{{ICON_UPDATE}}"></i>
-                </button>
-              </div>
+                {% if esTransaccion %}
+                  <a href="{{ url_for('salida_informacion') }}" class="btn_update">
+                    <i class="{{ICON_UPDATE}}"></i>
+                  </a>
+                {% else %}
+                  <button class="clickable-modal btn_update" id="modal_crud_update_{{tabla}}_{{fila[primary_key]}}">
+                    <i class="{{ICON_UPDATE}}"></i>
+                  </button>
+                {% endif %}
               {% endif %}
 
               {% if crud_delete %}
@@ -229,6 +232,16 @@
                 </button>
               </div>
               {% endif %}
+
+
+                          {% if esTransaccion %}
+              <a href="{{ url_for('seguimiento_empleado_prueba', id='VH001') }}" class="btn btn-secondary btn-small">
+                <i class="fa-solid fa-location-dot"></i>
+                Seguir
+              </a>
+
+            {% endif %}
+
 
             </div>
           </td>
@@ -339,10 +352,8 @@
 
 <script src="/static/js/orderHeadTable.js"></script>
 <script src="/static/js/paginationCrud.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
-<!-- <script>
+<script>
   const today = new Date().toISOString().split('T')[0];
   const date_solo = document.querySelector('input[type="date"][data-type="date"]')
   if (date_solo) {
@@ -352,6 +363,6 @@
     document.querySelector('input[type="date"][data-type="date_fin"]').value = today;
   }
   // document.getElementById('fecha_fin').value = today;
-</script> -->
+</script>
 
 {% endblock %}
