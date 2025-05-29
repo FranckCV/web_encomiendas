@@ -75,7 +75,6 @@ Registro de Envíos Masivos
               <option value="">Seleccione...</option>
               <option value="domicilio">A Domicilio</option>
               <option value="agencia">En Agencia</option>
-              <option value="express">Express</option>
             </select>
           </div>
 
@@ -181,10 +180,7 @@ Registro de Envíos Masivos
               <option value="otros">Otros</option>
             </select>
           </div>
-          <div class="campo-grupo">
-            <label>Descripción *</label>
-            <input type="text" id="m-descripcionArticulo" placeholder="Descripción detallada del contenido" required>
-          </div>
+
           <div class="campo-grupo">
             <label>Valor (S/) *</label>
             <input type="number" id="m-valorEnvio" step="0.01" min="0" placeholder="0.00" required>
@@ -204,6 +200,11 @@ Registro de Envíos Masivos
           <div class="campo-grupo">
             <label>Alto (cm) *</label>
             <input type="number" id="m-alto" step="0.1" min="0.1" placeholder="0.0" required>
+          </div>
+
+          <div class="campo-grupo" style="grid-column: 1/5; grid-row: 3/4;">
+            <label>Descripción *</label>
+            <input type="text" id="m-descripcionArticulo" placeholder="Descripción detallada del contenido" required>
           </div>
 
           <div class="campo-grupo" id="grupo-folios" style="display:none;">
@@ -401,31 +402,6 @@ Registro de Envíos Masivos
       apellidos: ""
     },
     {
-      tipoEntrega: "express",
-      departamento: "Arequipa",
-      provincia: "Arequipa",
-      distrito: "Cayma",
-      direccion: "Calle Los Álamos 567",
-      referencia: "Casa con puerta azul, al lado de la bodega",
-      tienda: "",
-      tipoEmpaque: "bolsa",
-      tipoArticulo: "ropa",
-      descripcionArticulo: "Ropa deportiva Nike - 5 prendas variadas",
-      valorEnvio: "450.00",
-      peso: "1.2",
-      largo: "35",
-      ancho: "25",
-      alto: "15",
-      folios: "",
-      tipoDocumento: "dni",
-      nroDocumento: "78912345",
-      celular: "954321678",
-      razonSocial: "",
-      contacto: "",
-      nombres: "Carlos Alberto",
-      apellidos: "Mendoza Silva"
-    },
-    {
       tipoEntrega: "domicilio",
       departamento: "Cusco",
       provincia: "Cusco",
@@ -474,31 +450,6 @@ Registro de Envíos Masivos
       contacto: "Sandra Rodríguez - Administradora",
       nombres: "",
       apellidos: ""
-    },
-    {
-      tipoEntrega: "express",
-      departamento: "Lambayeque",
-      provincia: "Chiclayo",
-      distrito: "Chiclayo",
-      direccion: "Av. Balta 1250, Oficina 201",
-      referencia: "Segundo piso del edificio azul",
-      tienda: "",
-      tipoEmpaque: "caja",
-      tipoArticulo: "herramientas",
-      descripcionArticulo: "Kit de herramientas eléctricas Bosch",
-      valorEnvio: "1200.00",
-      peso: "5.2",
-      largo: "50",
-      ancho: "40",
-      alto: "30",
-      folios: "",
-      tipoDocumento: "dni",
-      nroDocumento: "16985274",
-      celular: "978456123",
-      razonSocial: "",
-      contacto: "",
-      nombres: "Roberto Carlos",
-      apellidos: "Fernández Díaz"
     }
   ];
 
@@ -1127,7 +1078,6 @@ Registro de Envíos Masivos
     titulo.style.animation = 'fadeIn 0.5s ease-out';
   });
 
-  // Agregar estilos para badges y botones
   const style = document.createElement('style');
   style.textContent = `
     .badge {

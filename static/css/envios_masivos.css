@@ -24,7 +24,7 @@
 /* Grid de campos */
 .campos-envio {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.2rem;
     margin-bottom: 1.5rem;
 }
@@ -35,7 +35,9 @@
     flex-direction: column;
     gap: 0.4rem;
 }
-
+#m-descripcionArticulo{
+    height: 100px;
+}
 .campo-grupo label {
     font-size: 0.85rem;
     color: #4a5568;

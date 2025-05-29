@@ -3,7 +3,7 @@ from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select
 import controladores.bd as bd
 #####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####
 
-table_name = 'estado_encomienda'
+table_name = 'salida'
 
 def get_info_columns():
     return show_columns(table_name)
@@ -36,18 +36,37 @@ def table_fetchall():
 
 def get_table():
     sql= f'''
-        select 
-            est.id ,
-            est.nombre,
-            est.descripcion,
-            est.activo 
-        from {table_name} est
+        SELECT
+        id, 
+    CONCAT(e.nombre, ' ', e.apellidos) AS nom_conductor,
+    u.placa,
+    ub.departamento AS destino,
+    s.fecha,
+    s.hora,
+    u.capacidad,
+    CASE s.estado
+        WHEN 'P' THEN 'Pendiente (origen sucursal / domicilio)'
+        WHEN 'E' THEN 'En curso (en ruta)'
+        WHEN 'C' THEN 'Completada (destino sucursal / domicilio)'
+        WHEN 'X' THEN 'Cancelada'
+        ELSE 'Estado desconocido'
+    END AS estado
+FROM salida s
+INNER JOIN unidad u ON u.id = s.unidadid
+INNER JOIN empleado e ON e.id = s.conductor_principal
+INNER JOIN sucursal su ON su.id = s.destino_final
+INNER JOIN ubigeo ub ON ub.codigo = su.ubigeocodigo
     '''
     columnas = {
         'id': ['ID' , 0.5 ] , 
-        'nombre' : ['Nombre' , 1 ] , 
-        'descripcion' : ['Descripcion' , 5.5] , 
-        'activo' : ['Actividad' , 3.5] , 
+        'nom_conductor' : ['Conductor' , 1 ] , 
+        'placa' : ['Placa de unidad' , 5.5] , 
+        'destino' : ['Destino' , 3.5] , 
+        'fecha' : ['Fecha' , 1] , 
+        'hora' : ['Hora' , 1] , 
+        'capacidad' : ['Capacidad' , 3.5] , 
+        'estado' : ['Estado' , 3.5] ,
+
         }
     filas = sql_select_fetchall(sql)
     
@@ -56,28 +75,28 @@ def get_table():
 
 ######_ CAMBIAR PARAMETROS Y SQL INTERNO _###### 
 
-def unactive_row( id ):
-    unactive_row_table(table_name , id)
+# def unactive_row( id ):
+#     unactive_row_table(table_name , id)
 
 
-def insert_row( nombre , descripcion = None ):
-    sql = f'''
-        INSERT INTO 
-            {table_name} ( nombre , descripcion , activo )
-        VALUES 
-            ( %s , %s , 1 )
-    '''
-    sql_execute(sql,( nombre , descripcion ))
+# def insert_row( nombre , descripcion = None ):
+#     sql = f'''
+#         INSERT INTO 
+#             {table_name} ( nombre , descripcion , activo )
+#         VALUES 
+#             ( %s , %s , 1 )
+#     '''
+#     sql_execute(sql,( nombre , descripcion ))
 
 
-def update_row( id , nombre , descripcion =None ):
-    sql = f'''
-        update {table_name} set 
-        nombre = %s ,
-        descripcion = %s
-        where {get_primary_key()} = {id}
-    '''
-    sql_execute(sql,(nombre , descripcion))
+# def update_row( id , nombre , descripcion =None ):
+#     sql = f'''
+#         update {table_name} set 
+#         nombre = %s ,
+#         descripcion = %s
+#         where {get_primary_key()} = {id}
+#     '''
+#     sql_execute(sql,(nombre , descripcion))
 
 
 #####_ ADICIONALES _#####
