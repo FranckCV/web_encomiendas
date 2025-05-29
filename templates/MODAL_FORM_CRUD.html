@@ -145,6 +145,23 @@
           </div>
           {% endif %}
 
+        {% elif campo[3] == 'decimal_6' %}
+          <input id="{{campo[0]}}" name="{{campo[0]}}"
+            type="number" placeholder="{{campo[2]}}"
+            step="0.000001"
+            {% if campo[4] %}required{% endif %}
+            {% if campo[5] == False or modo_modal == 'consult' %}disabled{% endif %}
+            value="{% if fila and fila[campo[0]] != None %}{{fila[campo[0]]}}{% endif %}">
+
+        {% elif campo[3] == 'decimal_2' %}
+          <input id="{{campo[0]}}" name="{{campo[0]}}"
+            type="number" placeholder="{{campo[2]}}"
+            step="0.01"
+            {% if campo[4] %}required{% endif %}
+            {% if campo[5] == False or modo_modal == 'consult' %}disabled{% endif %}
+            value="{% if fila and fila[campo[0]] != None %}{{fila[campo[0]]}}{% endif %}">
+
+
         {% else %}
           <input id="{{campo[0]}}" name="{{campo[0]}}"
             type="{{campo[3]}}" placeholder="{{campo[2]}}"

@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
     activeFilters[id].value = value;
   });
 
+  
   const searchTerm = searchInput?.value?.trim().toLowerCase() || '';
 
   filteredRows = allRows.filter(row => {
@@ -158,9 +159,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (currentPage < totalPages) showPage(currentPage + 1);
   });
 
+  if (searchInput) {
   searchInput.addEventListener("input", () => {
     applyFilters();
   });
+}
 
   // Inicialización
   applyFilters();
