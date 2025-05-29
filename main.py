@@ -35,6 +35,8 @@ from controladores import controlador_articulo as controlador_articulo
 from controladores import controlador_descuento as controlador_descuento
 from controladores import controlador_descuento_articulo as controlador_descuento_articulo
 from controladores import controlador_salida as controlador_salida
+from controladores import controlador_reclamo as controlador_reclamo
+from controladores import controlador_preguntas_frecuentes as controlador_pregunta_frecuente
 
 
 
@@ -348,6 +350,62 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
+ "reclamo": {
+    "active": True,
+    "id": "reclamo",
+    "titulo": "Reclamos",
+    "nombre_tabla": "reclamo",
+    "controlador": controlador_reclamo,  # Asegúrate de importar esto arriba
+    "icon_page": "fa-solid fa-file",  # Puedes cambiar el ícono
+    "filters": [],
+    "fields_form": [
+        ['id', 'ID', 'ID', 'text', True, False, None],
+        ['nombres_razon', 'Cliente', 'Cliente', 'text', True, True, None],
+        ['direccion', 'Dirección', 'Dirección', 'text', True, True, None],
+        ['correo', 'Correo', 'Correo', 'email', True, True, None],
+        ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
+        ['titulo_incidencia', 'Incidencia', 'Incidencia', 'text', True, True, None],
+        ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
+        ['fecha_recojo', 'Fecha de recojo', 'Fecha', 'date', True, True, None],
+        ['estado_reclamoid', 'Estado', 'Estado', 'select', True, True, [lambda: controlador_estado_reclamo.get_options(), 'nombre']],
+        ['sucursal_id', 'Sucursal', 'Sucursal', 'select', True, True, [lambda: controlador_sucursal.get_options(), 'direccion']]
+    ],
+    "crud_forms": {
+        "crud_list": True,
+        "crud_search": True,
+        "crud_consult": True,
+        "crud_insert": True,
+        "crud_update": True,
+        "crud_delete": True,
+        "crud_unactive": False
+    }
+},
+"pregunta_frecuente": {
+    "active": True,
+    "titulo": "preguntas frecuentes",
+    "nombre_tabla": "pregunta frecuente",
+    "controlador": controlador_pregunta_frecuente,
+    "icon_page": 'fa-solid fa-circle-question',
+    "filters": [
+        ['activo', f'{TITLE_STATE}', get_options_active()],
+    ],
+    "fields_form": [
+        #  ID/NAME          LABEL              PLACEHOLDER            TYPE      REQUIRED  ABLE/DISABLE  DATOS
+        ['id',              'ID',              'ID',                  'text',     True,     False,       None],
+        ['titulo',          'Título',          'Título',              'text',     True,     True,        None],
+        ['descripcion',     'Descripción',     'Descripción',         'textarea', True,     True,        None],
+        ['activo',          f'{TITLE_STATE}',  'Activo',              'p',        True,     False,       None],
+    ],
+    "crud_forms": {
+        "crud_list": True,
+        "crud_search": True,
+        "crud_consult": True,
+        "crud_insert": True,
+        "crud_update": True,
+        "crud_delete": True,
+        "crud_unactive": True,
+    }
+},
   
 # LEO
     "tamanio_caja": {
@@ -1316,7 +1374,7 @@ MENU_ADMIN = {
         'active': True ,
         'icon_page' : 'fa-solid fa-circle-question',
         'dashboard' : True,
-        'cruds' :     [ 'tipo_indemnizacion','tipo_reclamo','motivo_reclamo','causa_reclamo','estado_reclamo','reclamo' ],
+        'cruds' :     [ 'tipo_indemnizacion','tipo_reclamo','motivo_reclamo','causa_reclamo','estado_reclamo','reclamo','pregunta_frecuente' ],
         'reports' :   [ ],
     },
     'ventas' : {
