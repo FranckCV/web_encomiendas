@@ -1061,6 +1061,31 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
+    "salida": {
+        "active" : True ,
+        "titulo": "salidas de unidades",
+        "nombre_tabla": "salida",
+        "controlador": controlador_contenido_paquete,
+        "icon_page": 'ri-box-3-fill',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
     
 }
 
