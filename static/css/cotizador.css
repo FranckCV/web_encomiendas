@@ -22,10 +22,10 @@ section.general_element {
 }
 
 .calculator-section {
-    background-color: var(--white);
+    /* background-color: var(--white); */
     border-radius: 10px;
     padding: 20px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    /* box-shadow: 0 3px 10px rgba(0,0,0,0.1); */
     /* margin-top: 20px; */
 }
 

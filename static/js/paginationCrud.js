@@ -13,54 +13,54 @@ document.addEventListener("DOMContentLoaded", function () {
   let filteredRows = [...allRows]; // Esta lista se actualiza con los filtros
 
   function applyFilters() {
-  const activeFilters = {};
-  filters.forEach(filter => {
-    const type = filter.dataset.type;
-    const id = filter.id;
-    const value = filter.value;
+    const activeFilters = {};
+    filters.forEach(filter => {
+      const type = filter.dataset.type;
+      const id = filter.id;
+      const value = filter.value;
 
-    if (!activeFilters[id]) activeFilters[id] = {};
-    activeFilters[id].type = type;
-    activeFilters[id].value = value;
-  });
-
-  
-  const searchTerm = searchInput?.value?.trim().toLowerCase() || '';
-
-  filteredRows = allRows.filter(row => {
-    const matchesFilters = Object.entries(activeFilters).every(([id, config]) => {
-      const dataType = config.type;
-      const filterValue = config.value;
-      const dataKey = id.replace(/_ini$|_fin$/, '');
-
-      const rowValue = row.dataset[dataKey]; // formato YYYY-MM-DD en dataset
-
-      if (filterValue === "") return true; // sin filtro
-
-      if (dataType === 'date') {
-        return rowValue === filterValue;
-      }
-
-      if (dataType === 'date_ini') {
-        return rowValue >= filterValue;
-      }
-
-      if (dataType === 'date_fin') {
-        return rowValue <= filterValue;
-      }
-
-      return rowValue === filterValue;
+      if (!activeFilters[id]) activeFilters[id] = {};
+      activeFilters[id].type = type;
+      activeFilters[id].value = value;
     });
 
-    const matchesSearch = !searchInput || Array.from(row.querySelectorAll("p"))
-      .some(cell => cell.textContent.toLowerCase().includes(searchTerm));
 
-    return matchesFilters && matchesSearch;
-  });
+    const searchTerm = searchInput?.value?.trim().toLowerCase() || '';
 
-  currentPage = 1;
-  showPage(currentPage);
-}
+    filteredRows = allRows.filter(row => {
+      const matchesFilters = Object.entries(activeFilters).every(([id, config]) => {
+        const dataType = config.type;
+        const filterValue = config.value;
+        const dataKey = id.replace(/_ini$|_fin$/, '');
+
+        const rowValue = row.dataset[dataKey]; // formato YYYY-MM-DD en dataset
+
+        if (filterValue === "") return true; // sin filtro
+
+        if (dataType === 'date') {
+          return rowValue === filterValue;
+        }
+
+        if (dataType === 'date_ini') {
+          return rowValue >= filterValue;
+        }
+
+        if (dataType === 'date_fin') {
+          return rowValue <= filterValue;
+        }
+
+        return rowValue === filterValue;
+      });
+
+      const matchesSearch = !searchInput || Array.from(row.querySelectorAll("p"))
+        .some(cell => cell.textContent.toLowerCase().includes(searchTerm));
+
+      return matchesFilters && matchesSearch;
+    });
+
+    currentPage = 1;
+    showPage(currentPage);
+  }
 
 
   function showPage(page) {
@@ -160,10 +160,10 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   if (searchInput) {
-  searchInput.addEventListener("input", () => {
-    applyFilters();
-  });
-}
+    searchInput.addEventListener("input", () => {
+      applyFilters();
+    });
+  }
 
   // Inicialización
   applyFilters();

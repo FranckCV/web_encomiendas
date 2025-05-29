@@ -1605,6 +1605,8 @@ def inject_globals():
 
     return dict(
         # todo el sistema
+        # URL_IMG_LOGO           = f'/static/img/img_empresa/{controlador_empresa.get_logo()}' ,
+        URL_IMG_LOGO           = f'/static/img/img_empresa/logo.png' ,
         main_information = main_information ,
         cookie_error = cookie_error,
         datosUsuario = datosUsuario ,
@@ -1621,7 +1623,6 @@ def inject_globals():
 
 
         # constantes
-        URL_IMG_LOGO           = f'/static/img/img_empresa/{controlador_empresa.get_logo()}' ,
         MENU_ADMIN             = MENU_ADMIN,
         HABILITAR_ICON_PAGES   = HABILITAR_ICON_PAGES,
         SYSTEM_NAME            = main_information['nombre'],
