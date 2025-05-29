@@ -1,0 +1,486 @@
+{% extends "MAESTRA_GENERAL.html" %}
+
+{% block titulo %}
+Selector de Ubicación
+{% endblock %}
+
+{% block estilos %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<link rel="stylesheet" href="../static/css/sucursales.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+
+<style>
+    .ubicacion-container {
+        padding: 20px;
+    }
+
+    .ubicacion-titulo {
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    .ubicacion-subtitle {
+        color: #7f8c8d;
+        margin-bottom: 30px;
+        font-size: 1.1rem;
+    }
+
+    #map {
+        width: 100%;
+        height: 400px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        cursor: crosshair;
+    }
+
+    .formulario-ubicacion {
+        background: #f8f9fa;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control {
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 12px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: #3498db;
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        outline: none;
+    }
+
+    .form-control:read-only {
+        background-color: #f8f9fa;
+        color: #6c757d;
+    }
+
+    .instrucciones {
+        background: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+    }
+
+    .instrucciones h5 {
+        color: #1976d2;
+        margin-bottom: 8px;
+    }
+
+    .instrucciones p {
+        color: #424242;
+        margin: 0;
+    }
+
+    .btn-limpiar {
+        background: #e74c3c;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+    }
+
+    .btn-limpiar:hover {
+        background: #c0392b;
+    }
+
+    .btn-guardar {
+        background: #27ae60;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+        margin-right: 10px;
+    }
+
+    .btn-guardar:hover {
+        background: #229954;
+    }
+
+    .loading {
+        color: #3498db;
+        font-style: italic;
+    }
+
+    .error {
+        color: #e74c3c;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .coordenadas-container {
+        display: flex;
+        gap: 15px;
+    }
+
+    .coordenadas-container .form-group {
+        flex: 1;
+    }
+
+    @media (max-width: 768px) {
+        .coordenadas-container {
+            flex-direction: column;
+        }
+        
+        .ubicacion-titulo {
+            font-size: 1.5rem;
+        }
+        
+        #map {
+            height: 300px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="ubicacion-container">
+    <!-- <h1 class="ubicacion-titulo">Selector de Ubicación</h1>
+    <p class="ubicacion-subtitle">Haz clic en el mapa para seleccionar una ubicación y obtener sus datos</p> -->
+    
+    <div class="row">
+        <div class="col-lg-8 col-md-7">
+            <!-- <div class="instrucciones">
+                <h5><i class="fa-solid fa-info-circle"></i> Instrucciones</h5>
+                <p>Haz clic en cualquier punto del mapa para obtener automáticamente la dirección, código postal y coordenadas de esa ubicación.</p>
+            </div> -->
+            <div id="map"></div>
+        </div>
+        
+        <div class="col-lg-4 col-md-5">
+            <div class="formulario-ubicacion">
+                <h4 style="margin-bottom: 20px; color: #2c3e50;">
+                    <i class="fa-solid fa-map-marker-alt"></i> Datos de Ubicación
+                </h4>
+                
+                <div class="form-group">
+                    <label class="form-label" for="direccion">
+                        <i class="fa-solid fa-location-dot"></i> Dirección Completa
+                    </label>
+                    <textarea 
+                        id="direccion" 
+                        class="form-control" 
+                        rows="3" 
+                        placeholder="La dirección aparecerá aquí..."
+                        
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="codigoPostal">
+                        <i class="fa-solid fa-envelope"></i> Código Postal
+                    </label>
+                    <input 
+                        type="text" 
+                        id="codigoPostal" 
+                        class="form-control" 
+                        placeholder="Código postal..."
+                        readonly
+                    >
+                </div>
+
+                <div class="coordenadas-container">
+                    <div class="form-group">
+                        <label class="form-label" for="latitud">
+                            <i class="fa-solid fa-globe"></i> Latitud
+                        </label>
+                        <input 
+                            type="text" 
+                            id="latitud" 
+                            class="form-control" 
+                            placeholder="Latitud..."
+                            readonly
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="longitud">
+                            <i class="fa-solid fa-globe"></i> Longitud
+                        </label>
+                        <input 
+                            type="text" 
+                            id="longitud" 
+                            class="form-control" 
+                            placeholder="Longitud..."
+                            readonly
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="pais">
+                        <i class="fa-solid fa-flag"></i> País
+                    </label>
+                    <input 
+                        type="text" 
+                        id="pais" 
+                        class="form-control" 
+                        placeholder="País..."
+                        readonly
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="ciudad">
+                        <i class="fa-solid fa-city"></i> Ciudad
+                    </label>
+                    <input 
+                        type="text" 
+                        id="ciudad" 
+                        class="form-control" 
+                        placeholder="Ciudad..."
+                        readonly
+                    >
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <button id="btn-guardar" class="btn-guardar">
+                        <i class="fa-solid fa-save"></i> Guardar Ubicación
+                    </button>
+                    <button id="btn-limpiar" class="btn-limpiar">
+                        <i class="fa-solid fa-trash"></i> Limpiar
+                    </button>
+                </div>
+
+                <div id="status-message" style="margin-top: 15px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="../static/js/mapita.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Referencias a los elementos del formulario
+    const direccionInput = document.getElementById('direccion');
+    const codigoPostalInput = document.getElementById('codigoPostal');
+    const latitudInput = document.getElementById('latitud');
+    const longitudInput = document.getElementById('longitud');
+    const paisInput = document.getElementById('pais');
+    const ciudadInput = document.getElementById('ciudad');
+    const btnLimpiar = document.getElementById('btn-limpiar');
+    const btnGuardar = document.getElementById('btn-guardar');
+    const statusMessage = document.getElementById('status-message');
+
+    let currentMarker = null;
+
+    // Función para mostrar mensajes de estado
+    function mostrarStatus(mensaje, tipo = 'info') {
+        statusMessage.innerHTML = `
+            <div class="${tipo === 'error' ? 'error' : tipo === 'loading' ? 'loading' : ''}" 
+                 style="padding: 10px; border-radius: 4px; ${tipo === 'success' ? 'background: #d4edda; color: #155724;' : ''}">
+                ${tipo === 'loading' ? '<i class="fa-solid fa-spinner fa-spin"></i> ' : ''}
+                ${mensaje}
+            </div>
+        `;
+        
+        if (tipo !== 'loading') {
+            setTimeout(() => {
+                statusMessage.innerHTML = '';
+            }, 5000);
+        }
+    }
+
+    // Función de geocodificación inversa mejorada
+    function reverseGeocode(lat, lng) {
+        mostrarStatus('Obteniendo información de la ubicación...', 'loading');
+        
+        const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.display_name) {
+                    // Llenar los campos con la información obtenida
+                    direccionInput.value = data.display_name || '';
+                    latitudInput.value = lat.toFixed(6);
+                    longitudInput.value = lng.toFixed(6);
+                    
+                    // Extraer información adicional del address
+                    const address = data.address || {};
+                    codigoPostalInput.value = address.postcode || 'No disponible';
+                    paisInput.value = address.country || 'No disponible';
+                    
+                    // Intentar obtener la ciudad (puede estar en diferentes campos)
+                    const ciudad = address.city || address.town || address.village || 
+                                 address.municipality || address.county || 'No disponible';
+                    ciudadInput.value = ciudad;
+                    
+                    mostrarStatus('¡Ubicación encontrada exitosamente!', 'success');
+                } else {
+                    throw new Error('No se encontró información para esta ubicación');
+                }
+            })
+            .catch(error => {
+                console.error('Error en geocodificación inversa:', error);
+                mostrarStatus('Error al obtener la información de la ubicación: ' + error.message, 'error');
+                
+                // Llenar al menos las coordenadas
+                latitudInput.value = lat.toFixed(6);
+                longitudInput.value = lng.toFixed(6);
+                direccionInput.value = 'Error al obtener dirección';
+            });
+    }
+
+    // Verificar que el mapa esté disponible
+    if (typeof map !== 'undefined') {
+        // Centrar el mapa en Perú
+        map.setView([-9.1900, -75.0152], 6);
+        
+        // Agregar evento de clic al mapa
+        map.on('click', function(e) {
+            const { lat, lng } = e.latlng;
+            
+            // Remover marcador anterior si existe
+            if (currentMarker) {
+                map.removeLayer(currentMarker);
+            }
+            
+            // Crear nuevo marcador
+            currentMarker = L.marker([lat, lng]).addTo(map);
+            currentMarker.bindPopup(`
+                <div style="text-align: center;">
+                    <strong>Ubicación Seleccionada</strong><br>
+                    <small>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}</small>
+                </div>
+            `).openPopup();
+            
+            // Ejecutar geocodificación inversa
+            reverseGeocode(lat, lng);
+        });
+        
+        // Cambiar cursor cuando pase sobre el mapa
+        map.getContainer().style.cursor = 'crosshair';
+    } else {
+        mostrarStatus('Error: El mapa no se pudo cargar correctamente', 'error');
+    }
+
+    // Evento para limpiar formulario
+    btnLimpiar.addEventListener('click', function() {
+        direccionInput.value = '';
+        codigoPostalInput.value = '';
+        latitudInput.value = '';
+        longitudInput.value = '';
+        paisInput.value = '';
+        ciudadInput.value = '';
+        statusMessage.innerHTML = '';
+        
+        // Remover marcador del mapa
+        if (currentMarker) {
+            map.removeLayer(currentMarker);
+            currentMarker = null;
+        }
+        
+        mostrarStatus('Formulario limpiado', 'success');
+    });
+
+    // Evento para guardar ubicación
+    btnGuardar.addEventListener('click', function() {
+        if (!latitudInput.value || !longitudInput.value) {
+            mostrarStatus('Por favor, selecciona una ubicación en el mapa primero', 'error');
+            return;
+        }
+        
+        const ubicacionData = {
+            direccion: direccionInput.value,
+            codigoPostal: codigoPostalInput.value,
+            latitud: latitudInput.value,
+            longitud: longitudInput.value,
+            pais: paisInput.value,
+            ciudad: ciudadInput.value,
+            timestamp: new Date().toISOString()
+        };
+        
+        // Aquí puedes enviar los datos al servidor
+        console.log('Datos de ubicación a guardar:', ubicacionData);
+        
+        // Ejemplo de cómo podrías enviar al servidor
+        /*
+        fetch('/guardar-ubicacion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(ubicacionData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            mostrarStatus('Ubicación guardada exitosamente', 'success');
+        })
+        .catch(error => {
+            mostrarStatus('Error al guardar la ubicación', 'error');
+        });
+        */
+        
+        mostrarStatus('Datos de ubicación listos (revisar consola)', 'success');
+    });
+    
+
+    L.Control.geocoder({
+    defaultMarkGeocode: false,
+    placeholder: 'Buscar dirección...',
+    errorMessage: 'No se encontró el lugar',
+    geocoder: L.Control.Geocoder.nominatim({
+    geocodingQueryParams: {
+        countrycodes: 'pe'
+    }
+})
+
+})
+.on('markgeocode', function(e) {
+    const latlng = e.geocode.center;
+    map.setView(latlng, 16);
+
+    if (currentMarker) {
+        map.removeLayer(currentMarker);
+    }
+
+    currentMarker = L.marker(latlng).addTo(map);
+    currentMarker.bindPopup(`
+        <div style="text-align: center;">
+            <strong>Resultado de Búsqueda</strong><br>
+            <small>Lat: ${latlng.lat.toFixed(6)}<br>Lng: ${latlng.lng.toFixed(6)}</small>
+        </div>
+        `).openPopup();
+
+        reverseGeocode(latlng.lat, latlng.lng);
+    })
+    .addTo(map);
+
+
+
+});
+</script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+{% endblock %}

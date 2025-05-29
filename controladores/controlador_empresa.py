@@ -34,22 +34,22 @@ def table_fetchall():
     return resultados
 
 
-def get_table():
-    sql= f'''
-        select 
-            mar.id ,
-            mar.nombre ,
-            mar.activo 
-        from {table_name} mar
-    '''
-    columnas = {
-        'id': ['ID' , 0.5 ] , 
-        'nombre' : ['Nombre' , 9.5] , 
-        'activo' : ['Actividad' , 1] 
-        }
-    filas = sql_select_fetchall(sql)
+# def get_table():
+#     sql= f'''
+#         select 
+#             mar.id ,
+#             mar.nombre ,
+#             mar.activo 
+#         from {table_name} mar
+#     '''
+#     columnas = {
+#         'id': ['ID' , 0.5 ] , 
+#         'nombre' : ['Nombre' , 9.5] , 
+#         'activo' : ['Actividad' , 1] 
+#         }
+#     filas = sql_select_fetchall(sql)
     
-    return columnas , filas
+#     return columnas , filas
 
 
 ######_ CAMBIAR PARAMETROS Y SQL INTERNO _###### 
@@ -67,44 +67,46 @@ def get_table():
 #     '''
 #     sql_execute(sql,(nombre))
 
-
-def update_row( nombre , correo , nro_telefono , color_pri , color_sec , color_ter ):
+def update_row( nombre , correo , nro_telefono , logo, porcentaje_garantia , color_pri , color_sec , color_ter ):
     sql = f'''
         update {table_name} set 
         nombre = %s ,
         correo = %s ,
         nro_telefono = %s ,
+        logo = %s ,
+        porcentaje_garantia = %s ,
         color_pri = %s ,
         color_sec = %s ,
         color_ter = %s 
         where id = 1
     '''
-    sql_execute(sql,( nombre , correo , nro_telefono , color_pri , color_sec , color_ter ))
+    sql_execute(sql,( nombre , correo , nro_telefono , logo, porcentaje_garantia , color_pri , color_sec , color_ter ))
 
 
-# emp.id ,
-#             emp.nombre ,
-#             emp.correo ,
-#             emp.nro_telefono ,
-#             emp.color_pri ,
-#             emp.color_sec ,
-#             emp.color_ter 
-
-#####_ ADICIONALES _#####
-
-# def get_options_marca():
-#     sql= f'''
-#         select 
-#             id ,
-#             nombre
-#         from {table_name}
-#         order by nombre asc
+# def update_row( nombre , correo , nro_telefono , porcentaje_garantia , color_pri , color_sec , color_ter ):
+#     sql = f'''
+#         update {table_name} set 
+#         nombre = %s ,
+#         correo = %s ,
+#         nro_telefono = %s ,
+#         porcentaje_garantia = %s ,
+#         color_pri = %s ,
+#         color_sec = %s ,
+#         color_ter = %s 
+#         where id = 1
 #     '''
-#     filas = sql_select_fetchall(sql)
-    
-#     lista = [(fila["id"], fila["nombre"]) for fila in filas]
+#     sql_execute(sql,( nombre , correo , nro_telefono , porcentaje_garantia , color_pri , color_sec , color_ter ))
 
-#     return lista
+
+# def update_img( logo ):
+#     sql = f'''
+#         update {table_name} set 
+#         logo = %s
+#         where id = 1
+#     '''
+#     sql_execute(sql,( logo ))
+
+
 
 def get_information():
     sql= f'''
@@ -123,3 +125,38 @@ def get_information():
     info = sql_select_fetchone(sql)
     
     return info
+
+
+def get_data():
+    sql= f'''
+        select 
+            emp.id ,
+            emp.nombre ,
+            emp.correo ,
+            emp.nro_telefono ,
+            emp.porcentaje_garantia , 
+            emp.logo,
+            emp.color_pri ,
+            emp.color_sec ,
+            emp.color_ter 
+        from empresa emp
+        where id = 1
+    '''
+    
+    info = sql_select_fetchone(sql)
+    
+    return info
+
+
+def get_logo():
+    sql= f'''
+        select 
+            emp.logo 
+        from empresa emp
+        where id = 1
+    '''
+    
+    info = sql_select_fetchone(sql)['logo']
+    
+    return info
+

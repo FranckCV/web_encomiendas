@@ -16,7 +16,7 @@ def exists_Activo():
 def delete_row(id):
     sql = f'''
         DELETE FROM {table_name}
-        WHERE usuarioid = {id}
+        WHERE id = {id}
     '''
     sql_execute(sql)
 
@@ -38,7 +38,7 @@ def table_fetchall():
 def get_table():
     sql = f'''
         SELECT 
-            cl.usuarioid,
+            cl.id,
             cl.nombre_siglas,
             cl.apellidos_razon,
             cl.correo,
@@ -52,7 +52,7 @@ def get_table():
     '''
     
     columnas = {
-        'usuarioid': ['ID', 0.5],
+        'id': ['ID', 0.5],
         'nombre_siglas': ['Nombre o siglas', 1.5],
         'apellidos_razon': ['Apellidos o razón social', 1.5],
         'correo': ['Correo', 1.5],
@@ -91,7 +91,7 @@ def update_row(id, correo, telefono, num_documento, nombre_siglas, apellidos_raz
             apellidos_razon = %s,
             tipo_documentoid = %s,
             tipo_clienteid = %s
-        WHERE usuarioid = {id}
+        WHERE id = {id}
     '''
     sql_execute(sql, (correo, telefono, num_documento, nombre_siglas, apellidos_razon, tipo_documentoid, tipo_clienteid))
 
@@ -100,7 +100,7 @@ def update_row(id, correo, telefono, num_documento, nombre_siglas, apellidos_raz
 def get_report_test():
     sql = f'''
         SELECT 
-            cl.usuarioid,
+            cl.id,
             cl.nombre_siglas,
             cl.apellidos_razon,
             cl.correo,
@@ -114,7 +114,7 @@ def get_report_test():
     '''
     
     columnas = {
-        'usuarioid': ['ID', 0.5],
+        'id': ['ID', 0.5],
         'nombre_siglas': ['Nombre o siglas', 1.5],
         'apellidos_razon': ['Apellidos o razón social', 1.5],
         'correo': ['Correo', 1.5],
@@ -139,16 +139,16 @@ def get_reporte_ventas():
             GROUP_CONCAT(art.nombre SEPARATOR ', ') AS articulos,
             tv.monto_total
         FROM transaccion_venta tv
-        INNER JOIN cliente cl ON tv.clienteid = cl.usuarioid
+        INNER JOIN cliente cl ON tv.clienteid = cl.id
         INNER JOIN detalle_venta dv ON tv.num_serie = dv.ventanum_serie AND tv.tipo_comprobanteid = dv.ventatipo_comprobanteid
         INNER JOIN articulo art ON dv.articuloid = art.id
         GROUP BY tv.num_serie, tv.fecha, tv.hora, cliente, tv.monto_total
-        ORDER BY tv.fecha DESC, tv.hora DESC
+        ORDER BY tv.fecha DESC, tv.hora DESC 
     '''
     
     columnas = {
         'num_serie'   : ['Serie', 0.7],
-        'fecha_txt'       : ['Fecha', 1],
+        'fecha_txt'   : ['Fecha', 1],
         'hora'        : ['Hora', 0.8],
         'cliente'     : ['Cliente', 1.8],
         'articulos'   : ['Artículos Comprados', 2],

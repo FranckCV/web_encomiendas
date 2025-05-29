@@ -3,20 +3,53 @@
 {% block estilos_html %}
         
     <link rel="stylesheet" href="/static/css/login_form.css">
+    <style>
+        {% if URL_BG %}
+        body {
+            background-image: url(/static/img/{{URL_BG}});
+        }
+        {% endif %}
+    </style>
     {% block estilos %}
     {% endblock %}
     <title>
-        {% block titulo %}
-        {% endblock %}| {{SYSTEM_NAME}}
+        {{TITULO_FORM}} | {{SYSTEM_NAME}}
     </title>
 
 {% endblock %}
 
 
 {% block body_html %}
-        
-    {% block contenido %}
+
+<section class="general_element">
+<form id="" name="" 
+{% if URL_POST  %}
+method="POST" action="{{url_for(URL_POST)}}"
+{% endif %}
+>
+    <a class="logo_icon" href="{{url_for('main_page')}}">
+        <img src="{{URL_IMG_LOGO}}" alt="logo">
+    </a>
+
+    <h2>{{TITULO_FORM}}</h2>
+
+    <div class="inputs">
+        {% block contenido_form %}
+        {% endblock %}
+    </div>
+
+    {% block pre_btn %}
     {% endblock %}
+
+    <div id="send">
+        <input type="submit" class="btn" value="{{BTN_NAME}}" required>
+    </div>
+
+    {% block post_btn %}
+    {% endblock %}
+
+</form>
+</section>
 
 {% endblock %}
 
@@ -24,10 +57,6 @@
 
 {% block scripts_html %}
 
-    <script src="/static/js/common_scripts/bootstrap.bundle.min.js"></script>
-    <script src="/static/js/common_scripts/bootstrap.min.js"></script>
-    <script src="/static/js/common_scripts/common_script.js"></script>
-    
     {% block scripts %}
     {% endblock %}
 

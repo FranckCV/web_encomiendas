@@ -239,7 +239,7 @@ Permisos para {{info_rol.get('nombre')}}
         background-color: var(--color4);
         border-radius: 25px;
         padding-inline: 5px;
-        padding-block: 3px;
+        padding-block: 5px;
     }
 
     .pag_block:hover {
@@ -304,8 +304,8 @@ Permisos para {{info_rol.get('nombre')}}
         align-items: center;
         justify-content: center;
         font-size: 85%;
-        height: 22.5px;
-        width:  22.5px;
+        height: 25px;
+        width:  25px;
         padding: 0;
     }
 
@@ -326,8 +326,8 @@ Permisos para {{info_rol.get('nombre')}}
         border-radius: 20px;
         background-color: var(--color9);
         justify-self: flex-end;
-        padding-inline: 7px;
-        padding-block: 6px;
+        padding-inline: 5px;
+        padding-block: 4px;
     }
 
     .back_to_page {
@@ -340,6 +340,7 @@ Permisos para {{info_rol.get('nombre')}}
         display: flex;
         align-items: center;
         justify-content: center;
+        width: fit-content;
         gap: 15px;
     }
 
@@ -364,6 +365,7 @@ Permisos para {{info_rol.get('nombre')}}
         Permisos para {{info_rol.get('nombre')}}
     </h3>
 
+
     <style>
         .pag_block {
             grid-template-columns: auto auto;
@@ -373,6 +375,9 @@ Permisos para {{info_rol.get('nombre')}}
             grid-template-columns: 97.5%;
         }
 
+        .block_admin>* {
+            height: 72.5vh;
+        }
 
         .cant_title {
             width: 5.75vw;
@@ -585,6 +590,14 @@ Permisos para {{info_rol.get('nombre')}}
 
 </div>
 
+{% if rolid %}
+<div class="block_crud">
+    <a class="back_to_page btn_back" href="{{url_for('administrar_paginas')}}">
+        <i class="fa-solid fa-arrow-left"></i>
+        <p>Volver a {{NOMBRE_ADMINPAGES_PAGE}}</p>
+    </a>
+</div>
+{% endif %}
 
 {% for modulo in modulos %}
 

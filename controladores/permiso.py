@@ -8,7 +8,8 @@ def get_lista_modulos():
             mdl.icono ,
             mdl.key ,
             mdl.color ,
-            mdl.activo 
+            mdl.activo ,
+            mdl.img
         from modulo mdl
         order by 2 asc 
     '''
@@ -25,7 +26,8 @@ def get_modulo_key(key):
             mdl.icono ,
             mdl.key ,
             mdl.color ,
-            mdl.activo 
+            mdl.activo ,
+            mdl.img
         from modulo mdl
         where mdl.key = %s
     '''
