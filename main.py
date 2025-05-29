@@ -1662,14 +1662,11 @@ paginas_simples = [
     'cajas',
     'cajas_prueba',
     'sobre_nosotros',
-<<<<<<< HEAD
-    'TerminosCondiciones'
-=======
+    'TerminosCondiciones',
     'salidas_programadas', #para eliminar
     'mapa_curds',
     'envio_masivo',
     'salida_informacion'
->>>>>>> d6fd260c863b8aea1808c6cd5d2a0ab23267a829
 ]
 
 
