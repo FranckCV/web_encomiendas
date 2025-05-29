@@ -69,43 +69,7 @@
         
         ">
 
-<<<<<<< HEAD
       </i>
-=======
-        </i>
-      </div>
-      <div class="user-text">
-        <p>
-          {% if tipoUsuario == 'E' %}
-            Panel Administrativo
-          {% elif tipoUsuario == 'C' %}
-            Mi perfil
-          {% else %}
-            Iniciar sesión
-          {% endif %}
-        </p>
-      </div>
-    </a>
-  </header>
-
-  <div class="secondary-menu">
-    <div class="secondary-block">
-      <div class="secondary-link">
-        <i class="fas fa-store"></i>
-        <span>Tienda</span>
-        <i class="fa-solid fa-angle-down"></i>
-      </div>
-      <div class="secondary-content">
-        <a class="secondary-sublink" href="{{ url_for('cajas') }}">
-          <span>Cajas</span>
-          <i class="fa-solid fa-chevron-right"></i>
-        </a>
-        <a class="secondary-sublink" href="{{ url_for('articulos') }}">
-          <span>Más Productos</span>
-          <i class="fa-solid fa-chevron-right"></i>
-        </a>
-      </div>
->>>>>>> d6fd260c863b8aea1808c6cd5d2a0ab23267a829
     </div>
     <div class="user-text">
       <p>
@@ -129,7 +93,7 @@
       <i class="fa-solid fa-angle-down"></i>
     </div>
     <div class="secondary-content">
-      <a class="secondary-sublink" href="{{ url_for('cajas_prueba') }}">
+      <a class="secondary-sublink" href="{{ url_for('cajas') }}">
         <span>Cajas</span>
         <i class="fa-solid fa-chevron-right"></i>
       </a>

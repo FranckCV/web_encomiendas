@@ -242,7 +242,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   adjustResponsiveness();
   window.addEventListener('resize', adjustResponsiveness);
 
-  // 7) Inicialización final
+
+
+
+  // ) Inicialización final
   updateProductInfo(currentSize);
   updateQuantity(currentQuantity);
+
+
 });
