@@ -638,10 +638,10 @@ CONTROLADORES = {
             ['direccion',     'Dirección',       'Dirección',       'text',      True ,    True,       'map' ],
             ['teléfono',      'Teléfono',        'Teléfono',        'text',      False,    True,       None ],
             ['horario_l_v',   'Horario L-V',     'Ej: 9am - 6pm',   'text',      False,    True,       None ],
-            ['latitud',       'Latitud',         'Latitud',         'number',    False,    True,       'map' ],
+            ['latitud',       'Latitud',         'Latitud',         'decimal_6',    False,    True,       'map' ],
             ['horario_s_d',   'Horario S-D',     'Ej: 9am - 1pm',   'text',      False,    True,       None ],
             ['referencia',    'Referencia',      'Referencia',      'text',      False,    True,       None ],
-            ['longitud',      'Longitud',        'Longitud',        'number',    False,    True,       'map' ],
+            ['longitud',      'Longitud',        'Longitud',        'decimal_6',    False,    True,       'map' ],
         ],
         "crud_forms": {
             "crud_list": True ,
