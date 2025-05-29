@@ -1582,7 +1582,8 @@ paginas_simples = [
     'envio_masivo',
     'cajas',
     'cajas_prueba',
-    'sobre_nosotros'
+    'sobre_nosotros',
+    'TerminosCondiciones'
 ]
 
 
