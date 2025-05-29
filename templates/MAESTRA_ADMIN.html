@@ -3,8 +3,11 @@
 {% block estilos_html %}
 
 <link rel="stylesheet" href="/static/css/admin_styles.css">
+
 {% block estilos %}
+
 {% endblock %}
+
 <title>
     {% block titulo %}
     {% endblock %}| {{SYSTEM_NAME}}
@@ -40,6 +43,10 @@
     <style>
         .tip_title {
             color: color-mix(in srgb, {{modulo['color']}} 80%, white 45%) ;
+        }
+        
+        .tip_title:hover {
+            color: color-mix(in srgb, {{modulo['color']}} 80%, white 95%) ;
         }
 
         .{{modulo['key']}}.menu_title:hover {
@@ -100,7 +107,7 @@
             <div class="tip_block">
                 <p class="tip_title">{{ tipo_pag['nombre'] }} - {{ tipo_pag['cant'] }}  </p>
 
-                <div class="tip_content">
+                <div class="tip_content collapsed">
                     {% for page in paginas %}
 
                     {% if page['tipo_paginaid'] == tipo_pag['id'] and page['moduloid'] == cur_modulo_id %}
@@ -179,20 +186,25 @@
 
 
 {% block scripts_html %}
-<script>
-    // // MENU OPTION
-    // const menuButton = document.querySelector("#menu_button");
-    // const aside = document.querySelector("#menu_aside");
-    // function toggleMenu() {
-    //     aside.classList.toggle("desplegar");
-    // }
 
-    // if (menuButton && aside) {
-    //     menuButton.addEventListener("click", () => {
-    //         aside.classList.toggle("desplegar");
-    //     });
-    // }
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const tipTitles = document.querySelectorAll('.tip_title');
+    
+    tipTitles.forEach(title => {
+        // title.style.cursor = 'pointer';
+        
+        title.addEventListener('click', function() {
+            const tipContent = this.parentElement.querySelector('.tip_content');
+            
+            if (tipContent) {
+                tipContent.classList.toggle('collapsed');
+            }
+        });
+    });
+});
 </script>
+
 <script src="/static/js/crudModal.js"></script>
 
 {% block scripts %}

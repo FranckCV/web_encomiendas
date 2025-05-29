@@ -35,7 +35,9 @@ from controladores import controlador_articulo as controlador_articulo
 from controladores import controlador_descuento as controlador_descuento
 from controladores import controlador_descuento_articulo as controlador_descuento_articulo
 
-
+import hashlib
+import os
+from werkzeug.utils import secure_filename
 import re
 import configuraciones
 from functools import wraps
@@ -43,13 +45,12 @@ import inspect
 # import json
 # from flask_jwt import JWT, jwt_required, current_identity
 # import uuid
-import hashlib
 # import base64
 # from datetime import datetime, date
 
 app = Flask(__name__, template_folder='templates')
 
-URL_IMG_LOGO = '/static/img/logo.png'
+# url_img_logo = f'/static/img/img_empresa/{controlador_empresa.get_logo()}'
 STATE_0              = configuraciones.STATE_0
 STATE_1              = configuraciones.STATE_1
 TITLE_STATE          = configuraciones.TITLE_STATE
@@ -210,6 +211,23 @@ def esSesionIniciada():
     else:
         return False
     
+
+# UPLOAD_FOLDER = 'static/uploads/empresa'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def guardar_imagen_bd(tabla,ad,archivo):
+    if archivo and '.' in archivo.filename and archivo.filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS:
+        filename_seguro = secure_filename(archivo.filename)
+        # timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        # nombre_final = f"{timestamp}_{filename_seguro}"
+        upload_folder = f'static/img/img_{tabla}'
+        nombre_final = f"{ad}{filename_seguro}"
+        ruta_completa = os.path.join(upload_folder, nombre_final)
+        archivo.save(ruta_completa)
+        return nombre_final
+    return None
+
+
 
 ###########_ DICCIONARIOS _#############
 
@@ -1399,38 +1417,7 @@ def validar_empleado():
                     page = f(*args, **kwargs)
 
                     if page:
-                        # f_name = f.__name__
-                        # # print(args)
-                        # # print(kwargs)
-                        # # print(f_name)
-                        # cur_modulo_id = None
-                        # list_kwargs = list(kwargs.values())
-                        # if list_kwargs :
-                        #     # print(list_kwargs)
-                        #     key = list_kwargs[0]
-                        #     if f_name == 'dashboard' :
-                        #         dataPage = acceso.get_modulo_key(key)
-                        #         if dataPage :
-                        #             cur_modulo_id = dataPage['id']
-                        #     else:
-                        #         dataPage =  acceso.get_pagina_key(key)
-                        #         # print(dataPage)
-                        #         if dataPage :
-                        #             cur_modulo_id = dataPage['moduloid']
-                            
-                        # # print(cur_modulo_id)
-
-                        # response = f(*args, **kwargs)
-
-                        # response = make_response(response)
-
-                        # # Obtener el valor actual de la cookie
-                        # cookie_modulo_id = request.cookies.get('cur_modulo_id')
-
-                        # # Solo actualizamos si cambió
-                        # if cur_modulo_id and str(cur_modulo_id) != str(cookie_modulo_id):
-                        #     response.set_cookie('cur_modulo_id', str(cur_modulo_id), max_age=3600)  # 1 hora, ajustable
-
+     
                         return page
 
                     else:
@@ -1509,8 +1496,6 @@ def inject_globals():
     else:
         tipoUsuario = None
 
-    # a = request.args
-    # print(a)
     return dict(
         # todo el sistema
         main_information = main_information ,
@@ -1529,7 +1514,7 @@ def inject_globals():
 
 
         # constantes
-        URL_IMG_LOGO           = URL_IMG_LOGO ,
+        URL_IMG_LOGO           = f'/static/img/img_empresa/{controlador_empresa.get_logo()}' ,
         MENU_ADMIN             = MENU_ADMIN,
         HABILITAR_ICON_PAGES   = HABILITAR_ICON_PAGES,
         SYSTEM_NAME            = main_information['nombre'],
@@ -1633,7 +1618,7 @@ def contac():
 @app.route("/api/cajas")
 def api_cajas():
     filas = controlador_articulo.get_table_with_discount()
-    print(filas)
+    # print(filas)
     productSizes = {}
 
     for fila in filas:
@@ -1659,7 +1644,7 @@ def api_cajas():
                 "name": fila['nom_descuento'],  
                 "value": float(fila['cantidad_descuento'])
             })
-    print(productSizes)
+    # print(productSizes)
     return jsonify(productSizes)
 
 
@@ -1851,9 +1836,10 @@ def administrar_paginas():
 #        ID/NAME   LABEL              PLACEHOLDER    TYPE       REQUIRED   ABLE/DISABLE   DATOS
         # ['id',     'ID',                'ID',       'text',    True ,     True,          None ],
         ['nombre', 'Nombre del módulo', 'Nombre',   'text',    True ,     True,          None ],
-        ['activo', 'Actividad',         'Color',    'p',       True,      True,          None ],
         ['icono',  'Icono',             'Icono',    'icon',    True ,     True,          None ],
+        ['activo', 'Actividad',         'Color',    'p',       True,      True,          None ],
         ['color',  'Color',             'color',    'color',   True,      True,          None ],
+        ['img',  'Imagen',             'Imagen',    'img',   True,      True,          None ],
     ]
 
     fields_form_page = [
@@ -1905,7 +1891,7 @@ def permiso_rol(rolid):
 @app.route("/informacion_empresa")
 @validar_empleado()
 def informacion_empresa():
-    information = controlador_empresa.get_information()
+    information = controlador_empresa.get_data()
     
     return render_template(
         'informacion_empresa.html' ,
@@ -2018,33 +2004,47 @@ def crud_unactive(tabla):
     return redirect(url_for('crud_generico', tabla = tabla))
 
 
+# @app.route("/update_empresa", methods=["POST"])
+# @validar_empleado()
+# @validar_error_crud()
+# def update_empresa():
+        
+
+#     controlador = controlador_empresa
+#     firma = inspect.signature(controlador.update_row)
+
+#     valores = []
+#     for nombre, parametro in firma.parameters.items():
+#         valor = request.form.get(nombre)
+#         valores.append(valor)
+
+#     controlador.update_row( *valores )
+
+#     return redirect(url_for('informacion_empresa'))
+
 @app.route("/update_empresa", methods=["POST"])
 @validar_empleado()
 @validar_error_crud()
 def update_empresa():
-    # try:
-        # config = CONTROLADORES.get(tabla)
-        # if not config:
-        #     return "Tabla no soportada", 404
+    controlador = controlador_empresa
+    firma = inspect.signature(controlador.update_row)
 
-        # active = config["active"]
-
-        # if active is False:
-        #     return "Tabla no soportada", 404
-
-        controlador = controlador_empresa
-        firma = inspect.signature(controlador.update_row)
-
-        valores = []
-        for nombre, parametro in firma.parameters.items():
+    valores = []
+    for nombre, parametro in firma.parameters.items():
+        if nombre in request.files:
+            archivo = request.files[nombre]
+            if archivo.filename != "":
+                nuevo_nombre = guardar_imagen_bd('empresa' ,archivo)
+                valores.append(nuevo_nombre)
+            else:
+                # Si no se selecciona una nueva imagen, mantener la actual
+                valores.append(request.form.get(f"{nombre}_actual"))
+        else:
             valor = request.form.get(nombre)
             valores.append(valor)
 
-        controlador.update_row( *valores )
-
-        return redirect(url_for('informacion_empresa'))
-    # except Exception as e:
-    #     return f"No se aceptan carácteres especiales", 400
+    controlador.update_row(*valores)
+    return redirect(url_for('informacion_empresa'))
 
 
 @app.route("/procesar_login", methods=["POST"])
@@ -2055,7 +2055,7 @@ def procesar_login():
         usuario = controlador_usuario.get_usuario_por_correo(correo)
         encpassword = encrypt_sha256_string(password)
         # print(encpassword)
-        print(usuario)
+        # print(usuario)
 
         if usuario and encpassword == usuario['contrasenia']:
             resp = resp_login(

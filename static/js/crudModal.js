@@ -35,6 +35,25 @@ document.querySelectorAll('.clickable-modal').forEach(button => {
 });
 
 
+const divs = document.querySelectorAll('.td_content:not(.td_primary_key)');
+
+divs.forEach(div => {
+    let elementP = div.querySelector('.p_value');
+    if (elementP) {
+        let content = elementP.innerText.trim();
+
+        if (!isNaN(content) && content.includes('.')) {
+            div.classList.add('td_right');
+        }
+        else if (!isNaN(content)) {
+            div.classList.add('td_right');
+        }
+        else {
+            div.classList.add('td_left');
+        }
+    }
+});
+
 
 document.addEventListener("DOMContentLoaded", () => {
     const forms = document.querySelectorAll(".form_fields");
@@ -95,26 +114,6 @@ function limpiarSelectsDelModal(modal) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 document.addEventListener('input', (e) => {
     if (e.target.matches('.form_icon input[type="text"]:not(:disabled)')) {
         const input = e.target;
@@ -144,6 +143,28 @@ document.addEventListener('input', (e) => {
         });
     }
 });
+
+
+document.addEventListener('change', (e) => {
+    if (e.target.matches('.form_img input[type="file"]:not(:disabled)')) {
+        const input = e.target;
+        const imgPrev = input.closest('.form_img').querySelector('img');
+
+        if ( e.target.files && e.target.files[0] ) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                imgPrev.src = event.target.result;
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    }
+});
+
+
+
+
+
+
 
 
 
