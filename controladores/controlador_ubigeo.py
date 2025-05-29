@@ -42,7 +42,7 @@ def get_options():
     sql= f'''
         SELECT 
             codigo,
-            CONCAT(distrito, "/", provincia, "/", departamento) AS ubigeo
+            CONCAT(departamento, " / ", provincia, " / ", distrito) AS ubigeo
         FROM {table_name}
         order by ubigeo
     '''
@@ -50,7 +50,6 @@ def get_options():
     
     lista = [(fila['codigo'], fila["ubigeo"]) for fila in filas]
     return lista
-
 
 def get_options_departamento():
     sql= f'''
