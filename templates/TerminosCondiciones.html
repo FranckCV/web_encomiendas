@@ -1,369 +1,451 @@
 {% extends 'MAESTRA_GENERAL.html' %}
 
 {% block estilos %}
-  <link rel="stylesheet" href="/static/css/TerminosCondiciones.css" />
+<link rel="stylesheet" href="/static/css/TerminosCondiciones.css" />
 {% endblock %}
 
 {% block titulo %}
-  Términos y Condiciones
+Términos y Condiciones
 {% endblock %}
 
 {% block contenido %}
-  <div class="terminos-container">
-    <div class="header">
-      <h1>📦 Términos y Condiciones</h1>
-      <p>Servicio de Encomiendas Express</p>
+<div class="terminos-container">
+  <div class="header">
+    <h1> Términos y Condiciones</h1>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <i class="fas fa-shipping-fast"></i>
+      <h3>24h</h3>
+      <p>Entrega Express</p>
+    </div>
+    <div class="stat-card">
+      <i class="fas fa-shield-alt"></i>
+      <h3>100%</h3>
+      <p>Seguro Incluido</p>
+    </div>
+    <div class="stat-card">
+      <i class="fas fa-map-marked-alt"></i>
+      <h3>50+</h3>
+      <p>Ciudades</p>
     </div>
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <i class="fas fa-shipping-fast"></i>
-        <h3>24h</h3>
-        <p>Entrega Express</p>
-      </div>
-      <div class="stat-card">
-        <i class="fas fa-shield-alt"></i>
-        <h3>100%</h3>
-        <p>Seguro Incluido</p>
-      </div>
-      <div class="stat-card">
-        <i class="fas fa-map-marked-alt"></i>
-        <h3>50+</h3>
-        <p>Ciudades</p>
-      </div>
-      <div class="stat-card">
-        <i class="fas fa-star"></i>
-        <h3>4.9/5</h3>
-        <p>Calificación</p>
+  </div>
+
+  <div class="content">
+    <div class="highlight">
+      <strong>¡Importante!</strong> Al utilizar nuestros servicios de encomiendas, aceptas automáticamente estos
+      términos y condiciones. Te recomendamos leerlos detenidamente.
+    </div>
+
+    <div class="section">
+      <h2><i class="fas fa-info-circle"></i>Definiciones y Alcance del Servicio</h2>
+      <p>Nuestro servicio de encomiendas comprende el transporte, custodia y entrega de paquetes, documentos y
+        mercancías dentro del territorio nacional.</p>
+
+      <div class="visual-list">
+        <div class="visual-item">
+          <i class="fas fa-box"></i>
+          <div>
+            <strong>Encomienda:</strong><br>
+            Todo paquete, documento o mercancía confiada para su transporte
+          </div>
+        </div>
+        <div class="visual-item">
+          <i class="fas fa-user"></i>
+          <div>
+            <strong>Remitente:</strong><br>
+            Persona que envía la encomienda
+          </div>
+        </div>
+        <div class="visual-item">
+          <i class="fas fa-user-check"></i>
+          <div>
+            <strong>Destinatario:</strong><br>
+            Persona que recibe la encomienda
+          </div>
+        </div>
+        <div class="visual-item">
+          <i class="fas fa-handshake"></i>
+          <div>
+            <strong>Cliente:</strong><br>
+            Tanto remitente como destinatario
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="content">
-      <div class="highlight">
-        <strong>¡Importante!</strong> Al utilizar nuestros servicios de encomiendas, aceptas automáticamente estos términos y condiciones. Te recomendamos leerlos detenidamente.
+    <div class="section">
+      <h2><i class="fas fa-tasks"></i>Responsabilidades del Cliente</h2>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-icon">
+            <i class="fas fa-info"></i>
+          </div>
+          <div class="timeline-content">
+            <h4>Información Veraz</h4>
+            <p>Proporcionar datos completos y correctos sobre la encomienda</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-icon">
+            <i class="fas fa-box-open"></i>
+          </div>
+          <div class="timeline-content">
+            <h4>Embalaje Adecuado</h4>
+            <p>Proteger correctamente los productos frágiles</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-icon">
+            <i class="fas fa-ban"></i>
+          </div>
+          <div class="timeline-content">
+            <h4>Artículos Permitidos</h4>
+            <p>No enviar productos prohibidos por ley</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="timeline-content">
+            <h4>Disponibilidad</h4>
+            <p>Estar presente para la entrega en horarios acordados</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2><i class="fas fa-exclamation-triangle"></i>Artículos Prohibidos</h2>
+      <p>Por motivos de seguridad y legalidad, <strong>NO</strong> aceptamos:</p>
+
+      <div class="prohibited-grid">
+        <div class="prohibited-item">
+          <i class="fas fa-skull-crossbones"></i>
+          <strong>Sustancias Tóxicas</strong>
+        </div>
+        <div class="prohibited-item">
+          <i class="fas fa-fire"></i>
+          <strong>Inflamables</strong>
+        </div>
+        <div class="prohibited-item">
+          <i class="fas fa-crosshairs"></i>
+          <strong>Armas</strong>
+        </div>
+        <div class="prohibited-item">
+          <i class="fas fa-pills"></i>
+          <strong>Drogas</strong>
+        </div>
+        <div class="prohibited-item">
+          <i class="fas fa-dollar-sign"></i>
+          <strong>Dinero Efectivo</strong>
+        </div>
+        <div class="prohibited-item">
+          <i class="fas fa-paw"></i>
+          <strong>Animales Vivos</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2><i class="fas fa-calculator"></i>Tarifas y Pagos</h2>
+      <p>Nuestras tarifas se calculan según múltiples factores:</p>
+
+      <div class="pricing-table">
+        <div class="pricing-header">
+          <h3><i class="fas fa-chart-line"></i> Factores de Precio</h3>
+        </div>
+        <div class="pricing-row">
+          <div class="pricing-cell">
+            <i class="fas fa-weight-hanging"></i>
+            <strong>Peso</strong>
+            <small>Por kilogramo</small>
+          </div>
+          <div class="pricing-cell">
+            <i class="fas fa-ruler-combined"></i>
+            <strong>Dimensiones</strong>
+            <small>Volumen del paquete</small>
+          </div>
+          <div class="pricing-cell">
+            <i class="fas fa-route"></i>
+            <strong>Distancia</strong>
+            <small>Kilómetros de ruta</small>
+          </div>
+        </div>
       </div>
 
-      <div class="section">
-        <h2><i class="fas fa-info-circle"></i>Definiciones y Alcance del Servicio</h2>
-        <p>Nuestro servicio de encomiendas comprende el transporte, custodia y entrega de paquetes, documentos y mercancías dentro del territorio nacional.</p>
-        
+      <div class="payment-methods">
+        <h4><i class="fas fa-credit-card"></i> Métodos de Pago Aceptados:</h4>
         <div class="visual-list">
           <div class="visual-item">
+            <i class="fas fa-money-bill-wave"></i>
+            <span>Efectivo</span>
+          </div>
+          <div class="visual-item">
+            <i class="fas fa-credit-card"></i>
+            <span>Tarjetas Débito/Crédito</span>
+          </div>
+          <div class="visual-item">
+            <i class="fas fa-university"></i>
+            <span>Transferencias Bancarias</span>
+          </div>
+          <div class="visual-item">
+            <i class="fas fa-mobile-alt"></i>
+            <span>Billetera Digital</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2><i class="fas fa-stopwatch"></i>Tiempos de Entrega</h2>
+
+      <div class="pricing-table">
+        <div class="pricing-header">
+          <h3><i class="fas fa-truck"></i> Opciones de Envío</h3>
+        </div>
+        <div class="pricing-row">
+          <div class="pricing-cell">
             <i class="fas fa-box"></i>
+            <strong>Envío de Empaques</strong>
+          </div>
+          <div class="pricing-cell">
+            <i class="fas fa-envelope"></i>
+            <strong>Envío de Sobres</strong>
+          </div>
+          <div class="pricing-cell">
+            <i class="fas fa-truck"></i>
+            <strong>Envios Masivos</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="data-protection">
+      <h3><i class="fas fa-lock"></i> Tu información está segura</h3>
+      <p>Cumplimos con la Ley de Protección de Datos Personales N° 29733 y su reglamento.</p>
+
+      <div class="subsection">
+        <h4><i class="fas fa-database"></i> Datos que Recopilamos</h4>
+        <div class="data-types">
+          <div class="data-type-item">
+            <i class="fas fa-user-circle"></i>
             <div>
-              <strong>Encomienda:</strong><br>
-              Todo paquete, documento o mercancía confiada para su transporte
+              <strong>Datos de Registro:</strong>
+              <p>Nombre completo, DNI/RUC, teléfono, email, dirección</p>
             </div>
           </div>
-          <div class="visual-item">
-            <i class="fas fa-user"></i>
+          <div class="data-type-item">
+            <i class="fas fa-shipping-fast"></i>
             <div>
-              <strong>Remitente:</strong><br>
-              Persona que envía la encomienda
+              <strong>Datos de Encomiendas:</strong>
+              <p>Direcciones de origen y destino, contenido, valor declarado</p>
             </div>
           </div>
-          <div class="visual-item">
-            <i class="fas fa-user-check"></i>
+          <div class="data-type-item">
+            <i class="fas fa-credit-card"></i>
             <div>
-              <strong>Destinatario:</strong><br>
-              Persona que recibe la encomienda
+              <strong>Datos de Pago:</strong>
+              <p>Información de facturación (no almacenamos datos de tarjetas)</p>
             </div>
           </div>
-          <div class="visual-item">
-            <i class="fas fa-handshake"></i>
+          <div class="data-type-item">
+            <i class="fas fa-chart-bar"></i>
             <div>
-              <strong>Cliente:</strong><br>
-              Tanto remitente como destinatario
+              <strong>Datos de Navegación:</strong>
+              <p>Cookies, IP, actividad en la plataforma</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="section">
-        <h2><i class="fas fa-tasks"></i>Responsabilidades del Cliente</h2>
-        <div class="timeline">
-          <div class="timeline-item">
-            <div class="timeline-icon">
-              <i class="fas fa-info"></i>
-            </div>
-            <div class="timeline-content">
-              <h4>Información Veraz</h4>
-              <p>Proporcionar datos completos y correctos sobre la encomienda</p>
+      <div class="subsection">
+        <h4><i class="fas fa-cogs"></i> Finalidades del Tratamiento</h4>
+        <div class="data-icons">
+          <div class="data-icon">
+            <i class="fas fa-shipping-fast"></i>
+            <p><strong>Procesamiento de Encomiendas</strong><br>Gestión completa del servicio de envíos</p>
+          </div>
+          <div class="data-icon">
+            <i class="fas fa-user-cog"></i>
+            <p><strong>Gestión de Cuentas</strong><br>Creación y mantenimiento de perfiles de usuario</p>
+          </div>
+          <div class="data-icon">
+            <i class="fas fa-comments"></i>
+            <p><strong>Comunicaciones</strong><br>Notificaciones, soporte y actualizaciones</p>
+          </div>
+          <div class="data-icon">
+            <i class="fas fa-chart-line"></i>
+            <p><strong>Mejora de Servicios</strong><br>Análisis y optimización de la plataforma</p>
+          </div>
+          <div class="data-icon">
+            <i class="fas fa-receipt"></i>
+            <p><strong>Facturación</strong><br>Emisión de comprobantes y gestión contable</p>
+          </div>
+          <div class="data-icon">
+            <i class="fas fa-balance-scale"></i>
+            <p><strong>Cumplimiento Legal</strong><br>Obligaciones tributarias y regulatorias</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h4><i class="fas fa-user-check"></i> Tus Derechos como Titular</h4>
+        <div class="rights-grid">
+          <div class="right-item">
+            <i class="fas fa-eye"></i>
+            <div>
+              <strong>Acceso</strong>
+              <p>Conocer qué datos tuyos procesamos</p>
             </div>
           </div>
-          <div class="timeline-item">
-            <div class="timeline-icon">
-              <i class="fas fa-box-open"></i>
-            </div>
-            <div class="timeline-content">
-              <h4>Embalaje Adecuado</h4>
-              <p>Proteger correctamente los productos frágiles</p>
+          <div class="right-item">
+            <i class="fas fa-edit"></i>
+            <div>
+              <strong>Rectificación</strong>
+              <p>Corregir datos inexactos o incompletos</p>
             </div>
           </div>
-          <div class="timeline-item">
-            <div class="timeline-icon">
-              <i class="fas fa-ban"></i>
-            </div>
-            <div class="timeline-content">
-              <h4>Artículos Permitidos</h4>
-              <p>No enviar productos prohibidos por ley</p>
+          <div class="right-item">
+            <i class="fas fa-ban"></i>
+            <div>
+              <strong>Cancelación</strong>
+              <p>Eliminar datos que ya no son necesarios</p>
             </div>
           </div>
-          <div class="timeline-item">
-            <div class="timeline-icon">
-              <i class="fas fa-clock"></i>
-            </div>
-            <div class="timeline-content">
-              <h4>Disponibilidad</h4>
-              <p>Estar presente para la entrega en horarios acordados</p>
+          <div class="right-item">
+            <i class="fas fa-stop-circle"></i>
+            <div>
+              <strong>Oposición</strong>
+              <p>Oponerte al tratamiento en casos específicos</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="section">
-        <h2><i class="fas fa-exclamation-triangle"></i>Artículos Prohibidos</h2>
-        <p>Por motivos de seguridad y legalidad, <strong>NO</strong> aceptamos:</p>
-        
-        <div class="prohibited-grid">
-          <div class="prohibited-item">
-            <i class="fas fa-skull-crossbones"></i>
-            <strong>Sustancias Tóxicas</strong>
+      <div class="subsection">
+        <h4><i class="fas fa-shield-alt"></i> Seguridad de la Información</h4>
+        <div class="security-measures">
+          <div class="security-item">
+            <i class="fas fa-lock"></i>
+            <span>Encriptación SSL/TLS en todas las transmisiones</span>
           </div>
-          <div class="prohibited-item">
-            <i class="fas fa-fire"></i>
-            <strong>Inflamables</strong>
+          <div class="security-item">
+            <i class="fas fa-server"></i>
+            <span>Servidores seguros con acceso restringido</span>
           </div>
-          <div class="prohibited-item">
-            <i class="fas fa-crosshairs"></i>
-            <strong>Armas</strong>
+          <div class="security-item">
+            <i class="fas fa-user-shield"></i>
+            <span>Personal capacitado en protección de datos</span>
           </div>
-          <div class="prohibited-item">
-            <i class="fas fa-pills"></i>
-            <strong>Drogas</strong>
-          </div>
-          <div class="prohibited-item">
-            <i class="fas fa-dollar-sign"></i>
-            <strong>Dinero Efectivo</strong>
-          </div>
-          <div class="prohibited-item">
-            <i class="fas fa-paw"></i>
-            <strong>Animales Vivos</strong>
+          <div class="security-item">
+            <i class="fas fa-history"></i>
+            <span>Copias de seguridad y planes de contingencia</span>
           </div>
         </div>
       </div>
 
-      <div class="section">
-        <h2><i class="fas fa-calculator"></i>Tarifas y Pagos</h2>
-        <p>Nuestras tarifas se calculan según múltiples factores:</p>
-        
-        <div class="pricing-table">
-          <div class="pricing-header">
-            <h3><i class="fas fa-chart-line"></i> Factores de Precio</h3>
+      <div class="subsection">
+        <h4><i class="fas fa-cookie-bite"></i> Política de Cookies</h4>
+        <p>Utilizamos cookies para mejorar tu experiencia de navegación:</p>
+        <div class="cookie-types">
+          <div class="cookie-item">
+            <strong>Cookies Esenciales:</strong>
+            <p>Necesarias para el funcionamiento básico del sitio</p>
           </div>
-          <div class="pricing-row">
-            <div class="pricing-cell">
-              <i class="fas fa-weight-hanging"></i>
-              <strong>Peso</strong>
-              <small>Por kilogramo</small>
-            </div>
-            <div class="pricing-cell">
-              <i class="fas fa-ruler-combined"></i>
-              <strong>Dimensiones</strong>
-              <small>Volumen del paquete</small>
-            </div>
-            <div class="pricing-cell">
-              <i class="fas fa-route"></i>
-              <strong>Distancia</strong>
-              <small>Kilómetros de ruta</small>
-            </div>
+          <div class="cookie-item">
+            <strong>Cookies de Rendimiento:</strong>
+            <p>Nos ayudan a entender cómo interactúas con el sitio</p>
+          </div>
+          <div class="cookie-item">
+            <strong>Cookies de Personalización:</strong>
+            <p>Recuerdan tus preferencias y configuraciones</p>
           </div>
         </div>
-
-        <div class="payment-methods">
-          <h4><i class="fas fa-credit-card"></i> Métodos de Pago Aceptados:</h4>
-          <div class="visual-list">
-            <div class="visual-item">
-              <i class="fas fa-money-bill-wave"></i>
-              <span>Efectivo</span>
-            </div>
-            <div class="visual-item">
-              <i class="fas fa-credit-card"></i>
-              <span>Tarjetas Débito/Crédito</span>
-            </div>
-            <div class="visual-item">
-              <i class="fas fa-university"></i>
-              <span>Transferencias Bancarias</span>
-            </div>
-            <div class="visual-item">
-              <i class="fas fa-mobile-alt"></i>
-              <span>Pagos Móviles</span>
-            </div>
-          </div>
-        </div>
+        <p>Puedes gestionar las cookies desde la configuración de tu navegador.</p>
       </div>
 
-      <div class="section">
-        <h2><i class="fas fa-stopwatch"></i>Tiempos de Entrega</h2>
-        
-        <div class="pricing-table">
-          <div class="pricing-header">
-            <h3><i class="fas fa-truck"></i> Opciones de Envío</h3>
+      <div class="data-retention">
+        <h4><i class="fas fa-calendar-alt"></i> Tiempo de Conservación</h4>
+        <p>Conservamos tus datos personales durante:</p>
+        <ul>
+          <li><strong>Datos de usuario:</strong> Mientras mantengas tu cuenta activa</li>
+          <li><strong>Historial de encomiendas:</strong> 5 años para fines contables y tributarios</li>
+          <li><strong>Datos de comunicación:</strong> 2 años desde el último contacto</li>
+          <li><strong>Cookies:</strong> Según el tipo, entre 30 días y 2 años</li>
+        </ul>
+      </div>
+
+      <p><strong>No compartimos información con terceros sin tu consentimiento, excepto cuando sea requerido por
+          ley.</strong></p>
+    </div>
+
+    <div class="data-protection">
+      <h3><i class="fas fa-user-plus"></i>Registro de Usuario y Cuenta</h3>
+
+      <div class="subsection">
+        <h4><i class="fas fa-clipboard-check"></i> Requisitos para el Registro</h4>
+        <div class="requirements-list">
+          <div class="requirement-item">
+            <i class="fas fa-id-card"></i>
+            <div>
+              <strong>Mayoría de Edad:</strong>
+              <p>Debes ser mayor de 18 años o contar con autorización de un adulto responsable</p>
+            </div>
           </div>
-          <div class="pricing-row">
-            <div class="pricing-cell">
-              <i class="fas fa-bolt"></i>
-              <strong>Express</strong>
-              <small>24-48 horas</small>
-              <div class="progress-bar">
-                <div class="progress-fill" style="width: 90%;">Rápido</div>
-              </div>
+          <div class="requirement-item">
+            <i class="fas fa-check-circle"></i>
+            <div>
+              <strong>Información Veraz:</strong>
+              <p>Todos los datos proporcionados deben ser reales y verificables</p>
             </div>
-            <div class="pricing-cell">
-              <i class="fas fa-truck"></i>
-              <strong>Regular</strong>
-              <small>3-5 días hábiles</small>
-              <div class="progress-bar">
-                <div class="progress-fill" style="width: 60%;">Normal</div>
-              </div>
+          </div>
+          <div class="requirement-item">
+            <i class="fas fa-envelope"></i>
+            <div>
+              <strong>Email Válido:</strong>
+              <p>Necesario para confirmación de cuenta y comunicaciones importantes</p>
             </div>
-            <div class="pricing-cell">
-              <i class="fas fa-moon"></i>
-              <strong>Overnight</strong>
-              <small>Siguiente día</small>
-              <div class="progress-bar">
-                <div class="progress-fill" style="width: 100%;">Ultra</div>
-              </div>
+          </div>
+          <div class="requirement-item">
+            <i class="fas fa-phone"></i>
+            <div>
+              <strong>Teléfono Activo:</strong>
+              <p>Para coordinación de entregas y notificaciones urgentes</p>
             </div>
           </div>
         </div>
       </div>
 
- <!--      <div class="section">
-        <h2><i class="fas fa-shield-alt"></i>Responsabilidad y Seguros</h2>
-        
-        <div class="insurance-cards">
-          <div class="insurance-card">
-            <i class="fas fa-umbrella"></i>
-            <h4>Cobertura Básica</h4>
-            <p><strong>$100</strong></p>
-            <p>Incluido sin costo</p>
-          </div>
-          <div class="insurance-card">
-            <i class="fas fa-shield-alt"></i>
-            <h4>Cobertura Estándar</h4>
-            <p><strong>$500</strong></p>
-            <p>Límite por defecto</p>
-          </div>
-          <div class="insurance-card">
-            <i class="fas fa-crown"></i>
-            <h4>Cobertura Premium</h4>
-            <p><strong>Valor Declarado</strong></p>
-            <p>2% del valor total</p>
-          </div>
-        </div>
-      </div> -->
-
-      <div class="section">
-        <h2><i class="fas fa-exclamation-circle"></i>Política de Reclamos</h2>
-        
-        <div class="timeline">
-          <div class="timeline-item">
-            <div class="timeline-icon">
-              <i class="fas fa-phone"></i>
-            </div>
-            <div class="timeline-content">
-              <h4>1. Contacto Inmediato</h4>
-              <p>Reportar dentro de las 24 horas del incidente</p>
-            </div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-icon">
-              <i class="fas fa-camera"></i>
-            </div>
-            <div class="timeline-content">
-              <h4>2. Evidencia</h4>
-              <p>Proporcionar fotos y número de guía</p>
-            </div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-icon">
-              <i class="fas fa-file-alt"></i>
-            </div>
-            <div class="timeline-content">
-              <h4>3. Formulario</h4>
-              <p>Completar reclamo oficial</p>
-            </div>
-          </div>
-          <div class="timeline-item">
-            <div class="timeline-icon">
-              <i class="fas fa-check-circle"></i>
-            </div>
-            <div class="timeline-content">
-              <h4>4. Respuesta</h4>
-              <p>Resolución en máximo 5 días hábiles</p>
-            </div>
-          </div>
-        </div>
+      <div class="subsection">
+        <h4><i class="fas fa-key"></i> Responsabilidades de la Cuenta</h4>
+        <ul>
+          <li>Mantener la confidencialidad de tu contraseña</li>
+          <li>Notificar inmediatamente cualquier uso no autorizado</li>
+          <li>Actualizar tu información personal cuando sea necesario</li>
+          <li>Usar la cuenta únicamente para fines legítimos</li>
+          <li>No compartir tu cuenta con terceros</li>
+        </ul>
       </div>
 
-      <div class="section">
-        <h2><i class="fas fa-user-shield"></i>Protección de Datos</h2>
-        
-        <div class="data-protection">
-          <h3><i class="fas fa-lock"></i> Tu información está segura</h3>
-          <p>Protegemos tu información personal conforme a la ley.</p>
-          
-          <div class="data-icons">
-            <div class="data-icon">
-              <i class="fas fa-shipping-fast"></i>
-              <p>Procesamiento de Encomiendas</p>
-            </div>
-            <div class="data-icon">
-              <i class="fas fa-comments"></i>
-              <p>Comunicación del Servicio</p>
-            </div>
-            <div class="data-icon">
-              <i class="fas fa-chart-line"></i>
-              <p>Mejora de Servicios</p>
-            </div>
-          </div>
-          
-          <p><strong>No compartimos información con terceros sin tu consentimiento.</strong></p>
-        </div>
-      </div>
-
-      <div class="contact-grid">
-        <a href="tel:+51987654321" class="contact-item">
-          <i class="fas fa-phone"></i>
-          <strong>Llamar</strong>
-          <small>+51 987 654 321</small>
-        </a>
-        <a href="mailto:info@encomiendas.com" class="contact-item">
-          <i class="fas fa-envelope"></i>
-          <strong>Email</strong>
-          <small>info@encomiendas.com</small>
-        </a>
-        <a href="#" class="contact-item">
-          <i class="fab fa-whatsapp"></i>
-          <strong>WhatsApp</strong>
-          <small>Soporte 24/7</small>
-        </a>
-        <a href="{{ url_for('sucursales') }}" class="contact-item">
-          <i class="fas fa-map-marker-alt"></i>
-          <strong>Oficinas</strong>
-          <small>Ver ubicaciones</small>
-        </a>
-      </div>
-
-      <div class="last-updated">
-        <p><strong>Última actualización:</strong> Abril 2025</p>
-        <p>Estos términos pueden ser modificados con previo aviso de 30 días</p>
+      <div class="subsection">
+        <h4><i class="fas fa-ban"></i> Suspensión y Cancelación</h4>
+        <p>Nos reservamos el derecho de suspender o cancelar cuentas en caso de:</p>
+        <ul>
+          <li>Violación de estos términos y condiciones</li>
+          <li>Actividades fraudulentas o ilegales</li>
+          <li>Información falsa o documentación fraudulenta</li>
+          <li>Comportamiento abusivo hacia nuestro personal</li>
+          <li>Incumplimiento reiterado de pagos</li>
+        </ul>
       </div>
     </div>
   </div>
-{% endblock %}
+  {% endblock %}
 
-{% block scripts %}
+  {% block scripts %}
   <script src="/static/js/TerminosCondiciones.js"></script>
-{% endblock %}
+  {% endblock %}
