@@ -1189,6 +1189,35 @@ REPORTES = {
             ['fecha', 'Fecha', None, 'interval_date' ],
         ] ,
     },
+    "reporte_usuarios": {
+        "active": True,
+        "icon_page": "fa-solid fa-users",
+        "titulo": "Reporte de Usuarios",
+        "table": controlador_usuario.get_report_usuarios(),
+        "filters": [
+            ['tipo_usuario', 'Tipo de Usuario', lambda: controlador_usuario.get_options()],
+            ['activo', 'Estado', lambda: [(1, "Activo"), (0, "Inactivo")]],
+        ],
+    },
+   "articulos_mas_vendidos": {
+        "active": True,
+        "icon_page": "fa-solid fa-boxes-stacked",
+        "titulo": "Artículos Más Vendidos",
+        "table": controlador_articulo.get_report_mas_vendidos(),  
+        "filters": [
+            ['fecha', 'Fecha', None, 'interval_date'],
+        ],
+    },
+    "articulos_reposicion": {
+        "active": True,
+        "icon_page": "fa-solid fa-box-open",
+        "titulo": "Reporte de artículos que necesitan reposición",
+        "table": controlador_articulo.get_report_articulos_reposicion,  # sin ()
+        "filters": [
+            ['stock_min', 'Stock Mínimo', None, 'number'],
+        ],
+    }
+
 }
 
 

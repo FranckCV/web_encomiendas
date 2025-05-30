@@ -10,18 +10,14 @@ Contáctanos - Shalom
 
 {% block contenido %}
 <div class="contacto-container">
-    <!-- Banner de bienvenida -->
-    <div class="welcome-banner">
-        <div class="welcome-content">
-            <h2>Contáctanos</h2>
-            <p>Estamos aquí para ayudarte con tus envíos. No dudes en comunicarte con nosotros.</p>
-        </div>
-    </div>
+    
+    <h1 class="head_title">Contáctanos</h1>
+    <h5 class="h5">Estamos aquí para ayudarte con tus envíos. No dudes en comunicarte con nosotros.</h5>
 
     <!-- Sección de información de contacto -->
     <div class="info-contacto">
         <h2>{{SYSTEM_NAME}}</h2>
-        
+
         <div class="info-item">
             <div class="info-icon">
                 <i class="fa-solid fa-location-dot"></i>
@@ -32,7 +28,7 @@ Contáctanos - Shalom
                 Urb. Matute, La Victoria
             </div>
         </div>
-        
+
         <div class="info-item">
             <div class="info-icon">
                 <i class="fa-solid fa-phone"></i>
@@ -43,18 +39,18 @@ Contáctanos - Shalom
                 +51 987 576 777 <span class="whatsapp-text">(Solo Whatsapp)</span>
             </div>
         </div>
-        
+
         <div class="info-item">
             <div class="info-icon">
                 <i class="fa-solid fa-envelope"></i>
             </div>
             <div class="info-titulo">Email</div>
             <div class="info-texto">
-                <a href="mailto:atencionalcliente@shalom.com.pe">atencionalcliente@shalom.com.pe</a><br>
-                <a href="mailto:ventas@shalom.com.pe">ventas@shalom.com.pe</a>
+                <a href="mailto:atencionalcliente@shalom.com.pe">soporte@NewOlva.com.pe</a><br>
+                <a href="mailto:ventas@shalom.com.pe">ventas@NewOlva.com.pe</a>
             </div>
         </div>
-        
+
         <div class="info-item">
             <div class="info-icon">
                 <i class="fa-solid fa-clock"></i>
@@ -73,22 +69,22 @@ Contáctanos - Shalom
                 <label for="nombreCompleto">Nombre Completo</label>
                 <input type="text" class="form-control" id="nombreCompleto" name="nombreCompleto" required>
             </div>
-            
+
             <div class="form-group">
                 <label for="numeroDocumento">Número de Documento</label>
                 <input type="text" class="form-control" id="numeroDocumento" name="numeroDocumento" required>
             </div>
-            
+
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" class="form-control" id="email" name="email" required>
             </div>
-            
+
             <div class="form-group">
                 <label for="telefono">Teléfono</label>
                 <input type="tel" class="form-control" id="telefono" name="telefono" required>
             </div>
-            
+
             <div class="form-group">
                 <label for="servicio">¿Qué servicio deseas descubrir?</label>
                 <select class="form-control" id="servicio" name="servicio" required>
@@ -100,7 +96,7 @@ Contáctanos - Shalom
                     <option value="entrega_domicilio">Entrega a Domicilio</option>
                 </select>
             </div>
-            
+
             <div class="form-group">
                 <label for="enviosMensuales">¿Cuántos envíos al mes? (Estimado)</label>
                 <select class="form-control" id="enviosMensuales" name="enviosMensuales" required>
@@ -112,7 +108,7 @@ Contáctanos - Shalom
                     <option value="mas_100">Más de 100 envíos</option>
                 </select>
             </div>
-            
+
             <div class="form-group">
                 <label for="tipoCliente">Tipo de cliente</label>
                 <select class="form-control" id="tipoCliente" name="tipoCliente" required>
@@ -123,7 +119,7 @@ Contáctanos - Shalom
                     <option value="corporativo">Corporativo</option>
                 </select>
             </div>
-            
+
             <div class="form-group">
                 <label for="sede">Sede</label>
                 <select class="form-control" id="sede" name="sede" required>
@@ -135,12 +131,13 @@ Contáctanos - Shalom
                     <option value="provincia">Provincia</option>
                 </select>
             </div>
-            
+
             <div class="checkbox-group">
                 <input type="checkbox" id="aceptoTerminos" name="aceptoTerminos" required>
-                <label for="aceptoTerminos">Al registrarme, acepto los <a href="{{ url_for('TerminosCondiciones') }}">Términos y condiciones</a></label>
+                <label for="aceptoTerminos">Al registrarme, acepto los <a
+                        href="{{ url_for('TerminosCondiciones') }}">Términos y condiciones</a></label>
             </div>
-            
+
             <button type="submit" class="btn-submit">Enviar</button>
         </form>
     </div>

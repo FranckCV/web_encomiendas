@@ -21,17 +21,18 @@
         }
 
         /* Título caja */
-        .titulo-cajas {
-<<<<<<< HEAD
+        .head_title {
             font-size: 32px;
+            /* filter: brightness(1.9); */
+            /* color: var(--color4); */
             color: #0E1D63;
             text-align: center;
             font-weight: 700;
-            margin: 30px 0 -2px 0;
-=======
-            margin-top: 0px;
->>>>>>> 04279d1bfb16fe5bdcece2c7428ab0bbaf000b24
+            margin-bottom: 10px;
+            /* margin: 30px 0 0px 0; */
+            text-transform: uppercase;
         }
+
 
         /* SECCIÓN DE DETALLES DEL PRODUCTO OPTIMIZADA */
         .producto-detalle {
