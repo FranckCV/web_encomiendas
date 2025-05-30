@@ -2034,12 +2034,7 @@ VALUES
     ('YZA9012', '1519046MNG', '15M25016325O', 22.00, 50.00, 'Unidad para transporte pesado', 'A', 11),
     ('BCD0123', '1519047NNG', '15M25016326P', 19.00, 40.00, 'Camión para largo alcance', 'A', 12);
 
-INSERT INTO estado_reclamo (nombre, activo) VALUES
-('En revisión', 1),
-('Aprobado', 1),
-('Rechazado', 1),
-('En espera', 1),
-('Resuelto', 1);
+
 INSERT INTO tipo_indemnizacion (nombre, descripcion, activo) VALUES 
 ('Pérdida total', 'Indemnización completa en caso de pérdida total del paquete o artículo enviado.', 1),
 ('Daños parciales', 'Indemnización por daños parciales al contenido del paquete.', 1),
