@@ -1,5 +1,5 @@
 INSERT INTO empresa (id, nombre, correo, nro_telefono, logo, color_pri, color_sec, color_ter) VALUES
-(1, 'New Olva', 'info@newolva.com', '+123 456 789', 'a', '#1d4c82', '#13e2da', '#1b98e0');
+(1, 'New Olva', 'info@newolva.com', '+123 456 789', 'logo.png', '#1d4c82', '#13e2da', '#1b98e0');
 
 
 INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo`) VALUES
@@ -2357,10 +2357,59 @@ INSERT INTO estado_reclamo (id, nombre, activo) VALUES
 (5, 'Resuelto', 1);
 
 
-INSERT INTO `estado_encomienda` (`id`, `nombre`, `descripcion`, `activo`) VALUES
+INSERT INTO estado_encomienda (`id`, `nombre`, `descripcion`, `activo`) VALUES
 (1, 'En origen', 'Paquete en sucursal de origen', 1),
 (2, 'En tránsito', 'Paquete en camino', 1),
 (3, 'En destino', 'Paquete en sucursal de destino', 1),
 (4, 'Entregado', 'Paquete entregado', 1);
+
+
+
+INSERT INTO detalle_estado (nombre, descripcion, activo, estado_encomiendaid) VALUES
+('Solicitud registrada', 'Se ha generado una orden de envío en el sistema.', 1, 1),
+('Recepción física en oficina', 'El paquete ha sido recibido físicamente en la oficina de origen.', 1, 1),
+('Validación de contenido', 'El contenido del paquete ha sido verificado por el personal.', 1, 1),
+('Embalaje y etiquetado', 'El paquete fue embalado y etiquetado correctamente.', 1, 1),
+('Esperando programación de ruta', 'El paquete está esperando asignación a una unidad de transporte.', 1, 1),
+('Listo para despacho', 'El paquete está completamente preparado para salir de la oficina de origen.', 1, 1);
+
+INSERT INTO detalle_estado (nombre, descripcion, activo, estado_encomiendaid) VALUES
+('Despachado de oficina origen', 'El paquete ha salido de la oficina de origen.', 1, 2),
+('Abordo del transporte', 'La encomienda está siendo transportada hacia su destino.', 1, 2),
+('Llegada a centro logístico intermedio', 'La encomienda llegó a una central intermedia para redistribución.', 1, 2),
+('Cambio de transporte', 'El paquete ha sido trasladado a otra unidad de transporte.', 1, 2),
+('Revisión de contenido por fiscalización', 'La encomienda fue revisada por control interno o externo.', 1, 2),
+('Retardo por condiciones climáticas', 'Se ha producido un retraso en la ruta por causas climáticas.', 1, 2),
+('Reanudación de tránsito', 'El paquete ha retomado su ruta hacia el destino final.', 1, 2);
+
+INSERT INTO detalle_estado (nombre, descripcion, activo, estado_encomiendaid) VALUES
+('Arribo a oficina destino', 'El paquete ha llegado a la ciudad y oficina de destino.', 1, 3),
+('Descarga y registro', 'El paquete ha sido descargado y registrado en el sistema.', 1, 3),
+('Clasificación para entrega', 'El paquete fue clasificado y preparado para su entrega final.', 1, 3),
+('Asignado a repartidor', 'El paquete ha sido asignado a un repartidor o mensajero.', 1, 3),
+('Intento de entrega fallido', 'No se logró entregar el paquete en el primer intento.', 1, 3),
+('Reprogramación de entrega', 'Se ha programado una nueva fecha para la entrega.', 1, 3),
+('En espera en oficina destino', 'El destinatario puede recoger el paquete en la oficina.', 1, 3);
+
+INSERT INTO detalle_estado (nombre, descripcion, activo, estado_encomiendaid) VALUES
+('Entregado a destinatario', 'El paquete fue entregado directamente al destinatario.', 1, 4),
+('Entregado a tercero autorizado', 'La encomienda fue entregada a un familiar o persona autorizada.', 1, 4),
+('Firma y documento registrados', 'Se registró la firma del receptor y su documento de identidad.', 1, 4),
+('Confirmación vía sistema', 'El cliente ha confirmado la recepción mediante la aplicación.', 1, 4),
+('Observación en entrega', 'Se dejó constancia de observaciones al momento de la entrega.', 1, 4),
+('Entrega finalizada', 'El proceso de entrega se marcó como finalizado en el sistema.', 1, 4);
+
+INSERT INTO detalle_reclamo (nombre, descripcion, estado_reclamoid) VALUES
+('Reclamo registrado', 'El reclamo ha sido registrado exitosamente en el sistema.', 1),
+('Revisión inicial', 'El reclamo está siendo revisado por el área correspondiente.', 4),
+('Solicitud aprobada', 'El reclamo fue aprobado para su resolución.', 2),
+('Solicitud rechazada', 'El reclamo fue rechazado por no cumplir con las condiciones.', 3),
+('Problema solucionado', 'El reclamo fue resuelto y se notificó al cliente.', 5),
+('Pendiente de documentos', 'Se requiere documentación adicional del cliente.', 4),
+('Validación de evidencia', 'Se está validando la evidencia presentada.', 4),
+('Reclamo confirmado', 'El reclamo fue confirmado como procedente.', 2),
+('Reclamo no procedente', 'El reclamo fue evaluado como no procedente.', 3),
+('Caso cerrado', 'El caso fue cerrado y archivado tras resolución.', 5);
+
 
 
