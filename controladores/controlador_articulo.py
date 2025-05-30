@@ -141,18 +141,7 @@ def get_table_with_discount():
     
     return filas
 
-def sql_select_fetchall(sql, params=None):
-    try:
-        conexion = obtener_conexion()
-        cursor = conexion.cursor(dictionary=True)
-        cursor.execute(sql, params or ())
-        resultados = cursor.fetchall()
-        cursor.close()
-        conexion.close()
-        return resultados or []
-    except Exception as e:
-        print(f"Error en consulta SQL: {e}")
-        return []
+
 
 def get_report_mas_vendidos(fecha_inicio=None, fecha_fin=None):
     try:
