@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 24-05-2025 a las 08:55:46
+-- Tiempo de generación: 30-05-2025 a las 03:55:25
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.1.17
 
@@ -18,24 +18,6 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `acceso`
---
-
-CREATE TABLE `acceso` (
-  `paginaid` int(11) NOT NULL,
-  `rolid` int(11) NOT NULL,
-  `permiso` tinyint(1) NOT NULL,
-  `search` tinyint(1) NOT NULL,
-  `consult` tinyint(1) NOT NULL,
-  `insert` tinyint(1) NOT NULL,
-  `update` tinyint(1) NOT NULL,
-  `delete` tinyint(1) NOT NULL,
-  `unactive` tinyint(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Estructura de tabla para la tabla `articulo`
 --
 
@@ -45,7 +27,7 @@ CREATE TABLE `articulo` (
   `precio` decimal(9,2) NOT NULL,
   `stock` int(11) NOT NULL,
   `activo` tinyint(1) NOT NULL,
-  `img` mediumblob NOT NULL,
+  `img` text NOT NULL,
   `dimensiones` varchar(20) DEFAULT NULL,
   `tamaño_cajaid` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -55,26 +37,18 @@ CREATE TABLE `articulo` (
 --
 
 INSERT INTO `articulo` (`id`, `nombre`, `precio`, `stock`, `activo`, `img`, `dimensiones`, `tamaño_cajaid`) VALUES
-(1, 'Accesorios para fiestas - Pack básico', 15.99, 100, 1, '', '20x15x10', 3),
-(2, 'Accesorios electrónicos - Audífonos', 39.90, 50, 1, '', '10x10x5', 2),
-(3, 'Artículos de limpieza - Set hogar', 25.50, 70, 1, '', '30x20x15', 4),
-(4, 'Artículos publicitarios - Llavero logo', 5.00, 200, 1, '', '5x3x1', 1),
-(5, 'Bisutería - Collar artesanal', 12.00, 150, 1, '', '10x10x2', 2),
-(6, 'Caja de cartón reforzada', 8.99, 300, 1, '', '40x30x30', 5),
-(7, 'Tarjetas personales - 100 unidades', 18.00, 80, 1, '', '9x5x1', 1),
-(8, 'Muebles - Mesa pequeña de madera', 120.00, 10, 1, '', '100x50x45', 5),
-(9, 'Ferretería - Juego de destornilladores', 22.90, 60, 1, '', '25x15x5', 3),
-(10, 'Alimentación - Pack snacks saludables', 14.50, 90, 1, '', '30x20x10', 3),
-(11, 'Cosméticos - Set de maquillaje', 35.00, 40, 1, '', '20x15x5', 3),
-(12, 'Electrohogar - Hervidor eléctrico', 75.00, 25, 1, '', '30x25x20', 4),
-(13, 'Juguetes - Muñeca interactiva', 49.99, 30, 1, '', '35x20x15', 4),
-(14, 'Material médico - Guantes (100u)', 9.50, 100, 1, '', '20x10x5', 2),
-(15, 'Medicinas - Kit primeros auxilios', 29.99, 45, 1, '', '25x15x8', 3),
-(16, 'Repuestos - Filtro de aire', 18.75, 60, 1, '', '15x15x5', 2),
-(17, 'Ropa y accesorios - Camiseta básica', 19.00, 120, 1, '', '30x25x2', 3),
-(18, 'Valija documentos - Carpeta reforzada', 11.00, 100, 1, '', '33x25x2', 3),
-(19, 'Útiles de escritorio - Pack escolares', 17.90, 150, 1, '', '25x20x5', 3),
-(20, 'Útiles de oficina - Organizador modular', 27.50, 40, 1, '', '30x20x10', 3);
+(1, 'Caja XXS', 1.50, 100, 1, '/static/img/caja XXS.png', '10×15×10', 1),
+(2, 'Caja XS', 2.00, 100, 1, '/static/img/caja XS.png', '15×20×12', 2),
+(3, 'Caja S', 2.50, 100, 1, '/static/img/caja S.png', '20×30×12', 3),
+(4, 'Caja M', 3.20, 100, 1, '/static/img/caja M.png', '24×30×20', 4),
+(5, 'Caja L', 4.00, 100, 1, '/static/img/caja L.png', '30×42×23', 5),
+(6, 'Plumón Indeleble', 3.00, 100, 1, '/static/img/plumon.png', NULL, NULL),
+(7, 'Sobre A4', 1.00, 100, 0, '/static/img/sobre.png', '21×29.7 cm', NULL),
+(8, 'Cinta de Embalaje', 5.90, 100, 1, '/static/img/cintaEmbalaje.png', '48 mm × 40 m', NULL),
+(9, 'Stretch Film', 12.00, 100, 1, '/static/img/stretchfilm.png', 'Varios tamaños', NULL),
+(10, 'Burbupack', 2.50, 100, 1, '/static/img/burbupack.png', '1 m × 1 m', NULL),
+(11, 'aaa', 5.00, 200, 1, 'yape.png', '10', 5),
+(12, 'hjhg', 6.00, 435, 1, 'yape.png', 'gyf', 5);
 
 -- --------------------------------------------------------
 
@@ -135,8 +109,8 @@ INSERT INTO `causa_reclamo` (`id`, `nombre`, `descripcion`, `motivo_reclamoid`) 
 --
 
 CREATE TABLE `cliente` (
-  `usuarioid` int(10) NOT NULL,
-  `correo` varchar(150) NOT NULL,
+  `id` int(10) NOT NULL,
+  `correo` varchar(250) NOT NULL,
   `telefono` varchar(15) DEFAULT NULL,
   `num_documento` varchar(20) NOT NULL,
   `nombre_siglas` varchar(150) NOT NULL,
@@ -144,6 +118,15 @@ CREATE TABLE `cliente` (
   `tipo_documentoid` int(11) NOT NULL,
   `tipo_clienteid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `cliente`
+--
+
+INSERT INTO `cliente` (`id`, `correo`, `telefono`, `num_documento`, `nombre_siglas`, `apellidos_razon`, `tipo_documentoid`, `tipo_clienteid`) VALUES
+(1, 'fabs@correo.com', '987654321', '12345678', 'Fabiola', 'Mejía', 1, 2),
+(4, 'ana@mail.com', '987654321', '12245678', 'Ana', 'Pérez', 1, 1),
+(5, 'empresa@corp.com', '901234567', '20481234567', 'CORP SAC', 'Soluciones Integrales', 2, 2);
 
 -- --------------------------------------------------------
 
@@ -186,6 +169,81 @@ INSERT INTO `contenido_paquete` (`id`, `nombre`, `activo`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `descuento`
+--
+
+CREATE TABLE `descuento` (
+  `id` int(4) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `descripcion` text DEFAULT NULL,
+  `fecha_inicio` date NOT NULL,
+  `fecha_fin` date NOT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `descuento`
+--
+
+INSERT INTO `descuento` (`id`, `nombre`, `descripcion`, `fecha_inicio`, `fecha_fin`, `activo`) VALUES
+(1, 'Descuento Volumen 25', 'Descuento para compras a partir de 25 unidades', '2024-01-01', '2025-01-01', 1),
+(2, 'Descuento Volumen 50', 'Descuento para compras a partir de 50 unidades', '2024-01-01', '2025-01-01', 1),
+(3, 'Descuento Promocional Verano', 'Descuento especial verano 2024', '2024-06-01', '2024-08-31', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `descuento_articulo`
+--
+
+CREATE TABLE `descuento_articulo` (
+  `descuentoid` int(4) NOT NULL,
+  `articuloid` int(10) NOT NULL,
+  `cantidad_descuento` decimal(9,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `descuento_articulo`
+--
+
+INSERT INTO `descuento_articulo` (`descuentoid`, `articuloid`, `cantidad_descuento`) VALUES
+(1, 1, 1.50),
+(1, 2, 1.80),
+(1, 3, 2.00),
+(1, 4, 2.20),
+(1, 5, 2.50),
+(2, 1, 3.50),
+(2, 2, 3.80),
+(2, 3, 4.00),
+(2, 4, 4.30),
+(2, 5, 4.50);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `detalle_estado`
+--
+
+CREATE TABLE `detalle_estado` (
+  `id` int(10) NOT NULL,
+  `nombre` varchar(50) NOT NULL,
+  `descripcion` text DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
+  `estado_encomiendaid` int(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `detalle_estado`
+--
+
+INSERT INTO `detalle_estado` (`id`, `nombre`, `descripcion`, `activo`, `estado_encomiendaid`) VALUES
+(1, 'Recibido en sucursal', 'El paquete fue recibido', 1, 1),
+(2, 'En ruta', 'Paquete se encuentra en tránsito', 1, 2),
+(3, 'Entregado a destinatario', 'Paquete fue entregado', 1, 4);
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `detalle_venta`
 --
 
@@ -203,7 +261,7 @@ CREATE TABLE `detalle_venta` (
 --
 
 CREATE TABLE `empleado` (
-  `usuarioid` int(10) NOT NULL,
+  `id` int(10) NOT NULL,
   `nombre` varchar(150) NOT NULL,
   `apellidos` varchar(150) NOT NULL,
   `correo` varchar(250) NOT NULL,
@@ -214,7 +272,7 @@ CREATE TABLE `empleado` (
 -- Volcado de datos para la tabla `empleado`
 --
 
-INSERT INTO `empleado` (`usuarioid`, `nombre`, `apellidos`, `correo`, `rolid`) VALUES
+INSERT INTO `empleado` (`id`, `nombre`, `apellidos`, `correo`, `rolid`) VALUES
 (1, 'Ana', 'Ramírez', 'ana@gmail.com', 1),
 (2, 'Juan', 'Perez', 'perez@gmail.com', 1);
 
@@ -226,7 +284,7 @@ INSERT INTO `empleado` (`usuarioid`, `nombre`, `apellidos`, `correo`, `rolid`) V
 
 CREATE TABLE `empleado_salida` (
   `salidaid` int(10) NOT NULL,
-  `empleadousuarioid` int(10) NOT NULL
+  `empleadoid` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -238,20 +296,21 @@ CREATE TABLE `empleado_salida` (
 CREATE TABLE `empresa` (
   `id` int(11) NOT NULL,
   `nombre` varchar(200) NOT NULL,
-  `correo` varchar(200) NOT NULL,
+  `correo` varchar(250) NOT NULL,
   `nro_telefono` varchar(20) NOT NULL,
-  `logo` mediumblob NOT NULL,
+  `logo` text NOT NULL,
   `color_pri` varchar(20) NOT NULL,
   `color_sec` varchar(20) NOT NULL,
-  `color_ter` varchar(20) NOT NULL
+  `color_ter` varchar(20) NOT NULL,
+  `porcentaje_garantia` decimal(9,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `empresa`
 --
 
-INSERT INTO `empresa` (`id`, `nombre`, `correo`, `nro_telefono`, `logo`, `color_pri`, `color_sec`, `color_ter`) VALUES
-(1, 'New Olva', 'info@newolva.com', '+123 456 789', 0x61, '#1d4c82', '#13e2da', '#1b98e0');
+INSERT INTO `empresa` (`id`, `nombre`, `correo`, `nro_telefono`, `logo`, `color_pri`, `color_sec`, `color_ter`, `porcentaje_garantia`) VALUES
+(1, 'New Olva', 'info@newolva.com', '+123 456 789', 'logo.png', '#00209e', '#13e2da', '#1b98e0', 123.00);
 
 -- --------------------------------------------------------
 
@@ -271,11 +330,21 @@ CREATE TABLE `escala` (
 --
 
 CREATE TABLE `estado_encomienda` (
-  `id` int(10) NOT NULL,
-  `nombre` varchar(50) NOT NULL,
-  `descripcion` text DEFAULT NULL,
-  `activo` tinyint(1) NOT NULL DEFAULT 1
+  `id` int(4) NOT NULL,
+  `nombre` varchar(200) NOT NULL,
+  `descripcion` text NOT NULL,
+  `activo` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `estado_encomienda`
+--
+
+INSERT INTO `estado_encomienda` (`id`, `nombre`, `descripcion`, `activo`) VALUES
+(1, 'En origen', 'Paquete en sucursal de origen', 1),
+(2, 'En tránsito', 'Paquete en camino', 1),
+(3, 'En destino', 'Paquete en sucursal de destino', 1),
+(4, 'Entregado', 'Paquete entregado', 1);
 
 -- --------------------------------------------------------
 
@@ -294,11 +363,10 @@ CREATE TABLE `estado_reclamo` (
 --
 
 INSERT INTO `estado_reclamo` (`id`, `nombre`, `activo`) VALUES
-(1, 'En revisión', 1),
-(2, 'Aprobado', 1),
-(3, 'Rechazado', 1),
-(4, 'En espera', 1),
-(5, 'Resuelto', 1);
+(1, 'Pendiente de revisión', 1),
+(2, 'En evaluación', 1),
+(3, 'Finalizado', 1),
+(4, 'Rechazado', 1);
 
 -- --------------------------------------------------------
 
@@ -329,6 +397,24 @@ INSERT INTO `marca` (`id`, `nombre`, `activo`) VALUES
 (10, 'Hyundai', 1),
 (11, 'International', 1),
 (12, 'Kenworth', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `mensaje_contacto`
+--
+
+CREATE TABLE `mensaje_contacto` (
+  `id` int(4) NOT NULL,
+  `nombre` varchar(200) NOT NULL,
+  `nro_documento` varchar(20) NOT NULL,
+  `correo` varchar(250) NOT NULL,
+  `telefono` varchar(15) NOT NULL,
+  `mensaje` text NOT NULL,
+  `tipo_documentoid` int(11) NOT NULL,
+  `tipo_clienteid` int(11) NOT NULL,
+  `sucursalid` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -382,17 +468,17 @@ CREATE TABLE `modelo` (
 
 INSERT INTO `modelo` (`id`, `nombre`, `activo`, `marcaid`, `tipo_unidadid`) VALUES
 (1, 'FH16', 0, 1, 1),
-(2, 'Daily', 1, 2, 2),
-(3, 'R-Series', 1, 3, 1),
-(4, 'Actros', 1, 4, 1),
-(5, 'XF', 1, 5, 1),
-(6, 'Premium Lander', 1, 6, 1),
-(7, '500 Series', 1, 7, 4),
-(8, 'Fighter', 1, 8, 1),
-(9, 'N-Series', 1, 9, 2),
-(10, 'HD65', 1, 10, 5),
-(11, 'ProStar', 1, 11, 1),
-(12, 'T680', 1, 12, 3);
+(2, 'Daily', 0, 2, 2),
+(3, 'R-Series', 0, 3, 1),
+(4, 'Actros', 0, 4, 1),
+(5, 'XF', 0, 5, 1),
+(6, 'Premium Lander', 0, 6, 1),
+(7, '500 Series', 0, 7, 4),
+(8, 'Fighter', 0, 8, 1),
+(9, 'N-Series', 0, 9, 2),
+(10, 'HD65', 0, 10, 5),
+(11, 'ProStar', 0, 11, 1),
+(12, 'T680', 0, 12, 3);
 
 -- --------------------------------------------------------
 
@@ -406,21 +492,22 @@ CREATE TABLE `modulo` (
   `icono` varchar(150) DEFAULT NULL,
   `key` varchar(150) NOT NULL,
   `color` varchar(20) NOT NULL,
-  `activo` tinyint(1) NOT NULL DEFAULT 1
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
+  `img` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `modulo`
 --
 
-INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo`) VALUES
-(1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF\n', 1),
-(2, 'Logística', 'fa-solid fa-truck-front', 'logistica', '#00F068', 1),
-(3, 'Encomiendas', 'fa-solid fa-box', 'encomienda', '#FF5E1A', 1),
-(4, 'Atención al cliente', 'fa-solid fa-circle-question', 'atencion', '#8232D2', 1),
-(5, 'Ventas', 'fa-solid fa-file-invoice-dollar', 'ventas', 'red', 1),
-(6, 'Seguridad', 'fa-solid fa-shield-halved', 'seguridad', '#F0B000', 1),
-(7, 'Personal', 'fa-solid fa-briefcase', 'personal', '#00E0F0', 1);
+INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo`, `img`) VALUES
+(1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF', 1, 'administracion.jpg'),
+(2, 'Logística', 'fa-solid fa-truck-front', 'logistica', '#00F068', 1, 'logistica.jpg'),
+(3, 'Encomiendas', 'fa-solid fa-box', 'encomienda', '#FF5E1A', 1, 'encomienda.jpg'),
+(4, 'Atención al cliente', 'fa-solid fa-circle-question', 'atencion', '#8232D2', 1, 'atencion.jpg'),
+(5, 'Ventas', 'fa-solid fa-file-invoice-dollar', 'ventas', '#ff0000', 1, 'ventas.jpg'),
+(6, 'Seguridad', 'fa-solid fa-shield-halved', 'seguridad', '#F0B000', 1, 'seguridad.jpg'),
+(7, 'Personal', 'fa-solid fa-briefcase', 'personal', '#00E0F0', 1, 'personal.jpg');
 
 -- --------------------------------------------------------
 
@@ -505,10 +592,12 @@ INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `tipo_paginaid`,
 
 CREATE TABLE `paquete` (
   `tracking` int(11) NOT NULL,
+  `clave` char(4) NOT NULL,
   `valor` decimal(9,2) NOT NULL,
   `peso` decimal(9,2) NOT NULL,
   `alto` decimal(9,2) NOT NULL,
   `largo` decimal(9,2) NOT NULL,
+  `precio_ruta` decimal(9,2) NOT NULL,
   `ancho` decimal(9,2) NOT NULL,
   `descripcion` text NOT NULL,
   `direccion_destinatario` varchar(255) DEFAULT NULL,
@@ -524,6 +613,57 @@ CREATE TABLE `paquete` (
   `tipo_empaqueid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `paquete`
+--
+
+INSERT INTO `paquete` (`tracking`, `clave`, `valor`, `peso`, `alto`, `largo`, `precio_ruta`, `ancho`, `descripcion`, `direccion_destinatario`, `telefono_destinatario`, `num_documento_destinatario`, `sucursal_destino_id`, `codigo_postal`, `tipo_documento_destinatario_id`, `contenido_paqueteid`, `tipo_recepcionid`, `salidaid`, `transaccion_encomienda_num_serie`, `tipo_empaqueid`) VALUES
+(2, 'ABCD', 120.00, 3.50, 10.00, 20.00, 15.00, 15.00, 'Paquete de accesorios', 'Calle Falsa 123', '999888777', '76543210', 1, '10212', 1, 1, 2, 1, 2, 1),
+(3, 'EFGH', 250.00, 5.00, 15.00, 25.00, 30.00, 20.00, 'Ropa para temporada', 'Av. Central 456', '988776655', '87654321', 2, '13411', 1, 2, 1, 2, 1, 2),
+(1234, 'abcd', 20.00, 10.00, 2.00, 3.00, 3.00, 2.10, 'No se', NULL, NULL, NULL, 1, '10011', 1, 5, 1, 1, 1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `paquete_descuento`
+--
+
+CREATE TABLE `paquete_descuento` (
+  `paquetetracking` int(11) NOT NULL,
+  `descuentoid` int(4) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `permiso`
+--
+
+CREATE TABLE `permiso` (
+  `paginaid` int(11) NOT NULL,
+  `rolid` int(11) NOT NULL,
+  `acceso` tinyint(1) NOT NULL,
+  `search` tinyint(1) NOT NULL,
+  `consult` tinyint(1) NOT NULL,
+  `insert` tinyint(1) NOT NULL,
+  `update` tinyint(1) NOT NULL,
+  `delete` tinyint(1) NOT NULL,
+  `unactive` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `pregunta_frecuente`
+--
+
+CREATE TABLE `pregunta_frecuente` (
+  `id` int(4) NOT NULL,
+  `titulo` text NOT NULL,
+  `descripcion` text NOT NULL,
+  `activo` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
 
 --
@@ -534,7 +674,7 @@ CREATE TABLE `reclamo` (
   `id` int(10) NOT NULL,
   `nombres_razon` varchar(200) NOT NULL,
   `direccion` text NOT NULL,
-  `correo` varchar(200) NOT NULL,
+  `correo` varchar(250) NOT NULL,
   `telefono` char(9) NOT NULL,
   `n_documento` varchar(11) NOT NULL,
   `monto_indemnizado` decimal(9,2) DEFAULT NULL,
@@ -599,8 +739,19 @@ CREATE TABLE `salida` (
   `id` int(10) NOT NULL,
   `unidadid` int(10) NOT NULL,
   `fecha` date NOT NULL,
-  `hora` time NOT NULL
+  `hora` time NOT NULL,
+  `recojo` tinyint(1) NOT NULL,
+  `entrega` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `salida`
+--
+
+INSERT INTO `salida` (`id`, `unidadid`, `fecha`, `hora`, `recojo`, `entrega`) VALUES
+(1, 4, '2025-05-07', '07:34:15', 0, 0),
+(2, 1, '2024-05-01', '08:30:00', 1, 0),
+(3, 2, '2024-05-03', '14:45:00', 0, 1);
 
 -- --------------------------------------------------------
 
@@ -622,7 +773,7 @@ CREATE TABLE `seguimiento` (
 CREATE TABLE `sucursal` (
   `id` int(10) NOT NULL,
   `abreviatura` char(5) NOT NULL,
-  `codigo_postal` char(5) NOT NULL,
+  `codigo_postal` char(5) DEFAULT NULL,
   `direccion` varchar(150) NOT NULL,
   `horario_l_v` varchar(255) DEFAULT NULL,
   `horario_s_d` varchar(255) DEFAULT NULL,
@@ -633,6 +784,90 @@ CREATE TABLE `sucursal` (
   `activo` tinyint(1) NOT NULL DEFAULT 1,
   `ubigeocodigo` varchar(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `sucursal`
+--
+
+INSERT INTO `sucursal` (`id`, `abreviatura`, `codigo_postal`, `direccion`, `horario_l_v`, `horario_s_d`, `latitud`, `longitud`, `teléfono`, `referencia`, `activo`, `ubigeocodigo`) VALUES
+(1, 'AMA01', '01001', 'Jr. Octavio Ortiz Arrieta 270, Chachapoyas', '8:30am a 1pm y de 3pm a 6pm', '9am a 2pm', -6.232460, -77.872700, '', '', 1, '10101'),
+(2, 'AMA02', '', 'Av. CAHUIDE S/N, CAMPORREDONDO, LUYA - AMAZONAS', '8am a 1pm y de 3pm a 6pm', '8am a 12pm', -6.213162, -78.319717, '', '', 1, '10402'),
+(3, 'AMA03', '', 'JR. MIGUEL GRAU NRO. 275, OCALLI, LUYA - AMAZONAS', '8am a 1pm y de 3pm a 6pm', '8am a 12pm', -6.235146, -78.266227, '', '', 1, '10402'),
+(4, 'AMA05', '', 'Jr. Mesones Muro 394, BAGUA GRANDE. Ref. Frente a la PNP', '8am a 6pm', '8am a 6pm', NULL, NULL, '', '', 1, '10701'),
+(5, 'AMA07', '', 'JR. SAN MARTIN 199 - EL MILAGRO', '9am - 7:00pm', '9am - 7:00pm', NULL, NULL, '', '', 1, '10703'),
+(6, 'ANC01', '', 'Av. Magdalena 240, Casma', '9am a 1pm y de 3pm a 7pm', '9am a 5pm', NULL, NULL, '', '', 1, '20501'),
+(7, 'ANC02', '', 'Av. Alberto Reyes 239, Huarmey', '9am a 1:30pm y de 4:30pm a 8:30pm', '9am a 2pm', NULL, NULL, '', '', 1, '21901'),
+(8, 'ANC03', '', 'JR. INDEPENDENCIA NRO. 310, AIJA - ANCASH', '8am a 1pm y 4pm a 6pm', '8am a 1pm y 4pm a 6pm', NULL, NULL, '', '', 1, '20201'),
+(9, 'ANC11', '', 'Av. Ramón Castilla S/N, Cdra 8 - Caraz', '9am a 1pm y 3pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '20701'),
+(10, 'ANC12', '', 'Av. Arias Graziani S/N Yungay', '9am a 1pm y de 3pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '21501'),
+(11, 'ANC13', '', 'Jr. Manuel Alvarez -1065, Barrio San Bartolomé - Huari.', '9am a 12:30pm y de 2:30pm a 7pm', '9am a 1pm', NULL, NULL, '', '', 1, '140806'),
+(12, 'ANC14', '', 'Av. Agustín Gamarra Nro. 743, Soledad Baja - Huaraz', '9am a 6:30pm', '9am a 3pm', NULL, NULL, '', '', 1, '20101'),
+(13, 'ANC15', '', 'Av Jose Pardo 456, Chimbote', 'Central: 8:30am a 10pm', 'Central: 8:30am a 9pm', NULL, NULL, 'Frente A Plaza De Armas', '', 1, '21301'),
+(14, 'ANC16', '', 'AV. Pacifico Mz. S3 Lt. 36 Urb José Mariátegui, Nuevo Chimbote. Ref: Frente A La Ferretería Becor.', 'Central: 8:30am a 8pm', 'Central: 8:30am a 7pm', NULL, NULL, '', '', 1, '21309'),
+(15, 'ANC17', '', 'Av. 28 De Julio 330, Sihuas', '8am a 1pm y de 3pm a 7pm', '9am a 1pm', NULL, NULL, '', '', 1, '21410'),
+(16, 'APU01', '', 'Jr. Elias N° 118, Abancay', '8am a 1pm y de 3pm a 5:30pm', '8am a 1pm y de 3pm a 5:30pm', NULL, NULL, '', '', 1, '30101'),
+(17, 'APU02', '', 'Av. Panamericana Nro. 503, Curahuasi. Ref: A media cuadra del semáforo.', '9am a 12:30pm y de 3pm a 6pm', '9am a 12:30pm', NULL, NULL, '', '', 1, '30103'),
+(18, 'APU03', '', 'Jr. Juan Francisco Ramos 559, Andahuaylas', '8:30am a 5pm', '8:30am a 1pm', NULL, NULL, '', '', 1, '30301'),
+(19, 'APU04', '', 'Av. Panamericana # 528, Chalhuanca', '9am a 3pm', 'NO HAY ATENCIÓN', NULL, NULL, '', '', 1, '30201'),
+(20, 'APU05', '', 'Av. Los Incas S/N, Uripa, Chincheros.', '9am a 5pm', '9am a 1pm', NULL, NULL, 'Frente a la comisaría de Uripa - Anco Huallo', '', 1, '30705'),
+(21, 'APU06', '', 'Av. Grau 117, Chuquibambilla.', '9am a 1pm y de 3pm a 5pm', '9am a 1pm', NULL, NULL, '', '', 1, '30601'),
+(22, 'ARE01', '', 'Av. San José N.º 103-A, Cercado - Arequipa.', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '40102'),
+(23, 'ARE02', '', 'Av. Parra Nro. 388, Cercado - Arequipa.', '9am a 6:30pm', '9am a 6pm', NULL, NULL, '', '', 1, '40102'),
+(24, 'ARE03', '', 'CALLE MAYTA CAPAC 601 IV CENTENARIO, CERCADO, AREQUIPA', '8:30am a 6pm', '9:30am a 3pm', NULL, NULL, '', '', 1, '40102'),
+(25, 'ARE04', '', 'Av. Panamericana - Pueblo joven El Triunfo ZN B MZ A Lote 12', '8:30am a 1pm y de 2pm a 6pm', '8:30am a 2pm', NULL, NULL, '', '', 1, '40106'),
+(26, 'ARE05', '', 'Calle Miguel Grau 214  Plaza De Las Americas, Cerro Colorado. Arequipa', '9am a 7pm', '9:30am a 3pm', NULL, NULL, '', '', 1, '40105'),
+(27, 'ARE06', '', 'Av. Daniel Alcides Carrión N° 269, José Luis Bustamante Rivero, Arequipa.', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '40110'),
+(28, 'LIM01', '', 'Av. Primavera 275, Barranca', '9am a 7pm', '9am a 5pm', NULL, NULL, '', '', 1, '150701'),
+(29, 'LIM02', '', 'AV.- 26 DE JUNIO 405, Canta.', '8am a 6pm', 'NO HAY ATENCION', NULL, NULL, '', '', 1, '150107'),
+(30, 'LIM03', '', 'Jr. 2 De Mayo 601-D San Vicente, Cañete', '9am a 7pm', '9am a 1pm', NULL, NULL, '', '', 1, '150502'),
+(31, 'LIM04', '', 'Av. Antigua Pan. Sur 243, Mala', '9am a 1pm y 2pm a 6pm', '9am a 2pm', NULL, NULL, '', '', 1, '150505'),
+(32, 'LIM05', '', 'Jr. Mariscal Castilla 117, Huacho', '9am a 8pm', '9am a 5pm', NULL, NULL, '', '', 1, '150701'),
+(33, 'LIM06', '', 'Av. Chancay Nro. 245 - Huaral. Ref. Al frente del Restaurant la Estacion.', '8:30am a 7pm', '8:30am a 6:30pm', NULL, NULL, '', '', 1, '150603'),
+(34, 'LIM07', '', 'Calle Mariscal Sucre Nro. 104, Chancay. Ref: Frente a Panadería El Tanta.', '9am a 1pm y de 3pm a 7pm', '9am a 5pm', NULL, NULL, '', '', 1, '150602'),
+(35, 'LIM08', '', 'Jr. Bolognesi 398, Lurin', '8am a 5pm', '9am a 2pm', NULL, NULL, '', '', 1, '150603'),
+(36, 'LIM09', '', 'Plaza de armas S/N, al frente del hotel Inga, Yauyos-Lima', '8am a 5pm', 'NO HAY ATENCION', NULL, NULL, '', '', 1, '150603'),
+(37, 'CAJ01', '', 'Jr. Los Nogales N° 426, Villa Universitaria, Cajamarca.', '9:00 am a 7:00pm', '9:00am a 7:00 pm', NULL, NULL, '', '', 1, '60101'),
+(38, 'CAJ02', '', 'Jr. Bolognesi 117, Cajabamba. Ref: Esquina del Jr. Zavala y Bologensi, a una cuadra de la RENIEC.', '11:00am a 1:30pm - 4:00pm a 7:30pm', '9am a 1pm', NULL, NULL, '', '', 1, '60201'),
+(39, 'CAJ03', '', 'Esquina entre Bolognesi y Pedro Ortiz Montoya, Celendin.', '9am a 12pm y de 2:30pm a 6pm', '9am a 12pm', NULL, NULL, '', '', 1, '60301'),
+(40, 'CAJ04', '', 'JR. GREGORIO MALCA N° 625, Chota', '8:30am a 7:00 pm', '9:00 am a 1:00pm', NULL, NULL, '', '', 1, '60401'),
+(41, 'CAJ05', '', 'Jr. José Galvez S/N, Contumaza.', '9am a 12pm y de 3pm a 5pm', '9am a 12pm', NULL, NULL, '', '', 1, '60501'),
+(42, 'CAJ06', '', 'Jr. Contumazá 318, Chilete', '8am a 1pm y de 3pm a 7:30pm', '9am a 12pm', NULL, NULL, '', '', 1, '60601'),
+(43, 'CAJ07', '', 'Jr. Ramón Castilla 353, Cutervo', '9am a 1pm y de 3pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '60701'),
+(44, 'CAJ08', '', 'Jr. San Carlos 1015, Bambamarca', '9am a 1pm y de 3pm a 7:30pm', '9am a 1pm', NULL, NULL, '', '', 1, '60801'),
+(45, 'CAJ09', '', 'Jr. Miguel Grau 338, San Miguel.', '9am a 12:30pm y de 2:30pm a 7pm', '9am a 1pm', NULL, NULL, '', '', 1, '60901'),
+(46, 'CAJ10', '', 'Jr. Néstor Batanero Nro. 478, San Pablo.', '8am a 8pm', 'NO HAY ATENCIÓN', NULL, NULL, '', '', 1, '61001'),
+(47, 'CAJ11', '', 'Entre Jr. Miguel Grau y Jr. Túpac Amaru, San Marcos.', '7am a 2pm / 2pm a 5pm', '9am a 12pm', NULL, NULL, '', '', 1, '61101'),
+(48, 'CAJ12', '', 'Jr. Cajamarca 484, Tembladera.', '8am a 7pm', '9am a 1pm', NULL, NULL, '', '', 1, '61201'),
+(49, 'CAJ13', '', 'Calle San Martín 1255, Jaen', '9am a 1 pm / 3pm a 7 pm', '9am a 1 pm / 3pm a 7 pm', NULL, NULL, '', '', 1, '60801'),
+(50, 'CAJ14', '', 'Av. Lindo Nro. 150, Pucará', '8am a 2pm y de 4pm a 6pm', '8am a 2pm y de 4pm a 6pm', NULL, NULL, '', '', 1, '60110'),
+(51, 'CAJ15', '', 'JR.SAN MARTIN #456 - Ref.Frente al parque principal, costado de la agencia agraria.', '9am a 1pm y de 3pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '60102'),
+(52, 'CAJ16', '', 'JR. CAUTIVO S/N, NAMBALLE, SAN IGNACIO', '8am a 1pm y de 3pm a 5pm', '8am a 1pm y de 3pm a 5pm', NULL, NULL, '', '', 1, '60802'),
+(53, 'CAJ17', '', 'Jr. Zarrumillas 150, Santa Cruz.', '8am a 12pm y de 5pm a 6pm', '8am a 12pm', NULL, NULL, '', '', 1, '60111'),
+(54, 'CHI01', '', 'Mariscal Castilla 208, Chiclayo', '8am a 7pm', '9am a 7pm', NULL, NULL, '', '', 1, '140101'),
+(55, 'CHI02', '', 'AV. Miguel Grau 675, Urb. Santa Victoria, Chiclayo', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '140102'),
+(56, 'CHI03', '', 'Av. Tacna 164, Chiclayo', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '140103'),
+(57, 'CHI04', '', 'Calle Torres Paz Nro. 224, Interior C, Pimentel', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '140113'),
+(58, 'CHI05', '', 'Av. Huamachuco Nro. 809, Lambayeque. Frente al parque infantil.', '9am a 2pm y de 3pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '140108'),
+(59, 'TRU01', '', 'Av. Tupac Amaru 1675 Urb Alto Mochica, Trujillo', '9am a 1pm y 1:45pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '130101'),
+(60, 'TRU02', '', 'Av. Santa 1260, Trujillo Ref. A media cuadra del cruce con Av. América', '8am a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '130102'),
+(61, 'TRU03', '', 'Av. España 1234, Trujillo', '8am a 5pm', '9am a 1pm', NULL, NULL, '', '', 1, '130103'),
+(62, 'TRU04', '', 'Calle San Martín 234, Trujillo', '9am a 5pm', '9am a 1pm', NULL, NULL, '', '', 1, '130104'),
+(63, 'TRU05', '', 'Jr. Los Pinos 567, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '130105'),
+(64, 'TRU06', '', 'Av. América 900, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, '130106'),
+(65, 'TRU07', '', 'Jr. Francisco Pizarro 876, Trujillo', '8am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '130107'),
+(66, 'TRU08', '', 'Av. Larco 123, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '130108'),
+(67, 'TRU09', '', 'Calle Grau 321, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, '130109'),
+(68, 'TRU10', '', 'Av. España 789, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '130110'),
+(69, 'TRU11', '', 'Jr. San Juan 456, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, '130111'),
+(70, 'TRU12', '', 'Av. Perú 123, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '130112'),
+(71, 'TRU13', '', 'Jr. Libertad 890, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, '130113'),
+(72, 'TRU14', '', 'Av. Bolívar 456, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '130114'),
+(73, 'TRU15', '', 'Calle Huamachuco 123, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, '130115'),
+(74, 'TRU16', '', 'Av. La Marina 789, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '130116'),
+(75, 'TRU17', '', 'Jr. Cajamarca 456, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, '130117'),
+(76, 'TRU18', '', 'Av. Brasil 123, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '130118'),
+(77, 'TRU19', '', 'Calle San Martín 789, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, '130119'),
+(78, 'TRU20', '', 'Av. 28 de Julio 456, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '130120');
 
 -- --------------------------------------------------------
 
@@ -668,6 +903,43 @@ CREATE TABLE `tarifa_ruta` (
   `sucursal_destino_id` int(10) NOT NULL,
   `tarifa` decimal(9,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `tarifa_ruta`
+--
+
+INSERT INTO `tarifa_ruta` (`sucursal_origen_id`, `sucursal_destino_id`, `tarifa`) VALUES
+(1, 2, 12.50),
+(1, 3, 9.75),
+(1, 4, 14.20),
+(2, 3, 10.30),
+(2, 5, 19.00),
+(3, 6, 11.50),
+(4, 5, 17.00),
+(4, 7, 15.75),
+(5, 8, 13.25),
+(6, 9, 8.95),
+(7, 10, 18.00),
+(8, 11, 12.10),
+(9, 12, 16.50),
+(10, 13, 9.90),
+(11, 14, 14.40),
+(12, 15, 10.80),
+(13, 16, 19.75),
+(14, 17, 8.50),
+(15, 18, 13.95),
+(16, 19, 11.25),
+(17, 20, 18.50),
+(18, 21, 16.10),
+(19, 22, 14.75),
+(20, 23, 9.60),
+(21, 24, 12.85),
+(22, 25, 15.30),
+(23, 26, 10.15),
+(24, 27, 8.75),
+(25, 28, 17.90),
+(26, 29, 13.60),
+(27, 30, 14.95);
 
 -- --------------------------------------------------------
 
@@ -755,6 +1027,14 @@ CREATE TABLE `tipo_empaque` (
   `activo` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `tipo_empaque`
+--
+
+INSERT INTO `tipo_empaque` (`id`, `nombre`, `peso_maximo`, `unidad_medida`, `activo`) VALUES
+(1, 'Caja', 30, 'kg', 1),
+(2, 'Sobre', 5, 'gr', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -812,6 +1092,14 @@ CREATE TABLE `tipo_recepcion` (
   `nombre` varchar(100) NOT NULL COMMENT 'Recojo en tienda\r\nEnvío a domicilio\r\nCon recojo y pago en tienda\r\n ',
   `activo` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `tipo_recepcion`
+--
+
+INSERT INTO `tipo_recepcion` (`id`, `nombre`, `activo`) VALUES
+(1, 'Recepción en sucursal', 1),
+(2, 'Recepción en domicilio', 1);
 
 -- --------------------------------------------------------
 
@@ -901,9 +1189,19 @@ CREATE TABLE `transaccion_encomienda` (
   `id_sucursal_origen` int(11) NOT NULL,
   `fecha` date NOT NULL,
   `hora` time NOT NULL,
+  `direccion_recojo` varchar(255) DEFAULT NULL,
   `clienteid` int(10) NOT NULL,
   `tipo_comprobanteid` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `transaccion_encomienda`
+--
+
+INSERT INTO `transaccion_encomienda` (`num_serie`, `masivo`, `descripcion`, `monto_total`, `recojo_casa`, `id_sucursal_origen`, `fecha`, `hora`, `direccion_recojo`, `clienteid`, `tipo_comprobanteid`) VALUES
+(1, 0, 'aa', 200.00, 1, 1, '2025-05-07', '07:41:27', NULL, 1, 2),
+(2, 0, 'Envío individual', 150.00, 0, 1, '2024-05-01', '08:00:00', 'Av. Principal 123', 1, 1),
+(3, 1, 'Envío masivo a cliente empresa', 500.00, 1, 2, '2024-05-03', '14:00:00', 'Jr. Comercial 456', 4, 2);
 
 -- --------------------------------------------------------
 
@@ -2848,6 +3146,7 @@ CREATE TABLE `unidad` (
   `volumen` decimal(9,2) NOT NULL,
   `descripcion` text DEFAULT NULL,
   `estado` char(1) NOT NULL,
+  `fecha_compra` date DEFAULT NULL,
   `modeloid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -2855,19 +3154,19 @@ CREATE TABLE `unidad` (
 -- Volcado de datos para la tabla `unidad`
 --
 
-INSERT INTO `unidad` (`id`, `placa`, `MTC`, `TUC`, `capacidad`, `volumen`, `descripcion`, `estado`, `modeloid`) VALUES
-(1, 'ABC1234', '1519036CN', '15M25016315E', 10.50, 20.00, 'Unidad para carga pesada', 'A', 1),
-(2, 'XYZ5678', '1519037DN', '15M25016316F', 12.00, 25.00, 'Camión de reparto urbano', 'A', 2),
-(3, 'JKL1234', '1519038EN', '15M25016317G', 15.00, 30.00, 'Unidad de carga mediana', 'A', 3),
-(4, 'QRS2345', '1519039FN', '15M25016318H', 20.00, 35.00, 'Camión de carga pesada', 'A', 4),
-(5, 'TUV3456', '1519040GN', '15M25016319I', 18.00, 40.00, 'Camión para transporte internacional', 'A', 5),
-(6, 'WXY4567', '1519041HN', '15M25016320J', 25.00, 45.00, 'Unidad para transporte de carga', 'A', 6),
-(7, 'LMN5678', '1519042IN', '15M25016321K', 12.50, 28.00, 'Unidad para transporte pesado', 'A', 7),
-(8, 'PQR6789', '1519043JN', '15M25016322L', 14.00, 30.50, 'Camión para carga ligera', 'A', 8),
-(9, 'STU7890', '1519044KN', '15M25016323M', 11.00, 23.00, 'Unidad para transporte urbano', 'A', 9),
-(10, 'VWX8901', '1519045LN', '15M25016324N', 16.50, 34.00, 'Unidad de carga mediana', 'A', 10),
-(11, 'YZA9012', '1519046MN', '15M25016325O', 22.00, 50.00, 'Unidad para transporte pesado', 'A', 11),
-(12, 'BCD0123', '1519047NN', '15M25016326P', 19.00, 40.00, 'Camión para largo alcance', 'A', 12);
+INSERT INTO `unidad` (`id`, `placa`, `MTC`, `TUC`, `capacidad`, `volumen`, `descripcion`, `estado`, `fecha_compra`, `modeloid`) VALUES
+(1, 'ABC1234', '1519036CN', '15M25016315E', 10.50, 20.00, 'Unidad para carga pesada', 'A', NULL, 1),
+(2, 'XYZ5678', '1519037DN', '15M25016316F', 12.00, 25.00, 'Camión de reparto urbano', 'A', NULL, 2),
+(3, 'JKL1234', '1519038EN', '15M25016317G', 15.00, 30.00, 'Unidad de carga mediana', 'A', NULL, 3),
+(4, 'QRS2345', '1519039FN', '15M25016318H', 20.00, 35.00, 'Camión de carga pesada', 'A', NULL, 4),
+(5, 'TUV3456', '1519040GN', '15M25016319I', 18.00, 40.00, 'Camión para transporte internacional', 'A', NULL, 5),
+(6, 'WXY4567', '1519041HN', '15M25016320J', 25.00, 45.00, 'Unidad para transporte de carga', 'A', NULL, 6),
+(7, 'LMN5678', '1519042IN', '15M25016321K', 12.50, 28.00, 'Unidad para transporte pesado', 'A', NULL, 7),
+(8, 'PQR6789', '1519043JN', '15M25016322L', 14.00, 30.50, 'Camión para carga ligera', 'A', NULL, 8),
+(9, 'STU7890', '1519044KN', '15M25016323M', 11.00, 23.00, 'Unidad para transporte urbano', 'A', NULL, 9),
+(10, 'VWX8901', '1519045LN', '15M25016324N', 16.50, 34.00, 'Unidad de carga mediana', 'A', NULL, 10),
+(11, 'YZA9012', '1519046MN', '15M25016325O', 22.00, 50.00, 'Unidad para transporte pesado', 'A', NULL, 11),
+(12, 'BCD0123', '1519047NN', '15M25016326P', 19.00, 40.00, 'Camión para largo alcance', 'A', NULL, 12);
 
 -- --------------------------------------------------------
 
@@ -2877,7 +3176,7 @@ INSERT INTO `unidad` (`id`, `placa`, `MTC`, `TUC`, `capacidad`, `volumen`, `desc
 
 CREATE TABLE `usuario` (
   `id` int(11) NOT NULL,
-  `correo` varchar(255) NOT NULL,
+  `correo` varchar(250) NOT NULL,
   `contrasenia` varchar(255) NOT NULL,
   `tipo_usuario` char(1) NOT NULL,
   `activo` tinyint(1) NOT NULL
@@ -2894,13 +3193,6 @@ INSERT INTO `usuario` (`id`, `correo`, `contrasenia`, `tipo_usuario`, `activo`) 
 --
 -- Índices para tablas volcadas
 --
-
---
--- Indices de la tabla `acceso`
---
-ALTER TABLE `acceso`
-  ADD PRIMARY KEY (`paginaid`,`rolid`),
-  ADD KEY `FKacceso650542` (`rolid`);
 
 --
 -- Indices de la tabla `articulo`
@@ -2920,17 +3212,37 @@ ALTER TABLE `causa_reclamo`
 -- Indices de la tabla `cliente`
 --
 ALTER TABLE `cliente`
-  ADD PRIMARY KEY (`usuarioid`),
+  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `correo` (`correo`),
   ADD UNIQUE KEY `num_documento` (`num_documento`),
-  ADD KEY `FKcliente66106` (`tipo_documentoid`),
-  ADD KEY `FKcliente404372` (`tipo_clienteid`);
+  ADD KEY `FKcliente404372` (`tipo_clienteid`),
+  ADD KEY `FKcliente66106` (`tipo_documentoid`);
 
 --
 -- Indices de la tabla `contenido_paquete`
 --
 ALTER TABLE `contenido_paquete`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `descuento`
+--
+ALTER TABLE `descuento`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `descuento_articulo`
+--
+ALTER TABLE `descuento_articulo`
+  ADD PRIMARY KEY (`descuentoid`,`articuloid`),
+  ADD KEY `FKdescuento_822045` (`articuloid`);
+
+--
+-- Indices de la tabla `detalle_estado`
+--
+ALTER TABLE `detalle_estado`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FKdetalle_es814073` (`estado_encomiendaid`);
 
 --
 -- Indices de la tabla `detalle_venta`
@@ -2943,7 +3255,7 @@ ALTER TABLE `detalle_venta`
 -- Indices de la tabla `empleado`
 --
 ALTER TABLE `empleado`
-  ADD PRIMARY KEY (`usuarioid`),
+  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `correo` (`correo`),
   ADD KEY `FKempleado961716` (`rolid`);
 
@@ -2951,8 +3263,8 @@ ALTER TABLE `empleado`
 -- Indices de la tabla `empleado_salida`
 --
 ALTER TABLE `empleado_salida`
-  ADD PRIMARY KEY (`salidaid`,`empleadousuarioid`),
-  ADD KEY `FKempleado_s308635` (`empleadousuarioid`);
+  ADD PRIMARY KEY (`salidaid`,`empleadoid`),
+  ADD KEY `FKempleado_s895470` (`empleadoid`);
 
 --
 -- Indices de la tabla `empresa`
@@ -2986,6 +3298,15 @@ ALTER TABLE `marca`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indices de la tabla `mensaje_contacto`
+--
+ALTER TABLE `mensaje_contacto`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `FKmensaje_co839897` (`sucursalid`),
+  ADD KEY `FKmensaje_co632658` (`tipo_clienteid`),
+  ADD KEY `FKmensaje_co868453` (`tipo_documentoid`);
+
+--
 -- Indices de la tabla `metodo_pago`
 --
 ALTER TABLE `metodo_pago`
@@ -3003,8 +3324,8 @@ ALTER TABLE `metodo_pago_venta`
 --
 ALTER TABLE `modelo`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `FKmodelo121578` (`marcaid`),
-  ADD KEY `FKmodelo83299` (`tipo_unidadid`);
+  ADD KEY `FKmodelo83299` (`tipo_unidadid`),
+  ADD KEY `FKmodelo121578` (`marcaid`);
 
 --
 -- Indices de la tabla `modulo`
@@ -3024,32 +3345,52 @@ ALTER TABLE `motivo_reclamo`
 --
 ALTER TABLE `pagina`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `FKpagina910561` (`tipo_paginaid`),
-  ADD KEY `FKpagina193794` (`moduloid`);
+  ADD KEY `FKpagina193794` (`moduloid`),
+  ADD KEY `FKpagina910561` (`tipo_paginaid`);
 
 --
 -- Indices de la tabla `paquete`
 --
 ALTER TABLE `paquete`
   ADD PRIMARY KEY (`tracking`),
-  ADD KEY `FKpaquete148321` (`transaccion_encomienda_num_serie`),
-  ADD KEY `FKpaquete532667` (`tipo_recepcionid`),
-  ADD KEY `FKpaquete691155` (`salidaid`),
-  ADD KEY `FKpaquete992725` (`tipo_documento_destinatario_id`),
+  ADD KEY `FKpaquete94264` (`tipo_empaqueid`),
   ADD KEY `FKpaquete329420` (`contenido_paqueteid`),
-  ADD KEY `FKpaquete94264` (`tipo_empaqueid`);
+  ADD KEY `FKpaquete992725` (`tipo_documento_destinatario_id`),
+  ADD KEY `FKpaquete691155` (`salidaid`),
+  ADD KEY `FKpaquete532667` (`tipo_recepcionid`),
+  ADD KEY `FKpaquete148321` (`transaccion_encomienda_num_serie`);
+
+--
+-- Indices de la tabla `paquete_descuento`
+--
+ALTER TABLE `paquete_descuento`
+  ADD PRIMARY KEY (`paquetetracking`,`descuentoid`),
+  ADD KEY `FKpaquete_de412901` (`descuentoid`);
+
+--
+-- Indices de la tabla `permiso`
+--
+ALTER TABLE `permiso`
+  ADD PRIMARY KEY (`paginaid`,`rolid`),
+  ADD KEY `FKpermiso814160` (`rolid`);
+
+--
+-- Indices de la tabla `pregunta_frecuente`
+--
+ALTER TABLE `pregunta_frecuente`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indices de la tabla `reclamo`
 --
 ALTER TABLE `reclamo`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `FKreclamo902505` (`estado_reclamoid`),
-  ADD KEY `FKreclamo501927` (`tipo_indemnizacionid`),
-  ADD KEY `FKreclamo680466` (`paquetetracking`),
-  ADD KEY `FKreclamo555298` (`ubigeocodigo`),
+  ADD KEY `FKreclamo970308` (`tipo_documentoid`),
   ADD KEY `FKreclamo820690` (`causa_reclamoid`),
-  ADD KEY `FKreclamo970308` (`tipo_documentoid`);
+  ADD KEY `FKreclamo555298` (`ubigeocodigo`),
+  ADD KEY `FKreclamo680466` (`paquetetracking`),
+  ADD KEY `FKreclamo501927` (`tipo_indemnizacionid`),
+  ADD KEY `FKreclamo902505` (`estado_reclamoid`);
 
 --
 -- Indices de la tabla `rol`
@@ -3078,7 +3419,6 @@ ALTER TABLE `seguimiento`
 ALTER TABLE `sucursal`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `abreviatura` (`abreviatura`),
-  ADD UNIQUE KEY `codigo_postal` (`codigo_postal`),
   ADD KEY `FKsucursal756715` (`ubigeocodigo`);
 
 --
@@ -3159,16 +3499,16 @@ ALTER TABLE `tipo_unidad`
 --
 ALTER TABLE `transaccion_encomienda`
   ADD PRIMARY KEY (`num_serie`),
-  ADD KEY `FKtransaccio662746` (`tipo_comprobanteid`),
-  ADD KEY `FKtransaccio902557` (`clienteid`);
+  ADD KEY `FKtransaccio308913` (`clienteid`),
+  ADD KEY `FKtransaccio662746` (`tipo_comprobanteid`);
 
 --
 -- Indices de la tabla `transaccion_venta`
 --
 ALTER TABLE `transaccion_venta`
   ADD PRIMARY KEY (`num_serie`,`tipo_comprobanteid`),
-  ADD KEY `FKtransaccio293973` (`tipo_comprobanteid`),
-  ADD KEY `FKtransaccio533784` (`clienteid`);
+  ADD KEY `FKtransaccio322313` (`clienteid`),
+  ADD KEY `FKtransaccio293973` (`tipo_comprobanteid`);
 
 --
 -- Indices de la tabla `ubigeo`
@@ -3201,7 +3541,7 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de la tabla `articulo`
 --
 ALTER TABLE `articulo`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `causa_reclamo`
@@ -3213,7 +3553,7 @@ ALTER TABLE `causa_reclamo`
 -- AUTO_INCREMENT de la tabla `cliente`
 --
 ALTER TABLE `cliente`
-  MODIFY `usuarioid` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `contenido_paquete`
@@ -3222,10 +3562,22 @@ ALTER TABLE `contenido_paquete`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
+-- AUTO_INCREMENT de la tabla `descuento`
+--
+ALTER TABLE `descuento`
+  MODIFY `id` int(4) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de la tabla `detalle_estado`
+--
+ALTER TABLE `detalle_estado`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT de la tabla `empleado`
 --
 ALTER TABLE `empleado`
-  MODIFY `usuarioid` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `empresa`
@@ -3237,7 +3589,7 @@ ALTER TABLE `empresa`
 -- AUTO_INCREMENT de la tabla `estado_encomienda`
 --
 ALTER TABLE `estado_encomienda`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(4) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `estado_reclamo`
@@ -3250,6 +3602,12 @@ ALTER TABLE `estado_reclamo`
 --
 ALTER TABLE `marca`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT de la tabla `mensaje_contacto`
+--
+ALTER TABLE `mensaje_contacto`
+  MODIFY `id` int(4) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `metodo_pago`
@@ -3291,7 +3649,13 @@ ALTER TABLE `pagina`
 -- AUTO_INCREMENT de la tabla `paquete`
 --
 ALTER TABLE `paquete`
-  MODIFY `tracking` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `tracking` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1235;
+
+--
+-- AUTO_INCREMENT de la tabla `pregunta_frecuente`
+--
+ALTER TABLE `pregunta_frecuente`
+  MODIFY `id` int(4) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `reclamo`
@@ -3309,13 +3673,13 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `salida`
 --
 ALTER TABLE `salida`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `sucursal`
 --
 ALTER TABLE `sucursal`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
 -- AUTO_INCREMENT de la tabla `tamanio_caja`
@@ -3345,7 +3709,7 @@ ALTER TABLE `tipo_documento`
 -- AUTO_INCREMENT de la tabla `tipo_empaque`
 --
 ALTER TABLE `tipo_empaque`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `tipo_indemnizacion`
@@ -3363,7 +3727,7 @@ ALTER TABLE `tipo_pagina`
 -- AUTO_INCREMENT de la tabla `tipo_recepcion`
 --
 ALTER TABLE `tipo_recepcion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `tipo_reclamo`
@@ -3387,7 +3751,7 @@ ALTER TABLE `tipo_unidad`
 -- AUTO_INCREMENT de la tabla `transaccion_encomienda`
 --
 ALTER TABLE `transaccion_encomienda`
-  MODIFY `num_serie` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `num_serie` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `unidad`
@@ -3404,13 +3768,6 @@ ALTER TABLE `usuario`
 --
 -- Restricciones para tablas volcadas
 --
-
---
--- Filtros para la tabla `acceso`
---
-ALTER TABLE `acceso`
-  ADD CONSTRAINT `FKacceso288305` FOREIGN KEY (`paginaid`) REFERENCES `pagina` (`id`),
-  ADD CONSTRAINT `FKacceso650542` FOREIGN KEY (`rolid`) REFERENCES `rol` (`id`);
 
 --
 -- Filtros para la tabla `articulo`
@@ -3432,6 +3789,19 @@ ALTER TABLE `cliente`
   ADD CONSTRAINT `FKcliente66106` FOREIGN KEY (`tipo_documentoid`) REFERENCES `tipo_documento` (`id`);
 
 --
+-- Filtros para la tabla `descuento_articulo`
+--
+ALTER TABLE `descuento_articulo`
+  ADD CONSTRAINT `FKdescuento_629531` FOREIGN KEY (`descuentoid`) REFERENCES `descuento` (`id`),
+  ADD CONSTRAINT `FKdescuento_822045` FOREIGN KEY (`articuloid`) REFERENCES `articulo` (`id`);
+
+--
+-- Filtros para la tabla `detalle_estado`
+--
+ALTER TABLE `detalle_estado`
+  ADD CONSTRAINT `FKdetalle_es814073` FOREIGN KEY (`estado_encomiendaid`) REFERENCES `estado_encomienda` (`id`);
+
+--
 -- Filtros para la tabla `detalle_venta`
 --
 ALTER TABLE `detalle_venta`
@@ -3448,8 +3818,8 @@ ALTER TABLE `empleado`
 -- Filtros para la tabla `empleado_salida`
 --
 ALTER TABLE `empleado_salida`
-  ADD CONSTRAINT `FKempleado_s308635` FOREIGN KEY (`empleadousuarioid`) REFERENCES `empleado` (`usuarioid`),
-  ADD CONSTRAINT `FKempleado_s707218` FOREIGN KEY (`salidaid`) REFERENCES `salida` (`id`);
+  ADD CONSTRAINT `FKempleado_s707218` FOREIGN KEY (`salidaid`) REFERENCES `salida` (`id`),
+  ADD CONSTRAINT `FKempleado_s895470` FOREIGN KEY (`empleadoid`) REFERENCES `empleado` (`id`);
 
 --
 -- Filtros para la tabla `escala`
@@ -3457,6 +3827,14 @@ ALTER TABLE `empleado_salida`
 ALTER TABLE `escala`
   ADD CONSTRAINT `FKescala650496` FOREIGN KEY (`salidaid`) REFERENCES `salida` (`id`),
   ADD CONSTRAINT `FKescala667165` FOREIGN KEY (`sucursalid`) REFERENCES `sucursal` (`id`);
+
+--
+-- Filtros para la tabla `mensaje_contacto`
+--
+ALTER TABLE `mensaje_contacto`
+  ADD CONSTRAINT `FKmensaje_co632658` FOREIGN KEY (`tipo_clienteid`) REFERENCES `tipo_cliente` (`id`),
+  ADD CONSTRAINT `FKmensaje_co839897` FOREIGN KEY (`sucursalid`) REFERENCES `sucursal` (`id`),
+  ADD CONSTRAINT `FKmensaje_co868453` FOREIGN KEY (`tipo_documentoid`) REFERENCES `tipo_documento` (`id`);
 
 --
 -- Filtros para la tabla `metodo_pago_venta`
@@ -3496,6 +3874,20 @@ ALTER TABLE `paquete`
   ADD CONSTRAINT `FKpaquete992725` FOREIGN KEY (`tipo_documento_destinatario_id`) REFERENCES `tipo_documento` (`id`);
 
 --
+-- Filtros para la tabla `paquete_descuento`
+--
+ALTER TABLE `paquete_descuento`
+  ADD CONSTRAINT `FKpaquete_de412901` FOREIGN KEY (`descuentoid`) REFERENCES `descuento` (`id`),
+  ADD CONSTRAINT `FKpaquete_de604728` FOREIGN KEY (`paquetetracking`) REFERENCES `paquete` (`tracking`);
+
+--
+-- Filtros para la tabla `permiso`
+--
+ALTER TABLE `permiso`
+  ADD CONSTRAINT `FKpermiso451923` FOREIGN KEY (`paginaid`) REFERENCES `pagina` (`id`),
+  ADD CONSTRAINT `FKpermiso814160` FOREIGN KEY (`rolid`) REFERENCES `rol` (`id`);
+
+--
 -- Filtros para la tabla `reclamo`
 --
 ALTER TABLE `reclamo`
@@ -3523,7 +3915,7 @@ ALTER TABLE `salida`
 --
 ALTER TABLE `seguimiento`
   ADD CONSTRAINT `FKseguimient381900` FOREIGN KEY (`paquetetracking`) REFERENCES `paquete` (`tracking`),
-  ADD CONSTRAINT `FKseguimient857034` FOREIGN KEY (`estado_encomiendaid`) REFERENCES `estado_encomienda` (`id`);
+  ADD CONSTRAINT `FKseguimient915034` FOREIGN KEY (`estado_encomiendaid`) REFERENCES `detalle_estado` (`id`);
 
 --
 -- Filtros para la tabla `sucursal`
@@ -3542,15 +3934,15 @@ ALTER TABLE `tarifa_ruta`
 -- Filtros para la tabla `transaccion_encomienda`
 --
 ALTER TABLE `transaccion_encomienda`
-  ADD CONSTRAINT `FKtransaccio662746` FOREIGN KEY (`tipo_comprobanteid`) REFERENCES `tipo_comprobante` (`id`),
-  ADD CONSTRAINT `FKtransaccio902557` FOREIGN KEY (`clienteid`) REFERENCES `cliente` (`usuarioid`);
+  ADD CONSTRAINT `FKtransaccio308913` FOREIGN KEY (`clienteid`) REFERENCES `cliente` (`id`),
+  ADD CONSTRAINT `FKtransaccio662746` FOREIGN KEY (`tipo_comprobanteid`) REFERENCES `tipo_comprobante` (`id`);
 
 --
 -- Filtros para la tabla `transaccion_venta`
 --
 ALTER TABLE `transaccion_venta`
   ADD CONSTRAINT `FKtransaccio293973` FOREIGN KEY (`tipo_comprobanteid`) REFERENCES `tipo_comprobante` (`id`),
-  ADD CONSTRAINT `FKtransaccio533784` FOREIGN KEY (`clienteid`) REFERENCES `cliente` (`usuarioid`);
+  ADD CONSTRAINT `FKtransaccio322313` FOREIGN KEY (`clienteid`) REFERENCES `cliente` (`id`);
 
 --
 -- Filtros para la tabla `unidad`
