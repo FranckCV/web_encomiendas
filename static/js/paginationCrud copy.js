@@ -15,44 +15,18 @@ document.addEventListener("DOMContentLoaded", function () {
   function applyFilters() {
     const activeFilters = {};
     filters.forEach(filter => {
-      const type = filter.dataset.type;
-      const id = filter.id;
-      const value = filter.value;
-
-      if (!activeFilters[id]) activeFilters[id] = {};
-      activeFilters[id].type = type;
-      activeFilters[id].value = value;
+      activeFilters[filter.id] = filter.value;
+      // console.log(filter.value);
     });
 
-
-    const searchTerm = searchInput?.value?.trim().toLowerCase() || '';
+    const searchTerm = searchInput.value.trim().toLowerCase() || '';
 
     filteredRows = allRows.filter(row => {
-      const matchesFilters = Object.entries(activeFilters).every(([id, config]) => {
-        const dataType = config.type;
-        const filterValue = config.value;
-        const dataKey = id.replace(/_ini$|_fin$/, '');
-
-        const rowValue = row.dataset[dataKey]; // formato YYYY-MM-DD en dataset
-
-        if (filterValue === "") return true; // sin filtro
-
-        if (dataType === 'date') {
-          return rowValue === filterValue;
-        }
-
-        if (dataType === 'date_ini') {
-          return rowValue >= filterValue;
-        }
-
-        if (dataType === 'date_fin') {
-          return rowValue <= filterValue;
-        }
-
-        return rowValue === filterValue;
+      const matchesFilters = Object.entries(activeFilters).every(([key, value]) => {
+        return value === FILTER_VALUE_DEFAULT || row.getAttribute(`data-${key}`) === value;
       });
 
-      const matchesSearch = !searchInput || Array.from(row.querySelectorAll("p"))
+      const matchesSearch = Array.from(row.querySelectorAll("p"))
         .some(cell => cell.textContent.toLowerCase().includes(searchTerm));
 
       return matchesFilters && matchesSearch;
@@ -61,7 +35,6 @@ document.addEventListener("DOMContentLoaded", function () {
     currentPage = 1;
     showPage(currentPage);
   }
-
 
   function showPage(page) {
     rowsPerPage = parseInt(selectCantidad.value);
@@ -159,11 +132,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (currentPage < totalPages) showPage(currentPage + 1);
   });
 
-  if (searchInput) {
-    searchInput.addEventListener("input", () => {
-      applyFilters();
-    });
-  }
+  searchInput.addEventListener("input", () => {
+    applyFilters();
+  });
 
   // Inicialización
   applyFilters();

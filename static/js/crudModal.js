@@ -10,9 +10,128 @@ function openModal(idmodal) {
     modalClonado.style.display = 'flex';
     overlay.style.display = 'flex';
 
-    // Llenar selects dinámicamente al abrir el modal
     llenarSelectsDelModal(modalClonado);
+
+    const mapContainer = modalClonado.querySelector('.map_space[data-has-map]');
+    if (mapContainer) {
+        const uniqueMapId = 'map_' + Date.now();
+        const mapDiv = document.createElement('div');
+        mapDiv.id = uniqueMapId;
+        mapDiv.style.height = '250px';
+        mapDiv.style.width = '400px';
+        mapContainer.appendChild(mapDiv);
+
+        // Obtener inputs ANTES de crear el mapa
+        const direccionInput = modalClonado.querySelector('#direccion');
+        const latitudInput = modalClonado.querySelector('#latitud');
+        const longitudInput = modalClonado.querySelector('#longitud');
+        const codigoPostalInput = modalClonado.querySelector('#codigo_postal');
+
+        let currentMarker = null;
+
+        // Coordenadas guardadas
+        let initialLat = -9.1900;
+        let initialLng = -75.0152;
+        let initialZoom = 5;
+
+        const latSaved = parseFloat(latitudInput?.value);
+        const lngSaved = parseFloat(longitudInput?.value);
+
+        if (!isNaN(latSaved) && !isNaN(lngSaved)) {
+            initialLat = latSaved;
+            initialLng = lngSaved;
+            initialZoom = 16;
+        }
+
+        const map = L.map(uniqueMapId).setView([initialLat, initialLng], initialZoom);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        function reverseGeocode(lat, lng) {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (direccionInput) direccionInput.value = data.display_name || '';
+                    if (latitudInput) latitudInput.value = lat.toFixed(6);
+                    if (longitudInput) longitudInput.value = lng.toFixed(6);
+
+                    const address = data.address || {};
+                    if (codigoPostalInput) codigoPostalInput.value = address.postcode || '';
+                })
+                .catch(() => {
+                    if (direccionInput) direccionInput.value = 'Error al obtener dirección';
+                    if (latitudInput) latitudInput.value = lat.toFixed(6);
+                    if (longitudInput) longitudInput.value = lng.toFixed(6);
+                });
+        }
+
+        // Mostrar marcador si ya hay coordenadas guardadas
+        if (!isNaN(latSaved) && !isNaN(lngSaved)) {
+    currentMarker = L.marker([latSaved, lngSaved]).addTo(map);
+    currentMarker.bindPopup(`
+        <div style="text-align: center;">
+            <strong>Ubicación Guardada</strong><br>
+            <small>Lat: ${latSaved.toFixed(6)}<br>Lng: ${lngSaved.toFixed(6)}</small>
+        </div>
+    `).openPopup();
+
+    // Solo hacer reverseGeocode si direccion o codigo postal están vacíos
+    const direccionVacia = !direccionInput?.value?.trim();
+    const postalVacio = !codigoPostalInput?.value?.trim();
+    if (direccionVacia || postalVacio) {
+        reverseGeocode(latSaved, lngSaved);
+    }
 }
+
+
+        // Al hacer clic en el mapa
+        map.on('click', function (e) {
+            const { lat, lng } = e.latlng;
+
+            if (currentMarker) map.removeLayer(currentMarker);
+            currentMarker = L.marker([lat, lng]).addTo(map);
+            currentMarker.bindPopup(`
+                <div style="text-align: center;">
+                    <strong>Ubicación Seleccionada</strong><br>
+                    <small>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}</small>
+                </div>
+            `).openPopup();
+
+            reverseGeocode(lat, lng);
+        });
+
+        map.getContainer().style.cursor = 'crosshair';
+
+        // Buscador de direcciones
+        L.Control.geocoder({
+            defaultMarkGeocode: false,
+            placeholder: 'Buscar dirección...',
+            errorMessage: 'No se encontró el lugar',
+            geocoder: L.Control.Geocoder.nominatim({ geocodingQueryParams: { countrycodes: 'pe' } })
+        })
+            .on('markgeocode', function (e) {
+                const latlng = e.geocode.center;
+                map.setView(latlng, 16);
+
+                if (currentMarker) map.removeLayer(currentMarker);
+                currentMarker = L.marker(latlng).addTo(map);
+                currentMarker.bindPopup(`
+                    <div style="text-align: center;">
+                        <strong>Resultado de Búsqueda</strong><br>
+                        <small>Lat: ${latlng.lat.toFixed(6)}<br>Lng: ${latlng.lng.toFixed(6)}</small>
+                    </div>
+                `).openPopup();
+
+                reverseGeocode(latlng.lat, latlng.lng);
+            })
+            .addTo(map);
+    }
+}
+
 
 function closeModal() {
     const overlay = document.getElementById('overlayModal');
@@ -150,7 +269,7 @@ document.addEventListener('change', (e) => {
         const input = e.target;
         const imgPrev = input.closest('.form_img').querySelector('img');
 
-        if ( e.target.files && e.target.files[0] ) {
+        if (e.target.files && e.target.files[0]) {
             const reader = new FileReader();
             reader.onload = function (event) {
                 imgPrev.src = event.target.result;
@@ -159,7 +278,6 @@ document.addEventListener('change', (e) => {
         }
     }
 });
-
 
 
 

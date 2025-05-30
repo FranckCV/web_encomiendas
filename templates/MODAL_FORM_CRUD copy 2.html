@@ -145,23 +145,6 @@
           </div>
           {% endif %}
 
-        {% elif campo[3] == 'decimal_6' %}
-          <input id="{{campo[0]}}" name="{{campo[0]}}"
-            type="number" placeholder="{{campo[2]}}"
-            step="0.000001"
-            {% if campo[4] %}required{% endif %}
-            {% if campo[5] == False or modo_modal == 'consult' %}disabled{% endif %}
-            value="{% if fila and fila[campo[0]] != None %}{{fila[campo[0]]}}{% endif %}">
-
-        {% elif campo[3] == 'decimal_2' %}
-          <input id="{{campo[0]}}" name="{{campo[0]}}"
-            type="number" placeholder="{{campo[2]}}"
-            step="0.01"
-            {% if campo[4] %}required{% endif %}
-            {% if campo[5] == False or modo_modal == 'consult' %}disabled{% endif %}
-            value="{% if fila and fila[campo[0]] != None %}{{fila[campo[0]]}}{% endif %}">
-
-
         {% else %}
           <input id="{{campo[0]}}" name="{{campo[0]}}"
             type="{{campo[3]}}" placeholder="{{campo[2]}}"
@@ -185,22 +168,142 @@
           width: 600px;
         }
       </style>
-
-      {% if modo_modal == 'consult' %}
-      <!-- <style>
-        .map_space::before {
-          content: '';
-          position: absolute;
-        }
-        </style> -->
-      {% endif %}
-
       <div class="map_content" >
         <label for="">Seleccione una ubicación del mapa</label>
+        <div class="map_space" style="width: 400px;">
 
-        <div class="map_space" data-has-map="true">
+          <style>
+            @import url("https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css");
+            @import url("../static/css/sucursales.css");
+            @import url("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css");
+
+            #map {
+              width: 100%;
+              height: 275px;
+              /* aspect-ratio: 1 / 1; */
+              border-radius: 8px;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+              cursor: crosshair;
+            }
+          </style>
+          <div id="map"></div>
+
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+          <script>
+            const map = L.map('map').setView([-9.1900, -75.0152], 5); // Vista centrada en Perú
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+          </script>
+          <script>
+            document.addEventListener('DOMContentLoaded', function () {
+
+            {% for campo in fields_form %}
+            {% if campo[6] == 'map' %}
+            const {{campo[0]}}Input = document.getElementById('{{campo[0]}}');
+            {% endif %}
+            {% endfor %}
+
+            // const direccionInput = document.getElementById('direccion');
+            // const codigo_postalInput = document.getElementById('codigo_postal');
+            // const latitudInput = document.getElementById('latitud');
+            // const longitudInput = document.getElementById('longitud');
+
+            let currentMarker = null;
+
+            function reverseGeocode(lat, lng) {
+                const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1`;
+
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error en la respuesta del servidor');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data && data.display_name) {
+                            direccionInput.value = data.display_name || '';
+                            latitudInput.value = lat.toFixed(6);
+                            longitudInput.value = lng.toFixed(6);
+                            
+                            const address = data.address || {};
+                            codigo_postalInput.value = address.postcode || 'No disponible';
+                        } else {
+                            throw new Error('No se encontró información para esta ubicación');
+                        }
+                    })
+                    .catch(error => {
+                        latitudInput.value = lat.toFixed(6);
+                        longitudInput.value = lng.toFixed(6);
+                        direccionInput.value = 'Error al obtener dirección';
+                    });
+            }
+
+            if (typeof map !== 'undefined') {
+                map.setView([-9.1900, -75.0152], 6);
+                
+                map.on('click', function(e) {
+                    const { lat, lng } = e.latlng;
+                    
+                    if (currentMarker) {
+                        map.removeLayer(currentMarker);
+                    }
+                    
+                    currentMarker = L.marker([lat, lng]).addTo(map);
+                    currentMarker.bindPopup(`
+                        <div style="text-align: center;">
+                            <strong>Ubicación Seleccionada</strong><br>
+                            <small>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}</small>
+                        </div>
+                    `).openPopup();
+                    
+                    reverseGeocode(lat, lng);
+                });
+                
+                map.getContainer().style.cursor = 'crosshair';
+            } else {
+
+            }
+
+            L.Control.geocoder({
+            defaultMarkGeocode: false,
+            placeholder: 'Buscar dirección...',
+            errorMessage: 'No se encontró el lugar',
+            geocoder: L.Control.Geocoder.nominatim({
+            geocodingQueryParams: {
+                countrycodes: 'pe'
+            }
+        })
+
+        })
+        .on('markgeocode', function(e) {
+            const latlng = e.geocode.center;
+            map.setView(latlng, 16);
+
+            if (currentMarker) {
+                map.removeLayer(currentMarker);
+            }
+
+            currentMarker = L.marker(latlng).addTo(map);
+            currentMarker.bindPopup(`
+                <div style="text-align: center;">
+                    <strong>Resultado de Búsqueda</strong><br>
+                    <small>Lat: ${latlng.lat.toFixed(6)}<br>Lng: ${latlng.lng.toFixed(6)}</small>
+                </div>
+                `).openPopup();
+
+                reverseGeocode(latlng.lat, latlng.lng);
+            })
+            .addTo(map);
+
+
+
+        });
+          </script>
+          <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
         </div>
-
       </div>
     {% endif %}
 
