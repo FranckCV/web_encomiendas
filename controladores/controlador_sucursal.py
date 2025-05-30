@@ -44,7 +44,7 @@ def get_table():
             s.abreviatura,
             s.codigo_postal,
             s.direccion,
-            CONCAT(u.distrito, "/", u.provincia, "/", u.departamento) AS ubigeo,
+            CONCAT(u.departamento, " / ", u.provincia, " / ", u.distrito) AS ubigeo,
             s.ubigeocodigo,
             s.horario_l_v,
             s.horario_s_d,

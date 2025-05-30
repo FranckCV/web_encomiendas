@@ -6,7 +6,7 @@ Selector de Ubicación
 
 {% block estilos %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-<link rel="stylesheet" href="../static/css/sucursales.css">
+<!-- <link rel="stylesheet" href="../static/css/sucursales.css"> -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 
 <style>
@@ -159,15 +159,8 @@ Selector de Ubicación
 
 {% block contenido %}
 <div class="ubicacion-container">
-    <!-- <h1 class="ubicacion-titulo">Selector de Ubicación</h1>
-    <p class="ubicacion-subtitle">Haz clic en el mapa para seleccionar una ubicación y obtener sus datos</p> -->
-    
     <div class="row">
         <div class="col-lg-8 col-md-7">
-            <!-- <div class="instrucciones">
-                <h5><i class="fa-solid fa-info-circle"></i> Instrucciones</h5>
-                <p>Haz clic en cualquier punto del mapa para obtener automáticamente la dirección, código postal y coordenadas de esa ubicación.</p>
-            </div> -->
             <div id="map"></div>
         </div>
         
@@ -284,6 +277,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const longitudInput = document.getElementById('longitud');
     const paisInput = document.getElementById('pais');
     const ciudadInput = document.getElementById('ciudad');
+    
     const btnLimpiar = document.getElementById('btn-limpiar');
     const btnGuardar = document.getElementById('btn-guardar');
     const statusMessage = document.getElementById('status-message');

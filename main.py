@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify  #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import permiso as permiso
+from controladores import controlador_paquete as controlador_paquete
 from controladores import controlador_tipo_pagina as controlador_tipo_pagina
 from controladores import controlador_modulo as controlador_modulo
 from controladores import controlador_empresa as controlador_empresa
@@ -475,7 +476,7 @@ CONTROLADORES = {
             ['stock',       'Stock',           'Stock',       'number',     True ,     True  ,        None ],
             ['dimensiones', 'Dimensiones',     'Dimensiones', 'text',     True ,     True  ,        None ],
             ['tamaño_cajaid','Tamaño Caja',    'Tamaño Caja', 'select',     True ,     True  ,        [lambda: controlador_tamanio_caja.get_options() , 'tam_nombre' ]  ],
-            ['img',         'Imagen',          'Imagen',      'text',     True ,     True  ,        None ],
+            ['img',         'Imagen',          'Imagen',      'img',     True ,     True  ,        None ],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
         ],
         "crud_forms": {
@@ -625,29 +626,29 @@ CONTROLADORES = {
         "controlador": controlador_sucursal,
         "icon_page" : "ri-store-3-line",
         "filters":[
-            ],
+        ],
+
         "fields_form": [
     #         ID/NAME         LABEL              PLACEHOLDER        TYPE       REQUIRED   ABLE/DISABLE   DATOS
             ['id',            'ID',              'ID',              'text',      True ,    False,      True ],
-            ['abreviatura',   'Abreviatura',     'Abreviatura',     'text',      True ,    True,       None ],
-            ['codigo_postal', 'Código Postal',   'Código Postal',   'text',      True ,    True,       None ],
-            ['direccion',     'Dirección',       'Dirección',       'text',      True ,    True,       None ],
-            ['ubigeocodigo',  'Ubigeo',          'Elegir ubigeo',   'select',    True ,    True,       [lambda: controlador_ubigeo.get_options(), 'ubigeo'] ],
-            ['horario_l_v',   'Horario L-V',     'Ej: 9am - 6pm',   'text',      False,    True,       None ],
-            ['horario_s_d',   'Horario S-D',     'Ej: 9am - 1pm',   'text',      False,    True,       None ],
-            ['latitud',       'Latitud',         'Latitud',         'text',      False,    True,       None ],
-            ['longitud',      'Longitud',        'Longitud',        'text',      False,    True,       None ],
-            ['teléfono',      'Teléfono',        'Teléfono',        'text',      False,    True,       None ],
-            ['referencia',    'Referencia',      'Referencia',      'text',      False,    True,       None ],
             ['activo',        f'{TITLE_STATE}',  'activo',          'p',         True ,    False,      None ],
+            ['codigo_postal', 'Código Postal',   'Código Postal',   'text',      True ,    True,       'map' ],
+            ['abreviatura',   'Abreviatura',     'Abreviatura',     'text',      True ,    True,       None ],
+            ['ubigeocodigo',  'Ubigeo',          'Elegir ubigeo',   'select',    True ,    True,       [lambda: controlador_ubigeo.get_options(), 'ubigeo'] ],
+            ['direccion',     'Dirección',       'Dirección',       'text',      True ,    True,       'map' ],
+            ['teléfono',      'Teléfono',        'Teléfono',        'text',      False,    True,       None ],
+            ['horario_l_v',   'Horario L-V',     'Ej: 9am - 6pm',   'text',      False,    True,       None ],
+            ['latitud',       'Latitud',         'Latitud',         'decimal_6',    False,    True,       'map' ],
+            ['horario_s_d',   'Horario S-D',     'Ej: 9am - 1pm',   'text',      False,    True,       None ],
+            ['referencia',    'Referencia',      'Referencia',      'text',      False,    True,       None ],
+            ['longitud',      'Longitud',        'Longitud',        'decimal_6',    False,    True,       'map' ],
         ],
-
         "crud_forms": {
             "crud_list": True ,
             "crud_search": True ,
-            "crud_consult": True ,
+            "crud_consult": True , 
             "crud_insert": True ,
-            "crud_update": True ,
+            "crud_update": True , 
             "crud_delete": True ,
             "crud_unactive": True ,
         }
@@ -1005,7 +1006,9 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-     "descuento": {
+    
+    # huh?
+    "descuento": {
         "active" : True ,
         "titulo": "Descuentos",
         "icon_page": 'fa-solid fa-percent',
@@ -1033,7 +1036,7 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-         "descuento_articulo": {
+    "descuento_articulo": {
         "active" : True ,
         "titulo": "Descuentos de artículos",
         "icon_page": 'fa-solid fa-percent',
@@ -1063,20 +1066,21 @@ CONTROLADORES = {
 # ADICIONAL (NO CRUD)
     "modulo": {
         "active" : True ,
-        "no_crud" : True ,
+        "no_crud" : 'administrar_paginas' ,
         # "titulo": "marcas de unidades",
         # "nombre_tabla": "marca",
         "controlador": controlador_modulo,
         # "icon_page": 'fa-solid fa-car-side',
         # "filters": [
-        #     ['activo', f'{TITLE_STATE}', get_options_active() ],
         # ] ,
-#         "fields_form": [
-# #            ID/NAME   LABEL     PLACEHOLDER  TYPE     REQUIRED   ABLE/DISABLE   DATOS
-#             ['id',     'ID',     'ID',        'text',  True ,     False ,        None ],
-#             ['nombre', 'Nombre', 'Nombre',    'text',  True ,     True ,         None ],
-#             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-#         ],
+        "fields_form" : [
+        #   ID/NAME    LABEL              PLACEHOLDER    TYPE       REQUIRED   ABLE/DISABLE   DATOS
+            ['nombre', 'Nombre del módulo', 'Nombre',   'text',    True ,     True,          None ],
+            ['activo', 'Actividad',         'Color',    'p',       True,      True,          None ],
+            ['icono',  'Icono',             'Icono',    'icon',    True ,     True,          None ],
+            ['color',  'Color',             'color',    'color',   True,      True,          None ],
+            ['img',  'Imagen',             'Imagen',    'img',   True,      True,          None ],
+        ],
         "crud_forms": {
             "crud_list": True ,
             "crud_search": True ,
@@ -1155,7 +1159,7 @@ REPORTES = {
         ] ,
         
     },
-        "lista_empleados": {
+    "lista_empleados": {
         "active" : True ,
         'icon_page' : 'fa-solid fa-clipboard-user' ,
         "titulo": "Listado de empleados",
@@ -1165,7 +1169,6 @@ REPORTES = {
         ] ,
         
     },
-
     "ventas_periodo": {
         "active" : True ,
         'icon_page' : 'fa-solid fa-sack-dollar' ,
@@ -1173,8 +1176,17 @@ REPORTES = {
         "table" : controlador_cliente.get_reporte_ventas(),
         "filters": [
             # ['rol_id', 'Rol', lambda: controlador_rol.get_options() , 'select' ],
-            ['fecha', 'Fecha', None, 'date' ],
-            ['fecha', 'Fecha', None, 'date' ],
+            ['fecha', 'Fecha', None, 'interval_date' ], 
+            # ['fecha', 'Fecha', None, 'date' ],
+        ] ,
+    },
+    "paquete_estado_fecha": {
+        "active" : True ,
+        'icon_page' : 'fa-solid fa-box' ,
+        "titulo": "Listado de paquetes por estado actual y fecha",
+        "table" : controlador_paquete.get_report_test(),
+        "filters": [
+            ['fecha', 'Fecha', None, 'interval_date' ],
         ] ,
     },
 }
@@ -1593,6 +1605,8 @@ def inject_globals():
 
     return dict(
         # todo el sistema
+        # URL_IMG_LOGO           = f'/static/img/img_empresa/{controlador_empresa.get_logo()}' ,
+        URL_IMG_LOGO           = f'/static/img/img_empresa/logo.png' ,
         main_information = main_information ,
         cookie_error = cookie_error,
         datosUsuario = datosUsuario ,
@@ -1609,7 +1623,6 @@ def inject_globals():
 
 
         # constantes
-        URL_IMG_LOGO           = f'/static/img/img_empresa/{controlador_empresa.get_logo()}' ,
         MENU_ADMIN             = MENU_ADMIN,
         HABILITAR_ICON_PAGES   = HABILITAR_ICON_PAGES,
         SYSTEM_NAME            = main_information['nombre'],
@@ -1837,7 +1850,7 @@ def dashboard(module_name):
 
 
 @app.route("/crud=<tabla>")
-@validar_empleado()
+# @validar_empleado()
 def crud_generico(tabla):
     config = CONTROLADORES.get(tabla)
     if config:
@@ -1922,13 +1935,12 @@ def reporte(report_name):
             )
 
 @app.route("/transaccion=<tabla>")
-@validar_empleado()
+# @validar_empleado()
 def crud_transaccion(tabla):
     config = TRANSACCIONES.get(tabla)
     if config:
         active = config["active"]
-        no_crud = config.get('no_crud')
-        if active is True and (no_crud is None or no_crud is False):
+        if active is True :
             icon_page_crud = get_icon_page(config.get("icon_page"))
             titulo = config["titulo"]
             controlador = config["controlador"]
@@ -1982,12 +1994,12 @@ def administrar_paginas():
     roles = permiso.get_lista_roles()
     tipos_rol = permiso.get_lista_tipo_roles()
     cants_mod = permiso.get_cants_modulos()
+
     fields_form_modulo = [
-#        ID/NAME   LABEL              PLACEHOLDER    TYPE       REQUIRED   ABLE/DISABLE   DATOS
-        # ['id',     'ID',                'ID',       'text',    True ,     True,          None ],
+    #   ID/NAME    LABEL              PLACEHOLDER    TYPE       REQUIRED   ABLE/DISABLE   DATOS
         ['nombre', 'Nombre del módulo', 'Nombre',   'text',    True ,     True,          None ],
-        ['icono',  'Icono',             'Icono',    'icon',    True ,     True,          None ],
         ['activo', 'Actividad',         'Color',    'p',       True,      True,          None ],
+        ['icono',  'Icono',             'Icono',    'icon',    True ,     True,          None ],
         ['color',  'Color',             'color',    'color',   True,      True,          None ],
         ['img',  'Imagen',             'Imagen',    'img',   True,      True,          None ],
     ]
@@ -2001,6 +2013,7 @@ def administrar_paginas():
         ['icono',         'Icono',             'Icono',      'icon',    True ,   True   ,      None ],
     ]
     
+
     return render_template(
         'administrar_paginas.html' ,
         modulos = modulos ,
@@ -2061,6 +2074,7 @@ def crud_insert(tabla):
             return "Tabla no soportada", 404
 
         active = config["active"]
+        no_crud = config.get('no_crud')
 
         if active is False:
             return "Tabla no soportada", 404
@@ -2070,12 +2084,26 @@ def crud_insert(tabla):
 
         valores = []
         for nombre, parametro in firma.parameters.items():
-            valor = request.form.get(nombre)
-            valores.append(valor)
+            # valor = request.form.get(nombre)
+            # valores.append(valor)
+            if nombre in request.files:
+                archivo = request.files[nombre]
+                if archivo.filename != "":
+                    nuevo_nombre = guardar_imagen_bd('empresa' ,archivo)
+                    valores.append(nuevo_nombre)
+                else:
+                    # Si no se selecciona una nueva imagen, mantener la actual
+                    valores.append(request.form.get(f"{nombre}_actual"))
+            else:
+                valor = request.form.get(nombre)
+                valores.append(valor)
 
         controlador.insert_row( *valores )
 
-        return redirect(url_for('crud_generico', tabla = tabla))
+        if no_crud :
+            return redirect(url_for(no_crud))
+        else:
+            return redirect(url_for('crud_generico', tabla = tabla))
     # except Exception as e:
     #     return f"No se aceptan carácteres especiales", 400
 
@@ -2090,6 +2118,8 @@ def crud_update(tabla):
             return "Tabla no soportada", 404
 
         active = config["active"]
+        no_crud = config.get('no_crud')
+
         # no_crud = config["no_crud"]
 
         if active is False:
@@ -2104,8 +2134,10 @@ def crud_update(tabla):
             valores.append(valor)
 
         controlador.update_row( *valores )
-
-        return redirect(url_for('crud_generico', tabla = tabla))
+        if no_crud :
+            return redirect(url_for(no_crud))
+        else:
+            return redirect(url_for('crud_generico', tabla = tabla))
     # except Exception as e:
     #     return f"No se aceptan carácteres especiales", 400
 
