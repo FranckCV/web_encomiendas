@@ -57,7 +57,6 @@ import inspect
 
 app = Flask(__name__, template_folder='templates')
 
-# url_img_logo = f'/static/img/img_empresa/{controlador_empresa.get_logo()}'
 STATE_0              = configuraciones.STATE_0
 STATE_1              = configuraciones.STATE_1
 TITLE_STATE          = configuraciones.TITLE_STATE
@@ -1663,8 +1662,8 @@ def inject_globals():
 
     return dict(
         # todo el sistema
-        # URL_IMG_LOGO           = f'/static/img/img_empresa/{controlador_empresa.get_logo()}' ,
-        URL_IMG_LOGO           = f'/static/img/img_empresa/logo.png' ,
+        URL_IMG_LOGO           = f'/static/img/img_empresa/{controlador_empresa.get_logo()}' ,
+        # URL_IMG_LOGO           = f'/static/img/img_empresa/logo.png' ,
         main_information = main_information ,
         cookie_error = cookie_error,
         datosUsuario = datosUsuario ,

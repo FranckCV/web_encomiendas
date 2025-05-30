@@ -47,10 +47,9 @@ def get_table():
             art.dimensiones,
             tam.nombre as tam_nombre,
             art.tamaño_cajaid,
-            art.img,
             art.activo
         FROM {table_name} art
-        LEFT JOIN tamanio_caja tam ON tam.id = art.tamaño_cajaid;
+        LEFT JOIN tamanio_caja tam ON tam.id = art.tamaño_cajaid
     '''
     columnas = {
         'id': ['ID', 0.5], 
@@ -141,7 +140,8 @@ def get_table_with_discount():
     
     return filas
 
-def sql_select_fetchall(sql, params=None):
+
+def my_sql_select_fetchall(sql, params=None):
     try:
         conexion = obtener_conexion()
         cursor = conexion.cursor(dictionary=True)
@@ -187,7 +187,7 @@ def get_report_mas_vendidos(fecha_inicio=None, fecha_fin=None):
             'stock': ['Stock', 1],
         }
 
-        filas = sql_select_fetchall(sql, tuple(params))
+        filas = my_sql_select_fetchall(sql, tuple(params))
         return columnas, filas
 
     except Exception as e:
@@ -218,7 +218,7 @@ def get_report_articulos_reposicion(stock_min=10):
             'precio': ['Precio', 1],
         }
 
-        filas = sql_select_fetchall(sql, (stock_min,))
+        filas = my_sql_select_fetchall(sql, (stock_min,))
         return columnas, filas
 
     except Exception as e:
