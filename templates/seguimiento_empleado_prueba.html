@@ -149,7 +149,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
   <script>
     // Variable para la placa desde Flask
-    const placaSeleccionada = "{{ placa if placa else '' }}";
+    const placaSeleccionada = {{ placa|default('""')|tojson }};
     
     // Resto del código JavaScript...
     let map
@@ -166,7 +166,7 @@
     // Datos de vehículos - MODIFICAR para usar placas reales
     const vehicles = [
       {
-        id: 'ABC-123', // Usar placa en lugar de VH001
+        id: 'VH001', // Usar placa en lugar de VH001
         driver: 'Carlos Mendoza',
         status: 'active',
         origin: 'Chiclayo, Lambayeque',

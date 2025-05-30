@@ -37,7 +37,7 @@ def table_fetchall():
 def get_table():
     sql= f'''
         SELECT
-        id, 
+        s.id, 
     CONCAT(e.nombre, ' ', e.apellidos) AS nom_conductor,
     u.placa,
     ub.departamento AS destino,
@@ -60,11 +60,11 @@ INNER JOIN ubigeo ub ON ub.codigo = su.ubigeocodigo
     columnas = {
         'id': ['ID' , 0.5 ] , 
         'nom_conductor' : ['Conductor' , 1 ] , 
-        'placa' : ['Placa de unidad' , 5.5] , 
+        'placa' : ['Placa' , 1] , 
         'destino' : ['Destino' , 3.5] , 
-        'fecha' : ['Fecha' , 1] , 
+        'fecha' : ['Fecha' , 1.2] , 
         'hora' : ['Hora' , 1] , 
-        'capacidad' : ['Capacidad' , 3.5] , 
+        'capacidad' : ['Capacidad' , 1.5] , 
         'estado' : ['Estado' , 3.5] ,
 
         }

@@ -1964,13 +1964,12 @@ def reporte(report_name):
             )
 
 @app.route("/transaccion=<tabla>")
-@validar_empleado()
+# @validar_empleado()
 def crud_transaccion(tabla):
     config = TRANSACCIONES.get(tabla)
     if config:
         active = config["active"]
-        no_crud = config.get('no_crud')
-        if active is True and (no_crud is None or no_crud is False):
+        if active is True :
             icon_page_crud = get_icon_page(config.get("icon_page"))
             titulo = config["titulo"]
             controlador = config["controlador"]

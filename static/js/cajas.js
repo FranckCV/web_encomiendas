@@ -219,7 +219,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-
+   /*  // Agregar al carrito con validación
+    if (addToCartBtn) {
+        addToCartBtn.addEventListener('click', () => {
+            const quantity = parseInt(qtyInput.value);
+            if (quantity > 0 && quantity <= maxQuantity) {
+                // Calcular precio final
+                const productData = productSizes[currentSize];
+                let finalPrice = productData.price;
+                
+                if (quantity >= 50 && productData.discounts[50]) {
+                    finalPrice = productData.discounts[50];
+                } else if (quantity >= 25 && productData.discounts[25]) {
+                    finalPrice = productData.discounts[25];
+                }
+                
+                const totalPrice = (finalPrice * quantity).toFixed(2);
+                
+                // Aquí iría la lógica para agregar al carrito
+                alert(`Se han agregado ${quantity} unidades de caja ${currentSize.toUpperCase()} al carrito\nPrecio unitario: S/ ${finalPrice.toFixed(2)}\nTotal: S/ ${totalPrice}`);
+            } else {
+                highlightLimit();
+            }
+        });
+    } */
+    
     // Botones de tamaño
     const sizeBtns = document.querySelectorAll('.size-btn');
     sizeBtns.forEach(btn => {

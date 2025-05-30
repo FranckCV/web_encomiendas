@@ -186,13 +186,19 @@
 
               {% if crud_consult %}
                 {% if esTransaccion %}
-                  <a href="{{ url_for('salida_informacion') }}" class="btn_consult">
-                    <i class="{{ICON_CONSULT}}"></i>
-                  </a>
-                {% else %}
-                  <button class="clickable-modal btn_consult" id="modal_crud_consult_{{tabla}}_{{fila[primary_key]}}">
+              <div class="opciones_fila">
+                <a href="{{ url_for('salida_informacion') }}" >
+                  <button class="btn_consult">
                     <i class="{{ICON_CONSULT}}"></i>
                   </button>
+                </a>
+              </div>
+                {% else %}
+              <div class="opciones_fila">
+                <button class="clickable-modal btn_consult" id="modal_crud_consult_{{tabla}}_{{fila[primary_key]}}">
+                  <i class="{{ICON_CONSULT}}"></i>
+                </button>
+              </div>
                 {% endif %}
               {% endif %}
 
@@ -215,9 +221,13 @@
 
               {% if crud_update %}
                 {% if esTransaccion %}
-                  <a href="{{ url_for('salida_informacion') }}" class="btn_update">
+              <div class="opciones_fila">
+                <a href="{{ url_for('salida_informacion') }}" >
+                  <button class="btn_update">
                     <i class="{{ICON_UPDATE}}"></i>
-                  </a>
+                  </button>
+                </a>
+              </div>
                 {% else %}
                   <button class="clickable-modal btn_update" id="modal_crud_update_{{tabla}}_{{fila[primary_key]}}">
                     <i class="{{ICON_UPDATE}}"></i>
@@ -234,11 +244,15 @@
               {% endif %}
 
 
-                          {% if esTransaccion %}
-              <a href="{{ url_for('seguimiento_empleado_prueba', id='VH001') }}" class="btn btn-secondary btn-small">
-                <i class="fa-solid fa-location-dot"></i>
-                Seguir
-              </a>
+              {% if esTransaccion %}
+              <div class="opciones_fila">
+                <a href="{{ url_for('seguimiento_empleado_prueba', placa='VH001') }}">
+                  <button  class="btn btn-secondary btn-small" style="padding: inherit;">
+                  <i class="fa-solid fa-location-dot"></i>
+
+                  </button>
+                </a>
+              </div>
 
             {% endif %}
 
