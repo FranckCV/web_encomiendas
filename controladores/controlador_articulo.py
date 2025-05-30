@@ -163,11 +163,15 @@ def get_report_mas_vendidos(fecha_inicio=None, fecha_fin=None):
                 COALESCE(SUM(dv.cantidad), 0) AS total_vendido,
                 a.stock
             FROM articulo a
-            LEFT JOIN detalle_venta dv ON a.id = dv.articuloid
-            LEFT JOIN transaccion_venta tv ON dv.num_serie = tv.num_serie AND dv.tipo_comprobanteid = tv.tipo_comprobanteid
+            LEFT JOIN detalle_venta dv 
+                ON a.id = dv.articuloid
+            LEFT JOIN transaccion_venta tv 
+                ON dv.ventanum_serie = tv.num_serie 
+                AND dv.ventatipo_comprobanteid = tv.tipo_comprobanteid
             WHERE 1=1
         '''
         params = []
+
         if fecha_inicio and fecha_fin:
             if len(fecha_inicio) == 10 and len(fecha_fin) == 10:
                 sql += " AND tv.fecha BETWEEN %s AND %s "
@@ -182,12 +186,12 @@ def get_report_mas_vendidos(fecha_inicio=None, fecha_fin=None):
 
         columnas = {
             'id': ['ID', 0.5],
-            'nombre': ['Nombre', 2],
+            'nombre': ['Nombre', 3],
             'total_vendido': ['Total Vendido', 1.5],
             'stock': ['Stock', 1],
         }
 
-        filas = my_sql_select_fetchall(sql, tuple(params))
+        filas = sql_select_fetchall(sql, tuple(params))
         return columnas, filas
 
     except Exception as e:
@@ -213,12 +217,12 @@ def get_report_articulos_reposicion(stock_min=10):
 
         columnas = {
             'id': ['ID', 0.5],
-            'nombre': ['Nombre', 2],
+            'nombre': ['Nombre', 3],
             'stock': ['Stock', 1],
             'precio': ['Precio', 1],
         }
 
-        filas = my_sql_select_fetchall(sql, (stock_min,))
+        filas = sql_select_fetchall(sql, (stock_min,))
         return columnas, filas
 
     except Exception as e:
