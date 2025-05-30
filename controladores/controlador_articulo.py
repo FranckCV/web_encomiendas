@@ -39,32 +39,32 @@ def table_fetchall():
 
 def get_table():
     sql= f'''
-        select 
-            art.id ,
-            art.nombre ,
-            art.precio ,
-            art.stock ,
-            art.dimensiones ,
+        SELECT 
+            art.id,
+            art.nombre,
+            art.precio,
+            art.stock,
+            art.dimensiones,
             tam.nombre as tam_nombre,
-            art.tamaño_cajaid ,
+            art.tamaño_cajaid,
             art.img,
-            art.activo 
-        from {table_name} art
-        left join tamanio_caja tam on tam.id = art.tamaño_cajaid 
-
+            art.activo
+        FROM {table_name} art
+        LEFT JOIN tamanio_caja tam ON tam.id = art.tamaño_cajaid;
     '''
     columnas = {
-        'id': ['ID' , 0.5] , 
-        'nombre' : ['Nombre' , 5] , 
-        'precio' : ['Precio' , 1] , 
-        'stock' : ['Stock' , 1] , 
-        'dimensiones' : ['Dimensiones' , 2] , 
-        'tam_nombre' : ['Tamaño de caja' , 3] , 
-        'activo' : ['Actividad' , 1] 
-        }
+        'id': ['ID', 0.5], 
+        'nombre': ['Nombre', 5], 
+        'precio': ['Precio', 1], 
+        'stock': ['Stock', 1], 
+        'dimensiones': ['Dimensiones', 2], 
+        'tam_nombre': ['Tamaño de caja', 3], 
+        'img': ['Imagen', 3],  # si quieres mostrar imagen
+        'activo': ['Actividad', 1] 
+    }
     filas = sql_select_fetchall(sql)
-    
-    return columnas , filas
+    return columnas, filas
+
 
 
 ######_ CRUD ESPECIFICAS _###### 
@@ -141,5 +141,87 @@ def get_table_with_discount():
     
     return filas
 
+def sql_select_fetchall(sql, params=None):
+    try:
+        conexion = obtener_conexion()
+        cursor = conexion.cursor(dictionary=True)
+        cursor.execute(sql, params or ())
+        resultados = cursor.fetchall()
+        cursor.close()
+        conexion.close()
+        return resultados or []
+    except Exception as e:
+        print(f"Error en consulta SQL: {e}")
+        return []
 
+def get_report_mas_vendidos(fecha_inicio=None, fecha_fin=None):
+    try:
+        sql = '''
+            SELECT 
+                a.id,
+                a.nombre,
+                COALESCE(SUM(dv.cantidad), 0) AS total_vendido,
+                a.stock
+            FROM articulo a
+            LEFT JOIN detalle_venta dv ON a.id = dv.articuloid
+            LEFT JOIN transaccion_venta tv ON dv.num_serie = tv.num_serie AND dv.tipo_comprobanteid = tv.tipo_comprobanteid
+            WHERE 1=1
+        '''
+        params = []
+        if fecha_inicio and fecha_fin:
+            if len(fecha_inicio) == 10 and len(fecha_fin) == 10:
+                sql += " AND tv.fecha BETWEEN %s AND %s "
+                params.extend([fecha_inicio, fecha_fin])
+            else:
+                print("Formato de fecha incorrecto, filtro ignorado.")
+
+        sql += '''
+            GROUP BY a.id, a.nombre, a.stock
+            ORDER BY total_vendido DESC
+        '''
+
+        columnas = {
+            'id': ['ID', 0.5],
+            'nombre': ['Nombre', 2],
+            'total_vendido': ['Total Vendido', 1.5],
+            'stock': ['Stock', 1],
+        }
+
+        filas = sql_select_fetchall(sql, tuple(params))
+        return columnas, filas
+
+    except Exception as e:
+        print(f"Error en get_report_mas_vendidos: {e}")
+        return {}, []
+
+
+def get_report_articulos_reposicion(stock_min=10):
+    try:
+        if not isinstance(stock_min, int) or stock_min < 0:
+            stock_min = 10
+
+        sql = '''
+            SELECT
+                id,
+                nombre,
+                stock,
+                precio
+            FROM articulo
+            WHERE stock < %s AND activo = 1
+            ORDER BY stock ASC
+        '''
+
+        columnas = {
+            'id': ['ID', 0.5],
+            'nombre': ['Nombre', 2],
+            'stock': ['Stock', 1],
+            'precio': ['Precio', 1],
+        }
+
+        filas = sql_select_fetchall(sql, (stock_min,))
+        return columnas, filas
+
+    except Exception as e:
+        print(f"Error en get_report_articulos_reposicion: {e}")
+        return {}, []
 

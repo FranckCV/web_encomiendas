@@ -204,3 +204,37 @@ def get_usuario_empleado_por_id(user_id):
     info = sql_select_fetchone(sql , (user_id))
     return info
 
+def get_report_usuarios():
+    sql = '''
+        SELECT 
+            id,
+            correo,
+            tipo_usuario,
+            activo
+        FROM usuario
+        ORDER BY id 
+    '''
+
+    columnas = {
+        'id': ['ID', 0.5],
+        'correo': ['Correo', 2],
+        'tipo_usuario': ['Tipo de Usuario', 1.5],
+        'activo': ['Activo', 1],
+    }
+
+    filas = sql_select_fetchall(sql)
+    return columnas, filas
+
+def get_options():
+    sql = '''
+        SELECT 
+            tipo_usuario,
+            tipo_usuario AS nombre
+        FROM usuario
+        WHERE activo = 1
+        GROUP BY tipo_usuario
+        ORDER BY tipo_usuario 
+    '''
+    filas = sql_select_fetchall(sql)
+    lista = [(fila['tipo_usuario'], fila['tipo_usuario']) for fila in filas]
+    return lista
