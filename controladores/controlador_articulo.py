@@ -173,6 +173,7 @@ def get_report_mas_vendidos(fecha_inicio=None, fecha_fin=None):
         params = []
 
         if fecha_inicio and fecha_fin:
+            # Asumo formato 'YYYY-MM-DD' y validación simple de longitud
             if len(fecha_inicio) == 10 and len(fecha_fin) == 10:
                 sql += " AND tv.fecha BETWEEN %s AND %s "
                 params.extend([fecha_inicio, fecha_fin])
@@ -198,34 +199,61 @@ def get_report_mas_vendidos(fecha_inicio=None, fecha_fin=None):
         print(f"Error en get_report_mas_vendidos: {e}")
         return {}, []
 
-
-def get_report_articulos_reposicion(stock_min=10):
+def get_report_reposicion(stock_minimo=10):
+    """
+    Obtiene un reporte de artículos que necesitan reposición
+    basado en un stock mínimo definido
+    """
     try:
-        if not isinstance(stock_min, int) or stock_min < 0:
-            stock_min = 10
-
         sql = '''
-            SELECT
-                id,
-                nombre,
-                stock,
-                precio
-            FROM articulo
-            WHERE stock < %s AND activo = 1
-            ORDER BY stock ASC
+            SELECT 
+                a.id,
+                a.nombre,
+                a.precio,
+                a.stock,
+                a.dimensiones,
+                tam.nombre as tam_nombre,
+                CASE 
+                    WHEN a.stock = 0 THEN 'Sin Stock'
+                    WHEN a.stock <= %s THEN 'Stock Bajo'
+                    ELSE 'Stock Normal'
+                END as estado_stock,
+                COALESCE(SUM(dv.cantidad), 0) AS total_vendido
+            FROM articulo a
+            LEFT JOIN tamanio_caja tam ON tam.id = a.tamaño_cajaid
+            LEFT JOIN detalle_venta dv ON a.id = dv.articuloid
+            WHERE a.activo = 1 
+                AND a.stock <= %s
+            GROUP BY a.id, a.nombre, a.precio, a.stock, a.dimensiones, tam.nombre
+            ORDER BY a.stock ASC, total_vendido DESC
         '''
-
+        
         columnas = {
             'id': ['ID', 0.5],
-            'nombre': ['Nombre', 3],
-            'stock': ['Stock', 1],
+            'nombre': ['Artículo', 3],
             'precio': ['Precio', 1],
+            'stock': ['Stock Actual', 1],
+            'dimensiones': ['Dimensiones', 2],
+            'tam_nombre': ['Tamaño Caja', 2],
+            'estado_stock': ['Estado', 1.5],
+            'total_vendido': ['Total Vendido', 1.5],
         }
-
-        filas = sql_select_fetchall(sql, (stock_min,))
+        
+        filas = sql_select_fetchall(sql, (stock_minimo, stock_minimo))
+        
         return columnas, filas
-
+        
     except Exception as e:
-        print(f"Error en get_report_articulos_reposicion: {e}")
+        print(f"Error en get_report_reposicion: {e}")
         return {}, []
 
+def get_stock_minimo_options():
+    """Retorna opciones predefinidas para el stock mínimo"""
+    return [
+        (5, "5 unidades"),
+        (10, "10 unidades"), 
+        (15, "15 unidades"),
+        (20, "20 unidades"),
+        (25, "25 unidades"),
+        (50, "50 unidades")
+    ]
