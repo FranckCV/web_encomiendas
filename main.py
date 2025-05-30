@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify  #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import permiso as permiso
+from controladores import controlador_detalle_reclamo as controlador_detalle_reclamo
 from controladores import controlador_paquete as controlador_paquete
 from controladores import controlador_tipo_pagina as controlador_tipo_pagina
 from controladores import controlador_modulo as controlador_modulo
@@ -351,7 +352,7 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
- "reclamo": {
+    "reclamo": {
     "active": True,
     "id": "reclamo",
     "titulo": "Reclamos",
@@ -381,7 +382,7 @@ CONTROLADORES = {
         "crud_unactive": False
     }
 },
-"pregunta_frecuente": {
+    "pregunta_frecuente": {
     "active": True,
     "titulo": "preguntas frecuentes",
     "nombre_tabla": "pregunta frecuente",
@@ -1006,7 +1007,34 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-    
+    "detalle_reclamo": {
+        "active" : True ,
+        "titulo": "detalles de estados de reclamo",
+        "icon_page": 'fa-solid fa-file',
+        "nombre_tabla": "detalle de un estado de reclamo",
+        "controlador": controlador_detalle_reclamo,
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id', 'ID', 'ID', 'text', False, False, True],
+            ['nombre', 'Nombre del Rol', 'Rol', 'text', True, True, True],
+            ['descripcion', 'Descripción', 'Descripción del rol', 'textarea', False, True, None],
+            ['activo', f'{TITLE_STATE}', 'activo', 'p', True, True, None],
+            ['estado_reclamoid', 'Estado de reclamo', 'Seleccionar', 'select', True, True, [lambda: controlador_estado_reclamo.get_options(), 'est_nom' ]],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+
     # huh?
     "descuento": {
         "active" : True ,
@@ -1416,7 +1444,6 @@ MENU_ADMIN = {
 }
 
 
-
 TRANSACCIONES = {
     "salida": {
         "active" : True ,
@@ -1450,6 +1477,8 @@ TRANSACCIONES = {
     },
     
 }
+
+
 ###########_ REDIRECT _#############
 
 @app.route("/")
@@ -2085,8 +2114,6 @@ def crud_insert(tabla):
 
         valores = []
         for nombre, parametro in firma.parameters.items():
-            # valor = request.form.get(nombre)
-            # valores.append(valor)
             if nombre in request.files:
                 archivo = request.files[nombre]
                 if archivo.filename != "":
@@ -2152,6 +2179,7 @@ def crud_delete(tabla):
         return "Tabla no soportada", 404
 
     active = config["active"]
+    no_crud = config.get('no_crud')
 
     if active is False:
         return "Tabla no soportada", 404
@@ -2161,7 +2189,10 @@ def crud_delete(tabla):
 
     controlador.delete_row( request.form.get(primary_key) )
 
-    return redirect(url_for('crud_generico', tabla = tabla))
+    if no_crud :
+        return redirect(url_for(no_crud))
+    else:
+        return redirect(url_for('crud_generico', tabla = tabla))
 
 
 @app.route("/unactive_row=<tabla>", methods=["POST"])
@@ -2173,6 +2204,7 @@ def crud_unactive(tabla):
         return "Tabla no soportada", 404
 
     active = config["active"]
+    no_crud = config.get('no_crud')
 
     if active is False:
         return "Tabla no soportada", 404
@@ -2184,26 +2216,11 @@ def crud_unactive(tabla):
     if existe_activo:
         controlador.unactive_row( request.form.get(primary_key) )
 
-    return redirect(url_for('crud_generico', tabla = tabla))
+    if no_crud :
+        return redirect(url_for(no_crud))
+    else:
+        return redirect(url_for('crud_generico', tabla = tabla))
 
-
-# @app.route("/update_empresa", methods=["POST"])
-# @validar_empleado()
-# @validar_error_crud()
-# def update_empresa():
-        
-
-#     controlador = controlador_empresa
-#     firma = inspect.signature(controlador.update_row)
-
-#     valores = []
-#     for nombre, parametro in firma.parameters.items():
-#         valor = request.form.get(nombre)
-#         valores.append(valor)
-
-#     controlador.update_row( *valores )
-
-#     return redirect(url_for('informacion_empresa'))
 
 @app.route("/update_empresa", methods=["POST"])
 @validar_empleado()
@@ -2220,7 +2237,6 @@ def update_empresa():
                 nuevo_nombre = guardar_imagen_bd('empresa' ,archivo)
                 valores.append(nuevo_nombre)
             else:
-                # Si no se selecciona una nueva imagen, mantener la actual
                 valores.append(request.form.get(f"{nombre}_actual"))
         else:
             valor = request.form.get(nombre)

@@ -126,6 +126,7 @@
             id="{{campo[0]}}" 
             name="{{campo[0]}}" 
             accept="image/*" 
+            {% if campo[4] %}required{% endif %}
             {% if campo[5] == False %}disabled{% endif %}
           >
           <div class="form_img_container" id="">
@@ -137,7 +138,7 @@
             type="file" 
             id="{{campo[0]}}" 
             name="{{campo[0]}}" 
-            accept="image/*" 
+            accept="image/*"             
             {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}
           >
           <div class="form_img_container" id="">
