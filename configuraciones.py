@@ -29,8 +29,9 @@ ICON_DELETE   = 'fa-solid fa-trash-can'
 ICON_ACTIVE   = 'fa-solid fa-square-check'
 ICON_UNACTIVE = 'fa-regular fa-square-check'
 
-ICON_PAGE_CRUD      = 'fa-solid fa-file'
-ICON_PAGE_REPORT    = 'fa-solid fa-file'
+ICON_PAGE_NOICON    = 'ri-close-circle-line' 
+ICON_PAGE_CRUD      = 'ri-close-circle-line d_i' 
+ICON_PAGE_REPORT    = 'ri-close-circle-line d_i'
 ICON_PAGE_DASHBOARD = 'ri-layout-grid-fill'
 ICON_PAGE_PANEL     = 'ri-dashboard-line'
 

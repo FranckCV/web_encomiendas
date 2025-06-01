@@ -2,14 +2,14 @@ INSERT INTO empresa (id, nombre, correo, nro_telefono, logo, color_pri, color_se
 (1, 'New Olva', 'info@newolva.com', '+123 456 789', 'logo.png', '#1d4c82', '#13e2da', '#1b98e0');
 
 
-INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo`) VALUES
-(1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF', 0),
-(2, 'Logística', 'fa-solid fa-truck-front', 'logistica', '#00F068', 1),
-(3, 'Encomiendas', 'fa-solid fa-box', 'encomienda', '#FF5E1A', 1),
-(4, 'Atención al cliente', 'fa-solid fa-circle-question', 'atencion', '#8232D2', 1),
-(5, 'Ventas', 'fa-solid fa-file-invoice-dollar', 'ventas', '#ff0000', 1),
-(6, 'Seguridad', 'fa-solid fa-shield-halved', 'seguridad', '#F0B000', 1),
-(7, 'Personal', 'fa-solid fa-briefcase', 'personal', '#00E0F0', 1);
+INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo` , img) VALUES
+(1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF', 0       , 'administracion.jpg'),
+(2, 'Logística', 'fa-solid fa-truck-front', 'logistica', '#00F068', 1              , 'logistica.jpg'),
+(3, 'Encomiendas', 'fa-solid fa-box', 'encomienda', '#FF5E1A', 1                   , 'encomienda.jpg'),
+(4, 'Atención al cliente', 'fa-solid fa-circle-question', 'atencion', '#8232D2', 1 , 'atencion.jpg'),
+(5, 'Ventas', 'fa-solid fa-file-invoice-dollar', 'ventas', '#ff0000', 1            , 'ventas.jpg'),
+(6, 'Seguridad', 'fa-solid fa-shield-halved', 'seguridad', '#F0B000', 1            , 'seguridad.jpg'),
+(7, 'Personal', 'fa-solid fa-briefcase', 'personal', '#00E0F0', 1                  , 'personal.jpg');
 
 
 INSERT INTO `tipo_pagina` (`id`, `nombre`) VALUES

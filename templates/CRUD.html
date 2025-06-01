@@ -12,28 +12,6 @@
 
 {% block estilos %}
 
-<style>
-  @import url("https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css");
-  @import url("../static/css/sucursales.css");
-  @import url("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css");
-
-  .map {
-    width: 100%;
-    height: 275px;
-    /* aspect-ratio: 1 / 1; */
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    cursor: crosshair;
-    border: 1px solid #9c9c9c;
-
-  }
-
-  .map_space {
-    border: 1px solid #9c9c9c;
-    border-radius: 8px;
-
-  }
-</style>
 {% if esReporte %}
 <style>
   .td_content {
@@ -41,6 +19,7 @@
   }
 </style>
 {% endif %}
+
 {% endblock %}
 
 
@@ -254,8 +233,12 @@
           <option value="{{ option }}" {% if option==selected_option_crud %}selected{% endif %}>{{ option }}</option>
           {% endfor %}
         </select>
-        <p for="">registros por página</p>
+        <p for="">registros por página 
+        </p>
 
+        <p>
+          | Total de filas: {{filas | length}}
+        </p>
 
       </div>
     </div>
@@ -316,6 +299,8 @@
   </div>
 </div>
 
+
+
 {% endblock %}
 
 
@@ -339,19 +324,35 @@
 
 <script src="/static/js/orderHeadTable.js"></script>
 <script src="/static/js/paginationCrud.js"></script>
+
+{% if 'map' in fields_form | map(attribute=6) | list %}
+<style>
+  @import url("https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css");
+  @import url("../static/css/sucursales.css");
+  @import url("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css");
+
+  .map {
+    width: 100%;
+    height: 275px;
+    /* aspect-ratio: 1 / 1; */
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: crosshair;
+    border: 1px solid #9c9c9c;
+
+  }
+
+  .map_space {
+    border: 1px solid #9c9c9c;
+    border-radius: 8px;
+
+  }
+</style>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+{% endif %}
 
-<!-- <script>
-  const today = new Date().toISOString().split('T')[0];
-  const date_solo = document.querySelector('input[type="date"][data-type="date"]')
-  if (date_solo) {
-    date_solo.value = today;
-  } else {
-    document.querySelector('input[type="date"][data-type="date_ini"]').value = today;
-    document.querySelector('input[type="date"][data-type="date_fin"]').value = today;
-  }
-  // document.getElementById('fecha_fin').value = today;
-</script> -->
+
 
 {% endblock %}

@@ -31,7 +31,8 @@
     --dark-color: color-mix(in srgb, var(--color-base) 5%, rgb(35, 35, 35) 100%);
     --color0: rgb(33, 37, 41);
 
-    --color-back: darkred;
+    --color-cancel: darkred;
+    --color-back: rgb(99, 99, 99);
     --color-acept: #006c16;
     
     --color-background: color-mix(in srgb, var(--color-contrast) 30%, var(--color-contrast) 100%);
@@ -310,7 +311,10 @@ a[href="#"] {
     text-transform: uppercase;
 }
 
-
+i.d_i {
+    font-size: 100% !important;
+    color: #cecece98 !important;
+}
 
 
 

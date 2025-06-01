@@ -54,9 +54,11 @@ def get_options():
 def get_options_departamento():
     sql= f'''
         SELECT DISTINCT 
-            departamento 
-        FROM {table_name}
-        order by departamento
+            ub.departamento 
+        FROM ubigeo ub
+        inner join sucursal su on ub.codigo = su.ubigeocodigo
+        where ub.activo = 1
+        order by ub.departamento
     '''
     filas = sql_select_fetchall(sql)
     
@@ -68,10 +70,12 @@ def get_options_departamento():
 def get_options_provincia():
     sql= f'''
         SELECT DISTINCT 
-            departamento ,
-            provincia
-        FROM {table_name}
-        order by departamento , provincia
+            ub.departamento ,
+            ub.provincia
+        FROM ubigeo ub
+        inner join sucursal su on ub.codigo = su.ubigeocodigo
+        where ub.activo = 1
+        order by ub.departamento , ub.provincia
     '''
     filas = sql_select_fetchall(sql)
     
@@ -82,14 +86,15 @@ def get_options_provincia():
 
 def get_options_distrito():
     sql= f'''
-        SELECT 
-            codigo , 
-            departamento ,
-            provincia ,
-            distrito 
-        FROM {table_name}
-        where activo = 1
-        order by departamento , provincia , distrito
+        SELECT DISTINCT
+            ub.codigo , 
+            ub.departamento ,
+            ub.provincia ,
+            ub.distrito 
+        FROM ubigeo ub
+        inner join sucursal su on ub.codigo = su.ubigeocodigo
+        where ub.activo = 1
+        order by ub.departamento , ub.provincia , ub.distrito
     '''
     filas = sql_select_fetchall(sql)
     

@@ -2,7 +2,7 @@ from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select
 import controladores.bd as bd
 #####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####
 
-table_name = 'tipo_pagina'
+table_name = 'pagina'
 
 def get_info_columns():
     return show_columns(table_name)
@@ -73,13 +73,26 @@ def unactive_row( id ):
 #     sql_execute(sql,( titulo , icono , color ))
 
 
-def update_row( id , nombre ):
+# def update_row( id , titulo , icono , tipo_paginaid , moduloid ):
+#     sql = f'''
+#         update pagina set 
+#             titulo = %s , 
+#             icono = %s , 
+#             tipo_paginaid = %s ,
+#             moduloid = %s 
+#         where id = %s
+#     '''
+#     bd.sql_execute(sql,( titulo , icono , tipo_paginaid , moduloid , id ))
+
+def update_row( id , titulo , icono , moduloid ):
     sql = f'''
-        update modulo set 
-            nombre = %s 
+        update pagina set 
+            titulo = %s , 
+            icono = %s , 
+            moduloid = %s 
         where id = %s
     '''
-    bd.sql_execute(sql,( nombre , id ))
+    bd.sql_execute(sql,( titulo , icono , moduloid , id ))
 
 
 #####_ ADICIONALES _#####
@@ -97,7 +110,6 @@ def get_options():
     lista = [(fila['id'], fila["nombre"]) for fila in filas]
 
     return lista
-
 
 
 

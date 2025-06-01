@@ -17,6 +17,8 @@ Permisos para {{info_rol.get('nombre')}}
     .section_content {
         gap: 20px;
         padding: 25px;
+        padding-right: 10px;
+        padding-bottom: 10px;
     }
 
     .block_admin {
@@ -26,7 +28,7 @@ Permisos para {{info_rol.get('nombre')}}
     }
 
     .block_admin>* {
-        height: 80vh;
+        height: 79.5vh;
         /* background-color: #dfdfdf5e; */
         background-color: var(--color9);
         overflow-y: auto;
@@ -41,6 +43,20 @@ Permisos para {{info_rol.get('nombre')}}
         gap: 10px;
         display: flex;
         flex-direction: column;
+    }
+
+    .block_rol::-webkit-scrollbar {
+        width: 5px;
+        height: 8px;
+    }
+
+    .block_rol::-webkit-scrollbar-thumb {
+        background-color: var(--color-sec);
+        border-radius: var(--border-radius-size);
+    }
+
+    .block_rol::-webkit-scrollbar-track {
+        background-color: transparent;
     }
 
     .block_rol h5 {
@@ -372,15 +388,15 @@ Permisos para {{info_rol.get('nombre')}}
         }
 
         .block_access {
-            grid-template-columns: 97.5%;
+            /* grid-template-columns: 97.5%; */
         }
 
         .block_admin>* {
-            height: 72.5vh;
+            height: 71.5vh;
         }
 
         .cant_title {
-            width: 5.75vw;
+            /* width: 5.75vw; */
         }
     </style>
 
@@ -453,17 +469,22 @@ Permisos para {{info_rol.get('nombre')}}
             </div>
 
             <div class="mod_content">
+
+                {% for tipo_page in cants_mod %}
+                {% if tipo_page.id == modulo.id and tipo_page.cant > 0 %}
+                <p>{{ tipo_page.tip_nombre }}</p>
+
                 {% for page in paginas %}
 
-                {% if page.get('moduloid') == modulo.get('id') %}
+                {% if page.get('moduloid') == modulo.id and tipo_page.tip_id == page.tipo_paginaid %}
                 <div class="pag_block">
                     <div class="pag_title">
                         {% if page.get('tipo_paginaid') == 1 %}
-                        <i class="{{ page.get('icono') or ICON_PAGE_CRUD }}"></i>
-                        <p> {{NOMBRE_CRUD_PAGE}} {{ page.get('titulo') | lower }} </p>
-                        {% elif page.get('tipo_paginaid') == 2 %}
-                        <i class="{{ page.get('icono') or ICON_PAGE_REPORT }}"></i>
-                        <p> {{ page.get('titulo') }} </p>
+                            <i class="{{ page.get('icono') or ICON_PAGE_NOICON }}"></i>
+                            <p> {{NOMBRE_CRUD_PAGE}} {{ page.get('titulo') | lower }} </p>
+                        {% else %}
+                            <i class="{{ page.get('icono') or ICON_PAGE_NOICON }}"></i>
+                            <p> {{ page.get('titulo') }} </p>
                         {% endif %}
                     </div>
 
@@ -547,6 +568,12 @@ Permisos para {{info_rol.get('nombre')}}
                 {% endif %}
 
                 {% endfor %}
+
+                {% endif %}
+                {% endfor %}
+
+                
+
             </div>
         </div>
         {% endfor %}
@@ -599,6 +626,8 @@ Permisos para {{info_rol.get('nombre')}}
 </div>
 {% endif %}
 
+
+
 {% for modulo in modulos %}
 
 {% set fila = modulo %}
@@ -618,32 +647,29 @@ Permisos para {{info_rol.get('nombre')}}
 {% include 'MODAL_FORM_CRUD.html' %}
 
 
+    {% for pagina in paginas %}
+    {% if pagina.get('moduloid') == modulo.get('id') %}
 
 
-{% for pagina in paginas %}
-{% if pagina.get('moduloid') == modulo.get('id') %}
+    {% set fila = pagina %}
+    {% set tabla = 'pagina' %}
+    {% set primary_key = 'id' %}
+    {% set nombre_tabla = 'página' %}
+    {% set fields_form = fields_form_page %}
 
 
-{% set fila = pagina %}
-{% set tabla = 'pagina' %}
-{% set primary_key = 'id' %}
-{% set nombre_tabla = 'página' %}
-{% set fields_form = fields_form_page %}
+    {% set modo_modal = 'consult' %}
+    {% include 'MODAL_FORM_CRUD.html' %}
+
+    {% set modo_modal = 'update' %}
+    {% include 'MODAL_FORM_CRUD.html' %}
+
+    {% set modo_modal = 'unactive' %}
+    {% include 'MODAL_FORM_CRUD.html' %}
 
 
-{% set modo_modal = 'consult' %}
-{% include 'MODAL_FORM_CRUD.html' %}
-
-{% set modo_modal = 'update' %}
-{% include 'MODAL_FORM_CRUD.html' %}
-
-{% set modo_modal = 'unactive' %}
-{% include 'MODAL_FORM_CRUD.html' %}
-
-
-{% endif %}
-{% endfor %}
-
+    {% endif %}
+    {% endfor %}
 
 
 {% endfor %}
@@ -661,6 +687,24 @@ Permisos para {{info_rol.get('nombre')}}
 
 {% block scripts %}
 
+{% if fields_form_page and fields_form_modulo %}
+{% set fields_form_final = fields_form_page + fields_form_modulo %}
+
+<script>
+
+  const SELECT_OPTIONS = {
+    {% for campo in fields_form_final if campo[3] == 'select' %}
+    "{{campo[0]}}": [
+        {% for option in campo[6][0]() %}
+        { value: "{{option[0]}}", label: "{{option[1]}}" }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]{% if not loop.last %},{% endif %}
+    {% endfor %}
+    
+  };
+
+</script>
+{% endif %}
 
 <script>
     const options = document.querySelectorAll('.opciones_fila ');
@@ -674,25 +718,11 @@ Permisos para {{info_rol.get('nombre')}}
     });
 </script>
 
-<!-- <script>
-    const options = document.querySelectorAll('.opciones_fila ');
-    options.forEach(opt => {
-        const btns = opt.querySelectorAll('button');
-        btns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const isAccess = btn.classList.contains('btn_access');
-                if (isAccess) {
-                    btns.forEach(b => {
-                        b.classList.add('unable');
-                    });
-                    btn.classList.add('unable');
-                } else {
-                    btn.classList.toggle('unable');
-                }
-            });
-        });
-    });
-</script> -->
+
+
+{% if rolid %}
+
+{% endif %}
 
 
 {% endblock %}

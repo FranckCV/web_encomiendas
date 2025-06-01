@@ -268,9 +268,9 @@ CREATE TABLE salida (
   recojo              tinyint(1) NOT NULL, 
   entrega             tinyint(1) NOT NULL, 
   estado              char(1) NOT NULL, 
-  unidadid            int(10) NOT NULL, 
   destino_final       int(10) NOT NULL, 
   conductor_principal int(11) NOT NULL, 
+  unidadid            int(10) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE seguimiento (
   detalle_estadoid int(10) NOT NULL, 

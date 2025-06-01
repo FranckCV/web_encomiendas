@@ -47,6 +47,7 @@ def get_table():
             art.dimensiones,
             tam.nombre as tam_nombre,
             art.tamaño_cajaid,
+            art.img ,
             art.activo
         FROM {table_name} art
         LEFT JOIN tamanio_caja tam ON tam.id = art.tamaño_cajaid
@@ -76,7 +77,7 @@ def insert_row( nombre, precio, stock, img, dimensiones,tamaño_cajaid ):
     sql = f'''
         INSERT INTO 
             {table_name} 
-            ( nombre, precio, stock, img, dimensiones,tamaño_cajaid , activo)
+            ( nombre, precio, stock, img, dimensiones, tamaño_cajaid , activo)
         VALUES 
             ( %s ,%s ,%s ,%s ,%s ,%s , 1)
     '''

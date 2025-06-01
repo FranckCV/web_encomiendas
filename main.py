@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify  #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import permiso as permiso
+from controladores import controlador_pagina as controlador_pagina
 from controladores import controlador_detalle_reclamo as controlador_detalle_reclamo
 from controladores import controlador_paquete as controlador_paquete
 from controladores import controlador_tipo_pagina as controlador_tipo_pagina
@@ -73,6 +74,7 @@ NOMBRE_BTN_UNACTIVE  = configuraciones.NOMBRE_BTN_UNACTIVE
 NOMBRE_BTN_LIST      = configuraciones.NOMBRE_BTN_LIST
 NOMBRE_BTN_CONSULT   = configuraciones.NOMBRE_BTN_CONSULT
 NOMBRE_BTN_SEARCH    = configuraciones.NOMBRE_BTN_SEARCH
+ICON_PAGE_NOICON     = configuraciones.ICON_PAGE_NOICON 
 ICON_PAGE_CRUD       = configuraciones.ICON_PAGE_CRUD 
 ICON_PAGE_REPORT     = configuraciones.ICON_PAGE_REPORT 
 ICON_PAGE_DASHBOARD  = configuraciones.ICON_PAGE_DASHBOARD 
@@ -228,6 +230,7 @@ def guardar_imagen_bd(tabla,ad,archivo):
         # nombre_final = f"{timestamp}_{filename_seguro}"
         upload_folder = f'static/img/img_{tabla}'
         nombre_final = f"{ad}{filename_seguro}"
+        print('IMG archivo:',nombre_final)
         ruta_completa = os.path.join(upload_folder, nombre_final)
         archivo.save(ruta_completa)
         return nombre_final
@@ -352,61 +355,61 @@ CONTROLADORES = {
         }
     },
     "reclamo": {
-    "active": True,
-    "id": "reclamo",
-    "titulo": "Reclamos",
-    "nombre_tabla": "reclamo",
-    "controlador": controlador_reclamo,  # Asegúrate de importar esto arriba
-    "icon_page": "fa-solid fa-file",  # Puedes cambiar el ícono
-    "filters": [],
-    "fields_form": [
-        ['id', 'ID', 'ID', 'text', True, False, None],
-        ['nombres_razon', 'Cliente', 'Cliente', 'text', True, True, None],
-        ['direccion', 'Dirección', 'Dirección', 'text', True, True, None],
-        ['correo', 'Correo', 'Correo', 'email', True, True, None],
-        ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
-        ['titulo_incidencia', 'Incidencia', 'Incidencia', 'text', True, True, None],
-        ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
-        ['fecha_recojo', 'Fecha de recojo', 'Fecha', 'date', True, True, None],
-        ['estado_reclamoid', 'Estado', 'Estado', 'select', True, True, [lambda: controlador_estado_reclamo.get_options(), 'nombre']],
-        ['sucursal_id', 'Sucursal', 'Sucursal', 'select', True, True, [lambda: controlador_sucursal.get_options(), 'direccion']]
-    ],
-    "crud_forms": {
-        "crud_list": True,
-        "crud_search": True,
-        "crud_consult": True,
-        "crud_insert": True,
-        "crud_update": True,
-        "crud_delete": True,
-        "crud_unactive": False
-    }
-},
+        "active": True,
+        "id": "reclamo",
+        "titulo": "Reclamos",
+        "nombre_tabla": "reclamo",
+        "controlador": controlador_reclamo,  # Asegúrate de importar esto arriba
+        "icon_page": "fa-solid fa-file",  # Puedes cambiar el ícono
+        "filters": [],
+        "fields_form": [
+            ['id', 'ID', 'ID', 'text', True, False, None],
+            ['nombres_razon', 'Cliente', 'Cliente', 'text', True, True, None],
+            ['direccion', 'Dirección', 'Dirección', 'text', True, True, None],
+            ['correo', 'Correo', 'Correo', 'email', True, True, None],
+            ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
+            ['titulo_incidencia', 'Incidencia', 'Incidencia', 'text', True, True, None],
+            ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
+            ['fecha_recojo', 'Fecha de recojo', 'Fecha', 'date', True, True, None],
+            ['estado_reclamoid', 'Estado', 'Estado', 'select', True, True, [lambda: controlador_estado_reclamo.get_options(), 'nombre']],
+            ['sucursal_id', 'Sucursal', 'Sucursal', 'select', True, True, [lambda: controlador_sucursal.get_options(), 'direccion']]
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": False
+        }
+    },
     "pregunta_frecuente": {
-    "active": True,
-    "titulo": "preguntas frecuentes",
-    "nombre_tabla": "pregunta frecuente",
-    "controlador": controlador_pregunta_frecuente,
-    "icon_page": 'fa-solid fa-circle-question',
-    "filters": [
-        ['activo', f'{TITLE_STATE}', get_options_active()],
-    ],
-    "fields_form": [
-        #  ID/NAME          LABEL              PLACEHOLDER            TYPE      REQUIRED  ABLE/DISABLE  DATOS
-        ['id',              'ID',              'ID',                  'text',     True,     False,       None],
-        ['titulo',          'Título',          'Título',              'text',     True,     True,        None],
-        ['descripcion',     'Descripción',     'Descripción',         'textarea', True,     True,        None],
-        ['activo',          f'{TITLE_STATE}',  'Activo',              'p',        True,     False,       None],
-    ],
-    "crud_forms": {
-        "crud_list": True,
-        "crud_search": True,
-        "crud_consult": True,
-        "crud_insert": True,
-        "crud_update": True,
-        "crud_delete": True,
-        "crud_unactive": True,
-    }
-},
+        "active": True,
+        "titulo": "preguntas frecuentes",
+        "nombre_tabla": "pregunta frecuente",
+        "controlador": controlador_pregunta_frecuente,
+        "icon_page": 'fa-solid fa-circle-question',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active()],
+        ],
+        "fields_form": [
+            #  ID/NAME          LABEL              PLACEHOLDER            TYPE      REQUIRED  ABLE/DISABLE  DATOS
+            ['id',              'ID',              'ID',                  'text',     True,     False,       None],
+            ['titulo',          'Título',          'Título',              'text',     True,     True,        None],
+            ['descripcion',     'Descripción',     'Descripción',         'textarea', True,     True,        None],
+            ['activo',          f'{TITLE_STATE}',  'Activo',              'p',        True,     False,       None],
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": True,
+        }
+    },
   
 # LEO
     "tamanio_caja": {
@@ -472,11 +475,11 @@ CONTROLADORES = {
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
             ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
             ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['precio',      'Precio',          'Precio',      'number',     True ,     True  ,        None ],
-            ['stock',       'Stock',           'Stock',       'number',     True ,     True  ,        None ],
-            ['dimensiones', 'Dimensiones',     'Dimensiones', 'text',     True ,     True  ,        None ],
-            ['tamaño_cajaid','Tamaño Caja',    'Tamaño Caja', 'select',     True ,     True  ,        [lambda: controlador_tamanio_caja.get_options() , 'tam_nombre' ]  ],
-            ['img',         'Imagen',          'Imagen',      'img',     True ,     True  ,        None ],
+            ['precio',      'Precio',          'Precio',      'number',   True ,     True  ,        None ],
+            ['stock',       'Stock',           'Stock',       'number',   True ,     True  ,        None ],
+            ['dimensiones', 'Dimensiones',     'Dimensiones', 'text',     False ,     True  ,        None ],
+            ['tamaño_cajaid','Tamaño Caja',    'Tamaño Caja', 'select',   False ,     True  ,        [lambda: controlador_tamanio_caja.get_options() , 'tam_nombre' ]  ],
+            ['img',         'Imagen',          'Imagen',      'img',      True ,     True  ,        None ],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
         ],
         "crud_forms": {
@@ -713,7 +716,7 @@ CONTROLADORES = {
         "controlador": controlador_empleado,
         "icon_page": 'fa-solid fa-id-card',
         "filters": [
-            ['rolid', 'Rol', lambda: controlador_rol.get_options()],
+            # ['rolid', 'Rol', lambda: controlador_rol.get_options()],
         ],
         "fields_form": [
             ['usuarioid', 'ID', 'ID', 'text', False, False, True],
@@ -1093,7 +1096,6 @@ CONTROLADORES = {
 # ADICIONAL (NO CRUD)
     "modulo": {
         "active" : True ,
-        "no_crud" : 'administrar_paginas' ,
         # "titulo": "marcas de unidades",
         # "nombre_tabla": "marca",
         "controlador": controlador_modulo,
@@ -1116,9 +1118,37 @@ CONTROLADORES = {
             "crud_update": True ,
             "crud_delete": True ,
             "crud_unactive": True ,
-        }
+        },
+        "no_crud" : 'administrar_paginas' ,
     },
-    
+    "pagina": {
+        "active" : True ,
+        # "titulo": "marcas de unidades",
+        # "nombre_tabla": "marca",
+        "controlador": controlador_pagina,
+        # "icon_page": 'fa-solid fa-car-side',
+        # "filters": [
+        # ] ,
+        "fields_form" : [
+        #   ID/NAME    LABEL              PLACEHOLDER    TYPE       REQUIRED   ABLE/DISABLE   DATOS
+            ['nombre', 'Nombre del módulo', 'Nombre',   'text',    True ,     True,          None ],
+            ['activo', 'Actividad',         'Color',    'p',       True,      True,          None ],
+            ['icono',  'Icono',             'Icono',    'icon',    True ,     True,          None ],
+            ['color',  'Color',             'color',    'color',   True,      True,          None ],
+            ['img',  'Imagen',             'Imagen',    'img',   True,      True,          None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        },
+        "no_crud" : 'administrar_paginas' ,
+    },
+
 # _BORRAR
     "ubigeo" : {
         "active":True,
@@ -1242,6 +1272,15 @@ REPORTES = {
         "table": controlador_articulo.get_report_articulos_reposicion,  # sin ()
         "filters": [
             ['stock_min', 'Stock Mínimo', None, 'number'],
+        ],
+    },
+    "horarios_sucursal": {
+        "active": True,
+        "icon_page": "fa-solid fa-clock",
+        "titulo": "Reporte de horarios de sucursales",
+        "table": controlador_sucursal.get_report_horario(), 
+        "filters": [
+            # ['stock_min', 'Stock Mínimo', None, 'number'],
         ],
     }
 
@@ -1701,15 +1740,16 @@ def inject_globals():
         ICON_PAGE_REPORT       = ICON_PAGE_REPORT ,
         ICON_PAGE_DASHBOARD    = ICON_PAGE_DASHBOARD ,
         ICON_PAGE_PANEL        = ICON_PAGE_PANEL ,
-        ICON_LIST              = ICON_LIST    ,
-        ICON_CONSULT           = ICON_CONSULT ,
-        ICON_SEARCH            = ICON_SEARCH  ,
-        ICON_INSERT            = ICON_INSERT  ,
-        ICON_UPDATE            = ICON_UPDATE  ,
-        ICON_DELETE            = ICON_DELETE  ,
-        ICON_ACTIVE            = ICON_ACTIVE,
-        ICON_UNACTIVE          = ICON_UNACTIVE,
-        ICON_UNLOCK            = ICON_UNLOCK,
+        ICON_LIST              = ICON_LIST     ,
+        ICON_CONSULT           = ICON_CONSULT  ,
+        ICON_SEARCH            = ICON_SEARCH   ,
+        ICON_INSERT            = ICON_INSERT   ,
+        ICON_UPDATE            = ICON_UPDATE   ,
+        ICON_DELETE            = ICON_DELETE   ,
+        ICON_ACTIVE            = ICON_ACTIVE   ,
+        ICON_UNACTIVE          = ICON_UNACTIVE ,
+        ICON_UNLOCK            = ICON_UNLOCK   ,
+        ICON_PAGE_NOICON       = f'{ICON_PAGE_NOICON} d_i' ,
     )
 
 
@@ -2063,11 +2103,11 @@ def administrar_paginas():
 
     fields_form_page = [
 #        ID/NAME          LABEL               PLACEHOLDER    TYPE    REQUIRED   ABLE/DISABLE   DATOS
-        ['titulo',         'Nombre del módulo', 'Nombre',     'text',    True ,   True   ,      None ],
-        ['activo',         'Actividad',         'Color',      'p',       True,    True   ,      None ],
-        ['moduloid',       'Módulo',           'Módulo',      'select',  True ,   None   ,   [lambda: controlador_modulo.get_options() , 'nom_modulo'] ],
-        ['tipo_paginaid',  'Tipo de página',   'Tipo de página',      'select',  True ,   None   ,   [lambda: controlador_tipo_pagina.get_options() , 'nom_tipo'] ],
-        ['icono',         'Icono',             'Icono',      'icon',    True ,   True   ,      None ],
+        ['titulo',         'Nombre del módulo', 'Nombre',        'text',    True ,   True   ,      None ],
+        ['activo',         'Actividad',         'Color',         'p',       True,    True   ,      None ],
+        ['icono',         'Icono',             'Icono',             'icon',    False ,   True   ,      None ],
+        ['moduloid',       'Módulo',           'Módulo',          'select',  True ,   None   ,   [lambda: controlador_modulo.get_options() , 'nom_modulo'] ], 
+        # ['tipo_paginaid',  'Tipo de página',   'Tipo de página',    'select',  True ,   None   ,   [lambda: controlador_tipo_pagina.get_options() , 'nom_tipo'] ],
     ]
     
 
@@ -2144,7 +2184,7 @@ def crud_insert(tabla):
             if nombre in request.files:
                 archivo = request.files[nombre]
                 if archivo.filename != "":
-                    nuevo_nombre = guardar_imagen_bd('empresa' ,archivo)
+                    nuevo_nombre = guardar_imagen_bd(tabla , '' , archivo)
                     valores.append(nuevo_nombre)
                 else:
                     # Si no se selecciona una nueva imagen, mantener la actual
@@ -2185,8 +2225,19 @@ def crud_update(tabla):
 
         valores = []
         for nombre, parametro in firma.parameters.items():
-            valor = request.form.get(nombre)
-            valores.append(valor)
+            if nombre in request.files:
+                archivo = request.files[nombre]
+                # print(archivo)
+                if archivo.filename != "":
+                    # print(nombre)
+                    nuevo_nombre = guardar_imagen_bd(tabla,'' ,archivo)
+                    valores.append(nuevo_nombre)
+                else:
+                    # Si no se selecciona una nueva imagen, mantener la actual
+                    valores.append(request.form.get(f"{nombre}_actual"))
+            else:
+                valor = request.form.get(nombre)
+                valores.append(valor)
 
         controlador.update_row( *valores )
         if no_crud :
@@ -2261,7 +2312,7 @@ def update_empresa():
         if nombre in request.files:
             archivo = request.files[nombre]
             if archivo.filename != "":
-                nuevo_nombre = guardar_imagen_bd('empresa' ,archivo)
+                nuevo_nombre = guardar_imagen_bd('empresa' ,'',archivo)
                 valores.append(nuevo_nombre)
             else:
                 valores.append(request.form.get(f"{nombre}_actual"))

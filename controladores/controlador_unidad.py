@@ -154,9 +154,10 @@ def get_report_test():
 
 def get_options_estado():
     lista= [
-        [ 'A' , 'Activo' ],
+        [ 'D' , 'Disponible' ],
+        [ 'C' , 'En curso' ],
         [ 'M' , 'En mantenimiento' ],
-        [ 'I' , 'Inactivo' ],
+        [ 'N' , 'No disponible' ],
     ]
 
     return lista

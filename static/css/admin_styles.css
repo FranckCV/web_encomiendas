@@ -151,7 +151,7 @@ header.general_element {
 
 .user_out:hover i,
 .menu_user:hover .user_out i {
-    color: var(--color-back);
+    color: var(--color-cancel);
     filter: brightness(1.7);
 }
 
@@ -693,6 +693,11 @@ p.text_none {
     color: white;
 }
 
+.btn_cancel {
+    background-color: var(--color-cancel) !important;
+    color: white;
+}
+
 .btn_back {
     background-color: var(--color-back) !important;
     color: white;
@@ -753,12 +758,16 @@ p.text_none {
     color: var(--color-consult) !important;
 }
 
+.text_cancel {
+    color: var(--color-cancel) !important;
+}
+
 .text_back {
-    color: var(--color-back);
+    color: var(--color-back) !important;
 }
 
 .text_acept {
-    color: var(--color-acept);
+    color: var(--color-acept) !important;
 }
 
 
@@ -946,6 +955,7 @@ input[type="number"] ,
     display: flex;
     justify-content: center;
     font-size: 250%;
+    line-height: 1;
 }
 
 .form_img {
