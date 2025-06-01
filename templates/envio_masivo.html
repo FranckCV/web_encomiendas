@@ -61,207 +61,236 @@ Registro de Envíos Masivos
       </div>
     </div>
 
-    <!-- SECCIÓN: ENVÍOS MASIVOS -->
+    <!-- SECCIÓN: ENVÍOS MASIVOS CON PESTAÑAS -->
     <div id="seccion-masiva" style="display: block;">
       <div class="seccion-masiva">
         <h2 class="titulo-seccion">Agregar envío</h2>
         
-        <!-- Destino -->
-        <h3 style="color: #0E1D63; font-size: 1.1rem; margin: 1.5rem 0 1rem 0;">📍 Destino</h3>
-        <div class="campos-envio">
-          <div class="campo-grupo">
-            <label>Tipo de Entrega *</label>
-            <select id="m-tipoEntrega" required onchange="mostrarCamposDestino()">
-              <option value="">Seleccione...</option>
-              <option value="domicilio">A Domicilio</option>
-              <option value="agencia">En Agencia</option>
-            </select>
+        <!-- Sistema de Pestañas -->
+        <div class="tabs-container">
+          <div class="tabs-nav">
+            <button type="button" class="tab-btn active" data-tab="destino">
+              📍 Destino
+            </button>
+            <button type="button" class="tab-btn" data-tab="paquete">
+              📦 Paquete
+            </button>
+            <button type="button" class="tab-btn" data-tab="destinatario">
+              👤 Destinatario
+            </button>
           </div>
 
-          <div class="campo-grupo">
-            <label>Departamento *</label>
-            <select id="m-departamento" required>
-              <option value="">Seleccione...</option>
-              <option value="Amazonas">Amazonas</option>
-              <option value="Ancash">Áncash</option>
-              <option value="Apurimac">Apurímac</option>
-              <option value="Arequipa">Arequipa</option>
-              <option value="Ayacucho">Ayacucho</option>
-              <option value="Cajamarca">Cajamarca</option>
-              <option value="Callao">Callao</option>
-              <option value="Cusco">Cusco</option>
-              <option value="Huancavelica">Huancavelica</option>
-              <option value="Huanuco">Huánuco</option>
-              <option value="Ica">Ica</option>
-              <option value="Junin">Junín</option>
-              <option value="La Libertad">La Libertad</option>
-              <option value="Lambayeque">Lambayeque</option>
-              <option value="Lima">Lima</option>
-              <option value="Loreto">Loreto</option>
-              <option value="Madre de Dios">Madre de Dios</option>
-              <option value="Moquegua">Moquegua</option>
-              <option value="Pasco">Pasco</option>
-              <option value="Piura">Piura</option>
-              <option value="Puno">Puno</option>
-              <option value="San Martin">San Martín</option>
-              <option value="Tacna">Tacna</option>
-              <option value="Tumbes">Tumbes</option>
-              <option value="Ucayali">Ucayali</option>
-            </select>
-          </div>
+          <!-- Contenido de las pestañas -->
+          <div class="tabs-content">
+            
+            <!-- PESTAÑA DESTINO -->
+            <div class="tab-panel active" id="tab-destino">
+              <div class="campos-envio">
+                <div class="campo-grupo">
+                  <label>Tipo de Entrega *</label>
+                  <select id="m-tipoEntrega" required onchange="mostrarCamposDestino()">
+                    <option value="">Seleccione...</option>
+                    <option value="domicilio">A Domicilio</option>
+                    <option value="agencia">En Agencia</option>
+                  </select>
+                </div>
 
-          <div class="campo-grupo">
-            <label>Provincia *</label>
-            <select id="m-provincia" required>
-              <option value="">Seleccione departamento primero</option>
-            </select>
-          </div>
+                <div class="campo-grupo">
+                  <label>Departamento *</label>
+                  <select id="m-departamento" required>
+                    <option value="">Seleccione...</option>
+                    <option value="Amazonas">Amazonas</option>
+                    <option value="Ancash">Áncash</option>
+                    <option value="Apurimac">Apurímac</option>
+                    <option value="Arequipa">Arequipa</option>
+                    <option value="Ayacucho">Ayacucho</option>
+                    <option value="Cajamarca">Cajamarca</option>
+                    <option value="Callao">Callao</option>
+                    <option value="Cusco">Cusco</option>
+                    <option value="Huancavelica">Huancavelica</option>
+                    <option value="Huanuco">Huánuco</option>
+                    <option value="Ica">Ica</option>
+                    <option value="Junin">Junín</option>
+                    <option value="La Libertad">La Libertad</option>
+                    <option value="Lambayeque">Lambayeque</option>
+                    <option value="Lima">Lima</option>
+                    <option value="Loreto">Loreto</option>
+                    <option value="Madre de Dios">Madre de Dios</option>
+                    <option value="Moquegua">Moquegua</option>
+                    <option value="Pasco">Pasco</option>
+                    <option value="Piura">Piura</option>
+                    <option value="Puno">Puno</option>
+                    <option value="San Martin">San Martín</option>
+                    <option value="Tacna">Tacna</option>
+                    <option value="Tumbes">Tumbes</option>
+                    <option value="Ucayali">Ucayali</option>
+                  </select>
+                </div>
 
-          <div class="campo-grupo">
-            <label>Distrito *</label>
-            <select id="m-distrito" required>
-              <option value="">Seleccione provincia primero</option>
-            </select>
-          </div>
+                <div class="campo-grupo">
+                  <label>Provincia *</label>
+                  <select id="m-provincia" required>
+                    <option value="">Seleccione departamento primero</option>
+                  </select>
+                </div>
 
-          <!-- Dirección y Referencia: solo para domicilio -->
-          <div class="campo-grupo" id="grupo-direccion" style="display:none;">
-            <label>Dirección *</label>
-            <input type="text" id="m-direccion" placeholder="Av./Jr./Calle Nombre #123">
-          </div>
+                <div class="campo-grupo">
+                  <label>Distrito *</label>
+                  <select id="m-distrito" required>
+                    <option value="">Seleccione provincia primero</option>
+                  </select>
+                </div>
 
-          <div class="campo-grupo" id="grupo-referencia" style="display:none;">
-            <label>Referencia</label>
-            <input type="text" id="m-referencia" placeholder="Entre calles, cerca de...">
-          </div>
+                <!-- Dirección y Referencia: solo para domicilio -->
+                <div class="campo-grupo" id="grupo-direccion" style="display:none;">
+                  <label>Dirección *</label>
+                  <input type="text" id="m-direccion" placeholder="Av./Jr./Calle Nombre #123">
+                </div>
 
-          <!-- Tienda: solo para agencia -->
-          <div class="campo-grupo" id="grupo-tienda" style="display:none;">
-            <label>Tienda *</label>
-            <select id="m-tienda">
-              <option value="">Seleccione tienda</option>
-              <option value="tienda-lima-centro">Tienda Lima Centro</option>
-              <option value="tienda-miraflores">Tienda Miraflores</option>
-              <option value="tienda-san-isidro">Tienda San Isidro</option>
-              <option value="tienda-trujillo">Tienda Trujillo</option>
-              <option value="tienda-arequipa">Tienda Arequipa</option>
-              <option value="tienda-chiclayo">Tienda Chiclayo</option>
-              <option value="tienda-piura">Tienda Piura</option>
-              <option value="tienda-cusco">Tienda Cusco</option>
-            </select>
-          </div>
-        </div>
-        
-        <!-- Descripción del envío -->
-        <h3 style="color: #0E1D63; font-size: 1.1rem; margin: 1.5rem 0 1rem 0;">📦 Descripción del paquete</h3>
-        <div class="campos-envio">
-          <div class="campo-grupo">
-            <label>Tipo empaque *</label>
-            <select id="m-tipoEmpaque" required onchange="toggleFolios()">
-              <option value="">Seleccione...</option>
-              <option value="caja">Caja</option>
-              <option value="sobre">Sobre</option>
-              <option value="bolsa">Bolsa</option>
-              <option value="paquete">Paquete</option>
-            </select>
-          </div>
-          <div class="campo-grupo">
-            <label>Tipo Artículo *</label>
-            <select id="m-tipoArticulo" required>
-              <option value="">Seleccione...</option>
-              <option value="documentos">Documentos</option>
-              <option value="ropa">Ropa</option>
-              <option value="electronicos">Electrónicos</option>
-              <option value="libros">Libros</option>
-              <option value="alimentos">Alimentos no perecibles</option>
-              <option value="cosmeticos">Cosméticos</option>
-              <option value="juguetes">Juguetes</option>
-              <option value="herramientas">Herramientas</option>
-              <option value="otros">Otros</option>
-            </select>
-          </div>
+                <div class="campo-grupo" id="grupo-referencia" style="display:none;">
+                  <label>Referencia</label>
+                  <input type="text" id="m-referencia" placeholder="Entre calles, cerca de...">
+                </div>
 
-          <div class="campo-grupo">
-            <label>Valor (S/) *</label>
-            <input type="number" id="m-valorEnvio" step="0.01" min="0" placeholder="0.00" required>
-          </div>
-          <div class="campo-grupo">
-            <label>Peso (kg) *</label>
-            <input type="number" id="m-peso" step="0.001" min="0.001" placeholder="0.00" required>
-          </div>
-          <div class="campo-grupo">
-            <label>Largo (cm) *</label>
-            <input type="number" id="m-largo" step="0.1" min="0.1" placeholder="0.0" required>
-          </div>
-          <div class="campo-grupo">
-            <label>Ancho (cm) *</label>
-            <input type="number" id="m-ancho" step="0.1" min="0.1" placeholder="0.0" required>
-          </div>
-          <div class="campo-grupo">
-            <label>Alto (cm) *</label>
-            <input type="number" id="m-alto" step="0.1" min="0.1" placeholder="0.0" required>
-          </div>
-
-          <div class="campo-grupo" style="grid-column: 1/5; grid-row: 3/4;">
-            <label>Descripción *</label>
-            <input type="text" id="m-descripcionArticulo" placeholder="Descripción detallada del contenido" required>
-          </div>
-
-          <div class="campo-grupo" id="grupo-folios" style="display:none;">
-            <label># Folios *</label>
-            <input type="number" id="m-folios" min="1" placeholder="Cantidad de hojas">
-          </div>
-        </div>
-
-        <!-- Datos de quién recibe -->
-        <h3 style="color: #0E1D63; font-size: 1.1rem; margin: 1.5rem 0 1rem 0;">👤 Datos de quién recibe</h3>
-        <div class="campos-envio">
-          <div class="campo-grupo">
-            <label>Tipo Documento *</label>
-            <select id="m-tipoDocumento" required onchange="mostrarCamposReceptor()">
-              <option value="">Seleccione...</option>
-              <option value="dni">DNI</option>
-              <option value="ruc">RUC</option>
-              <option value="ce">Carnet de Extranjería</option>
-            </select>
-          </div>
-          <div class="campo-grupo">
-            <label>Nro Documento *</label>
-            <input type="text" id="m-nroDocumento" placeholder="Número de documento" required>
-          </div>
-          
-          <!-- CAMPO CELULAR -->
-          <div class="campo-grupo">
-            <label>Celular *</label>
-            <input type="tel" id="m-celular" required placeholder="999999999" pattern="[0-9]{9}" title="Ingrese 9 dígitos">
-          </div>
-
-          <!-- Campos para RUC -->
-          <div id="campos-ruc" style="display:none; width:100%; grid-column: 1/-1;">
-            <div class="campos-envio">
-              <div class="campo-grupo">
-                <label>Razón Social *</label>
-                <input type="text" id="m-razonSocial" placeholder="Nombre de la empresa">
+                <!-- Tienda: solo para agencia -->
+                <div class="campo-grupo" id="grupo-tienda" style="display:none;">
+                  <label>Tienda *</label>
+                  <select id="m-tienda">
+                    <option value="">Seleccione tienda</option>
+                    <option value="tienda-lima-centro">Tienda Lima Centro</option>
+                    <option value="tienda-miraflores">Tienda Miraflores</option>
+                    <option value="tienda-san-isidro">Tienda San Isidro</option>
+                    <option value="tienda-trujillo">Tienda Trujillo</option>
+                    <option value="tienda-arequipa">Tienda Arequipa</option>
+                    <option value="tienda-chiclayo">Tienda Chiclayo</option>
+                    <option value="tienda-piura">Tienda Piura</option>
+                    <option value="tienda-cusco">Tienda Cusco</option>
+                  </select>
+                </div>
               </div>
-              <div class="campo-grupo">
-                <label>Contacto *</label>
-                <input type="text" id="m-contacto" placeholder="Persona de contacto">
+            </div>
+
+            <!-- PESTAÑA PAQUETE -->
+            <div class="tab-panel" id="tab-paquete">
+              <div class="campos-envio">
+                <div class="campo-grupo">
+                  <label>Tipo empaque *</label>
+                  <select id="m-tipoEmpaque" required onchange="toggleFolios()">
+                    <option value="">Seleccione...</option>
+                    <option value="caja">Caja</option>
+                    <option value="sobre">Sobre</option>
+                    <option value="bolsa">Bolsa</option>
+                    <option value="paquete">Paquete</option>
+                  </select>
+                </div>
+                
+                <div class="campo-grupo">
+                  <label>Tipo Artículo *</label>
+                  <select id="m-tipoArticulo" required>
+                    <option value="">Seleccione...</option>
+                    <option value="documentos">Documentos</option>
+                    <option value="ropa">Ropa</option>
+                    <option value="electronicos">Electrónicos</option>
+                    <option value="libros">Libros</option>
+                    <option value="alimentos">Alimentos no perecibles</option>
+                    <option value="cosmeticos">Cosméticos</option>
+                    <option value="juguetes">Juguetes</option>
+                    <option value="herramientas">Herramientas</option>
+                    <option value="otros">Otros</option>
+                  </select>
+                </div>
+
+                <div class="campo-grupo">
+                  <label>Valor (S/) *</label>
+                  <input type="number" id="m-valorEnvio" step="0.01" min="0" placeholder="0.00" required>
+                </div>
+                
+                <div class="campo-grupo">
+                  <label>Peso (kg) *</label>
+                  <input type="number" id="m-peso" step="0.001" min="0.001" placeholder="0.00" required>
+                </div>
+                
+                <div class="campo-grupo">
+                  <label>Largo (cm) *</label>
+                  <input type="number" id="m-largo" step="0.1" min="0.1" placeholder="0.0" required>
+                </div>
+                
+                <div class="campo-grupo">
+                  <label>Ancho (cm) *</label>
+                  <input type="number" id="m-ancho" step="0.1" min="0.1" placeholder="0.0" required>
+                </div>
+                
+                <div class="campo-grupo">
+                  <label>Alto (cm) *</label>
+                  <input type="number" id="m-alto" step="0.1" min="0.1" placeholder="0.0" required>
+                </div>
+
+                <div class="campo-grupo" id="grupo-folios" style="display:none;">
+                  <label># Folios *</label>
+                  <input type="number" id="m-folios" min="1" placeholder="Cantidad de hojas">
+                </div>
+
+                <div class="campo-grupo campo-descripcion">
+                  <label>Descripción *</label>
+                  <textarea id="m-descripcionArticulo" placeholder="Descripción detallada del contenido" required></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- PESTAÑA DESTINATARIO -->
+            <div class="tab-panel" id="tab-destinatario">
+              <div class="campos-envio">
+                <div class="campo-grupo">
+                  <label>Tipo Documento *</label>
+                  <select id="m-tipoDocumento" required onchange="mostrarCamposReceptor()">
+                    <option value="">Seleccione...</option>
+                    <option value="dni">DNI</option>
+                    <option value="ruc">RUC</option>
+                    <option value="ce">Carnet de Extranjería</option>
+                  </select>
+                </div>
+                
+                <div class="campo-grupo">
+                  <label>Nro Documento *</label>
+                  <input type="text" id="m-nroDocumento" placeholder="Número de documento" required>
+                </div>
+                
+                <div class="campo-grupo">
+                  <label>Celular *</label>
+                  <input type="tel" id="m-celular" required placeholder="999999999" pattern="[0-9]{9}" title="Ingrese 9 dígitos">
+                </div>
+
+                <!-- Campos para RUC -->
+                <div id="campos-ruc" style="display:none; grid-column: 1/-1;">
+                  <div class="campos-ruc-grid">
+                    <div class="campo-grupo">
+                      <label>Razón Social *</label>
+                      <input type="text" id="m-razonSocial" placeholder="Nombre de la empresa">
+                    </div>
+                    <div class="campo-grupo">
+                      <label>Contacto *</label>
+                      <input type="text" id="m-contacto" placeholder="Persona de contacto">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Campos para personas naturales -->
+                <div id="campos-nombres" class="campo-grupo">
+                  <label>Nombres *</label>
+                  <input type="text" id="m-nombres" placeholder="Nombres completos">
+                </div>
+                
+                <div id="campos-apellidos" class="campo-grupo">
+                  <label>Apellidos *</label>
+                  <input type="text" id="m-apellidos" placeholder="Apellidos completos">
+                </div>
               </div>
             </div>
           </div>
-
-          <!-- Campos para personas naturales -->
-          <div id="campos-nombres" class="campo-grupo">
-            <label>Nombres *</label>
-            <input type="text" id="m-nombres" placeholder="Nombres completos">
-          </div>
-          <div id="campos-apellidos" class="campo-grupo">
-            <label>Apellidos *</label>
-            <input type="text" id="m-apellidos" placeholder="Apellidos completos">
-          </div>
         </div>
 
-        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+        <!-- Botones de acción -->
+        <div class="form-actions">
           <button type="button" class="btn-agregar" onclick="agregarEnvio()">+ Agregar envío</button>
           <button type="button" class="btn-limpiar" onclick="limpiarFormularioMasivo()">Limpiar formulario</button>
         </div>
@@ -294,7 +323,7 @@ Registro de Envíos Masivos
           </div>
         </div>
 
-        <div style="display: flex; gap: 1rem; margin-top: 1.5rem; justify-content: flex-end;">
+        <div class="table-actions">
           <button type="button" class="btn-limpiar-todos" onclick="limpiarTodosEnvios()" title="Eliminar todos los envíos">🗑️ Limpiar Todo</button>
           <button type="button" class="btn-exportar" onclick="exportarCSV()">📥 Exportar CSV</button>
         </div>
@@ -337,7 +366,6 @@ Registro de Envíos Masivos
     <!-- Botón continuar -->
     <button type="button" class="btn-continuar" id="btn-continuar">CONTINUAR</button>
   </form>
-
 </div>
 
 {% endblock %}
@@ -400,62 +428,31 @@ Registro de Envíos Masivos
       contacto: "Juan Pérez - Gerente",
       nombres: "",
       apellidos: ""
-    },
-    {
-      tipoEntrega: "domicilio",
-      departamento: "Cusco",
-      provincia: "Cusco",
-      distrito: "Wanchaq",
-      direccion: "Jr. Manco Capac 890, Interior 3",
-      referencia: "Cerca al mercado central, edificio amarillo",
-      tienda: "",
-      tipoEmpaque: "caja",
-      tipoArticulo: "libros",
-      descripcionArticulo: "Colección de libros educativos - 15 unidades",
-      valorEnvio: "320.00",
-      peso: "3.8",
-      largo: "45",
-      ancho: "35",
-      alto: "20",
-      folios: "",
-      tipoDocumento: "ce",
-      nroDocumento: "001234567",
-      celular: "923456789",
-      razonSocial: "",
-      contacto: "",
-      nombres: "Ana Lucía",
-      apellidos: "Vargas Torres"
-    },
-    {
-      tipoEntrega: "agencia",
-      departamento: "La Libertad",
-      provincia: "Trujillo",
-      distrito: "Trujillo",
-      direccion: "",
-      referencia: "",
-      tienda: "tienda-trujillo",
-      tipoEmpaque: "paquete",
-      tipoArticulo: "cosmeticos",
-      descripcionArticulo: "Set de maquillaje profesional MAC",
-      valorEnvio: "850.00",
-      peso: "1.5",
-      largo: "30",
-      ancho: "25",
-      alto: "12",
-      folios: "",
-      tipoDocumento: "ruc",
-      nroDocumento: "20789456123",
-      celular: "945612378",
-      razonSocial: "Belleza Total E.I.R.L.",
-      contacto: "Sandra Rodríguez - Administradora",
-      nombres: "",
-      apellidos: ""
     }
   ];
 
   // Variable para controlar si se cargan los datos de ejemplo
-  // IMPORTANTE: Cambiar a false en producción
   let cargarDatosEjemplo = true; // 🔴 CAMBIAR A false EN PRODUCCIÓN
+
+  // Funcionalidad de pestañas
+  function initTabs() {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetTab = btn.getAttribute('data-tab');
+        
+        // Remover clase active de todos los botones y paneles
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabPanels.forEach(p => p.classList.remove('active'));
+        
+        // Agregar clase active al botón y panel seleccionado
+        btn.classList.add('active');
+        document.getElementById(`tab-${targetTab}`).classList.add('active');
+      });
+    });
+  }
 
   // Mostrar campos según tipo de entrega
   function mostrarCamposDestino() {
@@ -563,52 +560,49 @@ Registro de Envíos Masivos
       apellidos: document.getElementById('m-apellidos').value
     };
 
-    // Validar campos básicos
+    // Validar campos básicos por pestañas
+    const errors = [];
+
+    // Validar pestaña Destino
     if (!envio.tipoEntrega || !envio.departamento || !envio.provincia || !envio.distrito) {
-      alert('Por favor complete todos los campos de ubicación y tipo de entrega');
-      return;
+      errors.push('Complete todos los campos de ubicación en la pestaña Destino');
     }
 
-    // Validar según tipo de entrega
     if ((envio.tipoEntrega === 'domicilio' || envio.tipoEntrega === 'express') && !envio.direccion) {
-      alert('Por favor ingrese la dirección de entrega');
-      return;
+      errors.push('Ingrese la dirección de entrega en la pestaña Destino');
     }
     if (envio.tipoEntrega === 'agencia' && !envio.tienda) {
-      alert('Por favor seleccione la tienda para el recojo');
-      return;
+      errors.push('Seleccione la tienda para el recojo en la pestaña Destino');
     }
 
-    // Validar descripción del envío
+    // Validar pestaña Paquete
     if (!envio.tipoEmpaque || !envio.tipoArticulo || !envio.descripcionArticulo ||
         !envio.valorEnvio || !envio.peso || !envio.largo || !envio.ancho || !envio.alto) {
-      alert('Por favor complete todos los campos de la descripción del envío');
-      return;
+      errors.push('Complete todos los campos de la pestaña Paquete');
     }
 
-    // Validar folios si es sobre
     if (envio.tipoEmpaque === 'sobre' && (!envio.folios || envio.folios < 1)) {
-      alert('Por favor ingrese el número de folios');
-      return;
+      errors.push('Ingrese el número de folios en la pestaña Paquete');
     }
 
-    // Validar datos del receptor
+    // Validar pestaña Destinatario
     if (!envio.tipoDocumento || !envio.nroDocumento || !envio.celular) {
-      alert('Por favor complete los datos básicos del destinatario');
-      return;
+      errors.push('Complete los datos básicos en la pestaña Destinatario');
     }
 
-    // Validar según tipo de documento
     if (envio.tipoDocumento === 'ruc') {
       if (!envio.razonSocial || !envio.contacto) {
-        alert('Por favor complete Razón Social y Contacto');
-        return;
+        errors.push('Complete Razón Social y Contacto en la pestaña Destinatario');
       }
     } else {
       if (!envio.nombres || !envio.apellidos) {
-        alert('Por favor complete nombres y apellidos del destinatario');
-        return;
+        errors.push('Complete nombres y apellidos en la pestaña Destinatario');
       }
+    }
+
+    if (errors.length > 0) {
+      alert(errors.join('\n'));
+      return;
     }
 
     // Agregar o actualizar envío
@@ -733,10 +727,12 @@ Registro de Envíos Masivos
           <td>
             <div class="btn-actions">
               <button class="btn-small btn-editar" onclick="editarEnvio(${index})" title="Editar">
-                ✏️
+                                  <i class="{{ICON_UPDATE}}"></i>
+
               </button>
               <button class="btn-small btn-eliminar" onclick="eliminarEnvio(${index})" title="Eliminar">
-                🗑️
+                                  <i class="{{ICON_DELETE}}"></i>
+
               </button>
             </div>
           </td>
@@ -1024,6 +1020,9 @@ Registro de Envíos Masivos
 
   // Inicializar al cargar
   document.addEventListener("DOMContentLoaded", function () {
+    // Inicializar pestañas
+    initTabs();
+    
     mostrarCamposDestino();
     toggleFolios();
     mostrarCamposReceptor();
@@ -1033,8 +1032,12 @@ Registro de Envíos Masivos
       enviosMasivos = [...enviosEjemplo];
       actualizarTabla();
       
-      // Mostrar mensaje informativo
-    
+      // Pre-llenar datos del remitente para la demo
+      document.getElementById('remitente-tipo-doc').value = 'ruc';
+      document.getElementById('remitente-numero-doc').value = '20123456789';
+      document.getElementById('remitente-telefono').value = '987654321';
+      document.getElementById('remitente-nombre').value = 'Empresa de Envíos Demo S.A.C.';
+      document.getElementById('remitente-email').value = 'demo@enviosmasivos.com';
       
       // Agregar indicador permanente
       const indicator = document.createElement('div');
@@ -1059,18 +1062,6 @@ Registro de Envíos Masivos
         }
       };
       document.body.appendChild(indicator);
-      
-      // Pre-llenar datos del remitente para la demo
-      document.getElementById('remitente-tipo-doc').value = 'ruc';
-      document.getElementById('remitente-numero-doc').value = '20123456789';
-      document.getElementById('remitente-telefono').value = '987654321';
-      document.getElementById('remitente-nombre').value = 'Empresa de Envíos Demo S.A.C.';
-      document.getElementById('remitente-email').value = 'demo@enviosmasivos.com';
-      
-      setTimeout(() => {
-        info.style.animation = 'fadeOut 0.5s ease-out';
-        setTimeout(() => info.remove(), 500);
-      }, 8000);
     }
     
     // Agregar animación para el título
@@ -1078,88 +1069,6 @@ Registro de Envíos Masivos
     titulo.style.animation = 'fadeIn 0.5s ease-out';
   });
 
-  const style = document.createElement('style');
-  style.textContent = `
-    .badge {
-      display: inline-block;
-      padding: 0.25rem 0.75rem;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-    .badge-domicilio {
-      background: #e6fffa;
-      color: #047857;
-    }
-    .badge-agencia {
-      background: #fef3c7;
-      color: #92400e;
-    }
-    .badge-express {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-    .btn-limpiar {
-      background: #e2e8f0;
-      color: #4a5568;
-      padding: 0.8rem 2rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-    .btn-limpiar:hover {
-      background: #cbd5e0;
-    }
-    .btn-limpiar-todos {
-      background: #fc8181;
-      color: white;
-      padding: 0.6rem 1.5rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 500;
-      font-size: 0.9rem;
-      transition: all 0.3s ease;
-    }
-    .btn-limpiar-todos:hover {
-      background: #f56565;
-      transform: translateY(-1px);
-    }
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
-    
-    /* Indicador de modo demo */
-    .demo-indicator {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      z-index: 1000;
-      cursor: pointer;
-    }
-    .demo-indicator:hover {
-      transform: scale(1.05);
-    }
-  `;
-  document.head.appendChild(style);
 </script>
+
 {% endblock %}
