@@ -171,7 +171,6 @@ def get_agencias_data():
 
     return agencias
 
-<<<<<<< HEAD
 def get_ubigeo():
     sql = '''
             select
@@ -206,7 +205,6 @@ def get_ubigeo():
     return estructura
     
     
-=======
 
 
 def get_report_horario():
@@ -246,4 +244,3 @@ def get_report_horario():
 
     filas = sql_select_fetchall(sql)
     return columnas, filas
->>>>>>> 58a04dafaaa0bbd4cb2a5d9401863e2d601864e8
