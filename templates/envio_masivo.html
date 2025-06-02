@@ -11,6 +11,7 @@ Registro de Envíos Masivos
 
 {% block contenido %}
 
+
 <div class="navigation-links">
   <a href="{{ url_for('tipos_envio') }}" class="back-link">← Regresar</a>
 </div>
@@ -43,28 +44,67 @@ Registro de Envíos Masivos
 
   <form id="formulario-envio" class="formulario">
     <!-- SECCIÓN: QUIÉN ENVÍA -->
-    <div id="seccion-quien-envia" class="seccion">
+    <div id="seccion-quien-envia" >
       <h2 class="titulo-seccion">¿Quién envía?</h2>
-      <div class="form-group">
-        <select id="remitente-tipo-doc" required>
-          <option value="">Tipo De Documento</option>
-          <option value="dni">DNI</option>
-          <option value="ruc">RUC</option>
-          <option value="ce">Carnet de Extranjería</option>
-        </select>
-        <input type="text" id="remitente-numero-doc" placeholder="Número" required>
-        <input type="text" id="remitente-telefono" placeholder="Confirma tu teléfono" required>
-      </div>
-      <div class="form-group">
-        <input type="text" id="remitente-nombre" placeholder="Nombre completo" required>
-        <input type="email" id="remitente-email" placeholder="Confirma tu email" required>
-      </div>
-    </div>
 
+      <div id="seccion_remitente">
+
+            <div class="campo-grupo">
+              <select id="remitente-tipo-doc" required>
+                <option disabled selected value="">Seleccione tipo de documento</option>
+                {% for fila in nombre_doc %}
+                  <option value="{{ fila[0] }}">{{ fila[1] }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="campo-grupo">
+              <input type="text" id="remitente-numero-doc" placeholder="Número de documento" required>
+            </div>
+
+            <div class="campo-grupo">
+              <input type="text" id="remitente-telefono" placeholder="Número de teléfono" required>
+            </div>
+
+            <div class="campo-grupo">
+              <input type="text" id="remitente-nombre" placeholder="Nombre completo" required>
+            </div>
+
+            <div class="campo-grupo">
+              <input type="email" id="remitente-email" placeholder="Email" required>
+            </div>
+
+        </div>
+    </div>
+    <div id="desde-donde-envia" >
+      <h2 class="titulo-seccion">¿Desde dónde envía?</h2>
+
+      <div id="seccion-origen">
+         <div class="campos-envio">
+              <div class="campo-grupo">
+                  <label>Departamento *</label>
+                  <select id="origen-departamento" required>
+                  </select>
+                </div>
+
+                <div class="campo-grupo">
+                  <label>Provincia *</label>
+                  <select id="origen-provincia" required>
+                  </select>
+                </div>
+
+                <div class="campo-grupo">
+                  <label>Distrito *</label>
+                  <select id="origen-distrito" required>
+                  </select>
+                </div>
+          </div>
+        </div>
+    </div>
     <!-- SECCIÓN: ENVÍOS MASIVOS CON PESTAÑAS -->
     <div id="seccion-masiva" style="display: block;">
       <div class="seccion-masiva">
-        <h2 class="titulo-seccion">Agregar envío</h2>
+        <h2 class="titulo-seccion">Registro de encomiendas</h2>
         
         <!-- Sistema de Pestañas -->
         <div class="tabs-container">
@@ -87,64 +127,41 @@ Registro de Envíos Masivos
             <div class="tab-panel active" id="tab-destino">
               <div class="campos-envio">
                 <div class="campo-grupo">
-                  <label>Tipo de Entrega *</label>
+                  <label>Tipo de recepción *</label>
                   <select id="m-tipoEntrega" required onchange="mostrarCamposDestino()">
-                    <option value="">Seleccione...</option>
-                    <option value="domicilio">A Domicilio</option>
-                    <option value="agencia">En Agencia</option>
+                    <option disabled selected value="">Seleccione tipo de recepción</option>
+                      {% for fila in nombre_rep %}
+                        <option value="{{ fila[0] }}">{{ fila[1] }}</option>
+                      {% endfor %}
                   </select>
                 </div>
 
                 <div class="campo-grupo">
                   <label>Departamento *</label>
-                  <select id="m-departamento" required>
-                    <option value="">Seleccione...</option>
-                    <option value="Amazonas">Amazonas</option>
-                    <option value="Ancash">Áncash</option>
-                    <option value="Apurimac">Apurímac</option>
-                    <option value="Arequipa">Arequipa</option>
-                    <option value="Ayacucho">Ayacucho</option>
-                    <option value="Cajamarca">Cajamarca</option>
-                    <option value="Callao">Callao</option>
-                    <option value="Cusco">Cusco</option>
-                    <option value="Huancavelica">Huancavelica</option>
-                    <option value="Huanuco">Huánuco</option>
-                    <option value="Ica">Ica</option>
-                    <option value="Junin">Junín</option>
-                    <option value="La Libertad">La Libertad</option>
-                    <option value="Lambayeque">Lambayeque</option>
-                    <option value="Lima">Lima</option>
-                    <option value="Loreto">Loreto</option>
-                    <option value="Madre de Dios">Madre de Dios</option>
-                    <option value="Moquegua">Moquegua</option>
-                    <option value="Pasco">Pasco</option>
-                    <option value="Piura">Piura</option>
-                    <option value="Puno">Puno</option>
-                    <option value="San Martin">San Martín</option>
-                    <option value="Tacna">Tacna</option>
-                    <option value="Tumbes">Tumbes</option>
-                    <option value="Ucayali">Ucayali</option>
+                  <select id="select-departamento" required>
+                    <option disabled selected value="">----</option>
                   </select>
                 </div>
 
                 <div class="campo-grupo">
                   <label>Provincia *</label>
-                  <select id="m-provincia" required>
-                    <option value="">Seleccione departamento primero</option>
+                  <select id="select-provincia" required>
+                  <option disabled selected value="">----</option>
+
                   </select>
                 </div>
 
                 <div class="campo-grupo">
                   <label>Distrito *</label>
-                  <select id="m-distrito" required>
-                    <option value="">Seleccione provincia primero</option>
+                  <select id="select-distrito" required>
+                         <option disabled selected value="">----</option>
                   </select>
                 </div>
 
                 <!-- Dirección y Referencia: solo para domicilio -->
                 <div class="campo-grupo" id="grupo-direccion" style="display:none;">
                   <label>Dirección *</label>
-                  <input type="text" id="m-direccion" placeholder="Av./Jr./Calle Nombre #123">
+                  <input type="text" id="m-direccion" placeholder="Av./Jr./Calle Nombre #123" required>
                 </div>
 
                 <div class="campo-grupo" id="grupo-referencia" style="display:none;">
@@ -154,17 +171,8 @@ Registro de Envíos Masivos
 
                 <!-- Tienda: solo para agencia -->
                 <div class="campo-grupo" id="grupo-tienda" style="display:none;">
-                  <label>Tienda *</label>
-                  <select id="m-tienda">
-                    <option value="">Seleccione tienda</option>
-                    <option value="tienda-lima-centro">Tienda Lima Centro</option>
-                    <option value="tienda-miraflores">Tienda Miraflores</option>
-                    <option value="tienda-san-isidro">Tienda San Isidro</option>
-                    <option value="tienda-trujillo">Tienda Trujillo</option>
-                    <option value="tienda-arequipa">Tienda Arequipa</option>
-                    <option value="tienda-chiclayo">Tienda Chiclayo</option>
-                    <option value="tienda-piura">Tienda Piura</option>
-                    <option value="tienda-cusco">Tienda Cusco</option>
+                  <label>Sucursal *</label>
+                  <select id="select-sucursal" required>
                   </select>
                 </div>
               </div>
@@ -174,31 +182,24 @@ Registro de Envíos Masivos
             <div class="tab-panel" id="tab-paquete">
               <div class="campos-envio">
                 <div class="campo-grupo">
-                  <label>Tipo empaque *</label>
-                  <select id="m-tipoEmpaque" required onchange="toggleFolios()">
-                    <option value="">Seleccione...</option>
-                    <option value="caja">Caja</option>
-                    <option value="sobre">Sobre</option>
-                    <option value="bolsa">Bolsa</option>
-                    <option value="paquete">Paquete</option>
+                  <label>Tipo de empaque *</label>
+                    <select id="m-tipoEmpaque" required onchange="toggleFolios(); toggleArticulos();">
+                      <option disabled selected value="">Seleccione tipo de empaque</option>
+                      {% for fila in empaque %}
+                        <option value="{{ fila[0] }}">{{ fila[1] }}</option>
+                      {% endfor %}
                   </select>
                 </div>
                 
-                <div class="campo-grupo">
-                  <label>Tipo Artículo *</label>
-                  <select id="m-tipoArticulo" required>
-                    <option value="">Seleccione...</option>
-                    <option value="documentos">Documentos</option>
-                    <option value="ropa">Ropa</option>
-                    <option value="electronicos">Electrónicos</option>
-                    <option value="libros">Libros</option>
-                    <option value="alimentos">Alimentos no perecibles</option>
-                    <option value="cosmeticos">Cosméticos</option>
-                    <option value="juguetes">Juguetes</option>
-                    <option value="herramientas">Herramientas</option>
-                    <option value="otros">Otros</option>
-                  </select>
-                </div>
+                <div class="campo-grupo" id="grupo-articulos" style="display:none;">
+                      <label>Tipo de contenido *</label>
+                      <select id="m-tipoArticulo" required>
+                      <option disabled selected value="">Seleccione tipo de contenido</option>
+                      {% for fila in articulos %}
+                        <option value="{{ fila[0] }}">{{ fila[1] }}</option>
+                      {% endfor %}
+                      </select>
+                  </div>
 
                 <div class="campo-grupo">
                   <label>Valor (S/) *</label>
@@ -227,7 +228,7 @@ Registro de Envíos Masivos
 
                 <div class="campo-grupo" id="grupo-folios" style="display:none;">
                   <label># Folios *</label>
-                  <input type="number" id="m-folios" min="1" placeholder="Cantidad de hojas">
+                  <input type="number" id="m-folios" min="1" placeholder="Cantidad de hojas" required>
                 </div>
 
                 <div class="campo-grupo campo-descripcion">
@@ -241,17 +242,17 @@ Registro de Envíos Masivos
             <div class="tab-panel" id="tab-destinatario">
               <div class="campos-envio">
                 <div class="campo-grupo">
-                  <label>Tipo Documento *</label>
+                  <label>Tipo de documento *</label>
                   <select id="m-tipoDocumento" required onchange="mostrarCamposReceptor()">
-                    <option value="">Seleccione...</option>
-                    <option value="dni">DNI</option>
-                    <option value="ruc">RUC</option>
-                    <option value="ce">Carnet de Extranjería</option>
+                    <option disabled selected value="">Seleccione tipo de documento</option>
+                    {% for fila in nombre_doc %}
+                      <option value="{{ fila[0] }}">{{ fila[1] }}</option>
+                    {% endfor %}
                   </select>
                 </div>
                 
                 <div class="campo-grupo">
-                  <label>Nro Documento *</label>
+                  <label>Nro de documento *</label>
                   <input type="text" id="m-nroDocumento" placeholder="Número de documento" required>
                 </div>
                 
@@ -260,30 +261,38 @@ Registro de Envíos Masivos
                   <input type="tel" id="m-celular" required placeholder="999999999" pattern="[0-9]{9}" title="Ingrese 9 dígitos">
                 </div>
 
+
+
+
+
                 <!-- Campos para RUC -->
-                <div id="campos-ruc" style="display:none; grid-column: 1/-1;">
-                  <div class="campos-ruc-grid">
-                    <div class="campo-grupo">
+
+
+                    <div class="campo-grupo" id="campo-razon-ruc">
                       <label>Razón Social *</label>
                       <input type="text" id="m-razonSocial" placeholder="Nombre de la empresa">
                     </div>
-                    <div class="campo-grupo">
+
+                    <div class="campo-grupo"  id="campo-contacto-ruc">
                       <label>Contacto *</label>
                       <input type="text" id="m-contacto" placeholder="Persona de contacto">
                     </div>
-                  </div>
-                </div>
+
 
                 <!-- Campos para personas naturales -->
-                <div id="campos-nombres" class="campo-grupo">
+                <div id="campos-nombres" class="campo-grupo" style="display:none;">
                   <label>Nombres *</label>
                   <input type="text" id="m-nombres" placeholder="Nombres completos">
                 </div>
                 
-                <div id="campos-apellidos" class="campo-grupo">
+                <div id="campos-apellidos" class="campo-grupo" style="display:none;">
                   <label>Apellidos *</label>
                   <input type="text" id="m-apellidos" placeholder="Apellidos completos">
                 </div>
+
+
+
+
               </div>
             </div>
           </div>
@@ -291,7 +300,7 @@ Registro de Envíos Masivos
 
         <!-- Botones de acción -->
         <div class="form-actions">
-          <button type="button" class="btn-agregar" onclick="agregarEnvio()">+ Agregar envío</button>
+          <button type="button" class="btn-agregar" onclick="agregarEnvio()"> + Agregar envío</button>
           <button type="button" class="btn-limpiar" onclick="limpiarFormularioMasivo()">Limpiar formulario</button>
         </div>
       </div>
@@ -324,751 +333,36 @@ Registro de Envíos Masivos
         </div>
 
         <div class="table-actions">
-          <button type="button" class="btn-limpiar-todos" onclick="limpiarTodosEnvios()" title="Eliminar todos los envíos">🗑️ Limpiar Todo</button>
+          <button type="button" class="btn-limpiar-todos" onclick="limpiarTodosEnvios()" title="Eliminar todos los envíos">🗑️ Eliminar todo</button>
           <button type="button" class="btn-exportar" onclick="exportarCSV()">📥 Exportar CSV</button>
         </div>
       </div>
     </div>
 
-    <!-- SECCIÓN DE RESUMEN -->
-    <div id="seccion-resumen" style="display:none;">
-      <h2 class="titulo-seccion">Resumen de Envíos</h2>
-      
-      <div class="resumen-remitente">
-        <h4>👤 Datos del Remitente</h4>
-        <div class="resumen-info">
-          <div class="resumen-item">
-            <span class="resumen-label">Tipo de Documento</span>
-            <span class="resumen-value" id="resumen-tipo-doc"></span>
-          </div>
-          <div class="resumen-item">
-            <span class="resumen-label">Número de Documento</span>
-            <span class="resumen-value" id="resumen-numero-doc"></span>
-          </div>
-          <div class="resumen-item">
-            <span class="resumen-label">Nombre Completo</span>
-            <span class="resumen-value" id="resumen-nombre"></span>
-          </div>
-          <div class="resumen-item">
-            <span class="resumen-label">Teléfono</span>
-            <span class="resumen-value" id="resumen-telefono"></span>
-          </div>
-          <div class="resumen-item">
-            <span class="resumen-label">Email</span>
-            <span class="resumen-value" id="resumen-email"></span>
-          </div>
-        </div>
-      </div>
 
-      <div id="resumen-envios"></div>
-    </div>
 
     <!-- Botón continuar -->
     <button type="button" class="btn-continuar" id="btn-continuar">CONTINUAR</button>
   </form>
 </div>
 
+
+
+
 {% endblock %}
 
 {% block scripts %}
+
 <script>
-  // Variables globales
-  let enviosMasivos = [];
-  let pasoActual = 1;
-  let editIndex = -1;
-
-  // Datos de ejemplo para demostración
-  const enviosEjemplo = [
-    {
-      tipoEntrega: "domicilio",
-      departamento: "Lima",
-      provincia: "Lima",
-      distrito: "Miraflores",
-      direccion: "Av. Larco 345, Dpto 502",
-      referencia: "Frente al parque Kennedy",
-      tienda: "",
-      tipoEmpaque: "caja",
-      tipoArticulo: "electronicos",
-      descripcionArticulo: "Laptop Dell Inspiron 15 + accesorios",
-      valorEnvio: "2500.00",
-      peso: "2.5",
-      largo: "40",
-      ancho: "30",
-      alto: "10",
-      folios: "",
-      tipoDocumento: "dni",
-      nroDocumento: "45678912",
-      celular: "987654321",
-      razonSocial: "",
-      contacto: "",
-      nombres: "María Elena",
-      apellidos: "González López"
-    },
-    {
-      tipoEntrega: "agencia",
-      departamento: "Lima",
-      provincia: "Lima",
-      distrito: "San Isidro",
-      direccion: "",
-      referencia: "",
-      tienda: "tienda-san-isidro",
-      tipoEmpaque: "sobre",
-      tipoArticulo: "documentos",
-      descripcionArticulo: "Documentos legales importantes - Contrato de venta",
-      valorEnvio: "50.00",
-      peso: "0.5",
-      largo: "30",
-      ancho: "20",
-      alto: "2",
-      folios: "25",
-      tipoDocumento: "ruc",
-      nroDocumento: "20456789123",
-      celular: "912345678",
-      razonSocial: "Empresa ABC S.A.C.",
-      contacto: "Juan Pérez - Gerente",
-      nombres: "",
-      apellidos: ""
-    }
-  ];
-
-  // Variable para controlar si se cargan los datos de ejemplo
-  let cargarDatosEjemplo = true; // 🔴 CAMBIAR A false EN PRODUCCIÓN
-
-  // Funcionalidad de pestañas
-  function initTabs() {
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabPanels = document.querySelectorAll('.tab-panel');
-
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const targetTab = btn.getAttribute('data-tab');
-        
-        // Remover clase active de todos los botones y paneles
-        tabBtns.forEach(b => b.classList.remove('active'));
-        tabPanels.forEach(p => p.classList.remove('active'));
-        
-        // Agregar clase active al botón y panel seleccionado
-        btn.classList.add('active');
-        document.getElementById(`tab-${targetTab}`).classList.add('active');
-      });
-    });
-  }
-
-  // Mostrar campos según tipo de entrega
-  function mostrarCamposDestino() {
-    const tipoEntrega = document.getElementById('m-tipoEntrega').value;
-    const grupoDireccion = document.getElementById('grupo-direccion');
-    const grupoReferencia = document.getElementById('grupo-referencia');
-    const grupoTienda = document.getElementById('grupo-tienda');
-
-    if (tipoEntrega === 'domicilio' || tipoEntrega === 'express') {
-      grupoDireccion.style.display = 'flex';
-      grupoReferencia.style.display = 'flex';
-      grupoTienda.style.display = 'none';
-
-      document.getElementById('m-direccion').required = true;
-      document.getElementById('m-referencia').required = false;
-      document.getElementById('m-tienda').required = false;
-    } else if (tipoEntrega === 'agencia') {
-      grupoDireccion.style.display = 'none';
-      grupoReferencia.style.display = 'none';
-      grupoTienda.style.display = 'flex';
-
-      document.getElementById('m-direccion').required = false;
-      document.getElementById('m-referencia').required = false;
-      document.getElementById('m-tienda').required = true;
-    } else {
-      grupoDireccion.style.display = 'none';
-      grupoReferencia.style.display = 'none';
-      grupoTienda.style.display = 'none';
-
-      document.getElementById('m-direccion').required = false;
-      document.getElementById('m-referencia').required = false;
-      document.getElementById('m-tienda').required = false;
-    }
-  }
-
-  // Mostrar campo folios solo si es sobre
-  function toggleFolios() {
-    const tipoEmpaque = document.getElementById('m-tipoEmpaque').value;
-    const grupoFolios = document.getElementById('grupo-folios');
-    const foliosInput = document.getElementById('m-folios');
-
-    if (tipoEmpaque === 'sobre') {
-      grupoFolios.style.display = 'flex';
-      foliosInput.required = true;
-    } else {
-      grupoFolios.style.display = 'none';
-      foliosInput.required = false;
-      foliosInput.value = '';
-    }
-  }
-
-  // Mostrar campos según tipo de documento del receptor
-  function mostrarCamposReceptor() {
-    const tipoDocumento = document.getElementById('m-tipoDocumento').value;
-    const camposRuc = document.getElementById('campos-ruc');
-    const camposNombres = document.getElementById('campos-nombres');
-    const camposApellidos = document.getElementById('campos-apellidos');
-
-    if (tipoDocumento === 'ruc') {
-      camposRuc.style.display = 'block';
-      camposNombres.style.display = 'none';
-      camposApellidos.style.display = 'none';
-
-      document.getElementById('m-razonSocial').required = true;
-      document.getElementById('m-contacto').required = true;
-      document.getElementById('m-nombres').required = false;
-      document.getElementById('m-apellidos').required = false;
-    } else {
-      camposRuc.style.display = 'none';
-      camposNombres.style.display = 'flex';
-      camposApellidos.style.display = 'flex';
-
-      document.getElementById('m-razonSocial').required = false;
-      document.getElementById('m-contacto').required = false;
-      document.getElementById('m-nombres').required = true;
-      document.getElementById('m-apellidos').required = true;
-    }
-  }
-
-  // Función para agregar envío
-  function agregarEnvio() {
-    const envio = {
-      tipoEntrega: document.getElementById('m-tipoEntrega').value,
-      departamento: document.getElementById('m-departamento').value,
-      provincia: document.getElementById('m-provincia').value,
-      distrito: document.getElementById('m-distrito').value,
-      direccion: document.getElementById('m-direccion').value,
-      referencia: document.getElementById('m-referencia').value,
-      tienda: document.getElementById('m-tienda').value,
-      tipoEmpaque: document.getElementById('m-tipoEmpaque').value,
-      tipoArticulo: document.getElementById('m-tipoArticulo').value,
-      descripcionArticulo: document.getElementById('m-descripcionArticulo').value,
-      valorEnvio: document.getElementById('m-valorEnvio').value,
-      peso: document.getElementById('m-peso').value,
-      largo: document.getElementById('m-largo').value,
-      ancho: document.getElementById('m-ancho').value,
-      alto: document.getElementById('m-alto').value,
-      folios: document.getElementById('m-folios').value,
-      tipoDocumento: document.getElementById('m-tipoDocumento').value,
-      nroDocumento: document.getElementById('m-nroDocumento').value,
-      celular: document.getElementById('m-celular').value,
-      razonSocial: document.getElementById('m-razonSocial').value,
-      contacto: document.getElementById('m-contacto').value,
-      nombres: document.getElementById('m-nombres').value,
-      apellidos: document.getElementById('m-apellidos').value
-    };
-
-    // Validar campos básicos por pestañas
-    const errors = [];
-
-    // Validar pestaña Destino
-    if (!envio.tipoEntrega || !envio.departamento || !envio.provincia || !envio.distrito) {
-      errors.push('Complete todos los campos de ubicación en la pestaña Destino');
-    }
-
-    if ((envio.tipoEntrega === 'domicilio' || envio.tipoEntrega === 'express') && !envio.direccion) {
-      errors.push('Ingrese la dirección de entrega en la pestaña Destino');
-    }
-    if (envio.tipoEntrega === 'agencia' && !envio.tienda) {
-      errors.push('Seleccione la tienda para el recojo en la pestaña Destino');
-    }
-
-    // Validar pestaña Paquete
-    if (!envio.tipoEmpaque || !envio.tipoArticulo || !envio.descripcionArticulo ||
-        !envio.valorEnvio || !envio.peso || !envio.largo || !envio.ancho || !envio.alto) {
-      errors.push('Complete todos los campos de la pestaña Paquete');
-    }
-
-    if (envio.tipoEmpaque === 'sobre' && (!envio.folios || envio.folios < 1)) {
-      errors.push('Ingrese el número de folios en la pestaña Paquete');
-    }
-
-    // Validar pestaña Destinatario
-    if (!envio.tipoDocumento || !envio.nroDocumento || !envio.celular) {
-      errors.push('Complete los datos básicos en la pestaña Destinatario');
-    }
-
-    if (envio.tipoDocumento === 'ruc') {
-      if (!envio.razonSocial || !envio.contacto) {
-        errors.push('Complete Razón Social y Contacto en la pestaña Destinatario');
-      }
-    } else {
-      if (!envio.nombres || !envio.apellidos) {
-        errors.push('Complete nombres y apellidos en la pestaña Destinatario');
-      }
-    }
-
-    if (errors.length > 0) {
-      alert(errors.join('\n'));
-      return;
-    }
-
-    // Agregar o actualizar envío
-    if (editIndex >= 0) {
-      enviosMasivos[editIndex] = envio;
-      editIndex = -1;
-    } else {
-      enviosMasivos.push(envio);
-    }
-
-    actualizarTabla();
-    limpiarFormularioMasivo();
-    
-    // Mostrar mensaje de éxito
-    const mensaje = editIndex >= 0 ? 'Envío actualizado correctamente' : 'Envío agregado correctamente';
-    mostrarMensajeExito(mensaje);
-  }
-
-  // Mostrar mensaje de éxito temporal
-  function mostrarMensajeExito(mensaje) {
-    const alert = document.createElement('div');
-    alert.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: #48bb78;
-      color: white;
-      padding: 1rem 2rem;
-      border-radius: 6px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      z-index: 1000;
-      animation: slideIn 0.3s ease-out;
-    `;
-    alert.textContent = mensaje;
-    document.body.appendChild(alert);
-    
-    setTimeout(() => {
-      alert.remove();
-    }, 3000);
-  }
-
-  // Actualizar tabla
-  function actualizarTabla() {
-    const tableContent = document.getElementById('tableContent');
-    const totalEnvios = document.getElementById('totalEnvios');
-    const pesoTotal = document.getElementById('pesoTotal');
-    const valorTotal = document.getElementById('valorTotal');
-
-    if (enviosMasivos.length === 0) {
-      tableContent.innerHTML = `
-        <div class="empty-state">
-          <p>No hay envíos registrados aún</p>
-          <p>Comienza agregando tu primer envío</p>
-        </div>
-      `;
-      totalEnvios.textContent = '0';
-      pesoTotal.textContent = '0';
-      valorTotal.textContent = '0.00';
-      return;
-    }
-
-    let sumaPeso = 0;
-    let sumaValor = 0;
-
-    let html = `
-      <div style="overflow-x: auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Tipo</th>
-              <th>Destinatario</th>
-              <th>Destino</th>
-              <th>Descripción</th>
-              <th>Dimensiones</th>
-              <th>Peso</th>
-              <th>Valor</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-    `;
-
-    enviosMasivos.forEach((envio, index) => {
-      sumaPeso += parseFloat(envio.peso) || 0;
-      sumaValor += parseFloat(envio.valorEnvio) || 0;
-
-      let destinatario = '';
-      if(envio.tipoDocumento === 'ruc'){
-        destinatario = envio.razonSocial || '';
-      } else {
-        destinatario = `${envio.nombres || ''} ${envio.apellidos || ''}`.trim();
-      }
-
-      // Badge para tipo de entrega
-      let badgeClass = '';
-      if (envio.tipoEntrega === 'express') badgeClass = 'badge-express';
-      else if (envio.tipoEntrega === 'agencia') badgeClass = 'badge-agencia';
-      else badgeClass = 'badge-domicilio';
-
-      html += `
-        <tr>
-          <td>${index + 1}</td>
-          <td><span class="badge ${badgeClass}">${envio.tipoEntrega}</span></td>
-          <td>
-            <div><strong>${destinatario}</strong></div>
-            <small style="color: #718096;">${envio.tipoDocumento.toUpperCase()}: ${envio.nroDocumento}</small>
-          </td>
-          <td>
-            <div>${envio.distrito}</div>
-            <small style="color: #718096;">${envio.provincia}, ${envio.departamento}</small>
-          </td>
-          <td>
-            <div>${envio.descripcionArticulo}</div>
-            <small style="color: #718096;">${envio.tipoArticulo} - ${envio.tipoEmpaque}</small>
-          </td>
-          <td>
-            <small>${envio.largo}x${envio.ancho}x${envio.alto} cm</small>
-          </td>
-          <td>${envio.peso} kg</td>
-          <td><strong>S/ ${parseFloat(envio.valorEnvio).toFixed(2)}</strong></td>
-          <td>
-            <div class="btn-actions">
-              <button class="btn-small btn-editar" onclick="editarEnvio(${index})" title="Editar">
-                                  <i class="{{ICON_UPDATE}}"></i>
-
-              </button>
-              <button class="btn-small btn-eliminar" onclick="eliminarEnvio(${index})" title="Eliminar">
-                                  <i class="{{ICON_DELETE}}"></i>
-
-              </button>
-            </div>
-          </td>
-        </tr>
-      `;
-    });
-
-    html += `
-          </tbody>
-        </table>
-      </div>
-    `;
-
-    tableContent.innerHTML = html;
-    totalEnvios.textContent = enviosMasivos.length;
-    pesoTotal.textContent = sumaPeso.toFixed(2);
-    valorTotal.textContent = sumaValor.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
-
-  // Editar envío
-  function editarEnvio(index) {
-    const envio = enviosMasivos[index];
-    editIndex = index;
-
-    // Llenar formulario
-    document.getElementById('m-tipoEntrega').value = envio.tipoEntrega;
-    mostrarCamposDestino();
-
-    document.getElementById('m-departamento').value = envio.departamento;
-    document.getElementById('m-provincia').value = envio.provincia;
-    document.getElementById('m-distrito').value = envio.distrito;
-    document.getElementById('m-direccion').value = envio.direccion;
-    document.getElementById('m-referencia').value = envio.referencia;
-    document.getElementById('m-tienda').value = envio.tienda;
-
-    document.getElementById('m-tipoEmpaque').value = envio.tipoEmpaque;
-    toggleFolios();
-
-    document.getElementById('m-tipoArticulo').value = envio.tipoArticulo;
-    document.getElementById('m-descripcionArticulo').value = envio.descripcionArticulo;
-    document.getElementById('m-valorEnvio').value = envio.valorEnvio;
-    document.getElementById('m-peso').value = envio.peso;
-    document.getElementById('m-largo').value = envio.largo;
-    document.getElementById('m-ancho').value = envio.ancho;
-    document.getElementById('m-alto').value = envio.alto;
-    document.getElementById('m-folios').value = envio.folios;
-
-    document.getElementById('m-tipoDocumento').value = envio.tipoDocumento;
-    mostrarCamposReceptor();
-
-    document.getElementById('m-nroDocumento').value = envio.nroDocumento;
-    document.getElementById('m-celular').value = envio.celular;
-    document.getElementById('m-razonSocial').value = envio.razonSocial;
-    document.getElementById('m-contacto').value = envio.contacto;
-    document.getElementById('m-nombres').value = envio.nombres;
-    document.getElementById('m-apellidos').value = envio.apellidos || '';
-
-    // Scroll al formulario
-    document.querySelector('.seccion-masiva').scrollIntoView({ behavior: 'smooth' });
-  }
-
-  // Eliminar envío
-  function eliminarEnvio(index) {
-    if (confirm('¿Está seguro de eliminar este envío?')) {
-      enviosMasivos.splice(index, 1);
-      actualizarTabla();
-      mostrarMensajeExito('Envío eliminado correctamente');
-    }
-  }
-
-  // Limpiar formulario
-  function limpiarFormularioMasivo() {
-    document.getElementById('m-tipoEntrega').value = '';
-    mostrarCamposDestino();
-
-    document.getElementById('m-departamento').value = '';
-    document.getElementById('m-provincia').value = '';
-    document.getElementById('m-distrito').value = '';
-    document.getElementById('m-direccion').value = '';
-    document.getElementById('m-referencia').value = '';
-    document.getElementById('m-tienda').value = '';
-
-    document.getElementById('m-tipoEmpaque').value = '';
-    toggleFolios();
-
-    document.getElementById('m-tipoArticulo').value = '';
-    document.getElementById('m-descripcionArticulo').value = '';
-    document.getElementById('m-valorEnvio').value = '';
-    document.getElementById('m-peso').value = '';
-    document.getElementById('m-largo').value = '';
-    document.getElementById('m-ancho').value = '';
-    document.getElementById('m-alto').value = '';
-    document.getElementById('m-folios').value = '';
-
-    document.getElementById('m-tipoDocumento').value = '';
-    mostrarCamposReceptor();
-
-    document.getElementById('m-nroDocumento').value = '';
-    document.getElementById('m-celular').value = '';
-    document.getElementById('m-razonSocial').value = '';
-    document.getElementById('m-contacto').value = '';
-    document.getElementById('m-nombres').value = '';
-    document.getElementById('m-apellidos').value = '';
-    
-    editIndex = -1;
-  }
-
-  // Limpiar todos los envíos
-  function limpiarTodosEnvios() {
-    if (enviosMasivos.length === 0) {
-      alert('No hay envíos para eliminar');
-      return;
-    }
-    
-    if (confirm(`¿Está seguro de eliminar todos los ${enviosMasivos.length} envíos registrados?`)) {
-      enviosMasivos = [];
-      actualizarTabla();
-      mostrarMensajeExito('Todos los envíos han sido eliminados');
-    }
-  }
-
-  // Exportar CSV
-  function exportarCSV() {
-    if (enviosMasivos.length === 0) {
-      alert('No hay envíos para exportar');
-      return;
-    }
-
-    const headers = [
-      'Nro', 'Tipo de Entrega', 'Departamento', 'Provincia', 'Distrito',
-      'Dirección', 'Referencia', 'Tienda', 'Tipo Empaque', 'Tipo Artículo',
-      'Descripción de Artículo', 'Valor del Envío (S/)', 'Peso (kg)', 'Largo (cm)',
-      'Ancho (cm)', 'Alto (cm)', '# Folios', 'Tipo Documento',
-      'Nro Documento', 'Celular', 'Razón Social', 'Contacto', 'Nombres', 'Apellidos'
-    ];
-
-    let csv = '\ufeff' + headers.join(',') + '\n'; // BOM para Excel
-
-    enviosMasivos.forEach((envio, index) => {
-      const row = [
-        index + 1,
-        envio.tipoEntrega, 
-        envio.departamento, 
-        envio.provincia,
-        envio.distrito, 
-        envio.direccion, 
-        envio.referencia, 
-        envio.tienda,
-        envio.tipoEmpaque, 
-        envio.tipoArticulo, 
-        envio.descripcionArticulo,
-        envio.valorEnvio, 
-        envio.peso, 
-        envio.largo, 
-        envio.ancho, 
-        envio.alto,
-        envio.folios || '', 
-        envio.tipoDocumento,
-        envio.nroDocumento, 
-        envio.celular, 
-        envio.razonSocial, 
-        envio.contacto,
-        envio.nombres, 
-        envio.apellidos || ''
-      ];
-      csv += row.map(field => `"${field || ''}"`).join(',') + '\n';
-    });
-
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `envios_masivos_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-    
-    mostrarMensajeExito('CSV exportado correctamente');
-  }
-
-  // Actualizar pasos
-  function actualizarPasos() {
-    document.querySelectorAll('.step').forEach((step, index) => {
-      step.classList.remove('active');
-      if (index < pasoActual) {
-        step.classList.add('active');
-      }
-    });
-  }
-
-  // Mostrar resumen
-  function mostrarResumen() {
-    // Datos del remitente
-    const tipoDoc = document.getElementById('remitente-tipo-doc');
-    document.getElementById('resumen-tipo-doc').textContent = 
-      tipoDoc.options[tipoDoc.selectedIndex].text || 'No especificado';
-    document.getElementById('resumen-numero-doc').textContent = 
-      document.getElementById('remitente-numero-doc').value || 'No especificado';
-    document.getElementById('resumen-nombre').textContent = 
-      document.getElementById('remitente-nombre').value || 'No especificado';
-    document.getElementById('resumen-telefono').textContent = 
-      document.getElementById('remitente-telefono').value || 'No especificado';
-    document.getElementById('resumen-email').textContent = 
-      document.getElementById('remitente-email').value || 'No especificado';
-
-    // Resumen de envíos
-    const resumenEnvios = document.getElementById('resumen-envios');
-    resumenEnvios.innerHTML = `
-      <h4 style="margin-top: 2rem; margin-bottom: 1rem; color: #0E1D63;">📦 Detalle de Envíos (${enviosMasivos.length} envíos)</h4>
-    `;
-    resumenEnvios.innerHTML += document.getElementById('tableContent').innerHTML;
-  }
-
-  // Botón continuar
-  const btnContinuar = document.getElementById('btn-continuar');
-
-  btnContinuar.addEventListener('click', function () {
-    if (pasoActual === 1) {
-      // Validar datos del remitente
-      const camposRemitente = [
-        'remitente-tipo-doc',
-        'remitente-numero-doc',
-        'remitente-telefono',
-        'remitente-nombre',
-        'remitente-email'
-      ];
-
-      let datosCompletos = true;
-      camposRemitente.forEach(campo => {
-        if (!document.getElementById(campo).value) {
-          datosCompletos = false;
-          document.getElementById(campo).style.borderColor = '#fc8181';
-        } else {
-          document.getElementById(campo).style.borderColor = '';
-        }
-      });
-
-      if (!datosCompletos) {
-        alert('Por favor complete todos los datos del remitente');
-        return;
-      }
-
-      if (enviosMasivos.length === 0) {
-        alert('Debe agregar al menos un envío antes de continuar');
-        return;
-      }
-
-      // Mostrar resumen
-      document.getElementById('seccion-quien-envia').style.display = 'none';
-      document.getElementById('seccion-masiva').style.display = 'none';
-      document.getElementById('seccion-resumen').style.display = 'block';
-      mostrarResumen();
-      pasoActual = 2;
-      actualizarPasos();
-      btnContinuar.textContent = 'PROCESAR ENVÍOS';
-    } else if (pasoActual === 2) {
-      // Procesar envíos
-      if (confirm(`¿Está seguro de procesar ${enviosMasivos.length} envíos?`)) {
-        // Preparar datos para enviar al servidor
-        const datosEnvio = {
-          remitente: {
-            tipoDocumento: document.getElementById('remitente-tipo-doc').value,
-            numeroDocumento: document.getElementById('remitente-numero-doc').value,
-            telefono: document.getElementById('remitente-telefono').value,
-            nombre: document.getElementById('remitente-nombre').value,
-            email: document.getElementById('remitente-email').value
-          },
-          envios: enviosMasivos
-        };
-
-        // Aquí iría la llamada AJAX al servidor
-        console.log('Datos a enviar:', datosEnvio);
-        
-        // Simulación de éxito
-        alert(`✅ Se han procesado exitosamente ${enviosMasivos.length} envíos`);
-
-        pasoActual = 3;
-        actualizarPasos();
-        btnContinuar.style.display = 'none';
-        
-        // Redirigir a medios de pago después de 2 segundos
-        setTimeout(() => {
-          console.log('Redirigir a medios de pago');
-        }, 2000);
-      }
-    }
-  });
-
-  // Inicializar al cargar
-  document.addEventListener("DOMContentLoaded", function () {
-    // Inicializar pestañas
-    initTabs();
-    
-    mostrarCamposDestino();
-    toggleFolios();
-    mostrarCamposReceptor();
-    
-    // Cargar datos de ejemplo si está habilitado
-    if (cargarDatosEjemplo) {
-      enviosMasivos = [...enviosEjemplo];
-      actualizarTabla();
-      
-      // Pre-llenar datos del remitente para la demo
-      document.getElementById('remitente-tipo-doc').value = 'ruc';
-      document.getElementById('remitente-numero-doc').value = '20123456789';
-      document.getElementById('remitente-telefono').value = '987654321';
-      document.getElementById('remitente-nombre').value = 'Empresa de Envíos Demo S.A.C.';
-      document.getElementById('remitente-email').value = 'demo@enviosmasivos.com';
-      
-      // Agregar indicador permanente
-      const indicator = document.createElement('div');
-      indicator.className = 'demo-indicator';
-      indicator.innerHTML = '🎯 Modo Demo';
-      indicator.title = 'Click para desactivar el modo demo y limpiar los datos de ejemplo';
-      indicator.onclick = function() {
-        if (confirm('¿Desea desactivar el modo demo y limpiar todos los datos de ejemplo?')) {
-          cargarDatosEjemplo = false;
-          enviosMasivos = [];
-          actualizarTabla();
-          
-          // Limpiar también los datos del remitente
-          document.getElementById('remitente-tipo-doc').value = '';
-          document.getElementById('remitente-numero-doc').value = '';
-          document.getElementById('remitente-telefono').value = '';
-          document.getElementById('remitente-nombre').value = '';
-          document.getElementById('remitente-email').value = '';
-          
-          indicator.remove();
-          mostrarMensajeExito('Modo demo desactivado - Todos los datos han sido limpiados');
-        }
-      };
-      document.body.appendChild(indicator);
-    }
-    
-    // Agregar animación para el título
-    const titulo = document.querySelector('.titulo-envio');
-    titulo.style.animation = 'fadeIn 0.5s ease-out';
-  });
-
+  window.CONFIG_ENVIO = {
+    tiposDocumento: {{ nombre_doc | tojson }},
+    tiposRecepcion: {{ nombre_rep | tojson }},
+    tiposEmpaque: {{ empaque | tojson }},
+    sucursales: {{ sucursales | safe }},
+    articulos : {{articulos | tojson}}
+  };
 </script>
+<script src="{{ url_for('static', filename='js/envio_masivo.js') }}"></script>
+
 
 {% endblock %}

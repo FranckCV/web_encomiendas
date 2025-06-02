@@ -5,18 +5,52 @@
 {% endblock estilos %}
 
 {% block contenido %}
- <div class="container">
 
 
-            <div class="block_crud block_title" style="padding: 20px 10px 30px 10px; font-size: 1rem;">
-            <h3 class="crud_title"><i class="fa-solid fa-truck-fast"></i> Programar nueva salida</h3>
-        </div>
+  <div class="container">
+        <!-- Header -->
+    <div class="block_crud block_title" style="padding: 20px 10px 30px 10px; font-size: 1rem;">
+  <h3 class="crud_title">
+    <i class="fas fa-shipping-fast"></i> 
+    Programar nueva salida
+  </h3>
+</div>
 
+        <!-- Resumen Superior -->
+        <div class="summary-container">
+            <h2 class="summary-title">
+                <i class="fa-solid fa-chart-line"></i>
+                Resumen de la Salida
+            </h2>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalEmpleados">0</div>
+                    <div class="stat-label">Empleados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalPaquetes">0</div>
+                    <div class="stat-label">Paquetes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pesoTotalStat">0</div>
+                    <div class="stat-label">Peso (kg)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalEscalas">0</div>
+                    <div class="stat-label">Escalas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalRecojos">0</div>
+                    <div class="stat-label">Recojos</div>
+                </div>
+            </div>
 
-        <div class="content">
-            <!-- Fecha y Hora -->
-            <div class="section">
-                <h2 class="section-title">📅 Datos generales de salida</h2>
+            <!-- Datos Generales aquí -->
+            <div class="general-data-section">
+                <h3 class="general-title">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    Datos Generales
+                </h3>
                 <div class="form-group">
                     <div class="form-field">
                         <label for="fecha">Fecha de salida:</label>
@@ -26,174 +60,193 @@
                         <label for="hora">Hora de salida:</label>
                         <input type="time" id="hora" required>
                     </div>
-                      <div class="form-field">
-                        <label for="destinoSelect">Seleccionar destino final:</label>
-                        <select id="destinoSelect" onchange="seleccionarDestino()" required>
-                            <option value="">-- Seleccione el destino final --</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Selección de Vehículo -->
-            <div class="section">
-                <h2 class="section-title">🚚 Selección de vehículo</h2>
-                <div class="alert alert-error" id="errorVehiculo"></div>
-                
-                <table id="vehiculosTabla">
-                    <thead>
-                        <tr>
-                            <th>Vehículo</th>
-                            <th>Capacidad Máxima (kg)</th>
-                            <th>Capacidad Usada (kg)</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-
-                <div class="assigned-items" id="vehiculoSeleccionado" style="display: none;">
-                    <h4>🚚 Vehículo Seleccionado:</h4>
-                    <div id="vehiculoInfo"></div>
-                    <div class="capacity-bar" style="margin-top: 10px;">
-                        <div id="capacityFill" class="capacity-fill" style="width: 0%"></div>
-                    </div>
-                    <div id="capacityText" style="margin-top: 5px; font-size: 0.9rem; color: #666;">0 kg / 0 kg (0%)</div>
-                </div>
-            </div>
-
-            <!-- Gestión de Empleados -->
-            <div class="section">
-                <h2 class="section-title">👥 Gestión de Empleados</h2>
-                
-                <table id="empleadosTabla">
-                    <thead>
-                        <tr>
-                            <th>Empleado</th>
-                            <th>Rol</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-
-                <div class="assigned-items">
-                    <h4>👥 Empleados Asignados:</h4>
-                    <div id="empleadosAsignados">
-                        <span style="color: #666; font-style: italic;">No hay empleados asignados</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Gestión de Paquetes -->
-            <div class="section">
-                <h2 class="section-title">📦 Gestión de Paquetes</h2>
-                <div class="alert alert-error" id="errorPaquetes"></div>
-                
-                <table id="paquetesTabla">
-                    <thead>
-                        <tr>
-                            <th>Tracking</th>
-                            <th>Descripción</th>
-                            <th>Peso (kg)</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-
-                <div class="assigned-items">
-                    <h4>📦 Paquetes Asignados:</h4>
-                    <div id="paquetesAsignados">
-                        <span style="color: #666; font-style: italic;">No hay paquetes asignados</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Escalas -->
-            <div class="section">
-                <h2 class="section-title">🗺️ Escalas de ruta</h2>
-                <div class="form-group">
                     <div class="form-field">
-                        <label for="sucursalSelect">Seleccionar sucursal:</label>
-                        <select id="sucursalSelect">
-                            <option value="">-- Seleccione una sucursal --</option>
+                        <label for="destinoSelect">Seleccionar destino final:</label>
+                        <select id="destinoSelect" required>
+                            <option value="">-- Seleccione el destino final --</option>
+                            <option value="lima">Lima</option>
+                            <option value="arequipa">Arequipa</option>
+                            <option value="trujillo">Trujillo</option>
+                            <option value="cusco">Cusco</option>
+                            <option value="piura">Piura</option>
                         </select>
                     </div>
-                    <div class="form-field" style="display: flex; align-items: end;">
-                        <button class="btn" onclick="agregarEscala()">+ Agregar escala</button>
-                    </div>
                 </div>
-                
-                <div class="escalas-container">
-                    <h4>📍 Escalas programadas:</h4>
-                    <div id="escalasLista">
-                        <span style="color: #666; font-style: italic;">No hay escalas programadas</span>
+            </div>
+        </div>
+
+        <!-- Sistema de Pestañas -->
+        <div class="tabs-container">
+            <div class="tabs-nav">
+                <button class="tab-btn active" onclick="openTab(event, 'tab-vehiculo')">
+                    <i class="fa-solid fa-truck"></i>
+                    Vehículo
+                </button>
+                <button class="tab-btn" onclick="openTab(event, 'tab-empleados')">
+                    <i class="fa-solid fa-users"></i>
+                    Empleados
+                </button>
+                <button class="tab-btn" onclick="openTab(event, 'tab-paquetes')">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                    Paquetes
+                </button>
+                <button class="tab-btn" onclick="openTab(event, 'tab-escalas')">
+                    <i class="fa-solid fa-route"></i>
+                    Escalas
+                </button>
+                <button class="tab-btn" onclick="openTab(event, 'tab-recojos')">
+                    <i class="fa-solid fa-house"></i>
+                    Recojos
+                </button>
+            </div>
+
+            <!-- Contenido Pestaña: Vehículo -->
+            <div id="tab-vehiculo" class="tab-content active">
+                <div class="section">
+                    <h2 class="section-title">🚚 Selección de vehículo</h2>
+                    <div class="alert alert-error" id="errorVehiculo"></div>
+                    
+                    <table id="vehiculosTabla">
+                        <thead>
+                            <tr>
+                                <th>Vehículo</th>
+                                <th>Capacidad Máxima (kg)</th>
+                                <th>Capacidad Usada (kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+
+                    <div class="assigned-items" id="vehiculoSeleccionado" style="display: none;">
+                        <h4>🚚 Vehículo Seleccionado:</h4>
+                        <div id="vehiculoInfo"></div>
+                        <div class="capacity-bar" style="margin-top: 10px;">
+                            <div id="capacityFill" class="capacity-fill" style="width: 0%"></div>
+                        </div>
+                        <div id="capacityText" style="margin-top: 5px; font-size: 0.9rem; color: #666;">0 kg / 0 kg (0%)</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Recojos en Casa -->
-            <div class="section">
-                <h2 class="section-title">🏠 Recojos en casa</h2>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="recojoCheckbox" onchange="toggleRecojoSection()">
-                    <label for="recojoCheckbox">¿Incluir recojos en casa?</label>
-                </div>
-                
-                <div class="recojo-section" id="recojoSection">
-                    <h4 style="color: #f39c12; margin-bottom: 15px;">📋 Transacciones disponibles para recojo:</h4>
-                    <div id="transaccionesRecojo">
-                        <!-- Las transacciones se cargan aquí dinámicamente -->
-                    </div>
+            <!-- Contenido Pestaña: Empleados -->
+            <div id="tab-empleados" class="tab-content">
+                <div class="section">
+                    <h2 class="section-title">👥 Gestión de Empleados</h2>
                     
-                    <div class="assigned-items" style="margin-top: 20px;">
-                        <h4>🏠 Recojos seleccionados:</h4>
-                        <div id="recojosAsignados">
-                            <span style="color: #666; font-style: italic;">No hay recojos seleccionados</span>
+                    <table id="empleadosTabla">
+                        <thead>
+                            <tr>
+                                <th>Empleado</th>
+                                <th>Rol</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+
+                    <div class="assigned-items">
+                        <h4>👥 Empleados Asignados:</h4>
+                        <div id="empleadosAsignados">
+                            <span style="color: #666; font-style: italic;">No hay empleados asignados</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Resumen -->
-            <div class="section">
-                <h2 class="section-title">📊 Resumen de la salida</h2>
-                <div class="stats">
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalEmpleados">0</div>
-                        <div class="stat-label">Empleados</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalPaquetes">0</div>
-                        <div class="stat-label">Paquetes</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="pesoTotalStat">0</div>
-                        <div class="stat-label">Peso total (kg)</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalEscalas">0</div>
-                        <div class="stat-label">Escalas</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalRecojos">0</div>
-                        <div class="stat-label">Recojos</div>
+            <!-- Contenido Pestaña: Paquetes -->
+            <div id="tab-paquetes" class="tab-content">
+                <div class="section">
+                    <h2 class="section-title">📦 Gestión de Paquetes</h2>
+                    <div class="alert alert-error" id="errorPaquetes"></div>
+                    
+                    <table id="paquetesTabla">
+                        <thead>
+                            <tr>
+                                <th>Tracking</th>
+                                <th>Descripción</th>
+                                <th>Peso (kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+
+                    <div class="assigned-items">
+                        <h4>📦 Paquetes Asignados:</h4>
+                        <div id="paquetesAsignados">
+                            <span style="color: #666; font-style: italic;">No hay paquetes asignados</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Botón Guardar -->
-            <div style="text-align: center;">
-                <button class="btn btn-success" onclick="guardarSalida()"> Guardar salida</button>
-                <div class="alert" id="mensajeGuardado" style="margin-top: 15px;"></div>
+            <!-- Contenido Pestaña: Escalas -->
+            <div id="tab-escalas" class="tab-content">
+                <div class="section">
+                    <h2 class="section-title">🗺️ Escalas de ruta</h2>
+                    <div class="form-group">
+                        <div class="form-field">
+                            <label for="sucursalSelect">Seleccionar sucursal:</label>
+                            <select id="sucursalSelect">
+                                <option value="">-- Seleccione una sucursal --</option>
+                            </select>
+                        </div>
+                        <div class="form-field" style="display: flex; align-items: end;">
+                            <button class="btn" onclick="agregarEscala()">
+                                <i class="fa-solid fa-plus"></i>
+                                Agregar escala
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="escalas-container">
+                        <h4>📍 Escalas programadas:</h4>
+                        <div id="escalasLista">
+                            <span style="color: #666; font-style: italic;">No hay escalas programadas</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido Pestaña: Recojos -->
+            <div id="tab-recojos" class="tab-content">
+                <div class="section">
+                    <h2 class="section-title">🏠 Recojos en casa</h2>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="recojoCheckbox" onchange="toggleRecojoSection()">
+                        <label for="recojoCheckbox">¿Incluir recojos en casa?</label>
+                    </div>
+                    
+                    <div class="recojo-section" id="recojoSection">
+                        <h4 style="color: #f39c12; margin-bottom: 15px;">📋 Transacciones disponibles para recojo:</h4>
+                        <div id="transaccionesRecojo">
+                            <!-- Las transacciones se cargan aquí dinámicamente -->
+                        </div>
+                        
+                        <div class="assigned-items" style="margin-top: 20px;">
+                            <h4>🏠 Recojos seleccionados:</h4>
+                            <div id="recojosAsignados">
+                                <span style="color: #666; font-style: italic;">No hay recojos seleccionados</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
+        <!-- Botón Guardar -->
+        <div class="save-section">
+            <button class="btn btn-success" onclick="guardarSalida()">
+                Guardar salida
+            </button>
+            <div class="alert" id="mensajeGuardado" style="margin-top: 15px;"></div>
+        </div>
+    </div>
 {% endblock contenido %}
 
 
 {% block scripts %}
- <script>
-        // Datos de muestra - Vehículos con más ejemplos
+
+  <script>
+        // Datos de muestra - Vehículos
         const vehiculos = [
             { id: 1, nombre: "Camión Mercedes Actros - ABC123", capacidadMaxima: 5000, capacidadUsada: 0 },
             { id: 2, nombre: "Furgoneta Ford Transit - DEF456", capacidadMaxima: 2000, capacidadUsada: 300 },
@@ -205,7 +258,7 @@
             { id: 8, nombre: "Camioneta Nissan NP300 - VWX234", capacidadMaxima: 1200, capacidadUsada: 800 }
         ];
 
-        // Datos de muestra - Empleados con más ejemplos
+        // Datos de muestra - Empleados
         const empleados = [
             { id: 1, nombre: "Juan Carlos Pérez", rol: "Conductor" },
             { id: 2, nombre: "María Elena García", rol: "Auxiliar" },
@@ -219,7 +272,7 @@
             { id: 10, nombre: "Sofía Isabel Morales", rol: "Auxiliar" }
         ];
 
-        // Datos de muestra - Paquetes con más ejemplos
+        // Datos de muestra - Paquetes
         const paquetes = [
             { id: 1, tracking: "TRK001234", descripcion: "Documentos legales urgentes", peso: 2},
             { id: 2, tracking: "TRK001235", descripcion: "Equipos electrónicos - Laptops", peso: 15},
@@ -233,7 +286,7 @@
             { id: 10, tracking: "TRK001243", descripcion: "Productos cosméticos", peso: 6}
         ];
 
-        // Datos de muestra - Sucursales con más ejemplos
+        // Datos de muestra - Sucursales
         const sucursales = [
             { id: 1, nombre: "Sucursal Centro Histórico", direccion: "Jr. de la Unión 123, Cercado de Lima" },
             { id: 2, nombre: "Sucursal San Isidro", direccion: "Av. Javier Prado Este 456, San Isidro" },
@@ -245,7 +298,7 @@
             { id: 8, nombre: "Sucursal Villa El Salvador", direccion: "Av. Pastor Sevilla 258, Villa El Salvador" }
         ];
 
-        // Datos de transacciones de recojo en casa con más ejemplos
+        // Datos de transacciones de recojo en casa
         const transaccionesRecojo = [
             { 
                 id: 1, 
@@ -321,6 +374,27 @@
         let recojosAsignados = [];
         let pesoTotal = 0;
 
+        // Función para cambiar pestañas
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            
+            // Ocultar todo el contenido de pestañas
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            
+            // Remover la clase activa de todos los botones de pestañas
+            tablinks = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            
+            // Mostrar la pestaña actual y marcar el botón como activo
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
         // Inicializar la aplicación
         document.addEventListener('DOMContentLoaded', function() {
             const ahora = new Date();
@@ -378,30 +452,29 @@
                             </div>
                             ${vehiculo.capacidadUsada} / ${vehiculo.capacidadMaxima} kg (${porcentaje.toFixed(1)}%)
                         </td>
-
                     </tr>
                 `;
             }).join('');
         }
-function renderizarEmpleados() {
-    const tbody = document.querySelector('#empleadosTabla tbody');
-    tbody.innerHTML = empleados.map(empleado => {
-        const yaAsignado = empleadosAsignados.some(e => e.id === empleado.id);
-        
-        return `
-            <tr class="employee-row ${yaAsignado ? 'selected' : ''}" 
-                onclick="toggleEmpleado(${empleado.id})">
-                <td>${empleado.nombre}</td>
-                <td>
-                    <span style="padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">
-                        ${empleado.rol}
-                    </span>
-                </td>
-            </tr>
-        `;
-    }).join('');
-}
 
+        function renderizarEmpleados() {
+            const tbody = document.querySelector('#empleadosTabla tbody');
+            tbody.innerHTML = empleados.map(empleado => {
+                const yaAsignado = empleadosAsignados.some(e => e.id === empleado.id);
+                
+                return `
+                    <tr class="employee-row ${yaAsignado ? 'selected' : ''}" 
+                        onclick="toggleEmpleado(${empleado.id})">
+                        <td>${empleado.nombre}</td>
+                        <td>
+                            <span style="padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">
+                                ${empleado.rol}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
 
         function renderizarPaquetes() {
             const tbody = document.querySelector('#paquetesTabla tbody');
@@ -419,7 +492,6 @@ function renderizarEmpleados() {
                                 ${paquete.peso} kg
                             </span>
                         </td>
-
                     </tr>
                 `;
             }).join('');
@@ -437,24 +509,23 @@ function renderizarEmpleados() {
             actualizarCapacidadVehiculo();
             renderizarVehiculos();
             hideAlert('errorVehiculo');
+            actualizarEstadisticas();
         }
 
-function toggleEmpleado(empleadoId) {
-    const empleado = empleados.find(e => e.id === empleadoId);
-    
-    
-    const index = empleadosAsignados.findIndex(e => e.id === empleadoId);
-    
-    if (index === -1) {
-        empleadosAsignados.push(empleado);
-    } else {
-        empleadosAsignados.splice(index, 1);
-    }
-    
-    actualizarEmpleadosAsignados();
-    renderizarEmpleados();
-    actualizarEstadisticas();
-}
+        function toggleEmpleado(empleadoId) {
+            const empleado = empleados.find(e => e.id === empleadoId);
+            const index = empleadosAsignados.findIndex(e => e.id === empleadoId);
+            
+            if (index === -1) {
+                empleadosAsignados.push(empleado);
+            } else {
+                empleadosAsignados.splice(index, 1);
+            }
+            
+            actualizarEmpleadosAsignados();
+            renderizarEmpleados();
+            actualizarEstadisticas();
+        }
 
         function togglePaquete(paqueteId) {
             if (!vehiculoSeleccionado) {
@@ -583,7 +654,6 @@ function toggleEmpleado(empleadoId) {
             
             const sucursal = sucursales.find(s => s.id === sucursalId);
             
-            // Verificar si ya está agregada
             if (escalas.some(e => e.id === sucursalId)) {
                 alert('Esta sucursal ya está agregada como escala');
                 return;
@@ -592,8 +662,6 @@ function toggleEmpleado(empleadoId) {
             escalas.push(sucursal);
             actualizarEscalas();
             actualizarEstadisticas();
-            
-            // Resetear el select
             select.value = '';
         }
 
@@ -616,7 +684,7 @@ function toggleEmpleado(empleadoId) {
                             <small style="color: #666;">${escala.direccion}</small>
                         </div>
                         <button class="btn btn-danger" onclick="removerEscala(${escala.id})" style="padding: 5px 10px; font-size: 0.8rem;">
-                            🗑️ Quitar
+                            <i class="fa-solid fa-trash"></i> Quitar
                         </button>
                     </div>`
                 ).join('');
@@ -631,9 +699,7 @@ function toggleEmpleado(empleadoId) {
                 section.classList.add('show');
             } else {
                 section.classList.remove('show');
-                // Limpiar recojos seleccionados
                 recojosAsignados = [];
-                // Desmarcar todos los checkboxes
                 transaccionesRecojo.forEach(transaccion => {
                     const checkbox = document.getElementById(`recojo_${transaccion.id}`);
                     const item = document.querySelector(`#recojo_${transaccion.id}`).closest('.recojo-item');
@@ -739,4 +805,5 @@ function toggleEmpleado(empleadoId) {
                 'success');
         }
     </script>
+
 {% endblock scripts %}

@@ -404,12 +404,12 @@
 }
 
 .highlight {
-    background: linear-gradient(120deg, #f39c12, #e67e22);
+    background: linear-gradient(120deg, #12bff3, #2269e6);
     color: white;
     padding: 20px;
     border-radius: var(--border-radius);
     margin: 20px 0;
-    border-left: 4px solid #d35400;
+    border-left: 4px solid var(--color-primary);;
     position: relative;
     overflow: hidden;
     box-shadow: var(--box-shadow);
