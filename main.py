@@ -1901,7 +1901,7 @@ def mostrar_pagoenvio():
 #########
 
 @app.route('/envio_masivo')
-def envios_masivos_prueba():
+def envio_masivo():
     nombre_doc = controlador_tipo_documento.get_options()
     nombre_rep = controlador_tipo_recepcion.get_options()
     sucursales = controlador_sucursal.get_ubigeo()

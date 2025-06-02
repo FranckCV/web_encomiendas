@@ -151,7 +151,7 @@ h2 {
 
 .campo-grupo input:hover,
 .campo-grupo select:hover {
-    border-color: #cbd5e0;
+    border-color: #667eea;
 }
 
 /* Ajustes específicos para campos */
@@ -654,9 +654,7 @@ textarea:required:user-invalid {
     animation: fadeIn 0.3s ease-out;
 }
 
-/* ===== RESPONSIVE DESIGN ===== */
 
-/* Mejoras responsivas para pestañas */
 @media (max-width: 768px) {
     .tabs-nav {
         flex-direction: column;

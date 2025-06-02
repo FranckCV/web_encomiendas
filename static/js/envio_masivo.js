@@ -10,6 +10,9 @@ const regexCE = /^[A-Z0-9]{9,12}$/i;
 const regexNombre = /^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]{2,60}$/;
 //Correo
 const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+//Dirección
+const regexDireccion = /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9°#\.\,\-\s]{5,200}$/;
+
 
 const STORAGE_KEY = 'enviosMasivosTemp';
 
@@ -17,7 +20,7 @@ const STORAGE_KEY = 'enviosMasivosTemp';
 
  const tipoDoc = document.getElementById('remitente-tipo-doc');
 const numeroDoc = document.getElementById('remitente-numero-doc');
-const mensajeDoc = document.getElementById('mensaje-validacion');
+const mensajeDoc = document.getElementById('mensaje-validacion-numero');
 
 numeroDoc.addEventListener('input', () => {
   const tipo = tipoDoc.value;
@@ -66,11 +69,72 @@ telefonoRemitente.addEventListener('input', () => {
     telefonoRemitente.style.borderColor = '';
   } else if (valido) {
     mensajeTelefono.style.display = 'none';
-    telefonoRemitente.style.borderColor = 'green';
+    telefonoRemitente.style.borderColor = '#48bb78';
   } else {
     mensajeTelefono.style.display = 'block';
     mensajeTelefono.textContent = 'El teléfono debe comenzar con 9 y tener 9 dígitos.';
-    telefonoRemitente.style.borderColor = 'red';
+    telefonoRemitente.style.borderColor = '#fc8181';
+  }
+});
+
+const nombreRemitente = document.getElementById('remitente-nombre');
+const mensajeNombre = document.getElementById('mensaje-validacion-nombre');
+
+nombreRemitente.addEventListener('input', () => {
+  const nombre = nombreRemitente.value.trim();
+  const valido = regexNombre.test(nombre);
+
+  if (nombre === '') {
+    mensajeNombre.style.display = 'none';
+    nombreRemitente.style.borderColor = '';
+  } else if (valido) {
+    mensajeNombre.style.display = 'none';
+    nombreRemitente.style.borderColor = '#48bb78'; // verde
+  } else {
+    mensajeNombre.style.display = 'block';
+    mensajeNombre.textContent = 'Solo se permiten letras y espacios (mínimo 2 caracteres).';
+    nombreRemitente.style.borderColor = '#fc8181'; // rojo
+  }
+});
+
+
+const emailRemitente = document.getElementById('remitente-email');
+const mensajeEmail = document.getElementById('mensaje-validacion-email');
+
+emailRemitente.addEventListener('input', () => {
+  const email = emailRemitente.value.trim();
+  const valido = regexEmail.test(email);
+
+  if (email === '') {
+    mensajeEmail.style.display = 'none';
+    emailRemitente.style.borderColor = '';
+  } else if (valido) {
+    mensajeEmail.style.display = 'none';
+    emailRemitente.style.borderColor = '#48bb78';
+  } else {
+    mensajeEmail.style.display = 'block';
+    mensajeEmail.textContent = 'Debe ingresar un correo válido (ej. usuario@dominio.com).';
+    emailRemitente.style.borderColor = '#fc8181';
+  }
+});
+
+const direccionDestinatario = document.getElementById('m-direccion');
+const mensajeDireccion = document.getElementById('mensaje-validacion-direccion');
+
+direccionDestinatario.addEventListener('input', () => {
+  const direccion = direccionDestinatario.value.trim();
+  const valido = regexDireccion.test(direccion);
+
+  if (direccion === '') {
+    mensajeDireccion.style.display = 'none';
+    direccionDestinatario.style.borderColor = '';
+  } else if (valido) {
+    mensajeDireccion.style.display = 'none';
+    direccionDestinatario.style.borderColor = '#48bb78';
+  } else {
+    mensajeDireccion.style.display = 'block';
+    mensajeDireccion.textContent = 'La dirección debe tener entre 5 y 100 caracteres válidos.';
+    direccionDestinatario.style.borderColor = '#fc8181';
   }
 });
 

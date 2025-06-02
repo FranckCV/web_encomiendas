@@ -60,25 +60,25 @@ Registro de Envíos Masivos
 
             <div class="campo-grupo">
               <input type="text" id="remitente-numero-doc" placeholder="Número de documento" required>
-                <small id="mensaje-validacion" style="color: red; display: none;"></small>
+                <small id="mensaje-validacion-numero" style="color: red; display: none;"></small>
 
             </div>
 
             <div class="campo-grupo">
               <input type="text" id="remitente-telefono" placeholder="Número de teléfono" required>
-                <small id="mensaje-validacion" style="color: red; display: none;"></small>
+                <small id="mensaje-validacion-telefono" style="color: red; display: none;"></small>
 
             </div>
 
             <div class="campo-grupo">
               <input type="text" id="remitente-nombre" placeholder="Nombre completo" required>
-              <small id="mensaje-validacion" style="color: red; display: none;"></small>
+              <small id="mensaje-validacion-nombre" style="color: red; display: none;"></small>
 
             </div>
 
             <div class="campo-grupo">
               <input type="email" id="remitente-email" placeholder="Email" required>
-              <small id="mensaje-validacion" style="color: red; display: none;"></small>
+              <small id="mensaje-validacion-email" style="color: red; display: none;"></small>
             </div>
 
         </div>
@@ -169,11 +169,13 @@ Registro de Envíos Masivos
                 <div class="campo-grupo" id="grupo-direccion" style="display:none;">
                   <label>Dirección *</label>
                   <input type="text" id="m-direccion" placeholder="Av./Jr./Calle Nombre #123" required>
+                  <small id="mensaje-validacion-direccion" style="color: red; display: none;"></small>
                 </div>
 
                 <div class="campo-grupo" id="grupo-referencia" style="display:none;">
                   <label>Referencia</label>
                   <input type="text" id="m-referencia" placeholder="Entre calles, cerca de...">
+                  <small id="mensaje-validacion-referencia" style="color: red; display: none;"></small>
                 </div>
 
                 <!-- Tienda: solo para agencia -->
@@ -211,21 +213,25 @@ Registro de Envíos Masivos
                 <div class="campo-grupo">
                   <label>Valor (S/) *</label>
                   <input type="number" id="m-valorEnvio" step="0.01" min="0" placeholder="0.00" required>
+                   <small id="mensaje-validacion-email" style="color: red; display: none;"></small>
                 </div>
                 
                 <div class="campo-grupo">
                   <label>Peso (kg) *</label>
                   <input type="number" id="m-peso" step="0.001" min="0.001" placeholder="0.00" required>
+                  <small id="mensaje-validacion-email" style="color: red; display: none;"></small>
                 </div>
                 
                 <div class="campo-grupo">
                   <label>Largo (cm) *</label>
                   <input type="number" id="m-largo" step="0.1" min="0.1" placeholder="0.0" required>
+                  <small id="mensaje-validacion-email" style="color: red; display: none;"></small>
                 </div>
                 
                 <div class="campo-grupo">
                   <label>Ancho (cm) *</label>
                   <input type="number" id="m-ancho" step="0.1" min="0.1" placeholder="0.0" required>
+                   <small id="mensaje-validacion-email" style="color: red; display: none;"></small>
                 </div>
                 
                 <div class="campo-grupo">
