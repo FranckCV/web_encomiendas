@@ -11,10 +11,72 @@ const regexNombre = /^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]{2,60}$/;
 //Correo
 const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
+const STORAGE_KEY = 'enviosMasivosTemp';
 
 
 
+ const tipoDoc = document.getElementById('remitente-tipo-doc');
+const numeroDoc = document.getElementById('remitente-numero-doc');
+const mensajeDoc = document.getElementById('mensaje-validacion');
 
+numeroDoc.addEventListener('input', () => {
+  const tipo = tipoDoc.value;
+  const valor = numeroDoc.value.trim();
+
+  let valido = false;
+  let mensaje = '';
+
+  switch (tipo) {
+    case '1': valido = regexDNI.test(valor); mensaje = 'Debe tener 8 dígitos.'; break;
+    case '2': valido = regexRUC.test(valor); mensaje = 'Debe comenzar con 10 o 20 y tener 11 dígitos.'; break;
+    case '3': valido = regexCE.test(valor); mensaje = 'Debe tener 9-12 caracteres alfanuméricos.'; break;
+    case '4': valido = regexPasaporte.test(valor); mensaje = 'Debe tener 6-12 caracteres alfanuméricos.'; break;
+    default: mensaje = 'Seleccione tipo de documento.'; break;
+  }
+
+  if (valor === '') {
+    mensajeDoc.style.display = 'none';
+    numeroDoc.style.borderColor = '';
+  } else if (valido) {
+    mensajeDoc.style.display = 'none';
+    numeroDoc.style.borderColor = '#48bb78';
+  } else {
+    mensajeDoc.style.display = 'block';
+    mensajeDoc.textContent = mensaje;
+    numeroDoc.style.borderColor = '#fc8181';
+  }
+});
+
+tipoDoc.addEventListener('change', () => {
+  const valorActual = numeroDoc.value.trim();
+  if (valorActual !== '') {
+    numeroDoc.dispatchEvent(new Event('input'));  
+  }
+});
+
+const telefonoRemitente = document.getElementById('remitente-telefono');
+const mensajeTelefono = document.getElementById('mensaje-validacion-telefono');
+
+telefonoRemitente.addEventListener('input', () => {
+  const telefono = telefonoRemitente.value.trim();
+  const valido = regexTelefono.test(telefono);
+
+  if (telefono === '') {
+    mensajeTelefono.style.display = 'none';
+    telefonoRemitente.style.borderColor = '';
+  } else if (valido) {
+    mensajeTelefono.style.display = 'none';
+    telefonoRemitente.style.borderColor = 'green';
+  } else {
+    mensajeTelefono.style.display = 'block';
+    mensajeTelefono.textContent = 'El teléfono debe comenzar con 9 y tener 9 dígitos.';
+    telefonoRemitente.style.borderColor = 'red';
+  }
+});
+
+
+
+//////////////////////////////////////////////////////////////////////
 let enviosMasivos = [];
 let editIndex = -1;
 let pasoActual = 1;
@@ -26,7 +88,6 @@ const {
 
 document.addEventListener("DOMContentLoaded", function () {
 
-  const STORAGE_KEY = 'enviosMasivosTemp';
 
   initTabs();
   // initUbigeo();
@@ -358,7 +419,7 @@ function mostrarCamposReceptor() {
 
 
 function agregarEnvio() {
-  // 1. Obtener campos de remitente
+  // 1. campos de remitente
   const remitente_tipo_doc = document.getElementById('remitente-tipo-doc');
   const remitente_numero_doc = document.getElementById('remitente-numero-doc');
   const remitente_telefono = document.getElementById('remitente-telefono');
