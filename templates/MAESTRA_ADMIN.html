@@ -108,7 +108,7 @@
                 <p class="tip_title">{{ tipo_pag['nombre'] }} - {{ tipo_pag['cant'] }}  </p>
 
                 <div class="tip_content collapsed">
-                    {% for page in paginas %}
+                    {% for page in menu_paginas %}
 
                     {% if page['tipo_paginaid'] == tipo_pag['id'] and page['moduloid'] == cur_modulo_id %}
 

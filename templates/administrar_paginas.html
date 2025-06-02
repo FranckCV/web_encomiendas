@@ -163,9 +163,9 @@ Permisos para {{info_rol.get('nombre')}}
         justify-self: flex-start;
         grid-area: mod_t;
     }
-    
+
     .mod_head .mod_title {
-        cursor: auto ;
+        cursor: auto;
     }
 
     .mod_title p {
@@ -194,8 +194,19 @@ Permisos para {{info_rol.get('nombre')}}
     }
 
     .mod_opt:hover {
-        scale: 1.25;
-        filter: brightness(4);
+        scale: 1.15;
+        color: var(--color-thr) !important;
+        /* filter: brightness(2); */
+    }
+
+    .mod_opt.unable {
+        background-color: var(--color4) !important;
+        color: white !important;
+    }
+
+    .mod_opt.unable:hover {
+        background-color: var(--color4) !important;
+        color: white !important;
     }
 
     .mod_cant {
@@ -321,13 +332,17 @@ Permisos para {{info_rol.get('nombre')}}
         justify-content: center;
         font-size: 85%;
         height: 25px;
-        width:  25px;
+        width: 25px;
         padding: 0;
+    }
+
+    .opciones_fila button:hover {
+        scale: 1.10;
     }
 
     .opciones_fila button i {
         display: flex;
-        
+
     }
 
     .opciones_fila button.unable {
@@ -364,7 +379,6 @@ Permisos para {{info_rol.get('nombre')}}
         display: flex;
         justify-content: space-between;
     }
-
 </style>
 
 
@@ -388,7 +402,7 @@ Permisos para {{info_rol.get('nombre')}}
         }
 
         .block_access {
-            /* grid-template-columns: 97.5%; */
+            grid-template-columns: 97.5%;
         }
 
         .block_admin>* {
@@ -396,7 +410,7 @@ Permisos para {{info_rol.get('nombre')}}
         }
 
         .cant_title {
-            /* width: 5.75vw; */
+            width: 5.75vw;
         }
     </style>
 
@@ -414,9 +428,8 @@ Permisos para {{info_rol.get('nombre')}}
 
     <div class="block_access">
         {% for modulo in modulos %}
-        <div class="mod_block" 
-        style="border: 1px solid color-mix(in srgb, {{ modulo.get('color') }} 40%, #dadada 80%) ;"
-        >
+        <div class="mod_block"
+            style="border: 1px solid color-mix(in srgb, {{ modulo.get('color') }} 40%, #dadada 80%) ;">
             <div class="mod_head">
                 <div class="mod_title" style="
                     background-color: color-mix(in srgb, {{ modulo.get('color') }} 15%, transparent 90%) ; 
@@ -429,29 +442,33 @@ Permisos para {{info_rol.get('nombre')}}
 
                 <div class="mod_opts">
                     {% if not rolid %}
-                    <button class="clickable-modal mod_opt text_consult" id="modal_crud_consult_modulo_{{ modulo.get('id') }}">
-                        <i class="{{ICON_CONSULT}}"></i>
-                    </button>
+                        <button class="clickable-modal mod_opt text_consult"
+                            id="modal_crud_consult_modulo_{{ modulo.get('id') }}">
+                            <i class="{{ICON_CONSULT}}"></i>
+                        </button>
 
-                    <button class="clickable-modal mod_opt text_update" id="modal_crud_update_modulo_{{ modulo.get('id') }}">
-                        <i class="{{ICON_UPDATE}}"></i>
-                    </button>
+                        <button class="clickable-modal mod_opt text_update"
+                            id="modal_crud_update_modulo_{{ modulo.get('id') }}">
+                            <i class="{{ICON_UPDATE}}"></i>
+                        </button>
 
-                    {% if modulo.get('activo') == 1 %}
-                    <button class="clickable-modal mod_opt text_active" id="modal_crud_unactive_modulo_{{ modulo.get('id') }}">
-                        <i class="{{ICON_ACTIVE}}"></i>
-                    </button>
+                        {% if modulo.get('activo') == 1 %}
+                        <button class="clickable-modal mod_opt text_active"
+                            id="modal_crud_unactive_modulo_{{ modulo.get('id') }}">
+                            <i class="{{ICON_ACTIVE}}"></i>
+                        </button>
+                        {% else %}
+                        <button class="clickable-modal mod_opt text_unactive"
+                            id="modal_crud_unactive_modulo_{{ modulo.get('id') }}">
+                            <i class="{{ICON_UNACTIVE}}"></i>
+                        </button>
+                        {% endif %}
+
                     {% else %}
-                    <button class="clickable-modal mod_opt text_unactive" id="modal_crud_unactive_modulo_{{ modulo.get('id') }}">
-                        <i class="{{ICON_UNACTIVE}}"></i>
-                    </button>
-                    {% endif %}
 
-                    {% else %}
-
-                    <button class="clickable-modal mod_opt text_access" id="">
-                        <i class="{{ICON_UNLOCK}}"></i>
-                    </button>
+                        <button class="clickable-modal mod_opt text_access unable" id="">
+                            <i class="{{ICON_UNLOCK}}"></i>
+                        </button>
 
                     {% endif %}
                 </div>
@@ -480,11 +497,11 @@ Permisos para {{info_rol.get('nombre')}}
                 <div class="pag_block">
                     <div class="pag_title">
                         {% if page.get('tipo_paginaid') == 1 %}
-                            <i class="{{ page.get('icono') or ICON_PAGE_NOICON }}"></i>
-                            <p> {{NOMBRE_CRUD_PAGE}} {{ page.get('titulo') | lower }} </p>
+                        <i class="{{ page.get('icono') or ICON_PAGE_NOICON }}"></i>
+                        <p> {{NOMBRE_CRUD_PAGE}} {{ page.get('titulo') | lower }} </p>
                         {% else %}
-                            <i class="{{ page.get('icono') or ICON_PAGE_NOICON }}"></i>
-                            <p> {{ page.get('titulo') }} </p>
+                        <i class="{{ page.get('icono') or ICON_PAGE_NOICON }}"></i>
+                        <p> {{ page.get('titulo') }} </p>
                         {% endif %}
                     </div>
 
@@ -493,44 +510,45 @@ Permisos para {{info_rol.get('nombre')}}
                     <div class="pag_content crud_ops">
 
                         <div class="opciones_fila">
-                            <button class=" btn_access" id="">
+                            <button class="btn_access {% if page.acceso is none or page.acceso == 0 %}unable{% endif %}" id="">
                                 <i class="{{ICON_UNLOCK}}"></i>
                             </button>
                         </div>
 
                         {% if page.get('tipo_paginaid') == 1 %}
                         <div class="opciones_fila">
-                            <button class=" btn_search" id="">
+                            <button class="btn_search {% if page.search is none or page.search == 0 %}unable{% endif %}" id="">
                                 <i class="{{ICON_SEARCH}}"></i>
+                                <!-- {{page.search}} -->
                             </button>
                         </div>
 
                         <div class="opciones_fila">
-                            <button class=" btn_insert" id="">
+                            <button class="btn_insert {% if page.insert is none or page.insert == 0 %}unable{% endif %}" id="">
                                 <i class="{{ICON_INSERT}}"></i>
                             </button>
                         </div>
 
                         <div class="opciones_fila">
-                            <button class=" btn_consult" id="">
+                            <button class=" btn_consult {% if page.consult is none or page.consult == 0 %}unable{% endif %}" id="">
                                 <i class="{{ICON_CONSULT}}"></i>
                             </button>
                         </div>
 
                         <div class="opciones_fila">
-                            <button class=" btn_active" id="">
+                            <button class=" btn_active {% if page.unactive is none or page.unactive == 0 %}unable{% endif %}" id="">
                                 <i class="{{ICON_ACTIVE}}"></i>
                             </button>
                         </div>
 
                         <div class="opciones_fila">
-                            <button class=" btn_update" id="">
+                            <button class=" btn_update {% if page['update'] is none or page['update'] == 0 %}unable{% endif %}" id="">
                                 <i class="{{ICON_UPDATE}}"></i>
                             </button>
                         </div>
 
                         <div class="opciones_fila">
-                            <button class=" btn_delete" id="">
+                            <button class=" btn_delete {% if page.delete is none or page.delete == 0 %}unable{% endif %}" id="">
                                 <i class="{{ICON_DELETE}}"></i>
                             </button>
                         </div>
@@ -542,20 +560,24 @@ Permisos para {{info_rol.get('nombre')}}
                     {% else %}
 
                     <div class="pag_options">
-                        <button class="clickable-modal btn_opt text_consult" id="modal_crud_consult_pagina_{{ page.get('id') }}">
+                        <button class="clickable-modal btn_opt text_consult"
+                            id="modal_crud_consult_pagina_{{ page.get('id') }}">
                             <i class="{{ICON_CONSULT}}"></i>
                         </button>
 
-                        <button class="clickable-modal btn_opt text_update" id="modal_crud_update_pagina_{{ page.get('id') }}">
+                        <button class="clickable-modal btn_opt text_update"
+                            id="modal_crud_update_pagina_{{ page.get('id') }}">
                             <i class="{{ICON_UPDATE}}"></i>
                         </button>
 
                         {% if page.get('activo') == 1 %}
-                        <button class="clickable-modal btn_opt text_active" id="modal_crud_unactive_pagina_{{ page.get('id') }}">
+                        <button class="clickable-modal btn_opt text_active"
+                            id="modal_crud_unactive_pagina_{{ page.get('id') }}">
                             <i class="{{ICON_ACTIVE}}"></i>
                         </button>
                         {% else %}
-                        <button class="clickable-modal btn_opt text_unactive" id="modal_crud_unactive_pagina_{{ page.get('id') }}">
+                        <button class="clickable-modal btn_opt text_unactive"
+                            id="modal_crud_unactive_pagina_{{ page.get('id') }}">
                             <i class="{{ICON_UNACTIVE}}"></i>
                         </button>
                         {% endif %}
@@ -572,7 +594,7 @@ Permisos para {{info_rol.get('nombre')}}
                 {% endif %}
                 {% endfor %}
 
-                
+
 
             </div>
         </div>
@@ -647,29 +669,29 @@ Permisos para {{info_rol.get('nombre')}}
 {% include 'MODAL_FORM_CRUD.html' %}
 
 
-    {% for pagina in paginas %}
-    {% if pagina.get('moduloid') == modulo.get('id') %}
+{% for pagina in paginas %}
+{% if pagina.get('moduloid') == modulo.get('id') %}
 
 
-    {% set fila = pagina %}
-    {% set tabla = 'pagina' %}
-    {% set primary_key = 'id' %}
-    {% set nombre_tabla = 'página' %}
-    {% set fields_form = fields_form_page %}
+{% set fila = pagina %}
+{% set tabla = 'pagina' %}
+{% set primary_key = 'id' %}
+{% set nombre_tabla = 'página' %}
+{% set fields_form = fields_form_page %}
 
 
-    {% set modo_modal = 'consult' %}
-    {% include 'MODAL_FORM_CRUD.html' %}
+{% set modo_modal = 'consult' %}
+{% include 'MODAL_FORM_CRUD.html' %}
 
-    {% set modo_modal = 'update' %}
-    {% include 'MODAL_FORM_CRUD.html' %}
+{% set modo_modal = 'update' %}
+{% include 'MODAL_FORM_CRUD.html' %}
 
-    {% set modo_modal = 'unactive' %}
-    {% include 'MODAL_FORM_CRUD.html' %}
+{% set modo_modal = 'unactive' %}
+{% include 'MODAL_FORM_CRUD.html' %}
 
 
-    {% endif %}
-    {% endfor %}
+{% endif %}
+{% endfor %}
 
 
 {% endfor %}
@@ -692,19 +714,23 @@ Permisos para {{info_rol.get('nombre')}}
 
 <script>
 
-  const SELECT_OPTIONS = {
+    const SELECT_OPTIONS = {
     {% for campo in fields_form_final if campo[3] == 'select' %}
     "{{campo[0]}}": [
         {% for option in campo[6][0]() %}
-        { value: "{{option[0]}}", label: "{{option[1]}}" }{% if not loop.last %},{% endif %}
-        {% endfor %}
-    ]{% if not loop.last %},{% endif %}
+    { value: "{{option[0]}}", label: "{{option[1]}}" } {% if not loop.last %}, {% endif %}
+    {% endfor %}
+    ]{% if not loop.last %}, {% endif %}
     {% endfor %}
     
   };
 
 </script>
 {% endif %}
+
+
+
+{% if rolid %}
 
 <script>
     const options = document.querySelectorAll('.opciones_fila ');
@@ -718,10 +744,58 @@ Permisos para {{info_rol.get('nombre')}}
     });
 </script>
 
+<script>
+    document.querySelectorAll('.opciones_fila').forEach(opt => {
+        opt.addEventListener('change', () => {
+            const id = opt.dataset.id;
+            // const valor = opt.checked ? 1 : 0;
 
+            fetch('/actualizar_permiso', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: id,
+                    respuesta: valor
+                })
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error("Error al actualizar");
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Actualizado:", data);
+                })
+                .catch(err => {
+                    alert("Error al actualizar respuesta");
+                    console.error(err);
+                });
+        });
+    });
 
-{% if rolid %}
+    // document.querySelectorAll('.textarea-comentario').forEach(txt => {
+    //     txt.addEventListener('blur', () => {
+    //         const id = txt.dataset.id;
+    //         const comentario = txt.value.trim();
 
+    //         fetch('/actualizar_comentario', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify({ id: id, comentario: comentario })
+    //         })
+    //             .then(response => response.json())
+    //             .then(data => console.log("Comentario actualizado:", data))
+    //             .catch(err => {
+    //                 alert("Error al actualizar comentario");
+    //                 console.error(err);
+    //             });
+    //     });
+    // });
+
+</script>
 {% endif %}
 
 

@@ -1670,9 +1670,7 @@ def inject_cur_modulo_id():
             dataPage = permiso.get_pagina_key(key)
             if dataPage:
                 return dict(cur_modulo_id=dataPage['moduloid'])
-
         return dict(cur_modulo_id=None)
-
     except Exception as e:
         return dict(cur_modulo_id=None)
 
@@ -1682,7 +1680,7 @@ def inject_globals():
     listar_pages_admin = listar_admin_pages()
     modulos = permiso.get_lista_modulos()
     tipos_paginas = permiso.get_lista_tipo_paginas()
-    paginas = permiso.get_paginas()
+    menu_paginas = permiso.get_paginas()
     options_pagination_crud , selected_option_crud = get_options_pagination_crud()
     cookie_error = request.cookies.get('error')
     user_id = request.cookies.get('user_id')
@@ -1713,7 +1711,7 @@ def inject_globals():
         selected_option_crud = selected_option_crud ,
         modulos= modulos ,
         tipos_paginas = tipos_paginas ,
-        paginas = paginas ,
+        menu_paginas = menu_paginas ,
 
         # paginas cliente
 
@@ -1921,9 +1919,34 @@ def sucursales():
     )
 
 
-###################################
+##################_ METHOD POST GENERALES _################## 
 
-##################_ ADMIN PAGE _################## 
+
+@app.route("/procesar_login", methods=["POST"])
+def procesar_login():
+    try:
+        correo = request.form["email"]
+        password = request.form["password"]
+        usuario = controlador_usuario.get_usuario_por_correo(correo)
+        encpassword = encrypt_sha256_string(password)
+        # print(encpassword)
+        # print(usuario)
+
+        if usuario and encpassword == usuario['contrasenia']:
+            resp = resp_login(
+                'login',
+                usuario['id'] ,
+                usuario['correo'] 
+            )
+            # controlador_usuario.actualizar_token(username, token)
+            return resp
+        else:
+            return rdrct_error(redirect_url('login') ,'LOGIN_INVALIDO')
+    except Exception as e:
+        return rdrct_error(redirect_url('login')  , e)
+
+
+##################_ PAGINAS EMPLEADO _################## 
 
 
 @app.route("/panel")
@@ -1947,7 +1970,7 @@ def dashboard(module_name):
 
 
 @app.route("/crud=<tabla>")
-# @validar_empleado()
+@validar_empleado()
 def crud_generico(tabla):
     config = CONTROLADORES.get(tabla)
     if config:
@@ -2031,8 +2054,9 @@ def reporte(report_name):
                 esReporte      = True ,
             )
 
+
 @app.route("/transaccion=<tabla>")
-# @validar_empleado()
+@validar_empleado()
 def crud_transaccion(tabla):
     config = TRANSACCIONES.get(tabla)
     if config:
@@ -2082,9 +2106,15 @@ def crud_transaccion(tabla):
                 esTransaccion = True
             )
 
+    
+@app.route("/seguimiento_empleado_prueba=<placa>")
+@validar_empleado()
+def seguimiento_empleado_prueba(placa):
+    return render_template('seguimiento_empleado_prueba.html', placa=placa)
+
 
 @app.route("/administrar_paginas")
-# @validar_empleado()
+@validar_empleado()
 def administrar_paginas():
     modulos = permiso.get_lista_modulos()
     paginas = permiso.get_paginas()
@@ -2128,7 +2158,7 @@ def administrar_paginas():
 @validar_empleado()
 def permiso_rol(rolid):
     modulos = permiso.get_lista_modulos()
-    paginas_cruds = permiso.get_paginas_crud()
+    paginas = permiso.get_paginas_permiso_rol(rolid)
     roles = permiso.get_lista_roles()
     tipos_rol = permiso.get_lista_tipo_roles()
     cants_mod = permiso.get_cants_modulos()
@@ -2138,7 +2168,7 @@ def permiso_rol(rolid):
     return render_template(
         'administrar_paginas.html' ,
         modulos = modulos ,
-        paginas_cruds = paginas_cruds , 
+        paginas = paginas , 
         roles = roles ,
         tipos_rol = tipos_rol ,
         rolid = rolid ,
@@ -2159,7 +2189,7 @@ def informacion_empresa():
         )
 
 
-##################_ METHOD POST _################## 
+##################_ PAGINAS EMPLEADO METHOD POST _################## 
 
 @app.route("/insert_row=<tabla>", methods=["POST"])
 @validar_empleado()
@@ -2204,8 +2234,8 @@ def crud_insert(tabla):
 
 
 @app.route("/update_row=<tabla>", methods=["POST"])
-# @validar_empleado()
-# @validar_error_crud()
+@validar_empleado()
+@validar_error_crud()
 def crud_update(tabla):
     # try:
         config = CONTROLADORES.get(tabla)
@@ -2274,8 +2304,8 @@ def crud_delete(tabla):
 
 
 @app.route("/unactive_row=<tabla>", methods=["POST"])
-# @validar_empleado()
-# @validar_error_crud()
+@validar_empleado()
+@validar_error_crud()
 def crud_unactive(tabla):
     config = CONTROLADORES.get(tabla)
     if not config:
@@ -2324,34 +2354,39 @@ def update_empresa():
     return redirect(url_for('informacion_empresa'))
 
 
-@app.route("/procesar_login", methods=["POST"])
-def procesar_login():
-    try:
-        correo = request.form["email"]
-        password = request.form["password"]
-        usuario = controlador_usuario.get_usuario_por_correo(correo)
-        encpassword = encrypt_sha256_string(password)
-        # print(encpassword)
-        # print(usuario)
 
-        if usuario and encpassword == usuario['contrasenia']:
-            resp = resp_login(
-                'login',
-                usuario['id'] ,
-                usuario['correo'] 
-            )
-            # controlador_usuario.actualizar_token(username, token)
-            return resp
-        else:
-            return rdrct_error(redirect_url('login') ,'LOGIN_INVALIDO')
+##################_ METHOD POST AJAX _################## 
+
+@app.route('/actualizar_permiso', methods=['POST'])
+def actualizar_permiso():
+    data = request.get_json()
+    id = data.get('id')
+    respuesta = data.get('respuesta')
+
+    try:
+        permiso.change_permiso_pagina(column , paginaid , rolid)
+        return jsonify({'success': True})
     except Exception as e:
-        return rdrct_error(redirect_url('login')  , e)
-    
-    
-@app.route("/seguimiento_empleado_prueba=<placa>")
-@validar_empleado()
-def seguimiento_empleado_prueba(placa):
-    return render_template('seguimiento_empleado_prueba.html', placa=placa)
+        print("Error al actualizar permiso:", e)
+        return jsonify({'success': False, 'error': str(e)})
+
+
+
+# @app.route('/actualizar_comentario', methods=['POST'])
+# def actualizar_comentario():
+#     data = request.get_json()
+#     id = data.get('id')
+#     comentario = data.get('comentario')
+#     try:
+#         controlador_evaluacion.actualizar_comentario_det_id(comentario , id)
+#         return jsonify({'success': True})
+#     except Exception as e:
+#         print("Error al actualizar comentario:", e)
+#         return jsonify({'success': False, 'error': str(e)})
+
+
+
+
 
 ###################################CARRITO###########################
 # @app.route('/agregar_carrito', methods = ['POST'])
