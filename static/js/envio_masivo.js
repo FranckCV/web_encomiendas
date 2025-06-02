@@ -26,6 +26,8 @@ const {
 
 document.addEventListener("DOMContentLoaded", function () {
 
+  const STORAGE_KEY = 'enviosMasivosTemp';
+
   initTabs();
   // initUbigeo();
   origenUbigeo();
@@ -442,12 +444,14 @@ function agregarEnvio() {
     }
   };
 
-  enviosMasivos.push(envio);
+
+localStorage.setItem(STORAGE_KEY, JSON.stringify(envio));
 
   limpiarFormularioMasivo();
 
   actualizarTabla();
 }
+
 
 function actualizarTabla() {
   const tableContent = document.getElementById('tableContent');
@@ -455,7 +459,10 @@ function actualizarTabla() {
   const pesoTotal = document.getElementById('pesoTotal');
   const valorTotal = document.getElementById('valorTotal');
 
-  if (enviosMasivos.length === 0) {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  const envios = stored ? JSON.parse(stored) : [];
+
+  if (envios.length === 0) {
     tableContent.innerHTML = `
       <div class="empty-state">
         <p>No hay envíos registrados aún</p>
@@ -490,7 +497,7 @@ function actualizarTabla() {
         <tbody>
   `;
 
-  enviosMasivos.forEach((envio, index) => {
+  envios.forEach((envio, index) => {
     const paquete = envio.paquete || {};
     const destino = envio.destino || {};
     const destinatario = envio.destinatario || {};
@@ -550,7 +557,7 @@ function actualizarTabla() {
   `;
 
   tableContent.innerHTML = html;
-  totalEnvios.textContent = enviosMasivos.length;
+  totalEnvios.textContent = envios.length;
   pesoTotal.textContent = sumaPeso.toFixed(2);
   valorTotal.textContent = sumaValor.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
