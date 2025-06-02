@@ -11,8 +11,7 @@ const regexNombre = /^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]{2,60}$/;
 //Correo
 const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 //Dirección
-const regexDireccion = /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9°#\.\,\-\s]{5,200}$/;
-
+const regexDireccion = /^[a-zA-Z0-9\sáéíóúÁÉÍÓÚñÑ\-,.#°º()]{5,100}$/;
 
 const STORAGE_KEY = 'enviosMasivosTemp';
 
@@ -138,6 +137,26 @@ direccionDestinatario.addEventListener('input', () => {
   }
 });
 
+
+// const referenciaDestinatario = document.getElementById('m-referencia');
+// const mensajeReferencia = document.getElementById('mensaje-validacion-referencia');
+
+// referenciaDestinatario.addEventListener('input', () => {
+//   const referencia = referenciaDestinatario.value.trim();
+//   const valido = regexDireccion.test(referencia);
+
+//   if (referencia === '') {
+//     mensajeReferencia.style.display = 'none';
+//     referenciaDestinatario.style.borderColor = '';
+//   } else if (valido) {
+//     mensajeReferencia.style.display = 'none';
+//     referenciaDestinatario.style.borderColor = '#48bb78';
+//   } else {
+//     mensajeReferencia.style.display = 'block';
+//     mensajeReferencia.textContent = 'La referencia debe tener entre 5 y 100 caracteres válidos.';
+//     referenciaDestinatario.style.borderColor = '#fc8181';
+//   }
+// });
 
 
 //////////////////////////////////////////////////////////////////////
@@ -327,7 +346,6 @@ function limpiarFormularioMasivo() {
   document.getElementById('select-sucursal').innerHTML = '<option value="">Seleccione tienda</option>';
 
   document.getElementById('m-direccion').value = '';
-  document.getElementById('m-referencia').value = '';
 
   document.getElementById('m-tipoEmpaque').value = '';
   toggleFolios();
@@ -404,20 +422,20 @@ function initTabs() {
 function mostrarCamposDestino() {
   const tipo = document.getElementById('m-tipoEntrega').value;
   const grupoDir = document.getElementById('grupo-direccion');
-  const grupoRef = document.getElementById('grupo-referencia');
+  // const grupoRef = document.getElementById('grupo-referencia');
   const grupoTienda = document.getElementById('grupo-tienda');
 
   if (tipo === '2') {
     grupoDir.style.display = 'flex';
-    grupoRef.style.display = 'flex';
+    // grupoRef.style.display = 'flex';
     grupoTienda.style.display = 'none';
   } else if (tipo === '1') {
     grupoDir.style.display = 'none';
-    grupoRef.style.display = 'none';
+    // grupoRef.style.display = 'none';
     grupoTienda.style.display = 'flex';
   } else {
     grupoDir.style.display = 'none';
-    grupoRef.style.display = 'none';
+    // grupoRef.style.display = 'none';
     grupoTienda.style.display = 'none';
   }
 }
@@ -496,7 +514,7 @@ function agregarEnvio() {
   const select_provincia = document.getElementById('select-provincia');
   const select_distrito = document.getElementById('select-distrito');
   const m_direccion = document.getElementById('m-direccion');
-  const m_referencia = document.getElementById('m-referencia');
+  // const m_referencia = document.getElementById('m-referencia');
   const select_sucursal = document.getElementById('select-sucursal');
 
   // 3. Datos del paquete
@@ -544,7 +562,7 @@ function agregarEnvio() {
       provincia: select_provincia.value,
       distrito: select_distrito.value,
       direccion: m_direccion?.value || '',
-      referencia: m_referencia?.value || '',
+      // referencia: m_referencia?.value || '',
       sucursalDestinoId: select_sucursal?.value || null
     },
     paquete: {
@@ -721,7 +739,7 @@ function editarEnvio(index) {
   document.getElementById('select-provincia').value = destino.provincia || '';
   document.getElementById('select-distrito').value = destino.distrito || '';
   document.getElementById('m-direccion').value = destino.direccion || '';
-  document.getElementById('m-referencia').value = destino.referencia || '';
+  // document.getElementById('m-referencia').value = destino.referencia || '';
   document.getElementById('select-sucursal').value = destino.sucursalDestinoId || '';
 
   // 4. Paquete
