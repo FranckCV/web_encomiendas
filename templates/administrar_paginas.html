@@ -412,6 +412,11 @@ Permisos para {{info_rol.get('nombre')}}
         .cant_title {
             width: 5.75vw;
         }
+
+        .mod_content {
+            height: 285px;
+        }
+
     </style>
 
     {% else %}
@@ -494,7 +499,7 @@ Permisos para {{info_rol.get('nombre')}}
                 {% for page in paginas %}
 
                 {% if page.get('moduloid') == modulo.id and tipo_page.tip_id == page.tipo_paginaid %}
-                <div class="pag_block">
+                <div class="pag_block" data-paginaid="{{page.id}}">
                     <div class="pag_title">
                         {% if page.get('tipo_paginaid') == 1 %}
                         <i class="{{ page.get('icono') or ICON_PAGE_NOICON }}"></i>
@@ -510,45 +515,45 @@ Permisos para {{info_rol.get('nombre')}}
                     <div class="pag_content crud_ops">
 
                         <div class="opciones_fila">
-                            <button class="btn_access {% if page.acceso is none or page.acceso == 0 %}unable{% endif %}" id="">
+                            <button data-column="acceso" class="btn_access {% if page.acceso is none or page.acceso == 0 %}unable{% endif %}" id="">
                                 <i class="{{ICON_UNLOCK}}"></i>
                             </button>
                         </div>
 
                         {% if page.get('tipo_paginaid') == 1 %}
                         <div class="opciones_fila">
-                            <button class="btn_search {% if page.search is none or page.search == 0 %}unable{% endif %}" id="">
+                            <button data-column="search" class="btn_search {% if page.search is none or page.search == 0 %}unable{% endif %}" id="">
                                 <i class="{{ICON_SEARCH}}"></i>
                                 <!-- {{page.search}} -->
                             </button>
                         </div>
 
                         <div class="opciones_fila">
-                            <button class="btn_insert {% if page.insert is none or page.insert == 0 %}unable{% endif %}" id="">
+                            <button data-column="insert" class="btn_insert {% if page.insert is none or page.insert == 0 %}unable{% endif %}" id="">
                                 <i class="{{ICON_INSERT}}"></i>
                             </button>
                         </div>
 
                         <div class="opciones_fila">
-                            <button class=" btn_consult {% if page.consult is none or page.consult == 0 %}unable{% endif %}" id="">
+                            <button data-column="consult" class=" btn_consult {% if page.consult is none or page.consult == 0 %}unable{% endif %}" id="">
                                 <i class="{{ICON_CONSULT}}"></i>
                             </button>
                         </div>
 
                         <div class="opciones_fila">
-                            <button class=" btn_active {% if page.unactive is none or page.unactive == 0 %}unable{% endif %}" id="">
+                            <button data-column="unactive" class=" btn_active {% if page.unactive is none or page.unactive == 0 %}unable{% endif %}" id="">
                                 <i class="{{ICON_ACTIVE}}"></i>
                             </button>
                         </div>
 
                         <div class="opciones_fila">
-                            <button class=" btn_update {% if page['update'] is none or page['update'] == 0 %}unable{% endif %}" id="">
+                            <button data-column="update" class=" btn_update {% if page['update'] is none or page['update'] == 0 %}unable{% endif %}" id="">
                                 <i class="{{ICON_UPDATE}}"></i>
                             </button>
                         </div>
 
                         <div class="opciones_fila">
-                            <button class=" btn_delete {% if page.delete is none or page.delete == 0 %}unable{% endif %}" id="">
+                            <button data-column="delete" class=" btn_delete {% if page.delete is none or page.delete == 0 %}unable{% endif %}" id="">
                                 <i class="{{ICON_DELETE}}"></i>
                             </button>
                         </div>
@@ -732,7 +737,7 @@ Permisos para {{info_rol.get('nombre')}}
 
 {% if rolid %}
 
-<script>
+<!-- <script>
     const options = document.querySelectorAll('.opciones_fila ');
     options.forEach(opt => {
         const btns = opt.querySelectorAll('button');
@@ -742,12 +747,14 @@ Permisos para {{info_rol.get('nombre')}}
             });
         });
     });
-</script>
+</script> -->
 
 <script>
-    document.querySelectorAll('.opciones_fila').forEach(opt => {
-        opt.addEventListener('change', () => {
-            const id = opt.dataset.id;
+    document.querySelectorAll('.opciones_fila button').forEach(opt => {
+        opt.addEventListener('click', () => {
+            const rolid = {{rolid}};
+            const column = opt.dataset.column;
+            const paginaid = opt.closest('[data-paginaid]').dataset.paginaid;
             // const valor = opt.checked ? 1 : 0;
 
             fetch('/actualizar_permiso', {
@@ -756,8 +763,9 @@ Permisos para {{info_rol.get('nombre')}}
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    id: id,
-                    respuesta: valor
+                    paginaid: paginaid,
+                    column: column ,
+                    rolid: rolid 
                 })
             })
                 .then(response => {
@@ -765,7 +773,12 @@ Permisos para {{info_rol.get('nombre')}}
                     return response.json();
                 })
                 .then(data => {
-                    console.log("Actualizado:", data);
+                    // console.log("Actualizado:", data);
+                    if (data.rpta == 1) {
+                        opt.classList.remove('unable');
+                    } else {
+                        opt.classList.add('unable');
+                    }
                 })
                 .catch(err => {
                     alert("Error al actualizar respuesta");
@@ -774,26 +787,7 @@ Permisos para {{info_rol.get('nombre')}}
         });
     });
 
-    // document.querySelectorAll('.textarea-comentario').forEach(txt => {
-    //     txt.addEventListener('blur', () => {
-    //         const id = txt.dataset.id;
-    //         const comentario = txt.value.trim();
 
-    //         fetch('/actualizar_comentario', {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             body: JSON.stringify({ id: id, comentario: comentario })
-    //         })
-    //             .then(response => response.json())
-    //             .then(data => console.log("Comentario actualizado:", data))
-    //             .catch(err => {
-    //                 alert("Error al actualizar comentario");
-    //                 console.error(err);
-    //             });
-    //     });
-    // });
 
 </script>
 {% endif %}

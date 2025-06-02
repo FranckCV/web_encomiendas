@@ -296,15 +296,21 @@ def nuevo_permiso_pagina_rol( paginaid , rolid):
 def update_permiso_pagina(column , paginaid , rolid):
     sql = f'''
         update permiso set 
-        {column} = NOT {column}
+        `{column}` = NOT `{column}`
         where paginaid = {paginaid} and rolid = {rolid}
     '''
     bd.sql_execute(sql)
 
 
 def change_permiso_pagina(column , paginaid , rolid):
-    data = consult_permiso_rol(column , paginaid , rolid)
-    if data.paginaid and data.rolid: 
+    data = consult_permiso_rol( paginaid , rolid)
+    # print(paginaid)
+    # print(rolid)
+    # print('pre if')
+    # print(data['paginaid'])
+    # print(data['rolid']) 
+    if data['paginaid'] is not None and data['rolid'] is not None: 
+        # print('post if')
         update_permiso_pagina(column , paginaid , rolid)
     else:
         nuevo_permiso_pagina_rol( paginaid , rolid)

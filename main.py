@@ -2373,15 +2373,34 @@ def update_empresa():
 @app.route('/actualizar_permiso', methods=['POST'])
 def actualizar_permiso():
     data = request.get_json()
-    id = data.get('id')
-    respuesta = data.get('respuesta')
+    paginaid = data.get('paginaid')
+    column = data.get('column')
+    rolid = data.get('rolid')
 
     try:
         permiso.change_permiso_pagina(column , paginaid , rolid)
-        return jsonify({'success': True})
+        rpta_column = permiso.consult_permiso_rol(paginaid , rolid)[column]
+        return jsonify({'success': True , 'rpta' : rpta_column})
     except Exception as e:
         print("Error al actualizar permiso:", e)
         return jsonify({'success': False, 'error': str(e)})
+
+
+@app.route('/actualizar_permiso_modulo', methods=['POST'])
+def actualizar_permiso_modulo():
+    data = request.get_json()
+    moduloid = data.get('moduloid')
+    column = data.get('column')
+    rolid = data.get('rolid')
+
+    try:
+        permiso.change_permiso_modulo(column , moduloid , rolid)
+        # rpta_column = permiso.consult_permiso_rol(moduloid , rolid)[column]
+        return jsonify({'success': True })
+    except Exception as e:
+        print("Error al actualizar permiso:", e)
+        return jsonify({'success': False, 'error': str(e)})
+
 
 
 
