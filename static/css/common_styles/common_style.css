@@ -31,9 +31,6 @@
     --dark-color: color-mix(in srgb, var(--color-base) 5%, rgb(35, 35, 35) 100%);
     --color0: rgb(33, 37, 41);
 
-    --color-cancel: darkred;
-    --color-back: rgb(99, 99, 99);
-    --color-acept: #006c16;
     
     --color-background: color-mix(in srgb, var(--color-contrast) 30%, var(--color-contrast) 100%);
     --primary-color: #0066cc;
@@ -43,6 +40,23 @@
     --border-color: #dddddd;
     --success-color: #28a745;
     --error-color: #dc3545;
+    
+    --color-cancel: darkred;
+    --color-back: rgb(99, 99, 99);
+    --color-acept: #006c16;
+
+    --color-access: var(--color15);
+    --color-search: var(--color1);
+    --color-consult: color-mix(in srgb, var(--color5) 100%, var(--color-contrast) 15%);
+    --color-insert: color-mix(in srgb, var(--color5) 50%, #0cc84e 100%) !important;
+    --color-update: color-mix(in srgb, var(--color5) 50%, #ffd900 100%);
+    --color-active: color-mix(in srgb, var(--color5) 50%, #57e18c 100%);
+    --color-unactive: color-mix(in srgb, var(--color5) 70%, #959595 80%);
+    --color-delete: color-mix(in srgb, var(--color5) 50%, #ae0e2e 100%);
+
+    --color-crud: var(--color1);
+    --color-report: var(--color15);
+    --color-dashboard: var(--color16);
 }
 
 *:not(i) {
@@ -319,6 +333,120 @@ i.d_i {
 
 
 
+.btn_insert {
+    background-color: var(--color-insert) !important;
+    color: white;
+}
+
+.btn_search {
+    background-color: var(--color-search);
+    color: white;
+}
+
+.btn_access {
+    background-color: var(--color-access);
+    color: white;
+}
+
+.btn_update {
+    background-color: var(--color-update) !important;
+    color: white;
+}
+
+.btn_active {
+    background-color: var(--color-active) !important;
+    color: white;
+}
+
+.btn_unactive {
+    background-color: var(--color-unactive) !important;
+    color: white;
+}
+
+.btn_delete {
+    background-color: var(--color-delete) !important;
+    color: white;
+}
+
+.btn_consult {
+    background-color: var(--color-consult) !important;
+    color: white;
+}
+
+.btn_cancel {
+    background-color: var(--color-cancel) !important;
+    color: white;
+}
+
+.btn_back {
+    background-color: var(--color-back) !important;
+    color: white;
+}
+
+.btn_acept {
+    background-color: var(--color-acept) !important;
+    color: white;
+}
 
 
+
+
+
+
+.text_insert,
+.text_search,
+.text_update,
+.text_unactive,
+.text_delete,
+.text_consult,
+.text_back,
+.text_acept,
+.text_access,
+.text_active {
+    background-color: transparent;
+}
+
+.text_insert {
+    color: var(--color-insert);
+}
+
+.text_search {
+    color: var(--color-search);
+}
+
+.text_access {
+    color: var(--color-access);
+}
+
+.text_update {
+    color: var(--color-update) !important;
+}
+
+.text_active {
+    color: var(--color-active) !important;
+}
+
+.text_unactive {
+    color: var(--color-unactive) !important;
+}
+
+.text_delete {
+    color: var(--color-delete) !important;
+}
+
+.text_consult {
+    color: var(--color-consult) !important;
+}
+
+.text_cancel {
+    color: var(--color-cancel) !important;
+}
+
+.text_back {
+    color: var(--color-back) !important;
+}
+
+.text_acept {
+    color: var(--color-acept) !important;
+}
 
