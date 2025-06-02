@@ -91,7 +91,7 @@ body {
 .nav-link span {
     display: block;
     overflow: hidden;
-    white-space: nowrap;
+    /* white-space: nowrap; */
     text-overflow: ellipsis;
     width: 140px;
 }
