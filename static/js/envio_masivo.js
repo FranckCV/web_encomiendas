@@ -26,6 +26,8 @@ const {
 
 document.addEventListener("DOMContentLoaded", function () {
 
+  const STORAGE_KEY = 'KEY';
+
   initTabs();
   // initUbigeo();
   origenUbigeo();
