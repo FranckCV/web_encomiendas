@@ -188,25 +188,40 @@ Permisos para {{info_rol.get('nombre')}}
     }
 
     .mod_opt {
-        padding-inline: 5px;
-        color: var(--color4) !important;
+        /* padding-inline: 5px; */
+        height: 30px;
+        aspect-ratio: 1 / 1;
+        display: flex;
+        justify-content: center;
+        padding: 0;
+        align-items: center;
+        background-color: var(--color4) !important;
+        color: white;
         font-size: 140%;
+        border-radius: 50px;
+        border: 1px solid var(--color4);
     }
 
     .mod_opt:hover {
         scale: 1.15;
-        color: var(--color-thr) !important;
+        background-color: var(--color-thr) !important;
+        border: 1px solid var(--color-thr);
+
         /* filter: brightness(2); */
     }
 
     .mod_opt.unable {
-        background-color: var(--color4) !important;
-        color: white !important;
+        color: var(--color4) !important;
+        background-color: white !important;
     }
 
     .mod_opt.unable:hover {
-        background-color: var(--color4) !important;
-        color: white !important;
+        color: var(--color-thr) !important;
+        border: 1px solid var(--color-thr);
+    }
+
+    .mod_opt i {
+        font-size: 80%;
     }
 
     .mod_cant {
@@ -471,8 +486,26 @@ Permisos para {{info_rol.get('nombre')}}
 
                     {% else %}
 
-                        <button class="clickable-modal mod_opt text_access unable" id="">
+                        <button class=" mod_opt text_access " id="">
                             <i class="{{ICON_UNLOCK}}"></i>
+                        </button>
+                        <button class=" mod_opt text_search unable" id="">
+                            <i class="{{ICON_SEARCH}}"></i>
+                        </button>
+                        <button class=" mod_opt text_access unable" id="">
+                            <i class="{{ICON_INSERT}}"></i>
+                        </button>
+                        <button class=" mod_opt text_access unable" id="">
+                            <i class="{{ICON_CONSULT}}"></i>
+                        </button>
+                        <button class=" mod_opt text_access unable" id="">
+                            <i class="{{ICON_ACTIVE}}"></i>
+                        </button>
+                        <button class=" mod_opt text_access unable" id="">
+                            <i class="{{ICON_UPDATE}}"></i>
+                        </button>
+                        <button class=" mod_opt text_access unable" id="">
+                            <i class="{{ICON_DELETE}}"></i>
                         </button>
 
                     {% endif %}
