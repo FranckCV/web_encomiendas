@@ -1,4 +1,12 @@
-//Validaciones
+const {
+  rutasTarifas,
+} = window.CONFIG_ENVIO || {};
+
+let enviosMasivos = [];
+let editIndex = -1;
+let pasoActual = 1;
+let cargarDatosEjemplo = false;
+
 //Teléfono
 const regexTelefono = /^9\d{8}$/;
 //documentos
@@ -159,148 +167,107 @@ direccionDestinatario.addEventListener('input', () => {
 // });
 
 
-//////////////////////////////////////////////////////////////////////
-let enviosMasivos = [];
-let editIndex = -1;
-let pasoActual = 1;
-let cargarDatosEjemplo = false;
-
-const {
-  sucursales,
-} = window.CONFIG_ENVIO || {};
-
 document.addEventListener("DOMContentLoaded", function () {
 
 
   initTabs();
-  // initUbigeo();
-  origenUbigeo();
   mostrarCamposDestino();
   toggleFolios();
   toggleArticulos();
   mostrarCamposReceptor();
 });
 
-function origenUbigeo() {
+
+let origenSeleccionado = null; // clave tipo 'Lima|Lima|San Isidro'
+
+// Cargar ORIGEN
+function cargarOrigenes() {
   const selectDep = document.getElementById('origen-departamento');
   const selectProv = document.getElementById('origen-provincia');
   const selectDist = document.getElementById('origen-distrito');
 
-
-
   selectDep.innerHTML = `<option disabled selected value="">Seleccione departamento</option>`;
   selectProv.innerHTML = `<option disabled selected value="">Seleccione provincia</option>`;
   selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
 
-
-  Object.keys(sucursales).forEach(dep => {
-    selectDep.append(new Option(dep, dep));
-  });
+  const origenesUnicos = Object.keys(rutasTarifas);
+  const departamentos = [...new Set(origenesUnicos.map(k => k.split('|')[0]))];
+  departamentos.forEach(dep => selectDep.append(new Option(dep, dep)));
 
   selectDep.addEventListener('change', () => {
+    selectProv.innerHTML = `<option disabled selected value="">Seleccione provincia</option>`;
+    selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
     const dep = selectDep.value;
-    selectProv.innerHTML = '<option disabled selected value="">Seleccione provincia</option>';
-    selectDist.innerHTML = '<option disabled selected value="">Seleccione distrito</option>';
 
-    if (sucursales[dep]) {
-      Object.keys(sucursales[dep]).forEach(prov => {
-        selectProv.append(new Option(prov, prov));
-      });
-    }
+    const provincias = origenesUnicos
+      .filter(k => k.startsWith(dep + '|'))
+      .map(k => k.split('|')[1]);
+    [...new Set(provincias)].forEach(prov => selectProv.append(new Option(prov, prov)));
   });
 
   selectProv.addEventListener('change', () => {
+    selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
     const dep = selectDep.value;
     const prov = selectProv.value;
-    selectDist.innerHTML = '<option disabled selected value="">Seleccione distrito</option>';
 
-    if (sucursales[dep] && sucursales[dep][prov]) {
-      Object.keys(sucursales[dep][prov]).forEach(dist => {
-        selectDist.append(new Option(dist, dist));
-      });
-    }
-  });
-
-
-}
-
-
-function initUbigeo() {
-  const selectDep = document.getElementById('m-departamento') || document.getElementById('select-departamento');
-  const selectProv = document.getElementById('m-provincia') || document.getElementById('select-provincia');
-  const selectDist = document.getElementById('m-distrito') || document.getElementById('select-distrito');
-  const selectTienda = document.getElementById('m-tienda') || document.getElementById('select-sucursal');
-
-  const origenDist = document.getElementById('origen-distrito')?.value;
-
-  selectDep.innerHTML = `<option disabled selected value="">Seleccione departamento</option>`;
-  selectProv.innerHTML = `<option disabled selected value="">Seleccione provincia</option>`;
-  selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
-  selectTienda.innerHTML = `<option disabled selected value="">Seleccione sucursal</option>`;
-
-  // Agregar solo departamentos con al menos una provincia con al menos un distrito distinto al de origen
-  Object.entries(sucursales).forEach(([dep, provincias]) => {
-    const provinciasValidas = Object.entries(provincias).filter(([prov, distritos]) => {
-      const distritosValidos = Object.keys(distritos).filter(dist => dist !== origenDist);
-      return distritosValidos.length > 0;
-    });
-
-    if (provinciasValidas.length > 0) {
-      selectDep.append(new Option(dep, dep));
-    }
-  });
-
-  selectDep.addEventListener('change', () => {
-    const dep = selectDep.value;
-    selectProv.innerHTML = '<option disabled selected value="">Seleccione provincia</option>';
-    selectDist.innerHTML = '<option disabled selected value="">Seleccione distrito</option>';
-    selectTienda.innerHTML = '<option disabled selected value="">Seleccione sucursal</option>';
-
-    if (sucursales[dep]) {
-      Object.entries(sucursales[dep]).forEach(([prov, distritos]) => {
-        const distritosValidos = Object.keys(distritos).filter(dist => dist !== origenDist);
-        if (distritosValidos.length > 0) {
-          selectProv.append(new Option(prov, prov));
-        }
-      });
-    }
-  });
-
-  selectProv.addEventListener('change', () => {
-    const dep = selectDep.value;
-    const prov = selectProv.value;
-    selectDist.innerHTML = '<option disabled selected value="">Seleccione distrito</option>';
-    selectTienda.innerHTML = '<option disabled selected value="">Seleccione sucursal</option>';
-
-    if (sucursales[dep] && sucursales[dep][prov]) {
-      Object.keys(sucursales[dep][prov]).forEach(dist => {
-        if (dist !== origenDist) {
-          selectDist.append(new Option(dist, dist));
-        }
-      });
-    }
+    const distritos = origenesUnicos
+      .filter(k => k.startsWith(`${dep}|${prov}|`))
+      .map(k => k.split('|')[2]);
+    [...new Set(distritos)].forEach(dist => selectDist.append(new Option(dist, dist)));
   });
 
   selectDist.addEventListener('change', () => {
     const dep = selectDep.value;
     const prov = selectProv.value;
     const dist = selectDist.value;
-    selectTienda.innerHTML = '<option disabled selected value="">Seleccione sucursal</option>';
 
-    if (sucursales[dep] && sucursales[dep][prov] && sucursales[dep][prov][dist]) {
-      sucursales[dep][prov][dist].forEach(s => {
-        const text = `${s.direc}`;
-        selectTienda.append(new Option(text, s.id));
-      });
-    }
+    origenSeleccionado = `${dep}|${prov}|${dist}`;
+    cargarDestinos(origenSeleccionado);
   });
 }
 
 
+function cargarDestinos(origenKey) {
+  const destinos = rutasTarifas[origenKey] || [];
 
-document.getElementById('origen-distrito').addEventListener('change', () => {
-  initUbigeo();
-});
+  const selectDep = document.getElementById('select-departamento');
+  const selectProv = document.getElementById('select-provincia');
+  const selectDist = document.getElementById('select-distrito');
+
+  selectDep.innerHTML = `<option disabled selected value="">Seleccione departamento</option>`;
+  selectProv.innerHTML = `<option disabled selected value="">Seleccione provincia</option>`;
+  selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
+
+  const deps = [...new Set(destinos.map(d => d.departamento))];
+  deps.forEach(dep => selectDep.append(new Option(dep, dep)));
+
+  selectDep.addEventListener('change', () => {
+    selectProv.innerHTML = `<option disabled selected value="">Seleccione provincia</option>`;
+    selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
+    const dep = selectDep.value;
+
+    const provs = destinos
+      .filter(d => d.departamento === dep)
+      .map(d => d.provincia);
+    [...new Set(provs)].forEach(prov => selectProv.append(new Option(prov, prov)));
+  });
+
+  selectProv.addEventListener('change', () => {
+    selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
+    const dep = selectDep.value;
+    const prov = selectProv.value;
+
+    const dists = destinos
+      .filter(d => d.departamento === dep && d.provincia === prov)
+      .map(d => d.distrito);
+    [...new Set(dists)].forEach(dist => selectDist.append(new Option(dist, dist)));
+  });
+
+  selectDist.addEventListener('change', () => {
+    mostrarTarifaBase();
+  });
+}
+
 
 
 // // === 7. PERSISTENCIA CON LOCALSTORAGE ===
@@ -770,105 +737,91 @@ function editarEnvio(index) {
 }
 /******************************************************************************************************************************************/
 function calcularTarifa() {
-
-  const departamento = document.getElementById('select-departamento').value;
-  const provincia = document.getElementById('select-provincia').value;
-  const distrito = document.getElementById('select-distrito').value;
+  const origenSucursalId = document.getElementById('origen-sucursal-id')?.value;
+  const destinoSucursalId = document.getElementById('select-sucursal')?.value;
   const tipoEntrega = document.getElementById('m-tipoEntrega').value;
   const peso = parseFloat(document.getElementById('m-peso').value) || 0;
   const valor = parseFloat(document.getElementById('m-valorEnvio').value) || 0;
 
-  // Solo calcular si tenemos los datos mínimos
-  if (!departamento || !provincia || !distrito || !tipoEntrega) {
+  const keyTarifa = `${origenSucursalId}|${destinoSucursalId}`;
+  const tarifas = window.CONFIG_ENVIO?.tarifas || {};
+  const tarifaBase = parseFloat(tarifas[keyTarifa]) || null;
+
+  if (!tarifaBase || !origenSucursalId || !destinoSucursalId || !tipoEntrega) {
     document.getElementById('seccion-tarifa').classList.add('tarifa-oculta');
     return;
   }
 
-  // Simulación de cálculo de tarifa
-  let tarifaBase = 15.00;
-  let costoPesoAdicional = 0;
+  let costoExtraPeso = 0;
   let costoValorAsegurado = 0;
-  let costoRecojoDomicilio = 0;
+  let costoDomicilio = 0;
 
-  // Ajustar tarifa base según destino
-  if (departamento === 'arequipa') tarifaBase = 18.00;
-  if (departamento === 'cusco') tarifaBase = 22.00;
-
-  // Costo por peso adicional (más de 1kg)
-  if (peso > 1) {
-    costoPesoAdicional = (peso - 1) * 2.00;
-  }
-
-  // Costo de seguro (2% si valor > 100)
   if (valor > 100) {
-    costoValorAsegurado = valor * 0.02;
+    costoValorAsegurado = valor * 0.006;
   }
 
-  // Costo por entrega a domicilio (25% adicional sobre tarifa base)
+  if (peso > 5) {
+    costoExtraPeso = tarifaBase * 0.003;
+  } else if (peso > 3) {
+    costoExtraPeso = tarifaBase * 0.002;
+  }
+
   if (tipoEntrega === '1') {
-    costoRecojoDomicilio = tarifaBase * 0.25;
+    costoDomicilio = tarifaBase * 0.25;
   }
 
-  const costoTotal = tarifaBase + costoPesoAdicional + costoValorAsegurado + costoRecojoDomicilio;
+  const total = tarifaBase + costoExtraPeso + costoValorAsegurado + costoDomicilio;
 
-  // Actualizar la interfaz
   tarifaActual = {
     base: tarifaBase,
-    pesoAdicional: costoPesoAdicional,
+    pesoAdicional: costoExtraPeso,
     valorAsegurado: costoValorAsegurado,
-    recojoDomicilio: costoRecojoDomicilio,
-    total: costoTotal,
+    recojoDomicilio: costoDomicilio,
+    total: total,
     requiereSeguro: valor > 100
   };
 
-  // Actualizar textos en la tarifa
-  document.getElementById('origen-texto').textContent = 'Lima';
-  document.getElementById('destino-texto').textContent =
-    `${departamento.charAt(0).toUpperCase() + departamento.slice(1)}, ${provincia}, ${distrito}`;
+  // Mostrar en pantalla
+  document.getElementById('tarifa-base').textContent = `S/ ${tarifaBase.toFixed(2)}`;
+  document.getElementById('costo-peso-adicional').textContent = `S/ ${costoExtraPeso.toFixed(2)}`;
+  document.getElementById('costo-valor-asegurado').textContent = `S/ ${costoValorAsegurado.toFixed(2)}`;
+  document.getElementById('costo-recojo-domicilio').textContent = `S/ ${costoDomicilio.toFixed(2)}`;
+  document.getElementById('costo-total-final').textContent = `S/ ${total.toFixed(2)}`;
+
+  document.getElementById('peso-estimado').textContent = `${peso} kg`;
   document.getElementById('tipo-entrega-texto').textContent =
     tipoEntrega === '1' ? 'Entrega a domicilio' : 'Recojo en agencia';
-  document.getElementById('peso-estimado').textContent = `${peso} kg`;
 
-  // Actualizar valores en el breakdown
-  document.getElementById('tarifa-base').textContent = `S/ ${tarifaBase.toFixed(2)}`;
-  document.getElementById('costo-peso-adicional').textContent = `S/ ${costoPesoAdicional.toFixed(2)}`;
-  document.getElementById('costo-valor-asegurado').textContent = `S/ ${costoValorAsegurado.toFixed(2)}`;
-  document.getElementById('costo-recojo-domicilio').textContent = `S/ ${costoRecojoDomicilio.toFixed(2)}`;
-  document.getElementById('costo-total-final').textContent = `S/ ${costoTotal.toFixed(2)}`;
+  const itemDomicilio = document.getElementById('item-entrega-domicilio');
+  itemDomicilio.style.display = tipoEntrega === '1' ? 'flex' : 'none';
 
-  // Mostrar/ocultar la línea de entrega a domicilio según corresponda
-  const itemEntregaDomicilio = document.getElementById('item-entrega-domicilio');
-  if (tipoEntrega === '1') {
-    itemEntregaDomicilio.style.display = 'flex';
-  } else {
-    itemEntregaDomicilio.style.display = 'none';
-  }
-
-  // Mostrar sección de tarifa
   document.getElementById('seccion-tarifa').classList.remove('tarifa-oculta');
 }
+
 
 function mostrarModalDetalleTarifa() {
   if (!tarifaActual) return;
 
-  // Actualizar valores en el modal
+  const peso = parseFloat(document.getElementById('m-peso').value) || 0;
+  const valor = parseFloat(document.getElementById('m-valorEnvio').value) || 0;
+  const tipoEntrega = document.getElementById('m-tipoEntrega').value;
+
+  // Mostrar valores en el modal
   document.getElementById('modal-tarifa-base').textContent = `S/ ${tarifaActual.base.toFixed(2)}`;
   document.getElementById('modal-costo-peso').textContent = `S/ ${tarifaActual.pesoAdicional.toFixed(2)}`;
   document.getElementById('modal-costo-valor').textContent = `S/ ${tarifaActual.valorAsegurado.toFixed(2)}`;
   document.getElementById('modal-costo-domicilio').textContent = `S/ ${tarifaActual.recojoDomicilio.toFixed(2)}`;
   document.getElementById('modal-total-final').textContent = `S/ ${tarifaActual.total.toFixed(2)}`;
 
-  // Mostrar/ocultar secciones según corresponda
-  const peso = parseFloat(document.getElementById('m-peso').value) || 0;
-  const valor = parseFloat(document.getElementById('m-valorEnvio').value) || 0;
-  const tipoEntrega = document.getElementById('m-tipoEntrega').value;
-
   // Sección peso
-  if (peso > 1) {
+  if (peso > 3) {
     document.getElementById('explicacion-peso').style.display = 'block';
-    const pesoAdicional = peso - 1;
-    document.getElementById('detalle-peso-info').textContent =
-      `Peso adicional: ${pesoAdicional.toFixed(2)} kg × S/ 2.00 = S/ ${tarifaActual.pesoAdicional.toFixed(2)}`;
+
+    let porcentajePeso = peso > 5 ? 0.3 : 0.2;
+    let detalle = `Se aplica un ${porcentajePeso * 100}% adicional sobre la tarifa base ` +
+                  `(S/ ${tarifaActual.base.toFixed(2)}) por superar los ${peso > 5 ? '5' : '3'} kg.`;
+
+    document.getElementById('detalle-peso-info').textContent = detalle;
   } else {
     document.getElementById('explicacion-peso').style.display = 'none';
   }
@@ -877,7 +830,7 @@ function mostrarModalDetalleTarifa() {
   if (valor > 100) {
     document.getElementById('explicacion-valor').style.display = 'block';
     document.getElementById('detalle-valor-info').textContent =
-      `2% del valor declarado (S/ ${valor.toFixed(2)}) = S/ ${tarifaActual.valorAsegurado.toFixed(2)}`;
+      `Se aplica 0.6% del valor declarado (S/ ${valor.toFixed(2)}) = S/ ${tarifaActual.valorAsegurado.toFixed(2)}`;
   } else {
     document.getElementById('explicacion-valor').style.display = 'none';
   }
@@ -885,12 +838,16 @@ function mostrarModalDetalleTarifa() {
   // Sección domicilio
   if (tipoEntrega === '1') {
     document.getElementById('explicacion-domicilio').style.display = 'block';
+    document.getElementById('detalle-domicilio-info').textContent =
+      `Se aplica 25% adicional por entrega a domicilio sobre tarifa base (S/ ${tarifaActual.base.toFixed(2)}) = S/ ${tarifaActual.recojoDomicilio.toFixed(2)}`;
   } else {
     document.getElementById('explicacion-domicilio').style.display = 'none';
   }
 
+  // Mostrar el modal
   document.getElementById('modalDetalleTarifa').style.display = 'flex';
 }
+
 
 function cerrarModalDetalleTarifa() {
   document.getElementById('modalDetalleTarifa').style.display = 'none';

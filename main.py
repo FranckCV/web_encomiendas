@@ -1904,15 +1904,20 @@ def mostrar_pagoenvio():
 def envio_masivo():
     nombre_doc = controlador_tipo_documento.get_options()
     nombre_rep = controlador_tipo_recepcion.get_options()
-    sucursales = controlador_sucursal.get_ubigeo()
+    rutas_tarifas = controlador_tarifa_ruta.get_sucursales_origen_destino()
     articulos = controlador_contenido_paquete.get_options()
     empaque = controlador_tipo_empaque.get_options()
     return render_template('envio_masivo.html', 
                            nombre_doc=nombre_doc,
                            nombre_rep=nombre_rep,
-                           sucursales=json.dumps(sucursales), 
-                           empaque= empaque, 
-                           articulos=articulos)     
+                           rutasTarifas=json.dumps(rutas_tarifas), 
+                           empaque=empaque, 
+                           articulos=articulos)
+    
+    
+    
+    
+    
 
 ################# Sucursales ######################
 
