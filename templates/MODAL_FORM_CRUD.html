@@ -3,7 +3,7 @@
         {% if modo_modal in ['insert', 'update', 'delete', 'unactive']  %}
         action="{{ url_for('crud_' + modo_modal, tabla=tabla) }}"
         method="POST"
-        
+        enctype="multipart/form-data"
         {% endif %}>
         
     <input type="hidden" name="{{ primary_key }}" value="{{ fila[primary_key] if fila else '' }}">
@@ -92,9 +92,9 @@
 
         {% elif campo[3] == 'icon' %}
             <input type="text" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" 
-            {% if campo[4] %}required{% endif %} value="{{modulo[campo[0]]}}" 
+            {% if campo[4] %}required{% endif %} value="{{fila[campo[0]]}}" 
              {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}>
-            <i class="{{modulo[campo[0]]}}"></i>
+            <i class="{{fila[campo[0]]}}"></i>
 
         {% elif campo[3] == 'color' %}
 
@@ -103,7 +103,7 @@
           class="input_color_sync"
           data-name="{{campo[0]}}"
           name="{{campo[0]}}" 
-          value="{{modulo[campo[0]]}}" 
+          value="{{fila[campo[0]]}}" 
           placeholder="Valor hexadecimal" 
           {% if campo[4] %}required{% endif %} 
           {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}
@@ -113,7 +113,7 @@
           class="input_color_sync"
           data-name="{{campo[0]}}"
           name="{{campo[0]}}" 
-          value="{{ modulo[campo[0]]}}" 
+          value="{{ fila[campo[0]]}}" 
           {% if campo[4] %}required{% endif %}
           {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}
           >
@@ -212,7 +212,7 @@
 
     <div class="row">
       <div class="col">
-        <div class="button btn_back" onclick="closeModal()">Cancelar</div>
+        <div class="button btn_cancel" onclick="closeModal()">Cancelar</div>
       </div>
       <div class="col-1"></div>
       <div class="col">

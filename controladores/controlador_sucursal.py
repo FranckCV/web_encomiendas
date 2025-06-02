@@ -171,6 +171,7 @@ def get_agencias_data():
 
     return agencias
 
+<<<<<<< HEAD
 def get_ubigeo():
     sql = '''
             select
@@ -205,3 +206,44 @@ def get_ubigeo():
     return estructura
     
     
+=======
+
+
+def get_report_horario():
+    sql = f'''
+        SELECT 
+            s.id,
+            s.abreviatura,
+            s.codigo_postal,
+            s.direccion,
+            CONCAT(u.departamento, " / ", u.provincia, " / ", u.distrito) AS ubigeo,
+            s.ubigeocodigo,
+            s.horario_l_v,
+            s.horario_s_d,
+            s.latitud,
+            s.longitud,
+            s.teléfono,
+            s.referencia,
+            s.activo
+        FROM 
+            {table_name} s
+        INNER JOIN 
+            ubigeo u ON u.codigo = s.ubigeocodigo
+        where s.activo = 1
+    '''
+
+    columnas = {
+        'id': ['ID', 0.5],
+        'abreviatura': ['Abreviatura', 0.75],
+        'horario_l_v': ['Horario L-V', 1.5],
+        'horario_s_d': ['Horario S-D', 1.5],
+        # 'direccion': ['Dirección', 3],
+        'ubigeo': ['Ubigeo', 2.5],
+        # 'codigo_postal': ['C. Postal', 0.5], 
+        # 'teléfono': ['Teléfono', 1.5],
+        # 'activo': ['Activo', 0.5]
+    }
+
+    filas = sql_select_fetchall(sql)
+    return columnas, filas
+>>>>>>> 58a04dafaaa0bbd4cb2a5d9401863e2d601864e8
