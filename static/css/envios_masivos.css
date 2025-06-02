@@ -124,6 +124,7 @@ h2 {
     gap: 0.4rem;
 }
 
+
 .campo-grupo label {
     font-size: 0.85rem;
     color: #4a5568;
@@ -134,7 +135,7 @@ h2 {
 .campo-grupo input,
 .campo-grupo select {
     padding: 0.75rem 1rem;
-    border: 2px solid #e2e8f0;
+    border: 2px solid #9aa5b5;
     border-radius: 6px;
     font-size: 0.95rem;
     transition: all 0.3s ease;
@@ -178,12 +179,6 @@ h2 {
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-/* Grid para campos RUC */
-.campos-ruc-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.2rem;
-}
 
 /* Botones de acción del formulario */
 .form-actions {
@@ -276,13 +271,16 @@ h2 {
     transition: all 0.3s ease;
 }
 
+
+
+
 .btn-exportar:hover {
     background: #4a5568;
     transform: translateY(-1px);
 }
 
 .btn-limpiar-todos {
-    background: var(--color3);
+    background: var(--color-back);
     color: white;
     padding: 0.6rem 1.5rem;
     border: none;
@@ -537,25 +535,36 @@ td small {
     color: #718096;
 }
 
+#seccion_remitente{
+     display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
 /* Campos condicionales */
 #grupo-direccion,
 #grupo-referencia,
 #grupo-tienda,
 #grupo-folios,
-#campos-ruc {
+#campo-contacto-ruc,
+#campo-razon-ruc {
     transition: all 0.3s ease;
 }
 
-/* Mejoras de accesibilidad */
-.campo-grupo input:invalid,
-.campo-grupo select:invalid {
-    border-color: #fc8181;
+#select-sucursal:user-valid,
+input:required:user-valid,
+select:required:user-valid,
+textarea:required:user-valid {
+  border-color: #48bb78; /* verde */
+}
+#select-sucursal:user-invalid,
+input:required:user-invalid,
+select:required:user-invalid,
+textarea:required:user-invalid {
+  border-color: #fc8181; /* rojo */
 }
 
-.campo-grupo input:valid,
-.campo-grupo select:valid {
-    border-color: #48bb78;
-}
 
 /* Indicadores visuales para pestañas completadas */
 .tab-btn.completed {
@@ -640,7 +649,7 @@ td small {
     to { opacity: 0; }
 }
 
-.campo-grupo[style*="display: flex"],
+.campo-grupo[style*="display: grid"],
 .campo-grupo[style*="display: block"] {
     animation: fadeIn 0.3s ease-out;
 }

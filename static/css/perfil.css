@@ -308,6 +308,8 @@
             margin-bottom: 20px;
             font-size: 1.3rem;
             font-weight: 900;
+                        text-transform: uppercase;
+
         }
 
         .info-item {
@@ -325,6 +327,8 @@
         .info-label {
             font-weight: 600;
             color: #1976d2;
+                        text-transform: uppercase;
+
         }
 
         .info-value {

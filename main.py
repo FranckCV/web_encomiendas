@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify  #, after_this_request, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json  #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import permiso as permiso
 from controladores import controlador_pagina as controlador_pagina
@@ -1773,7 +1773,6 @@ paginas_simples = [
     'TerminosCondiciones',
     'salidas_programadas', #para eliminar
     'mapa_curds',
-    'envio_masivo',
     'salida_informacion'
 ]
 
@@ -1900,6 +1899,20 @@ def mostrar_pagoenvio():
 
 
 #########
+
+@app.route('/envio_masivo')
+def envios_masivos_prueba():
+    nombre_doc = controlador_tipo_documento.get_options()
+    nombre_rep = controlador_tipo_recepcion.get_options()
+    sucursales = controlador_sucursal.get_ubigeo()
+    articulos = controlador_contenido_paquete.get_options()
+    empaque = controlador_tipo_empaque.get_options()
+    return render_template('envio_masivo.html', 
+                           nombre_doc=nombre_doc,
+                           nombre_rep=nombre_rep,
+                           sucursales=json.dumps(sucursales), 
+                           empaque= empaque, 
+                           articulos=articulos)     
 
 ################# Sucursales ######################
 

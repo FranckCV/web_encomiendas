@@ -171,6 +171,40 @@ def get_agencias_data():
 
     return agencias
 
+def get_ubigeo():
+    sql = '''
+            select
+            s.id, 
+            s.direccion,
+            u.departamento,
+            u.provincia,
+            u.distrito
+            from 
+            sucursal s
+            inner join ubigeo u on u.codigo = s.ubigeocodigo
+                 '''
+    filas = sql_select_fetchall(sql)
+    
+    #Crear estructura de diccionario
+    estructura = {}
+    
+    for fila in filas:
+        dep = fila['departamento']
+        prov = fila['provincia']
+        dist = fila['distrito']
+        sucursal = {
+            'id' : fila['id'],
+            'direc' : fila['direccion']
+        }
+        
+        estructura.setdefault(dep,{}) #clave, diccionario
+        estructura[dep].setdefault(prov,{})    
+        estructura[dep][prov].setdefault(dist,[])
+        estructura[dep][prov][dist].append(sucursal)
+    
+    return estructura
+    
+    
 
 
 def get_report_horario():
