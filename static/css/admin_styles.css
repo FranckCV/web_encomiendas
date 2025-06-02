@@ -657,8 +657,12 @@ p.text_none {
     /* font-size: 155%; */
     font-size: 40px;
     color: var(--color1);
+    justify-self: center;
 }
 
+.crud_title i.d_i {
+    font-size: 135% !important;
+}
 
 .clickable-modal {
     cursor: pointer;

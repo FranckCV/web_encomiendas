@@ -16,10 +16,10 @@ def exists_Activo():
     return exists_column_Activo(table_name)
 
 
-def delete_row( id ):
+def delete_row( sucursal_origen_id , sucursal_destino_id ):
     sql = f'''
-        delete from {table_name}
-        where id = {id}
+        delete from tarifa_ruta
+        where sucursal_origen_id = {sucursal_origen_id} and sucursal_destino_id = {sucursal_destino_id}
     '''
     sql_execute(sql)
 
@@ -76,13 +76,13 @@ def insert_row(sucursal_origen_id, sucursal_destino_id, tarifa):
     sql_execute(sql, (sucursal_origen_id, sucursal_destino_id, tarifa))
 
 
-def update_row(sucursal_origen_id, sucursal_destino_id, nueva_tarifa):
+def update_row(sucursal_origen_id, sucursal_destino_id, tarifa):
     sql = '''
         UPDATE tarifa_ruta
         SET tarifa = %s
         WHERE sucursal_origen_id = %s AND sucursal_destino_id = %s
     '''
-    sql_execute(sql, (nueva_tarifa, sucursal_origen_id, sucursal_destino_id))
+    sql_execute(sql, (tarifa, sucursal_origen_id, sucursal_destino_id))
 
 
 #####_ ADICIONALES _#####

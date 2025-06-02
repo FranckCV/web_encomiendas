@@ -600,18 +600,18 @@ CONTROLADORES = {
     },
     "tarifa_ruta": {
         "active" : True ,
-        "titulo": "Tarifa de ruta",
-        "nombre_tabla": "tarifa_ruta",
+        "titulo": "Tarifas de rutas",
+        "nombre_tabla": "tarifa de una ruta",
         "controlador": controlador_tarifa_ruta,
         "icon_page": '',
         "filters": [
         ] ,
         "fields_form": [
 #            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
-            ['tarifa',      'Tarifa',          'Tarifa',      'text',     True ,     True  ,        None ],
-            ['sucursal_origen_id',  'Sucursal de origen', 'Sucursal de origen', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_origen_id' ] ],
-            ['sucursal_destino_id',  'Sucursal de destino', 'Sucursal de destino', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_destino_id' ] ],
-],
+            ['tarifa',      'Tarifa',          'Tarifa',      'decimal_2',     True ,     True  ,        None ],
+            ['sucursal_origen_id',  'Sucursal de origen', 'Sucursal de origen', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_origen' ] ],
+            ['sucursal_destino_id',  'Sucursal de destino', 'Sucursal de destino', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_destino' ] ],
+        ],
         "crud_forms": {
             "crud_list": True,
             "crud_search": True,
@@ -1983,7 +1983,7 @@ def dashboard(module_name):
 
 
 @app.route("/crud=<tabla>")
-@validar_empleado()
+# @validar_empleado()
 def crud_generico(tabla):
     config = CONTROLADORES.get(tabla)
     if config:
@@ -2205,8 +2205,8 @@ def informacion_empresa():
 ##################_ PAGINAS EMPLEADO METHOD POST _################## 
 
 @app.route("/insert_row=<tabla>", methods=["POST"])
-@validar_empleado()
-@validar_error_crud()
+# @validar_empleado()
+# @validar_error_crud()
 def crud_insert(tabla):
     # try:
         config = CONTROLADORES.get(tabla)
@@ -2247,8 +2247,8 @@ def crud_insert(tabla):
 
 
 @app.route("/update_row=<tabla>", methods=["POST"])
-@validar_empleado()
-@validar_error_crud()
+# @validar_empleado()
+# @validar_error_crud()
 def crud_update(tabla):
     # try:
         config = CONTROLADORES.get(tabla)
@@ -2292,8 +2292,8 @@ def crud_update(tabla):
 
 
 @app.route("/delete_row=<tabla>", methods=["POST"])
-@validar_empleado()
-@validar_error_crud()
+# @validar_empleado()
+# @validar_error_crud()
 def crud_delete(tabla):
     config = CONTROLADORES.get(tabla)
     if not config:
@@ -2308,7 +2308,11 @@ def crud_delete(tabla):
     controlador = config["controlador"]
     primary_key = controlador.get_primary_key()
 
-    controlador.delete_row( request.form.get(primary_key) )
+    if isinstance(primary_key, list):
+        valores_pk = [request.form.get(pk) for pk in primary_key]
+        controlador.delete_row(*valores_pk)
+    else:
+        controlador.delete_row(request.form.get(primary_key))
 
     if no_crud :
         return redirect(url_for(no_crud))
@@ -2317,8 +2321,8 @@ def crud_delete(tabla):
 
 
 @app.route("/unactive_row=<tabla>", methods=["POST"])
-@validar_empleado()
-@validar_error_crud()
+# @validar_empleado()
+# @validar_error_crud()
 def crud_unactive(tabla):
     config = CONTROLADORES.get(tabla)
     if not config:
@@ -2335,7 +2339,11 @@ def crud_unactive(tabla):
     primary_key = controlador.get_primary_key()
 
     if existe_activo:
-        controlador.unactive_row( request.form.get(primary_key) )
+        if isinstance(primary_key, list):
+            valores_pk = [request.form.get(pk) for pk in primary_key]
+            controlador.unactive_row(*valores_pk)
+        else:
+            controlador.unactive_row(request.form.get(primary_key))
 
     if no_crud :
         return redirect(url_for(no_crud))

@@ -188,25 +188,21 @@ Permisos para {{info_rol.get('nombre')}}
     }
 
     .mod_opt {
-        padding-inline: 5px;
-        color: var(--color4) !important;
+        /* padding-inline: 5px; */
+        height: 30px;
+        aspect-ratio: 1 / 1;
+        display: flex;
+        justify-content: center;
+        padding: 0;
+        align-items: center;
         font-size: 140%;
+        border-radius: 50px;
+        color: var(--color4) !important;
     }
-
+    
     .mod_opt:hover {
-        scale: 1.15;
+        scale: 1.10;
         color: var(--color-thr) !important;
-        /* filter: brightness(2); */
-    }
-
-    .mod_opt.unable {
-        background-color: var(--color4) !important;
-        color: white !important;
-    }
-
-    .mod_opt.unable:hover {
-        background-color: var(--color4) !important;
-        color: white !important;
     }
 
     .mod_cant {
@@ -298,7 +294,7 @@ Permisos para {{info_rol.get('nombre')}}
     }
 
     .pag_options button:hover {
-        scale: 1.25;
+        scale: 1.15;
     }
 
     .pag_title {
@@ -397,25 +393,52 @@ Permisos para {{info_rol.get('nombre')}}
 
 
     <style>
-        .pag_block {
-            grid-template-columns: auto auto;
-        }
+    .pag_block {
+        grid-template-columns: auto auto;
+    }
 
-        .block_access {
-            grid-template-columns: 97.5%;
-        }
+    .block_access {
+        grid-template-columns: 97.5%;
+    }
 
-        .block_admin>* {
-            height: 71.5vh;
-        }
+    .block_admin>* {
+        height: 71.5vh;
+    }
 
-        .cant_title {
-            width: 5.75vw;
-        }
+    .cant_title {
+        width: 5.75vw;
+    }
 
-        .mod_content {
-            height: 285px;
-        }
+    .mod_content {
+        height: 285px;
+    }
+
+        
+    .mod_opt {
+        background-color: var(--color4) !important;
+        border: 1px solid var(--color4);
+        color: white !important;
+    }
+        
+    .mod_opt i {
+        font-size: 80%;
+    }
+
+    .mod_opt:hover {
+        background-color: var(--color-thr) !important;
+        border: 1px solid var(--color-thr);
+        color: white !important;
+    }
+
+    .mod_opt.unable {
+        color: var(--color4) !important;
+        background-color: white !important;
+    }
+
+    .mod_opt.unable:hover {
+        color: var(--color-thr) !important;
+        border: 1px solid var(--color-thr);
+    }
 
     </style>
 
@@ -471,8 +494,26 @@ Permisos para {{info_rol.get('nombre')}}
 
                     {% else %}
 
-                        <button class="clickable-modal mod_opt text_access unable" id="">
+                        <button class=" mod_opt text_access " id="">
                             <i class="{{ICON_UNLOCK}}"></i>
+                        </button>
+                        <button class=" mod_opt text_search unable" id="">
+                            <i class="{{ICON_SEARCH}}"></i>
+                        </button>
+                        <button class=" mod_opt text_access unable" id="">
+                            <i class="{{ICON_INSERT}}"></i>
+                        </button>
+                        <button class=" mod_opt text_access unable" id="">
+                            <i class="{{ICON_CONSULT}}"></i>
+                        </button>
+                        <button class=" mod_opt text_access unable" id="">
+                            <i class="{{ICON_ACTIVE}}"></i>
+                        </button>
+                        <button class=" mod_opt text_access unable" id="">
+                            <i class="{{ICON_UPDATE}}"></i>
+                        </button>
+                        <button class=" mod_opt text_access unable" id="">
+                            <i class="{{ICON_DELETE}}"></i>
                         </button>
 
                     {% endif %}
@@ -737,17 +778,17 @@ Permisos para {{info_rol.get('nombre')}}
 
 {% if rolid %}
 
-<!-- <script>
-    const options = document.querySelectorAll('.opciones_fila ');
-    options.forEach(opt => {
-        const btns = opt.querySelectorAll('button');
+<script>
+    // const options = document.querySelectorAll('.opciones_fila ');
+    // options.forEach(opt => {
+        const btns = document.querySelectorAll('.mod_opt');
         btns.forEach(btn => {
             btn.addEventListener('click', () => {
                 btn.classList.toggle('unable');
             });
         });
-    });
-</script> -->
+    // });
+</script>
 
 <script>
     document.querySelectorAll('.opciones_fila button').forEach(opt => {
