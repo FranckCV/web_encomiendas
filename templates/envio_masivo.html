@@ -245,7 +245,7 @@ Registro de Envíos Masivos
                 </div>
 
                 <div class="campo-grupo campo-descripcion">
-                  <label>Descripción *</label>
+                  <label>Descripción(Opcional)</label>
                   <textarea id="m-descripcionArticulo" placeholder="Descripción detallada del contenido" required></textarea>
                 </div>
               </div>
@@ -374,6 +374,7 @@ Registro de Envíos Masivos
   </div>
 </div>
 
+
 <style>
 .modal-confirm {
   position: fixed;
@@ -406,6 +407,149 @@ Registro de Envíos Masivos
 }
 </style>
 
+  <!-- Modal de Seguro -->
+    <div id="modalSeguro" class="modal-seguro">
+        <div class="modal-seguro-content">
+            <div class="modal-seguro-header">
+                <h3>⚠️ Seguro Obligatorio</h3>
+            </div>
+            
+            <div class="modal-seguro-body">
+                <div class="alerta-valor">
+                    <div class="alerta-valor-monto" id="valorDeclarado">S/ 150.00</div>
+                    <div class="alerta-valor-texto">El valor declarado excede los S/ 100.00</div>
+                </div>
+
+                <div class="porcentaje-seguro">
+                    <div class="porcentaje-valor" id="porcentajeSeguro">2%</div>
+                    <div class="porcentaje-label">Se aplicará porcentaje de seguro</div>
+                </div>
+
+                <ul class="condiciones-lista">
+                    <li>
+                        <div>
+                            <strong>Seguro obligatorio:</strong> Para envíos con valor declarado superior a S/ 100.00, se aplicará automáticamente un seguro del 2% sobre el valor total.
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <strong>Cobertura:</strong> El seguro cubre pérdida total o daños del paquete durante el transporte hasta el monto declarado.
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <strong>Responsabilidad:</strong> El valor declarado debe ser real y verificable. Declaraciones falsas pueden anular la cobertura.
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <strong>Proceso de reclamo:</strong> En caso de siniestro, deberá presentar documentación que respalde el valor declarado.
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <strong>Tiempo de reclamo:</strong> Los reclamos deben reportarse dentro de las 48 horas posteriores a la entrega programada.
+                        </div>
+                    </li>
+                </ul>
+
+                <div style="background: #f7fafc; padding: 1rem; border-radius: 8px; border-left: 4px solid #48bb78;">
+                    <strong>Costo del seguro:</strong> S/ <span id="costoSeguroModal">3.00</span>
+                    <br>
+                    <small style="color: #718096;">Este monto se agregará automáticamente al costo total del envío</small>
+                </div>
+
+                <div class="modal-seguro-buttons">
+                    <button class="btn-modal btn-modal-cancelar" onclick="cerrarModalSeguro()">
+                        Cancelar
+                    </button>
+                    <button class="btn-modal btn-modal-aceptar" onclick="aceptarSeguroYAgregar()">
+                        Acepto y continúo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalle de Tarifa -->
+    <div id="modalDetalleTarifa" class="modal-detalle-tarifa">
+        <div class="modal-detalle-content">
+            <div class="modal-detalle-header">
+                <h3>💰 ¿Por qué este precio?</h3>
+            </div>
+            
+            <div class="modal-detalle-body">
+                <div class="detalle-explicacion">
+                    <h4>📊 Desglose detallado de la tarifa</h4>
+                    
+                    <div class="detalle-item-explicacion">
+                        <div class="detalle-item-titulo">
+                            <span>Tarifa Base</span>
+                            <span class="detalle-item-monto" id="modal-tarifa-base">S/ 18.00</span>
+                        </div>
+                        <div class="detalle-item-descripcion">
+                            Costo estándar por el servicio de transporte entre las ciudades seleccionadas. Esta tarifa se calcula en base a la distancia y zona de cobertura.
+                        </div>
+                    </div>
+
+                    <div class="detalle-item-explicacion" id="explicacion-peso">
+                        <div class="detalle-item-titulo">
+                            <span>Costo Adicional por Peso</span>
+                            <span class="detalle-item-monto" id="modal-costo-peso">S/ 4.00</span>
+                        </div>
+                        <div class="detalle-item-descripcion">
+                            Su paquete excede el peso base incluido (1 kg). Se aplica un costo adicional por cada kilogramo extra.
+                            <div class="detalle-porcentaje">
+                                <span class="detalle-porcentaje-texto" id="detalle-peso-info">Peso adicional: 2 kg × S/ 2.00 = S/ 4.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detalle-item-explicacion" id="explicacion-valor" style="display: none;">
+                        <div class="detalle-item-titulo">
+                            <span>Costo Adicional por Valor Asegurado</span>
+                            <span class="detalle-item-monto" id="modal-costo-valor">S/ 0.00</span>
+                        </div>
+                        <div class="detalle-item-descripcion">
+                            Para paquetes con valor declarado superior a S/ 100.00, se aplica un seguro obligatorio para proteger su envío.
+                            <div class="detalle-porcentaje">
+                                <span class="detalle-porcentaje-texto" id="detalle-valor-info">2% del valor declarado</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detalle-item-explicacion" id="explicacion-domicilio" style="display: none;">
+                        <div class="detalle-item-titulo">
+                            <span>Costo Adicional por Entrega a Domicilio</span>
+                            <span class="detalle-item-monto" id="modal-costo-domicilio">S/ 0.00</span>
+                        </div>
+                        <div class="detalle-item-descripcion">
+                            Servicio de entrega a domicilio que incluye la llegada de nuestro personal hasta la dirección específica del destinatario.
+                            <div class="detalle-porcentaje">
+                                <span class="detalle-porcentaje-texto">Incremento del 25% sobre la tarifa base</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #f0f4f8; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #667eea;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <strong style="color: #2d3748; font-size: 1.1rem;">Total Final:</strong>
+                        <strong style="color: #667eea; font-size: 1.3rem;" id="modal-total-final">S/ 22.00</strong>
+                    </div>
+                    <small style="color: #718096;">
+                        * Los precios pueden variar según las dimensiones exactas al momento del pesaje
+                    </small>
+                </div>
+            </div>
+
+            <div class="modal-detalle-footer">
+                <button class="btn-cerrar-detalle" onclick="cerrarModalDetalleTarifa()">
+                    Entendido
+                </button>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
 

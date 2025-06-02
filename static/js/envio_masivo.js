@@ -17,7 +17,7 @@ const STORAGE_KEY = 'enviosMasivosTemp';
 
 
 
- const tipoDoc = document.getElementById('remitente-tipo-doc');
+const tipoDoc = document.getElementById('remitente-tipo-doc');
 const numeroDoc = document.getElementById('remitente-numero-doc');
 const mensajeDoc = document.getElementById('mensaje-validacion-numero');
 
@@ -52,7 +52,7 @@ numeroDoc.addEventListener('input', () => {
 tipoDoc.addEventListener('change', () => {
   const valorActual = numeroDoc.value.trim();
   if (valorActual !== '') {
-    numeroDoc.dispatchEvent(new Event('input'));  
+    numeroDoc.dispatchEvent(new Event('input'));
   }
 });
 
@@ -588,7 +588,7 @@ function agregarEnvio() {
   };
 
 
-localStorage.setItem(STORAGE_KEY, JSON.stringify(envio));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(envio));
 
   limpiarFormularioMasivo();
 
@@ -714,7 +714,7 @@ function editarEnvio(index) {
 
   editIndex = index;
 
-    const btnAgregar = document.querySelector('.btn-agregar');
+  const btnAgregar = document.querySelector('.btn-agregar');
   if (btnAgregar) {
     btnAgregar.textContent = '💾 Guardar cambios';
   }
@@ -767,4 +767,158 @@ function editarEnvio(index) {
   document.getElementById('m-apellidos').value = destinatario.apellidos || '';
 
   document.querySelector('.tab-btn[data-tab="destino"]').click();
+}
+/******************************************************************************************************************************************/
+function calcularTarifa() {
+
+  const departamento = document.getElementById('select-departamento').value;
+  const provincia = document.getElementById('select-provincia').value;
+  const distrito = document.getElementById('select-distrito').value;
+  const tipoEntrega = document.getElementById('m-tipoEntrega').value;
+  const peso = parseFloat(document.getElementById('m-peso').value) || 0;
+  const valor = parseFloat(document.getElementById('m-valorEnvio').value) || 0;
+
+  // Solo calcular si tenemos los datos mínimos
+  if (!departamento || !provincia || !distrito || !tipoEntrega) {
+    document.getElementById('seccion-tarifa').classList.add('tarifa-oculta');
+    return;
+  }
+
+  // Simulación de cálculo de tarifa
+  let tarifaBase = 15.00;
+  let costoPesoAdicional = 0;
+  let costoValorAsegurado = 0;
+  let costoRecojoDomicilio = 0;
+
+  // Ajustar tarifa base según destino
+  if (departamento === 'arequipa') tarifaBase = 18.00;
+  if (departamento === 'cusco') tarifaBase = 22.00;
+
+  // Costo por peso adicional (más de 1kg)
+  if (peso > 1) {
+    costoPesoAdicional = (peso - 1) * 2.00;
+  }
+
+  // Costo de seguro (2% si valor > 100)
+  if (valor > 100) {
+    costoValorAsegurado = valor * 0.02;
+  }
+
+  // Costo por entrega a domicilio (25% adicional sobre tarifa base)
+  if (tipoEntrega === '1') {
+    costoRecojoDomicilio = tarifaBase * 0.25;
+  }
+
+  const costoTotal = tarifaBase + costoPesoAdicional + costoValorAsegurado + costoRecojoDomicilio;
+
+  // Actualizar la interfaz
+  tarifaActual = {
+    base: tarifaBase,
+    pesoAdicional: costoPesoAdicional,
+    valorAsegurado: costoValorAsegurado,
+    recojoDomicilio: costoRecojoDomicilio,
+    total: costoTotal,
+    requiereSeguro: valor > 100
+  };
+
+  // Actualizar textos en la tarifa
+  document.getElementById('origen-texto').textContent = 'Lima';
+  document.getElementById('destino-texto').textContent =
+    `${departamento.charAt(0).toUpperCase() + departamento.slice(1)}, ${provincia}, ${distrito}`;
+  document.getElementById('tipo-entrega-texto').textContent =
+    tipoEntrega === '1' ? 'Entrega a domicilio' : 'Recojo en agencia';
+  document.getElementById('peso-estimado').textContent = `${peso} kg`;
+
+  // Actualizar valores en el breakdown
+  document.getElementById('tarifa-base').textContent = `S/ ${tarifaBase.toFixed(2)}`;
+  document.getElementById('costo-peso-adicional').textContent = `S/ ${costoPesoAdicional.toFixed(2)}`;
+  document.getElementById('costo-valor-asegurado').textContent = `S/ ${costoValorAsegurado.toFixed(2)}`;
+  document.getElementById('costo-recojo-domicilio').textContent = `S/ ${costoRecojoDomicilio.toFixed(2)}`;
+  document.getElementById('costo-total-final').textContent = `S/ ${costoTotal.toFixed(2)}`;
+
+  // Mostrar/ocultar la línea de entrega a domicilio según corresponda
+  const itemEntregaDomicilio = document.getElementById('item-entrega-domicilio');
+  if (tipoEntrega === '1') {
+    itemEntregaDomicilio.style.display = 'flex';
+  } else {
+    itemEntregaDomicilio.style.display = 'none';
+  }
+
+  // Mostrar sección de tarifa
+  document.getElementById('seccion-tarifa').classList.remove('tarifa-oculta');
+}
+
+function mostrarModalDetalleTarifa() {
+  if (!tarifaActual) return;
+
+  // Actualizar valores en el modal
+  document.getElementById('modal-tarifa-base').textContent = `S/ ${tarifaActual.base.toFixed(2)}`;
+  document.getElementById('modal-costo-peso').textContent = `S/ ${tarifaActual.pesoAdicional.toFixed(2)}`;
+  document.getElementById('modal-costo-valor').textContent = `S/ ${tarifaActual.valorAsegurado.toFixed(2)}`;
+  document.getElementById('modal-costo-domicilio').textContent = `S/ ${tarifaActual.recojoDomicilio.toFixed(2)}`;
+  document.getElementById('modal-total-final').textContent = `S/ ${tarifaActual.total.toFixed(2)}`;
+
+  // Mostrar/ocultar secciones según corresponda
+  const peso = parseFloat(document.getElementById('m-peso').value) || 0;
+  const valor = parseFloat(document.getElementById('m-valorEnvio').value) || 0;
+  const tipoEntrega = document.getElementById('m-tipoEntrega').value;
+
+  // Sección peso
+  if (peso > 1) {
+    document.getElementById('explicacion-peso').style.display = 'block';
+    const pesoAdicional = peso - 1;
+    document.getElementById('detalle-peso-info').textContent =
+      `Peso adicional: ${pesoAdicional.toFixed(2)} kg × S/ 2.00 = S/ ${tarifaActual.pesoAdicional.toFixed(2)}`;
+  } else {
+    document.getElementById('explicacion-peso').style.display = 'none';
+  }
+
+  // Sección valor asegurado
+  if (valor > 100) {
+    document.getElementById('explicacion-valor').style.display = 'block';
+    document.getElementById('detalle-valor-info').textContent =
+      `2% del valor declarado (S/ ${valor.toFixed(2)}) = S/ ${tarifaActual.valorAsegurado.toFixed(2)}`;
+  } else {
+    document.getElementById('explicacion-valor').style.display = 'none';
+  }
+
+  // Sección domicilio
+  if (tipoEntrega === '1') {
+    document.getElementById('explicacion-domicilio').style.display = 'block';
+  } else {
+    document.getElementById('explicacion-domicilio').style.display = 'none';
+  }
+
+  document.getElementById('modalDetalleTarifa').style.display = 'flex';
+}
+
+function cerrarModalDetalleTarifa() {
+  document.getElementById('modalDetalleTarifa').style.display = 'none';
+}
+
+function verificarSeguroYAgregar() {
+  const valor = parseFloat(document.getElementById('m-valorEnvio').value) || 0;
+
+  if (valor > 100) {
+    mostrarModalSeguro(valor);
+  } else {
+    agregarEnvio();
+  }
+}
+
+function mostrarModalSeguro(valor) {
+  const costoSeguro = valor * 0.02;
+
+  document.getElementById('valorDeclarado').textContent = `S/ ${valor.toFixed(2)}`;
+  document.getElementById('costoSeguroModal').textContent = `${costoSeguro.toFixed(2)}`;
+  document.getElementById('modalSeguro').style.display = 'flex';
+}
+
+function cerrarModalSeguro() {
+  document.getElementById('modalSeguro').style.display = 'none';
+}
+
+function aceptarSeguroYAgregar() {
+  cerrarModalSeguro();
+  agregarEnvio();
 }

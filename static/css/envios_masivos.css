@@ -1,6 +1,4 @@
-/* ===== ESTILOS GENERALES PARA ENVÍOS MASIVOS ===== */
 
-/* Títulos */
 h2 {
     font-size: 1.5rem;
 }
@@ -28,7 +26,6 @@ h2 {
 
 /* ===== ESTILOS PARA EL SISTEMA DE PESTAÑAS ===== */
 
-/* Contenedor principal de pestañas */
 .tabs-container {
     background: white;
     border-radius: 12px;
@@ -761,3 +758,342 @@ textarea:required:user-invalid {
         padding: 0.8rem 2rem;
     }
 }
+
+ /* ===== NUEVO: SECCIÓN DE TARIFA REDISEÑADA ===== */
+        .seccion-tarifa-nueva {
+            margin: 1.5rem 0;
+        }
+
+        .tarifa-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .tarifa-header-nueva {
+            background: #f8f9fa;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .tarifa-titulo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tarifa-icono {
+            font-size: 1.2rem;
+        }
+
+        .tarifa-titulo h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 0;
+        }
+
+        .tarifa-estado {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tarifa-ruta {
+            padding: 1.5rem;
+            background: #f7fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .ruta-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .ruta-punto {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .ruta-label {
+            font-size: 0.75rem;
+            color: #718096;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ruta-valor {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .ruta-flecha {
+            font-size: 1.5rem;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .tarifa-detalles {
+            padding: 1rem 1.5rem;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .detalle-fila {
+            display: grid;
+            grid-template-columns: auto 1fr auto 1fr;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .detalle-label,
+        .detalle-peso {
+            font-size: 0.85rem;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .detalle-valor,
+        .detalle-peso-valor {
+            font-size: 0.85rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .tarifa-breakdown {
+            padding: 1.5rem;
+            background: white;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f7fafc;
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-label {
+            font-size: 0.9rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .breakdown-valor {
+            font-size: 0.9rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .breakdown-separator {
+            height: 1px;
+            background: #2d3748;
+            margin: 1rem 0;
+        }
+
+        .breakdown-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0 0.5rem 0;
+        }
+
+        .breakdown-total-label {
+            font-size: 1rem;
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        .breakdown-total-valor {
+            font-size: 1.2rem;
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        .tarifa-disclaimer {
+            padding: 1rem 1.5rem;
+            background: #fffaf0;
+            border-top: 1px solid #fed7aa;
+        }
+
+        .tarifa-disclaimer p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #c05621;
+            font-style: italic;
+        }
+
+        .btn-ver-detalle-nuevo {
+            width: 100%;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ver-detalle-nuevo:hover {
+            background: #5a67d8;
+        }
+
+        /* ===== NUEVO: MODAL DE DETALLE DE TARIFA ===== */
+        .modal-detalle-tarifa {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-detalle-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        .modal-detalle-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 16px 16px 0 0;
+            text-align: center;
+        }
+
+        .modal-detalle-header h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .modal-detalle-body {
+            padding: 2rem;
+        }
+
+        .detalle-explicacion {
+            margin-bottom: 2rem;
+        }
+
+        .detalle-explicacion h4 {
+            color: #2d3748;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detalle-item-explicacion {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .detalle-item-titulo {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detalle-item-monto {
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .detalle-item-descripcion {
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        .detalle-porcentaje {
+            background: #e6fffa;
+            border: 1px solid #81e6d9;
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            margin-top: 0.5rem;
+            display: inline-block;
+        }
+
+        .detalle-porcentaje-texto {
+            font-size: 0.8rem;
+            color: #234e52;
+            font-weight: 600;
+        }
+
+        .modal-detalle-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .btn-cerrar-detalle {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cerrar-detalle:hover {
+            background: #5a67d8;
+        }
+
+        .tarifa-oculta {
+            display: none;
+        }
+
+        /* Botones de acción del formulario */
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
