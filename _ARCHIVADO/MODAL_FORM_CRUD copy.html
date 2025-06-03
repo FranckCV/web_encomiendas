@@ -46,37 +46,29 @@
         <label for="{{campo[0]}}">{{campo[1]}}:</label>
 
         {% if campo[3] == 'select' %}
-            {% if modo_modal == 'consult' %}
-            <input 
-            id="{{campo[0]}}" 
-            type="text" 
-            class="select_{{campo[0]}}" 
-            name="{{campo[0]}}" 
-            placeholder="{{campo[2]}}" 
-            value="{{ fila[campo[6][1]] }}"
-            disabled
-            {% if campo[4] %}required{% endif %} 
-            >
+          {% if modo_modal == 'consult' %}
+          <input 
+          id="{{campo[0]}}" 
+          type="text" 
+          name="{{campo[0]}}" 
+          placeholder="{{campo[2]}}" 
+          value="{{ fila[campo[6][1]] }}"
+          disabled
+          {% if campo[4] %}required{% endif %} 
+          >
             {% else %}
-                {% set datos = campo[6][0]() if campo[6] and campo[6][0] is callable else campo[6][0] %}
                 <select 
                 id="{{campo[0]}}" 
                 name="{{campo[0]}}"
+                data-select="{{campo[0]}}"
+                {% if modo_modal != 'insert' and fila[campo[0]] is not none %} data-select-value="{{fila[campo[0]]}}" {% endif %}
                 {% if modo_modal == 'consult' or campo[5] == False %} disabled {% endif %}
                 >
                     {% if modo_modal == 'insert' %}
                     <option value="-1" disabled selected>{{campo[2]}}</option>
                     {% endif %}
-                    {% for option in datos %}
-                    <option value="{{option[0]}}"
-                        {% if modo_modal != 'insert' and fila[campo[0]]==option[0] %}selected{% endif %}>
-                        {{option[1]}}
-                    </option>
-                    {% endfor %}
-
+                    </select>
             {% endif %}
-
-          </select>
 
         {% elif campo[3] == 'textarea' %}
           <textarea id="{{campo[0]}}" name="{{campo[0]}}"
@@ -121,6 +113,33 @@
         {% if campo[4] %}required{% endif %}
         {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}
         >
+
+        {% elif campo[3] == 'img' %}
+        
+          {% if modo_modal == 'insert' %}
+          <input 
+            type="file" 
+            id="{{campo[0]}}" 
+            name="{{campo[0]}}" 
+            accept="image/*" 
+            {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}
+          >
+          <div class="form_img_container" id="">
+            <img id="" class="clickable-image" src="" alt="Imagen {{tabla}}">
+          </div>
+          {% else %}
+          <input type="hidden" name="{{campo[0]}}_actual" value="{{fila[campo[0]]}}">
+          <input 
+            type="file" 
+            id="{{campo[0]}}" 
+            name="{{campo[0]}}" 
+            accept="image/*" 
+            {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}
+          >
+          <div class="form_img_container" id="">
+            <img id="" class="clickable-image" src="/static/img/img_{{tabla}}/{{fila[campo[0]]}}" alt="Imagen {{tabla}}">
+          </div>
+          {% endif %}
 
         {% else %}
           <input id="{{campo[0]}}" name="{{campo[0]}}"

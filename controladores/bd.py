@@ -4,7 +4,7 @@ from pymysql.cursors import DictCursor
 def obtener_conexion():
     return pymysql.connect(host='localhost',
                                 # port=3306,
-                                port=3306,
+                                port=3307,
                                 user='root',
                                 password='',
                                 db='bd_encomiendas' ,
@@ -65,10 +65,15 @@ def show_columns(table_name):
 
 
 def show_primary_key(tabla):
+    keys = []
     for row in show_columns(tabla):
-        if row['Key'] == 'PRI' and row['Null'] == 'NO':
-            return row['Field']
-    return None
+        if row['Key'] == 'PRI':
+            keys.append(row['Field'])
+
+    if len(keys) == 1:
+        return keys[0]
+    else:
+        return keys
 
 
 def find_column_table(column_name, tabla):

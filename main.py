@@ -1,6 +1,8 @@
-from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify  #, after_this_request, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json  #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import permiso as permiso
+from controladores import controlador_pagina as controlador_pagina
+from controladores import controlador_detalle_reclamo as controlador_detalle_reclamo
 from controladores import controlador_paquete as controlador_paquete
 from controladores import controlador_tipo_pagina as controlador_tipo_pagina
 from controladores import controlador_modulo as controlador_modulo
@@ -56,7 +58,6 @@ import inspect
 
 app = Flask(__name__, template_folder='templates')
 
-# url_img_logo = f'/static/img/img_empresa/{controlador_empresa.get_logo()}'
 STATE_0              = configuraciones.STATE_0
 STATE_1              = configuraciones.STATE_1
 TITLE_STATE          = configuraciones.TITLE_STATE
@@ -73,6 +74,7 @@ NOMBRE_BTN_UNACTIVE  = configuraciones.NOMBRE_BTN_UNACTIVE
 NOMBRE_BTN_LIST      = configuraciones.NOMBRE_BTN_LIST
 NOMBRE_BTN_CONSULT   = configuraciones.NOMBRE_BTN_CONSULT
 NOMBRE_BTN_SEARCH    = configuraciones.NOMBRE_BTN_SEARCH
+ICON_PAGE_NOICON     = configuraciones.ICON_PAGE_NOICON 
 ICON_PAGE_CRUD       = configuraciones.ICON_PAGE_CRUD 
 ICON_PAGE_REPORT     = configuraciones.ICON_PAGE_REPORT 
 ICON_PAGE_DASHBOARD  = configuraciones.ICON_PAGE_DASHBOARD 
@@ -228,6 +230,7 @@ def guardar_imagen_bd(tabla,ad,archivo):
         # nombre_final = f"{timestamp}_{filename_seguro}"
         upload_folder = f'static/img/img_{tabla}'
         nombre_final = f"{ad}{filename_seguro}"
+        print('IMG archivo:',nombre_final)
         ruta_completa = os.path.join(upload_folder, nombre_final)
         archivo.save(ruta_completa)
         return nombre_final
@@ -351,62 +354,62 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
- "reclamo": {
-    "active": True,
-    "id": "reclamo",
-    "titulo": "Reclamos",
-    "nombre_tabla": "reclamo",
-    "controlador": controlador_reclamo,  # Asegúrate de importar esto arriba
-    "icon_page": "fa-solid fa-file",  # Puedes cambiar el ícono
-    "filters": [],
-    "fields_form": [
-        ['id', 'ID', 'ID', 'text', True, False, None],
-        ['nombres_razon', 'Cliente', 'Cliente', 'text', True, True, None],
-        ['direccion', 'Dirección', 'Dirección', 'text', True, True, None],
-        ['correo', 'Correo', 'Correo', 'email', True, True, None],
-        ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
-        ['titulo_incidencia', 'Incidencia', 'Incidencia', 'text', True, True, None],
-        ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
-        ['fecha_recojo', 'Fecha de recojo', 'Fecha', 'date', True, True, None],
-        ['estado_reclamoid', 'Estado', 'Estado', 'select', True, True, [lambda: controlador_estado_reclamo.get_options(), 'nombre']],
-        ['sucursal_id', 'Sucursal', 'Sucursal', 'select', True, True, [lambda: controlador_sucursal.get_options(), 'direccion']]
-    ],
-    "crud_forms": {
-        "crud_list": True,
-        "crud_search": True,
-        "crud_consult": True,
-        "crud_insert": True,
-        "crud_update": True,
-        "crud_delete": True,
-        "crud_unactive": False
-    }
-},
-"pregunta_frecuente": {
-    "active": True,
-    "titulo": "preguntas frecuentes",
-    "nombre_tabla": "pregunta frecuente",
-    "controlador": controlador_pregunta_frecuente,
-    "icon_page": 'fa-solid fa-circle-question',
-    "filters": [
-        ['activo', f'{TITLE_STATE}', get_options_active()],
-    ],
-    "fields_form": [
-        #  ID/NAME          LABEL              PLACEHOLDER            TYPE      REQUIRED  ABLE/DISABLE  DATOS
-        ['id',              'ID',              'ID',                  'text',     True,     False,       None],
-        ['titulo',          'Título',          'Título',              'text',     True,     True,        None],
-        ['descripcion',     'Descripción',     'Descripción',         'textarea', True,     True,        None],
-        ['activo',          f'{TITLE_STATE}',  'Activo',              'p',        True,     False,       None],
-    ],
-    "crud_forms": {
-        "crud_list": True,
-        "crud_search": True,
-        "crud_consult": True,
-        "crud_insert": True,
-        "crud_update": True,
-        "crud_delete": True,
-        "crud_unactive": True,
-    }
-},
+    "reclamo": {
+        "active": True,
+        "id": "reclamo",
+        "titulo": "Reclamos",
+        "nombre_tabla": "reclamo",
+        "controlador": controlador_reclamo,  # Asegúrate de importar esto arriba
+        "icon_page": "fa-solid fa-file",  # Puedes cambiar el ícono
+        "filters": [],
+        "fields_form": [
+            ['id', 'ID', 'ID', 'text', True, False, None],
+            ['nombres_razon', 'Cliente', 'Cliente', 'text', True, True, None],
+            ['direccion', 'Dirección', 'Dirección', 'text', True, True, None],
+            ['correo', 'Correo', 'Correo', 'email', True, True, None],
+            ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
+            ['titulo_incidencia', 'Incidencia', 'Incidencia', 'text', True, True, None],
+            ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
+            ['fecha_recojo', 'Fecha de recojo', 'Fecha', 'date', True, True, None],
+            ['estado_reclamoid', 'Estado', 'Estado', 'select', True, True, [lambda: controlador_estado_reclamo.get_options(), 'nombre']],
+            ['sucursal_id', 'Sucursal', 'Sucursal', 'select', True, True, [lambda: controlador_sucursal.get_options(), 'direccion']]
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": False
+        }
+    },
+    "pregunta_frecuente": {
+        "active": True,
+        "titulo": "preguntas frecuentes",
+        "nombre_tabla": "pregunta frecuente",
+        "controlador": controlador_pregunta_frecuente,
+        "icon_page": 'fa-solid fa-circle-question',
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active()],
+        ],
+        "fields_form": [
+            #  ID/NAME          LABEL              PLACEHOLDER            TYPE      REQUIRED  ABLE/DISABLE  DATOS
+            ['id',              'ID',              'ID',                  'text',     True,     False,       None],
+            ['titulo',          'Título',          'Título',              'text',     True,     True,        None],
+            ['descripcion',     'Descripción',     'Descripción',         'textarea', True,     True,        None],
+            ['activo',          f'{TITLE_STATE}',  'Activo',              'p',        True,     False,       None],
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": True,
+        }
+    },
   
 # LEO
     "tamanio_caja": {
@@ -472,11 +475,11 @@ CONTROLADORES = {
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
             ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
             ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['precio',      'Precio',          'Precio',      'number',     True ,     True  ,        None ],
-            ['stock',       'Stock',           'Stock',       'number',     True ,     True  ,        None ],
-            ['dimensiones', 'Dimensiones',     'Dimensiones', 'text',     True ,     True  ,        None ],
-            ['tamaño_cajaid','Tamaño Caja',    'Tamaño Caja', 'select',     True ,     True  ,        [lambda: controlador_tamanio_caja.get_options() , 'tam_nombre' ]  ],
-            ['img',         'Imagen',          'Imagen',      'img',     True ,     True  ,        None ],
+            ['precio',      'Precio',          'Precio',      'number',   True ,     True  ,        None ],
+            ['stock',       'Stock',           'Stock',       'number',   True ,     True  ,        None ],
+            ['dimensiones', 'Dimensiones',     'Dimensiones', 'text',     False ,     True  ,        None ],
+            ['tamaño_cajaid','Tamaño Caja',    'Tamaño Caja', 'select',   False ,     True  ,        [lambda: controlador_tamanio_caja.get_options() , 'tam_nombre' ]  ],
+            ['img',         'Imagen',          'Imagen',      'img',      True ,     True  ,        None ],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
         ],
         "crud_forms": {
@@ -597,18 +600,18 @@ CONTROLADORES = {
     },
     "tarifa_ruta": {
         "active" : True ,
-        "titulo": "Tarifa de ruta",
-        "nombre_tabla": "tarifa_ruta",
+        "titulo": "Tarifas de rutas",
+        "nombre_tabla": "tarifa de una ruta",
         "controlador": controlador_tarifa_ruta,
         "icon_page": '',
         "filters": [
         ] ,
         "fields_form": [
 #            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
-            ['tarifa',      'Tarifa',          'Tarifa',      'text',     True ,     True  ,        None ],
-            ['sucursal_origen_id',  'Sucursal de origen', 'Sucursal de origen', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_origen_id' ] ],
-            ['sucursal_destino_id',  'Sucursal de destino', 'Sucursal de destino', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_destino_id' ] ],
-],
+            ['tarifa',      'Tarifa',          'Tarifa',      'decimal_2',     True ,     True  ,        None ],
+            ['sucursal_origen_id',  'Sucursal de origen', 'Sucursal de origen', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_origen' ] ],
+            ['sucursal_destino_id',  'Sucursal de destino', 'Sucursal de destino', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_destino' ] ],
+        ],
         "crud_forms": {
             "crud_list": True,
             "crud_search": True,
@@ -713,7 +716,7 @@ CONTROLADORES = {
         "controlador": controlador_empleado,
         "icon_page": 'fa-solid fa-id-card',
         "filters": [
-            ['rolid', 'Rol', lambda: controlador_rol.get_options()],
+            # ['rolid', 'Rol', lambda: controlador_rol.get_options()],
         ],
         "fields_form": [
             ['usuarioid', 'ID', 'ID', 'text', False, False, True],
@@ -1006,7 +1009,34 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-    
+    "detalle_reclamo": {
+        "active" : True ,
+        "titulo": "detalles de estados de reclamo",
+        "icon_page": 'fa-solid fa-file',
+        "nombre_tabla": "detalle de un estado de reclamo",
+        "controlador": controlador_detalle_reclamo,
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id', 'ID', 'ID', 'text', False, False, True],
+            ['nombre', 'Nombre del Rol', 'Rol', 'text', True, True, True],
+            ['descripcion', 'Descripción', 'Descripción del rol', 'textarea', False, True, None],
+            ['activo', f'{TITLE_STATE}', 'activo', 'p', True, True, None],
+            ['estado_reclamoid', 'Estado de reclamo', 'Seleccionar', 'select', True, True, [lambda: controlador_estado_reclamo.get_options(), 'est_nom' ]],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+
     # huh?
     "descuento": {
         "active" : True ,
@@ -1066,7 +1096,6 @@ CONTROLADORES = {
 # ADICIONAL (NO CRUD)
     "modulo": {
         "active" : True ,
-        "no_crud" : 'administrar_paginas' ,
         # "titulo": "marcas de unidades",
         # "nombre_tabla": "marca",
         "controlador": controlador_modulo,
@@ -1089,9 +1118,37 @@ CONTROLADORES = {
             "crud_update": True ,
             "crud_delete": True ,
             "crud_unactive": True ,
-        }
+        },
+        "no_crud" : 'administrar_paginas' ,
     },
-    
+    "pagina": {
+        "active" : True ,
+        # "titulo": "marcas de unidades",
+        # "nombre_tabla": "marca",
+        "controlador": controlador_pagina,
+        # "icon_page": 'fa-solid fa-car-side',
+        # "filters": [
+        # ] ,
+        "fields_form" : [
+        #   ID/NAME    LABEL              PLACEHOLDER    TYPE       REQUIRED   ABLE/DISABLE   DATOS
+            ['nombre', 'Nombre del módulo', 'Nombre',   'text',    True ,     True,          None ],
+            ['activo', 'Actividad',         'Color',    'p',       True,      True,          None ],
+            ['icono',  'Icono',             'Icono',    'icon',    True ,     True,          None ],
+            ['color',  'Color',             'color',    'color',   True,      True,          None ],
+            ['img',  'Imagen',             'Imagen',    'img',   True,      True,          None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        },
+        "no_crud" : 'administrar_paginas' ,
+    },
+
 # _BORRAR
     "ubigeo" : {
         "active":True,
@@ -1207,6 +1264,43 @@ REPORTES = {
         "filters": [],  # No se requiere filtro por ahora
     },
 
+    "reporte_usuarios": {
+        "active": True,
+        "icon_page": "fa-solid fa-users",
+        "titulo": "Reporte de Usuarios",
+        "table": controlador_usuario.get_report_usuarios(),
+        "filters": [
+            ['tipo_usuario', 'Tipo de Usuario', lambda: controlador_usuario.get_options()],
+            ['activo', 'Estado', lambda: [(1, "Activo"), (0, "Inactivo")]],
+        ],
+    },     
+    "articulos_mas_vendidos": {
+        "active": True,
+        "icon_page": "fa-solid fa-boxes-stacked",
+        "titulo": "Artículos Más Vendidos",
+        "table": controlador_articulo.get_report_mas_vendidos(),  # referencia a función sin paréntesis
+        "filters": [
+            ['fecha', 'Fecha', None, 'interval_date'],  # filtro rango de fechas
+        ],
+    },
+    "articulos_reposicion": {
+        "active": True,
+        "icon_page": "fa-solid fa-boxes-stacked",
+        "titulo": "Artículos que Necesitan Reposición",
+        "table": controlador_articulo.get_report_reposicion(),  # función sin paréntesis
+        "filters": [
+            ['stock_minimo', 'Stock Mínimo', lambda: controlador_articulo.get_stock_minimo_options(), 'select'],
+        ],
+    },
+    "horarios_sucursal": {
+        "active": True,
+        "icon_page": "fa-solid fa-clock",
+        "titulo": "Reporte de horarios de sucursales",
+        "table": controlador_sucursal.get_report_horario(), 
+        "filters": [
+            # ['stock_min', 'Stock Mínimo', None, 'number'],
+        ],
+    }
 
 }
 
@@ -1435,7 +1529,6 @@ MENU_ADMIN = {
 }
 
 
-
 TRANSACCIONES = {
     "salida": {
         "active" : True ,
@@ -1469,6 +1562,8 @@ TRANSACCIONES = {
     },
     
 }
+
+
 ###########_ REDIRECT _#############
 
 @app.route("/")
@@ -1593,9 +1688,7 @@ def inject_cur_modulo_id():
             dataPage = permiso.get_pagina_key(key)
             if dataPage:
                 return dict(cur_modulo_id=dataPage['moduloid'])
-
         return dict(cur_modulo_id=None)
-
     except Exception as e:
         return dict(cur_modulo_id=None)
 
@@ -1605,7 +1698,7 @@ def inject_globals():
     listar_pages_admin = listar_admin_pages()
     modulos = permiso.get_lista_modulos()
     tipos_paginas = permiso.get_lista_tipo_paginas()
-    paginas = permiso.get_paginas()
+    menu_paginas = permiso.get_paginas()
     options_pagination_crud , selected_option_crud = get_options_pagination_crud()
     cookie_error = request.cookies.get('error')
     user_id = request.cookies.get('user_id')
@@ -1624,8 +1717,8 @@ def inject_globals():
 
     return dict(
         # todo el sistema
-        # URL_IMG_LOGO           = f'/static/img/img_empresa/{controlador_empresa.get_logo()}' ,
-        URL_IMG_LOGO           = f'/static/img/img_empresa/logo.png' ,
+        URL_IMG_LOGO           = f'/static/img/img_empresa/{controlador_empresa.get_logo()}' ,
+        # URL_IMG_LOGO           = f'/static/img/img_empresa/logo.png' ,
         main_information = main_information ,
         cookie_error = cookie_error,
         datosUsuario = datosUsuario ,
@@ -1636,7 +1729,7 @@ def inject_globals():
         selected_option_crud = selected_option_crud ,
         modulos= modulos ,
         tipos_paginas = tipos_paginas ,
-        paginas = paginas ,
+        menu_paginas = menu_paginas ,
 
         # paginas cliente
 
@@ -1663,15 +1756,16 @@ def inject_globals():
         ICON_PAGE_REPORT       = ICON_PAGE_REPORT ,
         ICON_PAGE_DASHBOARD    = ICON_PAGE_DASHBOARD ,
         ICON_PAGE_PANEL        = ICON_PAGE_PANEL ,
-        ICON_LIST              = ICON_LIST    ,
-        ICON_CONSULT           = ICON_CONSULT ,
-        ICON_SEARCH            = ICON_SEARCH  ,
-        ICON_INSERT            = ICON_INSERT  ,
-        ICON_UPDATE            = ICON_UPDATE  ,
-        ICON_DELETE            = ICON_DELETE  ,
-        ICON_ACTIVE            = ICON_ACTIVE,
-        ICON_UNACTIVE          = ICON_UNACTIVE,
-        ICON_UNLOCK            = ICON_UNLOCK,
+        ICON_LIST              = ICON_LIST     ,
+        ICON_CONSULT           = ICON_CONSULT  ,
+        ICON_SEARCH            = ICON_SEARCH   ,
+        ICON_INSERT            = ICON_INSERT   ,
+        ICON_UPDATE            = ICON_UPDATE   ,
+        ICON_DELETE            = ICON_DELETE   ,
+        ICON_ACTIVE            = ICON_ACTIVE   ,
+        ICON_UNACTIVE          = ICON_UNACTIVE ,
+        ICON_UNLOCK            = ICON_UNLOCK   ,
+        ICON_PAGE_NOICON       = f'{ICON_PAGE_NOICON} d_i' ,
     )
 
 
@@ -1693,6 +1787,7 @@ paginas_simples = [
     'prueba_seguimiento',
     'cajas',
     'cajas_prueba',
+    'articulos',
     'sobre_nosotros',
     'TerminosCondiciones',
     'salidas_programadas', #para eliminar
@@ -1700,7 +1795,8 @@ paginas_simples = [
     'envio_masivo',
     'salida_informacion',
     'cambiar_contrasenia',
-    'programacion_devolucion'
+    'programacion_devolucion',
+    'salida_informacion'
 ]
 
 
@@ -1780,11 +1876,35 @@ def api_cajas():
     return jsonify(productSizes)
 
 
+@app.route("/api/articulos")
+def api_articulos():
+    filas = controlador_articulo.get_table_with_discount()
+    articulos = {}
+
+    for fila in filas:
+        if not fila['activo']:
+            continue
+
+        key = fila['nom_articulo'].lower()
+        if key not in articulos:
+            articulos[key] = {
+                "name_product": fila['nom_articulo'],
+                "price": float(fila['precio']),
+                "stock": fila['stock'],
+                "dimensions": fila['dimensiones'] or '',
+                "image": fila['img'] or '',
+                "size_name": fila['tam_nombre'] or '',
+                "discounts": []
+            }
+        if fila['cantidad_descuento'] and fila['nom_descuento']:
+            articulos[key]["discounts"].append({
+                "name": fila['nom_descuento'],
+                "value": float(fila['cantidad_descuento'])
+            })
+
+    return jsonify(articulos)
 
 
-@app.route("/articulos")
-def articulos():
-    return render_template('articulos.html')
 
 
 @app.route("/carrito")
@@ -1827,6 +1947,20 @@ def mostrar_pagoenvio():
 
 #########
 
+@app.route('/envio_masivo')
+def envio_masivo():
+    nombre_doc = controlador_tipo_documento.get_options()
+    nombre_rep = controlador_tipo_recepcion.get_options()
+    sucursales = controlador_sucursal.get_ubigeo()
+    articulos = controlador_contenido_paquete.get_options()
+    empaque = controlador_tipo_empaque.get_options()
+    return render_template('envio_masivo.html', 
+                           nombre_doc=nombre_doc,
+                           nombre_rep=nombre_rep,
+                           sucursales=json.dumps(sucursales), 
+                           empaque= empaque, 
+                           articulos=articulos)     
+
 ################# Sucursales ######################
 
 @app.route("/sucursales")
@@ -1845,9 +1979,34 @@ def sucursales():
     )
 
 
-###################################
+##################_ METHOD POST GENERALES _################## 
 
-##################_ ADMIN PAGE _################## 
+
+@app.route("/procesar_login", methods=["POST"])
+def procesar_login():
+    try:
+        correo = request.form["email"]
+        password = request.form["password"]
+        usuario = controlador_usuario.get_usuario_por_correo(correo)
+        encpassword = encrypt_sha256_string(password)
+        # print(encpassword)
+        # print(usuario)
+
+        if usuario and encpassword == usuario['contrasenia']:
+            resp = resp_login(
+                'login',
+                usuario['id'] ,
+                usuario['correo'] 
+            )
+            # controlador_usuario.actualizar_token(username, token)
+            return resp
+        else:
+            return rdrct_error(redirect_url('login') ,'LOGIN_INVALIDO')
+    except Exception as e:
+        return rdrct_error(redirect_url('login')  , e)
+
+
+##################_ PAGINAS EMPLEADO _################## 
 
 
 @app.route("/panel")
@@ -1955,14 +2114,14 @@ def reporte(report_name):
                 esReporte      = True ,
             )
 
+
 @app.route("/transaccion=<tabla>")
 @validar_empleado()
 def crud_transaccion(tabla):
     config = TRANSACCIONES.get(tabla)
     if config:
         active = config["active"]
-        no_crud = config.get('no_crud')
-        if active is True and (no_crud is None or no_crud is False):
+        if active is True :
             icon_page_crud = get_icon_page(config.get("icon_page"))
             titulo = config["titulo"]
             controlador = config["controlador"]
@@ -2007,9 +2166,15 @@ def crud_transaccion(tabla):
                 esTransaccion = True
             )
 
+    
+@app.route("/seguimiento_empleado_prueba=<placa>")
+@validar_empleado()
+def seguimiento_empleado_prueba(placa):
+    return render_template('seguimiento_empleado_prueba.html', placa=placa)
+
 
 @app.route("/administrar_paginas")
-# @validar_empleado()
+@validar_empleado()
 def administrar_paginas():
     modulos = permiso.get_lista_modulos()
     paginas = permiso.get_paginas()
@@ -2028,11 +2193,11 @@ def administrar_paginas():
 
     fields_form_page = [
 #        ID/NAME          LABEL               PLACEHOLDER    TYPE    REQUIRED   ABLE/DISABLE   DATOS
-        ['titulo',         'Nombre del módulo', 'Nombre',     'text',    True ,   True   ,      None ],
-        ['activo',         'Actividad',         'Color',      'p',       True,    True   ,      None ],
-        ['moduloid',       'Módulo',           'Módulo',      'select',  True ,   None   ,   [lambda: controlador_modulo.get_options() , 'nom_modulo'] ],
-        ['tipo_paginaid',  'Tipo de página',   'Tipo de página',      'select',  True ,   None   ,   [lambda: controlador_tipo_pagina.get_options() , 'nom_tipo'] ],
-        ['icono',         'Icono',             'Icono',      'icon',    True ,   True   ,      None ],
+        ['titulo',         'Nombre del módulo', 'Nombre',        'text',    True ,   True   ,      None ],
+        ['activo',         'Actividad',         'Color',         'p',       True,    True   ,      None ],
+        ['icono',         'Icono',             'Icono',             'icon',    False ,   True   ,      None ],
+        ['moduloid',       'Módulo',           'Módulo',          'select',  True ,   None   ,   [lambda: controlador_modulo.get_options() , 'nom_modulo'] ], 
+        # ['tipo_paginaid',  'Tipo de página',   'Tipo de página',    'select',  True ,   None   ,   [lambda: controlador_tipo_pagina.get_options() , 'nom_tipo'] ],
     ]
     
 
@@ -2053,7 +2218,7 @@ def administrar_paginas():
 @validar_empleado()
 def permiso_rol(rolid):
     modulos = permiso.get_lista_modulos()
-    paginas_cruds = permiso.get_paginas_crud()
+    paginas = permiso.get_paginas_permiso_rol(rolid)
     roles = permiso.get_lista_roles()
     tipos_rol = permiso.get_lista_tipo_roles()
     cants_mod = permiso.get_cants_modulos()
@@ -2063,7 +2228,7 @@ def permiso_rol(rolid):
     return render_template(
         'administrar_paginas.html' ,
         modulos = modulos ,
-        paginas_cruds = paginas_cruds , 
+        paginas = paginas , 
         roles = roles ,
         tipos_rol = tipos_rol ,
         rolid = rolid ,
@@ -2084,11 +2249,11 @@ def informacion_empresa():
         )
 
 
-##################_ METHOD POST _################## 
+##################_ PAGINAS EMPLEADO METHOD POST _################## 
 
 @app.route("/insert_row=<tabla>", methods=["POST"])
-@validar_empleado()
-@validar_error_crud()
+# @validar_empleado()
+# @validar_error_crud()
 def crud_insert(tabla):
     # try:
         config = CONTROLADORES.get(tabla)
@@ -2106,12 +2271,10 @@ def crud_insert(tabla):
 
         valores = []
         for nombre, parametro in firma.parameters.items():
-            # valor = request.form.get(nombre)
-            # valores.append(valor)
             if nombre in request.files:
                 archivo = request.files[nombre]
                 if archivo.filename != "":
-                    nuevo_nombre = guardar_imagen_bd('empresa' ,archivo)
+                    nuevo_nombre = guardar_imagen_bd(tabla , '' , archivo)
                     valores.append(nuevo_nombre)
                 else:
                     # Si no se selecciona una nueva imagen, mantener la actual
@@ -2152,8 +2315,19 @@ def crud_update(tabla):
 
         valores = []
         for nombre, parametro in firma.parameters.items():
-            valor = request.form.get(nombre)
-            valores.append(valor)
+            if nombre in request.files:
+                archivo = request.files[nombre]
+                # print(archivo)
+                if archivo.filename != "":
+                    # print(nombre)
+                    nuevo_nombre = guardar_imagen_bd(tabla,'' ,archivo)
+                    valores.append(nuevo_nombre)
+                else:
+                    # Si no se selecciona una nueva imagen, mantener la actual
+                    valores.append(request.form.get(f"{nombre}_actual"))
+            else:
+                valor = request.form.get(nombre)
+                valores.append(valor)
 
         controlador.update_row( *valores )
         if no_crud :
@@ -2165,14 +2339,15 @@ def crud_update(tabla):
 
 
 @app.route("/delete_row=<tabla>", methods=["POST"])
-@validar_empleado()
-@validar_error_crud()
+# @validar_empleado()
+# @validar_error_crud()
 def crud_delete(tabla):
     config = CONTROLADORES.get(tabla)
     if not config:
         return "Tabla no soportada", 404
 
     active = config["active"]
+    no_crud = config.get('no_crud')
 
     if active is False:
         return "Tabla no soportada", 404
@@ -2180,9 +2355,16 @@ def crud_delete(tabla):
     controlador = config["controlador"]
     primary_key = controlador.get_primary_key()
 
-    controlador.delete_row( request.form.get(primary_key) )
+    if isinstance(primary_key, list):
+        valores_pk = [request.form.get(pk) for pk in primary_key]
+        controlador.delete_row(*valores_pk)
+    else:
+        controlador.delete_row(request.form.get(primary_key))
 
-    return redirect(url_for('crud_generico', tabla = tabla))
+    if no_crud :
+        return redirect(url_for(no_crud))
+    else:
+        return redirect(url_for('crud_generico', tabla = tabla))
 
 
 @app.route("/unactive_row=<tabla>", methods=["POST"])
@@ -2194,6 +2376,7 @@ def crud_unactive(tabla):
         return "Tabla no soportada", 404
 
     active = config["active"]
+    no_crud = config.get('no_crud')
 
     if active is False:
         return "Tabla no soportada", 404
@@ -2203,28 +2386,17 @@ def crud_unactive(tabla):
     primary_key = controlador.get_primary_key()
 
     if existe_activo:
-        controlador.unactive_row( request.form.get(primary_key) )
+        if isinstance(primary_key, list):
+            valores_pk = [request.form.get(pk) for pk in primary_key]
+            controlador.unactive_row(*valores_pk)
+        else:
+            controlador.unactive_row(request.form.get(primary_key))
 
-    return redirect(url_for('crud_generico', tabla = tabla))
+    if no_crud :
+        return redirect(url_for(no_crud))
+    else:
+        return redirect(url_for('crud_generico', tabla = tabla))
 
-
-# @app.route("/update_empresa", methods=["POST"])
-# @validar_empleado()
-# @validar_error_crud()
-# def update_empresa():
-        
-
-#     controlador = controlador_empresa
-#     firma = inspect.signature(controlador.update_row)
-
-#     valores = []
-#     for nombre, parametro in firma.parameters.items():
-#         valor = request.form.get(nombre)
-#         valores.append(valor)
-
-#     controlador.update_row( *valores )
-
-#     return redirect(url_for('informacion_empresa'))
 
 @app.route("/update_empresa", methods=["POST"])
 @validar_empleado()
@@ -2238,10 +2410,9 @@ def update_empresa():
         if nombre in request.files:
             archivo = request.files[nombre]
             if archivo.filename != "":
-                nuevo_nombre = guardar_imagen_bd('empresa' ,archivo)
+                nuevo_nombre = guardar_imagen_bd('empresa' ,'',archivo)
                 valores.append(nuevo_nombre)
             else:
-                # Si no se selecciona una nueva imagen, mantener la actual
                 valores.append(request.form.get(f"{nombre}_actual"))
         else:
             valor = request.form.get(nombre)
@@ -2251,34 +2422,58 @@ def update_empresa():
     return redirect(url_for('informacion_empresa'))
 
 
-@app.route("/procesar_login", methods=["POST"])
-def procesar_login():
-    try:
-        correo = request.form["email"]
-        password = request.form["password"]
-        usuario = controlador_usuario.get_usuario_por_correo(correo)
-        encpassword = encrypt_sha256_string(password)
-        # print(encpassword)
-        # print(usuario)
 
-        if usuario and encpassword == usuario['contrasenia']:
-            resp = resp_login(
-                'login',
-                usuario['id'] ,
-                usuario['correo'] 
-            )
-            # controlador_usuario.actualizar_token(username, token)
-            return resp
-        else:
-            return rdrct_error(redirect_url('login') ,'LOGIN_INVALIDO')
+##################_ METHOD POST AJAX _################## 
+
+@app.route('/actualizar_permiso', methods=['POST'])
+def actualizar_permiso():
+    data = request.get_json()
+    paginaid = data.get('paginaid')
+    column = data.get('column')
+    rolid = data.get('rolid')
+
+    try:
+        permiso.change_permiso_pagina(column , paginaid , rolid)
+        rpta_column = permiso.consult_permiso_rol(paginaid , rolid)[column]
+        return jsonify({'success': True , 'rpta' : rpta_column})
     except Exception as e:
-        return rdrct_error(redirect_url('login')  , e)
-    
-    
-@app.route("/seguimiento_empleado_prueba=<placa>")
-@validar_empleado()
-def seguimiento_empleado_prueba(placa):
-    return render_template('seguimiento_empleado_prueba.html', placa=placa)
+        print("Error al actualizar permiso:", e)
+        return jsonify({'success': False, 'error': str(e)})
+
+
+@app.route('/actualizar_permiso_modulo', methods=['POST'])
+def actualizar_permiso_modulo():
+    data = request.get_json()
+    moduloid = data.get('moduloid')
+    column = data.get('column')
+    rolid = data.get('rolid')
+
+    try:
+        permiso.change_permiso_modulo(column , moduloid , rolid)
+        # rpta_column = permiso.consult_permiso_rol(moduloid , rolid)[column]
+        return jsonify({'success': True })
+    except Exception as e:
+        print("Error al actualizar permiso:", e)
+        return jsonify({'success': False, 'error': str(e)})
+
+
+
+
+# @app.route('/actualizar_comentario', methods=['POST'])
+# def actualizar_comentario():
+#     data = request.get_json()
+#     id = data.get('id')
+#     comentario = data.get('comentario')
+#     try:
+#         controlador_evaluacion.actualizar_comentario_det_id(comentario , id)
+#         return jsonify({'success': True})
+#     except Exception as e:
+#         print("Error al actualizar comentario:", e)
+#         return jsonify({'success': False, 'error': str(e)})
+
+
+
+
 
 ###################################CARRITO###########################
 # @app.route('/agregar_carrito', methods = ['POST'])

@@ -39,32 +39,32 @@ def table_fetchall():
 
 def get_table():
     sql= f'''
-        select 
-            art.id ,
-            art.nombre ,
-            art.precio ,
-            art.stock ,
-            art.dimensiones ,
+        SELECT 
+            art.id,
+            art.nombre,
+            art.precio,
+            art.stock,
+            art.dimensiones,
             tam.nombre as tam_nombre,
-            art.tamaño_cajaid ,
-            art.img,
-            art.activo 
-        from {table_name} art
-        left join tamanio_caja tam on tam.id = art.tamaño_cajaid 
-
+            art.tamaño_cajaid,
+            art.img ,
+            art.activo
+        FROM {table_name} art
+        LEFT JOIN tamanio_caja tam ON tam.id = art.tamaño_cajaid
     '''
     columnas = {
-        'id': ['ID' , 0.5] , 
-        'nombre' : ['Nombre' , 5] , 
-        'precio' : ['Precio' , 1] , 
-        'stock' : ['Stock' , 1] , 
-        'dimensiones' : ['Dimensiones' , 2] , 
-        'tam_nombre' : ['Tamaño de caja' , 3] , 
-        'activo' : ['Actividad' , 1] 
-        }
+        'id': ['ID', 0.5], 
+        'nombre': ['Nombre', 5], 
+        'precio': ['Precio', 1], 
+        'stock': ['Stock', 1], 
+        'dimensiones': ['Dimensiones', 2], 
+        'tam_nombre': ['Tamaño de caja', 3], 
+        'img': ['Imagen', 3],  # si quieres mostrar imagen
+        'activo': ['Actividad', 1] 
+    }
     filas = sql_select_fetchall(sql)
-    
-    return columnas , filas
+    return columnas, filas
+
 
 
 ######_ CRUD ESPECIFICAS _###### 
@@ -77,7 +77,7 @@ def insert_row( nombre, precio, stock, img, dimensiones,tamaño_cajaid ):
     sql = f'''
         INSERT INTO 
             {table_name} 
-            ( nombre, precio, stock, img, dimensiones,tamaño_cajaid , activo)
+            ( nombre, precio, stock, img, dimensiones, tamaño_cajaid , activo)
         VALUES 
             ( %s ,%s ,%s ,%s ,%s ,%s , 1)
     '''
@@ -142,4 +142,119 @@ def get_table_with_discount():
     return filas
 
 
+def my_sql_select_fetchall(sql, params=None):
+    try:
+        conexion = obtener_conexion()
+        cursor = conexion.cursor(dictionary=True)
+        cursor.execute(sql, params or ())
+        resultados = cursor.fetchall()
+        cursor.close()
+        conexion.close()
+        return resultados or []
+    except Exception as e:
+        print(f"Error en consulta SQL: {e}")
+        return []
 
+def get_report_mas_vendidos(fecha_inicio=None, fecha_fin=None):
+    try:
+        sql = '''
+            SELECT 
+                a.id,
+                a.nombre,
+                COALESCE(SUM(dv.cantidad), 0) AS total_vendido,
+                a.stock
+            FROM articulo a
+            LEFT JOIN detalle_venta dv 
+                ON a.id = dv.articuloid
+            LEFT JOIN transaccion_venta tv 
+                ON dv.ventanum_serie = tv.num_serie 
+                AND dv.ventatipo_comprobanteid = tv.tipo_comprobanteid
+            WHERE 1=1
+        '''
+        params = []
+
+        if fecha_inicio and fecha_fin:
+            # Asumo formato 'YYYY-MM-DD' y validación simple de longitud
+            if len(fecha_inicio) == 10 and len(fecha_fin) == 10:
+                sql += " AND tv.fecha BETWEEN %s AND %s "
+                params.extend([fecha_inicio, fecha_fin])
+            else:
+                print("Formato de fecha incorrecto, filtro ignorado.")
+
+        sql += '''
+            GROUP BY a.id, a.nombre, a.stock
+            ORDER BY total_vendido DESC
+        '''
+
+        columnas = {
+            'id': ['ID', 0.5],
+            'nombre': ['Nombre', 3],
+            'total_vendido': ['Total Vendido', 1.5],
+            'stock': ['Stock', 1],
+        }
+
+        filas = sql_select_fetchall(sql, tuple(params))
+        return columnas, filas
+
+    except Exception as e:
+        print(f"Error en get_report_mas_vendidos: {e}")
+        return {}, []
+
+def get_report_reposicion(stock_minimo=10):
+    """
+    Obtiene un reporte de artículos que necesitan reposición
+    basado en un stock mínimo definido
+    """
+    try:
+        sql = '''
+            SELECT 
+                a.id,
+                a.nombre,
+                a.precio,
+                a.stock,
+                a.dimensiones,
+                tam.nombre as tam_nombre,
+                CASE 
+                    WHEN a.stock = 0 THEN 'Sin Stock'
+                    WHEN a.stock <= %s THEN 'Stock Bajo'
+                    ELSE 'Stock Normal'
+                END as estado_stock,
+                COALESCE(SUM(dv.cantidad), 0) AS total_vendido
+            FROM articulo a
+            LEFT JOIN tamanio_caja tam ON tam.id = a.tamaño_cajaid
+            LEFT JOIN detalle_venta dv ON a.id = dv.articuloid
+            WHERE a.activo = 1 
+                AND a.stock <= %s
+            GROUP BY a.id, a.nombre, a.precio, a.stock, a.dimensiones, tam.nombre
+            ORDER BY a.stock ASC, total_vendido DESC
+        '''
+        
+        columnas = {
+            'id': ['ID', 0.5],
+            'nombre': ['Artículo', 3],
+            'precio': ['Precio', 1],
+            'stock': ['Stock Actual', 1],
+            'dimensiones': ['Dimensiones', 2],
+            'tam_nombre': ['Tamaño Caja', 2],
+            'estado_stock': ['Estado', 1.5],
+            'total_vendido': ['Total Vendido', 1.5],
+        }
+        
+        filas = sql_select_fetchall(sql, (stock_minimo, stock_minimo))
+        
+        return columnas, filas
+        
+    except Exception as e:
+        print(f"Error en get_report_reposicion: {e}")
+        return {}, []
+
+def get_stock_minimo_options():
+    """Retorna opciones predefinidas para el stock mínimo"""
+    return [
+        (5, "5 unidades"),
+        (10, "10 unidades"), 
+        (15, "15 unidades"),
+        (20, "20 unidades"),
+        (25, "25 unidades"),
+        (50, "50 unidades")
+    ]

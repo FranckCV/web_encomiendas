@@ -21,9 +21,18 @@
         }
 
         /* Título caja */
-        .titulo-cajas {
-            margin-top: 0px;
+        .head_title {
+            font-size: 32px;
+            /* filter: brightness(1.9); */
+            /* color: var(--color4); */
+            color: #0E1D63;
+            text-align: center;
+            font-weight: 700;
+            margin-bottom: 10px;
+            /* margin: 30px 0 0px 0; */
+            text-transform: uppercase;
         }
+
 
         /* SECCIÓN DE DETALLES DEL PRODUCTO OPTIMIZADA */
         .producto-detalle {
@@ -71,7 +80,8 @@
             transition: all 0.3s ease;
         }
 
-        .size-btn.active, .size-btn:hover{
+        .size-btn.active,
+        .size-btn:hover {
             background-color: #1a3c5b;
             color: white;
             border-color: var(--color-primary);
@@ -81,7 +91,7 @@
         .producto-info {
             flex: 1;
             max-width: 400px;
-            padding: 10px 15px;
+            padding: 10px 0px;
             box-sizing: border-box;
         }
 
@@ -92,13 +102,16 @@
             margin-bottom: 5px;
         }
 
-        .producto-descripciones{
-            
+        .producto-descripciones {
+            color: var(--color-primary);
+            font-size: 1.2rem;
+            font-weight: bolder;
+            margin-bottom: 12px;
         }
 
         .producto-dimensiones {
             color: var(--color-text-light);
-            margin-bottom: 20px;
+            margin-bottom: 0px;
             font-size: 1.1rem;
         }
 
@@ -178,7 +191,7 @@
             transition: all 0.3s ease;
         }
 
-        .selector-cantidad{
+        .selector-cantidad {
             display: flex;
             justify-content: flex-start;
             align-items: center;
@@ -230,7 +243,8 @@
             gap: 15px;
             margin-bottom: 20px;
             /* flex-wrap: wrap; <- REMOVIDO para mantener elementos en línea */
-            justify-content: flex-start; /* Alineación a la izquierda */
+            justify-content: flex-start;
+            /* Alineación a la izquierda */
         }
 
         /* CORRECCIÓN: Selector de cantidad interno */
@@ -241,7 +255,8 @@
             border-radius: 30px;
             padding: 5px;
             width: fit-content;
-            flex-shrink: 0; /* Evita que se reduzca */
+            flex-shrink: 0;
+            /* Evita que se reduzca */
         }
 
         .qty-btn {
@@ -299,8 +314,10 @@
             font-size: 0.85rem;
             white-space: nowrap;
             transition: all 0.3s ease;
-            flex-shrink: 0; /* Evita que se reduzca */
-            min-width: fit-content; /* Mantiene su ancho mínimo */
+            flex-shrink: 0;
+            /* Evita que se reduzca */
+            min-width: fit-content;
+            /* Mantiene su ancho mínimo */
         }
 
         .quantity-limit.active {
@@ -310,9 +327,17 @@
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
 
         /* Botón de agregar al carrito */
@@ -347,33 +372,35 @@
                 padding: 2px;
                 max-width: 100%;
             }
-            
+
             .producto-detalle {
                 flex-direction: column;
                 gap: 5px;
                 padding: 5px;
             }
-            
-            .producto-imagen, .producto-info {
+
+            .producto-imagen,
+            .producto-info {
                 width: 100%;
                 padding: 8px;
             }
-            
+
             /* Botones de descuento en móvil */
             .precio-volumen-item {
                 flex-direction: column;
                 text-align: center;
                 padding: 10px 15px;
             }
-            
+
             /* CORRECCIÓN: Responsividad para la sección de cantidad - mantener en línea en móvil también */
             .cantidad-section {
-                flex-direction: row; /* Cambiado de column a row */
+                flex-direction: row;
+                /* Cambiado de column a row */
                 align-items: center;
                 gap: 10px;
                 justify-content: flex-start;
             }
-            
+
             /* En móviles muy pequeños, reducir el gap */
             .quantity-limit {
                 font-size: 0.8rem;
@@ -386,28 +413,29 @@
                 padding: 0;
                 margin: 0;
             }
-            
+
             .producto-detalle {
                 padding: 2px;
             }
-            
+
             .producto-titulo {
                 font-size: 1.5rem;
             }
-            
-            .moneda, .precio {
+
+            .moneda,
+            .precio {
                 font-size: 1.5rem;
             }
-            
+
             .btn-agregar {
                 padding: 12px 20px;
             }
-            
+
             /* En pantallas muy pequeñas, ajustar el gap */
             .cantidad-section {
                 gap: 8px;
             }
-            
+
             .quantity-limit {
                 font-size: 0.75rem;
             }

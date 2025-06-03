@@ -265,14 +265,14 @@
     max-width: 300px;
     padding: 2rem;
     border-radius: 10px;
-    box-shadow: 0 5px 15px rgb(108 168 255);
+    box-shadow: 0 5px 15px var(--accent-color);
     transition: 0.3s ease;
     background-color: white;
 }
 
 .stat-item:hover {
     transform: translateY(-10px);
-    box-shadow: 0 5px 25px rgb(56, 136, 255);
+    box-shadow: 0 5px 25px var(--accent-color);
 }
 
 .stat-icon {

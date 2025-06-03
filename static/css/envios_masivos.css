@@ -1,4 +1,7 @@
-/* ===== ESTILOS GENERALES PARA ENVÍOS MASIVOS ===== */
+
+h2 {
+    font-size: 1.5rem;
+}
 
 /* Sección principal masiva */
 .seccion-masiva {
@@ -21,10 +24,92 @@
     font-weight: 600;
 }
 
+/* ===== ESTILOS PARA EL SISTEMA DE PESTAÑAS ===== */
+
+.tabs-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+/* Navegación de pestañas */
+.tabs-nav {
+    display: flex;
+    background: #f7fafc;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 1.2rem 2rem;
+    background: transparent;
+    border: none;
+    color: #718096;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.tab-btn:hover {
+    background: #edf2f7;
+    color: #4a5568;
+}
+
+.tab-btn.active {
+    background: white;
+    color: #0E1D63;
+    font-weight: 700;
+    box-shadow: inset 0 -3px 0 #0E1D63;
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #0E1D63;
+}
+
+.tab-btn:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* Contenido de pestañas */
+.tabs-content {
+    background: white;
+}
+
+.tab-panel {
+    display: none;
+    padding: 2rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+}
+
+.tab-panel.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    animation: fadeIn 0.3s ease-out;
+}
+
 /* Grid de campos */
 .campos-envio {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1.2rem;
     margin-bottom: 1.5rem;
 }
@@ -35,9 +120,8 @@
     flex-direction: column;
     gap: 0.4rem;
 }
-#m-descripcionArticulo{
-    height: 100px;
-}
+
+
 .campo-grupo label {
     font-size: 0.85rem;
     color: #4a5568;
@@ -48,7 +132,7 @@
 .campo-grupo input,
 .campo-grupo select {
     padding: 0.75rem 1rem;
-    border: 2px solid #e2e8f0;
+    border: 2px solid #9aa5b5;
     border-radius: 6px;
     font-size: 0.95rem;
     transition: all 0.3s ease;
@@ -64,7 +148,189 @@
 
 .campo-grupo input:hover,
 .campo-grupo select:hover {
-    border-color: #cbd5e0;
+    border-color: #667eea;
+}
+
+/* Ajustes específicos para campos */
+.campo-descripcion {
+    grid-column: 1 / -1;
+}
+
+.campo-descripcion textarea,
+#m-descripcionArticulo {
+    min-height: 100px;
+    resize: vertical;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    background-color: white;
+}
+
+.campo-descripcion textarea:focus,
+#m-descripcionArticulo:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+
+/* Botones de acción del formulario */
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Botones de acción de la tabla */
+.table-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    justify-content: flex-end;
+}
+
+/* Botones */
+.btn-agregar {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+    padding: 0.8rem 2rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+}
+
+.btn-agregar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+}
+
+.btn-limpiar {
+    background: #e2e8f0;
+    color: #4a5568;
+    padding: 0.8rem 2rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-limpiar:hover {
+    background: #cbd5e0;
+}
+
+.btn-continuar {
+    background: #0E1D63;
+    color: white;
+    padding: 1rem 3rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-top: 2rem;
+    width: 100%;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(14, 29, 99, 0.3);
+}
+
+.btn-continuar:hover {
+    background: #0a1445;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(14, 29, 99, 0.4);
+}
+
+.btn-continuar:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-exportar {
+    background: #718096;
+    color: white;
+    padding: 0.6rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+
+
+
+.btn-exportar:hover {
+    background: #4a5568;
+    transform: translateY(-1px);
+}
+
+.btn-limpiar-todos {
+    background: var(--color-back);
+    color: white;
+    padding: 0.6rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.btn-limpiar-todos:hover {
+    transform: translateY(-1px);
+}
+
+/* Botones de acción en tabla */
+.btn-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-small {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+    border: none;
+    border-radius: 50%;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-editar {
+    background-color: color-mix(in srgb, var(--color5) 50%, #ffd900 100%);;
+    color: white;
+}
+
+.btn-editar:hover {
+    background: #3182ce;
+    transform: translateY(-1px);
+}
+
+.btn-eliminar {
+    background: color-mix(in srgb, var(--color5) 50%, #ae0e2e 100%);
+    color: white;
+}
+
+.btn-eliminar:hover {
+    background: #f56565;
+    transform: translateY(-1px);
 }
 
 /* Tabla de envíos */
@@ -75,6 +341,7 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     margin-top: 2rem;
     border: 1px solid #e2e8f0;
+    overflow-x: auto;
 }
 
 /* Header de la tabla */
@@ -153,6 +420,15 @@ tr:hover {
     background: #f8fafc;
 }
 
+/* Mejoras visuales adicionales */
+.tabla-envios table tbody tr:nth-child(even) {
+    background-color: #f9fafb;
+}
+
+.tabla-envios table tbody tr:nth-child(odd) {
+    background-color: white;
+}
+
 /* Estado vacío */
 .empty-state {
     text-align: center;
@@ -169,106 +445,6 @@ tr:hover {
 
 .empty-state p:last-child {
     font-size: 0.95rem;
-}
-
-/* Botones */
-.btn-agregar {
-    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-    color: white;
-    padding: 0.8rem 2rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
-}
-
-.btn-agregar:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
-}
-
-.btn-continuar {
-    background: #0E1D63;
-    color: white;
-    padding: 1rem 3rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 1rem;
-    margin-top: 2rem;
-    width: 100%;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(14, 29, 99, 0.3);
-}
-
-.btn-continuar:hover {
-    background: #0a1445;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(14, 29, 99, 0.4);
-}
-
-.btn-continuar:disabled {
-    background: #cbd5e0;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-.btn-exportar {
-    background: #718096;
-    color: white;
-    padding: 0.6rem 1.5rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-}
-
-.btn-exportar:hover {
-    background: #4a5568;
-    transform: translateY(-1px);
-}
-
-/* Botones de acción en tabla */
-.btn-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.btn-small {
-    padding: 0.4rem 1rem;
-    font-size: 0.8rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-.btn-editar {
-    background: #4299e1;
-    color: white;
-}
-
-.btn-editar:hover {
-    background: #3182ce;
-    transform: translateY(-1px);
-}
-
-.btn-eliminar {
-    background: #fc8181;
-    color: white;
-}
-
-.btn-eliminar:hover {
-    background: #f56565;
-    transform: translateY(-1px);
 }
 
 /* Sección de resumen */
@@ -323,17 +499,181 @@ tr:hover {
     font-size: 1rem;
 }
 
+/* Badges */
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-domicilio {
+    background: #e6fffa;
+    color: #047857;
+}
+
+.badge-agencia {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-express {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Badges en la tabla */
+td small {
+    display: inline-block;
+    margin-top: 0.2rem;
+    font-size: 0.75rem;
+    color: #718096;
+}
+
+#seccion_remitente{
+     display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
 /* Campos condicionales */
 #grupo-direccion,
 #grupo-referencia,
 #grupo-tienda,
 #grupo-folios,
-#campos-ruc {
+#campo-contacto-ruc,
+#campo-razon-ruc {
     transition: all 0.3s ease;
 }
 
-/* Responsive */
+#select-sucursal:user-valid,
+input:required:user-valid,
+select:required:user-valid,
+textarea:required:user-valid {
+  border-color: #48bb78; /* verde */
+}
+#select-sucursal:user-invalid,
+input:required:user-invalid,
+select:required:user-invalid,
+textarea:required:user-invalid {
+  border-color: #fc8181; /* rojo */
+}
+
+
+/* Indicadores visuales para pestañas completadas */
+.tab-btn.completed {
+    position: relative;
+}
+
+.tab-btn.completed::before {
+    content: '✓';
+    position: absolute;
+    top: 0.3rem;
+    right: 0.5rem;
+    background: #48bb78;
+    color: white;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Scrollbar personalizado */
+.tabla-envios::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tabla-envios::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.tabla-envios::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 10px;
+}
+
+.tabla-envios::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+/* Indicador de modo demo */
+.demo-indicator {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.demo-indicator:hover {
+    transform: scale(1.05);
+}
+
+/* Animaciones */
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+.campo-grupo[style*="display: grid"],
+.campo-grupo[style*="display: block"] {
+    animation: fadeIn 0.3s ease-out;
+}
+
+
 @media (max-width: 768px) {
+    .tabs-nav {
+        flex-direction: column;
+    }
+    
+    .tab-btn {
+        padding: 1rem 1.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .tab-panel {
+        padding: 1.5rem 1rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .campos-ruc-grid {
+        grid-template-columns: 1fr;
+    }
+
     .campos-envio {
         grid-template-columns: 1fr;
     }
@@ -371,7 +711,41 @@ tr:hover {
     }
 }
 
+@media (max-width: 576px) {
+    .tabs-nav {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+    
+    .tab-btn {
+        padding: 0.75rem 1rem;
+        text-align: left;
+        justify-content: flex-start;
+    }
+    
+    .stats {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .tabla-header {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+}
+
 @media (max-width: 480px) {
+    .tab-btn {
+        padding: 0.8rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .tab-panel {
+        padding: 1rem;
+    }
+
     .seccion-masiva {
         padding: 1.5rem 1rem;
     }
@@ -385,89 +759,341 @@ tr:hover {
     }
 }
 
-/* Animaciones */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+ /* ===== NUEVO: SECCIÓN DE TARIFA REDISEÑADA ===== */
+        .seccion-tarifa-nueva {
+            margin: 1.5rem 0;
+        }
 
-.campo-grupo[style*="display: flex"],
-.campo-grupo[style*="display: block"] {
-    animation: fadeIn 0.3s ease-out;
-}
+        .tarifa-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
 
-/* Mejoras de accesibilidad */
-.campo-grupo input:invalid,
-.campo-grupo select:invalid {
-    border-color: #fc8181;
-}
+        .tarifa-header-nueva {
+            background: #f8f9fa;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
 
-.campo-grupo input:valid,
-.campo-grupo select:valid {
-    border-color: #48bb78;
-}
+        .tarifa-titulo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
-/* Tooltips para campos obligatorios */
-.campo-grupo label::after {
-    content: attr(title);
-    position: absolute;
-    background: #2d3748;
-    color: white;
-    padding: 0.3rem 0.6rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-}
+        .tarifa-icono {
+            font-size: 1.2rem;
+        }
 
-.campo-grupo label:hover::after {
-    opacity: 1;
-}
+        .tarifa-titulo h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 0;
+        }
 
-/* Mejoras visuales adicionales */
-.tabla-envios table tbody tr:nth-child(even) {
-    background-color: #f9fafb;
-}
+        .tarifa-estado {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-.tabla-envios table tbody tr:nth-child(odd) {
-    background-color: white;
-}
+        .tarifa-ruta {
+            padding: 1.5rem;
+            background: #f7fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
 
-/* Badges en la tabla */
-td small {
-    display: inline-block;
-    margin-top: 0.2rem;
-    font-size: 0.75rem;
-    color: #718096;
-}
+        .ruta-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
 
-/* Scrollbar personalizado */
-.tabla-envios {
-    overflow-x: auto;
-}
+        .ruta-punto {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+        }
 
-.tabla-envios::-webkit-scrollbar {
-    height: 8px;
-}
+        .ruta-label {
+            font-size: 0.75rem;
+            color: #718096;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-.tabla-envios::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-}
+        .ruta-valor {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
 
-.tabla-envios::-webkit-scrollbar-thumb {
-    background: #cbd5e0;
-    border-radius: 10px;
-}
+        .ruta-flecha {
+            font-size: 1.5rem;
+            color: #667eea;
+            font-weight: bold;
+        }
 
-.tabla-envios::-webkit-scrollbar-thumb:hover {
-    background: #a0aec0;
-}
+        .tarifa-detalles {
+            padding: 1rem 1.5rem;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .detalle-fila {
+            display: grid;
+            grid-template-columns: auto 1fr auto 1fr;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .detalle-label,
+        .detalle-peso {
+            font-size: 0.85rem;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .detalle-valor,
+        .detalle-peso-valor {
+            font-size: 0.85rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .tarifa-breakdown {
+            padding: 1.5rem;
+            background: white;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f7fafc;
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-label {
+            font-size: 0.9rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .breakdown-valor {
+            font-size: 0.9rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .breakdown-separator {
+            height: 1px;
+            background: #2d3748;
+            margin: 1rem 0;
+        }
+
+        .breakdown-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0 0.5rem 0;
+        }
+
+        .breakdown-total-label {
+            font-size: 1rem;
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        .breakdown-total-valor {
+            font-size: 1.2rem;
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        .tarifa-disclaimer {
+            padding: 1rem 1.5rem;
+            background: #fffaf0;
+            border-top: 1px solid #fed7aa;
+        }
+
+        .tarifa-disclaimer p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #c05621;
+            font-style: italic;
+        }
+
+        .btn-ver-detalle-nuevo {
+            width: 100%;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ver-detalle-nuevo:hover {
+            background: #5a67d8;
+        }
+
+        /* ===== NUEVO: MODAL DE DETALLE DE TARIFA ===== */
+        .modal-detalle-tarifa {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-detalle-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        .modal-detalle-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 16px 16px 0 0;
+            text-align: center;
+        }
+
+        .modal-detalle-header h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .modal-detalle-body {
+            padding: 2rem;
+        }
+
+        .detalle-explicacion {
+            margin-bottom: 2rem;
+        }
+
+        .detalle-explicacion h4 {
+            color: #2d3748;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detalle-item-explicacion {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .detalle-item-titulo {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detalle-item-monto {
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .detalle-item-descripcion {
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        .detalle-porcentaje {
+            background: #e6fffa;
+            border: 1px solid #81e6d9;
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            margin-top: 0.5rem;
+            display: inline-block;
+        }
+
+        .detalle-porcentaje-texto {
+            font-size: 0.8rem;
+            color: #234e52;
+            font-weight: 600;
+        }
+
+        .modal-detalle-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .btn-cerrar-detalle {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cerrar-detalle:hover {
+            background: #5a67d8;
+        }
+
+        .tarifa-oculta {
+            display: none;
+        }
+
+        /* Botones de acción del formulario */
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
