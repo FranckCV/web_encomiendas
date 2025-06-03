@@ -79,8 +79,8 @@
           id="{{campo[0]}}" 
           type="text" 
           name="{{campo[0]}}" 
-          placeholder="{{campo[2]}}" 
-          value="{{ fila[campo[6][1]] }}"
+          placeholder="{{ campo[2] if fila[campo[6][1]] else 'Sin '~ campo[2] | lower }}" 
+          value="{{ fila[campo[6][1]] or ''}}"
           disabled
           {% if campo[4] %}required{% endif %} 
           >
@@ -92,10 +92,13 @@
                 {% if modo_modal != 'insert' and fila[campo[0]] is not none %} data-select-value="{{fila[campo[0]]}}" {% endif %}
                 {% if modo_modal == 'consult' or campo[5] == False %} disabled {% endif %}
                 >
-                    {% if modo_modal == 'insert' %}
-                    <option value="-1" disabled selected>{{campo[2]}}</option>
-                    {% endif %}
-                    </select>
+                  {% if modo_modal == 'insert' %}
+                  <option value="-1" disabled selected>{{campo[2]}}</option>
+                  {% elif modo_modal == 'update' and campo[4] == False %}
+                  <option value="" >Sin {{campo[2] | lower}}</option>
+                  {% endif %}
+
+                  </select>
             {% endif %}
 
         {% elif campo[3] == 'textarea' %}

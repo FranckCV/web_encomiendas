@@ -478,7 +478,7 @@ CONTROLADORES = {
             ['precio',      'Precio',          'Precio',      'number',   True ,     True  ,        None ],
             ['stock',       'Stock',           'Stock',       'number',   True ,     True  ,        None ],
             ['dimensiones', 'Dimensiones',     'Dimensiones', 'text',     False ,     True  ,        None ],
-            ['tamaño_cajaid','Tamaño Caja',    'Tamaño Caja', 'select',   False ,     True  ,        [lambda: controlador_tamanio_caja.get_options() , 'tam_nombre' ]  ],
+            ['tamaño_cajaid','Tamaño de Caja',    'Tamaño de Caja', 'select',   False ,     True  ,        [lambda: controlador_tamanio_caja.get_options() , 'tam_nombre' ]  ],
             ['img',         'Imagen',          'Imagen',      'img',      True ,     True  ,        None ],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
         ],
@@ -1870,7 +1870,7 @@ def api_articulos():
                 "price": float(fila['precio']),
                 "stock": fila['stock'],
                 "dimensions": fila['dimensiones'] or '',
-                "image": fila['img'] or '',
+                "image": f'/static/img/img_articulo/{fila['img'] or ''}',
                 "size_name": fila['tam_nombre'] or '',
                 "discounts": []
             }
@@ -2296,6 +2296,7 @@ def crud_update(tabla):
             if nombre in request.files:
                 archivo = request.files[nombre]
                 # print(archivo)
+                # print(archivo)
                 if archivo.filename != "":
                     # print(nombre)
                     nuevo_nombre = guardar_imagen_bd(tabla,'' ,archivo)
@@ -2305,8 +2306,12 @@ def crud_update(tabla):
                     valores.append(request.form.get(f"{nombre}_actual"))
             else:
                 valor = request.form.get(nombre)
+                # print(valor)
+                if valor == '':
+                    valor = None
                 valores.append(valor)
 
+        print(valores)
         controlador.update_row( *valores )
         if no_crud :
             return redirect(url_for(no_crud))

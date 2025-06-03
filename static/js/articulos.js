@@ -1,665 +1,278 @@
-document.addEventListener('DOMContentLoaded', function () {
-    // Referencias a elementos del DOM
-    const productoImg = document.querySelector('.producto-imagen img');
-    const productoTitulo = document.getElementById('producto-titulo');
-    const productoDescripcion = document.getElementById('producto-descripcion');
-    const productoDimensiones = document.getElementById('producto-dimensiones');
-    const precioPrincipal = document.getElementById('precio');
-    const preciosVolumen = document.getElementById('precios-volumen');
-    const sizeOptions = document.getElementById('size-options');
-    const decreaseBtn = document.querySelector('.qty-btn.decrease');
-    const increaseBtn = document.querySelector('.qty-btn.increase');
-    const qtyInput = document.querySelector('.qty-input');
-    const quantityLimit = document.querySelector('.quantity-limit') || createQuantityLimit();
-    const addToCartBtn = document.querySelector('.btn-agregar');
-    const thumbsContainer = document.getElementById('thumbs-container');
-    const productosRelacionadosGrid = document.getElementById('productos-relacionados-grid');
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
+document.addEventListener('DOMContentLoaded', async () => {
+  let productos = {};
+  try {
+    const res = await fetch('/api/articulos');
+    if (!res.ok) throw new Error(`Status ${res.status}`);
+    productos = await res.json();
+  } catch (e) {
+    console.error('Error cargando /api/articulos:', e);
+    return;
+  }
 
-    // Función para crear el elemento de límite de cantidad si no existe
-    function createQuantityLimit() {
-        const limitElement = document.createElement('div');
-        limitElement.classList.add('quantity-limit');
-        if (qtyInput && qtyInput.parentNode) {
-            qtyInput.parentNode.insertAdjacentElement('afterend', limitElement);
-        }
-        return limitElement;
+  const decreaseBtn = document.querySelector('.qty-btn.decrease');
+  const increaseBtn = document.querySelector('.qty-btn.increase');
+  const qtyInput = document.querySelector('.qty-input');
+  const quantityLimit = document.querySelector('.quantity-limit');
+  const addToCartBtn = document.querySelector('.btn-agregar');
+  const productImage = document.getElementById('producto-img');
+  const priceElement = document.getElementById('precio');
+  const dimensionsElement = document.getElementById('producto-dimensiones');
+  const discountContainer = document.getElementById('precios-volumen');
+  const sizeOptions = document.getElementById('size-options');
+  const titulo = document.getElementById('producto-titulo');
+  const thumbsContainer = document.getElementById('thumbs-container');
+
+  const keys = Object.keys(productos);
+  if (keys.length === 0) return;
+  let currentKey = keys[0];
+  let currentQuantity = 1;
+
+  function updateDiscountCards(descuentos) {
+    discountContainer.innerHTML = '';
+    if (!descuentos || descuentos.length === 0) {
+      discountContainer.innerHTML = '<p>No hay descuentos disponibles.</p>';
+      return;
     }
+    descuentos.forEach(desc => {
+      const div = document.createElement('div');
+      div.classList.add('precio-volumen-item');
 
-    // Datos de productos
-    const productos = [
-        {
-            id: 1,
-            nombre: "Plumón Indeleble",
-            descripcion: "Marcador permanente con punta gruesa redondeada que posee una tinta color negro resistente al agua y la luz.",
-            dimensiones: "Multimark Jumbo 23",
-            precio: 3.00,
-            imagen: "/static/img/plumon.png",
-            preciosVolumen: [
-                { precio: 2.50, cantidad: 12 },
-                { precio: 2.80, cantidad: 24 }
-            ],
-            tamanios: [],
-            maxQuantity: 50
-        },
-        {
-            id: 2,
-            nombre: "Sobre A4",
-            descripcion: "Ideal para el traslado de tus documentos.",
-            dimensiones: "21 x 29.7 cm",
-            precio: 1.00,
-            imagen: "/static/img/sobre.png",
-            preciosVolumen: [
-                { precio: 0.90, cantidad: 50 },
-                { precio: 0.80, cantidad: 100 }
-            ],
-            tamanios: [],
-            maxQuantity: 200
-        },
-        {
-            id: 3,
-            nombre: "Cinta de Embalaje",
-            descripcion: "Cinta adhesiva resistente para todo tipo de paquetes.",
-            dimensiones: "48mm x 40m",
-            precio: 5.90,
-            imagen: "/static/img/cintaEmbalaje.png",
-            preciosVolumen: [
-                { precio: 5.50, cantidad: 6 },
-                { precio: 5.00, cantidad: 12 }
-            ],
-            tamanios: [],
-            maxQuantity: 30
-        },
-        {
-            id: 4,
-            nombre: "Stretch Film",
-            descripcion: "Ideal para embalar y proteger todos tus envíos.",
-            dimensiones: "Varios tamaños",
-            precio: 12.00,
-            imagen: "/static/img/stretchfilm.png",
-            tamanios: ["9''", "15''"],
-            preciosPorTamanio: {
-                "9''": {
-                    precio: 12.00,
-                    preciosVolumen: [
-                        { precio: 11.00, cantidad: 5 },
-                        { precio: 10.00, cantidad: 10 }
-                    ]
-                },
-                "15''": {
-                    precio: 18.00,
-                    preciosVolumen: [
-                        { precio: 16.50, cantidad: 5 },
-                        { precio: 15.00, cantidad: 10 }
-                    ]
-                }
-            },
-            tamanioActivo: "9''",
-            maxQuantity: 20
-        },
-        {
-            id: 5,
-            nombre: "Burbupack",
-            descripcion: "Lámina de plástico burbuja para proteger objetos frágiles.",
-            dimensiones: "1m x 1m",
-            precio: 2.50,
-            imagen: "/static/img/burbupack.png",
-            tamanios: ["1m x 1m", "1m x 2m", "2m x 2m"],
-            preciosPorTamanio: {
-                "1m x 1m": {
-                    precio: 2.50,
-                    preciosVolumen: [
-                        { precio: 2.30, cantidad: 10 },
-                        { precio: 2.00, cantidad: 20 }
-                    ]
-                },
-                "1m x 2m": {
-                    precio: 4.50,
-                    preciosVolumen: [
-                        { precio: 4.20, cantidad: 10 },
-                        { precio: 3.80, cantidad: 20 }
-                    ]
-                },
-                "2m x 2m": {
-                    precio: 8.00,
-                    preciosVolumen: [
-                        { precio: 7.50, cantidad: 10 },
-                        { precio: 7.00, cantidad: 20 }
-                    ]
-                }
-            },
-            tamanioActivo: "1m x 1m",
-            maxQuantity: 40
-        }
-    ];
+      const priceSpan = document.createElement('span');
+      priceSpan.classList.add('etiqueta-precio');
+      priceSpan.textContent = `s/. ${desc.value.toFixed(2)}`;
 
-    // Estado actual
-    let productoActualIndex = 0;
-    let currentQuantity = 1;
+      const nameSpan = document.createElement('span');
+      nameSpan.classList.add('etiqueta-cantidad');
+      nameSpan.textContent = desc.name;
 
-    // Inicialización
-    function inicializarPagina() {
-        // Crear miniaturas para navegación
-        crearMiniaturas();
+      div.appendChild(priceSpan);
+      div.appendChild(nameSpan);
+      discountContainer.appendChild(div);
+    });
+  }
 
-        // Cargar producto inicial
-        cargarProducto(productoActualIndex);
+  function updateProductInfo(key) {
+    currentKey = key;
+    const data = productos[key];
+    if (!data) return;
 
-        // Cargar productos relacionados
-        if (productosRelacionadosGrid) {
-            cargarProductosRelacionados();
-        }
+    productImage.src = data.image;
+    productImage.alt = data.name_product || '';
+    dimensionsElement.textContent = data.dimensions || '';
+    titulo.textContent = data.name_product || '';
 
-        // Configurar eventos
-        configurarEventos();
-
-        // Inicializar control de cantidad
-        inicializarControlCantidad();
-
-        // Añadir estilos para descuentos activos
-        añadirEstilosDescuentos();
-
-        // Ajustar responsividad
-        ajustarResponsividad();
-        window.addEventListener('resize', ajustarResponsividad);
-    }
-
-    // Añadir estilos para resaltar los descuentos activos
-    function añadirEstilosDescuentos() {
-        const style = document.createElement('style');
-        style.textContent = `
-            .precio-volumen-item.active-discount {
-                border: 2px solid #1a3c5b;
-                transform: scale(1.05);
-                background-color: #e8f4f8;
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            }
-            .quantity-limit.active {
-                color: #e74c3c;
-                font-weight: bold;
-                transform: scale(1.05);
-                transition: all 0.3s ease;
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    // Ajustar responsividad según el tamaño de la ventana
-    function ajustarResponsividad() {
-        const productoDetalle = document.querySelector('.producto-detalle');
-        if (productoDetalle) {
-            if (window.innerWidth <= 768) {
-                productoDetalle.style.flexDirection = 'column';
-            } else {
-                productoDetalle.style.flexDirection = 'row';
-            }
-        }
-    }
-
-    // Crear miniaturas para navegación
-    function crearMiniaturas() {
-        if (!thumbsContainer) return;
-
-        thumbsContainer.innerHTML = '';
-
-        productos.forEach((producto, index) => {
-            const thumbItem = document.createElement('div');
-            thumbItem.classList.add('thumb-item');
-            if (index === productoActualIndex) {
-                thumbItem.classList.add('active');
-            }
-
-            thumbItem.innerHTML = `
-                <img src="${producto.imagen}" alt="${producto.nombre}">
-                <p>${producto.nombre}</p>
-            `;
-
-            thumbItem.addEventListener('click', () => {
-                productoActualIndex = index;
-                cargarProducto(index);
-                actualizarMiniaturaActiva();
-                if (productosRelacionadosGrid) {
-                    cargarProductosRelacionados();
-                }
-            });
-
-            thumbsContainer.appendChild(thumbItem);
+    // Tamaños si existen (adapta según tu estructura)
+    if (data.tamanios && data.tamanios.length > 0) {
+      sizeOptions.innerHTML = '';
+      sizeOptions.style.display = 'flex';
+      data.tamanios.forEach(t => {
+        const btn = document.createElement('button');
+        btn.classList.add('size-btn');
+        btn.textContent = t;
+        btn.dataset.size = t;
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          updatePrice();
         });
+        sizeOptions.appendChild(btn);
+      });
+      sizeOptions.firstChild.classList.add('active');
+    } else {
+      sizeOptions.style.display = 'none';
+      sizeOptions.innerHTML = '';
     }
 
-    // Actualizar miniatura activa
-    function actualizarMiniaturaActiva() {
-        const thumbItems = document.querySelectorAll('.thumb-item');
-        thumbItems.forEach((item, index) => {
-            if (index === productoActualIndex) {
-                item.classList.add('active');
-            } else {
-                item.classList.remove('active');
-            }
-        });
+    currentQuantity = 1;
+    qtyInput.value = 1;
+    quantityLimit.textContent = `Máximo: ${data.stock || 100} unidades`;
+
+    updateDiscountCards(data.discounts);
+    updatePrice();
+  }
+
+  function updatePrice() {
+    const data = productos[currentKey];
+    if (!data) return;
+
+    let price = data.price;
+    let bestDiscountPrice = null;
+    let bestVolume = 0;
+
+    if (data.discounts && data.discounts.length > 0) {
+      data.discounts.forEach(desc => {
+        const match = desc.name.match(/\d+/);
+        if (!match) return;
+        const volumen = parseInt(match[0], 10);
+        if (currentQuantity >= volumen && volumen > bestVolume) {
+          bestVolume = volumen;
+          bestDiscountPrice = desc.value;
+        }
+      });
     }
 
-    // Cargar datos del producto
-    function cargarProducto(index) {
-        const producto = productos[index];
+    if (bestDiscountPrice !== null) price = bestDiscountPrice;
 
-        // Actualizar información básica del producto
-        if (productoImg) {
-            productoImg.src = producto.imagen;
-            productoImg.alt = producto.nombre;
+    const totalPrice = price * currentQuantity;
+    priceElement.textContent = totalPrice.toFixed(2);
+
+    // Resaltar descuento aplicado
+    const discountItems = discountContainer.querySelectorAll('.precio-volumen-item');
+    discountItems.forEach(item => item.classList.remove('active-discount'));
+    if (bestVolume > 0 && discountItems.length) {
+      for (let i = 0; i < data.discounts.length; i++) {
+        if (data.discounts[i].value === bestDiscountPrice) {
+          discountItems[i].classList.add('active-discount');
+          break;
         }
+      }
+    }
+  }
 
-        if (productoTitulo) productoTitulo.textContent = producto.nombre;
-        if (productoDescripcion) productoDescripcion.textContent = producto.descripcion;
-        if (productoDimensiones) productoDimensiones.textContent = producto.dimensiones;
+  function updateQuantity(val) {
+    let n = parseInt(val, 10);
+    if (isNaN(n) || n < 1) n = 1;
+    else if (n > (productos[currentKey].stock || 100)) {
+      n = productos[currentKey].stock || 100;
+      quantityLimit.classList.add('active');
+      setTimeout(() => quantityLimit.classList.remove('active'), 1500);
+    }
+    currentQuantity = n;
+    qtyInput.value = n;
+    decreaseBtn.disabled = n === 1;
+    increaseBtn.disabled = n === (productos[currentKey].stock || 100);
+    updatePrice();
+  }
 
-        // Actualizar opciones de tamaño
-        if (sizeOptions) {
-            cargarOpcionesTamanio(producto.tamanios, producto.tamanioActivo);
+  function renderThumbnails() {
+    if (!thumbsContainer) return;
+    thumbsContainer.innerHTML = '';
+
+    keys.forEach(key => {
+      const prod = productos[key];
+      const thumb = document.createElement('div');
+      thumb.classList.add('thumb-item');
+      if (key === currentKey) thumb.classList.add('active');
+
+      thumb.innerHTML = `
+        <img src="${prod.image}" alt="${prod.name_product}">
+        <p>${prod.name_product}</p>
+      `;
+
+      thumb.addEventListener('click', () => {
+        updateProductInfo(key);
+        document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
+        thumb.classList.add('active');
+      });
+
+      thumbsContainer.appendChild(thumb);
+    });
+  }
+
+  decreaseBtn.addEventListener('click', () => updateQuantity(currentQuantity - 1));
+  increaseBtn.addEventListener('click', () => updateQuantity(currentQuantity + 1));
+  qtyInput.addEventListener('change', () => updateQuantity(qtyInput.value));
+  qtyInput.addEventListener('input', () => updateQuantity(qtyInput.value));
+
+  qtyInput.addEventListener('keydown', e => {
+    const allowedKeys = [8,9,13,27,46,35,36,37,39];
+    if (
+      allowedKeys.includes(e.keyCode) ||
+      ([65,67,86,88].includes(e.keyCode) && e.ctrlKey)
+    ) return;
+    if ((e.shiftKey || e.keyCode < 48 || e.keyCode > 57) && (e.keyCode < 96 || e.keyCode > 105)) {
+      e.preventDefault();
+      return;
+    }
+    const {value, selectionStart, selectionEnd} = qtyInput;
+    const char = e.key;
+    let next = value;
+    if (selectionStart === selectionEnd) {
+      next = value.slice(0, selectionStart) + char + value.slice(selectionEnd);
+    }
+    if (parseInt(next, 10) > (productos[currentKey].stock || 100)) {
+      e.preventDefault();
+      quantityLimit.classList.add('active');
+      setTimeout(() => quantityLimit.classList.remove('active'), 1500);
+    }
+  });
+
+  addToCartBtn.addEventListener('click', () => {
+    if (currentQuantity < 1 || currentQuantity > (productos[currentKey].stock || 100)) {
+      quantityLimit.classList.add('active');
+      setTimeout(() => quantityLimit.classList.remove('active'), 1500);
+      return;
+    }
+    const data = productos[currentKey];
+    if (!data) return;
+
+    let unitPrice = data.price;
+
+    if (data.discounts && data.discounts.length > 0) {
+      let bestDiscountPrice = null;
+      let bestVolume = 0;
+
+      data.discounts.forEach((desc) => {
+        const match = desc.name.match(/\d+/);
+        if (!match) return;
+        const volumen = parseInt(match[0], 10);
+        if (currentQuantity >= volumen && volumen > bestVolume) {
+          bestVolume = volumen;
+          bestDiscountPrice = desc.value;
         }
+      });
 
-        // Resetear cantidad y actualizar límite
-        if (qtyInput) {
-            qtyInput.value = 1;
-            currentQuantity = 1;
-            actualizarLimiteQuantidad(producto.maxQuantity);
-            validarCantidad();
-        }
-
-        // Actualizar precios según tamaño
-        actualizarPrecio();
+      if (bestDiscountPrice !== null && bestDiscountPrice < unitPrice) {
+        unitPrice = bestDiscountPrice;
+      }
     }
 
-    // Cargar opciones de tamaño
-    function cargarOpcionesTamanio(tamanios, tamanioActivo) {
-        if (!sizeOptions) return;
+    const total = (unitPrice * currentQuantity).toFixed(2);
 
-        sizeOptions.innerHTML = '';
+    const producto = {
+      size: currentKey,
+      quantity: currentQuantity,
+      unitPrice: unitPrice,
+      totalPrice: parseFloat(total),
+      name: data.name_product,
+      image: data.image,
+    };
 
-        if (tamanios.length === 0) {
-            sizeOptions.style.display = 'none';
-            return;
-        }
-
-        sizeOptions.style.display = 'flex';
-
-        tamanios.forEach(tamanio => {
-            const sizeBtn = document.createElement('button');
-            sizeBtn.classList.add('size-btn');
-            sizeBtn.textContent = tamanio;
-
-            if (tamanio === tamanioActivo) {
-                sizeBtn.classList.add('active');
-            }
-
-            sizeBtn.addEventListener('click', () => {
-                // Actualizar tamaño activo en el objeto del producto
-                productos[productoActualIndex].tamanioActivo = tamanio;
-
-                // Actualizar UI
-                document.querySelectorAll('.size-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                sizeBtn.classList.add('active');
-
-                // Actualizar precio según el tamaño seleccionado
-                actualizarPrecio();
-            });
-
-            sizeOptions.appendChild(sizeBtn);
-        });
+    let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+    const index = carrito.findIndex(item => item.size === producto.size && item.name === producto.name);
+    if (index !== -1) {
+      carrito[index].quantity += producto.quantity;
+      carrito[index].totalPrice = carrito[index].unitPrice * carrito[index].quantity;
+    } else {
+      carrito.push(producto);
     }
+    localStorage.setItem('carrito', JSON.stringify(carrito));
 
-    // Actualizar precio según el tamaño y la cantidad (FUNCIÓN MODIFICADA)
-    function actualizarPrecio() {
-        const producto = productos[productoActualIndex];
-        if (!producto) return;
+    alert(
+      `Agregaste ${producto.quantity} × ${producto.name} al carrito\nUnitario: S/ ${producto.unitPrice.toFixed(2)}\nTotal: S/ ${producto.totalPrice.toFixed(2)}`
+    );
+  });
 
-        // Determinar el precio base según el tamaño
-        let precioBase = producto.precio;
-        let preciosVol = producto.preciosVolumen || [];
+  // Agregar estilos para descuentos activos
+  const style = document.createElement('style');
+  style.textContent = `
+    .precio-volumen-item.active-discount {
+      border: 2px solid #1a3c5b;
+      transform: scale(1.05);
+      background-color: #e8f4f8;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }`;
+  document.head.appendChild(style);
 
-        // Si tiene precios por tamaño y un tamaño activo
-        if (producto.preciosPorTamanio && producto.tamanioActivo) {
-            const precioInfo = producto.preciosPorTamanio[producto.tamanioActivo];
-            if (precioInfo) {
-                precioBase = precioInfo.precio;
-                preciosVol = precioInfo.preciosVolumen || [];
-            }
-        }
+  function adjustResponsiveness() {
+    const det = document.querySelector('.producto-detalle');
+    det.style.flexDirection = window.innerWidth <= 768 ? 'column' : 'row';
+  }
+  adjustResponsiveness();
+  window.addEventListener('resize', adjustResponsiveness);
 
-        // Ordenar descuentos de menor a mayor cantidad
-        preciosVol.sort((a, b) => a.cantidad - b.cantidad);
-
-        // Aplicar el descuento más alto que sea menor o igual a la cantidad
-        let precioFinal = precioBase;
-        for (const descuento of preciosVol) {
-            if (currentQuantity >= descuento.cantidad) {
-                precioFinal = descuento.precio;
-            } else {
-                break; // Los descuentos están ordenados, podemos salir del bucle
-            }
-        }
-
-        // Actualizar precio en la interfaz
-        if (precioPrincipal) {
-            precioPrincipal.textContent = precioFinal.toFixed(2);
-        }
-
-        // Actualizar precios volumen
-        if (preciosVolumen) {
-            cargarPreciosVolumen(preciosVol);
-            resaltarDescuentoActivo(currentQuantity, preciosVol);
-        }
-    }
-
-    // Cargar precios por volumen (función modificada para mantener el orden correcto)
-    function cargarPreciosVolumen(precios) {
-        if (!preciosVolumen) return;
-
-        preciosVolumen.innerHTML = '';
-
-        // Ordenar de menor a mayor cantidad para mostrar en la UI
-        const preciosOrdenados = [...precios].sort((a, b) => a.cantidad - b.cantidad);
-
-        preciosOrdenados.forEach(precio => {
-            const precioItem = document.createElement('div');
-            precioItem.classList.add('precio-volumen-item');
-
-            precioItem.innerHTML = `
-            <span class="etiqueta-precio">S/ ${precio.precio.toFixed(2)}</span>
-            <span class="etiqueta-cantidad">a partir de ${precio.cantidad} uds.</span>
-        `;
-
-            preciosVolumen.appendChild(precioItem);
-        });
-    }
-
-    // Resaltar el descuento activo según la cantidad (FUNCIÓN MODIFICADA)
-    function resaltarDescuentoActivo(cantidad, preciosVol) {
-        const discountItems = document.querySelectorAll('.precio-volumen-item');
-
-        // Quitar resaltado de todos los items
-        discountItems.forEach(item => {
-            item.classList.remove('active-discount');
-        });
-
-        // Si no hay descuentos o no hay elementos visuales, salir
-        if (!preciosVol.length || !discountItems.length) return;
-
-        // Encontrar el descuento activo más alto
-        let descuentoActivoIndex = -1;
-        for (let i = 0; i < preciosVol.length; i++) {
-            if (cantidad >= preciosVol[i].cantidad) {
-                descuentoActivoIndex = i;
-            } else {
-                break;
-            }
-        }
-
-        // Resaltar el descuento activo si se encontró
-        if (descuentoActivoIndex !== -1) {
-            discountItems[descuentoActivoIndex].classList.add('active-discount');
-        }
-    }
-
-    // Actualizar mensaje de límite de cantidad
-    function actualizarLimiteQuantidad(maxQty) {
-        if (quantityLimit) {
-            quantityLimit.textContent = `Máximo: ${maxQty} unidades`;
-        }
-    }
-
-    // Mostrar alerta de límite
-    function mostrarAlertaLimite() {
-        quantityLimit.classList.add('active');
-        setTimeout(() => {
-            quantityLimit.classList.remove('active');
-        }, 1500);
-    }
-
-    // Validar la cantidad
-    function validarCantidad() {
-        if (!qtyInput) return;
-
-        const producto = productos[productoActualIndex];
-        if (!producto) return;
-
-        const maxQty = producto.maxQuantity;
-        let cantidad = parseInt(qtyInput.value);
-
-        // Validar valor
-        if (isNaN(cantidad) || cantidad < 1) {
-            cantidad = 1;
-        } else if (cantidad > maxQty) {
-            cantidad = maxQty;
-            mostrarAlertaLimite();
-        }
-
-        // Actualizar input y estado
-        qtyInput.value = cantidad;
-        currentQuantity = cantidad;
-
-        // Actualizar estado de botones
-        if (decreaseBtn) decreaseBtn.disabled = cantidad <= 1;
-        if (increaseBtn) increaseBtn.disabled = cantidad >= maxQty;
-
-        // Actualizar precio según cantidad
-        actualizarPrecio();
-    }
-
-    // Inicializar control de cantidad
-    function inicializarControlCantidad() {
-        if (!qtyInput) return;
-
-        // Eliminar readonly si existe
-        qtyInput.removeAttribute('readonly');
-        qtyInput.type = 'number';
-
-        // Manejar cambios en el input
-        qtyInput.addEventListener('input', validarCantidad);
-        qtyInput.addEventListener('blur', validarCantidad);
-
-        // Para evitar valores no numéricos
-        qtyInput.addEventListener('keydown', function (e) {
-            // Permitir: backspace, delete, tab, escape, enter
-            if ([46, 8, 9, 27, 13].indexOf(e.keyCode) !== -1 ||
-                // Permitir: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-                (e.keyCode === 65 && e.ctrlKey === true) ||
-                (e.keyCode === 67 && e.ctrlKey === true) ||
-                (e.keyCode === 86 && e.ctrlKey === true) ||
-                (e.keyCode === 88 && e.ctrlKey === true) ||
-                // Permitir: home, end, left, right
-                (e.keyCode >= 35 && e.keyCode <= 39)) {
-                return;
-            }
-
-            // Asegurarse de que sea un número
-            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) &&
-                (e.keyCode < 96 || e.keyCode > 105)) {
-                e.preventDefault();
-                return;
-            }
-
-            // Comprobar si excederá el límite máximo
-            const currentValue = qtyInput.value;
-            const selectionStart = qtyInput.selectionStart;
-            const selectionEnd = qtyInput.selectionEnd;
-            const keyValue = e.key;
-
-            // Si no hay selección (solo se está añadiendo un dígito)
-            if (selectionStart === selectionEnd) {
-                const newValue = currentValue.slice(0, selectionStart) + keyValue + currentValue.slice(selectionEnd);
-                const producto = productos[productoActualIndex];
-
-                if (parseInt(newValue) > producto.maxQuantity) {
-                    e.preventDefault();
-                    mostrarAlertaLimite();
-                }
-            }
-        });
-    }
-
-    // Cargar productos relacionados
-    function cargarProductosRelacionados() {
-        if (!productosRelacionadosGrid) return;
-
-        productosRelacionadosGrid.innerHTML = '';
-
-        // Mostrar productos aleatorios diferentes al actual
-        const productosDisponibles = [...productos];
-        productosDisponibles.splice(productoActualIndex, 1);
-
-        // Mezclar el array para productos aleatorios
-        const productosAleatorios = mezclarArray(productosDisponibles).slice(0, 4);
-
-        productosAleatorios.forEach(producto => {
-            const productoItem = document.createElement('div');
-            productoItem.classList.add('producto-item');
-
-            productoItem.innerHTML = `
-                <img src="${producto.imagen}" alt="${producto.nombre}">
-                <h3>${producto.nombre}</h3>
-                <p>S/ ${producto.precio.toFixed(2)}</p>
-            `;
-
-            productoItem.addEventListener('click', () => {
-                // Encontrar índice del producto seleccionado
-                const nuevoIndex = productos.findIndex(p => p.id === producto.id);
-                if (nuevoIndex !== -1) {
-                    productoActualIndex = nuevoIndex;
-                    cargarProducto(nuevoIndex);
-                    actualizarMiniaturaActiva();
-
-                    // Hacer scroll hacia arriba para mostrar el producto
-                    const productoDetalle = document.querySelector('.producto-detalle');
-                    if (productoDetalle) {
-                        productoDetalle.scrollIntoView({
-                            behavior: 'smooth'
-                        });
-                    }
-
-                    // Recargar productos relacionados
-                    cargarProductosRelacionados();
-                }
-            });
-
-            productosRelacionadosGrid.appendChild(productoItem);
-        });
-    }
-
-    // Mezclar array (algoritmo Fisher-Yates)
-    function mezclarArray(array) {
-        const newArray = [...array];
-        for (let i = newArray.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-        }
-        return newArray;
-    }
-
-    // Configurar eventos principales
-    function configurarEventos() {
-        // Navegación entre productos
-        if (prevBtn) {
-            prevBtn.addEventListener('click', () => {
-                productoActualIndex = (productoActualIndex - 1 + productos.length) % productos.length;
-                cargarProducto(productoActualIndex);
-                actualizarMiniaturaActiva();
-                if (productosRelacionadosGrid) {
-                    cargarProductosRelacionados();
-                }
-            });
-        }
-
-        if (nextBtn) {
-            nextBtn.addEventListener('click', () => {
-                productoActualIndex = (productoActualIndex + 1) % productos.length;
-                cargarProducto(productoActualIndex);
-                actualizarMiniaturaActiva();
-                if (productosRelacionadosGrid) {
-                    cargarProductosRelacionados();
-                }
-            });
-        }
-
-        // Control de cantidad
-        if (decreaseBtn) {
-            decreaseBtn.addEventListener('click', () => {
-                if (!qtyInput) return;
-
-                let cantidad = parseInt(qtyInput.value);
-                if (cantidad > 1) {
-                    qtyInput.value = cantidad - 1;
-                    validarCantidad();
-                }
-            });
-        }
-
-        if (increaseBtn) {
-            increaseBtn.addEventListener('click', () => {
-                if (!qtyInput) return;
-
-                let cantidad = parseInt(qtyInput.value);
-                qtyInput.value = cantidad + 1;
-                validarCantidad();
-            });
-        }
-
-        // Botón de agregar al carrito
-        if (addToCartBtn) {
-            addToCartBtn.addEventListener('click', () => {
-                const producto = productos[productoActualIndex];
-                if (!producto) return;
-
-                const cantidad = parseInt(qtyInput.value);
-                if (isNaN(cantidad) || cantidad < 1 || cantidad > producto.maxQuantity) {
-                    mostrarAlertaLimite();
-                    return;
-                }
-
-                // Determinar tamaño seleccionado
-                let tamanioSeleccionado = '';
-                if (producto.tamanios && producto.tamanios.length > 0 && producto.tamanioActivo) {
-                    tamanioSeleccionado = producto.tamanioActivo;
-                }
-
-                // Determinar precio unitario
-                let precioUnitario = producto.precio;
-                let preciosVol = producto.preciosVolumen || [];
-
-                if (producto.preciosPorTamanio && producto.tamanioActivo) {
-                    const precioInfo = producto.preciosPorTamanio[producto.tamanioActivo];
-                    if (precioInfo) {
-                        precioUnitario = precioInfo.precio;
-                        preciosVol = precioInfo.preciosVolumen || [];
-                    }
-                }
-
-                // Ordenar descuentos de menor a mayor cantidad
-                preciosVol.sort((a, b) => a.cantidad - b.cantidad);
-
-                // Calcular precio con descuento por volumen si aplica
-                for (const descuento of preciosVol) {
-                    if (cantidad >= descuento.cantidad) {
-                        precioUnitario = descuento.precio;
-                    } else {
-                        break;
-                    }
-                }
-
-                // Calcular precio total
-                const precioTotal = (precioUnitario * cantidad).toFixed(2);
-
-                // Mensaje de confirmación
-                alert(`Se han agregado ${cantidad} unidades de ${producto.nombre} ${tamanioSeleccionado ? '- ' + tamanioSeleccionado : ''} al carrito
-Precio unitario: S/ ${precioUnitario.toFixed(2)}
-Total: S/ ${precioTotal}`);
-            });
-        }
-    }
-
-    // Iniciar la página
-    inicializarPagina();
+  // Inicializar todo
+  updateProductInfo(currentKey);
+  renderThumbnails();
+  updateQuantity(currentQuantity);
 });
