@@ -1732,6 +1732,7 @@ paginas_simples = [
     'prueba_seguimiento',
     'cajas',
     'cajas_prueba',
+    'articulos',
     'sobre_nosotros',
     'TerminosCondiciones',
     'salidas_programadas', #para eliminar
@@ -1817,11 +1818,35 @@ def api_cajas():
     return jsonify(productSizes)
 
 
+@app.route("/api/articulos")
+def api_articulos():
+    filas = controlador_articulo.get_table_with_discount()
+    articulos = {}
+
+    for fila in filas:
+        if not fila['activo']:
+            continue
+
+        key = fila['nom_articulo'].lower()
+        if key not in articulos:
+            articulos[key] = {
+                "name_product": fila['nom_articulo'],
+                "price": float(fila['precio']),
+                "stock": fila['stock'],
+                "dimensions": fila['dimensiones'] or '',
+                "image": fila['img'] or '',
+                "size_name": fila['tam_nombre'] or '',
+                "discounts": []
+            }
+        if fila['cantidad_descuento'] and fila['nom_descuento']:
+            articulos[key]["discounts"].append({
+                "name": fila['nom_descuento'],
+                "value": float(fila['cantidad_descuento'])
+            })
+
+    return jsonify(articulos)
 
 
-@app.route("/articulos")
-def articulos():
-    return render_template('articulos.html')
 
 
 @app.route("/carrito")
