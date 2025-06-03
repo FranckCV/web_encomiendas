@@ -38,7 +38,7 @@ from controladores import controlador_descuento_articulo as controlador_descuent
 from controladores import controlador_salida as controlador_salida
 from controladores import controlador_reclamo as controlador_reclamo
 from controladores import controlador_preguntas_frecuentes as controlador_pregunta_frecuente
-
+from controladores import reporte_ingresos as reporte_ingresos
 
 
 import hashlib
@@ -1189,6 +1189,25 @@ REPORTES = {
             ['fecha', 'Fecha', None, 'interval_date' ],
         ] ,
     },
+    "listado_general_empleados_rol": {
+        "active": True,
+        "icon_page": "fa-solid fa-user-tie",
+        "titulo": "Listado de empleados por rol",
+        "table": controlador_empleado.get_report_test(),
+        "filters": [
+            ['rol_id', 'Rol', lambda: controlador_rol.get_options()],
+        ],
+    },
+
+    "ingresos_periodo": {
+        "active": True,
+        "icon_page": "fa-solid fa-coins",  # Puedes cambiar este ícono si quieres otro
+        "titulo": "Reporte de ingresos por periodo",
+        "table": reporte_ingresos.get_ingresos_diarios(),
+        "filters": [],  # No se requiere filtro por ahora
+    },
+
+
 }
 
 
@@ -1679,7 +1698,9 @@ paginas_simples = [
     'salidas_programadas', #para eliminar
     'mapa_curds',
     'envio_masivo',
-    'salida_informacion'
+    'salida_informacion',
+    'cambiar_contrasenia',
+    'programacion_devolucion'
 ]
 
 
