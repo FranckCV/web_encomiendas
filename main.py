@@ -40,7 +40,12 @@ from controladores import controlador_descuento_articulo as controlador_descuent
 from controladores import controlador_salida as controlador_salida
 from controladores import controlador_reclamo as controlador_reclamo
 from controladores import controlador_preguntas_frecuentes as controlador_pregunta_frecuente
+<<<<<<< HEAD
+from controladores import controlador_regla_cargo as controlador_regla_cargo
 
+=======
+from controladores import reporte_ingresos as reporte_ingresos
+>>>>>>> 8cc40e7272df8f6b4fad232eae40ffa4f72304f4
 
 
 import hashlib
@@ -1246,6 +1251,24 @@ REPORTES = {
             ['fecha', 'Fecha', None, 'interval_date' ],
         ] ,
     },
+    "listado_general_empleados_rol": {
+        "active": True,
+        "icon_page": "fa-solid fa-user-tie",
+        "titulo": "Listado de empleados por rol",
+        "table": controlador_empleado.get_report_test(),
+        "filters": [
+            ['rol_id', 'Rol', lambda: controlador_rol.get_options()],
+        ],
+    },
+
+    "ingresos_periodo": {
+        "active": True,
+        "icon_page": "fa-solid fa-coins",  # Puedes cambiar este ícono si quieres otro
+        "titulo": "Reporte de ingresos por periodo",
+        "table": reporte_ingresos.get_ingresos_diarios(),
+        "filters": [],  # No se requiere filtro por ahora
+    },
+
     "reporte_usuarios": {
         "active": True,
         "icon_page": "fa-solid fa-users",
@@ -1774,7 +1797,9 @@ paginas_simples = [
     'TerminosCondiciones',
     'salidas_programadas', #para eliminar
     'mapa_curds',
-    'salida_informacion'
+    'salida_informacion',
+    'cambiar_contrasenia',
+    'programacion_devolucion',
 ]
 
 
@@ -1929,15 +1954,24 @@ def mostrar_pagoenvio():
 def envio_masivo():
     nombre_doc = controlador_tipo_documento.get_options()
     nombre_rep = controlador_tipo_recepcion.get_options()
-    sucursales = controlador_sucursal.get_ubigeo()
+    rutas_tarifas = controlador_tarifa_ruta.get_sucursales_origen_destino()
     articulos = controlador_contenido_paquete.get_options()
     empaque = controlador_tipo_empaque.get_options()
+    condiciones = controlador_regla_cargo.get_condiciones_tarifa()
+    tarifas = controlador_tarifa_ruta.get_tarifas_ruta_dict()
     return render_template('envio_masivo.html', 
                            nombre_doc=nombre_doc,
                            nombre_rep=nombre_rep,
-                           sucursales=json.dumps(sucursales), 
-                           empaque= empaque, 
-                           articulos=articulos)     
+                           rutasTarifas=json.dumps(rutas_tarifas), 
+                           tarifas = json.dumps(tarifas),
+                           empaque=empaque, 
+                           articulos=articulos,
+                           condiciones=condiciones)
+    
+    
+    
+    
+    
 
 ################# Sucursales ######################
 

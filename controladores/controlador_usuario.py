@@ -38,26 +38,31 @@ def table_fetchall():
 
 
 def get_table():
-    sql= f'''
-        select 
-            usu.id ,
-            usu.correo ,
-            usu.contrasenia ,
-            usu.tipo_usuario ,
-            usu.activo 
-        from {table_name} usu
-
+    sql = f'''
+        SELECT 
+            usu.id,
+            usu.correo,
+            -- usu.contrasenia,  -- comentado según tu ejemplo
+            CASE 
+                WHEN usu.tipo_usuario = 'E' THEN 'Empleado'
+                WHEN usu.tipo_usuario = 'C' THEN 'Cliente'
+                ELSE 'Otro'
+            END AS tipo_usuario,
+            usu.activo
+        FROM {table_name} usu
     '''
+    
     columnas = {
-        'id': ['ID' , 0.5] , 
-        'correo' : ['Correo' , 4.5] , 
-        'contrasenia' : ['Contraseña' , 4.5] , 
-        'tipo_usuario' : ['Tipo Usuario' , 4.5] , 
-        'activo' : ['Actividad' , 1] 
-        }
+        'id'           : ['ID', 0.5],
+        'correo'       : ['Correo', 4.5],
+        'tipo_usuario' : ['Tipo Usuario', 4.5],
+        'activo'       : ['Actividad', 1],
+    }
+
     filas = sql_select_fetchall(sql)
     
-    return columnas , filas
+    return columnas, filas
+
 
 
 ######_ CRUD ESPECIFICAS _###### 

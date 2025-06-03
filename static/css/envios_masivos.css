@@ -511,12 +511,12 @@ tr:hover {
 
 .badge-domicilio {
     background: #e6fffa;
-    color: #047857;
+    color: #075741;
 }
 
 .badge-agencia {
     background: #fef3c7;
-    color: #92400e;
+    color: #c3906f;
 }
 
 .badge-express {
@@ -942,11 +942,12 @@ textarea:required:user-invalid {
             font-size: 0.8rem;
             color: #c05621;
             font-style: italic;
+            text-align: center;
         }
 
         .btn-ver-detalle-nuevo {
             width: 100%;
-            background: #667eea;
+            background: #061d86;
             color: white;
             border: none;
             padding: 0.8rem 1.5rem;

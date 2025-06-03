@@ -87,4 +87,57 @@ def update_row(sucursal_origen_id, sucursal_destino_id, tarifa):
 
 #####_ ADICIONALES _#####
 
+def get_sucursales_origen_destino():
+    sql = '''
+        SELECT 
+            s_origen.id AS id_origen,
+            u_origen.departamento AS dep_origen,
+            u_origen.provincia AS prov_origen,
+            u_origen.distrito AS dist_origen,
+            s_origen.direccion AS direc_origen,
+            
+            s_destino.id AS id_destino,
+            u_destino.departamento AS dep_destino,
+            u_destino.provincia AS prov_destino,
+            u_destino.distrito AS dist_destino,
+            s_destino.direccion AS direc_destino,
+            
+            tr.tarifa
+        FROM tarifa_ruta tr
+        INNER JOIN sucursal s_origen ON s_origen.id = tr.sucursal_origen_id
+        INNER JOIN ubigeo u_origen ON u_origen.codigo = s_origen.ubigeocodigo
+        INNER JOIN sucursal s_destino ON s_destino.id = tr.sucursal_destino_id
+        INNER JOIN ubigeo u_destino ON u_destino.codigo = s_destino.ubigeocodigo
+    '''
+    filas = sql_select_fetchall(sql)
 
+    estructura = {}
+
+    for fila in filas:
+        origen_key = f"{fila['dep_origen']}|{fila['prov_origen']}|{fila['dist_origen']}"
+        destino = {
+            'id': fila['id_destino'],
+            'departamento': fila['dep_destino'],
+            'provincia': fila['prov_destino'],
+            'distrito': fila['dist_destino'],
+            'direccion': fila['direc_destino'],
+            'tarifa': fila['tarifa'],
+            'id_origen': fila['id_origen'] 
+        }
+
+        estructura.setdefault(origen_key, []).append(destino)
+
+    return estructura
+
+def get_tarifas_ruta_dict():
+    sql = '''
+        SELECT 
+            s_origen.id AS id_origen,
+            s_destino.id AS id_destino,
+            tr.tarifa
+        FROM tarifa_ruta tr
+        INNER JOIN sucursal s_origen ON s_origen.id = tr.sucursal_origen_id
+        INNER JOIN sucursal s_destino ON s_destino.id = tr.sucursal_destino_id
+    '''
+    filas = sql_select_fetchall(sql)
+    return {f"{f['id_origen']}|{f['id_destino']}": f['tarifa'] for f in filas}

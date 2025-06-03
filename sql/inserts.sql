@@ -2407,4 +2407,12 @@ INSERT INTO detalle_reclamo (nombre, descripcion, estado_reclamoid) VALUES
 ('Caso cerrado', 'El caso fue cerrado y archivado tras resolución.', 5);
 
 
+INSERT INTO regla_cargo (id, tipo_condicion, inferior, superior, porcentaje) VALUES
+(1, 'V', 100, 3000, 0.6);
+
+INSERT INTO regla_cargo (id, tipo_condicion, inferior, superior, porcentaje) VALUES
+(2, 'V', 3000, 10000, 2.0);
+
+INSERT INTO regla_cargo (id, tipo_condicion, inferior, superior, porcentaje) VALUES
+(3, 'P', 1, NULL, 0.1);
 

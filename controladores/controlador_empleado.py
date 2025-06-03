@@ -119,3 +119,4 @@ def get_report_test():
     filas = sql_select_fetchall(sql)
     
     return columnas, filas
+
