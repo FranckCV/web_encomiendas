@@ -45,7 +45,7 @@ Registro de Envíos Masivos
   <form id="formulario-envio" class="formulario">
     <!-- SECCIÓN: QUIÉN ENVÍA -->
     <div id="seccion-quien-envia" >
-      <h2 class="titulo-seccion">¿Quién envía?</h2>
+      <h2 class="titulo-seccion">Datos del remitente</h2>
 
       <div id="seccion_remitente">
 
@@ -71,7 +71,7 @@ Registro de Envíos Masivos
             </div>
 
             <div class="campo-grupo">
-              <input type="text" id="remitente-nombre" placeholder="Nombre completo" required>
+              <input type="text" id="remitente-nombre" placeholder="Nombre completo/Razón social" required>
               <small id="mensaje-validacion-nombre" style="color: red; display: none;"></small>
 
             </div>
@@ -84,7 +84,7 @@ Registro de Envíos Masivos
         </div>
     </div>
     <div id="desde-donde-envia" >
-      <h2 class="titulo-seccion">¿Desde dónde envía?</h2>
+      <h2 class="titulo-seccion">Datos del lugar de origen</h2>
 
       <div id="seccion-origen">
          <div class="campos-envio">
@@ -105,6 +105,7 @@ Registro de Envíos Masivos
                   <select id="origen-distrito" required>
                   </select>
                 </div>
+                <input type="hidden" id="origen-sucursal-id" value="">
           </div>
         </div>
     </div>
@@ -168,7 +169,7 @@ Registro de Envíos Masivos
                 <!-- Dirección y Referencia: solo para domicilio -->
                 <div class="campo-grupo" id="grupo-direccion" style="display:none;">
                   <label>Dirección *</label>
-                  <input type="text" id="m-direccion" placeholder="Av./Jr./Calle Nombre #123" required>
+                  <input type="text" id="m-direccion" placeholder="Av./Jr./Calle Nombre #123">
                   <small id="mensaje-validacion-direccion" style="color: red; display: none;"></small>
                 </div>
 
@@ -181,10 +182,13 @@ Registro de Envíos Masivos
                 <!-- Tienda: solo para agencia -->
                 <div class="campo-grupo" id="grupo-tienda" style="display:none;">
                   <label>Sucursal *</label>
-                  <select id="select-sucursal" required>
+                  <select id="select-sucursal">
                   </select>
                 </div>
+                 <input type="hidden" id="destino-sucursal-id" value="">
               </div>
+
+
             </div>
 
             <!-- PESTAÑA PAQUETE -->
@@ -202,7 +206,7 @@ Registro de Envíos Masivos
                 
                 <div class="campo-grupo" id="grupo-articulos" style="display:none;">
                       <label>Tipo de contenido *</label>
-                      <select id="m-tipoArticulo" required>
+                      <select id="m-tipoArticulo">
                       <option disabled selected value="">Seleccione tipo de contenido</option>
                       {% for fila in articulos %}
                         <option value="{{ fila[0] }}">{{ fila[1] }}</option>
@@ -211,7 +215,7 @@ Registro de Envíos Masivos
                   </div>
 
                 <div class="campo-grupo">
-                  <label>Valor (S/) *</label>
+                  <label>Valor del paquete (S/) *</label>
                   <input type="number" id="m-valorEnvio" step="0.01" min="0" placeholder="0.00" required>
                    <small id="mensaje-validacion-email" style="color: red; display: none;"></small>
                 </div>
@@ -267,11 +271,13 @@ Registro de Envíos Masivos
                 <div class="campo-grupo">
                   <label>Nro de documento *</label>
                   <input type="text" id="m-nroDocumento" placeholder="Número de documento" required>
+                   <small id="mensaje-validacion-numero-dest" style="color: red; display: none;"></small>
                 </div>
                 
                 <div class="campo-grupo">
                   <label>Celular *</label>
                   <input type="tel" id="m-celular" required placeholder="999999999" pattern="[0-9]{9}" title="Ingrese 9 dígitos">
+                   <small id="mensaje-validacion-telefono-dest" style="color: red; display: none;"></small>
                 </div>
 
 
@@ -284,11 +290,13 @@ Registro de Envíos Masivos
                     <div class="campo-grupo" id="campo-razon-ruc">
                       <label>Razón Social *</label>
                       <input type="text" id="m-razonSocial" placeholder="Nombre de la empresa">
+                      <span   id="mensaje-validacion-razon-dest"></span>
                     </div>
 
                     <div class="campo-grupo"  id="campo-contacto-ruc">
                       <label>Contacto *</label>
                       <input type="text" id="m-contacto" placeholder="Persona de contacto">
+                      <span   id="mensaje-validacion-contacto-dest"></span>
                     </div>
 
 
@@ -296,11 +304,14 @@ Registro de Envíos Masivos
                 <div id="campos-nombres" class="campo-grupo" style="display:none;">
                   <label>Nombres *</label>
                   <input type="text" id="m-nombres" placeholder="Nombres completos">
+                  <span   id="mensaje-validacion-nombre-dest"></span>
                 </div>
                 
                 <div id="campos-apellidos" class="campo-grupo" style="display:none;">
                   <label>Apellidos *</label>
                   <input type="text" id="m-apellidos" placeholder="Apellidos completos">
+                  <span   id="mensaje-validacion-apellido-dest"></span>
+
                 </div>
 
 
@@ -310,10 +321,11 @@ Registro de Envíos Masivos
             </div>
           </div>
         </div>
+      
 
         <!-- Botones de acción -->
         <div class="form-actions">
-          <button type="button" class="btn-agregar" onclick="agregarEnvio()"> + Agregar envío</button>
+          <button type="button" class="btn-agregar" onclick="mostrarModalConfirmacion()"> + Agregar envío</button>
           <button type="button" class="btn-limpiar" onclick="limpiarFormularioMasivo()">Limpiar formulario</button>
         </div>
       </div>
@@ -346,7 +358,7 @@ Registro de Envíos Masivos
         </div>
 
         <div class="table-actions">
-          <button type="button" class="btn-limpiar-todos" onclick="limpiarTodosEnvios()" title="Eliminar todos los envíos">🗑️ Eliminar todo</button>
+          <button type="button" class="btn-limpiar-todos" onclick="eliminarTodo()" title="Eliminar todos los envíos">🗑️ Eliminar todo</button>
           <button type="button" class="btn-exportar" onclick="exportarCSV()">📥 Exportar CSV</button>
         </div>
       </div>
@@ -360,19 +372,32 @@ Registro de Envíos Masivos
 </div>
 
 
-
-
-
-<!-- Modal de Confirmación -->
 <div id="modalConfirmacion" class="modal-confirm" style="display: none;">
   <div class="modal-content">
     <p>¿Deseas agregar este envío?</p>
     <div class="modal-buttons">
-      <button class="btn_cancel" onclick="cerrarModal()">Cancelar</button>
-      <button class="btn_acept" id="confirmarBtn">Sí, agregar</button>
+      <!-- Agrega type="button" para que NO haga submit -->
+      <button type="button" class="btn_cancel" onclick="cerrarModal()">
+        Cancelar
+      </button>
+      <button type="button" class="btn_acept" id="confirmarBtn">
+        Sí, agregar
+      </button>
     </div>
   </div>
 </div>
+
+<div id="modalValidacion" class="modal-confirm" style="display: none;">
+  <div class="modal-content">
+    <p>Faltan campos por completar</p>
+    <div class="modal-buttons">
+      <button type="button" class="btn_cancel" onclick="cerrarModal()">
+        Entendido
+      </button>
+    </div>
+  </div>
+</div>
+
 
 
 <style>
@@ -407,179 +432,21 @@ Registro de Envíos Masivos
 }
 </style>
 
-  <!-- Modal de Seguro -->
-    <div id="modalSeguro" class="modal-seguro">
-        <div class="modal-seguro-content">
-            <div class="modal-seguro-header">
-                <h3>⚠️ Seguro Obligatorio</h3>
-            </div>
-            
-            <div class="modal-seguro-body">
-                <div class="alerta-valor">
-                    <div class="alerta-valor-monto" id="valorDeclarado">S/ 150.00</div>
-                    <div class="alerta-valor-texto">El valor declarado excede los S/ 100.00</div>
-                </div>
-
-                <div class="porcentaje-seguro">
-                    <div class="porcentaje-valor" id="porcentajeSeguro">2%</div>
-                    <div class="porcentaje-label">Se aplicará porcentaje de seguro</div>
-                </div>
-
-                <ul class="condiciones-lista">
-                    <li>
-                        <div>
-                            <strong>Seguro obligatorio:</strong> Para envíos con valor declarado superior a S/ 100.00, se aplicará automáticamente un seguro del 2% sobre el valor total.
-                        </div>
-                    </li>
-                    <li>
-                        <div>
-                            <strong>Cobertura:</strong> El seguro cubre pérdida total o daños del paquete durante el transporte hasta el monto declarado.
-                        </div>
-                    </li>
-                    <li>
-                        <div>
-                            <strong>Responsabilidad:</strong> El valor declarado debe ser real y verificable. Declaraciones falsas pueden anular la cobertura.
-                        </div>
-                    </li>
-                    <li>
-                        <div>
-                            <strong>Proceso de reclamo:</strong> En caso de siniestro, deberá presentar documentación que respalde el valor declarado.
-                        </div>
-                    </li>
-                    <li>
-                        <div>
-                            <strong>Tiempo de reclamo:</strong> Los reclamos deben reportarse dentro de las 48 horas posteriores a la entrega programada.
-                        </div>
-                    </li>
-                </ul>
-
-                <div style="background: #f7fafc; padding: 1rem; border-radius: 8px; border-left: 4px solid #48bb78;">
-                    <strong>Costo del seguro:</strong> S/ <span id="costoSeguroModal">3.00</span>
-                    <br>
-                    <small style="color: #718096;">Este monto se agregará automáticamente al costo total del envío</small>
-                </div>
-
-                <div class="modal-seguro-buttons">
-                    <button class="btn-modal btn-modal-cancelar" onclick="cerrarModalSeguro()">
-                        Cancelar
-                    </button>
-                    <button class="btn-modal btn-modal-aceptar" onclick="aceptarSeguroYAgregar()">
-                        Acepto y continúo
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Detalle de Tarifa -->
-    <div id="modalDetalleTarifa" class="modal-detalle-tarifa">
-        <div class="modal-detalle-content">
-            <div class="modal-detalle-header">
-                <h3>💰 ¿Por qué este precio?</h3>
-            </div>
-            
-            <div class="modal-detalle-body">
-                <div class="detalle-explicacion">
-                    <h4>📊 Desglose detallado de la tarifa</h4>
-                    
-                    <div class="detalle-item-explicacion">
-                        <div class="detalle-item-titulo">
-                            <span>Tarifa Base</span>
-                            <span class="detalle-item-monto" id="modal-tarifa-base">S/ 18.00</span>
-                        </div>
-                        <div class="detalle-item-descripcion">
-                            Costo estándar por el servicio de transporte entre las ciudades seleccionadas. Esta tarifa se calcula en base a la distancia y zona de cobertura.
-                        </div>
-                    </div>
-
-                    <div class="detalle-item-explicacion" id="explicacion-peso">
-                        <div class="detalle-item-titulo">
-                            <span>Costo Adicional por Peso</span>
-                            <span class="detalle-item-monto" id="modal-costo-peso">S/ 4.00</span>
-                        </div>
-                        <div class="detalle-item-descripcion">
-                            Su paquete excede el peso base incluido (1 kg). Se aplica un costo adicional por cada kilogramo extra.
-                            <div class="detalle-porcentaje">
-                                <span class="detalle-porcentaje-texto" id="detalle-peso-info">Peso adicional: 2 kg × S/ 2.00 = S/ 4.00</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="detalle-item-explicacion" id="explicacion-valor" style="display: none;">
-                        <div class="detalle-item-titulo">
-                            <span>Costo Adicional por Valor Asegurado</span>
-                            <span class="detalle-item-monto" id="modal-costo-valor">S/ 0.00</span>
-                        </div>
-                        <div class="detalle-item-descripcion">
-                            Para paquetes con valor declarado superior a S/ 100.00, se aplica un seguro obligatorio para proteger su envío.
-                            <div class="detalle-porcentaje">
-                                <span class="detalle-porcentaje-texto" id="detalle-valor-info">2% del valor declarado</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="detalle-item-explicacion" id="explicacion-domicilio" style="display: none;">
-                        <div class="detalle-item-titulo">
-                            <span>Costo Adicional por Entrega a Domicilio</span>
-                            <span class="detalle-item-monto" id="modal-costo-domicilio">S/ 0.00</span>
-                        </div>
-                        <div class="detalle-item-descripcion">
-                            Servicio de entrega a domicilio que incluye la llegada de nuestro personal hasta la dirección específica del destinatario.
-                            <div class="detalle-porcentaje">
-                                <span class="detalle-porcentaje-texto">Incremento del 25% sobre la tarifa base</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="background: #f0f4f8; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #667eea;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <strong style="color: #2d3748; font-size: 1.1rem;">Total Final:</strong>
-                        <strong style="color: #667eea; font-size: 1.3rem;" id="modal-total-final">S/ 22.00</strong>
-                    </div>
-                    <small style="color: #718096;">
-                        * Los precios pueden variar según las dimensiones exactas al momento del pesaje
-                    </small>
-                </div>
-            </div>
-
-            <div class="modal-detalle-footer">
-                <button class="btn-cerrar-detalle" onclick="cerrarModalDetalleTarifa()">
-                    Entendido
-                </button>
-            </div>
-        </div>
-    </div>
-
 {% endblock %}
 
 {% block scripts %}
 
-<script>
-function mostrarModalConfirmacion() {
-  document.getElementById('modalConfirmacion').style.display = 'flex';
 
-  // Aseguramos que no se acumulen múltiples listeners
-  const confirmarBtn = document.getElementById('confirmarBtn');
-  confirmarBtn.replaceWith(confirmarBtn.cloneNode(true)); // Reset listener
-  document.getElementById('confirmarBtn').addEventListener('click', () => {
-    cerrarModal();
-    agregarEnvio(); // Solo se llama si confirma
-  });
-}
-
-function cerrarModal() {
-  document.getElementById('modalConfirmacion').style.display = 'none';
-}
-</script>
 
 <script>
   window.CONFIG_ENVIO = {
     tiposDocumento: {{ nombre_doc | tojson }},
     tiposRecepcion: {{ nombre_rep | tojson }},
     tiposEmpaque: {{ empaque | tojson }},
-    rutasTarifas: {{ sucursales | safe }},
-    articulos : {{articulos | tojson}}
+    rutasTarifas: {{ rutasTarifas | safe }},
+    articulos : {{articulos | tojson}},
+    condiciones: {{ condiciones | tojson }},
+    tarifas :{{ tarifas | safe }}
   };
 </script>
 <script src="{{ url_for('static', filename='js/envio_masivo.js') }}"></script>

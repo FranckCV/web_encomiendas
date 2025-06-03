@@ -40,6 +40,7 @@ from controladores import controlador_descuento_articulo as controlador_descuent
 from controladores import controlador_salida as controlador_salida
 from controladores import controlador_reclamo as controlador_reclamo
 from controladores import controlador_preguntas_frecuentes as controlador_pregunta_frecuente
+from controladores import controlador_regla_cargo as controlador_regla_cargo
 
 
 
@@ -1907,12 +1908,16 @@ def envio_masivo():
     rutas_tarifas = controlador_tarifa_ruta.get_sucursales_origen_destino()
     articulos = controlador_contenido_paquete.get_options()
     empaque = controlador_tipo_empaque.get_options()
+    condiciones = controlador_regla_cargo.get_condiciones_tarifa()
+    tarifas = controlador_tarifa_ruta.get_tarifas_ruta_dict()
     return render_template('envio_masivo.html', 
                            nombre_doc=nombre_doc,
                            nombre_rep=nombre_rep,
                            rutasTarifas=json.dumps(rutas_tarifas), 
+                           tarifas = json.dumps(tarifas),
                            empaque=empaque, 
-                           articulos=articulos)
+                           articulos=articulos,
+                           condiciones=condiciones)
     
     
     
