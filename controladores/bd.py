@@ -3,13 +3,8 @@ from pymysql.cursors import DictCursor
 #Establecemos la conexión
 def obtener_conexion():
     return pymysql.connect(host='localhost',
-<<<<<<< HEAD
-                                 port=3306,
-                                #port=3307,
-=======
                                 port=3306,
                                 # port=3307,
->>>>>>> 28c20fde0712b15438aa27f6d7b132f863dbd5f9
                                 user='root',
                                 password='',
                                 db='bd_encomiendas' ,
