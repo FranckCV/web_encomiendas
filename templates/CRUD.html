@@ -12,28 +12,6 @@
 
 {% block estilos %}
 
-<style>
-  @import url("https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css");
-  @import url("../static/css/sucursales.css");
-  @import url("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css");
-
-  .map {
-    width: 100%;
-    height: 275px;
-    /* aspect-ratio: 1 / 1; */
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    cursor: crosshair;
-    border: 1px solid #9c9c9c;
-
-  }
-
-  .map_space {
-    border: 1px solid #9c9c9c;
-    border-radius: 8px;
-
-  }
-</style>
 {% if esReporte %}
 <style>
   .td_content {
@@ -41,6 +19,7 @@
   }
 </style>
 {% endif %}
+
 {% endblock %}
 
 
@@ -141,9 +120,13 @@
       <thead>
         <tr>
           {% for col in key_columns %}
-          <th {% if primary_key==col %} class="td_primary_key" {% elif col=='activo' %}
-            style="width: calc( 1 * var(--width-column) );" {% else %}
-            style="width: calc( {{columnas[col][1]}} * var(--width-column) );" {% endif %}>
+          <th {% if (primary_key is iterable and primary_key is not string and col == primary_key[0]) or col == primary_key %}
+                class="td_primary_key"
+              {% elif col == 'activo' %}
+                style="width: calc( 1 * var(--width-column) );"
+              {% else %}
+                style="width: calc( {{columnas[col][1]}} * var(--width-column) );"
+              {% endif %}>
             <div class="th_content">
               <p>
                 {{ columnas[col][0] }}
@@ -166,9 +149,15 @@
 
         <tr {% for col in table_columns %} data-{{col}}="{{fila[col]}}" {% endfor %}>
           {% for col_name in key_columns %}
-          <td class="{% if primary_key == col_name %} td_primary_key {% endif %}" td_name="{{col_name}}">
+          <td class="
+          {% if primary_key is iterable and primary_key is not string and col_name in primary_key %}
+            td_primary_key
+          {% elif primary_key == col_name %}
+            td_primary_key
+          {% endif %}" 
+          td_name="{{col_name}}">
             <div
-              class="td_content {% if col_name == primary_key %} td_primary_key {% elif col_name == 'activo' %} td_activo {% endif %}">
+              class="td_content {% if (primary_key is iterable and primary_key is not string and col_name in primary_key) or (col_name == primary_key) %}  td_primary_key {% elif col_name == 'activo' %}   td_activo {% endif %}">
               {% if col_name == 'activo' %}
               {% if fila[col_name] == 1 %}
               <p class="activo btn_active">{{STATE_1}}</p>
@@ -190,9 +179,19 @@
           <td class="opciones_column">
             <div class="acciones">
 
+              {% if primary_key is iterable and primary_key is not string %}
+                {% set id_parts = [] %}
+                {% for pk in primary_key %}
+                  {% set _ = id_parts.append(fila[pk]|string) %}
+                {% endfor %}
+                {% set id_pk = id_parts | join('_') %}
+              {% else %}
+                {% set id_pk = fila[primary_key]|string %}
+              {% endif %}
+
               {% if crud_consult %}
               <div class="opciones_fila">
-                <button class="clickable-modal btn_consult" id="modal_crud_consult_{{tabla}}_{{fila[primary_key]}}">
+                <button class="clickable-modal btn_consult" id="modal_crud_consult_{{tabla}}_{{id_pk}}">
                   <i class="{{ICON_CONSULT}}"></i>
                 </button>
               </div>
@@ -201,13 +200,13 @@
               {% if crud_unactive %}
               {% if fila['activo'] == 1 %}
               <div class="opciones_fila">
-                <button class="clickable-modal btn_active" id="modal_crud_unactive_{{tabla}}_{{fila[primary_key]}}">
+                <button class="clickable-modal btn_active" id="modal_crud_unactive_{{tabla}}_{{ id_pk }}">
                   <i class="{{ICON_ACTIVE}}"></i>
                 </button>
               </div>
               {% else %}
               <div class="opciones_fila">
-                <button class="clickable-modal btn_unactive" id="modal_crud_unactive_{{tabla}}_{{fila[primary_key]}}">
+                <button class="clickable-modal btn_unactive" id="modal_crud_unactive_{{tabla}}_{{ id_pk}}">
                   <i class="{{ICON_UNACTIVE}}"></i>
                 </button>
               </div>
@@ -216,7 +215,7 @@
 
               {% if crud_update %}
               <div class="opciones_fila">
-                <button class="clickable-modal btn_update" id="modal_crud_update_{{tabla}}_{{fila[primary_key]}}">
+                <button class="clickable-modal btn_update" id="modal_crud_update_{{tabla}}_{{ id_pk}}">
                   <i class="{{ICON_UPDATE}}"></i>
                 </button>
               </div>
@@ -224,7 +223,7 @@
 
               {% if crud_delete %}
               <div class="opciones_fila">
-                <button class="clickable-modal btn_delete" id="modal_crud_delete_{{tabla}}_{{fila[primary_key]}}">
+                <button class="clickable-modal btn_delete" id="modal_crud_delete_{{tabla}}_{{ id_pk }}">
                   <i class="{{ICON_DELETE}}"></i>
                 </button>
               </div>
@@ -254,8 +253,12 @@
           <option value="{{ option }}" {% if option==selected_option_crud %}selected{% endif %}>{{ option }}</option>
           {% endfor %}
         </select>
-        <p for="">registros por página</p>
+        <p for="">registros por página 
+        </p>
 
+        <p>
+          | Total de filas: {{filas | length}}
+        </p>
 
       </div>
     </div>
@@ -316,6 +319,8 @@
   </div>
 </div>
 
+
+
 {% endblock %}
 
 
@@ -339,19 +344,35 @@
 
 <script src="/static/js/orderHeadTable.js"></script>
 <script src="/static/js/paginationCrud.js"></script>
+
+{% if 'map' in fields_form | map(attribute=6) | list %}
+<style>
+  @import url("https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css");
+  @import url("../static/css/sucursales.css");
+  @import url("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css");
+
+  .map {
+    width: 100%;
+    height: 275px;
+    /* aspect-ratio: 1 / 1; */
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: crosshair;
+    border: 1px solid #9c9c9c;
+
+  }
+
+  .map_space {
+    border: 1px solid #9c9c9c;
+    border-radius: 8px;
+
+  }
+</style>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+{% endif %}
 
-<!-- <script>
-  const today = new Date().toISOString().split('T')[0];
-  const date_solo = document.querySelector('input[type="date"][data-type="date"]')
-  if (date_solo) {
-    date_solo.value = today;
-  } else {
-    document.querySelector('input[type="date"][data-type="date_ini"]').value = today;
-    document.querySelector('input[type="date"][data-type="date_fin"]').value = today;
-  }
-  // document.getElementById('fecha_fin').value = today;
-</script> -->
+
 
 {% endblock %}

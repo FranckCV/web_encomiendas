@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 30-05-2025 a las 10:16:48
+-- Tiempo de generación: 02-06-2025 a las 08:35:53
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.1.17
 
@@ -43,10 +43,11 @@ INSERT INTO `articulo` (`id`, `nombre`, `precio`, `stock`, `activo`, `img`, `dim
 (4, 'Caja M', 3.20, 100, 1, '/static/img/caja M.png', '24×30×20', 4),
 (5, 'Caja L', 4.00, 100, 1, '/static/img/caja L.png', '30×42×23', 5),
 (6, 'Plumón Indeleble', 3.00, 100, 1, '/static/img/plumon.png', NULL, NULL),
-(7, 'Sobre A4', 1.00, 100, 1, '/static/img/sobre.png', '21×29.7 cm', NULL),
+(7, 'Sobre A4', 1.00, 100, 1, 'mastercard.jpg', '21×29.7 cm', 5),
 (8, 'Cinta de Embalaje', 5.90, 100, 1, '/static/img/cintaEmbalaje.png', '48 mm × 40 m', NULL),
 (9, 'Stretch Film', 12.00, 100, 1, '/static/img/stretchfilm.png', 'Varios tamaños', NULL),
-(10, 'Burbupack', 2.50, 100, 1, '/static/img/burbupack.png', '1 m × 1 m', NULL);
+(10, 'Burbupack', 2.50, 100, 1, 'burbupack.png', '1 m × 1 m', 5),
+(11, 'yapi', 22.00, 2312, 1, 'mastercard.jpg', '10', 5);
 
 -- --------------------------------------------------------
 
@@ -122,9 +123,7 @@ CREATE TABLE `cliente` (
 --
 
 INSERT INTO `cliente` (`id`, `correo`, `telefono`, `num_documento`, `nombre_siglas`, `apellidos_razon`, `tipo_documentoid`, `tipo_clienteid`) VALUES
-(1, 'fabs@correo.com', '987654321', '12345678', 'Fabiola', 'Mejía', 1, 2),
-(4, 'ana@mail.com', '987654321', '12245678', 'Ana', 'Pérez', 1, 1),
-(5, 'empresa@corp.com', '901234567', '20481234567', 'CORP SAC', 'Soluciones Integrales', 2, 2);
+(1, 'fabs@correo.com', '987654321', '12345678', 'Fabiola', 'Mejía', 1, 2);
 
 -- --------------------------------------------------------
 
@@ -230,15 +229,6 @@ CREATE TABLE `detalle_estado` (
   `estado_encomiendaid` int(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `detalle_estado`
---
-
-INSERT INTO `detalle_estado` (`id`, `nombre`, `descripcion`, `activo`, `estado_encomiendaid`) VALUES
-(1, 'Recibido en sucursal', 'El paquete fue recibido', 1, 1),
-(2, 'En ruta', 'Paquete se encuentra en tránsito', 1, 2),
-(3, 'Entregado a destinatario', 'Paquete fue entregado', 1, 4);
-
 -- --------------------------------------------------------
 
 --
@@ -252,22 +242,6 @@ CREATE TABLE `detalle_reclamo` (
   `activo` tinyint(1) NOT NULL DEFAULT 1,
   `estado_reclamoid` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `detalle_reclamo`
---
-
-INSERT INTO `detalle_reclamo` (`id`, `nombre`, `descripcion`, `activo`, `estado_reclamoid`) VALUES
-(1, 'Reclamo registrado', 'El reclamo ha sido registrado exitosamente en el sistema.', 1, 1),
-(2, 'Revisión inicial', 'El reclamo está siendo revisado por el área correspondiente.', 1, 4),
-(3, 'Solicitud aprobada', 'El reclamo fue aprobado para su resolución.', 1, 2),
-(4, 'Solicitud rechazada', 'El reclamo fue rechazado por no cumplir con las condiciones.', 1, 3),
-(5, 'Problema solucionado', 'El reclamo fue resuelto y se notificó al cliente.', 1, 5),
-(6, 'Pendiente de documentos', 'Se requiere documentación adicional del cliente.', 1, 4),
-(7, 'Validación de evidencia', 'Se está validando la evidencia presentada.', 1, 4),
-(8, 'Reclamo confirmado', 'El reclamo fue confirmado como procedente.', 1, 2),
-(9, 'Reclamo no procedente', 'El reclamo fue evaluado como no procedente.', 1, 3),
-(10, 'Caso cerrado', 'El caso fue cerrado y archivado tras resolución.', 1, 5);
 
 -- --------------------------------------------------------
 
@@ -303,7 +277,7 @@ CREATE TABLE `empleado` (
 
 INSERT INTO `empleado` (`id`, `nombre`, `apellidos`, `correo`, `n_documento`, `rolid`) VALUES
 (1, 'Ana', 'Ramírez', 'ana@gmail.com', '', 1),
-(2, 'Juan', 'Perez', 'perez@gmail.com', '', 1);
+(2, 'Juan', 'Perez', 'perez@gmail.com', '', 11);
 
 -- --------------------------------------------------------
 
@@ -365,16 +339,6 @@ CREATE TABLE `estado_encomienda` (
   `activo` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `estado_encomienda`
---
-
-INSERT INTO `estado_encomienda` (`id`, `nombre`, `descripcion`, `activo`) VALUES
-(1, 'En origen', 'Paquete en sucursal de origen', 1),
-(2, 'En tránsito', 'Paquete en camino', 1),
-(3, 'En destino', 'Paquete en sucursal de destino', 1),
-(4, 'Entregado', 'Paquete entregado', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -392,10 +356,10 @@ CREATE TABLE `estado_reclamo` (
 --
 
 INSERT INTO `estado_reclamo` (`id`, `nombre`, `activo`) VALUES
-(1, 'Recibido', 1),
+(1, 'En revisión', 1),
 (2, 'Aprobado', 1),
 (3, 'Rechazado', 1),
-(4, 'En revisión', 1),
+(4, 'En espera', 1),
 (5, 'Resuelto', 1);
 
 -- --------------------------------------------------------
@@ -497,18 +461,18 @@ CREATE TABLE `modelo` (
 --
 
 INSERT INTO `modelo` (`id`, `nombre`, `activo`, `marcaid`, `tipo_unidadid`) VALUES
-(1, 'FH16', 1, 1, 1),
-(2, 'Daily', 1, 2, 2),
-(3, 'R-Series', 1, 3, 1),
-(4, 'Actros', 1, 4, 1),
-(5, 'XF', 1, 5, 1),
-(6, 'Premium Lander', 1, 6, 1),
-(7, '500 Series', 1, 7, 4),
-(8, 'Fighter', 1, 8, 1),
-(9, 'N-Series', 1, 9, 2),
-(10, 'HD65', 1, 10, 5),
-(11, 'ProStar', 1, 11, 1),
-(12, 'T680', 1, 12, 3);
+(1, 'FH16', 0, 1, 1),
+(2, 'Daily', 0, 2, 2),
+(3, 'R-Series', 0, 3, 1),
+(4, 'Actros', 0, 4, 1),
+(5, 'XF', 0, 5, 1),
+(6, 'Premium Lander', 0, 6, 1),
+(7, '500 Series', 0, 7, 4),
+(8, 'Fighter', 0, 8, 1),
+(9, 'N-Series', 0, 9, 2),
+(10, 'HD65', 0, 10, 5),
+(11, 'ProStar', 0, 11, 1),
+(12, 'T680', 0, 12, 3);
 
 -- --------------------------------------------------------
 
@@ -531,13 +495,13 @@ CREATE TABLE `modulo` (
 --
 
 INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo`, `img`) VALUES
-(1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF', 0, NULL),
-(2, 'Logística', 'fa-solid fa-truck-front', 'logistica', '#00F068', 1, NULL),
-(3, 'Encomiendas', 'fa-solid fa-box', 'encomienda', '#FF5E1A', 1, NULL),
-(4, 'Atención al cliente', 'fa-solid fa-circle-question', 'atencion', '#8232D2', 1, NULL),
-(5, 'Ventas', 'fa-solid fa-file-invoice-dollar', 'ventas', '#ff0000', 1, NULL),
-(6, 'Seguridad', 'fa-solid fa-shield-halved', 'seguridad', '#F0B000', 1, NULL),
-(7, 'Personal', 'fa-solid fa-briefcase', 'personal', '#00E0F0', 1, NULL);
+(1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF', 1, 'administracion.jpg'),
+(2, 'Logística', 'fa-solid fa-truck-front', 'logistica', '#00F068', 1, 'logistica.jpg'),
+(3, 'Encomiendas', 'fa-solid fa-box', 'encomienda', '#FF5E1A', 1, 'encomienda.jpg'),
+(4, 'Atención al cliente', 'fa-solid fa-circle-question', 'atencion', '#8232D2', 1, 'atencion.jpg'),
+(5, 'Ventas', 'fa-solid fa-file-invoice-dollar', 'ventas', '#ff0000', 1, 'ventas.jpg'),
+(6, 'Seguridad', 'fa-solid fa-shield-halved', 'seguridad', '#F0B000', 1, 'seguridad.jpg'),
+(7, 'Personal', 'fa-solid fa-briefcase', 'personal', '#00E0F0', 1, 'personal.jpg');
 
 -- --------------------------------------------------------
 
@@ -607,16 +571,14 @@ INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `tipo_paginaid`,
 (21, 'tipos de roles', 'ri-file-user-fill', 1, 'tipo_rol', 1, 7),
 (22, 'Motivos de reclamo', '', 1, 'motivo_reclamo', 1, 4),
 (23, 'Causas de reclamo', '', 1, 'causa_reclamo', 1, 4),
-(24, 'Tarifas de ruta', '', 1, 'tarifa_ruta', 1, 1),
+(24, 'Tarifas de ruta', 'fa-solid fa-dollar', 1, 'tarifa_ruta', 1, 1),
 (25, 'Sucursales', 'ri-store-3-line', 1, 'sucursal', 1, 1),
 (26, 'tipos de reclamos', 'fa-solid fa-book-open-reader', 1, 'tipo_reclamo', 1, 4),
 (27, 'Reporte', '', 1, 'aa', 4, 2),
 (28, 'Administración de páginas', 'ri-file-settings-fill', 1, 'administrar_paginas', 2, 6),
 (29, 'Información de la empresa', 'ri-file-lock-fill', 1, 'informacion_empresa', 2, 1),
 (30, 'Reclamo', 'fa fa-bullhorn', 1, 'reclamo', 1, 4),
-(31, 'Preguntas frecuentes', 'fa-solid fa-circle-question', 1, 'pregunsta_frecuente', 1, 4),
-(32, 'detalles de estados de reclamo', '', 1, 'detalle_reclamo', 1, 4),
-(33, 'Listado de paquetes por estado actual y fecha', 'fa-solid fa-box', 1, 'paquete_estado_fecha', 4, 3);
+(31, 'Preguntas frecuentes', 'fa-solid fa-circle-question', 1, 'pregunsta_frecuente', 1, 4);
 
 -- --------------------------------------------------------
 
@@ -646,15 +608,6 @@ CREATE TABLE `paquete` (
   `tipo_empaqueid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `paquete`
---
-
-INSERT INTO `paquete` (`tracking`, `clave`, `valor`, `peso`, `alto`, `largo`, `ancho`, `precio_ruta`, `descripcion`, `direccion_destinatario`, `telefono_destinatario`, `num_documento_destinatario`, `sucursal_destino_id`, `tipo_documento_destinatario_id`, `contenido_paqueteid`, `tipo_recepcionid`, `salidaid`, `transaccion_encomienda_num_serie`, `tipo_empaqueid`) VALUES
-(2, 'ABCD', 120.00, 3.50, 10.00, 20.00, 15.00, 15.00, 'Paquete de accesorios', 'Calle Falsa 123', '999888777', '76543210', 1, 1, 1, 2, 1, '2', 1),
-(3, 'EFGH', 250.00, 5.00, 15.00, 25.00, 20.00, 30.00, 'Ropa para temporada', 'Av. Central 456', '988776655', '87654321', 2, 1, 2, 1, 2, '1', 2),
-(1234, 'abcd', 20.00, 10.00, 2.00, 3.00, 2.10, 3.00, 'No se', NULL, NULL, NULL, 1, 1, 5, 1, 1, '1', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -683,6 +636,24 @@ CREATE TABLE `permiso` (
   `delete` tinyint(1) NOT NULL,
   `unactive` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `permiso`
+--
+
+INSERT INTO `permiso` (`paginaid`, `rolid`, `acceso`, `search`, `consult`, `insert`, `update`, `delete`, `unactive`) VALUES
+(1, 11, 1, 1, 1, 0, 0, 0, 0),
+(2, 11, 1, 1, 1, 1, 0, 0, 0),
+(2, 13, 1, 1, 0, 0, 0, 0, 0),
+(3, 11, 1, 1, 1, 0, 0, 0, 0),
+(3, 13, 1, 0, 0, 0, 0, 0, 0),
+(4, 11, 1, 1, 1, 0, 0, 0, 0),
+(13, 11, 1, 1, 1, 0, 0, 0, 0),
+(14, 11, 1, 1, 1, 0, 0, 0, 0),
+(24, 11, 1, 1, 1, 0, 0, 0, 0),
+(25, 11, 1, 1, 1, 0, 0, 0, 0),
+(25, 13, 1, 0, 0, 0, 0, 0, 0),
+(29, 11, 1, 0, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -774,19 +745,10 @@ CREATE TABLE `salida` (
   `recojo` tinyint(1) NOT NULL,
   `entrega` tinyint(1) NOT NULL,
   `estado` char(1) NOT NULL,
-  `unidadid` int(10) NOT NULL,
   `destino_final` int(10) NOT NULL,
-  `conductor_principal` int(11) NOT NULL
+  `conductor_principal` int(11) NOT NULL,
+  `unidadid` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `salida`
---
-
-INSERT INTO `salida` (`id`, `fecha`, `hora`, `recojo`, `entrega`, `estado`, `unidadid`, `destino_final`, `conductor_principal`) VALUES
-(1, '2025-05-07', '07:34:15', 0, 0, '', 4, 0, 0),
-(2, '2024-05-01', '08:30:00', 1, 0, '', 1, 0, 0),
-(3, '2024-05-03', '14:45:00', 0, 1, '', 2, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -798,17 +760,6 @@ CREATE TABLE `seguimiento` (
   `detalle_estadoid` int(10) NOT NULL,
   `paquetetracking` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `seguimiento`
---
-
-INSERT INTO `seguimiento` (`detalle_estadoid`, `paquetetracking`) VALUES
-(1, 2),
-(1, 3),
-(2, 2),
-(2, 3),
-(3, 3);
 
 -- --------------------------------------------------------
 
@@ -1252,15 +1203,6 @@ CREATE TABLE `transaccion_encomienda` (
   `clienteid` int(10) NOT NULL,
   `tipo_comprobanteid` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `transaccion_encomienda`
---
-
-INSERT INTO `transaccion_encomienda` (`num_serie`, `masivo`, `descripcion`, `monto_total`, `recojo_casa`, `id_sucursal_origen`, `fecha`, `hora`, `direccion_recojo`, `clienteid`, `tipo_comprobanteid`) VALUES
-('1', 0, 'aa', 200.00, 1, 1, '2025-05-07', '07:41:27', NULL, 1, 2),
-('2', 0, 'Envío individual', 150.00, 0, 1, '2024-05-01', '08:00:00', 'Av. Principal 123', 1, 1),
-('3', 1, 'Envío masivo a cliente empresa', 500.00, 1, 2, '2024-05-03', '14:00:00', 'Jr. Comercial 456', 4, 2);
 
 -- --------------------------------------------------------
 
@@ -3613,7 +3555,7 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de la tabla `articulo`
 --
 ALTER TABLE `articulo`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `causa_reclamo`
@@ -3625,7 +3567,7 @@ ALTER TABLE `causa_reclamo`
 -- AUTO_INCREMENT de la tabla `cliente`
 --
 ALTER TABLE `cliente`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `contenido_paquete`
@@ -3643,13 +3585,13 @@ ALTER TABLE `descuento`
 -- AUTO_INCREMENT de la tabla `detalle_estado`
 --
 ALTER TABLE `detalle_estado`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `detalle_reclamo`
 --
 ALTER TABLE `detalle_reclamo`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `empleado`
@@ -3667,7 +3609,7 @@ ALTER TABLE `empresa`
 -- AUTO_INCREMENT de la tabla `estado_encomienda`
 --
 ALTER TABLE `estado_encomienda`
-  MODIFY `id` int(4) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(4) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `estado_reclamo`
@@ -3721,13 +3663,13 @@ ALTER TABLE `motivo_reclamo`
 -- AUTO_INCREMENT de la tabla `pagina`
 --
 ALTER TABLE `pagina`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT de la tabla `paquete`
 --
 ALTER TABLE `paquete`
-  MODIFY `tracking` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1235;
+  MODIFY `tracking` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `pregunta_frecuente`
@@ -3751,7 +3693,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `salida`
 --
 ALTER TABLE `salida`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `sucursal`

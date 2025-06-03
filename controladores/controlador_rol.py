@@ -40,6 +40,8 @@ def get_table():
             tr.nombre AS nom_tiporol
         FROM {table_name} r
         INNER JOIN tipo_rol tr ON r.tipo_rolid = tr.id
+        where r.id != 1
+
     '''
     columnas = {
         'id': ['ID', 0.5],
@@ -76,14 +78,14 @@ def update_row(id, nombre, descripcion, tipo_rolid):
 def get_options():
     sql= f'''
         select 
-            {get_primary_key()} ,
+            id ,
             nombre
-        from {table_name}
-        where activo = 1
+        from rol
+        where activo = 1 
         order by nombre asc
     '''
     filas = sql_select_fetchall(sql)
     
-    lista = [(fila[get_primary_key()], fila["nombre"]) for fila in filas]
+    lista = [(fila['id'], fila["nombre"]) for fila in filas]
 
     return lista

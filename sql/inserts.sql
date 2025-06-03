@@ -2,14 +2,14 @@ INSERT INTO empresa (id, nombre, correo, nro_telefono, logo, color_pri, color_se
 (1, 'New Olva', 'info@newolva.com', '+123 456 789', 'logo.png', '#1d4c82', '#13e2da', '#1b98e0');
 
 
-INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo`) VALUES
-(1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF', 0),
-(2, 'Logística', 'fa-solid fa-truck-front', 'logistica', '#00F068', 1),
-(3, 'Encomiendas', 'fa-solid fa-box', 'encomienda', '#FF5E1A', 1),
-(4, 'Atención al cliente', 'fa-solid fa-circle-question', 'atencion', '#8232D2', 1),
-(5, 'Ventas', 'fa-solid fa-file-invoice-dollar', 'ventas', '#ff0000', 1),
-(6, 'Seguridad', 'fa-solid fa-shield-halved', 'seguridad', '#F0B000', 1),
-(7, 'Personal', 'fa-solid fa-briefcase', 'personal', '#00E0F0', 1);
+INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo` , img) VALUES
+(1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF', 0       , 'administracion.jpg'),
+(2, 'Logística', 'fa-solid fa-truck-front', 'logistica', '#00F068', 1              , 'logistica.jpg'),
+(3, 'Encomiendas', 'fa-solid fa-box', 'encomienda', '#FF5E1A', 1                   , 'encomienda.jpg'),
+(4, 'Atención al cliente', 'fa-solid fa-circle-question', 'atencion', '#8232D2', 1 , 'atencion.jpg'),
+(5, 'Ventas', 'fa-solid fa-file-invoice-dollar', 'ventas', '#ff0000', 1            , 'ventas.jpg'),
+(6, 'Seguridad', 'fa-solid fa-shield-halved', 'seguridad', '#F0B000', 1            , 'seguridad.jpg'),
+(7, 'Personal', 'fa-solid fa-briefcase', 'personal', '#00E0F0', 1                  , 'personal.jpg');
 
 
 INSERT INTO `tipo_pagina` (`id`, `nombre`) VALUES
@@ -2034,12 +2034,7 @@ VALUES
     ('YZA9012', '1519046MNG', '15M25016325O', 22.00, 50.00, 'Unidad para transporte pesado', 'A', 11),
     ('BCD0123', '1519047NNG', '15M25016326P', 19.00, 40.00, 'Camión para largo alcance', 'A', 12);
 
-INSERT INTO estado_reclamo (nombre, activo) VALUES
-('En revisión', 1),
-('Aprobado', 1),
-('Rechazado', 1),
-('En espera', 1),
-('Resuelto', 1);
+
 INSERT INTO tipo_indemnizacion (nombre, descripcion, activo) VALUES 
 ('Pérdida total', 'Indemnización completa en caso de pérdida total del paquete o artículo enviado.', 1),
 ('Daños parciales', 'Indemnización por daños parciales al contenido del paquete.', 1),

@@ -159,9 +159,7 @@ def get_lista_roles():
         order by rol.nombre
 
     '''
-
     filas = bd.sql_select_fetchall(sql)
-    
     return  filas
 
 
@@ -178,9 +176,7 @@ def get_lista_tipo_roles():
         GROUP BY tip.id
         HAVING COUNT(rol.id) != 0;
     '''
-
     filas = bd.sql_select_fetchall(sql)
-    
     return  filas
 
 
@@ -198,10 +194,9 @@ def get_info_rol(rolid):
         left join tipo_rol tip on tip.id = rol.tipo_rolid
         where tip.activo = 1 and rol.activo = 1 and tip.id != 1 and rol.id = {rolid}
     '''
-
     a = bd.sql_select_fetchone(sql)
-    
     return  a
+    
 
 def get_cants_modulos():
     sql= f'''
@@ -216,9 +211,7 @@ def get_cants_modulos():
         LEFT JOIN pagina p ON p.tipo_paginaid = tp.id AND p.moduloid = m.id
         GROUP BY m.id, tp.id;
     '''
-
     filas = bd.sql_select_fetchall(sql)
-    
     return  filas
 
 
@@ -244,14 +237,96 @@ def update_pagina( id , titulo , icono , moduloid ):
     bd.sql_execute(sql,( titulo , icono , moduloid ))
 
 
-def unable_permiso_pagina(column , paginaid , rolid):
+############################################################
+
+def get_paginas_permiso_rol( rolid):
+    sql= f'''
+        SELECT 
+            pag.id , 
+            pag.titulo , 
+            pag.icono , 
+            pag.activo, 
+            pag.key , 
+            pag.tipo_paginaid , 
+            pag.moduloid ,
+            mdl.nombre as nom_modulo , 
+            tip.nombre as nom_tipo ,
+            per.acceso ,
+            per.search ,
+            per.consult ,
+            per.insert ,
+            per.update ,
+            per.delete ,
+            per.unactive 
+        FROM rol
+        CROSS JOIN pagina pag 
+        inner join modulo mdl on mdl.id = pag.moduloid
+        inner join tipo_pagina tip on tip.id = pag.tipo_paginaid
+        LEFT JOIN permiso per ON per.rolid = rol.id AND per.paginaid = pag.id
+        WHERE rol.id = {rolid} and rol.activo = 1 and pag.activo = 1
+        order by pag.titulo
+    '''
+    data = bd.sql_select_fetchall(sql)
+    return  data
+
+
+def consult_permiso_rol( paginaid, rolid):
+    sql= f'''
+        SELECT 
+            rol.* ,
+            per.* ,
+            pag.*
+        FROM rol
+        CROSS JOIN pagina pag  
+        LEFT JOIN permiso per ON per.rolid = rol.id AND per.paginaid = pag.id
+        WHERE rol.id = {rolid} and pag.id = {paginaid} and rol.activo = 1 and pag.activo = 1
+    '''
+    data = bd.sql_select_fetchone(sql)
+    return  data
+
+
+def nuevo_permiso_pagina_rol( paginaid , rolid):
     sql = f'''
-        update acceso set 
-        {column} = NOT {column}
+        INSERT INTO `permiso`(`paginaid`, `rolid`, `acceso`, `search`, `consult`, `insert`, `update`, `delete`, `unactive`) VALUES 
+        ( %s , %s , 0 , 0 , 0 , 0 , 0 , 0 , 0 )
+    '''
+    bd.sql_execute(sql, (paginaid , rolid))
+
+
+def update_permiso_pagina(column , paginaid , rolid):
+    sql = f'''
+        update permiso set 
+        `{column}` = NOT `{column}`
         where paginaid = {paginaid} and rolid = {rolid}
     '''
     bd.sql_execute(sql)
-    # return 0
+
+
+def change_permiso_pagina(column , paginaid , rolid):
+    data = consult_permiso_rol( paginaid , rolid)
+    # print(paginaid)
+    # print(rolid)
+    # print('pre if')
+    # print(data['paginaid'])
+    # print(data['rolid']) 
+    if data['paginaid'] is not None and data['rolid'] is not None: 
+        # print('post if')
+        update_permiso_pagina(column , paginaid , rolid)
+    else:
+        nuevo_permiso_pagina_rol( paginaid , rolid)
+        update_permiso_pagina(column , paginaid , rolid)
+
+
+def change_permiso_modulo(column , moduloid , rolid):
+    filas = get_paginas_moduloid(moduloid)
+    for pagina in filas:
+        change_permiso_pagina(column , pagina['id'] , rolid)
+    
+
+
+    
+
+
 
 
 

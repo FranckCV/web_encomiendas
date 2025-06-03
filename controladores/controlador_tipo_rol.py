@@ -45,6 +45,7 @@ def get_table():
             tip.descripcion ,
             tip.activo 
         from {table_name} tip
+        where tip.id != 1
 
     '''
     columnas = {

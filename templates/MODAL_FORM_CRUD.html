@@ -1,12 +1,30 @@
-<div class="space_modal modal_crud_{{modo_modal}} modal_crud_base" id="modal_crud_{{modo_modal}}_{{tabla}}_{{fila[primary_key] if fila else ''}}">
+{% if primary_key is iterable and primary_key is not string %}
+  {% set id_parts = [] %}
+  {% for pk in primary_key %}
+    {% set _ = id_parts.append(fila[pk]|string) %}
+  {% endfor %}
+  {% set id_pk = id_parts | join('_') %}
+{% else %}
+  {% set id_pk = fila[primary_key]|string %}
+{% endif %}
+
+<div class="space_modal modal_crud_{{modo_modal}} modal_crud_base" id="modal_crud_{{modo_modal}}_{{tabla}}_{{ id_pk if modo_modal != 'insert' else ''}}">
   <form class="modal_crud_content"
         {% if modo_modal in ['insert', 'update', 'delete', 'unactive']  %}
         action="{{ url_for('crud_' + modo_modal, tabla=tabla) }}"
         method="POST"
-        
+        enctype="multipart/form-data"
         {% endif %}>
-        
-    <input type="hidden" name="{{ primary_key }}" value="{{ fila[primary_key] if fila else '' }}">
+    
+    {% if modo_modal != 'insert' %}
+    {% if primary_key is iterable and primary_key is not string %}
+      {% for pk in primary_key %}
+        <input type="hidden" name="{{ pk }}" value="{{ fila[pk] if fila else '' }}">
+      {% endfor %}
+    {% else %}
+      <input type="hidden" name="{{ primary_key }}" value="{{ fila[primary_key] if fila else '' }}">
+    {% endif %}
+    {% endif %}
 
     <div class="row">
       <h3>
@@ -25,16 +43,22 @@
 
     {% if modo_modal in ['delete', 'unactive'] %}
       <p>
+        {% if primary_key is iterable and primary_key is not string %}
+          {% set primary_value = primary_key | map(attribute=fila) | join(', ') %}
+        {% else %}
+          {% set primary_value = fila[primary_key] %}
+        {% endif %}
+
         ¿Está seguro de que desea 
         {% if modo_modal == 'delete' %}
-          eliminar este {{nombre_tabla}} ({{primary_key | upper}}: {{fila[primary_key]}})?
+          eliminar este {{nombre_tabla}} (ID: {{ primary_value }})?
         {% elif modo_modal == 'unactive' %}
           {% if fila['activo'] == 0 %}
             {{ ACT_STATE_1 | lower }}
           {% else %}
             {{ ACT_STATE_0 | lower }}
           {% endif %}
-          este {{nombre_tabla}} ({{primary_key | upper}}: {{fila[primary_key]}})?
+          este {{nombre_tabla}} (ID: {{ primary_value }})?
         {% endif %}
       </p>
     {% endif %}
@@ -92,9 +116,9 @@
 
         {% elif campo[3] == 'icon' %}
             <input type="text" placeholder="{{campo[2]}}" id="{{campo[0]}}" name="{{campo[0]}}" 
-            {% if campo[4] %}required{% endif %} value="{{modulo[campo[0]]}}" 
+            {% if campo[4] %}required{% endif %} value="{{fila[campo[0]]}}" 
              {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}>
-            <i class="{{modulo[campo[0]]}}"></i>
+            <i class="{{fila[campo[0]]}}"></i>
 
         {% elif campo[3] == 'color' %}
 
@@ -103,7 +127,7 @@
           class="input_color_sync"
           data-name="{{campo[0]}}"
           name="{{campo[0]}}" 
-          value="{{modulo[campo[0]]}}" 
+          value="{{fila[campo[0]]}}" 
           placeholder="Valor hexadecimal" 
           {% if campo[4] %}required{% endif %} 
           {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}
@@ -113,7 +137,7 @@
           class="input_color_sync"
           data-name="{{campo[0]}}"
           name="{{campo[0]}}" 
-          value="{{ modulo[campo[0]]}}" 
+          value="{{ fila[campo[0]]}}" 
           {% if campo[4] %}required{% endif %}
           {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}
           >
@@ -211,8 +235,9 @@
 
 
     <div class="row">
+
       <div class="col">
-        <div class="button btn_back" onclick="closeModal()">Cancelar</div>
+        <div class="button btn_cancel" onclick="closeModal()">Cancelar</div>
       </div>
       <div class="col-1"></div>
       <div class="col">
@@ -225,6 +250,7 @@
           Aceptar
         </button>
       </div>
+      
     </div>
   </form>
 </div>

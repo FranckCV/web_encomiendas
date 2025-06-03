@@ -4,7 +4,9 @@
 {% block titulo %}
 {% if esReporte %}
 {{titulo }}
-{% else %}
+{% elif esTransaccion%}
+Programar {{titulo | lower}}
+{%else%}
 {{NOMBRE_CRUD_PAGE}} {{titulo | lower}}
 {% endif %}
 {% endblock %}
@@ -31,6 +33,8 @@
 
     {% if esReporte %}
     {{titulo }}
+    {%elif esTransaccion%}
+    Programar {{titulo | lower}}
     {% else %}
     {{NOMBRE_CRUD_PAGE}} {{titulo | lower}}
     {% endif %}
