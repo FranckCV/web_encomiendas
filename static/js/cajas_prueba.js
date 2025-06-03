@@ -216,14 +216,49 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const total = (unitPrice * currentQuantity).toFixed(2);
 
+    let precio_unitario_1 = data.price;
+    let precio_unitario_2 = null;
+    let cantidad_precio_unitario_2 = null;
+    let precio_unitario_3 = null;
+    let cantidad_precio_unitario_3 = null;
+
+    // Obtener precios y cantidades desde los descuentos (ordenados)
+    if (data.discounts && data.discounts.length > 0) {
+      const ordenados = [...data.discounts].sort((a, b) => {
+        const volA = parseInt(a.name.match(/\d+/)?.[0] || '0', 10);
+        const volB = parseInt(b.name.match(/\d+/)?.[0] || '0', 10);
+        return volA - volB;
+      });
+
+      if (ordenados.length > 0) {
+        precio_unitario_2 = ordenados[0].value;
+        cantidad_precio_unitario_2 = parseInt(ordenados[0].name.match(/\d+/)?.[0] || '0', 10);
+      }
+      if (ordenados.length > 1) {
+        precio_unitario_3 = ordenados[1].value;
+        cantidad_precio_unitario_3 = parseInt(ordenados[1].name.match(/\d+/)?.[0] || '0', 10);
+      }
+    }
+
     const producto = {
+      id: data.id,
       size: currentSize,
       quantity: currentQuantity,
       unitPrice: unitPrice,
-      totalPrice: parseFloat(total),
+      // subtotal: unitPrice * currentQuantity,
+      // totalPrice: parseFloat(total),
       name: data.name_product,
       image: data.image,
+      originalPrice: precio_unitario_1,
+      discount: precio_unitario_1 - unitPrice,
+      precio_unitario_1,
+      precio_unitario_2,
+      cantidad_precio_unitario_2,
+      precio_unitario_3,
+      cantidad_precio_unitario_3
+      // description: 'aeaaaa'
     };
+
 
     let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
     const index = carrito.findIndex((item) => item.size === producto.size);

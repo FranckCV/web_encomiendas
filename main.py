@@ -41,7 +41,10 @@ from controladores import controlador_salida as controlador_salida
 from controladores import controlador_reclamo as controlador_reclamo
 from controladores import controlador_preguntas_frecuentes as controlador_pregunta_frecuente
 from controladores import reporte_ingresos as reporte_ingresos
-
+from controladores import controlador_transaccion_venta as controlador_transaccion_venta
+from controladores import controlador_detalle_venta as controlador_detalle_venta
+from controladores import controlador_metodo_pago_venta as controlador_metodo_pago_venta
+from controladores import controlador_articulo as controlador_articulo
 
 import hashlib
 import os
@@ -1863,7 +1866,8 @@ def api_cajas():
                 "price": precio,
                 "dimensions": fila['dimensiones'],
                 "image": img,
-                "discounts": []  
+                "discounts": [],
+                "id": fila['articuloid']  
             }
 
         if fila['cantidad_descuento'] and fila['nom_descuento']:
@@ -1908,6 +1912,55 @@ def api_articulos():
 @app.route("/carrito")
 def carrito():
     return render_template('carrito.html')
+
+@app.route("/venta/registrar", methods=["POST"])
+def registrar_venta():
+    data = request.get_json()
+
+    cliente_id = data.get("cliente_id")
+    tipo_comprobante_id = data.get("tipo_comprobante_id")
+    metodo_pago_id = data.get("metodo_pago_id")
+    articulos = data.get("articulos", [])
+
+    if not cliente_id or not tipo_comprobante_id or not metodo_pago_id or not articulos:
+        return jsonify({"error": "Faltan datos requeridos"}), 400
+
+    try:
+        # Calcular monto total
+        monto_total = 0
+        for item in articulos:
+            precio = controlador_articulo.obtener_precio_articulo(item["articulo_id"])
+            if precio is None:
+                return jsonify({"error": f"Artículo {item['articulo_id']} no encontrado"}), 404
+            monto_total += precio * item["cantidad"]
+
+        # Insertar cabecera de venta
+        venta_id = controlador_transaccion_venta.registrar_transaccion(
+            tipo_comprobante_id,
+            monto_total,
+            cliente_id
+        )
+
+        # Insertar cada detalle
+        for item in articulos:
+            controlador_detalle_venta.registrar_detalle_venta(
+                item["articulo_id"],
+                venta_id,
+                tipo_comprobante_id,
+                item["cantidad"]
+            )
+
+        # Insertar método de pago
+        controlador_metodo_pago_venta.registrar_metodo_pago_venta(
+            venta_id,
+            tipo_comprobante_id,
+            metodo_pago_id
+        )
+
+        return jsonify({"status": "ok", "venta_id": venta_id}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/cotizador")

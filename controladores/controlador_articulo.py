@@ -119,7 +119,7 @@ def get_options():
 def get_table_with_discount():
     sql= f'''
         select 
-            art.id ,
+            art.id as articuloid,
             art.nombre as nom_articulo,
             art.precio ,
             art.stock ,
@@ -258,3 +258,10 @@ def get_stock_minimo_options():
         (25, "25 unidades"),
         (50, "50 unidades")
     ]
+
+
+################## TRANSACCION VENTA ############
+def obtener_precio_articulo(articulo_id):
+    sql = "SELECT precio FROM articulo WHERE id = %s"
+    resultado = sql_select_fetchone(sql, (articulo_id,))
+    return resultado[0] if resultado else None
