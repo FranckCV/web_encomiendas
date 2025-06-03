@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Ordenar descuentos de menor a mayor cantidad
         preciosVol.sort((a, b) => a.cantidad - b.cantidad);
-        
+
         // Aplicar el descuento más alto que sea menor o igual a la cantidad
         let precioFinal = precioBase;
         for (const descuento of preciosVol) {
@@ -379,7 +379,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Resaltar el descuento activo según la cantidad (FUNCIÓN MODIFICADA)
     function resaltarDescuentoActivo(cantidad, preciosVol) {
         const discountItems = document.querySelectorAll('.precio-volumen-item');
-        
+
         // Quitar resaltado de todos los items
         discountItems.forEach(item => {
             item.classList.remove('active-discount');
@@ -639,7 +639,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Ordenar descuentos de menor a mayor cantidad
                 preciosVol.sort((a, b) => a.cantidad - b.cantidad);
-                
+
                 // Calcular precio con descuento por volumen si aplica
                 for (const descuento of preciosVol) {
                     if (cantidad >= descuento.cantidad) {

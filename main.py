@@ -40,8 +40,12 @@ from controladores import controlador_descuento_articulo as controlador_descuent
 from controladores import controlador_salida as controlador_salida
 from controladores import controlador_reclamo as controlador_reclamo
 from controladores import controlador_preguntas_frecuentes as controlador_pregunta_frecuente
+<<<<<<< HEAD
 from controladores import controlador_regla_cargo as controlador_regla_cargo
 
+=======
+from controladores import reporte_ingresos as reporte_ingresos
+>>>>>>> 8cc40e7272df8f6b4fad232eae40ffa4f72304f4
 
 
 import hashlib
@@ -1247,6 +1251,24 @@ REPORTES = {
             ['fecha', 'Fecha', None, 'interval_date' ],
         ] ,
     },
+    "listado_general_empleados_rol": {
+        "active": True,
+        "icon_page": "fa-solid fa-user-tie",
+        "titulo": "Listado de empleados por rol",
+        "table": controlador_empleado.get_report_test(),
+        "filters": [
+            ['rol_id', 'Rol', lambda: controlador_rol.get_options()],
+        ],
+    },
+
+    "ingresos_periodo": {
+        "active": True,
+        "icon_page": "fa-solid fa-coins",  # Puedes cambiar este ícono si quieres otro
+        "titulo": "Reporte de ingresos por periodo",
+        "table": reporte_ingresos.get_ingresos_diarios(),
+        "filters": [],  # No se requiere filtro por ahora
+    },
+
     "reporte_usuarios": {
         "active": True,
         "icon_page": "fa-solid fa-users",
@@ -1770,11 +1792,14 @@ paginas_simples = [
     'prueba_seguimiento',
     'cajas',
     'cajas_prueba',
+    'articulos',
     'sobre_nosotros',
     'TerminosCondiciones',
     'salidas_programadas', #para eliminar
     'mapa_curds',
-    'salida_informacion'
+    'salida_informacion',
+    'cambiar_contrasenia',
+    'programacion_devolucion',
 ]
 
 
@@ -1854,11 +1879,35 @@ def api_cajas():
     return jsonify(productSizes)
 
 
+@app.route("/api/articulos")
+def api_articulos():
+    filas = controlador_articulo.get_table_with_discount()
+    articulos = {}
+
+    for fila in filas:
+        if not fila['activo']:
+            continue
+
+        key = fila['nom_articulo'].lower()
+        if key not in articulos:
+            articulos[key] = {
+                "name_product": fila['nom_articulo'],
+                "price": float(fila['precio']),
+                "stock": fila['stock'],
+                "dimensions": fila['dimensiones'] or '',
+                "image": fila['img'] or '',
+                "size_name": fila['tam_nombre'] or '',
+                "discounts": []
+            }
+        if fila['cantidad_descuento'] and fila['nom_descuento']:
+            articulos[key]["discounts"].append({
+                "name": fila['nom_descuento'],
+                "value": float(fila['cantidad_descuento'])
+            })
+
+    return jsonify(articulos)
 
 
-@app.route("/articulos")
-def articulos():
-    return render_template('articulos.html')
 
 
 @app.route("/carrito")

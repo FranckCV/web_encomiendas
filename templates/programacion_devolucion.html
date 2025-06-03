@@ -1,0 +1,653 @@
+{% extends "MAESTRA_ADMIN.html" %}
+
+{% block titulo %}
+Programar Devolución de Paquete
+{% endblock %}
+
+{% block estilos %}
+<style>
+    .devolucion_container {
+    width: 100%;
+    padding: 20px;
+}
+
+
+    .search_section {
+        background: var(--color-bg-light);
+        border-radius: 8px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .search_title {
+        color: var(--color-text-primary);
+        font-size: 1.4em;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .search_form {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 15px;
+        align-items: end;
+    }
+
+    .search_group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .search_label {
+        font-weight: 600;
+        color: var(--color-text-secondary);
+        font-size: 0.9em;
+    }
+
+    .search_input {
+        padding: 12px 15px;
+        border: 2px solid var(--color-border);
+        border-radius: 6px;
+        font-size: 1em;
+        transition: border-color 0.3s ease;
+    }
+
+    .search_input:focus {
+        outline: none;
+        border-color: var(--color-page);
+    }
+
+    .btn_search {
+        padding: 12px 25px;
+        background: var(--color-page);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn_search:hover {
+        background: color-mix(in srgb, var(--color-page) 80%, black 20%);
+        transform: translateY(-1px);
+    }
+
+    .package_info {
+        background: white;
+        border-radius: 8px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-left: 4px solid var(--color-page);
+    }
+
+    .package_header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .package_title {
+        color: var(--color-text-primary);
+        font-size: 1.3em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .status_badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85em;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status_en_transito {
+        background: color-mix(in srgb, orange 20%, white 80%);
+        color: orange;
+    }
+
+    .package_details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .detail_group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .detail_item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .detail_label {
+        font-weight: 600;
+        color: var(--color-text-secondary);
+    }
+
+    .detail_value {
+        color: var(--color-text-primary);
+        font-weight: 500;
+    }
+
+    .devolucion_form {
+        background: white;
+        border-radius: 8px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .form_title {
+        color: var(--color-text-primary);
+        font-size: 1.3em;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form_grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .form_group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form_label {
+        font-weight: 600;
+        color: var(--color-text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .required {
+        color: #e74c3c;
+    }
+
+    .form_input, .form_select, .form_textarea {
+        padding: 12px 15px;
+        border: 2px solid var(--color-border);
+        border-radius: 6px;
+        font-size: 1em;
+        transition: border-color 0.3s ease;
+    }
+
+    .form_input:focus, .form_select:focus, .form_textarea:focus {
+        outline: none;
+        border-color: var(--color-page);
+    }
+
+    .form_textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .datetime_group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .unidad_info {
+        background: #f8f9fa;
+        border-radius: 6px;
+        padding: 15px;
+        margin-top: 10px;
+        border-left: 3px solid var(--color-page);
+    }
+
+    .unidad_details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .unidad_detail {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        font-size: 0.9em;
+    }
+
+    .unidad_label {
+        color: var(--color-text-secondary);
+        font-weight: 600;
+    }
+
+    .unidad_value {
+        color: var(--color-text-primary);
+        font-weight: 500;
+    }
+
+    .capacity_indicator {
+        background: #e9ecef;
+        border-radius: 10px;
+        height: 8px;
+        margin-top: 5px;
+        overflow: hidden;
+    }
+
+    .capacity_bar {
+        height: 100%;
+        background: linear-gradient(90deg, #28a745, #ffc107, #dc3545);
+        border-radius: 10px;
+        transition: width 0.3s ease;
+    }
+
+    .capacity_text {
+        font-size: 0.8em;
+        color: var(--color-text-secondary);
+        margin-top: 3px;
+    }
+
+    .form_actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+
+    .btn_cancel {
+        padding: 12px 25px;
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn_cancel:hover {
+        background: #5a6268;
+    }
+
+    .btn_submit {
+        padding: 12px 30px;
+        background: var(--color-page);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn_submit:hover {
+        background: color-mix(in srgb, var(--color-page) 80%, black 20%);
+        transform: translateY(-1px);
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .alert {
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .alert_error {
+        background: color-mix(in srgb, #e74c3c 20%, white 80%);
+        color: #c0392b;
+        border-left: 4px solid #e74c3c;
+    }
+
+    .alert_success {
+        background: color-mix(in srgb, #27ae60 20%, white 80%);
+        color: #229954;
+        border-left: 4px solid #27ae60;
+    }
+
+    .alert_warning {
+        background: color-mix(in srgb, #f39c12 20%, white 80%);
+        color: #d68910;
+        border-left: 4px solid #f39c12;
+    }
+
+    @media (max-width: 768px) {
+        .search_form {
+            grid-template-columns: 1fr;
+        }
+        
+        .package_header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .form_actions {
+            flex-direction: column;
+        }
+        
+        .datetime_group {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="devolucion_container">
+    <div class="block_crud">
+        <h3 class="crud_title">
+            <i class="ri-truck-line"></i>
+            Programar Devolución de Paquete
+        </h3>
+    </div>
+
+    <!-- Sección de búsqueda -->
+    <div class="search_section">
+        <h4 class="search_title">
+            <i class="ri-search-line"></i>
+            Buscar Paquete
+        </h4>
+        
+        <form class="search_form" id="search_form">
+            <div class="search_group">
+                <label class="search_label">Código de Seguimiento o Destinatario</label>
+                <input type="text" class="search_input" id="search_input" 
+                       placeholder="Ingrese código de tracking o nombre del destinatario">
+            </div>
+            <button type="submit" class="btn_search">
+                <i class="ri-search-line"></i>
+                Buscar
+            </button>
+        </form>
+    </div>
+
+    <!-- Información del paquete (inicialmente oculta) -->
+    <div class="package_info hidden" id="package_info">
+        <div class="package_header">
+            <h4 class="package_title">
+                <i class="ri-package-line"></i>
+                Información del Paquete
+            </h4>
+            <span class="status_badge status_en_transito">En Tránsito</span>
+        </div>
+        
+        <div class="package_details">
+            <div class="detail_group">
+                <div class="detail_item">
+                    <span class="detail_label">Código de Seguimiento:</span>
+                    <span class="detail_value" id="package_tracking">12345678</span>
+                </div>
+                <div class="detail_item">
+                    <span class="detail_label">Destinatario:</span>
+                    <span class="detail_value" id="package_destinatario">María González Pérez</span>
+                </div>
+                <div class="detail_item">
+                    <span class="detail_label">Dirección de Destino:</span>
+                    <span class="detail_value" id="package_direccion">Av. Los Pinos 123, San Isidro</span>
+                </div>
+                <div class="detail_item">
+                    <span class="detail_label">Teléfono:</span>
+                    <span class="detail_value" id="package_telefono">987654321</span>
+                </div>
+                <div class="detail_item">
+                    <span class="detail_label">Peso:</span>
+                    <span class="detail_value" id="package_peso">2.5 kg</span>
+                </div>
+                <div class="detail_item">
+                    <span class="detail_label">Dimensiones:</span>
+                    <span class="detail_value" id="package_dimensiones">30x20x15 cm</span>
+                </div>
+            </div>
+            
+            <div class="detail_group">
+                <div class="detail_item">
+                    <span class="detail_label">Sucursal de Origen:</span>
+                    <span class="detail_value" id="package_origen">Lima Centro (LIMCE)</span>
+                </div>
+                <div class="detail_item">
+                    <span class="detail_label">Sucursal de Destino:</span>
+                    <span class="detail_value" id="package_destino">San Isidro (SANID)</span>
+                </div>
+                <div class="detail_item">
+                    <span class="detail_label">Estado Actual:</span>
+                    <span class="detail_value" id="package_estado">En ruta de entrega</span>
+                </div>
+                <div class="detail_item">
+                    <span class="detail_label">Valor del Paquete:</span>
+                    <span class="detail_value" id="package_valor">S/ 150.00</span>
+                </div>
+                <div class="detail_item">
+                    <span class="detail_label">Unidad Actual:</span>
+                    <span class="detail_value" id="package_unidad_actual">ABC-123 (Furgoneta)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="devolucion_form hidden" id="devolucion_form">
+    <h4 class="form_title">
+        <i class="ri-truck-line"></i>
+        Asignar Unidad para Devolución
+    </h4>
+
+    <form id="form_devolucion">
+        <!-- Campo oculto para el tracking -->
+        <input type="hidden" id="tracking_id" name="tracking_id" value="">
+
+        <!-- Selección de unidad -->
+        <div class="form_group">
+            <label class="form_label">
+                Unidad de Transporte para Devolución <span class="required">*</span>
+                <i class="ri-truck-line" style="color: var(--color-page);"></i>
+            </label>
+            <select class="form_select" name="unidad_id" id="unidad_select" required>
+                <option value="">Seleccione una unidad disponible</option>
+                <!-- OPCIONES DE PRUEBA, reemplazar por backend -->
+                <option value="1" data-placa="ABC-123" data-modelo="Ford Transit" data-capacidad="1000" data-volumen="8.5" data-estado="A" data-ocupacion="65">ABC-123 - Ford Transit (Disponible)</option>
+                <option value="2" data-placa="DEF-456" data-modelo="Mercedes Sprinter" data-capacidad="1500" data-volumen="12.0" data-estado="A" data-ocupacion="80">DEF-456 - Mercedes Sprinter (Disponible)</option>
+                <option value="3" data-placa="GHI-789" data-modelo="Isuzu NPR" data-capacidad="2000" data-volumen="15.0" data-estado="A" data-ocupacion="45">GHI-789 - Isuzu NPR (Disponible)</option>
+                <option value="4" data-placa="JKL-012" data-modelo="Hyundai H100" data-capacidad="800" data-volumen="6.0" data-estado="M" data-ocupacion="0">JKL-012 - Hyundai H100 (En mantenimiento)</option>
+            </select>
+
+            <!-- Información detallada de la unidad seleccionada -->
+            <div class="unidad_info hidden" id="unidad_info">
+                <h5 style="margin: 0 0 10px 0; color: var(--color-text-primary);">
+                    <i class="ri-information-line"></i>
+                    Detalles de la Unidad Seleccionada
+                </h5>
+                <div class="unidad_details">
+                    <div class="unidad_detail"><span class="unidad_label">Placa:</span><span class="unidad_value" id="unidad_placa">-</span></div>
+                    <div class="unidad_detail"><span class="unidad_label">Modelo:</span><span class="unidad_value" id="unidad_modelo">-</span></div>
+                    <div class="unidad_detail"><span class="unidad_label">Capacidad:</span><span class="unidad_value" id="unidad_capacidad">-</span></div>
+                    <div class="unidad_detail"><span class="unidad_label">Volumen:</span><span class="unidad_value" id="unidad_volumen">-</span></div>
+                    <div class="unidad_detail"><span class="unidad_label">Estado:</span><span class="unidad_value" id="unidad_estado">-</span></div>
+                    <div class="unidad_detail"><span class="unidad_label">Ocupación actual:</span><span class="unidad_value" id="unidad_ocupacion">-</span></div>
+                </div>
+                <div class="capacity_indicator">
+                    <div class="capacity_bar" id="capacity_bar" style="width: 0%"></div>
+                </div>
+                <div class="capacity_text" id="capacity_text">Capacidad disponible: 100%</div>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="form_actions">
+            <button type="button" class="btn_cancel" onclick="cancelarDevolucion()">
+                Cancelar
+            </button>
+            <button type="submit" class="btn_submit">
+                <i class="ri-save-line"></i>
+                Confirmar Devolución
+            </button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchForm = document.getElementById('search_form');
+    const packageInfo = document.getElementById('package_info');
+    const devolucionForm = document.getElementById('devolucion_form');
+    const formDevolucion = document.getElementById('form_devolucion');
+    const unidadSelect = document.getElementById('unidad_select');
+    const unidadInfo = document.getElementById('unidad_info');
+
+    // Mostrar detalles al seleccionar una unidad
+    unidadSelect.addEventListener('change', function () {
+        const opt = this.options[this.selectedIndex];
+
+        if (opt.value) {
+            document.getElementById('unidad_placa').textContent = opt.dataset.placa;
+            document.getElementById('unidad_modelo').textContent = opt.dataset.modelo;
+            document.getElementById('unidad_capacidad').textContent = opt.dataset.capacidad + ' kg';
+            document.getElementById('unidad_volumen').textContent = opt.dataset.volumen + ' m³';
+            document.getElementById('unidad_estado').textContent = getEstadoText(opt.dataset.estado);
+            document.getElementById('unidad_ocupacion').textContent = opt.dataset.ocupacion + '%';
+
+            const ocupacion = parseInt(opt.dataset.ocupacion);
+            const bar = document.getElementById('capacity_bar');
+            const text = document.getElementById('capacity_text');
+
+            bar.style.width = ocupacion + '%';
+            text.textContent = `Capacidad disponible: ${100 - ocupacion}%`;
+
+            bar.style.background = ocupacion < 50 ? '#28a745' : ocupacion < 80 ? '#ffc107' : '#dc3545';
+
+            unidadInfo.classList.remove('hidden');
+
+            if (ocupacion > 90) {
+                showAlert('Advertencia: La unidad seleccionada tiene muy poca capacidad disponible.', 'warning');
+            }
+        } else {
+            unidadInfo.classList.add('hidden');
+        }
+    });
+
+    // Validación y envío simulado
+    formDevolucion.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const data = Object.fromEntries(new FormData(this));
+        const opt = unidadSelect.options[unidadSelect.selectedIndex];
+
+        if (!data.unidad_id) {
+            showAlert('Debe seleccionar una unidad de transporte.', 'error');
+            return;
+        }
+
+        if (opt.dataset.estado === 'M') {
+            showAlert('No se puede asignar una unidad que está en mantenimiento.', 'error');
+            return;
+        }
+
+        console.log("Devolución programada:", data);
+        showAlert('Devolución programada exitosamente.', 'success');
+
+        formDevolucion.reset();
+        unidadInfo.classList.add('hidden');
+        packageInfo.classList.add('hidden');
+        devolucionForm.classList.add('hidden');
+    });
+
+    // Buscar paquete (simulado)
+    searchForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const value = document.getElementById('search_input').value.trim();
+
+        if (!value) {
+            showAlert('Ingrese un código de seguimiento o destinatario.', 'error');
+            return;
+        }
+
+        buscarPaquete(value);
+    });
+
+    function buscarPaquete(valor) {
+        const mock = {
+            tracking: '12345678',
+            destinatario: 'María González Pérez',
+            direccion: 'Av. Los Pinos 123, San Isidro, Lima',
+            telefono: '987654321',
+            peso: '2.5 kg',
+            dimensiones: '30x20x15 cm',
+            sucursal_origen: 'Lima Centro (LIMCE)',
+            sucursal_destino: 'San Isidro (SANID)',
+            estado_actual: 'En ruta de entrega',
+            valor: 'S/ 150.00',
+            unidad_actual: 'ABC-123 (Furgoneta)'
+        };
+
+        document.getElementById('package_tracking').textContent = mock.tracking;
+        document.getElementById('package_destinatario').textContent = mock.destinatario;
+        document.getElementById('package_direccion').textContent = mock.direccion;
+        document.getElementById('package_telefono').textContent = mock.telefono;
+        document.getElementById('package_peso').textContent = mock.peso;
+        document.getElementById('package_dimensiones').textContent = mock.dimensiones;
+        document.getElementById('package_origen').textContent = mock.sucursal_origen;
+        document.getElementById('package_destino').textContent = mock.sucursal_destino;
+        document.getElementById('package_estado').textContent = mock.estado_actual;
+        document.getElementById('package_valor').textContent = mock.valor;
+        document.getElementById('package_unidad_actual').textContent = mock.unidad_actual;
+        document.getElementById('tracking_id').value = mock.tracking;
+
+        packageInfo.classList.remove('hidden');
+        devolucionForm.classList.remove('hidden');
+
+        showAlert('Paquete encontrado correctamente.', 'success');
+    }
+
+    function getEstadoText(e) {
+        return e === 'A' ? 'Activo/Disponible' : e === 'M' ? 'En Mantenimiento' : e === 'I' ? 'Inactivo' : 'Desconocido';
+    }
+
+    window.cancelarDevolucion = function () {
+        if (confirm("¿Deseas cancelar la devolución?")) {
+            formDevolucion.reset();
+            unidadInfo.classList.add('hidden');
+            devolucionForm.classList.add('hidden');
+            showAlert('Programación cancelada.', 'warning');
+        }
+    }
+
+    window.showAlert = function (msg, type = 'info') {
+        const alertDiv = document.createElement("div");
+        alertDiv.classList.add("alert", `alert_${type}`);
+        alertDiv.innerHTML = `<i class="ri-information-line"></i> ${msg}`;
+        document.querySelector(".devolucion_container").prepend(alertDiv);
+        setTimeout(() => alertDiv.remove(), 4000);
+    }
+});
+</script>
+{% endblock %}
