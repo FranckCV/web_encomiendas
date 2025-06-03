@@ -1792,11 +1792,9 @@ paginas_simples = [
     'TerminosCondiciones',
     'salidas_programadas', #para eliminar
     'mapa_curds',
-    'envio_masivo',
     'salida_informacion',
     'cambiar_contrasenia',
     'programacion_devolucion',
-    'salida_informacion'
 ]
 
 
