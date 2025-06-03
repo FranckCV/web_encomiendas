@@ -40,11 +40,14 @@ from controladores import controlador_descuento_articulo as controlador_descuent
 from controladores import controlador_salida as controlador_salida
 from controladores import controlador_reclamo as controlador_reclamo
 from controladores import controlador_preguntas_frecuentes as controlador_pregunta_frecuente
+from controladores import controlador_regla_cargo as controlador_regla_cargo
+
 from controladores import reporte_ingresos as reporte_ingresos
 from controladores import controlador_transaccion_venta as controlador_transaccion_venta
 from controladores import controlador_detalle_venta as controlador_detalle_venta
 from controladores import controlador_metodo_pago_venta as controlador_metodo_pago_venta
 from controladores import controlador_articulo as controlador_articulo
+
 
 import hashlib
 import os
@@ -481,7 +484,7 @@ CONTROLADORES = {
             ['precio',      'Precio',          'Precio',      'number',   True ,     True  ,        None ],
             ['stock',       'Stock',           'Stock',       'number',   True ,     True  ,        None ],
             ['dimensiones', 'Dimensiones',     'Dimensiones', 'text',     False ,     True  ,        None ],
-            ['tamaño_cajaid','Tamaño Caja',    'Tamaño Caja', 'select',   False ,     True  ,        [lambda: controlador_tamanio_caja.get_options() , 'tam_nombre' ]  ],
+            ['tamaño_cajaid','Tamaño de Caja',    'Tamaño de Caja', 'select',   False ,     True  ,        [lambda: controlador_tamanio_caja.get_options() , 'tam_nombre' ]  ],
             ['img',         'Imagen',          'Imagen',      'img',      True ,     True  ,        None ],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
         ],
@@ -1894,7 +1897,7 @@ def api_articulos():
                 "price": float(fila['precio']),
                 "stock": fila['stock'],
                 "dimensions": fila['dimensiones'] or '',
-                "image": fila['img'] or '',
+                "image": f'/static/img/img_articulo/{fila['img'] or ''}',
                 "size_name": fila['tam_nombre'] or '',
                 "discounts": []
             }
@@ -2002,15 +2005,24 @@ def mostrar_pagoenvio():
 def envio_masivo():
     nombre_doc = controlador_tipo_documento.get_options()
     nombre_rep = controlador_tipo_recepcion.get_options()
-    sucursales = controlador_sucursal.get_ubigeo()
+    rutas_tarifas = controlador_tarifa_ruta.get_sucursales_origen_destino()
     articulos = controlador_contenido_paquete.get_options()
     empaque = controlador_tipo_empaque.get_options()
+    condiciones = controlador_regla_cargo.get_condiciones_tarifa()
+    tarifas = controlador_tarifa_ruta.get_tarifas_ruta_dict()
     return render_template('envio_masivo.html', 
                            nombre_doc=nombre_doc,
                            nombre_rep=nombre_rep,
-                           sucursales=json.dumps(sucursales), 
-                           empaque= empaque, 
-                           articulos=articulos)     
+                           rutasTarifas=json.dumps(rutas_tarifas), 
+                           tarifas = json.dumps(tarifas),
+                           empaque=empaque, 
+                           articulos=articulos,
+                           condiciones=condiciones)
+    
+    
+    
+    
+    
 
 ################# Sucursales ######################
 
@@ -2369,6 +2381,7 @@ def crud_update(tabla):
             if nombre in request.files:
                 archivo = request.files[nombre]
                 # print(archivo)
+                # print(archivo)
                 if archivo.filename != "":
                     # print(nombre)
                     nuevo_nombre = guardar_imagen_bd(tabla,'' ,archivo)
@@ -2378,8 +2391,12 @@ def crud_update(tabla):
                     valores.append(request.form.get(f"{nombre}_actual"))
             else:
                 valor = request.form.get(nombre)
+                # print(valor)
+                if valor == '':
+                    valor = None
                 valores.append(valor)
 
+        print(valores)
         controlador.update_row( *valores )
         if no_crud :
             return redirect(url_for(no_crud))
