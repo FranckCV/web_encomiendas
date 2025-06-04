@@ -1897,7 +1897,7 @@ def api_articulos():
                 "price": float(fila['precio']),
                 "stock": fila['stock'],
                 "dimensions": fila['dimensiones'] or '',
-                "image": f'/static/img/img_articulo/{fila['img'] or ''}',
+                "image": f"/static/img/img_articulo/{(fila['img'] or '')}",
                 "size_name": fila['tam_nombre'] or '',
                 "discounts": []
             }
@@ -1988,7 +1988,22 @@ def tipos_envio():
 
 @app.route('/registro-envio')
 def registro_envio():
-    return render_template('registro_envio.html')
+    nombre_doc = controlador_tipo_documento.get_options()
+    nombre_rep = controlador_tipo_recepcion.get_options()
+    sucursales = controlador_sucursal.get_ubigeo()
+    articulos = controlador_contenido_paquete.get_options()
+    empaque = controlador_tipo_empaque.get_options()
+
+    return render_template(
+        'registro_envio.html',
+        nombre_doc=nombre_doc,
+        nombre_rep=nombre_rep,
+        sucursales=json.dumps(sucursales),
+        articulos=articulos,
+        empaque=empaque
+        
+    )
+
 
 @app.route('/resumen_envio')
 def mostrar_resumen():
