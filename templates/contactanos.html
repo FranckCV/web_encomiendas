@@ -2,6 +2,7 @@
 
 {% block estilos %}
 <link rel="stylesheet" href="/static/css/contactanos.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 {% endblock %}
 
 {% block titulo %}
@@ -9,6 +10,12 @@ Contáctanos - Shalom
 {% endblock %}
 
 {% block contenido %}
+<div id="successMessage" class="success-message" style="display: none;">
+    <i class="fas fa-check-circle"></i>
+    <p style="margin: 0;">¡Gracias por tu mensaje! Hemos recibido tu consulta y nos pondremos en contacto contigo
+        pronto.</p>
+    <div class="progress-bar"></div>
+</div>
 <div class="contacto-container">
 
     <h1 class="head_title">Contáctanos</h1>
@@ -118,9 +125,6 @@ Contáctanos - Shalom
             </div>
 
             <button type="submit" class="btn-submit">Enviar</button>
-            <div id="successMessage" class="success-message" style="display: none;">
-                <p>¡Gracias por tu mensaje! Hemos recibido tu consulta y nos pondremos en contacto contigo pronto.</p>
-            </div>
 
         </form>
     </div>
