@@ -40,12 +40,10 @@ from controladores import controlador_descuento_articulo as controlador_descuent
 from controladores import controlador_salida as controlador_salida
 from controladores import controlador_reclamo as controlador_reclamo
 from controladores import controlador_preguntas_frecuentes as controlador_pregunta_frecuente
-<<<<<<< HEAD
 from controladores import controlador_regla_cargo as controlador_regla_cargo
 
-=======
 from controladores import reporte_ingresos as reporte_ingresos
->>>>>>> 8cc40e7272df8f6b4fad232eae40ffa4f72304f4
+from controladores.bd import sql_execute
 
 
 import hashlib
@@ -1800,6 +1798,7 @@ paginas_simples = [
     'salida_informacion',
     'cambiar_contrasenia',
     'programacion_devolucion',
+    'Faq'
 ]
 
 
@@ -1838,14 +1837,70 @@ def logout():
 
 ##################_ CLIENTE PAGE _################## 
 
-@app.route("/faq")
-def Faq():
-    return render_template('Faq.html')
+@app.route('/api/Faq')
+def api_Faq():
+    columnas, filas = controlador_pregunta_frecuente.get_table()
+    # Filtrar solo activas
+    preguntas_activas = [f for f in filas if f['activo'] == 1]
+    return jsonify(preguntas_activas)
 
 
-@app.route("/contactanos")
-def contac():
+@app.route('/contactanos')
+def contactanos():
     return render_template('contactanos.html')
+
+@app.route('/enviar-formulario', methods=['POST'])
+def enviar_formulario():
+    try:
+        data = request.json  # esperamos JSON en el fetch del frontend
+        
+        nombre = data.get('nombreCompleto', '').strip()
+        nro_documento = data.get('numeroDocumento', '').strip()
+        correo = data.get('email', '').strip()
+        telefono = data.get('telefono', '').strip()
+        mensaje = data.get('mensaje', '').strip()
+        tipo_documentoid = data.get('tipoDocumentoId')  # si manejas tipos de doc, o null
+        tipo_clienteid = data.get('tipoClienteId')
+        sucursalid = data.get('sucursalId')
+        
+        # Validaciones básicas
+        if not (nombre and nro_documento and correo and telefono and mensaje and tipo_clienteid and sucursalid):
+            return jsonify({'success': False}), 400  # Solo devolvemos un estado de error
+
+        sql = '''
+            INSERT INTO mensaje_contacto 
+            (nombre, nro_documento, correo, telefono, mensaje, tipo_documentoid, tipo_clienteid, sucursalid)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        '''
+        sql_execute(sql, (nombre, nro_documento, correo, telefono, mensaje, tipo_documentoid, tipo_clienteid, sucursalid))
+        
+        return jsonify({'success': True})  # Solo devolvemos un estado de éxito sin mensaje
+    except Exception as e:
+        print(f"Error al guardar mensaje: {e}")
+        return jsonify({'success': False}), 500  # Solo devolvemos un estado de error
+
+@app.route('/api/tipo_cliente')
+def api_tipo_cliente():
+    from controladores import controlador_tipo_cliente
+    opciones = controlador_tipo_cliente.get_options()
+    # convertir lista de tuplas a lista de dicts
+    data = [{'id': o[0], 'nombre': o[1]} for o in opciones]
+    return jsonify(data)
+
+@app.route('/api/sucursales_simple')
+def api_sucursales_simple():
+    from controladores import controlador_sucursal
+    opciones = controlador_sucursal.get_options()
+    data = [{'id': o[0], 'direccion': o[1]} for o in opciones]
+    return jsonify(data)
+
+@app.route('/api/tipo_documento')
+def api_tipo_documento():
+    from controladores import controlador_tipo_documento
+    opciones = controlador_tipo_documento.get_options()
+    data = [{'id': o[0], 'nombre': o[1]} for o in opciones]
+    return jsonify(data)
+
 
 @app.route("/api/cajas")
 def api_cajas():
