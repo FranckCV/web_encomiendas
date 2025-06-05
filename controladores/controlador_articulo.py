@@ -144,6 +144,33 @@ def get_table_with_discount():
     return filas
 
 
+def get_table_cajas():
+    sql= f'''
+        select 
+            art.id as articuloid,
+            art.nombre as nom_articulo,
+            art.precio ,
+            art.stock ,
+            art.dimensiones ,
+            tam.nombre as tam_nombre,
+            art.tamaño_cajaid ,
+            art.img,
+            des.nombre as nom_descuento,
+            des_art.cantidad_descuento,
+            art.activo 
+        from articulo art
+        left join tamanio_caja tam on tam.id = art.tamaño_cajaid 
+        left join descuento_articulo des_art on des_art.articuloid = art.id
+        LEFT join descuento des on des.id = des_art.DESCUENTOid
+        where UPPER(art.nombre) like UPPER('%caja%')
+        ;
+
+    '''
+    
+    filas = sql_select_fetchall(sql)
+    
+    return filas
+
 def my_sql_select_fetchall(sql, params=None):
     try:
         conexion = obtener_conexion()

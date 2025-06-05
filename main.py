@@ -1893,9 +1893,9 @@ def api_tipo_cliente():
 
 @app.route('/api/sucursales_simple')
 def api_sucursales_simple():
-    from controladores import controlador_sucursal
-    opciones = controlador_sucursal.get_options()
-    data = [{'id': o[0], 'direccion': o[1]} for o in opciones]
+    # from controladores import controlador_sucursal
+    opciones = controlador_sucursal.get_ubigeo_sucursal()
+    data = [{'id': o['id'], 'direccion': o['direccion_completa']} for o in opciones]
     return jsonify(data)
 
 @app.route('/api/tipo_documento')
@@ -1908,12 +1908,12 @@ def api_tipo_documento():
 
 @app.route("/api/cajas")
 def api_cajas():
-    filas = controlador_articulo.get_table_with_discount()
+    filas = controlador_articulo.get_table_cajas()
     # print(filas)
     productSizes = {}
 
     for fila in filas:
-        if not fila['activo'] or not fila['tamaño_cajaid']:
+        if not fila['activo'] :
             continue
 
         key = fila['tam_nombre'].lower()
@@ -1926,16 +1926,18 @@ def api_cajas():
                 "name_product":nombre,
                 "price": precio,
                 "dimensions": fila['dimensiones'],
-                "image": img,
-                "discounts": [],
-                "id": fila['articuloid']  
+                "image": f"/static/img/img_articulo/{(fila['img'] or '')}",
+                "size_name": fila['tam_nombre'] or '',
+                "id": fila['articuloid'] ,
+                "discounts": [] 
             }
 
         if fila['cantidad_descuento'] and fila['nom_descuento']:
-            productSizes[key]["discounts"].append({
+            productSizes[key]['discounts'].append({
                 "name": fila['nom_descuento'],  
                 "value": float(fila['cantidad_descuento'])
             })
+    print(productSizes)
     return jsonify(productSizes)
 
 

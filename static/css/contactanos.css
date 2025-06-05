@@ -187,7 +187,7 @@ select.form-control {
 /* ========== NUEVO MENSAJE DE ÉXITO ANIMADO ========== */
 .success-message {
     position: fixed;
-    top: 150px;
+    top: 50%;
     left: 50%;
     transform: translateX(-50%) scale(0);
     background: linear-gradient(135deg, #4CAF50, #45a049);

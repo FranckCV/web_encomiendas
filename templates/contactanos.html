@@ -72,14 +72,27 @@ Contáctanos - Shalom
     <!-- Sección del formulario -->
     <div class="formulario-contacto">
         <form id="contactForm">
-            <div class="form-group">
-                <label for="nombreCompleto">Nombre Completo</label>
-                <input type="text" class="form-control" id="nombreCompleto" name="nombreCompleto" required>
-            </div>
 
+            <div class="form-group">
+                <label for="tipoCliente">Tipo Cliente</label>
+                <select class="form-control" id="tipoCliente" name="tipoCliente" required>
+                    <option value="" selected disabled>-</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="tipoDocumento">Tipo Documento</label>
+                <select class="form-control" id="tipoDocumento" name="tipoDocumento" required>
+                    <option value="" selected disabled>-</option>
+                </select>
+            </div>
             <div class="form-group">
                 <label for="numeroDocumento">Número de Documento</label>
                 <input type="text" class="form-control" id="numeroDocumento" name="numeroDocumento" required>
+            </div>
+
+            <div class="form-group">
+                <label for="nombreCompleto">Nombre Completo o Razón Social</label>
+                <input type="text" class="form-control" id="nombreCompleto" name="nombreCompleto" required>
             </div>
 
             <div class="form-group">
@@ -95,20 +108,6 @@ Contáctanos - Shalom
             <div class="form-group">
                 <label for="mensaje">Mensaje</label>
                 <textarea class="form-control" id="mensaje" name="mensaje" rows="4" required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="tipoDocumento">Tipo Documento</label>
-                <select class="form-control" id="tipoDocumento" name="tipoDocumento" required>
-                    <option value="" selected disabled>-</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="tipoCliente">Tipo Cliente</label>
-                <select class="form-control" id="tipoCliente" name="tipoCliente" required>
-                    <option value="" selected disabled>-</option>
-                </select>
             </div>
 
             <div class="form-group">

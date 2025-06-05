@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Función genérica para cargar opciones en un select
     function cargarOpciones(selectElement, datos, valorKey, textoKey) {
-        selectElement.innerHTML = '<option value="" selected disabled>-</option>';
+        selectElement.innerHTML = '<option value="" selected disabled>Selecciona una opción</option>';
         datos.forEach(item => {
             const option = document.createElement('option');
             option.value = item[valorKey];
