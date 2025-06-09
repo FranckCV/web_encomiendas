@@ -127,6 +127,7 @@ def get_table_with_discount():
             tam.nombre as tam_nombre,
             art.tamaño_cajaid ,
             art.img,
+            des.id,
             des.nombre as nom_descuento,
             des_art.cantidad_descuento,
             art.activo 

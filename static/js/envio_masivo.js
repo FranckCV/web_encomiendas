@@ -379,12 +379,15 @@ function toggleFolios() {
   const tipo = document.getElementById('m-tipoEmpaque').value;
   const grupoFolios = document.getElementById('grupo-folios');
   grupoFolios.style.display = (tipo === '2') ? 'flex' : 'none';
+  grupoFolios.querySelector('input').setAttribute('required','');
+
 }
 
 function toggleArticulos() {
   const tipo = document.getElementById('m-tipoEmpaque').value;
   const grupoArticulos = document.getElementById('grupo-articulos');
   grupoArticulos.style.display = (tipo === '1') ? 'flex' : 'none';
+  grupoArticulos.querySelector('select').setAttribute('required','');
 }
 
 function mostrarCamposReceptor() {
@@ -441,7 +444,8 @@ function validarRequeridos() {
 
     if (tipo === 'select') {
       valor = campo.value;
-    } else if (tipo === 'input' || tipo === 'textarea') {
+    // } else if (tipo === 'input' || tipo === 'textarea') {
+    } else if (tipo === 'input' ) {
       valor = campo.value.trim();
     }
 
@@ -608,7 +612,6 @@ function agregarEnvio() {
     console.error("Error al parsear localStorage:", e);
   }
 
-  // 7. Si editIndex >= 0: estamos editando, reemplazamos el índice; si no: agregamos
   if (editIndex >= 0) {
     enviosActuales[editIndex] = envio;
     editIndex = -1;   // restauramos a "no edición"
@@ -736,7 +739,7 @@ function actualizarTabla() {
   let sumaValor = 0;
 
   let html = `
-    <div style="overflow-x: auto;">
+    <div>
       <table>
         <thead>
           <tr>
@@ -879,10 +882,9 @@ function limpiarFormularioMasivo() {
 
 
 function cerrarModal() {
-  const modal = document.getElementById('modalConfirmacion');
-  modal.style.display = 'none';
-  const confirmarBtn = document.getElementById('confirmarBtn');
-  confirmarBtn.replaceWith(confirmarBtn.cloneNode(true));
+  document.getElementById('modalConfirmacion').style.display = 'none';
+  document.getElementById('modalValidacion').style.display = 'none';
+
 }
 
 function eliminarTodo() {

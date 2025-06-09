@@ -129,6 +129,34 @@ def get_sucursales_origen_destino():
 
     return estructura
 
+def get_tarifa_origen():
+    sql = '''
+        SELECT DISTINCT
+            s_origen.ubigeocodigo,
+            u.departamento,
+            u.provincia,
+            u.distrito
+        FROM tarifa_ruta tr
+        JOIN sucursal    s_origen ON s_origen.id     = tr.sucursal_origen_id
+        JOIN ubigeo      u        ON u.codigo          = s_origen.ubigeocodigo;
+
+    '''
+    filas = sql_select_fetchall(sql)
+    return {f"{f['id_origen']}|{f['id_destino']}": f['tarifa'] for f in filas}
+
+def get_tarifa_destino():
+    sql = '''
+        SELECT 
+            s_origen.id AS id_origen,
+            s_destino.id AS id_destino,
+        FROM tarifa_ruta tr
+        INNER JOIN sucursal s_origen ON s_origen.id = tr.sucursal_origen_id
+        INNER JOIN sucursal s_destino ON s_destino.id = tr.sucursal_destino_id
+    '''
+    filas = sql_select_fetchall(sql)
+    return {f"{f['id_origen']}|{f['id_destino']}": f['tarifa'] for f in filas}
+
+
 def get_tarifas_ruta_dict():
     sql = '''
         SELECT 

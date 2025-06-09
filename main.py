@@ -40,12 +40,8 @@ from controladores import controlador_descuento_articulo as controlador_descuent
 from controladores import controlador_salida as controlador_salida
 from controladores import controlador_reclamo as controlador_reclamo
 from controladores import controlador_preguntas_frecuentes as controlador_pregunta_frecuente
-<<<<<<< HEAD
 from controladores import controlador_regla_cargo as controlador_regla_cargo
-
-=======
 from controladores import reporte_ingresos as reporte_ingresos
->>>>>>> 8cc40e7272df8f6b4fad232eae40ffa4f72304f4
 
 
 import hashlib

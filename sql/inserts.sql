@@ -2416,3 +2416,23 @@ INSERT INTO regla_cargo (id, tipo_condicion, inferior, superior, porcentaje) VAL
 INSERT INTO regla_cargo (id, tipo_condicion, inferior, superior, porcentaje) VALUES
 (3, 'P', 1, NULL, 0.1);
 
+
+INSERT INTO tarifa_ruta values
+  (28, 29,  80.00),  
+  (28, 30, 100.00), 
+  (29, 30,  90.00),  
+  (28, 31,  95.00),  
+  (28, 32, 110.00),  
+  (29, 31,  85.00), 
+  (29, 32, 105.00), 
+
+  (59, 60,  10.00),  
+  (60, 61,  10.00),  
+  (59, 61,  15.00), 
+
+  (1, 28, 200.00),  
+  (2, 28, 180.00),  
+  (28, 59, 120.00),
+  (3,  5,  40.00),  
+  (5,  1,  70.00),  
+  (60, 28, 120.00);

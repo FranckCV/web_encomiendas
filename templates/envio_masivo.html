@@ -106,7 +106,24 @@ Registro de Envíos Masivos
                   </select>
                 </div>
                 <input type="hidden" id="origen-sucursal-id" value="">
+
           </div>
+          <div class="acciones_origen">
+
+              <div class="opciones_fila" style="display: none;">
+                <button class="clickable-modal btn_cancel" id="modal_crud_update_{{tabla}}_{{ id_pk}}">
+                   Cancelar
+                </button>
+              </div>
+
+              <div class="opciones_fila" style="display: none;">
+                <button class="clickable-modal btn_update" id="modal_crud_update_{{tabla}}_{{ id_pk}}">
+                  <i class="{{ICON_UPDATE}}"></i> Editar
+                </button>
+              </div>
+
+        </div>
+
         </div>
     </div>
     <!-- SECCIÓN: ENVÍOS MASIVOS CON PESTAÑAS -->
@@ -146,14 +163,14 @@ Registro de Envíos Masivos
 
                 <div class="campo-grupo">
                   <label>Departamento *</label>
-                  <select id="select-departamento" required>
+                  <select id="select-departamento" required disabled>
                     <option disabled selected value="">Elija lugar de origen primero</option>
                   </select>
                 </div>
 
                 <div class="campo-grupo">
                   <label>Provincia *</label>
-                  <select id="select-provincia" required>
+                  <select id="select-provincia" required disabled>
                   <option disabled selected value="">Elija lugar de origen primero</option>
 
                   </select>
@@ -161,7 +178,7 @@ Registro de Envíos Masivos
 
                 <div class="campo-grupo">
                   <label>Distrito *</label>
-                  <select id="select-distrito" required>
+                  <select id="select-distrito" required disabled>
                          <option disabled selected value="">Elija lugar de origen primero</option>
                   </select>
                 </div>
@@ -190,7 +207,6 @@ Registro de Envíos Masivos
 
 
             </div>
-
             <!-- PESTAÑA PAQUETE -->
             <div class="tab-panel" id="tab-paquete">
               <div class="campos-envio">
@@ -206,7 +222,7 @@ Registro de Envíos Masivos
                 
                 <div class="campo-grupo" id="grupo-articulos" style="display:none;">
                       <label>Tipo de contenido *</label>
-                      <select id="m-tipoArticulo">
+                      <select id="m-tipoArticulo" >
                       <option disabled selected value="">Seleccione tipo de contenido</option>
                       {% for fila in articulos %}
                         <option value="{{ fila[0] }}">{{ fila[1] }}</option>
@@ -245,7 +261,7 @@ Registro de Envíos Masivos
 
                 <div class="campo-grupo" id="grupo-folios" style="display:none;">
                   <label># Folios *</label>
-                  <input type="number" id="m-folios" min="1" placeholder="Cantidad de hojas" required>
+                  <input type="number" id="m-folios" min="1" placeholder="Cantidad de hojas" >
                 </div>
 
                 <div class="campo-grupo campo-descripcion">
@@ -254,7 +270,6 @@ Registro de Envíos Masivos
                 </div>
               </div>
             </div>
-
             <!-- PESTAÑA DESTINATARIO -->
             <div class="tab-panel" id="tab-destinatario">
               <div class="campos-envio">
@@ -319,7 +334,12 @@ Registro de Envíos Masivos
 
               </div>
             </div>
+
+              <button class="next" type="button"> <i class="fa-solid fa-arrow-right"></i></button>
+
           </div>
+
+
         </div>
       
 
@@ -343,10 +363,7 @@ Registro de Envíos Masivos
               <div class="stat-value" id="pesoTotal">0</div>
               <div class="stat-label">Peso Total (kg)</div>
             </div>
-            <div class="stat-item">
-              <div class="stat-value">S/ <span id="valorTotal">0.00</span></div>
-              <div class="stat-label">Valor Total</div>
-            </div>
+
           </div>
         </div>
 
@@ -359,15 +376,13 @@ Registro de Envíos Masivos
 
         <div class="table-actions">
           <button type="button" class="btn-limpiar-todos" onclick="eliminarTodo()" title="Eliminar todos los envíos">🗑️ Eliminar todo</button>
-          <button type="button" class="btn-exportar" onclick="exportarCSV()">📥 Exportar CSV</button>
+          <button type="button" class="btn-exportar" onclick="exportarExcel()">📥 Exportar excel</button>
         </div>
       </div>
     </div>
 
-
-
-    <!-- Botón continuar -->
     <button type="button" class="btn-continuar" id="btn-continuar">CONTINUAR</button>
+
   </form>
 </div>
 
