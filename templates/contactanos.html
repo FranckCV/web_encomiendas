@@ -2,6 +2,7 @@
 
 {% block estilos %}
 <link rel="stylesheet" href="/static/css/contactanos.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 {% endblock %}
 
 {% block titulo %}
@@ -9,8 +10,14 @@ Contáctanos - Shalom
 {% endblock %}
 
 {% block contenido %}
+<div id="successMessage" class="success-message" style="display: none;">
+    <i class="fas fa-check-circle"></i>
+    <p style="margin: 0;">¡Gracias por tu mensaje! Hemos recibido tu consulta y nos pondremos en contacto contigo
+        pronto.</p>
+    <div class="progress-bar"></div>
+</div>
 <div class="contacto-container">
-    
+
     <h1 class="head_title">Contáctanos</h1>
     <h5 class="h5">Estamos aquí para ayudarte con tus envíos. No dudes en comunicarte con nosotros.</h5>
 
@@ -46,8 +53,8 @@ Contáctanos - Shalom
             </div>
             <div class="info-titulo">Email</div>
             <div class="info-texto">
-                <a href="mailto:atencionalcliente@shalom.com.pe">soporte@NewOlva.com.pe</a><br>
-                <a href="mailto:ventas@shalom.com.pe">ventas@NewOlva.com.pe</a>
+                <a href="mailto:soporte@NewOlva.com.pe">soporte@NewOlva.com.pe</a><br>
+                <a href="mailto:ventas@NewOlva.com.pe">ventas@NewOlva.com.pe</a>
             </div>
         </div>
 
@@ -64,15 +71,28 @@ Contáctanos - Shalom
 
     <!-- Sección del formulario -->
     <div class="formulario-contacto">
-        <form id="contactForm" action="/enviar-formulario" method="POST">
-            <div class="form-group">
-                <label for="nombreCompleto">Nombre Completo</label>
-                <input type="text" class="form-control" id="nombreCompleto" name="nombreCompleto" required>
-            </div>
+        <form id="contactForm">
 
+            <div class="form-group">
+                <label for="tipoCliente">Tipo Cliente</label>
+                <select class="form-control" id="tipoCliente" name="tipoCliente" required>
+                    <option value="" selected disabled>-</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="tipoDocumento">Tipo Documento</label>
+                <select class="form-control" id="tipoDocumento" name="tipoDocumento" required>
+                    <option value="" selected disabled>-</option>
+                </select>
+            </div>
             <div class="form-group">
                 <label for="numeroDocumento">Número de Documento</label>
                 <input type="text" class="form-control" id="numeroDocumento" name="numeroDocumento" required>
+            </div>
+
+            <div class="form-group">
+                <label for="nombreCompleto">Nombre Completo o Razón Social</label>
+                <input type="text" class="form-control" id="nombreCompleto" name="nombreCompleto" required>
             </div>
 
             <div class="form-group">
@@ -86,49 +106,14 @@ Contáctanos - Shalom
             </div>
 
             <div class="form-group">
-                <label for="servicio">¿Qué servicio deseas descubrir?</label>
-                <select class="form-control" id="servicio" name="servicio" required>
-                    <option value="" selected disabled>-</option>
-                    <option value="envios_nacionales">Envíos Nacionales</option>
-                    <option value="envios_aereos">Envíos Aéreos</option>
-                    <option value="envios_corporativos">Envíos Corporativos</option>
-                    <option value="recojo_domicilio">Recojo a Domicilio</option>
-                    <option value="entrega_domicilio">Entrega a Domicilio</option>
-                </select>
+                <label for="mensaje">Mensaje</label>
+                <textarea class="form-control" id="mensaje" name="mensaje" rows="4" required></textarea>
             </div>
 
             <div class="form-group">
-                <label for="enviosMensuales">¿Cuántos envíos al mes? (Estimado)</label>
-                <select class="form-control" id="enviosMensuales" name="enviosMensuales" required>
+                <label for="sucursal">Sucursal</label>
+                <select class="form-control" id="sucursal" name="sucursal" required>
                     <option value="" selected disabled>-</option>
-                    <option value="1-5">1-5 envíos</option>
-                    <option value="6-20">6-20 envíos</option>
-                    <option value="21-50">21-50 envíos</option>
-                    <option value="51-100">51-100 envíos</option>
-                    <option value="mas_100">Más de 100 envíos</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="tipoCliente">Tipo de cliente</label>
-                <select class="form-control" id="tipoCliente" name="tipoCliente" required>
-                    <option value="" selected disabled>-</option>
-                    <option value="persona_natural">Persona Natural</option>
-                    <option value="empresa">Empresa</option>
-                    <option value="pyme">PYME</option>
-                    <option value="corporativo">Corporativo</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="sede">Sede</label>
-                <select class="form-control" id="sede" name="sede" required>
-                    <option value="" selected disabled>-</option>
-                    <option value="lima_central">Lima - Central</option>
-                    <option value="lima_norte">Lima - Norte</option>
-                    <option value="lima_sur">Lima - Sur</option>
-                    <option value="lima_este">Lima - Este</option>
-                    <option value="provincia">Provincia</option>
                 </select>
             </div>
 
@@ -139,6 +124,7 @@ Contáctanos - Shalom
             </div>
 
             <button type="submit" class="btn-submit">Enviar</button>
+
         </form>
     </div>
 </div>

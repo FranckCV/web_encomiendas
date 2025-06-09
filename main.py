@@ -41,7 +41,14 @@ from controladores import controlador_salida as controlador_salida
 from controladores import controlador_reclamo as controlador_reclamo
 from controladores import controlador_preguntas_frecuentes as controlador_pregunta_frecuente
 from controladores import controlador_regla_cargo as controlador_regla_cargo
+
+=======
 from controladores import reporte_ingresos as reporte_ingresos
+from controladores.bd import sql_execute
+from controladores import controlador_transaccion_venta as controlador_transaccion_venta
+from controladores import controlador_detalle_venta as controlador_detalle_venta
+from controladores import controlador_metodo_pago_venta as controlador_metodo_pago_venta
+from controladores import controlador_articulo as controlador_articulo
 
 
 import hashlib
@@ -479,7 +486,7 @@ CONTROLADORES = {
             ['precio',      'Precio',          'Precio',      'number',   True ,     True  ,        None ],
             ['stock',       'Stock',           'Stock',       'number',   True ,     True  ,        None ],
             ['dimensiones', 'Dimensiones',     'Dimensiones', 'text',     False ,     True  ,        None ],
-            ['tamaño_cajaid','Tamaño Caja',    'Tamaño Caja', 'select',   False ,     True  ,        [lambda: controlador_tamanio_caja.get_options() , 'tam_nombre' ]  ],
+            ['tamaño_cajaid','Tamaño de Caja',    'Tamaño de Caja', 'select',   False ,     True  ,        [lambda: controlador_tamanio_caja.get_options() , 'tam_nombre' ]  ],
             ['img',         'Imagen',          'Imagen',      'img',      True ,     True  ,        None ],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
         ],
@@ -1796,6 +1803,7 @@ paginas_simples = [
     'salida_informacion',
     'cambiar_contrasenia',
     'programacion_devolucion',
+    'Faq'
 ]
 
 
@@ -1834,23 +1842,79 @@ def logout():
 
 ##################_ CLIENTE PAGE _################## 
 
-@app.route("/faq")
-def Faq():
-    return render_template('Faq.html')
+@app.route('/api/Faq')
+def api_Faq():
+    columnas, filas = controlador_pregunta_frecuente.get_table()
+    # Filtrar solo activas
+    preguntas_activas = [f for f in filas if f['activo'] == 1]
+    return jsonify(preguntas_activas)
 
 
-@app.route("/contactanos")
-def contac():
+@app.route('/contactanos')
+def contactanos():
     return render_template('contactanos.html')
+
+@app.route('/enviar-formulario', methods=['POST'])
+def enviar_formulario():
+    try:
+        data = request.json  # esperamos JSON en el fetch del frontend
+        
+        nombre = data.get('nombreCompleto', '').strip()
+        nro_documento = data.get('numeroDocumento', '').strip()
+        correo = data.get('email', '').strip()
+        telefono = data.get('telefono', '').strip()
+        mensaje = data.get('mensaje', '').strip()
+        tipo_documentoid = data.get('tipoDocumentoId')  # si manejas tipos de doc, o null
+        tipo_clienteid = data.get('tipoClienteId')
+        sucursalid = data.get('sucursalId')
+        
+        # Validaciones básicas
+        if not (nombre and nro_documento and correo and telefono and mensaje and tipo_clienteid and sucursalid):
+            return jsonify({'success': False}), 400  # Solo devolvemos un estado de error
+
+        sql = '''
+            INSERT INTO mensaje_contacto 
+            (nombre, nro_documento, correo, telefono, mensaje, tipo_documentoid, tipo_clienteid, sucursalid)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        '''
+        sql_execute(sql, (nombre, nro_documento, correo, telefono, mensaje, tipo_documentoid, tipo_clienteid, sucursalid))
+        
+        return jsonify({'success': True})  # Solo devolvemos un estado de éxito sin mensaje
+    except Exception as e:
+        print(f"Error al guardar mensaje: {e}")
+        return jsonify({'success': False}), 500  # Solo devolvemos un estado de error
+
+@app.route('/api/tipo_cliente')
+def api_tipo_cliente():
+    from controladores import controlador_tipo_cliente
+    opciones = controlador_tipo_cliente.get_options()
+    # convertir lista de tuplas a lista de dicts
+    data = [{'id': o[0], 'nombre': o[1]} for o in opciones]
+    return jsonify(data)
+
+@app.route('/api/sucursales_simple')
+def api_sucursales_simple():
+    # from controladores import controlador_sucursal
+    opciones = controlador_sucursal.get_ubigeo_sucursal()
+    data = [{'id': o['id'], 'direccion': o['direccion_completa']} for o in opciones]
+    return jsonify(data)
+
+@app.route('/api/tipo_documento')
+def api_tipo_documento():
+    from controladores import controlador_tipo_documento
+    opciones = controlador_tipo_documento.get_options()
+    data = [{'id': o[0], 'nombre': o[1]} for o in opciones]
+    return jsonify(data)
+
 
 @app.route("/api/cajas")
 def api_cajas():
-    filas = controlador_articulo.get_table_with_discount()
+    filas = controlador_articulo.get_table_cajas()
     # print(filas)
     productSizes = {}
 
     for fila in filas:
-        if not fila['activo'] or not fila['tamaño_cajaid']:
+        if not fila['activo'] :
             continue
 
         key = fila['tam_nombre'].lower()
@@ -1863,15 +1927,18 @@ def api_cajas():
                 "name_product":nombre,
                 "price": precio,
                 "dimensions": fila['dimensiones'],
-                "image": img,
-                "discounts": []  
+                "image": f"/static/img/img_articulo/{(fila['img'] or '')}",
+                "size_name": fila['tam_nombre'] or '',
+                "id": fila['articuloid'] ,
+                "discounts": [] 
             }
 
         if fila['cantidad_descuento'] and fila['nom_descuento']:
-            productSizes[key]["discounts"].append({
+            productSizes[key]['discounts'].append({
                 "name": fila['nom_descuento'],  
                 "value": float(fila['cantidad_descuento'])
             })
+    print(productSizes)
     return jsonify(productSizes)
 
 
@@ -1891,7 +1958,7 @@ def api_articulos():
                 "price": float(fila['precio']),
                 "stock": fila['stock'],
                 "dimensions": fila['dimensiones'] or '',
-                "image": fila['img'] or '',
+                "image": f"/static/img/img_articulo/{(fila['img'] or '')}",
                 "size_name": fila['tam_nombre'] or '',
                 "discounts": []
             }
@@ -1909,6 +1976,55 @@ def api_articulos():
 @app.route("/carrito")
 def carrito():
     return render_template('carrito.html')
+
+@app.route("/venta/registrar", methods=["POST"])
+def registrar_venta():
+    data = request.get_json()
+
+    cliente_id = data.get("cliente_id")
+    tipo_comprobante_id = data.get("tipo_comprobante_id")
+    metodo_pago_id = data.get("metodo_pago_id")
+    articulos = data.get("articulos", [])
+
+    if not cliente_id or not tipo_comprobante_id or not metodo_pago_id or not articulos:
+        return jsonify({"error": "Faltan datos requeridos"}), 400
+
+    try:
+        # Calcular monto total
+        monto_total = 0
+        for item in articulos:
+            precio = controlador_articulo.obtener_precio_articulo(item["articulo_id"])
+            if precio is None:
+                return jsonify({"error": f"Artículo {item['articulo_id']} no encontrado"}), 404
+            monto_total += precio * item["cantidad"]
+
+        # Insertar cabecera de venta
+        venta_id = controlador_transaccion_venta.registrar_transaccion(
+            tipo_comprobante_id,
+            monto_total,
+            cliente_id
+        )
+
+        # Insertar cada detalle
+        for item in articulos:
+            controlador_detalle_venta.registrar_detalle_venta(
+                item["articulo_id"],
+                venta_id,
+                tipo_comprobante_id,
+                item["cantidad"]
+            )
+
+        # Insertar método de pago
+        controlador_metodo_pago_venta.registrar_metodo_pago_venta(
+            venta_id,
+            tipo_comprobante_id,
+            metodo_pago_id
+        )
+
+        return jsonify({"status": "ok", "venta_id": venta_id}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/cotizador")
@@ -1933,7 +2049,22 @@ def tipos_envio():
 
 @app.route('/registro-envio')
 def registro_envio():
-    return render_template('registro_envio.html')
+    nombre_doc = controlador_tipo_documento.get_options()
+    nombre_rep = controlador_tipo_recepcion.get_options()
+    sucursales = controlador_sucursal.get_ubigeo()
+    articulos = controlador_contenido_paquete.get_options()
+    empaque = controlador_tipo_empaque.get_options()
+
+    return render_template(
+        'registro_envio.html',
+        nombre_doc=nombre_doc,
+        nombre_rep=nombre_rep,
+        sucursales=json.dumps(sucursales),
+        articulos=articulos,
+        empaque=empaque
+        
+    )
+
 
 @app.route('/resumen_envio')
 def mostrar_resumen():
@@ -2326,6 +2457,7 @@ def crud_update(tabla):
             if nombre in request.files:
                 archivo = request.files[nombre]
                 # print(archivo)
+                # print(archivo)
                 if archivo.filename != "":
                     # print(nombre)
                     nuevo_nombre = guardar_imagen_bd(tabla,'' ,archivo)
@@ -2335,8 +2467,12 @@ def crud_update(tabla):
                     valores.append(request.form.get(f"{nombre}_actual"))
             else:
                 valor = request.form.get(nombre)
+                # print(valor)
+                if valor == '':
+                    valor = None
                 valores.append(valor)
 
+        print(valores)
         controlador.update_row( *valores )
         if no_crud :
             return redirect(url_for(no_crud))

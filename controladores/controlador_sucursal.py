@@ -206,6 +206,22 @@ def get_ubigeo():
     
     
 
+def get_ubigeo_sucursal():
+    sql = '''
+            select
+            s.id, 
+            CONCAT(u.departamento, ' / ', u.provincia, ' / ', u.distrito, ' / ' , s.direccion) AS direccion_completa
+            from 
+            sucursal s
+            inner join ubigeo u on u.codigo = s.ubigeocodigo
+                 '''
+    filas = sql_select_fetchall(sql)
+    
+    
+    
+    return filas
+    
+    
 
 def get_report_horario():
     sql = f'''
