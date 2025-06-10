@@ -1998,60 +1998,12 @@ from controladores.bd import sql_select_fetchall
 def obtener_carrito():
     # clienteid = request.cookies.get("idlogin") or request.args.get("clienteid")
     clienteid = 1
-    tipo_comprobanteid = 2
+    # tipo_comprobanteid = 2
 
     if not clienteid:
         return jsonify({"error": "Cliente no identificado"}), 400
 
-    transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid, tipo_comprobanteid)
-    # print(f"transaccioooon {transaccion}")
-    if not transaccion:
-        return jsonify([])
-
-    num_serie = transaccion.get("num_serie")
-
-    sql = '''
-        SELECT 
-            dv.articuloid AS id,
-            a.nombre AS name,
-            CAST(a.precio AS DECIMAL(10,2)) AS originalPrice,
-            dv.cantidad AS quantity,
-            a.img as image,
-
-            -- Descuentos
-            MAX(CASE 
-                WHEN REGEXP_SUBSTR(des.nombre, '[0-9]+') IS NOT NULL AND 
-                     CAST(REGEXP_SUBSTR(des.nombre, '[0-9]+') AS UNSIGNED) = vol.min_vol THEN des_art.cantidad_descuento
-                ELSE NULL END) AS precio_unitario_2,
-
-            MAX(CASE 
-                WHEN REGEXP_SUBSTR(des.nombre, '[0-9]+') IS NOT NULL AND 
-                     CAST(REGEXP_SUBSTR(des.nombre, '[0-9]+') AS UNSIGNED) = vol.max_vol THEN des_art.cantidad_descuento
-                ELSE NULL END) AS precio_unitario_3,
-
-            vol.min_vol AS cantidad_precio_unitario_2,
-            vol.max_vol AS cantidad_precio_unitario_3
-
-        FROM detalle_venta dv
-        JOIN articulo a ON dv.articuloid = a.id
-        LEFT JOIN descuento_articulo des_art ON des_art.articuloid = a.id
-        LEFT JOIN descuento des ON des.id = des_art.descuentoid
-
-        LEFT JOIN (
-            SELECT 
-                da.articuloid,
-                MIN(CAST(REGEXP_SUBSTR(d.nombre, '[0-9]+') AS UNSIGNED)) AS min_vol,
-                MAX(CAST(REGEXP_SUBSTR(d.nombre, '[0-9]+') AS UNSIGNED)) AS max_vol
-            FROM descuento_articulo da
-            JOIN descuento d ON d.id = da.descuentoid
-            GROUP BY da.articuloid
-        ) AS vol ON vol.articuloid = a.id
-
-        WHERE dv.ventanum_serie = %s AND dv.ventatipo_comprobanteid = %s
-        GROUP BY dv.articuloid, a.nombre, a.precio, dv.cantidad, a.img, vol.min_vol, vol.max_vol
-    '''
-
-    datos = sql_select_fetchall(sql, (num_serie, tipo_comprobanteid))
+    datos = controlador_transaccion_venta.obtener_carrito_cliente(clienteid)
 
     if isinstance(datos, Exception):
         return jsonify({"error": str(datos)}), 500
@@ -2081,6 +2033,43 @@ def registrar_item_carrito():
         return jsonify({"mensaje": "Item registrado en carrito", "num_serie": num_serie}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route("/eliminar-item-carrito", methods=["POST"])
+def eliminar_item_carrito():
+    data = request.get_json()
+    clienteid = data.get("clienteid")
+    articuloid = data.get("articuloid")
+
+    if not clienteid or not articuloid:
+        return jsonify({"error": "Datos incompletos"}), 400
+
+    transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
+    if not transaccion:
+        return jsonify({"error": "No hay transacción activa"}), 404
+
+    num_serie = transaccion["num_serie"]
+    controlador_transaccion_venta.eliminar_detalle_venta(articuloid, num_serie)
+    controlador_transaccion_venta.actualizar_monto_total(num_serie)
+
+    return jsonify({"success": True})
+
+@app.route("/vaciar-carrito", methods=["POST"])
+def vaciar_carrito():
+    data = request.get_json()
+    clienteid = data.get("clienteid")
+
+    if not clienteid:
+        return jsonify({"error": "Cliente no identificado"}), 400
+
+    transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
+    if not transaccion:
+        return jsonify({"error": "No hay carrito"}), 404
+
+    num_serie = transaccion["num_serie"]
+    controlador_transaccion_venta.eliminar_todo_detalle_venta(num_serie)
+    controlador_transaccion_venta.actualizar_monto_total(num_serie)
+
+    return jsonify({"success": True})
 
 
 @app.route("/venta/registrar", methods=["POST"])

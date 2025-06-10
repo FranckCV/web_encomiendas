@@ -106,22 +106,20 @@ CREATE TABLE seguimiento (
   PRIMARY KEY (estado_encomiendaid, 
   paquetetracking));
 CREATE TABLE transaccion_venta (
-  num_serie          int(11) NOT NULL, 
+  num_serie          int(11) NOT NULL AUTO_INCREMENT, 
   tipo_comprobanteid int(10) NOT NULL, 
   monto_total        numeric(9, 2), 
   fecha              date NOT NULL, 
   hora               time NOT NULL, 
   clienteid          int(10) NOT NULL, 
-  PRIMARY KEY (num_serie, 
-  tipo_comprobanteid));
+  PRIMARY KEY (num_serie));
 CREATE TABLE detalle_venta (
   articuloid              int(10) NOT NULL, 
   ventanum_serie          int(11) NOT NULL, 
   ventatipo_comprobanteid int(10) NOT NULL, 
   cantidad                int(10) NOT NULL, 
   PRIMARY KEY (articuloid, 
-  ventanum_serie, 
-  ventatipo_comprobanteid));
+  ventanum_serie));
 CREATE TABLE reclamo (
   id                   int(10) NOT NULL AUTO_INCREMENT, 
   nombres_razon        varchar(200) NOT NULL, 
