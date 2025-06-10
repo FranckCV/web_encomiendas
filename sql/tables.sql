@@ -480,3 +480,7 @@ ALTER TABLE mensaje_contacto ADD CONSTRAINT FKmensaje_co839897 FOREIGN KEY (sucu
 ALTER TABLE detalle_reclamo ADD CONSTRAINT FKdetalle_re335454 FOREIGN KEY (estado_reclamoid) REFERENCES estado_reclamo (id);
 ALTER TABLE seguimiento_reclamo ADD CONSTRAINT FKseguimient693109 FOREIGN KEY (reclamoid) REFERENCES reclamo (id);
 ALTER TABLE seguimiento_reclamo ADD CONSTRAINT FKseguimient644896 FOREIGN KEY (detalle_reclamoid) REFERENCES detalle_reclamo (id);
+
+
+-- AQUI ALGO PUES
+alter table transaccion_venta add column estado tinyint(1) not null DEFAULT 0;

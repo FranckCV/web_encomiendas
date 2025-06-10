@@ -1937,7 +1937,7 @@ def api_cajas():
                 "name": fila['nom_descuento'],  
                 "value": float(fila['cantidad_descuento'])
             })
-    print(productSizes)
+    # print(productSizes)
     return jsonify(productSizes)
 
 
@@ -1953,28 +1953,136 @@ def api_articulos():
         key = fila['nom_articulo'].lower()
         if key not in articulos:
             articulos[key] = {
+                "id": fila['articuloid'],
                 "name_product": fila['nom_articulo'],
                 "price": float(fila['precio']),
                 "stock": fila['stock'],
                 "dimensions": fila['dimensiones'] or '',
-                "image": f"/static/img/img_articulo/{(fila['img'] or '')}",
+                "image": f"/static/img/img_articulo/{fila['img'] or ''}",
                 "size_name": fila['tam_nombre'] or '',
-                "discounts": []
+                "discounts": [],
+                "cantidad_precio_unitario_2": None,
+                "precio_unitario_2": None,
+                "cantidad_precio_unitario_3": None,
+                "precio_unitario_3": None
             }
-        if fila['cantidad_descuento'] and fila['nom_descuento']:
+
+        if fila['cantidad_descuento'] and fila['volumen']:
             articulos[key]["discounts"].append({
                 "name": fila['nom_descuento'],
-                "value": float(fila['cantidad_descuento'])
+                "value": float(fila['cantidad_descuento']),
+                "volumen": int(fila['volumen'])
             })
 
-    return jsonify(articulos)
+    for articulo in articulos.values():
+        ordenados = sorted(articulo['discounts'], key=lambda x: x['volumen'])
+        if len(ordenados) >= 1:
+            articulo["cantidad_precio_unitario_2"] = ordenados[0]["volumen"]
+            articulo["precio_unitario_2"] = ordenados[0]["value"]
+        if len(ordenados) >= 2:
+            articulo["cantidad_precio_unitario_3"] = ordenados[1]["volumen"]
+            articulo["precio_unitario_3"] = ordenados[1]["value"]
 
+    return jsonify(articulos)
 
 
 
 @app.route("/carrito")
 def carrito():
     return render_template('carrito.html')
+
+from flask import jsonify, request
+from controladores import controlador_transaccion_venta
+from controladores.bd import sql_select_fetchall
+
+@app.route("/obtener-carrito", methods=["GET"])
+def obtener_carrito():
+    # clienteid = request.cookies.get("idlogin") or request.args.get("clienteid")
+    clienteid = 1
+    tipo_comprobanteid = 2
+
+    if not clienteid:
+        return jsonify({"error": "Cliente no identificado"}), 400
+
+    transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid, tipo_comprobanteid)
+    # print(f"transaccioooon {transaccion}")
+    if not transaccion:
+        return jsonify([])
+
+    num_serie = transaccion.get("num_serie")
+
+    sql = '''
+        SELECT 
+            dv.articuloid AS id,
+            a.nombre AS name,
+            CAST(a.precio AS DECIMAL(10,2)) AS originalPrice,
+            dv.cantidad AS quantity,
+            a.img as image,
+
+            -- Descuentos
+            MAX(CASE 
+                WHEN REGEXP_SUBSTR(des.nombre, '[0-9]+') IS NOT NULL AND 
+                     CAST(REGEXP_SUBSTR(des.nombre, '[0-9]+') AS UNSIGNED) = vol.min_vol THEN des_art.cantidad_descuento
+                ELSE NULL END) AS precio_unitario_2,
+
+            MAX(CASE 
+                WHEN REGEXP_SUBSTR(des.nombre, '[0-9]+') IS NOT NULL AND 
+                     CAST(REGEXP_SUBSTR(des.nombre, '[0-9]+') AS UNSIGNED) = vol.max_vol THEN des_art.cantidad_descuento
+                ELSE NULL END) AS precio_unitario_3,
+
+            vol.min_vol AS cantidad_precio_unitario_2,
+            vol.max_vol AS cantidad_precio_unitario_3
+
+        FROM detalle_venta dv
+        JOIN articulo a ON dv.articuloid = a.id
+        LEFT JOIN descuento_articulo des_art ON des_art.articuloid = a.id
+        LEFT JOIN descuento des ON des.id = des_art.descuentoid
+
+        LEFT JOIN (
+            SELECT 
+                da.articuloid,
+                MIN(CAST(REGEXP_SUBSTR(d.nombre, '[0-9]+') AS UNSIGNED)) AS min_vol,
+                MAX(CAST(REGEXP_SUBSTR(d.nombre, '[0-9]+') AS UNSIGNED)) AS max_vol
+            FROM descuento_articulo da
+            JOIN descuento d ON d.id = da.descuentoid
+            GROUP BY da.articuloid
+        ) AS vol ON vol.articuloid = a.id
+
+        WHERE dv.ventanum_serie = %s AND dv.ventatipo_comprobanteid = %s
+        GROUP BY dv.articuloid, a.nombre, a.precio, dv.cantidad, a.img, vol.min_vol, vol.max_vol
+    '''
+
+    datos = sql_select_fetchall(sql, (num_serie, tipo_comprobanteid))
+
+    if isinstance(datos, Exception):
+        return jsonify({"error": str(datos)}), 500
+
+    return jsonify(datos)
+
+
+@app.route("/registrar-item-carrito", methods=["POST"])
+def registrar_item_carrito():
+    data = request.get_json()
+    articuloid = data.get("articuloid")
+    cantidad = data.get("cantidad")
+    tipo_comprobanteid = 2  # Provisionalmente fijo
+
+    # clienteid = request.cookies.get("idlogin")
+    clienteid = data.get("clienteid")
+    if not clienteid or not articuloid or not cantidad:
+        return jsonify({"error": "Datos incompletos"}), 400
+
+    try:
+        num_serie = controlador_transaccion_venta.registrar_detalle_venta(
+            clienteid=int(clienteid),
+            tipo_comprobanteid=tipo_comprobanteid,
+            articuloid=int(articuloid),
+            cantidad=int(cantidad)
+        )
+        return jsonify({"mensaje": "Item registrado en carrito", "num_serie": num_serie}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route("/venta/registrar", methods=["POST"])
 def registrar_venta():
