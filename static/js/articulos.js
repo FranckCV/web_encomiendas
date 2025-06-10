@@ -175,16 +175,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   qtyInput.addEventListener('input', () => updateQuantity(qtyInput.value));
 
   qtyInput.addEventListener('keydown', e => {
-    const allowedKeys = [8,9,13,27,46,35,36,37,39];
+    const allowedKeys = [8, 9, 13, 27, 46, 35, 36, 37, 39];
     if (
       allowedKeys.includes(e.keyCode) ||
-      ([65,67,86,88].includes(e.keyCode) && e.ctrlKey)
+      ([65, 67, 86, 88].includes(e.keyCode) && e.ctrlKey)
     ) return;
     if ((e.shiftKey || e.keyCode < 48 || e.keyCode > 57) && (e.keyCode < 96 || e.keyCode > 105)) {
       e.preventDefault();
       return;
     }
-    const {value, selectionStart, selectionEnd} = qtyInput;
+    const { value, selectionStart, selectionEnd } = qtyInput;
     const char = e.key;
     let next = value;
     if (selectionStart === selectionEnd) {
@@ -230,12 +230,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     const total = (unitPrice * currentQuantity).toFixed(2);
 
     const producto = {
+      id: data.id,
       size: currentKey,
       quantity: currentQuantity,
       unitPrice: unitPrice,
       totalPrice: parseFloat(total),
       name: data.name_product,
-      image: data.image,
+      image: data.image.split('/').pop(),
+      originalPrice: data.price,
+      discount: data.price - unitPrice,
+      cantidad_precio_unitario_2: data.cantidad_precio_unitario_2,
+      precio_unitario_2: data.precio_unitario_2,
+      cantidad_precio_unitario_3: data.cantidad_precio_unitario_3,
+      precio_unitario_3: data.precio_unitario_3
     };
 
     let carrito = JSON.parse(localStorage.getItem('carrito')) || [];

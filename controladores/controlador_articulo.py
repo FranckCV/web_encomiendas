@@ -117,32 +117,30 @@ def get_options():
 
 
 def get_table_with_discount():
-    sql= f'''
-        select 
-            art.id as articuloid,
-            art.nombre as nom_articulo,
-            art.precio ,
-            art.stock ,
-            art.dimensiones ,
-            tam.nombre as tam_nombre,
-            art.tamaño_cajaid ,
+    sql = '''
+        SELECT 
+            art.id AS articuloid,
+            art.nombre AS nom_articulo,
+            art.precio,
+            art.stock,
+            art.dimensiones,
+            tam.nombre AS tam_nombre,
+            art.tamaño_cajaid,
             art.img,
             des.id,
             des.nombre as nom_descuento,
+            des.nombre AS nom_descuento,
+            REGEXP_SUBSTR(des.nombre, '[0-9]+') AS volumen,
             des_art.cantidad_descuento,
-            art.activo 
-        from articulo art
-        left join tamanio_caja tam on tam.id = art.tamaño_cajaid 
-        left join descuento_articulo des_art on des_art.articuloid = art.id
-        LEFT join descuento des on des.id = des_art.DESCUENTOid
-        where UPPER(art.nombre) not like UPPER('%caja%')
-        ;
-
+            art.activo
+        FROM articulo art
+        LEFT JOIN tamanio_caja tam ON tam.id = art.tamaño_cajaid
+        LEFT JOIN descuento_articulo des_art ON des_art.articuloid = art.id
+        LEFT JOIN descuento des ON des.id = des_art.descuentoid
+        WHERE UPPER(art.nombre) NOT LIKE UPPER('%caja%')
     '''
-    
-    filas = sql_select_fetchall(sql)
-    
-    return filas
+    return sql_select_fetchall(sql)
+
 
 
 def get_table_cajas():
