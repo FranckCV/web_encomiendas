@@ -2421,3 +2421,23 @@ INSERT INTO pregunta_frecuente (titulo, descripcion, activo) VALUES
 ('¿Cuáles son los medios para realizar el pago de mi envío?', '<ul><li>Efectivo en cualquiera de nuestras agencias</li><li>Transferencia bancaria a nuestra cuenta corporativa</li><li>Tarjetas de débito y crédito (Visa, Mastercard)</li><li>Pago en línea a través de nuestra plataforma web</li></ul>', 1),
 ('¿Cómo debe realizar un correcto embalaje?', '<ul><li>Utilizar cajas en buen estado y del tamaño adecuado para el contenido</li><li>Proteger los artículos frágiles con material amortiguador (burbujas, papel, etc.)</li><li>Sellar todas las aberturas con cinta de embalaje resistente</li><li>Etiquetar claramente el exterior con la información de destino</li><li>No sobrecargar las cajas (máximo 25 kg por bulto)</li></ul>', 1),
 ('¿Cómo puedo obtener mi guía de remisión transportista?', '<ul><li>Solicitarla en cualquiera de nuestras agencias al momento de realizar tu envío</li><li>Descargarla directamente desde nuestra plataforma web en la sección "Mis envíos"</li><li>Recibirla por correo electrónico cuando registres tu envío</li></ul><p>Recuerda que este documento es importante para el seguimiento y control de tu envío.</p>', 1);
+
+INSERT INTO tarifa_ruta values
+  (28, 29,  80.00),  
+  (28, 30, 100.00), 
+  (29, 30,  90.00),  
+  (28, 31,  95.00),  
+  (28, 32, 110.00),  
+  (29, 31,  85.00), 
+  (29, 32, 105.00), 
+
+  (59, 60,  10.00),  
+  (60, 61,  10.00),  
+  (59, 61,  15.00), 
+
+  (1, 28, 200.00),  
+  (2, 28, 180.00),  
+  (28, 59, 120.00),
+  (3,  5,  40.00),  
+  (5,  1,  70.00),  
+  (60, 28, 120.00);

@@ -156,6 +156,31 @@ document.addEventListener("DOMContentLoaded", function () {
   cargarOrigenes();
   actualizarTabla();
 
+  let dep = document.getElementById('origen-departamento');
+
+  dep.addEventListener('change', ()=>{
+    cargarProvincias(dep.value);
+  }
+  );
+
+
+  let prov = document.getElementById('origen-provincia');
+
+  prov.addEventListener('change', ()=>{
+    cargarDistritos(prov.value);
+
+  });
+
+  let dist = document.getElementById('origen-distrito');
+
+  let dep_destino = document.getElementById('select-departamento');
+
+  dist.addEventListener('change',()=>{
+    cargarDeparDestino(dep.value,prov.value,dist.value);
+    dep_destino.disabled=false;  
+  }
+);
+
 
   attachNumeroDocValidation(
     'remitente-tipo-doc',
@@ -213,63 +238,147 @@ let eventosRegistrados = {
   destino: false
 };
 
-function cargarOrigenes() {
-  const selectDep = document.getElementById('origen-departamento');
-  const selectProv = document.getElementById('origen-provincia');
-  const selectDist = document.getElementById('origen-distrito');
 
-  selectDep.innerHTML = `<option disabled selected value="">Seleccione departamento</option>`;
-  selectProv.innerHTML = `<option disabled selected value="">Seleccione provincia</option>`;
-  selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
 
-  const origenesUnicos = Object.keys(rutasTarifas);
-  const departamentos = [...new Set(origenesUnicos.map(k => k.split('|')[0]))];
-  departamentos.forEach(dep => selectDep.append(new Option(dep, dep)));
 
-  if (!eventosRegistrados.origen) {
-    selectDep.addEventListener('change', () => {
-      selectProv.innerHTML = `<option disabled selected value="">Seleccione provincia</option>`;
-      selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
-      const dep = selectDep.value;
+function cargarProvincias(depOrigen){
 
-      const provincias = origenesUnicos
-        .filter(k => k.startsWith(dep + '|'))
-        .map(k => k.split('|')[1]);
-      [...new Set(provincias)].forEach(prov => selectProv.append(new Option(prov, prov)));
-    });
+  dict_dep = {'dep':depOrigen}
+  ruta = '/api/provincia_origen'
+  fetch(ruta,{
+    method : 'POST',
+    headers : {
+      'Content-Type' : 'application/json'
+    },
+    body : JSON.stringify(dict_dep)
+  })
+  .then(res=>res.json())
+  .then(diccionario=>{
+      let provinciasSelect = document.getElementById('origen-provincia');
+      let distritosSelect = document.getElementById('origen-distrito');
+      provinciasSelect.innerHTML = '<option value="">Selecciona provincia</option>';
+      distritosSelect.innerHTML = '<option value="">Selecciona una provincia primero</option>';
 
-    selectProv.addEventListener('change', () => {
-      selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
-      const dep = selectDep.value;
-      const prov = selectProv.value;
-
-      const distritos = origenesUnicos
-        .filter(k => k.startsWith(`${dep}|${prov}|`))
-        .map(k => k.split('|')[2]);
-      [...new Set(distritos)].forEach(dist => selectDist.append(new Option(dist, dist)));
-    });
-
-    selectDist.addEventListener('change', () => {
-      const dep = selectDep.value;
-      const prov = selectProv.value;
-      const dist = selectDist.value;
-
-      origenSeleccionado = `${dep}|${prov}|${dist}`;
-
-      const destinos = rutasTarifas[origenSeleccionado];
-      if (destinos && destinos.length > 0) {
-        const sucursalOrigenId = destinos[0].id_origen || destinos[0].id_origen_sucursal || '';
-        if (sucursalOrigenId) {
-          document.getElementById('origen-sucursal-id').value = sucursalOrigenId;
-        }
-      }
-
-      cargarDestinos(origenSeleccionado);
-    });
-
-    eventosRegistrados.origen = true;
+    lista_provincia = diccionario.data;
+    lista_provincia.forEach(prov => provinciasSelect.append(new Option(prov.provincia, prov.provincia)));
   }
+  );
 }
+
+function cargarDistritos(provOrigen){
+  dict_prov = {'prov':provOrigen} //Un solo elemento, se debe poner en formato de diccionario
+  ruta = '/api/distrito_origen'
+  fetch(ruta,{
+    method : 'POST',
+    headers : {
+      'Content-Type' : 'application/json'
+    },
+    body : JSON.stringify(dict_prov)
+  })
+  .then(res => res.json())
+  .then(diccionario=>{
+    let distritosSelect = document.getElementById('origen-distrito');
+    distritosSelect.innerHTML = '<option disabled selected value="">Seleccione un distrito</option>';
+
+    lista_distritos = diccionario.data;
+    lista_distritos.forEach(dist => distritosSelect.append(new Option(dist.distrito,dist.distrito)));
+
+  } )
+}
+
+
+
+function cargarDeparDestino(dep_origen,prov_origen,dist_origen){
+  dict_ubigeo = {'dep':dep_origen,
+                 'prov':prov_origen,//Un solo elemento, se debe poner en formato de diccionario
+                 'dist':dist_origen}
+
+  ruta = '/api/departamento_destino'
+  fetch(ruta,{
+    method : 'POST',
+    headers : {
+      'Content-Type' : 'application/json'
+    },
+    body : JSON.stringify(dict_ubigeo)
+  })
+  .then(res => res.json())
+  .then(diccionario=>{
+    let departamentosSelect = document.getElementById('select-departamento');
+    let provinciasSelect = document.getElementById('select-provincia');
+    let distritosSelect = document.getElementById('select-distrito');
+
+    departamentosSelect.innerHTML = '<option disabled selected value="">Seleccione un departamento</option>';
+    provinciasSelect.innerHTML = '<option disabled selected value="">Seleccione un departamnento primero</option>';
+    distritosSelect.innerHTML = '<option disabled selected value="">Seleccione un departamnento primero</option>';
+
+
+    lista_departamentos = diccionario.data;
+    lista_departamentos.forEach(dep => departamentosSelect.append(new Option(dep.departamento,dep.departamento)));
+
+  } )
+}
+
+function cargarOrigenes(){
+  
+}
+
+// function cargarOrigenes() {
+//   const selectDep = document.getElementById('origen-departamento');
+//   const selectProv = document.getElementById('origen-provincia');
+//   const selectDist = document.getElementById('origen-distrito');
+
+//   selectDep.innerHTML = `<option disabled selected value="">Seleccione departamento</option>`;
+//   selectProv.innerHTML = `<option disabled selected value="">Seleccione provincia</option>`;
+//   selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
+
+//   const origenesUnicos = Object.keys(rutasTarifas);
+//   const departamentos = [...new Set(origenesUnicos.map(k => k.split('|')[0]))];
+//   departamentos.forEach(dep => selectDep.append(new Option(dep, dep)));
+
+//   if (!eventosRegistrados.origen) {
+//     selectDep.addEventListener('change', () => {
+//       selectProv.innerHTML = `<option disabled selected value="">Seleccione provincia</option>`;
+//       selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
+//       const dep = selectDep.value;
+
+//       const provincias = origenesUnicos
+//         .filter(k => k.startsWith(dep + '|'))
+//         .map(k => k.split('|')[1]);
+//       [...new Set(provincias)].forEach(prov => selectProv.append(new Option(prov, prov)));
+//     });
+
+//     selectProv.addEventListener('change', () => {
+//       selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
+//       const dep = selectDep.value;
+//       const prov = selectProv.value;
+
+//       const distritos = origenesUnicos
+//         .filter(k => k.startsWith(`${dep}|${prov}|`))
+//         .map(k => k.split('|')[2]);
+//       [...new Set(distritos)].forEach(dist => selectDist.append(new Option(dist, dist)));
+//     });
+
+//     selectDist.addEventListener('change', () => {
+//       const dep = selectDep.value;
+//       const prov = selectProv.value;
+//       const dist = selectDist.value;
+
+//       origenSeleccionado = `${dep}|${prov}|${dist}`;
+
+//       const destinos = rutasTarifas[origenSeleccionado];
+//       if (destinos && destinos.length > 0) {
+//         const sucursalOrigenId = destinos[0].id_origen || destinos[0].id_origen_sucursal || '';
+//         if (sucursalOrigenId) {
+//           document.getElementById('origen-sucursal-id').value = sucursalOrigenId;
+//         }
+//       }
+
+//       cargarDestinos(origenSeleccionado);
+//     });
+
+//     eventosRegistrados.origen = true;
+//   }
+// }
 
 function cargarDestinos(origenKey) {
   const destinos = rutasTarifas[origenKey] || [];
@@ -375,19 +484,22 @@ function mostrarCamposDestino() {
   }
 }
 
-function toggleFolios() {
+function toggleFolios() { //Funciona bien
   const tipo = document.getElementById('m-tipoEmpaque').value;
   const grupoFolios = document.getElementById('grupo-folios');
   grupoFolios.style.display = (tipo === '2') ? 'flex' : 'none';
+  grupoFolios.querySelector('input').setAttribute('required','');
+
 }
 
-function toggleArticulos() {
+function toggleArticulos() { //Funciona bien 
   const tipo = document.getElementById('m-tipoEmpaque').value;
   const grupoArticulos = document.getElementById('grupo-articulos');
   grupoArticulos.style.display = (tipo === '1') ? 'flex' : 'none';
+  grupoArticulos.querySelector('select').setAttribute('required','');
 }
 
-function mostrarCamposReceptor() {
+function mostrarCamposReceptor() { //Funciona bien
   const tipo = document.getElementById('m-tipoDocumento').value;
   const camposRazon = document.getElementById('campo-razon-ruc');
   const camposContacto = document.getElementById('campo-contacto-ruc');
@@ -441,7 +553,8 @@ function validarRequeridos() {
 
     if (tipo === 'select') {
       valor = campo.value;
-    } else if (tipo === 'input' || tipo === 'textarea') {
+    // } else if (tipo === 'input' || tipo === 'textarea') {
+    } else if (tipo === 'input' ) {
       valor = campo.value.trim();
     }
 
@@ -608,7 +721,6 @@ function agregarEnvio() {
     console.error("Error al parsear localStorage:", e);
   }
 
-  // 7. Si editIndex >= 0: estamos editando, reemplazamos el índice; si no: agregamos
   if (editIndex >= 0) {
     enviosActuales[editIndex] = envio;
     editIndex = -1;   // restauramos a "no edición"
@@ -714,7 +826,7 @@ function actualizarTabla() {
   const tableContent = document.getElementById('tableContent');
   const totalEnvios = document.getElementById('totalEnvios');
   const pesoTotal = document.getElementById('pesoTotal');
-  const valorTotal = document.getElementById('valorTotal');
+  // const valorTotal = document.getElementById('valorTotal');
 
   const stored = localStorage.getItem(STORAGE_KEY);
   const envios = stored ? JSON.parse(stored) : [];
@@ -728,15 +840,15 @@ function actualizarTabla() {
     `;
     totalEnvios.textContent = '0';
     pesoTotal.textContent = '0';
-    valorTotal.textContent = '0.00';
+    // valorTotal.textContent = '0.00';
     return;
   }
 
   let sumaPeso = 0;
-  let sumaValor = 0;
+  // let sumaValor = 0;
 
   let html = `
-    <div style="overflow-x: auto;">
+    <div>
       <table>
         <thead>
           <tr>
@@ -879,10 +991,9 @@ function limpiarFormularioMasivo() {
 
 
 function cerrarModal() {
-  const modal = document.getElementById('modalConfirmacion');
-  modal.style.display = 'none';
-  const confirmarBtn = document.getElementById('confirmarBtn');
-  confirmarBtn.replaceWith(confirmarBtn.cloneNode(true));
+  document.getElementById('modalConfirmacion').style.display = 'none';
+  document.getElementById('modalValidacion').style.display = 'none';
+
 }
 
 function eliminarTodo() {

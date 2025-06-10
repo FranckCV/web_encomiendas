@@ -2,7 +2,28 @@
 h2 {
     font-size: 1.5rem;
 }
+.acciones_origen{
+    display: flex;
+    justify-content: end;
+    gap: 10px;
+    padding-bottom: 15px;
 
+}
+
+.btn_update {
+   padding: 5px;
+}
+.btn_cancel {
+   padding: 5px;
+}
+.next{
+    background-color: #e8eaee;
+    padding: 5px;
+    border-radius: 50%;
+    place-self: end;
+    margin: 10px;
+    font-size: 1.1rem;
+}
 /* Sección principal masiva */
 .seccion-masiva {
     background: #f8f9fa;
@@ -89,6 +110,8 @@ h2 {
 /* Contenido de pestañas */
 .tabs-content {
     background: white;
+    display: flex;
+    flex-direction: column;
 }
 
 .tab-panel {
@@ -603,26 +626,7 @@ textarea:required:user-invalid {
     background: #a0aec0;
 }
 
-/* Indicador de modo demo */
-.demo-indicator {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 1000;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
 
-.demo-indicator:hover {
-    transform: scale(1.05);
-}
 
 /* Animaciones */
 @keyframes slideIn {
@@ -1098,3 +1102,262 @@ textarea:required:user-invalid {
             padding-top: 1.5rem;
             border-top: 1px solid #e2e8f0;
         }
+
+/* ===== ANIMACIONES PARA ENVÍOS MASIVOS ===== */
+
+/* Animación para pestañas disponibles */
+.tab-btn.next-available {
+    animation: pulse 2s infinite;
+    position: relative;
+}
+
+@keyframes pulse {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); 
+    }
+    70% { 
+        box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); 
+    }
+    100% { 
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); 
+    }
+}
+
+/* Pestaña completada */
+.tab-btn.completed {
+    background-color: #48bb78 !important;
+    color: white !important;
+    border-color: #48bb78 !important;
+}
+
+.tab-btn.completed::after {
+    content: " ✓";
+    font-weight: bold;
+}
+
+/* Animación para botón agregar */
+.btn-add-bounce {
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { 
+        transform: translateY(0); 
+    }
+    40% { 
+        transform: translateY(-5px); 
+    }
+    60% { 
+        transform: translateY(-3px); 
+    }
+}
+
+/* Estilos para campos deshabilitados */
+select:disabled, 
+input:disabled {
+    background-color: #f7fafc !important;
+    color: #a0aec0 !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Tabla de envíos */
+.table-envios {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table-envios th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.table-envios td {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 13px;
+}
+
+.table-envios tr:hover {
+    background-color: #f7fafc;
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+}
+
+.table-envios tr:last-child td {
+    border-bottom: none;
+}
+
+/* Botones de acción en tabla */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.btn-icon {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-edit {
+    background-color: #4299e1;
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #3182ce;
+    transform: translateY(-2px);
+}
+
+.btn-delete {
+    background-color: #f56565;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #e53e3e;
+    transform: translateY(-2px);
+}
+
+/* Estado vacío */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #718096;
+}
+
+.empty-state p:first-child {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.empty-state p:last-child {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* Transiciones suaves para pestañas */
+.tab-btn {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.tab-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.tab-panel {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: all 0.3s ease;
+}
+
+.tab-panel.active {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Efectos de validación */
+.form-group input.valid,
+.form-group select.valid {
+    border-color: #48bb78;
+    box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.1);
+}
+
+.form-group input.invalid,
+.form-group select.invalid {
+    border-color: #f56565;
+    box-shadow: 0 0 0 3px rgba(245, 101, 101, 0.1);
+}
+
+
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .table-envios {
+        font-size: 12px;
+    }
+    
+    .table-envios th,
+    .table-envios td {
+        padding: 8px 6px;
+    }
+    
+    .stats {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .stat-item {
+        min-width: auto;
+    }
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Mejoras para modales */
+.modal-confirm {
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    animation: slideIn 0.3s ease;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+@keyframes slideIn {
+    from { 
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to { 
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

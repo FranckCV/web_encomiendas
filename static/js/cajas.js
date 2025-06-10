@@ -249,7 +249,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // subtotal: unitPrice * currentQuantity,
       // totalPrice: parseFloat(total),
       name: data.name_product,
-      image: data.image,
+      image: data.image.split('/').pop(),
       originalPrice: precio_unitario_1,
       discount: precio_unitario_1 - unitPrice,
       precio_unitario_1,
