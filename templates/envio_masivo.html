@@ -10,6 +10,11 @@ Registro de Envíos Masivos
 {% endblock %}
 
 {% block contenido %}
+<style>
+  .desaparecer{
+
+  }
+</style>
 
 
 <div class="navigation-links">
@@ -91,18 +96,24 @@ Registro de Envíos Masivos
               <div class="campo-grupo">
                   <label>Departamento *</label>
                   <select id="origen-departamento" required>
+                        <option disabled selected value="">Seleccione departamento de origen</option>
+                      {% for fila in departamento_origen %}
+                        <option value="{{ fila.departamento }}">{{ fila.departamento }}</option>
+                      {% endfor %}
                   </select>
                 </div>
 
                 <div class="campo-grupo">
                   <label>Provincia *</label>
                   <select id="origen-provincia" required>
+                      <option disabled selected value="">Elija un departamento de origen primero</option>
                   </select>
                 </div>
 
                 <div class="campo-grupo">
                   <label>Distrito *</label>
                   <select id="origen-distrito" required>
+                      <option disabled selected value="">Elija un departamento de origen primero</option>
                   </select>
                 </div>
                 <input type="hidden" id="origen-sucursal-id" value="">
@@ -458,7 +469,7 @@ Registro de Envíos Masivos
     tiposDocumento: {{ nombre_doc | tojson }},
     tiposRecepcion: {{ nombre_rep | tojson }},
     tiposEmpaque: {{ empaque | tojson }},
-    rutasTarifas: {{ rutasTarifas | safe }},
+
     articulos : {{articulos | tojson}},
     condiciones: {{ condiciones | tojson }},
     tarifas :{{ tarifas | safe }}

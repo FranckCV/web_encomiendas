@@ -41,8 +41,6 @@ from controladores import controlador_salida as controlador_salida
 from controladores import controlador_reclamo as controlador_reclamo
 from controladores import controlador_preguntas_frecuentes as controlador_pregunta_frecuente
 from controladores import controlador_regla_cargo as controlador_regla_cargo
-
-=======
 from controladores import reporte_ingresos as reporte_ingresos
 from controladores.bd import sql_execute
 from controladores import controlador_transaccion_venta as controlador_transaccion_venta
@@ -2081,24 +2079,90 @@ def mostrar_pagoenvio():
 def envio_masivo():
     nombre_doc = controlador_tipo_documento.get_options()
     nombre_rep = controlador_tipo_recepcion.get_options()
-    rutas_tarifas = controlador_tarifa_ruta.get_sucursales_origen_destino()
+    # rutas_tarifas = controlador_tarifa_ruta.get_sucursales_origen_destino()
+    departamento_origen = controlador_tarifa_ruta.get_departamentos_origen()
     articulos = controlador_contenido_paquete.get_options()
     empaque = controlador_tipo_empaque.get_options()
     condiciones = controlador_regla_cargo.get_condiciones_tarifa()
     tarifas = controlador_tarifa_ruta.get_tarifas_ruta_dict()
+    print(departamento_origen)
     return render_template('envio_masivo.html', 
                            nombre_doc=nombre_doc,
                            nombre_rep=nombre_rep,
-                           rutasTarifas=json.dumps(rutas_tarifas), 
+                           departamento_origen = departamento_origen,
+                        #    rutasTarifas=json.dumps(rutas_tarifas), 
                            tarifas = json.dumps(tarifas),
                            empaque=empaque, 
                            articulos=articulos,
                            condiciones=condiciones)
     
+@app.route('/api/provincia_origen',  methods=["POST"])
+def provincia_origen():
+    try:
+        datos = request.get_json()
+        dep = datos.get('dep')
+        provincias = controlador_tarifa_ruta.get_provincia_origen(dep)
+        res = {
+            'data': provincias,
+            'msg': "Se listó con éxito",
+            'status':1
+        }
+        return jsonify(res)
+    except Exception as e:
+        res = {
+            'data': [],
+            'msg': f"Ocurrió un error al listar las provincias: {repr(e)}",
+            'status':-1
+        }
+        return jsonify(res)
+        
     
     
+@app.route('/api/distrito_origen',  methods=["POST"])
+def distrito_origen():
+    try:
+        datos = request.get_json()
+        prov = datos.get('prov')
+        distritos = controlador_tarifa_ruta.get_distrito_origen(prov)
+        print(distritos)
+        return {
+            'data': distritos,
+            'msg': "Se listó con éxito",
+            'status':1
+        }
+    except Exception as e:
+        return {
+            'data': [],
+            'msg': f"Ocurrió un error al listar las provincias: {repr(e)}",
+            'status':-1
+        }
     
     
+@app.route('/api/departamento_destino',  methods=["POST"])
+def departamento_destino():
+    try:
+        datos = request.get_json()
+        dep = datos.get('dep')
+        prov = datos.get('prov')
+        dist = datos.get('dist')
+        
+        codigo_origen = controlador_tarifa_ruta.get_ubigeo_origen(dep,prov,dist)
+        
+        departamentos = controlador_tarifa_ruta.get_departamento_destino(codigo_origen)
+        
+        return {
+            'data': departamentos,
+            'msg': "Se listó con éxito",
+            'status':1
+        }
+    except Exception as e:
+        return {
+            'data': [],
+            'msg': f"Ocurrió un error al listar las provincias: {repr(e)}",
+            'status':-1
+        }
+    
+
 
 ################# Sucursales ######################
 
