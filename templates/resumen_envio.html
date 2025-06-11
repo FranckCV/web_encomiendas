@@ -1,86 +1,66 @@
 {% extends 'MAESTRA_GENERAL.html' %}
 
 {% block titulo %}
-Resumen de Envíos
+  Resumen de Envíos
 {% endblock %}
 
 {% block estilos %}
-<link rel="stylesheet" href="/static/css/resumen_envio.css">
+  <link rel="stylesheet" href="/static/css/resumen_envio.css" />
+  <link rel="stylesheet" href="/static/css/envios_masivos.css" />
 {% endblock %}
 
 {% block contenido %}
+  <div class="container">
+    <h1 class="titulo-envio">REGISTRO DE ENVÍOS</h1>
 
-
-<div class="container">
-  <h1 class="titulo-envio">REGISTRO DE ENVÍOS</h1>
-
-  <div class="steps-container">
-    <div class="step completed">
-      <div class="circle">
-        <img src="/static/img/usuario.png" alt="Datos personales" />
+    <div class="steps-container">
+      <div class="step completed">
+        <div class="circle">
+          <img src="/static/img/usuario.png" alt="Datos personales" />
+        </div>
+        <p>Datos personales</p>
       </div>
-      <p>Datos personales</p>
-    </div>
-    <div class="line"></div>
-    <div class="step active">
-      <div class="circle">
-        <img src="/static/img/chek.png" alt="Confirma tus datos" />
+      <div class="line"></div>
+      <div class="step active">
+        <div class="circle">
+          <img src="/static/img/chek.png" alt="Confirma tus datos" />
+        </div>
+        <p>Confirma tus datos</p>
       </div>
-      <p>Confirma tus datos</p>
-    </div>
-    <div class="line"></div>
-    <div class="step">
-      <div class="circle">
-        <img src="/static/img/medio.png" alt="Medios de pago" />
+      <div class="line"></div>
+      <div class="step">
+        <div class="circle">
+          <img src="/static/img/medio.png" alt="Medios de pago" />
+        </div>
+        <p>Medios de pago</p>
       </div>
-      <p>Medios de pago</p>
+    </div>
+
+    <div class="header-resumen">
+      <h3>Resumen de envíos registrados</h3>
+    </div>
+
+    <div>
+      <h5>Origen : <span id="origen-paquete"></span></h5>
+    </div>
+
+    <div class="tabla-scroll">
+      <div id="tableContent"></div>
+    </div>
+
+    <div class="paginacion">
+      <button class="btn-paginacion">Anterior</button>
+      <span class="pagina-actual">1</span>
+      <button class="btn-paginacion">Siguiente</button>
+    </div>
+
+    <div class="botones-acciones">
+      <a href="{{ url_for('tipos_envio') }}" class="btn-volver">VOLVER</a>
+      <button type="button" class="btn-continuar" id="btn-continuar">IR A PAGAR</button>
     </div>
   </div>
+{% endblock %}
 
-
-  <div class="header-resumen">
-    <h2>Resumen de envíos registrados</h2>
-    <button class="btn-agregar">+ AGREGAR ENVÍOS</button>
-  </div>
-
-  <div class="tabla-scroll">
-    <table class="tabla-envios">
-      <thead>
-        <tr>
-          <th>Tipo Recepcion</th>
-          <th>Destinatario</th>
-          <th>Destino</th>
-          <th>Direccion</th>
-          <th>Tarifa</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td> </td>
-          <td></td>
-          <td>
-            <button class="btn-editar">Editar</button>
-            <button class="btn-eliminar">Eliminar</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="paginacion">
-    <button class="btn-paginacion">Anterior</button>
-    <span class="pagina-actual">1</span>
-    <button class="btn-paginacion">Siguiente</button>
-  </div>
-
-<div class="botones-acciones">
-  <a href="{{ url_for('tipos_envio') }}" class="btn-volver">VOLVER</a>
-  <button type="button" class="btn-continuar" id="btn-continuar">IR A PAGAR</button>
-</div>
-</div>
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/resumen_envio.js') }}"></script>
 {% endblock %}

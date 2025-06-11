@@ -1106,22 +1106,19 @@ textarea:required:user-invalid {
 /* ===== ANIMACIONES PARA ENVÍOS MASIVOS ===== */
 
 /* Animación para pestañas disponibles */
-.tab-btn.next-available {
-    animation: pulse 2s infinite;
-    position: relative;
+    @keyframes pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
-@keyframes pulse {
-    0% { 
-        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); 
-    }
-    70% { 
-        box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); 
-    }
-    100% { 
-        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); 
-    }
+
+
+.tab-btn.pulse {
+  animation: pulse 1s ease-in-out infinite;
+  color:#0E1D63; 
 }
+
 
 /* Pestaña completada */
 .tab-btn.completed {
@@ -1361,3 +1358,152 @@ input:disabled {
         opacity: 1;
     }
 }
+
+
+
+        .next {
+            background: #032a53;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: end;
+        }
+
+        .next:hover {
+            background: #0056b3;
+        }
+
+        .next:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+
+        
+        /* Modalidad de pago styles */
+        #tab-modalidad-pago .campos-envio {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        #tab-modalidad-pago .campos-envio > div {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        #tab-modalidad-pago .campos-envio > div:hover {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+
+        #tab-modalidad-pago input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            margin: 0;
+
+        }
+
+        #tab-modalidad-pago label {
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin: 0;
+        }
+
+#text-start{
+    font-style:italic ;
+    font-size: 0.8rem;
+    padding-top: 5px;
+}
+
+        
+        #tab-clave .campos-envio {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        #tab-clave .campos-envio p {
+            font-size: 1rem;
+            color: #4a5568;
+            font-weight: 500;
+            line-height: 1.6;
+            margin: 0;
+            max-width: 100%;
+        }
+
+        .pin-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: start;
+            align-items: center;
+        }
+
+        .pin-input {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #0E1D63;
+            background: white;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .pin-input:focus {
+            border-color: #0E1D63;
+            box-shadow: 0 0 0 3px rgba(14, 29, 99, 0.1);
+            transform: scale(1.05);
+        }
+
+        .pin-input:valid {
+            border-color: #48bb78;
+            background: #f0fff4;
+        }
+
+        .pin-input::placeholder {
+            color: #cbd5e0;
+            font-size: 2rem;
+        }
+
+        .pin-input::-webkit-outer-spin-button,
+        .pin-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .pin-input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* Responsive para pin container */
+        @media (max-width: 480px) {
+            .pin-container {
+                gap: 0.5rem;
+            }
+
+            .pin-input {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+        }
+
+

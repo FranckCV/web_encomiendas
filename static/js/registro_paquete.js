@@ -138,25 +138,6 @@ direccionDestinatario.addEventListener('input', () => {
 });
 
 
-// const referenciaDestinatario = document.getElementById('m-referencia');
-// const mensajeReferencia = document.getElementById('mensaje-validacion-referencia');
-
-// referenciaDestinatario.addEventListener('input', () => {
-//   const referencia = referenciaDestinatario.value.trim();
-//   const valido = regexDireccion.test(referencia);
-
-//   if (referencia === '') {
-//     mensajeReferencia.style.display = 'none';
-//     referenciaDestinatario.style.borderColor = '';
-//   } else if (valido) {
-//     mensajeReferencia.style.display = 'none';
-//     referenciaDestinatario.style.borderColor = '#48bb78';
-//   } else {
-//     mensajeReferencia.style.display = 'block';
-//     mensajeReferencia.textContent = 'La referencia debe tener entre 5 y 100 caracteres válidos.';
-//     referenciaDestinatario.style.borderColor = '#fc8181';
-//   }
-// });
 
 
 //////////////////////////////////////////////////////////////////////

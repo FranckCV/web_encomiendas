@@ -7,6 +7,7 @@ CREATE TABLE transaccion_encomienda (
   monto_total        numeric(9, 2), 
   recojo_casa        tinyint(1) NOT NULL, 
   id_sucursal_origen int(11) NOT NULL, 
+  estado_pago        char(1) NOT NULL, 
   fecha              date NOT NULL, 
   hora               time NOT NULL, 
   direccion_recojo   varchar(255), 
@@ -103,11 +104,13 @@ CREATE TABLE empleado_salida (
 CREATE TABLE seguimiento (
   estado_encomiendaid int(10) NOT NULL, 
   paquetetracking     int(11) NOT NULL, 
+  fecha_hora          date NOT NULL, 
   PRIMARY KEY (estado_encomiendaid, 
   paquetetracking));
 CREATE TABLE transaccion_venta (
   num_serie          int(11) NOT NULL, 
   tipo_comprobanteid int(10) NOT NULL, 
+  estado             tinyint(1) DEFAULT 0 NOT NULL, 
   monto_total        numeric(9, 2), 
   fecha              date NOT NULL, 
   hora               time NOT NULL, 
@@ -381,6 +384,7 @@ CREATE TABLE descuento_articulo (
 CREATE TABLE paquete_descuento (
   paquetetracking int(11) NOT NULL, 
   descuentoid     int(4) NOT NULL, 
+  cantidad        numeric(9, 2) NOT NULL, 
   PRIMARY KEY (paquetetracking, 
   descuentoid));
 CREATE TABLE estado_encomienda (
@@ -424,8 +428,14 @@ CREATE TABLE regla_cargo (
   id             int(4) NOT NULL AUTO_INCREMENT, 
   tipo_condicion char(1) NOT NULL, 
   inferior       numeric(9, 2) NOT NULL, 
-  superior       numeric(9, 2) NULL, 
+  superior       numeric(9, 2), 
   porcentaje     numeric(9, 2) NOT NULL, 
+  PRIMARY KEY (id));
+CREATE TABLE modalidad_pago (
+  id          int(11) NOT NULL AUTO_INCREMENT, 
+  nombre      varchar(200) NOT NULL, 
+  descripcion text, 
+  activo      tinyint(1) NOT NULL, 
   PRIMARY KEY (id));
 ALTER TABLE sucursal ADD CONSTRAINT FKsucursal756715 FOREIGN KEY (ubigeocodigo) REFERENCES ubigeo (codigo);
 ALTER TABLE escala ADD CONSTRAINT FKescala667165 FOREIGN KEY (sucursalid) REFERENCES sucursal (id);
@@ -480,7 +490,3 @@ ALTER TABLE mensaje_contacto ADD CONSTRAINT FKmensaje_co839897 FOREIGN KEY (sucu
 ALTER TABLE detalle_reclamo ADD CONSTRAINT FKdetalle_re335454 FOREIGN KEY (estado_reclamoid) REFERENCES estado_reclamo (id);
 ALTER TABLE seguimiento_reclamo ADD CONSTRAINT FKseguimient693109 FOREIGN KEY (reclamoid) REFERENCES reclamo (id);
 ALTER TABLE seguimiento_reclamo ADD CONSTRAINT FKseguimient644896 FOREIGN KEY (detalle_reclamoid) REFERENCES detalle_reclamo (id);
-
-
--- AQUI ALGO PUES
-alter table transaccion_venta add column estado tinyint(1) not null DEFAULT 0;

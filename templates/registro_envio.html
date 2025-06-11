@@ -104,6 +104,29 @@ Registro de Envíos Masivos
           </div>
         </div>
     </div>
+
+    <div id="modalidad-pago" >
+      <h2 class="titulo-seccion">Modalidad de pago</h2>
+
+      <div id="seccion-modalidad-pago">
+         <div class="campos-envio">
+          <div>
+         	<input type="radio" name="radio-choice-1" id="radio-choice-1" value="choice-1" checked="checked" />
+         	<label for="radio-choice-1">Pago en línea</label>
+      </div>
+        <div>
+         	<input type="radio" name="radio-choice-1" id="radio-choice-2" value="choice-2"  />
+         	<label for="radio-choice-2">Pago en sucursal</label>
+</div>
+
+<div>
+         	<input type="radio" name="radio-choice-1" id="radio-choice-3" value="choice-3"  />
+         	<label for="radio-choice-3">Paga el destinatario</label>
+          </div>
+          </div>
+        </div>
+    </div>
+
     <!-- SECCIÓN: ENVÍOS MASIVOS CON PESTAÑAS -->
     <div id="seccion-masiva" style="display: block;">
       <div class="seccion-masiva">
@@ -314,6 +337,7 @@ Registro de Envíos Masivos
 
               </div>
             </div>
+            <button><i class="fa-solid fa-arrow-right"></i></button>
           </div>
         </div>
        </div> <!-- cierre de .seccion-masiva -->
@@ -340,7 +364,7 @@ Registro de Envíos Masivos
     articulos : {{ articulos | tojson }}
   };
 </script>
-<script src="{{ url_for('static', filename='js/registro_paquete.js') }}"></script>
+<script src="{{ url_for('static', filename='js/registro_envio_prueba.js') }}"></script>
 
 
 {% endblock %}

@@ -1,9 +1,85 @@
-const { rutasTarifas } = window.CONFIG_ENVIO || {};
+const STORAGE_KEYS = {
+  REMITENTE: 'envios_remitente',
+  ORIGEN:    'envios_origen',
+  REGISTROS: 'envios_masivos'
+};
+const SELECTORS = {
+  remitente: '#seccion_remitente',
+  origen:    '#seccion-origen',
+  masiva:    '#seccion-masiva'
+};
 
-const STORAGE_KEY = "envios_masivos";
 
-let editIndex = -1;
-let pasoActual = 1;
+function save(key, obj) { localStorage.setItem(key, JSON.stringify(obj)); }
+function load(key) { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } }
+
+function saveRemitente() {
+  const data = { 
+    tipo:   document.getElementById('remitente-tipo-doc').value,
+    numero: document.getElementById('remitente-numero-doc').value,
+    telefono: document.getElementById('remitente-telefono').value,
+    nombre:   document.getElementById('remitente-nombre').value,
+    email:    document.getElementById('remitente-email').value
+  };
+  save(STORAGE_KEYS.REMITENTE, data);
+}
+
+function saveOrigen() {
+  const dep = document.getElementById('origen-departamento').value;
+  const prov= document.getElementById('origen-provincia').value;
+  const dist= document.getElementById('origen-distrito').value;
+  const suc = document.getElementById('origen-sucursal-id').value;
+  save(STORAGE_KEYS.ORIGEN, { dep, prov, dist, suc });
+}
+
+function saveRegistros() { save(STORAGE_KEYS.REGISTROS, registros); }
+
+function restoreState() {
+  // 1) Restaurar datos del remitente
+  const rem = load(STORAGE_KEYS.REMITENTE);
+  if (rem) {
+    document.getElementById('remitente-tipo-doc').value   = rem.tipo;
+    document.getElementById('remitente-numero-doc').value = rem.numero;
+    document.getElementById('remitente-telefono').value   = rem.telefono;
+    document.getElementById('remitente-nombre').value     = rem.nombre;
+    document.getElementById('remitente-email').value      = rem.email;
+  }
+
+  // 2) Restaurar datos del lugar de origen (pero NO lo bloqueamos aún)
+  const ori = load(STORAGE_KEYS.ORIGEN);
+  if (ori) {
+    const depSel  = document.getElementById('origen-departamento');
+    const provSel = document.getElementById('origen-provincia');
+    const distSel = document.getElementById('origen-distrito');
+    const sucId   = document.getElementById('origen-sucursal-id');
+
+    depSel.value = ori.dep;
+
+    // Cargar provincias y distritos en cascada
+    cargarProvincias(ori.dep)
+      .then(() => {
+        provSel.value = ori.prov;
+        return cargarDistritos(ori.prov);
+      })
+      .then(() => {
+        distSel.value = ori.dist;
+        sucId.value   = ori.suc;
+        // <-- nota: no llamamos lockOrigen() aquí
+      });
+  }
+
+  // 3) Restaurar registros y renderizar tabla
+  const regs = load(STORAGE_KEYS.REGISTROS);
+  if (Array.isArray(regs) && regs.length > 0) {
+    registros = regs;
+    renderTabla();
+    // Solo ahora que hay envíos guardados bloqueamos el origen
+    lockOrigen();
+  }
+}
+
+
+
 
 //Teléfono
 const regexTelefono = /^9\d{8}$/;
@@ -233,80 +309,19 @@ function attachNumberFieldsValidation() {
 
 /*************************************************************************************************+ */
 document.addEventListener("DOMContentLoaded", function () {
-  if (mode === 'caja' || mode === 'sobre') {
-    // deshabilita el select de tipo empaque
-    const tipoEmpaque = document.getElementById('m-tipoEmpaque');
-    tipoEmpaque.value = (mode === 'sobre' ? '2' : '1');  // 2 = folios, 1 = articulos
-    tipoEmpaque.disabled = true;
-
-    // forzamos la lógica de mostrar sólo folios o sólo artículos
-    if (mode === 'sobre') {
-      toggleFolios();
-      document.getElementById('grupo-articulos').style.display = 'none';
-    } else { // caja
-      toggleArticulos();
-      document.getElementById('grupo-folios').style.display = 'none';
-    }
-
-    // ocultar tabla de envíos y botón de agregar
-    document.querySelector('.tabla-envios').style.display = 'none';
-    document.querySelector('.btn-agregar').style.display = 'none';
-  }
-
-const pinInputs = document.querySelectorAll('.pin-input');
-
-pinInputs.forEach((input, idx) => {
-  input.addEventListener('input', e => {
-    // 1) Limita a un dígito
-    if (e.target.value.length > 1) e.target.value = e.target.value.slice(0,1);
-    // 2) Salta al siguiente
-    if (e.target.value && idx < pinInputs.length-1) {
-      pinInputs[idx+1].focus();
-    }
-    // 3) Si ya están todos llenos, guarda el PIN en tu variable
-    const valores = Array.from(pinInputs).map(i => i.value);
-    if (valores.every(v => v.length === 1)) {
-      // Aquí tienes el PIN completo:
-      const pin = valores.join('');
-      console.log('PIN completo:', pin);
-      // Por ejemplo, podrías almacenarlo en un campo hidden:
-      document.getElementById('destino-sucursal-id').value = pin;
-      // O directamente en tu objeto de formulario:
-      // currentForm.pin = pin;
-    }
-  });
-
-  // Previene teclas inválidas
-  input.addEventListener('keydown', e => {
-    if (!/[0-9]/.test(e.key) && !['Backspace','Delete','Tab','Enter'].includes(e.key)) {
-      e.preventDefault();
-    }
-  });
-
-  // Maneja pegado de hasta 4 dígitos
-  input.addEventListener('paste', e => {
-    e.preventDefault();
-    const digits = e.clipboardData.getData('text').replace(/\D/g,'').slice(0,4);
-    digits.split('').forEach((d,i) => {
-      if (pinInputs[i]) pinInputs[i].value = d;
-    });
-    // Luego dispara de nuevo el input de la última casilla para activar el guardado
-    pinInputs[digits.length-1]?.dispatchEvent(new Event('input'));
-  });
-});
-
-
 
   initTabs();
   mostrarCamposDestino();
   toggleFolios();
   toggleArticulos();
   mostrarCamposReceptor();
+  restoreState();
 
   let dep = document.getElementById('origen-departamento');
 
   dep.addEventListener('change', () => {
     cargarProvincias(dep.value);
+    saveOrigen(); 
   }
   );
 
@@ -315,6 +330,7 @@ pinInputs.forEach((input, idx) => {
 
   prov.addEventListener('change', () => {
     cargarDistritos(prov.value);
+    saveOrigen(); 
 
   });
 
@@ -324,6 +340,7 @@ pinInputs.forEach((input, idx) => {
 
   dist.addEventListener('change', () => {
     cargarDeparDestino(dep.value, prov.value, dist.value);
+    saveOrigen(); 
   }
   );
 
@@ -359,15 +376,15 @@ pinInputs.forEach((input, idx) => {
   document
     .querySelectorAll('.campos-envio > div')
     .forEach(option => {
-      const radio = option.querySelector('input[type="radio"]');
-      if (!radio) return;
+      const radio = option.querySelector('input');
 
       option.addEventListener('click', () => {
         radio.checked = true;
         radio.dispatchEvent(new Event('change'));
+
+
       });
     });
-
 
   attachNumberFieldsValidation();
 
@@ -817,7 +834,7 @@ function showModal({ message = '', onConfirm = null, onCancel = null }) {
   if (typeof onConfirm === 'function') {
     // Modo confirmación
     btnOk.style.display = 'inline-block';
-    btnOk.textContent = 'Continuar';
+    btnOk.textContent = 'Sí, agregar';
     btnOk.onclick = () => { modal.style.display = 'none'; onConfirm(); };
     btnCancel.textContent = 'Cancelar';
   } else {
@@ -855,8 +872,8 @@ function renderTabla() {
       `<td>${r.tipoEntrega}</td>` +
       `<td>${r.destino.departamento}/${r.destino.provincia}/${r.destino.distrito}</td>` +
       `<td>${r.tipoEmpaque === '2' ? r.folios + ' folios' : r.tipoEmpaque + ' - ' + r.tipoArticulo}</td>` +
-      `<td>${r.valorEnvio}</td>` +
-      `<td>${r.peso}</td>` +
+      `<td>s/ ${r.valorEnvio}</td>` +
+      `<td>${r.peso} kg</td>` +
       `<td>${r.largo} cm x ${r.ancho} cm x ${r.alto} cm</td>` +
       `<td>${r.destinatario}</td>` +
       `<td>${r.modalidadPago}</td>` +
@@ -871,6 +888,7 @@ function renderTabla() {
   html += '</tbody></table>';
   container.innerHTML = html;
   attachTableActions();
+  saveRegistros();
 }
 
 function attachTableActions() {
@@ -954,28 +972,16 @@ function fillFormData(r) {
   document.querySelectorAll('.pin-input').forEach((inp, idx) => inp.value = r.clave[idx] || '');
 }
 
+// Validación de campos visibles
 function validateEnvio() {
   const panel = document.querySelector('.tab-panel.active');
   const fields = panel.querySelectorAll('input, select, textarea');
-
   for (const f of fields) {
-    // ya ignoras los ocultos y la descripción opcional
     if (f.offsetParent === null || f.id === 'm-descripcionArticulo') continue;
-    // ignorar los radios aquí, los validamos en bloque abajo
-    if (f.type === 'radio') continue;
     if (!f.value.trim()) return false;
   }
-
-  // **Validación de radios** (por ejemplo, modalidad_pago en la primera pestaña)
-  const radios = panel.querySelectorAll('input[type="radio"][name="modalidad_pago"]');
-  if (radios.length) {
-    const algunoChequeado = Array.from(radios).some(r => r.checked);
-    if (!algunoChequeado) return false;
-  }
-
   return true;
 }
-
 
 // Agregar o editar envío
 function guardarRegistro() {
@@ -1036,43 +1042,18 @@ function unlockOrigen() {
 
 
 const btnAdd = document.querySelector('.btn-agregar');
-btnAdd.addEventListener('click', e => {
-  e.preventDefault();  // por si acaso
-  // ¿está todo completo?
+btnAdd.addEventListener('click', () => {
   if (!validateEnvio()) {
-    // aviso directo sin confirmación
+    // Si hay campos visibles vacíos, mostrar aviso
     showModal({ message: 'Complete todos los campos visibles' });
-    return;
+  } else {
+    // Si todo está bien, pedir confirmación antes de guardar
+    showModal({ message: '¿Agregar este envío?', onConfirm: guardarRegistro });
   }
-  // si todo OK, pides confirmación
-  showModal({
-    message: '¿Agregar este envío?',
-    onConfirm: guardarRegistro
-  });
 });
 
 // Cancelar edición
-document.querySelector('.btn-limpiar').addEventListener('click', e => {
-  e.preventDefault();
-
-  // 1) Seleccionamos todos los campos relevantes de la sección masiva
-  const fields = Array.from(
-    document.querySelectorAll(
-      '#seccion-masiva input, #seccion-masiva select, #seccion-masiva textarea'
-    )
-  );
-
-  // 2) Comprobamos si alguno está no vacío (ignoramos placeholders)
-  const anyFilled = fields.some(f => f.value && f.value.trim() !== '');
-
-  if (!anyFilled) {
-    // 3a) Si ningún campo tiene valor, aviso
-    showModal({ message: 'No hay campos para limpiar.' });
-  } else {
-    // 3b) Si hay al menos uno, cancelamos edición / limpiamos
-    cancelEdit();
-  }
-});
+document.querySelector('.btn-limpiar').addEventListener('click', cancelEdit);
 
 // Eliminar todos los registros
 document.querySelector('.btn-limpiar-todos').addEventListener('click', () => {
@@ -1094,28 +1075,22 @@ document.querySelector('.btn-limpiar-todos').addEventListener('click', () => {
 
 document.querySelector('.btn-exportar').addEventListener('click', () => {
   if (registros.length === 0) {
-    // Si no hay registros, aviso de que debe haber al menos uno
     showModal({ message: 'No hay registros para exportar.' });
   } else {
-    // Si hay registros, procedemos a exportar
     exportXLSX();
   }
 });
 
-// Ocultar botón de “cancelar edición” hasta que se entre en modo edición
-const btnCancelEdit = document.querySelector('.btn-cancel-edit');
-if (btnCancelEdit) btnCancelEdit.style.display = 'none';
-
-
-
 function exportXLSX() {
-  // 1. Tomar los envíos del array global
-  if (!registros || registros.length === 0) {
-    return showModal({ message: 'No hay envíos para exportar.' });
+  // 1. Recuperar envíos desde localStorage usando tu clave
+  const registrosJson = localStorage.getItem(STORAGE_KEYS.REGISTROS);
+  const envios = registrosJson ? JSON.parse(registrosJson) : [];
+  if (envios.length === 0) {
+    return alert('No hay envíos para exportar');
   }
 
   // 2. Transformar cada envío en una fila plana
-  const data = registros.map(e => ({
+  const data = envios.map(e => ({
     'Modalidad de Pago': e.modalidadPago,
     'Tipo de Entrega': e.tipoEntrega,
     'Depto. Destino': e.destino.departamento,
@@ -1133,11 +1108,20 @@ function exportXLSX() {
     'Clave de seguridad': e.clave
   }));
 
-  // 3. Crear worksheet y workbook con SheetJS
+  // 3. Crear worksheet y workbook
   const ws = XLSX.utils.json_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Envíos Masivos');
 
-  // 4. Disparar la descarga
+  // 4. Descargar archivo
   XLSX.writeFile(wb, 'envios_masivos.xlsx');
 }
+
+// Asociar al botón Exportar
+document.querySelector('.btn-exportar')
+        .addEventListener('click', exportXLSX);
+
+
+const btnCancelEdit = document.querySelector('.btn-cancel-edit');
+if (btnCancelEdit) btnCancelEdit.style.display = 'none';
+
