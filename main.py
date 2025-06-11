@@ -41,6 +41,7 @@ from controladores import controlador_salida as controlador_salida
 from controladores import controlador_reclamo as controlador_reclamo
 from controladores import controlador_preguntas_frecuentes as controlador_pregunta_frecuente
 from controladores import controlador_regla_cargo as controlador_regla_cargo
+from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 from controladores import reporte_ingresos as reporte_ingresos
 from controladores.bd import sql_execute
 from controladores import controlador_transaccion_venta as controlador_transaccion_venta
@@ -56,11 +57,10 @@ import hashlib
 import os
 from werkzeug.utils import secure_filename
 from werkzeug.routing import MapAdapter
-import re
+# import re
 import configuraciones
 from functools import wraps
 import inspect
-
 
 
 app = Flask(__name__, template_folder='templates')
@@ -1819,6 +1819,14 @@ def inject_cur_modulo_id():
         return dict(cur_modulo_id=None)
 
 
+def print_controlador():
+    lst = list(CONTROLADORES.keys())
+    for crud in lst:
+        page = CONTROLADORES[crud]
+        titulo = page.get('titulo')
+        icono = page.get('icon_page')
+        print( f'( {titulo} , {icono} , 1 , {crud} , 1 , 1 )' )
+
 @app.context_processor
 def inject_globals():
     # listar_pages_admin = listar_admin_pages()
@@ -1827,6 +1835,8 @@ def inject_globals():
     menu_paginas = []
     menu_rolid = None
 
+    # print_controlador()
+
     main_information = controlador_empresa.get_information()
     cookie_error = request.cookies.get('error')
     options_pagination_crud , selected_option_crud = get_options_pagination_crud()
@@ -1834,7 +1844,6 @@ def inject_globals():
     datosUsuario = getDatosUsuario()
     if datosUsuario:
         tipoUsuario = getDatosUsuario()['tipo_usuario']
-        print('extrae tipo')
         if tipoUsuario == 'E':
             datosUsuario = controlador_usuario.get_usuario_empleado_user_id(user_id)
             menu_rolid = datosUsuario['rolid']
@@ -1933,6 +1942,7 @@ paginas_simples = [
     'salida_informacion',
     'cambiar_contrasenia',
     'programacion_devolucion',
+    'maestra_para_vb',
     # 'Faq'
 ]
 
@@ -2012,32 +2022,35 @@ def cotizador():
         sucursales = sucursales,
     )
 
+from decimal import Decimal
 
-@app.route("/api/get_tarifa", methods=["POST"])
-def api_get_tarifa():
+
+@app.route("/api/calculate_tarifa", methods=["POST"])
+def api_calculate_tarifa():
     try:
         data = request.get_json()
         origen_id = data.get("origen_id")
         destino_id = data.get("destino_id")
-        includeRecojo = data.get('recojo')
+        valor = data.get('valor')
+        includeRecojo = data.get('includeRecojo')
+        peso = data.get('peso')
 
-        if origen_id is None or destino_id is None:
-            return jsonify({"error": "Faltan parámetros origen_id o destino_id"}), 400
+        if origen_id is None or destino_id is None or includeRecojo is None or peso is None:
+            return jsonify({"error": f" {data} "}), 400
 
         tarifa = controlador_tarifa_ruta.get_tarifa_ids(origen_id, destino_id)
+        regla_p = controlador_regla_cargo.get_regla_cargo_condicion( 'P' , peso )
+        regla_v = controlador_regla_cargo.get_regla_cargo_condicion( 'V' , valor )
 
-        if includeRecojo == 1:
-            a = controlador_empresa.get_porcentaje_recojo()
-        else:
-            a = 0
+        tarifa_ruta = Decimal(str(tarifa['tarifa'])) if tarifa else Decimal('0')
+        porcentaje_recojo = Decimal(str(controlador_empresa.get_porcentaje_recojo())) if includeRecojo == '1' else Decimal('0')
+        porcentaje_peso = Decimal(str(regla_p['porcentaje'])) if regla_p else Decimal('0')
+        porcentaje_valor = Decimal(str(regla_v['porcentaje'])) if regla_v else Decimal('0')
 
-
-
-        if tarifa:
-            return jsonify(tarifa['tarifa'])  # solo número
-        else:
-            return jsonify(None)  # o {"tarifa": None}
-
+        # print(tarifa_ruta)
+        respuesta = controlador_tarifa_ruta.calcularTarifaTotal( tarifa_ruta , peso , porcentaje_recojo , porcentaje_valor , porcentaje_peso )
+        # print(respuesta)
+        return jsonify(respuesta)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -2218,10 +2231,6 @@ def api_articulos():
 @app.route("/carrito")
 def carrito():
     return render_template('carrito.html')
-
-from flask import jsonify, request
-from controladores import controlador_transaccion_venta
-from controladores.bd import sql_select_fetchall
 
 @app.route("/obtener-carrito", methods=["GET"])
 def obtener_carrito():
@@ -2688,7 +2697,7 @@ def dashboard(module_name):
 
 
 @app.route("/crud=<tabla>")
-# @validar_empleado()
+@validar_empleado()
 def crud_generico(tabla):
     config = CONTROLADORES.get(tabla)
     page = permiso.get_pagina_key(tabla)

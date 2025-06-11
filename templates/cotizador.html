@@ -90,11 +90,20 @@ Cotizador de Tarifas de Envío
 
                 <div class="form-row">
                     <div class="form-col">
-                        <label>¿LO RECOGEMOS?</label>
-                        <select id="pickup-option">
-                            <option value="0">Sin recojo</option>
-                            <option value="1">Con recojo</option>
-                        </select>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <label>¿LO RECOGEMOS?</label>
+                                <select id="pickup-option">
+                                    <option value="0">Sin recojo</option>
+                                    <option value="1">Con recojo</option>
+                                </select>
+                            </div>
+
+                            <div class="form-col">
+                                <label>¿CUÁNTO VALE?</label>
+                                <input type="number" id="valor_declarado" min="0" step="0.01" placeholder="Valor" value="0.00">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-col">
@@ -125,7 +134,7 @@ Cotizador de Tarifas de Envío
                     <div class="form-col">
                         <div class="price-section">
                             <div class="price-text">Precio estimado:</div>
-                            <div class="price-amount" id="price-display">S/ 0.00</div>
+                            <div class="price-amount" id="price-display">S/. 0.00</div>
                         </div>
                     </div>
                 </div>
@@ -133,9 +142,9 @@ Cotizador de Tarifas de Envío
         </form>
 
         <div class="notes">
-            <p>Las tarifas son referenciales. Las tarifas incluyen IGV. 
+            <p>Las tarifas son referenciales. Las tarifas incluyen IGV.
                 Precios válidos solo para el Servicio Regular y
-                Partners de Lima a Provincias y de Lima a Lima. 
+                Partners de Lima a Provincias y de Lima a Lima.
             </p>
         </div>
     </div>
@@ -157,16 +166,8 @@ Cotizador de Tarifas de Envío
     const destDist = document.getElementById('destination-district');
     const destSuc = document.getElementById('destination-sucursal');
 
-    const pickup = document.getElementById('pickup-option').value;
-    const weight = parseFloat(document.getElementById('weight').value) || 0;
-    const weightUnit = document.getElementById('weight-unit').value;
-    const btnCalculate = document.getElementById('calculate-btn');
-
-    let weightInKg = weightUnit === 'g' ? weight / 1000 : weight;
-
-
     const inputWeight = document.getElementById("weight");
-    
+
     function validateInputDecimal(input) {
         let timeout = null;
         clearTimeout(timeout);
@@ -183,14 +184,17 @@ Cotizador de Tarifas de Envío
         }, 600); // espera 800 ms después del último input
     }
 
-    inputWeight.addEventListener("input", function () {
-        validateInputDecimal(inputWeight);
-    });
+    
 
-    inputWeight.addEventListener("blur", function () {
-        validateInputDecimal(inputWeight);
-    });
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+        input.addEventListener("input", function () {
+            validateInputDecimal(input);
+        });
 
+        input.addEventListener("blur", function () {
+            validateInputDecimal(input);
+        });
+    });
 
     let DEPARTAMENTOS = {{ departamentos | tojson }};
     let PROVINCIAS = {{ provincias | tojson }};
@@ -305,35 +309,67 @@ Cotizador de Tarifas de Envío
         });
     });
 
-
-    function obtenerTarifa(origen_id, destino_id) {
-        return fetch("/api/get_tarifa", {
+    function calcularTarifa(origen_id, destino_id, valor, recojo, peso) {
+        return fetch("/api/calculate_tarifa", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 origen_id: origen_id,
-                destino_id: destino_id
+                destino_id: destino_id,
+                valor: valor ,
+                includeRecojo: recojo,
+                peso: peso ,
             })
         })
-        .then(res => res.json())
-        .then(data => {
-            if (data.error) {
-                console.error("Error:", data.error);
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    console.error("Error:", data.error);
+                    return null;
+                }
+                return data;
+                // console.log('API:',data);
+                // número o null
+            })
+            .catch(err => {
+                console.error("Error de red:", err);
                 return null;
-            }
-            return data; // número o null
-        })
-        .catch(err => {
-            console.error("Error de red:", err);
-            return null;
-        });
+            });
     }
 
+    document.getElementById('calculate-btn').addEventListener('click', () => {
+        let origen_id = originSuc.value;
+        let destino_id = destSuc.value;
+
+        const weightUnit = document.getElementById('weight-unit').value;
+        let pickup = document.getElementById('pickup-option').value;
+        let valor_declarado = parseFloat(document.getElementById('valor_declarado').value);
+        let weightValue = parseFloat(inputWeight.value) || 0;
+        let weightInKg = weightUnit === 'g' ? parseFloat(weightValue / 1000) : parseFloat(weightValue);
+
+        console.log(weightInKg);
+
+        const priceTotal = document.getElementById('price-display');
+
+        // console.log(origen_id, ' - ',destino_id ,' - ', pickup ,' - ', weightInKg);
+
+        calcularTarifa(origen_id, destino_id, valor_declarado, pickup, weightInKg).then(data => {
+            // console.log('resultado:',data)
+            priceTotal.innerHTML = `S/. ${parseFloat(data).toFixed(2)}`;
+            // priceTotal.innerHTML = `S/. ${data}`;
+        });
+
+        // console.log('terminó');
+
+    });
 
 
-   
+
+
+
+
 
 </script>
 
