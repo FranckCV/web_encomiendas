@@ -182,7 +182,7 @@ CREATE TABLE motivo_reclamo (
 CREATE TABLE pagina (
   id            int(11) NOT NULL AUTO_INCREMENT, 
   titulo        varchar(150) NOT NULL, 
-  icono         varchar(150) NOT NULL, 
+  icono         varchar(150) NULL, 
   activo        tinyint(1) DEFAULT 1 NOT NULL, 
   `key`         varchar(150) NOT NULL, 
   tipo_paginaid int(11) NOT NULL, 

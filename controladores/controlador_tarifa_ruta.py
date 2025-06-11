@@ -304,7 +304,7 @@ def get_options_distrito_origen():
 
 def get_options_sucursal_origen():
     sql= f'''
-        select 
+        select distinct
             uori.codigo ,
             ori.id as id ,
             concat(ori.abreviatura,' / ', ori.direccion) as nom_sucursal
@@ -396,17 +396,43 @@ def get_tarifa_ids(origen_id , destino_id):
     filas = sql_select_fetchone(sql,(origen_id , destino_id))
     return filas
 
+from decimal import Decimal
 
-def calcularTarifaTotal( tarifa_ruta , peso , porcentaje_recojo , porcentaje_valor , porcentaje_peso ):
-    kilos_exceso = peso - 1 
-    porcentaje_valor = porcentaje_valor / 100 
-    
-    peso_porcentaje = kilos_exceso * porcentaje_peso / 100 if porcentaje_recojo > 0 else kilos_exceso
+from decimal import Decimal
+
+def calcularTarifaTotal(tarifa_ruta, peso, porcentaje_recojo, porcentaje_valor, porcentaje_peso):
+    # Convertir todos los valores a Decimal
+    tarifa_ruta = Decimal(str(tarifa_ruta))
+    peso = Decimal(str(peso))
+    porcentaje_recojo = Decimal(str(porcentaje_recojo))
+    porcentaje_valor = Decimal(str(porcentaje_valor))
+    porcentaje_peso = Decimal(str(porcentaje_peso))
+    print(tarifa_ruta) 
+    print(peso)
+    print(porcentaje_recojo)
+    print(porcentaje_valor)
+    print(porcentaje_peso)
+
+    # Calcular kilos en exceso (solo los kilos adicionales a 1)
+    kilos_exceso = peso - Decimal('1')
+    kilos_exceso = kilos_exceso if kilos_exceso > 0 else Decimal('0')
+
+    # Calcular aumentos
+    valor = porcentaje_valor / Decimal('100')
+    peso_porcentaje = kilos_exceso * (porcentaje_peso / Decimal('100'))
+    aumento_recojo = tarifa_ruta * (porcentaje_recojo / Decimal('100'))
     aumento_peso = tarifa_ruta * peso_porcentaje
-    aumento_valor = tarifa_ruta * porcentaje_valor
+    aumento_valor = tarifa_ruta * valor
 
-    aumento_recojo = tarifa_ruta * porcentaje_recojo / 100
-
+    # Total
     total = tarifa_ruta + aumento_peso + aumento_valor + aumento_recojo
+    print(total)
+    return round(total, 2)
 
-    return total
+
+    
+
+
+
+
+
