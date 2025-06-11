@@ -126,7 +126,7 @@ def get_usuario_por_correo(correo):
         from usuario usu
         left join cliente cli on cli.correo = usu.correo
         left join empleado emp on emp.correo = usu.correo
-        where usu.correo = %s and usu.activo
+        where usu.correo = %s and usu.activo = 1
     '''
 
     info = sql_select_fetchone(sql , (correo))
@@ -254,7 +254,7 @@ def get_options():
     return lista
 
 
-def register_user( correo , contrasenia ):
+def register_user_client( correo , contrasenia ):
     sql = f'''
         INSERT INTO 
             usuario 
@@ -264,5 +264,24 @@ def register_user( correo , contrasenia ):
     '''
     id = sql_execute_lastrowid(sql,( correo , contrasenia ))
     return id
+
+
+def get_info_usuario_por_correo(correo):
+    sql= f'''
+        select 
+            usu.id , 
+            usu.correo as usu_correo, 
+            emp.id as emp_id , 
+            emp.correo , 
+            cli.id as cli_id , 
+            cli.correo as cli_correo 
+        from usuario usu 
+        left join cliente cli on cli.correo = usu.correo 
+        left join empleado emp on emp.correo = usu.correo
+        where usu.correo = %s
+    '''
+
+    info = sql_select_fetchone(sql , (correo))
+    return info
 
 

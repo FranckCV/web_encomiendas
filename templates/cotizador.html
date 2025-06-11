@@ -27,30 +27,30 @@ Cotizador de Tarifas de Envío
             <div class="form-group">
                 <label>¿DÓNDE TE ENCUENTRAS?</label>
                 <div class="form-row">
-                    <div class="form-col">
+                    <!-- <div class="form-col">
                         <input id="origin-code" required type="text" placeholder="Código de ubigeo" maxlength="6">
-                    </div>
+                    </div> -->
                     <div class="form-col">
-                        <select id="origin-department" required>
+                        <select class="origin-select" id="origin-department" required>
                             <option value="">Departamentos</option>
-                            {% for dept in departamentos %}
-                            {% set name = dept.get('departamento') %}
-                            <option value="{{ name }}">{{ name }}</option>
-                            {% endfor %}
                         </select>
                     </div>
                     <div class="form-col">
-                        <select id="origin-province">
+                        <select class="origin-select" id="origin-province">
                             <option value="">Provincias</option>
                             <option value="" disabled>Selecciona un departamento </option>
-
                         </select>
                     </div>
                     <div class="form-col">
-                        <select id="origin-district">
+                        <select class="origin-select" id="origin-district">
                             <option value="">Distritos</option>
                             <option value="" disabled>Selecciona una provincia </option>
-
+                        </select>
+                    </div>
+                    <div class="form-col">
+                        <select class="origin-select" id="origin-sucursal">
+                            <option value="">Sucursales</option>
+                            <option value="" disabled>Selecciona un distrito </option>
                         </select>
                     </div>
                 </div>
@@ -60,67 +60,56 @@ Cotizador de Tarifas de Envío
                 <label>¿A DÓNDE LO LLEVAMOS?</label>
                 <div class="form-row">
                     <div class="form-col">
-                        <input id="destination-code" required type="text" placeholder="Código de ubigeo" maxlength="6">
-                    </div>
-                    <div class="form-col">
-                        <select id="destination-department">
+                        <select class="destination-select" id="destination-department">
                             <option value="">Departamentos</option>
-                            {% for dept in departamentos %}
-                            {% set name = dept.get('departamento') %}
-                            <option value="{{ name }}">{{ name }}</option>
-                            {% endfor %}
+                            <option value="" disabled>Selecciona una sucursal de origen</option>
                         </select>
                     </div>
                     <div class="form-col">
-                        <select id="destination-province">
+                        <select class="destination-select" id="destination-province">
                             <option value="">Provincias</option>
                             <option value="" disabled>Selecciona un departamento </option>
                         </select>
                     </div>
                     <div class="form-col">
-                        <select id="destination-district">
+                        <select class="destination-select" id="destination-district">
                             <option value="">Distritos</option>
                             <option value="" disabled>Selecciona una provincia </option>
                         </select>
                     </div>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-col">
-                    <label>¿LO RECOGEMOS?</label>
-                    <select id="pickup-option">
-                        <option value="no">Sin recojo</option>
-                        <option value="yes">Con recojo</option>
-                    </select>
-                </div>
-
-                <div class="form-col">
-                    <label>¿QUÉ QUIERES ENVIAR?</label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="envelope" name="package-type" value="envelope" checked>
-                            <label for="envelope">Sobres</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="package" name="package-type" value="package">
-                            <label for="package">Paquetes</label>
-                        </div>
+                    <div class="form-col">
+                        <select class="destination-select" id="destination-sucursal">
+                            <option value="">Sucursales</option>
+                            <option value="" disabled>Selecciona un distrito </option>
+                        </select>
                     </div>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>¿CUÁNTO PESA?</label>
+
                 <div class="form-row">
                     <div class="form-col">
-                        <input type="number" id="weight" min="0" step="0.1" placeholder="Peso">
-                    </div>
-                    <div class="form-col">
-                        <select id="weight-unit">
-                            <option value="kg">Kilogramos (kg)</option>
-                            <option value="g">Gramos (g)</option>
+                        <label>¿LO RECOGEMOS?</label>
+                        <select id="pickup-option">
+                            <option value="0">Sin recojo</option>
+                            <option value="1">Con recojo</option>
                         </select>
+                    </div>
+
+                    <div class="form-col">
+                        <label>¿CUÁNTO PESA?</label>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <input type="number" id="weight" min="0" step="0.01" placeholder="Peso" value="0.00">
+                            </div>
+                            <div class="form-col">
+                                <select id="weight-unit">
+                                    <option value="kg">Kilogramos (kg)</option>
+                                    <option value="g">Gramos (g)</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -144,9 +133,10 @@ Cotizador de Tarifas de Envío
         </form>
 
         <div class="notes">
-            <p>Las tarifas son referenciales. Las tarifas incluyen IGV. Precios válidos solo para el Servicio Regular y
-                Partners de Lima a Provincias y de Lima a Lima. No incluye cargo adicional del seguro para envíos
-                mayores a S/101.00 soles y envíos valorados. Se considera paquete desde 501 gramos.</p>
+            <p>Las tarifas son referenciales. Las tarifas incluyen IGV. 
+                Precios válidos solo para el Servicio Regular y
+                Partners de Lima a Provincias y de Lima a Lima. 
+            </p>
         </div>
     </div>
 </div>
@@ -157,241 +147,194 @@ Cotizador de Tarifas de Envío
 {% block scripts %}
 
 <script>
-
-    // const originDept = document.getElementById('origin-department').value;
-    // const originProv = document.getElementById('origin-province').value;
-    // const originDist = document.getElementById('origin-district').value;
-    // const destDept = document.getElementById('destination-department').value;
-    // const destProv = document.getElementById('destination-province').value;
-    // const destDist = document.getElementById('destination-district').value;
-
-    const originCode = document.getElementById('origin-code');
     const originDept = document.getElementById('origin-department');
     const originProv = document.getElementById('origin-province');
     const originDist = document.getElementById('origin-district');
-    const destCode = document.getElementById('destination-code');
+    const originSuc = document.getElementById('origin-sucursal');
+
     const destDept = document.getElementById('destination-department');
     const destProv = document.getElementById('destination-province');
     const destDist = document.getElementById('destination-district');
+    const destSuc = document.getElementById('destination-sucursal');
 
     const pickup = document.getElementById('pickup-option').value;
-    const packageType = document.querySelector('input[name="package-type"]:checked').value;
     const weight = parseFloat(document.getElementById('weight').value) || 0;
     const weightUnit = document.getElementById('weight-unit').value;
     const btnCalculate = document.getElementById('calculate-btn');
 
-    const DEPARTAMENTOS = {{ departamentos | tojson }};
-    const PROVINCIAS = {{ provincias | tojson }};
-    const DISTRITOS = {{ distritos | tojson }};
+    let weightInKg = weightUnit === 'g' ? weight / 1000 : weight;
 
-    function addOptionsToSelect(s_dept, s_prov, s_dist, i_code) {
+
+    const inputWeight = document.getElementById("weight");
+    
+    function validateInputDecimal(input) {
+        let timeout = null;
+        clearTimeout(timeout);
+
+        timeout = setTimeout(() => {
+            const valor = input.value;
+            const num = parseFloat(valor);
+
+            if (!isNaN(num)) {
+                input.value = num.toFixed(2);
+            } else {
+                input.value = '0.00';
+            }
+        }, 600); // espera 800 ms después del último input
+    }
+
+    inputWeight.addEventListener("input", function () {
+        validateInputDecimal(inputWeight);
+    });
+
+    inputWeight.addEventListener("blur", function () {
+        validateInputDecimal(inputWeight);
+    });
+
+
+    let DEPARTAMENTOS = {{ departamentos | tojson }};
+    let PROVINCIAS = {{ provincias | tojson }};
+    let DISTRITOS = {{ distritos | tojson }};
+    let SUCURSALES = {{ sucursales | tojson }};
+
+
+    function fillMainSelect(select, data, value, label) {
+        for (const key of data) {
+            select.innerHTML += `
+                <option value="${key[value]}">
+                    ${key[label]}
+                </option>
+            `
+        }
+    }
+
+    function fillSecondarySelect(select, data, value, label, select_main, comparation) {
+        for (const key of data) {
+            if (key[comparation] == select_main.value) {
+                select.innerHTML += `
+                    <option value="${key[value]}">
+                        ${key[label]}
+                    </option>
+                `
+            }
+
+        }
+    }
+
+    function resetSelect(select, option1, option2) {
+        select.innerHTML = `
+            <option value="">${option1}</option>
+            <option value="" disabled>${option2}</option>
+        `
+    }
+
+    function prepareSelect(select, option) {
+        select.innerHTML = `
+            <option value="" disabled selected>${option}</option>
+        `
+    }
+
+    function addOptionsToSelect(s_dept, s_prov, s_dist, s_suc, f_prov, f_dist, f_suc) {
         s_dept.addEventListener('change', () => {
             s_prov.innerHTML = '';
             if (s_dept.value == null || s_dept.value == '') {
-                s_prov.innerHTML = `
-                    <option value="">Provincias</option>
-                    <option value="" disabled>Selecciona un departamento </option>
-                `
-                i_code.value = null;
-                s_dist.innerHTML = `
-                    <option value="">Distritos</option>
-                    <option value="" disabled>Selecciona una provincia </option>
-                `
+                resetSelect(s_prov, 'Provincias', 'Selecciona un departamento');
             } else {
-                s_prov.innerHTML += `
-                    <option value="" disabled selected>Selecciona una provincia </option>
-                `
-                for (const key of PROVINCIAS) {
-                    if (key.departamento == s_dept.value) {
-                        s_prov.innerHTML += `
-                    <option value="${key.provincia}">
-                        ${key.provincia}
-                    </option>
-                `
-                    }
-                }
+                prepareSelect(s_prov, 'Selecciona una provincia');
+                fillSecondarySelect(s_prov, f_prov, 'provincia', 'provincia', s_dept, 'departamento');
             }
+            resetSelect(s_dist, 'Distritos', 'Selecciona una provincia');
+            resetSelect(s_suc, 'Sucursales', 'Selecciona un distrito');
         });
 
         s_prov.addEventListener('change', () => {
             s_dist.innerHTML = '';
             if (s_prov.value == null || s_prov.value == '') {
-                s_dist.innerHTML += `
-                <option value="">Distritos</option>
-                <option value="" disabled>Selecciona una provincia </option>
-            `
+                resetSelect(s_dist, 'Distritos', 'Selecciona una provincia');
             } else {
-                s_dist.innerHTML += `
-                <option value="" disabled selected>Selecciona un distrito </option>
-            `
-                for (const key of DISTRITOS) {
-                    if (key.provincia == s_prov.value) {
-                        s_dist.innerHTML += `
-                    <option value="${key.codigo}">
-                        ${key.distrito}
-                    </option>
-                `
-                    }
-                }
+                prepareSelect(s_dist, 'Selecciona un distrito');
+                fillSecondarySelect(s_dist, f_dist, 'codigo', 'distrito', s_prov, 'provincia');
             }
+            resetSelect(s_suc, 'Sucursales', 'Selecciona un distrito');
         });
 
         s_dist.addEventListener('change', () => {
-            i_code.value = '';
+            s_suc.innerHTML = '';
             if (s_dist.value == null || s_dist.value == '') {
-                i_code.value = null;
+                resetSelect(s_suc, 'Sucursales', 'Selecciona un distrito');
             } else {
-                for (const key of DISTRITOS) {
-                    if (key.codigo == s_dist.value) {
-                        i_code.value = `${key.codigo}`;
-                    }
-                }
+                prepareSelect(s_suc, 'Selecciona una sucursal');
+                fillSecondarySelect(s_suc, f_suc, 'id', 'nom_sucursal', s_dist, 'codigo');
             }
+        });
+
+    }
+
+    function obtenerDatosDestino(sucursal_id) {
+        return fetch(`/api/datos_destino?sucursal_id=${sucursal_id}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    console.error("Error:", data.error);
+                    return null;
+                }
+                return data; // Ya es un objeto JS
+            })
+            .catch(err => {
+                console.error("Error de red:", err);
+                return null;
+            });
+    }
+
+    fillMainSelect(originDept, DEPARTAMENTOS, 'departamento', 'departamento');
+
+    addOptionsToSelect(originDept, originProv, originDist, originSuc, PROVINCIAS, DISTRITOS, SUCURSALES);
+
+    document.querySelectorAll('.origin-select').forEach(select => {
+        select.addEventListener('change', () => {
+            if (originSuc.value == null || originSuc.value == '') {
+                resetSelect(destDept, 'Departamentos', 'Selecciona una sucursal de origen');
+                destDept.dispatchEvent(new Event("change"));
+            } else {
+                prepareSelect(destDept, 'Selecciona un departamento');
+                obtenerDatosDestino(originSuc.value).then(data => {
+                    fillMainSelect(destDept, data.departamentos, 'departamento', 'departamento');
+                    addOptionsToSelect(destDept, destProv, destDist, destSuc, data.provincias, data.distritos, data.sucursales);
+                });
+            }
+        });
+    });
+
+
+    function obtenerTarifa(origen_id, destino_id) {
+        return fetch("/api/get_tarifa", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                origen_id: origen_id,
+                destino_id: destino_id
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                console.error("Error:", data.error);
+                return null;
+            }
+            return data; // número o null
+        })
+        .catch(err => {
+            console.error("Error de red:", err);
+            return null;
         });
     }
 
-    addOptionsToSelect(originDept, originProv, originDist, originCode);
-    addOptionsToSelect(destDept, destProv, destDist, destCode);
 
 
+   
 
-
-
-
-
-
-
-    // originDept.addEventListener('change', () => {
-    //     originProv.innerHTML = '';
-    //     if (originDept.value == null || originDept.value == '') {
-    //         originProv.innerHTML += `
-    //             <option value="">Provincias</option>
-    //             <option value="" disabled>Selecciona un departamento </option>
-    //         `
-    //     } else {
-    //         originProv.innerHTML += `
-    //             <option value="" disabled selected>Selecciona un departamento </option>
-    //         `
-    //         for (const key of PROVINCIAS) {
-    //             if (key.departamento == originDept.value) {
-    //                 originProv.innerHTML += `
-    //                 <option value="${key.provincia}">
-    //                     ${key.provincia}
-    //                 </option>
-    //             `
-    //             }
-    //         }
-    //     }
-    // });
-
-    // originProv.addEventListener('change', () => {
-    //     originDist.innerHTML = '';
-    //     if (originProv.value == null || originProv.value == '') {
-    //         originDist.innerHTML += `
-    //             <option value="">Distritos</option>
-    //             <option value="" disabled>Selecciona una provincia </option>
-    //         `
-    //     } else {
-    //         originDist.innerHTML += `
-    //             <option value="" disabled selected>Selecciona una provincia </option>
-    //         `
-    //         for (const key of DISTRITOS) {
-    //             if (key.provincia == originProv.value) {
-    //                 originDist.innerHTML += `
-    //                 <option value="${key.codigo}">
-    //                     ${key.distrito}
-    //                 </option>
-    //             `
-    //             }
-    //         }
-    //     }
-    // });
-
-    // originDist.addEventListener('change', () => {
-    //     originCode.value = '';
-    //     if (originDist.value == null || originDist.value == '') {
-    //         originCode.value = null;
-    //     } else {
-    //         for (const key of DISTRITOS) {
-    //             if (key.codigo == originDist.value) {
-    //                 originCode.value = `${key.codigo}`;
-    //             }
-    //         }
-    //     }
-    // });
 </script>
 
-<!-- <script>
-    document.addEventListener('DOMContentLoaded', function() {
-                
-        // Cálculo de tarifa
-        document.getElementById('calculate-btn').addEventListener('click', function() {
-            // Obtener todos los valores del formulario
-            const originDept = document.getElementById('origin-department').value;
-            const originProv = document.getElementById('origin-province').value;
-            const originDist = document.getElementById('origin-district').value;
-            const destDept = document.getElementById('destination-department').value;
-            const destProv = document.getElementById('destination-province').value;
-            const destDist = document.getElementById('destination-district').value;
-            const pickup = document.getElementById('pickup-option').value;
-            const packageType = document.querySelector('input[name="package-type"]:checked').value;
-            const weight = parseFloat(document.getElementById('weight').value) || 0;
-            const weightUnit = document.getElementById('weight-unit').value;
-            
-            // Validar campos requeridos
-            if (!originDept || !originProv || !originDist || !destDept || !destProv || !destDist || weight <= 0) {
-                alert('Por favor complete todos los campos requeridos.');
-                return;
-            }
-            
-            // Convertir peso a kg si es necesario
-            let weightInKg = weightUnit === 'g' ? weight / 1000 : weight;
-            
-            // Calcular tarifa (esto es solo un ejemplo, deberías implementar tu lógica)
-            let price = calculateShippingRate(originDept, destDept, packageType, weightInKg, pickup);
-            
-            // Mostrar el precio calculado
-            document.getElementById('price-display').textContent = `S/ ${price.toFixed(2)}`;
-        });
-        
-        // Función para calcular la tarifa (ejemplo)
-        function calculateShippingRate(origin, destination, type, weight, pickup) {
-            // Tarifa base según origen y destino
-            let baseFee = 0;
-            
-            // Si es local (mismo departamento)
-            if (origin === destination) {
-                baseFee = 8;
-            } else {
-                // Si es a otro departamento
-                baseFee = 15;
-            }
-            
-            // Ajuste por tipo de paquete
-            let typeFactor = (type === 'envelope') ? 1 : 1.5;
-            
-            // Ajuste por peso
-            let weightFee = 0;
-            if (weight <= 0.5) {
-                weightFee = 0;
-            } else if (weight <= 1) {
-                weightFee = 3;
-            } else if (weight <= 3) {
-                weightFee = 6;
-            } else if (weight <= 5) {
-                weightFee = 10;
-            } else {
-                weightFee = 10 + (weight - 5) * 2;
-            }
-            
-            // Cargo por recojo
-            let pickupFee = (pickup === 'yes') ? 5 : 0;
-            
-            // Calcular tarifa total
-            let totalFee = (baseFee * typeFactor) + weightFee + pickupFee;
-            
-            return totalFee;
-        }
-    });
-</script> -->
 {% endblock %}

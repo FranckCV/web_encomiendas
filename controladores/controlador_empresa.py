@@ -135,3 +135,17 @@ def get_logo():
     
     return info
 
+
+def get_porcentaje_recojo():
+    sql= f'''
+        select 
+            emp.porcentaje_recojo 
+        from empresa emp
+        where id = 1
+    '''
+    
+    info = sql_select_fetchone(sql)['porcentaje_recojo']
+    
+    return info
+
+

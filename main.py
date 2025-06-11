@@ -193,24 +193,52 @@ def encrypt_sha256_string(str):
     return encstr
 
 # Crear response para login
-def resp_login( url_function , user_id , correo ):
-    resp = make_response(redirect_url(url_function))
-    resp.set_cookie('user_id', str(user_id))
-    resp.set_cookie('correo', correo)
-    return resp
+# def resp_login( url_function , user_id , correo ):
+#     resp = make_response(redirect_url(url_function))
+#     resp.set_cookie('user_id', str(user_id))
+#     resp.set_cookie('correo', correo)
+#     return resp
 
 
+# Crear response para login
+def resp_login( correo , contrasenia ):
+    usuario = controlador_usuario.get_usuario_por_correo(correo)
+    encpassword = encrypt_sha256_string(contrasenia)
+    if usuario and encpassword == usuario['contrasenia']:
+        resp = make_response(redirect_url('login'))
+        resp.set_cookie('user_id', str(usuario['id']))
+        resp.set_cookie('correo', correo)
+        return resp
+    else:
+        return rdrct_error(redirect_url('login') ,'LOGIN_INVALIDO')
+
+
+# Crear response para register
+def resp_register( correo, contrasenia , conf_contrasenia, telefono, num_documento, nombre_siglas, apellidos_razon, tipo_documentoid, tipo_clienteid ):
+    econtrasenia = encrypt_sha256_string(contrasenia)
+    econf_contrasenia = encrypt_sha256_string(conf_contrasenia)
+    if econf_contrasenia == econtrasenia:
+        if controlador_usuario.get_info_usuario_por_correo(correo) is None :
+            client_id = controlador_cliente.register_client( correo, telefono, num_documento, nombre_siglas, apellidos_razon, tipo_documentoid, tipo_clienteid )
+            user_id = controlador_usuario.register_user_client( correo , econtrasenia )
+            # return redirect_url('sign_up')
+            return resp_login( correo , contrasenia )
+        else:
+            return rdrct_error(redirect_url('sign_up') ,'Este correo ya fue registrado')
+    else:
+        return rdrct_error(redirect_url('sign_up') ,'Las contraseñas no coinciden')
+
+
+# Extraer función de un enlace
 def obtener_funcion_desde_url(app: Flask, url: str, method='GET'):
-    # Adaptador de rutas para trabajar con URLs externas
     adapter: MapAdapter = app.url_map.bind("localhost")
-
     try:
         endpoint, args = adapter.match(url, method=method)
         return endpoint  # nombre de la función de vista
     except Exception as e:
         return f"No se encontró ninguna función para la URL '{url}': {str(e)}"
 
-
+# Datos de usuario que ha iniciado sesión
 def getDatosUsuario():
     user_id = request.cookies.get('user_id') 
     correo = request.cookies.get('correo')
@@ -1875,15 +1903,67 @@ def logout():
 
 @app.route("/cotizador")
 def cotizador():
-    departamentos = controlador_ubigeo.get_options_departamento()
-    provincias = controlador_ubigeo.get_options_provincia()
-    distritos = controlador_ubigeo.get_options_distrito()
+    departamentos = controlador_tarifa_ruta.get_options_departamento_origen()
+    provincias = controlador_tarifa_ruta.get_options_provincia_origen()
+    distritos = controlador_tarifa_ruta.get_options_distrito_origen()
+    sucursales = controlador_tarifa_ruta.get_options_sucursal_origen() 
     return render_template(
         'cotizador.html' ,
         departamentos = departamentos,
         provincias = provincias,
         distritos = distritos,
+        sucursales = sucursales,
     )
+
+
+@app.route("/api/get_tarifa", methods=["POST"])
+def api_get_tarifa():
+    try:
+        data = request.get_json()
+        origen_id = data.get("origen_id")
+        destino_id = data.get("destino_id")
+        includeRecojo = data.get('recojo')
+
+        if origen_id is None or destino_id is None:
+            return jsonify({"error": "Faltan parámetros origen_id o destino_id"}), 400
+
+        tarifa = controlador_tarifa_ruta.get_tarifa_ids(origen_id, destino_id)
+
+        if includeRecojo == 1:
+            a = controlador_empresa.get_porcentaje_recojo()
+        else:
+            a = 0
+
+
+
+        if tarifa:
+            return jsonify(tarifa['tarifa'])  # solo número
+        else:
+            return jsonify(None)  # o {"tarifa": None}
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/datos_destino", methods=["GET"])
+def api_sucursales_por_ubigeo():
+    sucursal_id = request.args.get("sucursal_id")
+    if not sucursal_id:
+        return jsonify({"error": "ID de sucursal proporcionado"}), 400
+  
+    try:
+        departamentos = controlador_tarifa_ruta.get_options_departamento_destino(sucursal_id)
+        provincias = controlador_tarifa_ruta.get_options_provincia_destino(sucursal_id)
+        distritos = controlador_tarifa_ruta.get_options_distrito_destino(sucursal_id)
+        sucursales = controlador_tarifa_ruta.get_options_sucursal_destino(sucursal_id)
+        return jsonify({
+            "departamentos": departamentos ,
+            "provincias": provincias ,
+            "distritos": distritos ,
+            "sucursales": sucursales ,
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/contactanos")
@@ -2004,26 +2084,35 @@ def perfil():
 ##################_ METHOD POST GENERALES _################## 
 
 
+# @app.route("/procesar_login", methods=["POST"])
+# def procesar_login():
+#     try:
+#         correo = request.form["email"]
+#         password = request.form["password"]
+#         usuario = controlador_usuario.get_usuario_por_correo(correo)
+#         encpassword = encrypt_sha256_string(password)
+
+#         if usuario and encpassword == usuario['contrasenia']:
+#             resp = resp_login(
+#                 'login',
+#                 usuario['id'] ,
+#                 usuario['correo'] 
+#             )
+#             return resp
+#         else:
+#             return rdrct_error(redirect_url('login') ,'LOGIN_INVALIDO')
+#     except Exception as e:
+#         return rdrct_error(redirect_url('login')  , e)
+
+
+
 @app.route("/procesar_login", methods=["POST"])
 def procesar_login():
     try:
         correo = request.form["email"]
-        password = request.form["password"]
-        usuario = controlador_usuario.get_usuario_por_correo(correo)
-        encpassword = encrypt_sha256_string(password)
-        # print(encpassword)
-        # print(usuario)
-
-        if usuario and encpassword == usuario['contrasenia']:
-            resp = resp_login(
-                'login',
-                usuario['id'] ,
-                usuario['correo'] 
-            )
-            # controlador_usuario.actualizar_token(username, token)
-            return resp
-        else:
-            return rdrct_error(redirect_url('login') ,'LOGIN_INVALIDO')
+        contrasenia = request.form["password"]
+        resp = resp_login( correo , contrasenia )
+        return resp
     except Exception as e:
         return rdrct_error(redirect_url('login')  , e)
 
@@ -2031,21 +2120,15 @@ def procesar_login():
 @app.route("/procesar_register", methods=["POST"])
 def procesar_register():
     try:
-        correo = request.form["email"]
-        password = request.form["password"]
-        usuario = controlador_usuario.get_usuario_por_correo(correo)
-        encpassword = encrypt_sha256_string(password)
+        firma = inspect.signature(resp_register)
 
-        if usuario and encpassword == usuario['contrasenia']:
-            resp = resp_login(
-                'login',
-                usuario['id'] ,
-                usuario['correo'] 
-            )
-            # controlador_usuario.actualizar_token(username, token)
-            return resp
-        else:
-            return rdrct_error(redirect_url('login') ,'LOGIN_INVALIDO')
+        valores = []
+        for nombre, parametro in firma.parameters.items():
+            valor = request.form.get(nombre)
+            valores.append(valor)
+
+        return resp_register( *valores )
+
     except Exception as e:
         return rdrct_error(redirect_url('login')  , e)
 
@@ -2162,6 +2245,7 @@ def reporte(report_name):
                 key_columns    = list(columnas.keys()) ,
                 table_columns  = table_columns ,
                 crud_search    = True,
+                primary_key = None ,
                 # crud_consult   = True,
                 # crud_insert    = True,
                 # crud_update    = True,

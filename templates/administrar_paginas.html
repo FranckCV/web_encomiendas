@@ -916,24 +916,24 @@ Permisos para {{info_rol.get('nombre')}}
                     rolid: rolid 
                 })
             })
-                .then(response => {
-                    if (!response.ok) throw new Error("Error al actualizar");
-                    return response.json();
-                })
-                .then(data => {
-                    // console.log("Actualizado:", data);
-                    if (data.rpta == 1) {
-                        opt.classList.remove('unable');
-                    } else {
-                        opt.classList.add('unable');
-                    }
-                    actualizarBotonesPermisosModulo();
+            .then(response => {
+                if (!response.ok) throw new Error("Error al actualizar");
+                return response.json();
+            })
+            .then(data => {
+                // console.log("Actualizado:", data);
+                if (data.rpta == 1) {
+                    opt.classList.remove('unable');
+                } else {
+                    opt.classList.add('unable');
+                }
+                actualizarBotonesPermisosModulo();
 
-                })
-                .catch(err => {
-                    alert("Error al actualizar respuesta");
-                    console.error(err);
-                });
+            })
+            .catch(err => {
+                alert("Error al actualizar respuesta");
+                console.error(err);
+            });
         });
     });
 

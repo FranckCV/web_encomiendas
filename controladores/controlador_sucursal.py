@@ -244,3 +244,69 @@ def get_report_horario():
 
     filas = sql_select_fetchall(sql)
     return columnas, filas
+
+
+
+
+
+
+
+def get_options_departamento_sucursal():
+    sql= f'''
+        SELECT DISTINCT 
+            ub.departamento 
+        FROM ubigeo ub
+        inner join sucursal su on ub.codigo = su.ubigeocodigo
+        where ub.activo = 1
+        order by ub.departamento
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas
+
+
+def get_options_provincia_sucursal():
+    sql= f'''
+        SELECT DISTINCT 
+            ub.departamento ,
+            ub.provincia
+        FROM ubigeo ub
+        inner join sucursal su on ub.codigo = su.ubigeocodigo
+        where ub.activo = 1
+        order by ub.departamento , ub.provincia
+    '''
+    filas = sql_select_fetchall(sql)
+    
+    # lista = [( fila["departamento"] , fila["provincia"]) for fila in filas]
+    lista = filas
+    return lista
+
+
+def get_options_distrito_sucursal():
+    sql= f'''
+        SELECT DISTINCT
+            ub.codigo , 
+            ub.departamento ,
+            ub.provincia ,
+            ub.distrito 
+        FROM ubigeo ub
+        inner join sucursal su on ub.codigo = su.ubigeocodigo
+        where ub.activo = 1
+        order by ub.departamento , ub.provincia , ub.distrito
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas
+
+
+def get_options_ubigeo_sucursal():
+    sql= f'''
+        SELECT 
+            ubi.codigo ,
+            suc.id ,
+            concat(suc.abreviatura,' / ', suc.direccion) as nom_sucursal
+        FROM `sucursal` suc
+        inner join ubigeo ubi on ubi.codigo = suc.ubigeocodigo
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas
+
+
