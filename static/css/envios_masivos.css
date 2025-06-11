@@ -1,10 +1,29 @@
-/* ===== ESTILOS GENERALES PARA ENVÍOS MASIVOS ===== */
 
-/* Títulos */
 h2 {
     font-size: 1.5rem;
 }
+.acciones_origen{
+    display: flex;
+    justify-content: end;
+    gap: 10px;
+    padding-bottom: 15px;
 
+}
+
+.btn_update {
+   padding: 5px;
+}
+.btn_cancel {
+   padding: 5px;
+}
+.next{
+    background-color: #e8eaee;
+    padding: 5px;
+    border-radius: 50%;
+    place-self: end;
+    margin: 10px;
+    font-size: 1.1rem;
+}
 /* Sección principal masiva */
 .seccion-masiva {
     background: #f8f9fa;
@@ -28,7 +47,6 @@ h2 {
 
 /* ===== ESTILOS PARA EL SISTEMA DE PESTAÑAS ===== */
 
-/* Contenedor principal de pestañas */
 .tabs-container {
     background: white;
     border-radius: 12px;
@@ -92,6 +110,8 @@ h2 {
 /* Contenido de pestañas */
 .tabs-content {
     background: white;
+    display: flex;
+    flex-direction: column;
 }
 
 .tab-panel {
@@ -514,12 +534,12 @@ tr:hover {
 
 .badge-domicilio {
     background: #e6fffa;
-    color: #047857;
+    color: #075741;
 }
 
 .badge-agencia {
     background: #fef3c7;
-    color: #92400e;
+    color: #c3906f;
 }
 
 .badge-express {
@@ -606,26 +626,7 @@ textarea:required:user-invalid {
     background: #a0aec0;
 }
 
-/* Indicador de modo demo */
-.demo-indicator {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 1000;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
 
-.demo-indicator:hover {
-    transform: scale(1.05);
-}
 
 /* Animaciones */
 @keyframes slideIn {
@@ -759,5 +760,604 @@ textarea:required:user-invalid {
     
     .btn-continuar {
         padding: 0.8rem 2rem;
+    }
+}
+
+ /* ===== NUEVO: SECCIÓN DE TARIFA REDISEÑADA ===== */
+        .seccion-tarifa-nueva {
+            margin: 1.5rem 0;
+        }
+
+        .tarifa-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .tarifa-header-nueva {
+            background: #f8f9fa;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .tarifa-titulo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tarifa-icono {
+            font-size: 1.2rem;
+        }
+
+        .tarifa-titulo h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 0;
+        }
+
+        .tarifa-estado {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tarifa-ruta {
+            padding: 1.5rem;
+            background: #f7fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .ruta-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .ruta-punto {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .ruta-label {
+            font-size: 0.75rem;
+            color: #718096;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ruta-valor {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .ruta-flecha {
+            font-size: 1.5rem;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .tarifa-detalles {
+            padding: 1rem 1.5rem;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .detalle-fila {
+            display: grid;
+            grid-template-columns: auto 1fr auto 1fr;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .detalle-label,
+        .detalle-peso {
+            font-size: 0.85rem;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .detalle-valor,
+        .detalle-peso-valor {
+            font-size: 0.85rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .tarifa-breakdown {
+            padding: 1.5rem;
+            background: white;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f7fafc;
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-label {
+            font-size: 0.9rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .breakdown-valor {
+            font-size: 0.9rem;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .breakdown-separator {
+            height: 1px;
+            background: #2d3748;
+            margin: 1rem 0;
+        }
+
+        .breakdown-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0 0.5rem 0;
+        }
+
+        .breakdown-total-label {
+            font-size: 1rem;
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        .breakdown-total-valor {
+            font-size: 1.2rem;
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        .tarifa-disclaimer {
+            padding: 1rem 1.5rem;
+            background: #fffaf0;
+            border-top: 1px solid #fed7aa;
+        }
+
+        .tarifa-disclaimer p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #c05621;
+            font-style: italic;
+            text-align: center;
+        }
+
+        .btn-ver-detalle-nuevo {
+            width: 100%;
+            background: #061d86;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ver-detalle-nuevo:hover {
+            background: #5a67d8;
+        }
+
+        /* ===== NUEVO: MODAL DE DETALLE DE TARIFA ===== */
+        .modal-detalle-tarifa {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-detalle-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        .modal-detalle-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 16px 16px 0 0;
+            text-align: center;
+        }
+
+        .modal-detalle-header h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .modal-detalle-body {
+            padding: 2rem;
+        }
+
+        .detalle-explicacion {
+            margin-bottom: 2rem;
+        }
+
+        .detalle-explicacion h4 {
+            color: #2d3748;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detalle-item-explicacion {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .detalle-item-titulo {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detalle-item-monto {
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .detalle-item-descripcion {
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        .detalle-porcentaje {
+            background: #e6fffa;
+            border: 1px solid #81e6d9;
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            margin-top: 0.5rem;
+            display: inline-block;
+        }
+
+        .detalle-porcentaje-texto {
+            font-size: 0.8rem;
+            color: #234e52;
+            font-weight: 600;
+        }
+
+        .modal-detalle-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .btn-cerrar-detalle {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cerrar-detalle:hover {
+            background: #5a67d8;
+        }
+
+        .tarifa-oculta {
+            display: none;
+        }
+
+        /* Botones de acción del formulario */
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+/* ===== ANIMACIONES PARA ENVÍOS MASIVOS ===== */
+
+/* Animación para pestañas disponibles */
+.tab-btn.next-available {
+    animation: pulse 2s infinite;
+    position: relative;
+}
+
+@keyframes pulse {
+    0% { 
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); 
+    }
+    70% { 
+        box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); 
+    }
+    100% { 
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); 
+    }
+}
+
+/* Pestaña completada */
+.tab-btn.completed {
+    background-color: #48bb78 !important;
+    color: white !important;
+    border-color: #48bb78 !important;
+}
+
+.tab-btn.completed::after {
+    content: " ✓";
+    font-weight: bold;
+}
+
+/* Animación para botón agregar */
+.btn-add-bounce {
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { 
+        transform: translateY(0); 
+    }
+    40% { 
+        transform: translateY(-5px); 
+    }
+    60% { 
+        transform: translateY(-3px); 
+    }
+}
+
+/* Estilos para campos deshabilitados */
+select:disabled, 
+input:disabled {
+    background-color: #f7fafc !important;
+    color: #a0aec0 !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Tabla de envíos */
+.table-envios {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table-envios th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.table-envios td {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 13px;
+}
+
+.table-envios tr:hover {
+    background-color: #f7fafc;
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+}
+
+.table-envios tr:last-child td {
+    border-bottom: none;
+}
+
+/* Botones de acción en tabla */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.btn-icon {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.btn-edit {
+    background-color: #4299e1;
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #3182ce;
+    transform: translateY(-2px);
+}
+
+.btn-delete {
+    background-color: #f56565;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #e53e3e;
+    transform: translateY(-2px);
+}
+
+/* Estado vacío */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #718096;
+}
+
+.empty-state p:first-child {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.empty-state p:last-child {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* Transiciones suaves para pestañas */
+.tab-btn {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.tab-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.tab-panel {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: all 0.3s ease;
+}
+
+.tab-panel.active {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Efectos de validación */
+.form-group input.valid,
+.form-group select.valid {
+    border-color: #48bb78;
+    box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.1);
+}
+
+.form-group input.invalid,
+.form-group select.invalid {
+    border-color: #f56565;
+    box-shadow: 0 0 0 3px rgba(245, 101, 101, 0.1);
+}
+
+
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .table-envios {
+        font-size: 12px;
+    }
+    
+    .table-envios th,
+    .table-envios td {
+        padding: 8px 6px;
+    }
+    
+    .stats {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .stat-item {
+        min-width: auto;
+    }
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Mejoras para modales */
+.modal-confirm {
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    animation: slideIn 0.3s ease;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+@keyframes slideIn {
+    from { 
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to { 
+        transform: translateY(0);
+        opacity: 1;
     }
 }

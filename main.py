@@ -40,7 +40,13 @@ from controladores import controlador_descuento_articulo as controlador_descuent
 from controladores import controlador_salida as controlador_salida
 from controladores import controlador_reclamo as controlador_reclamo
 from controladores import controlador_preguntas_frecuentes as controlador_pregunta_frecuente
-
+from controladores import controlador_regla_cargo as controlador_regla_cargo
+from controladores import reporte_ingresos as reporte_ingresos
+from controladores.bd import sql_execute
+from controladores import controlador_transaccion_venta as controlador_transaccion_venta
+from controladores import controlador_detalle_venta as controlador_detalle_venta
+from controladores import controlador_metodo_pago_venta as controlador_metodo_pago_venta
+from controladores import controlador_articulo as controlador_articulo
 
 import hashlib
 import os
@@ -515,7 +521,7 @@ CONTROLADORES = {
             ['precio',      'Precio',          'Precio',      'number',   True ,     True  ,        None ],
             ['stock',       'Stock',           'Stock',       'number',   True ,     True  ,        None ],
             ['dimensiones', 'Dimensiones',     'Dimensiones', 'text',     False ,     True  ,        None ],
-            ['tamaño_cajaid','Tamaño Caja',    'Tamaño Caja', 'select',   False ,     True  ,        [lambda: controlador_tamanio_caja.get_options() , 'tam_nombre' ]  ],
+            ['tamaño_cajaid','Tamaño de Caja',    'Tamaño de Caja', 'select',   False ,     True  ,        [lambda: controlador_tamanio_caja.get_options() , 'tam_nombre' ]  ],
             ['img',         'Imagen',          'Imagen',      'img',      True ,     True  ,        None ],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
         ],
@@ -1283,6 +1289,24 @@ REPORTES = {
             ['fecha', 'Fecha', None, 'interval_date' ],
         ] ,
     },
+    "listado_general_empleados_rol": {
+        "active": True,
+        "icon_page": "fa-solid fa-user-tie",
+        "titulo": "Listado de empleados por rol",
+        "table": controlador_empleado.get_report_test(),
+        "filters": [
+            ['rol_id', 'Rol', lambda: controlador_rol.get_options()],
+        ],
+    },
+
+    "ingresos_periodo": {
+        "active": True,
+        "icon_page": "fa-solid fa-coins",  # Puedes cambiar este ícono si quieres otro
+        "titulo": "Reporte de ingresos por periodo",
+        "table": reporte_ingresos.get_ingresos_diarios(),
+        "filters": [],  # No se requiere filtro por ahora
+    },
+
     "reporte_usuarios": {
         "active": True,
         "icon_page": "fa-solid fa-users",
@@ -1832,11 +1856,15 @@ paginas_simples = [
     'prueba_seguimiento',
     'cajas',
     'cajas_prueba',
+    # 'articulos',
     'sobre_nosotros',
     'TerminosCondiciones',
     'salidas_programadas', #para eliminar
     'mapa_curds',
-    'salida_informacion'
+    'salida_informacion',
+    'cambiar_contrasenia',
+    'programacion_devolucion',
+    'Faq'
 ]
 
 
@@ -1964,21 +1992,82 @@ def api_sucursales_por_ubigeo():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+    
+@app.route('/api/Faq')
+def api_Faq():
+    columnas, filas = controlador_pregunta_frecuente.get_table()
+    # Filtrar solo activas
+    preguntas_activas = [f for f in filas if f['activo'] == 1]
+    return jsonify(preguntas_activas)
 
 
-@app.route("/contactanos")
-def contac():
+@app.route('/contactanos')
+def contactanos():
     return render_template('contactanos.html')
+
+
+@app.route('/enviar-formulario', methods=['POST'])
+def enviar_formulario():
+    try:
+        data = request.json  # esperamos JSON en el fetch del frontend
+        
+        nombre = data.get('nombreCompleto', '').strip()
+        nro_documento = data.get('numeroDocumento', '').strip()
+        correo = data.get('email', '').strip()
+        telefono = data.get('telefono', '').strip()
+        mensaje = data.get('mensaje', '').strip()
+        tipo_documentoid = data.get('tipoDocumentoId')  # si manejas tipos de doc, o null
+        tipo_clienteid = data.get('tipoClienteId')
+        sucursalid = data.get('sucursalId')
+        
+        # Validaciones básicas
+        if not (nombre and nro_documento and correo and telefono and mensaje and tipo_clienteid and sucursalid):
+            return jsonify({'success': False}), 400  # Solo devolvemos un estado de error
+
+        sql = '''
+            INSERT INTO mensaje_contacto 
+            (nombre, nro_documento, correo, telefono, mensaje, tipo_documentoid, tipo_clienteid, sucursalid)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        '''
+        sql_execute(sql, (nombre, nro_documento, correo, telefono, mensaje, tipo_documentoid, tipo_clienteid, sucursalid))
+        
+        return jsonify({'success': True})  # Solo devolvemos un estado de éxito sin mensaje
+    except Exception as e:
+        print(f"Error al guardar mensaje: {e}")
+        return jsonify({'success': False}), 500  # Solo devolvemos un estado de error
+
+@app.route('/api/tipo_cliente')
+def api_tipo_cliente():
+    from controladores import controlador_tipo_cliente
+    opciones = controlador_tipo_cliente.get_options()
+    # convertir lista de tuplas a lista de dicts
+    data = [{'id': o[0], 'nombre': o[1]} for o in opciones]
+    return jsonify(data)
+
+@app.route('/api/sucursales_simple')
+def api_sucursales_simple():
+    # from controladores import controlador_sucursal
+    opciones = controlador_sucursal.get_ubigeo_sucursal()
+    data = [{'id': o['id'], 'direccion': o['direccion_completa']} for o in opciones]
+    return jsonify(data)
+
+@app.route('/api/tipo_documento')
+def api_tipo_documento():
+    from controladores import controlador_tipo_documento
+    opciones = controlador_tipo_documento.get_options()
+    data = [{'id': o[0], 'nombre': o[1]} for o in opciones]
+    return jsonify(data)
 
 
 @app.route("/api/cajas")
 def api_cajas():
-    filas = controlador_articulo.get_table_with_discount()
+    filas = controlador_articulo.get_table_cajas()
     # print(filas)
     productSizes = {}
 
     for fila in filas:
-        if not fila['activo'] or not fila['tamaño_cajaid']:
+        if not fila['activo'] :
             continue
 
         key = fila['tam_nombre'].lower()
@@ -1991,15 +2080,18 @@ def api_cajas():
                 "name_product":nombre,
                 "price": precio,
                 "dimensions": fila['dimensiones'],
-                "image": img,
-                "discounts": []  
+                "image": f"/static/img/img_articulo/{(fila['img'] or '')}",
+                "size_name": fila['tam_nombre'] or '',
+                "id": fila['articuloid'] ,
+                "discounts": [] 
             }
 
         if fila['cantidad_descuento'] and fila['nom_descuento']:
-            productSizes[key]["discounts"].append({
+            productSizes[key]['discounts'].append({
                 "name": fila['nom_descuento'],  
                 "value": float(fila['cantidad_descuento'])
             })
+    # print(productSizes)
     return jsonify(productSizes)
 
 
@@ -2008,9 +2100,186 @@ def articulos():
     return render_template('articulos.html')
 
 
+@app.route("/api/articulos")
+def api_articulos():
+    filas = controlador_articulo.get_table_with_discount()
+    articulos = {}
+
+    for fila in filas:
+        if not fila['activo']:
+            continue
+
+        key = fila['nom_articulo'].lower()
+        if key not in articulos:
+            articulos[key] = {
+                "id": fila['articuloid'],
+                "name_product": fila['nom_articulo'],
+                "price": float(fila['precio']),
+                "stock": fila['stock'],
+                "dimensions": fila['dimensiones'] or '',
+                "image": f"/static/img/img_articulo/{fila['img'] or ''}",
+                "size_name": fila['tam_nombre'] or '',
+                "discounts": [],
+                "cantidad_precio_unitario_2": None,
+                "precio_unitario_2": None,
+                "cantidad_precio_unitario_3": None,
+                "precio_unitario_3": None
+            }
+
+        if fila['cantidad_descuento'] and fila['volumen']:
+            articulos[key]["discounts"].append({
+                "name": fila['nom_descuento'],
+                "value": float(fila['cantidad_descuento']),
+                "volumen": int(fila['volumen'])
+            })
+
+    for articulo in articulos.values():
+        ordenados = sorted(articulo['discounts'], key=lambda x: x['volumen'])
+        if len(ordenados) >= 1:
+            articulo["cantidad_precio_unitario_2"] = ordenados[0]["volumen"]
+            articulo["precio_unitario_2"] = ordenados[0]["value"]
+        if len(ordenados) >= 2:
+            articulo["cantidad_precio_unitario_3"] = ordenados[1]["volumen"]
+            articulo["precio_unitario_3"] = ordenados[1]["value"]
+
+    return jsonify(articulos)
+
+
+
 @app.route("/carrito")
 def carrito():
     return render_template('carrito.html')
+
+from flask import jsonify, request
+from controladores import controlador_transaccion_venta
+from controladores.bd import sql_select_fetchall
+
+@app.route("/obtener-carrito", methods=["GET"])
+def obtener_carrito():
+    # clienteid = request.cookies.get("idlogin") or request.args.get("clienteid")
+    clienteid = 1
+    # tipo_comprobanteid = 2
+
+    if not clienteid:
+        return jsonify({"error": "Cliente no identificado"}), 400
+
+    datos = controlador_transaccion_venta.obtener_carrito_cliente(clienteid)
+
+    if isinstance(datos, Exception):
+        return jsonify({"error": str(datos)}), 500
+
+    return jsonify(datos)
+
+
+@app.route("/registrar-item-carrito", methods=["POST"])
+def registrar_item_carrito():
+    data = request.get_json()
+    articuloid = data.get("articuloid")
+    cantidad = data.get("cantidad")
+    tipo_comprobanteid = 2  # Provisionalmente fijo
+
+    # clienteid = request.cookies.get("idlogin")
+    clienteid = data.get("clienteid")
+    if not clienteid or not articuloid or not cantidad:
+        return jsonify({"error": "Datos incompletos"}), 400
+
+    try:
+        num_serie = controlador_transaccion_venta.registrar_detalle_venta(
+            clienteid=int(clienteid),
+            tipo_comprobanteid=tipo_comprobanteid,
+            articuloid=int(articuloid),
+            cantidad=int(cantidad)
+        )
+        return jsonify({"mensaje": "Item registrado en carrito", "num_serie": num_serie}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/eliminar-item-carrito", methods=["POST"])
+def eliminar_item_carrito():
+    data = request.get_json()
+    clienteid = data.get("clienteid")
+    articuloid = data.get("articuloid")
+
+    if not clienteid or not articuloid:
+        return jsonify({"error": "Datos incompletos"}), 400
+
+    transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
+    if not transaccion:
+        return jsonify({"error": "No hay transacción activa"}), 404
+
+    num_serie = transaccion["num_serie"]
+    controlador_transaccion_venta.eliminar_detalle_venta(articuloid, num_serie)
+    controlador_transaccion_venta.actualizar_monto_total(num_serie)
+
+    return jsonify({"success": True})
+
+@app.route("/vaciar-carrito", methods=["POST"])
+def vaciar_carrito():
+    data = request.get_json()
+    clienteid = data.get("clienteid")
+
+    if not clienteid:
+        return jsonify({"error": "Cliente no identificado"}), 400
+
+    transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
+    if not transaccion:
+        return jsonify({"error": "No hay carrito"}), 404
+
+    num_serie = transaccion["num_serie"]
+    controlador_transaccion_venta.eliminar_todo_detalle_venta(num_serie)
+    controlador_transaccion_venta.actualizar_monto_total(num_serie)
+
+    return jsonify({"success": True})
+
+
+@app.route("/venta/registrar", methods=["POST"])
+def registrar_venta():
+    data = request.get_json()
+
+    cliente_id = data.get("cliente_id")
+    tipo_comprobante_id = data.get("tipo_comprobante_id")
+    metodo_pago_id = data.get("metodo_pago_id")
+    articulos = data.get("articulos", [])
+
+    if not cliente_id or not tipo_comprobante_id or not metodo_pago_id or not articulos:
+        return jsonify({"error": "Faltan datos requeridos"}), 400
+
+    try:
+        # Calcular monto total
+        monto_total = 0
+        for item in articulos:
+            precio = controlador_articulo.obtener_precio_articulo(item["articulo_id"])
+            if precio is None:
+                return jsonify({"error": f"Artículo {item['articulo_id']} no encontrado"}), 404
+            monto_total += precio * item["cantidad"]
+
+        # Insertar cabecera de venta
+        venta_id = controlador_transaccion_venta.registrar_transaccion(
+            tipo_comprobante_id,
+            monto_total,
+            cliente_id
+        )
+
+        # Insertar cada detalle
+        for item in articulos:
+            controlador_detalle_venta.registrar_detalle_venta(
+                item["articulo_id"],
+                venta_id,
+                tipo_comprobante_id,
+                item["cantidad"]
+            )
+
+        # Insertar método de pago
+        controlador_metodo_pago_venta.registrar_metodo_pago_venta(
+            venta_id,
+            tipo_comprobante_id,
+            metodo_pago_id
+        )
+
+        return jsonify({"status": "ok", "venta_id": venta_id}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/faq")
@@ -2043,7 +2312,22 @@ def tipos_envio():
 
 @app.route('/registro-envio')
 def registro_envio():
-    return render_template('registro_envio.html')
+    nombre_doc = controlador_tipo_documento.get_options()
+    nombre_rep = controlador_tipo_recepcion.get_options()
+    sucursales = controlador_sucursal.get_ubigeo()
+    articulos = controlador_contenido_paquete.get_options()
+    empaque = controlador_tipo_empaque.get_options()
+
+    return render_template(
+        'registro_envio.html',
+        nombre_doc=nombre_doc,
+        nombre_rep=nombre_rep,
+        sucursales=json.dumps(sucursales),
+        articulos=articulos,
+        empaque=empaque
+        
+    )
+
 
 @app.route('/resumen_envio')
 def mostrar_resumen():
@@ -2060,15 +2344,90 @@ def mostrar_pagoenvio():
 def envio_masivo():
     nombre_doc = controlador_tipo_documento.get_options()
     nombre_rep = controlador_tipo_recepcion.get_options()
-    sucursales = controlador_sucursal.get_ubigeo()
+    # rutas_tarifas = controlador_tarifa_ruta.get_sucursales_origen_destino()
+    departamento_origen = controlador_tarifa_ruta.get_departamentos_origen()
     articulos = controlador_contenido_paquete.get_options()
     empaque = controlador_tipo_empaque.get_options()
+    condiciones = controlador_regla_cargo.get_condiciones_tarifa()
+    tarifas = controlador_tarifa_ruta.get_tarifas_ruta_dict()
+    print(departamento_origen)
     return render_template('envio_masivo.html', 
                            nombre_doc=nombre_doc,
                            nombre_rep=nombre_rep,
-                           sucursales=json.dumps(sucursales), 
-                           empaque= empaque, 
-                           articulos=articulos)     
+                           departamento_origen = departamento_origen,
+                        #    rutasTarifas=json.dumps(rutas_tarifas), 
+                           tarifas = json.dumps(tarifas),
+                           empaque=empaque, 
+                           articulos=articulos,
+                           condiciones=condiciones)
+    
+@app.route('/api/provincia_origen',  methods=["POST"])
+def provincia_origen():
+    try:
+        datos = request.get_json()
+        dep = datos.get('dep')
+        provincias = controlador_tarifa_ruta.get_provincia_origen(dep)
+        res = {
+            'data': provincias,
+            'msg': "Se listó con éxito",
+            'status':1
+        }
+        return jsonify(res)
+    except Exception as e:
+        res = {
+            'data': [],
+            'msg': f"Ocurrió un error al listar las provincias: {repr(e)}",
+            'status':-1
+        }
+        return jsonify(res)
+        
+    
+    
+@app.route('/api/distrito_origen',  methods=["POST"])
+def distrito_origen():
+    try:
+        datos = request.get_json()
+        prov = datos.get('prov')
+        distritos = controlador_tarifa_ruta.get_distrito_origen(prov)
+        print(distritos)
+        return {
+            'data': distritos,
+            'msg': "Se listó con éxito",
+            'status':1
+        }
+    except Exception as e:
+        return {
+            'data': [],
+            'msg': f"Ocurrió un error al listar las provincias: {repr(e)}",
+            'status':-1
+        }
+    
+    
+@app.route('/api/departamento_destino',  methods=["POST"])
+def departamento_destino():
+    try:
+        datos = request.get_json()
+        dep = datos.get('dep')
+        prov = datos.get('prov')
+        dist = datos.get('dist')
+        
+        codigo_origen = controlador_tarifa_ruta.get_ubigeo_origen(dep,prov,dist)
+        
+        departamentos = controlador_tarifa_ruta.get_departamento_destino(codigo_origen)
+        
+        return {
+            'data': departamentos,
+            'msg': "Se listó con éxito",
+            'status':1
+        }
+    except Exception as e:
+        return {
+            'data': [],
+            'msg': f"Ocurrió un error al listar las provincias: {repr(e)}",
+            'status':-1
+        }
+    
+
 
 
 
@@ -2458,6 +2817,7 @@ def crud_update(tabla):
             if nombre in request.files:
                 archivo = request.files[nombre]
                 # print(archivo)
+                # print(archivo)
                 if archivo.filename != "":
                     # print(nombre)
                     nuevo_nombre = guardar_imagen_bd(tabla,'' ,archivo)
@@ -2467,8 +2827,12 @@ def crud_update(tabla):
                     valores.append(request.form.get(f"{nombre}_actual"))
             else:
                 valor = request.form.get(nombre)
+                # print(valor)
+                if valor == '':
+                    valor = None
                 valores.append(valor)
 
+        print(valores)
         controlador.update_row( *valores )
         if no_crud :
             return redirect(url_for(no_crud))

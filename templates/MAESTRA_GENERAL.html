@@ -25,7 +25,7 @@
         <span>Inicio</span>
       </a>  -->
     <a href="{{ url_for('tracking') }}" class="nav-link">
-      <i class="fas fa-search"></i>
+<i class="fa-solid fa-map-location-dot"></i>
       <span>Seguimiento</span>
     </a>
     <a href="{{ url_for('cotizador') }}" class="nav-link">
@@ -119,7 +119,7 @@
         <span>Preguntas Frecuentes</span>
         <i class="fa-solid fa-chevron-right"></i>
       </a>
-      <a class="secondary-sublink" href="{{ url_for('contac') }}">
+      <a class="secondary-sublink" href="{{ url_for('contactanos') }}">
         <span>Contáctanos</span>
         <i class="fa-solid fa-chevron-right"></i>
       </a>
@@ -240,6 +240,7 @@
 <script src="/static/js/common_scripts/bootstrap.bundle.min.js"></script>
 <script src="/static/js/common_scripts/bootstrap.min.js"></script>
 <script src="/static/js/common_scripts/common_script.js"></script>
+<script src="/static/js/actualizar_carrito.js"></script>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
@@ -258,10 +259,10 @@
         }
       })
     })
+    actualizarCantidadCarrito();
   })
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-
 {% block scripts %}
 
 {% endblock %}

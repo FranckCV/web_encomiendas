@@ -23,7 +23,7 @@ No recibimos - Artículos no aceptados
         <!-- Vidrio -->
         <div class="producto-card">
             <div class="producto-icono">
-                <img src="/static/img/no-recibimos/vidrio.png" alt="Vidrio">
+                <img src="/static/img/no_recibimos/vidrio.png" alt="Vidrio">
             </div>
             <h3 class="producto-titulo">Vidrio</h3>
             <p class="producto-descripcion">Ej: Vitrinas, estructuras de vidrio.</p>
@@ -32,7 +32,7 @@ No recibimos - Artículos no aceptados
         <!-- Artefactos mal envueltos -->
         <div class="producto-card">
             <div class="producto-icono">
-                <img src="/static/img/no-recibimos/artefactos.png" alt="Artefactos mal envueltos">
+                <img src="/static/img/no_recibimos/artefacto.png" alt="Artefactos mal envueltos">
             </div>
             <h3 class="producto-titulo">Artefactos mal envueltos</h3>
             <p class="producto-descripcion">Ej: Artefactos envueltos con mantas, colchas, cartón o Stretch Film.</p>
@@ -41,7 +41,7 @@ No recibimos - Artículos no aceptados
         <!-- Termas solares -->
         <div class="producto-card">
             <div class="producto-icono">
-                <img src="/static/img/no-recibimos/termas.png" alt="Termas solares">
+                <img src="/static/img/no_recibimos/terma_solar.png" alt="Termas solares">
             </div>
             <h3 class="producto-titulo">Termas solares</h3>
             <p class="producto-descripcion">Ej: Tubos al vacío o tubos para termas solares.</p>
@@ -50,7 +50,7 @@ No recibimos - Artículos no aceptados
         <!-- Paneles solares -->
         <div class="producto-card">
             <div class="producto-icono">
-                <img src="/static/img/no-recibimos/paneles.png" alt="Paneles solares">
+                <img src="/static/img/no_recibimos/panel_solar.png" alt="Paneles solares">
             </div>
             <h3 class="producto-titulo">Paneles solares</h3>
             <p class="producto-descripcion">Ej: Colectores térmicos y paneles solares híbridos.</p>
@@ -59,7 +59,7 @@ No recibimos - Artículos no aceptados
         <!-- Melamina armada -->
         <div class="producto-card">
             <div class="producto-icono">
-                <img src="/static/img/no-recibimos/melamina.png" alt="Melamina armada">
+                <img src="/static/img/no_recibimos/melamina.png" alt="Melamina armada">
             </div>
             <h3 class="producto-titulo">Melamina armada</h3>
             <p class="producto-descripcion">Ej: Muebles de melamina.</p>
@@ -68,7 +68,7 @@ No recibimos - Artículos no aceptados
         <!-- Granito -->
         <div class="producto-card">
             <div class="producto-icono">
-                <img src="/static/img/no-recibimos/granito.png" alt="Granito">
+                <img src="/static/img/no_recibimos/granito.png" alt="Granito">
             </div>
             <h3 class="producto-titulo">Granito</h3>
             <p class="producto-descripcion">Ej: Esculturas, adornos, etc.</p>
@@ -77,7 +77,7 @@ No recibimos - Artículos no aceptados
         <!-- Marmol -->
         <div class="producto-card">
             <div class="producto-icono">
-                <img src="/static/img/no-recibimos/marmol.png" alt="Mármol">
+                <img src="/static/img/no_recibimos/marmol.png" alt="Mármol">
             </div>
             <h3 class="producto-titulo">Mármol</h3>
             <p class="producto-descripcion">Ej: Losetas, esculturas, adornos, etc.</p>
@@ -86,16 +86,16 @@ No recibimos - Artículos no aceptados
         <!-- Sobre manila sin plastificar -->
         <div class="producto-card">
             <div class="producto-icono">
-                <img src="/static/img/no-recibimos/sobre.png" alt="Sobre manila sin plastificar">
+                <img src="/static/img/no_recibimos/alimentos.png" alt="Alimentos Perecibles">
             </div>
-            <h3 class="producto-titulo">Sobre manila sin plastificar</h3>
-            <p class="producto-descripcion">Los sobres manila deben estar plastificados.</p>
+            <h3 class="producto-titulo">Alimentos Perecibles</h3>
+            <p class="producto-descripcion">Ej: Frutas, verduras, carnes, etc.</p>
         </div>
 
         <!-- Tipos de balón -->
         <div class="producto-card">
             <div class="producto-icono">
-                <img src="/static/img/no-recibimos/balon.png" alt="Tipos de balón">
+                <img src="/static/img/no_recibimos/tanque-de-oxigeno.png" alt="Tipos de balón">
             </div>
             <h3 class="producto-titulo">Tipos de balón</h3>
             <p class="producto-descripcion">No recibimos ningún tipo de balón, ya sea de gas u oxígeno.</p>
@@ -104,7 +104,7 @@ No recibimos - Artículos no aceptados
         <!-- Lápidas -->
         <div class="producto-card">
             <div class="producto-icono">
-                <img src="/static/img/no-recibimos/lapidas.png" alt="Lápidas">
+                <img src="/static/img/no_recibimos/lapida.png" alt="Lápidas">
             </div>
             <h3 class="producto-titulo">Lápidas</h3>
             <p class="producto-descripcion">De mármol o granito.</p>
@@ -119,7 +119,7 @@ No recibimos - Artículos no aceptados
         <div class="info-texto">
             <h3>¿Necesitas enviar algo?</h3>
             <p>Consulta nuestras <a href="{{url_for('sucursales')}}">sucursales</a> o <a
-                    href="{{url_for('contac')}}">contáctanos</a> para más información.</p>
+                    href="{{ url_for('contactanos') }}">contáctanos</a> para más información.</p>
         </div>
     </div>
     <br>
@@ -147,7 +147,7 @@ No recibimos - Artículos no aceptados
             <div class="modal-contact">
                 <p>Para más información sobre alternativas de envío, por favor:</p>
                 <br>
-                <a href="{{url_for('contac')}}" class="contact-btn">Contactar con atención al cliente</a>
+                <a href="{{ url_for('contactanos') }}" class="contact-btn">Contactar con atención al cliente</a>
             </div>
         </div>
     </div>

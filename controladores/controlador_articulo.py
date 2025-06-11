@@ -59,7 +59,7 @@ def get_table():
         'stock': ['Stock', 1], 
         'dimensiones': ['Dimensiones', 2], 
         'tam_nombre': ['Tamaño de caja', 3], 
-        'img': ['Imagen', 3],  # si quieres mostrar imagen
+        # 'img': ['Imagen', 3],  # si quieres mostrar imagen
         'activo': ['Actividad', 1] 
     }
     filas = sql_select_fetchall(sql)
@@ -92,8 +92,8 @@ def update_row( id ,nombre, precio, stock, img, dimensiones,tamaño_cajaid ):
         stock = %s,
         img= %s,
         dimensiones = %s,
-        tamaño_cajaid= %s
-        where {get_primary_key()} = {id}
+        tamaño_cajaid = %s
+        where id = {id}
     '''
     sql_execute(sql, (nombre, precio, stock, img, dimensiones,tamaño_cajaid ))
 
@@ -117,9 +117,36 @@ def get_options():
 
 
 def get_table_with_discount():
+    sql = '''
+        SELECT 
+            art.id AS articuloid,
+            art.nombre AS nom_articulo,
+            art.precio,
+            art.stock,
+            art.dimensiones,
+            tam.nombre AS tam_nombre,
+            art.tamaño_cajaid,
+            art.img,
+            des.id,
+            des.nombre as nom_descuento,
+            des.nombre AS nom_descuento,
+            REGEXP_SUBSTR(des.nombre, '[0-9]+') AS volumen,
+            des_art.cantidad_descuento,
+            art.activo
+        FROM articulo art
+        LEFT JOIN tamanio_caja tam ON tam.id = art.tamaño_cajaid
+        LEFT JOIN descuento_articulo des_art ON des_art.articuloid = art.id
+        LEFT JOIN descuento des ON des.id = des_art.descuentoid
+        WHERE UPPER(art.nombre) NOT LIKE UPPER('%caja%')
+    '''
+    return sql_select_fetchall(sql)
+
+
+
+def get_table_cajas():
     sql= f'''
         select 
-            art.id ,
+            art.id as articuloid,
             art.nombre as nom_articulo,
             art.precio ,
             art.stock ,
@@ -133,14 +160,15 @@ def get_table_with_discount():
         from articulo art
         left join tamanio_caja tam on tam.id = art.tamaño_cajaid 
         left join descuento_articulo des_art on des_art.articuloid = art.id
-        LEFT join descuento des on des.id = des_art.DESCUENTOid;
+        LEFT join descuento des on des.id = des_art.DESCUENTOid
+        where UPPER(art.nombre) like UPPER('%caja%')
+        ;
 
     '''
     
     filas = sql_select_fetchall(sql)
     
     return filas
-
 
 def my_sql_select_fetchall(sql, params=None):
     try:
@@ -258,3 +286,10 @@ def get_stock_minimo_options():
         (25, "25 unidades"),
         (50, "50 unidades")
     ]
+
+
+################## TRANSACCION VENTA ############
+def obtener_precio_articulo(articulo_id):
+    sql = "SELECT precio FROM articulo WHERE id = %s"
+    resultado = sql_select_fetchone(sql, (articulo_id,))
+    return resultado[0] if resultado else None

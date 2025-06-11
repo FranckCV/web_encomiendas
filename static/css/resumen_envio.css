@@ -182,25 +182,51 @@ body {
     cursor: pointer;
 }
 
-.total-pago {
+
+.botones-acciones {
   display: flex;
-  justify-content: center; /* centra el botón */
-  margin-top: 30px;
-  margin-bottom: 60px;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  margin: 40px auto;
+  padding-bottom: 20px;
+  flex-wrap: wrap;
+  max-width: 600px;
 }
 
-
-.btn-pagar {
-    background-color: #00E0E0;
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    font-size: 16px;
-    font-weight: 600;
-    border-radius: 8px;
-    cursor: pointer;
+.btn-volver,
+.btn-continuar {
+  width: 100%;
+  max-width: 280px;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(14, 29, 99, 0.3);
+  text-align: center;
 }
 
-.btn-pagar:hover {
-    background-color: #00caca;
+.btn-volver {
+  background: #00E0E0;
+  color: white;
+}
+
+.btn-volver:hover {
+  background: #00caca;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(14, 29, 99, 0.4);
+}
+
+.btn-continuar {
+  background: #0E1D63;
+  color: white;
+}
+
+.btn-continuar:hover {
+  background: #0a1445;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(14, 29, 99, 0.4);
 }

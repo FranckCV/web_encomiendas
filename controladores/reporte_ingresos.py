@@ -3,38 +3,41 @@ import controladores.bd as bd
 
 def get_ingresos_diarios():
     sql = f'''
-        SELECT 
-            COALESCE(v.fecha, e.fecha) AS fecha,
-            IFNULL(SUM(v.monto_total), 0) AS ingresos_venta,
-            IFNULL(SUM(e.monto_total), 0) AS ingresos_encomienda,
-            IFNULL(SUM(v.monto_total), 0) + IFNULL(SUM(e.monto_total), 0) AS ingresos_totales
+        SELECT *
         FROM (
-            SELECT fecha, monto_total FROM transaccion_venta
-            UNION ALL
-            SELECT NULL AS fecha, NULL AS monto_total
-        ) v
-        LEFT JOIN (
-            SELECT fecha, monto_total FROM transaccion_encomienda
-            UNION ALL
-            SELECT NULL AS fecha, NULL AS monto_total
-        ) e ON v.fecha = e.fecha
-        GROUP BY COALESCE(v.fecha, e.fecha)
+            SELECT 
+                COALESCE(v.fecha, e.fecha) AS fecha,
+                IFNULL(SUM(v.monto_total), 0) AS ingresos_venta,
+                IFNULL(SUM(e.monto_total), 0) AS ingresos_encomienda,
+                IFNULL(SUM(v.monto_total), 0) + IFNULL(SUM(e.monto_total), 0) AS ingresos_totales
+            FROM (
+                SELECT fecha, monto_total FROM transaccion_venta
+                UNION ALL
+                SELECT NULL AS fecha, NULL AS monto_total
+            ) v
+            LEFT JOIN (
+                SELECT fecha, monto_total FROM transaccion_encomienda
+                UNION ALL
+                SELECT NULL AS fecha, NULL AS monto_total
+            ) e ON v.fecha = e.fecha
+            GROUP BY COALESCE(v.fecha, e.fecha)
 
-        UNION
+            UNION
 
-        SELECT 
-            e.fecha,
-            0 AS ingresos_venta,
-            SUM(e.monto_total) AS ingresos_encomienda,
-            SUM(e.monto_total) AS ingresos_totales
-        FROM transaccion_encomienda e
-        LEFT JOIN transaccion_venta v ON v.fecha = e.fecha
-        WHERE v.fecha IS NULL
-        GROUP BY e.fecha
-
+            SELECT 
+                e.fecha,
+                0 AS ingresos_venta,
+                SUM(e.monto_total) AS ingresos_encomienda,
+                SUM(e.monto_total) AS ingresos_totales
+            FROM transaccion_encomienda e
+            LEFT JOIN transaccion_venta v ON v.fecha = e.fecha
+            WHERE v.fecha IS NULL
+            GROUP BY e.fecha
+        ) sub
+        WHERE fecha IS NOT NULL
         ORDER BY fecha;
     '''
-
+    
     columnas = {
         'fecha'               : ['Fecha', 1.5],
         'ingresos_venta'      : ['Ingresos por ventas', 1.5],
