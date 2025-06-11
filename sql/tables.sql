@@ -262,8 +262,8 @@ Quien recibe
 CREATE TABLE regla_cargo (
   id             int(4) NOT NULL AUTO_INCREMENT, 
   tipo_condicion char(1) NOT NULL, 
-  inferior       numeric(9, 2) NOT NULL, 
-  superior       numeric(9, 2) NOT NULL, 
+  inferior       numeric(9, 2) NULL, 
+  superior       numeric(9, 2)  NULL, 
   porcentaje     numeric(9, 2) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE rol (
