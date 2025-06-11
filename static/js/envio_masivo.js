@@ -26,6 +26,78 @@ const regexRazonSocial = /^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ&\.\-,() ]{2,100}$/
 const regexPositivos = /^[0-9]+(?:\.[0-9]+)?$/;
 
 
+const valorInput = document.getElementById('m-valorEnvio');
+
+// Crea o reutiliza tu función showError / clearError
+function showError(input, msg) {
+  let err = input.nextElementSibling;
+  if (!err || !err.classList.contains('error-msg')) {
+    err = document.createElement('small');
+    err.className = 'error-msg';
+    err.style.color = '#fc8181';
+    input.insertAdjacentElement('afterend', err);
+  }
+  err.textContent = msg;
+  err.style.display = 'block';
+  input.style.borderColor = '#fc8181';
+}
+function clearError(input) {
+  const err = input.nextElementSibling;
+  if (err && err.classList.contains('error-msg')) err.style.display = 'none';
+  input.style.borderColor = '';
+}
+
+// Validación en tiempo real
+valorInput.addEventListener('input', () => {
+  const val = parseFloat(valorInput.value);
+  if (isNaN(val) || val < 0) {
+    clearError(valorInput);
+  } else if (val > MAX_VALOR) {
+    showError(valorInput, `El valor no puede exceder S/ ${MAX_VALOR}.`);
+  } else {
+    clearError(valorInput);
+  }
+});
+
+const MIN_CM = 5;
+const MAX_CM = 200;
+const MAX_VOLUMEN = 1000000; 
+
+const inputsDim = {
+  largo: document.getElementById('m-largo'),
+  ancho: document.getElementById('m-ancho'),
+  alto:  document.getElementById('m-alto')
+};
+
+Object.values(inputsDim).forEach(input => {
+  input.addEventListener('input', () => {
+    const largo = parseFloat(inputsDim.largo.value) || 0;
+    const ancho = parseFloat(inputsDim.ancho.value) || 0;
+    const alto  = parseFloat(inputsDim.alto.value)  || 0;
+    const val   = parseFloat(input.value);
+
+    // 1) Validar rango individual
+    if (isNaN(val) || val < MIN_CM || val > MAX_CM) {
+      showError(input, `Debe ingresar un valor entre ${MIN_CM} y ${MAX_CM} cm.`);
+    } else {
+      clearError(input);
+    }
+
+    // 2) Validar volumen total
+    const volumen = largo * ancho * alto;
+    if (largo && ancho && alto && volumen > MAX_VOLUMEN) {
+      // mostramos mensaje en el campo donde cambiaron
+      showError(input, `Volumen excesivo: ${volumen.toLocaleString()} cm³ (> ${MAX_VOLUMEN.toLocaleString()} cm³).`);
+    } else {
+      // limpiamos cualquier error de volumen
+      Object.values(inputsDim).forEach(i => clearError(i));
+    }
+  });
+});
+
+
+
+
 
 const tipoDoc = document.getElementById('remitente-tipo-doc');
 const numeroDoc = document.getElementById('remitente-numero-doc');

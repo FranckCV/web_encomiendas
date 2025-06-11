@@ -7,3 +7,13 @@ def get_condiciones_tarifa():
         FROM regla_cargo
     '''
     return sql_select_fetchall(sql)
+
+
+def get_max_valor():
+    sql = '''
+        SELECT max(superior) as valor_max
+        FROM regla_cargo
+    '''
+    row = sql_select_fetchone(sql)
+    
+    return row['valor_max'] if row and row.get('valor_max') is not None else 0
