@@ -168,16 +168,15 @@ def get_distrito_origen(prov):
 def get_ubigeo_origen(dep,prov,dist):
     sql = '''
         select codigo from ubigeo where departamento = %s and provincia = %s and distrito = %s
-    
     '''
-    filas = sql_select_fetchall(sql,(dep,prov,dist))
+    filas = sql_select_fetchone(sql,(dep,prov,dist))
     return filas
 
 
 
 def get_departamento_destino(codigo):
     sql = '''
-        SELECT codDestino.departamento
+        SELECT distinct codDestino.departamento
         from tarifa_ruta tr
             inner join sucursal origen on origen.id=tr.sucursal_origen_id
             inner join ubigeo codOrigen on codOrigen.codigo = origen.ubigeocodigo
@@ -189,29 +188,54 @@ def get_departamento_destino(codigo):
     return filas
 
 
-def get_provincia_destino(dep):
+def get_provincia_destino(dep,codigo):
     sql = '''
-         SELECT distinct uDestino.provincia
+          SELECT distinct uDestino.provincia
         from tarifa_ruta tr
             inner join sucursal destino on destino.id=tr.sucursal_destino_id
             inner join ubigeo uDestino on uDestino.codigo=destino.ubigeocodigo
-            where uDestino.departamento=%s
+            inner join sucursal origen on origen.id = tr.sucursal_origen_id
+            inner join ubigeo uOrigen on uOrigen.codigo = origen.ubigeocodigo
+            where uDestino.departamento =%s and uOrigen.codigo = %s
     '''
-    filas = sql_select_fetchall(sql,(dep))
+    filas = sql_select_fetchall(sql,(dep,codigo))
     return filas
 
 
-def get_distrito_destino(prov):
+def get_distrito_destino(prov,codigo):
     sql = '''
-         SELECT distinct uDestino.distrito
+          SELECT distinct uDestino.distrito
         from tarifa_ruta tr
             inner join sucursal destino on destino.id=tr.sucursal_destino_id
             inner join ubigeo uDestino on uDestino.codigo=destino.ubigeocodigo
-            where uDestino.provincia=%s
+            inner join sucursal origen on origen.id = tr.sucursal_origen_id
+            inner join ubigeo uOrigen on uOrigen.codigo = origen.ubigeocodigo
+            where uDestino.provincia =%s and uOrigen.codigo = %s
     '''
-    filas = sql_select_fetchall(sql,(prov))
+    filas = sql_select_fetchall(sql,(prov,codigo))
     return filas
 
+
+def get_sucursal_destino(codigo_origen,codigo_destino):
+    sql = '''
+         SELECT distinct destino.id,destino.direccion
+        from tarifa_ruta tr
+            inner join sucursal destino on destino.id=tr.sucursal_destino_id
+            inner join ubigeo uDestino on uDestino.codigo=destino.ubigeocodigo
+            inner join sucursal origen on origen.id = tr.sucursal_origen_id
+            inner join ubigeo uOrigen on uOrigen.codigo = origen.ubigeocodigo
+            where origen.ubigeocodigo = %s and destino.ubigeocodigo = %s
+    '''
+    filas = sql_select_fetchall(sql,(codigo_origen,codigo_destino))
+    return filas
+
+
+def get_codigo_ubigeo(dep,prov,dist):
+    sql = '''
+        select codigo from ubigeo where departamento = %s and provincia = %s and distrito = %s
+    '''
+    filas = sql_select_fetchone(sql,(dep,prov,dist))
+    return filas
 
 def get_tarifa_origen():
     sql = '''
@@ -253,3 +277,160 @@ def get_tarifas_ruta_dict():
     '''
     filas = sql_select_fetchall(sql)
     return {f"{f['id_origen']}|{f['id_destino']}": f['tarifa'] for f in filas}
+
+
+
+def get_options_departamento_origen():
+    sql= f'''
+        select distinct
+            uori.departamento as departamento
+        from tarifa_ruta tar 
+        inner join sucursal ori on ori.id = tar.sucursal_origen_id 
+        inner join sucursal des on des.id = tar.sucursal_destino_id 
+        inner join ubigeo uori on uori.codigo = ori.ubigeocodigo 
+        inner join ubigeo udes on udes.codigo = des.ubigeocodigo
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas
+
+
+def get_options_provincia_origen():
+    sql= f'''
+        select distinct
+            uori.departamento as departamento ,
+            uori.provincia as provincia
+        from tarifa_ruta tar 
+        inner join sucursal ori on ori.id = tar.sucursal_origen_id 
+        inner join sucursal des on des.id = tar.sucursal_destino_id 
+        inner join ubigeo uori on uori.codigo = ori.ubigeocodigo 
+        inner join ubigeo udes on udes.codigo = des.ubigeocodigo
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas
+
+
+def get_options_distrito_origen():
+    sql= f'''
+        select distinct
+            uori.codigo , 
+            uori.departamento ,
+            uori.provincia ,
+            uori.distrito as distrito
+        from tarifa_ruta tar 
+        inner join sucursal ori on ori.id = tar.sucursal_origen_id 
+        inner join sucursal des on des.id = tar.sucursal_destino_id 
+        inner join ubigeo uori on uori.codigo = ori.ubigeocodigo 
+        inner join ubigeo udes on udes.codigo = des.ubigeocodigo
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas
+
+
+def get_options_sucursal_origen():
+    sql= f'''
+        select 
+            uori.codigo ,
+            ori.id as id ,
+            concat(ori.abreviatura,' / ', ori.direccion) as nom_sucursal
+        from tarifa_ruta tar 
+        inner join sucursal ori on ori.id = tar.sucursal_origen_id 
+        inner join sucursal des on des.id = tar.sucursal_destino_id 
+        inner join ubigeo uori on uori.codigo = ori.ubigeocodigo 
+        inner join ubigeo udes on udes.codigo = des.ubigeocodigo
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas
+
+
+
+
+def get_options_departamento_destino(sucursal_id):
+    sql= f'''
+        select distinct
+            udes.departamento as departamento
+        from tarifa_ruta tar 
+        inner join sucursal ori on ori.id = tar.sucursal_origen_id 
+        inner join sucursal des on des.id = tar.sucursal_destino_id 
+        inner join ubigeo uori on uori.codigo = ori.ubigeocodigo 
+        inner join ubigeo udes on udes.codigo = des.ubigeocodigo
+        where ori.id = %s
+    '''
+    filas = sql_select_fetchall(sql,(sucursal_id))
+    return filas
+
+
+def get_options_provincia_destino(sucursal_id):
+    sql= f'''
+        select distinct
+            udes.departamento as departamento ,
+            udes.provincia as provincia
+        from tarifa_ruta tar 
+        inner join sucursal ori on ori.id = tar.sucursal_origen_id 
+        inner join sucursal des on des.id = tar.sucursal_destino_id 
+        inner join ubigeo uori on uori.codigo = ori.ubigeocodigo 
+        inner join ubigeo udes on udes.codigo = des.ubigeocodigo
+        where ori.id = %s
+    '''
+    filas = sql_select_fetchall(sql,(sucursal_id))
+    return filas
+
+
+def get_options_distrito_destino(sucursal_id):
+    sql= f'''
+        select distinct
+            udes.codigo , 
+            udes.departamento ,
+            udes.provincia ,
+            udes.distrito as distrito
+        from tarifa_ruta tar 
+        inner join sucursal ori on ori.id = tar.sucursal_origen_id 
+        inner join sucursal des on des.id = tar.sucursal_destino_id 
+        inner join ubigeo uori on uori.codigo = ori.ubigeocodigo 
+        inner join ubigeo udes on udes.codigo = des.ubigeocodigo
+        where ori.id = %s
+    '''
+    filas = sql_select_fetchall(sql,(sucursal_id))
+    return filas
+
+
+def get_options_sucursal_destino(sucursal_id):
+    sql= f'''
+        select 
+            udes.codigo ,
+            des.id as id ,
+            concat(des.abreviatura,' / ', des.direccion) as nom_sucursal
+        from tarifa_ruta tar 
+        inner join sucursal ori on ori.id = tar.sucursal_origen_id 
+        inner join sucursal des on des.id = tar.sucursal_destino_id 
+        inner join ubigeo uori on uori.codigo = ori.ubigeocodigo 
+        inner join ubigeo udes on udes.codigo = des.ubigeocodigo
+        where ori.id = %s
+    '''
+    filas = sql_select_fetchall(sql,(sucursal_id))
+    return filas
+
+
+def get_tarifa_ids(origen_id , destino_id):
+    sql= f'''
+        select
+            tarifa 
+        FROM tarifa_ruta 
+        WHERE sucursal_origen_id = %s and sucursal_destino_id = %s
+    '''
+    filas = sql_select_fetchone(sql,(origen_id , destino_id))
+    return filas
+
+
+def calcularTarifaTotal( tarifa_ruta , peso , porcentaje_recojo , porcentaje_valor , porcentaje_peso ):
+    kilos_exceso = peso - 1 
+    porcentaje_valor = porcentaje_valor / 100 
+    
+    peso_porcentaje = kilos_exceso * porcentaje_peso / 100 if porcentaje_recojo > 0 else kilos_exceso
+    aumento_peso = tarifa_ruta * peso_porcentaje
+    aumento_valor = tarifa_ruta * porcentaje_valor
+
+    aumento_recojo = tarifa_ruta * porcentaje_recojo / 100
+
+    total = tarifa_ruta + aumento_peso + aumento_valor + aumento_recojo
+
+    return total

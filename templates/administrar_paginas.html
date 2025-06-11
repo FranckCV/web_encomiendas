@@ -182,7 +182,7 @@ Permisos para {{info_rol.get('nombre')}}
 
     .mod_opts {
         grid-area: mod_o;
-        padding-inline: 0;
+        padding-inline: 10px;
         justify-self: flex-end;
         /* gap: 5px; */
     }
@@ -410,7 +410,7 @@ Permisos para {{info_rol.get('nombre')}}
     }
 
     .mod_content {
-        height: 285px;
+        height: auto;
     }
 
         
@@ -421,7 +421,7 @@ Permisos para {{info_rol.get('nombre')}}
     }
         
     .mod_opt i {
-        font-size: 80%;
+        font-size: 70%;
     }
 
     .mod_opt:hover {
@@ -456,7 +456,7 @@ Permisos para {{info_rol.get('nombre')}}
 
     <div class="block_access">
         {% for modulo in modulos %}
-        <div class="mod_block"
+        <div class="mod_block" data-moduloid="{{ modulo.get('id') }}"
             style="border: 1px solid color-mix(in srgb, {{ modulo.get('color') }} 40%, #dadada 80%) ;">
             <div class="mod_head">
                 <div class="mod_title" style="
@@ -494,25 +494,25 @@ Permisos para {{info_rol.get('nombre')}}
 
                     {% else %}
 
-                        <button class=" mod_opt text_access " id="">
+                        <button data-column="acceso" class=" mod_opt unable " id="">
                             <i class="{{ICON_UNLOCK}}"></i>
                         </button>
-                        <button class=" mod_opt text_search unable" id="">
+                        <button data-column="search" class=" mod_opt unable " id="">
                             <i class="{{ICON_SEARCH}}"></i>
                         </button>
-                        <button class=" mod_opt text_access unable" id="">
+                        <button data-column="insert" class=" mod_opt unable " id="">
                             <i class="{{ICON_INSERT}}"></i>
                         </button>
-                        <button class=" mod_opt text_access unable" id="">
+                        <button data-column="consult" class=" mod_opt unable " id="">
                             <i class="{{ICON_CONSULT}}"></i>
                         </button>
-                        <button class=" mod_opt text_access unable" id="">
+                        <button data-column="unactive" class=" mod_opt unable " id="">
                             <i class="{{ICON_ACTIVE}}"></i>
                         </button>
-                        <button class=" mod_opt text_access unable" id="">
+                        <button data-column="update" class=" mod_opt unable " id="">
                             <i class="{{ICON_UPDATE}}"></i>
                         </button>
-                        <button class=" mod_opt text_access unable" id="">
+                        <button data-column="delete" class=" mod_opt unable " id="">
                             <i class="{{ICON_DELETE}}"></i>
                         </button>
 
@@ -764,9 +764,9 @@ Permisos para {{info_rol.get('nombre')}}
     {% for campo in fields_form_final if campo[3] == 'select' %}
     "{{campo[0]}}": [
         {% for option in campo[6][0]() %}
-    { value: "{{option[0]}}", label: "{{option[1]}}" } {% if not loop.last %}, {% endif %}
-    {% endfor %}
-    ]{% if not loop.last %}, {% endif %}
+        { value: "{{option[0]}}", label: "{{option[1]}}" } {% if not loop.last %}, {% endif %}
+        {% endfor %}
+    ]{% if not loop.last %},  {% endif %}
     {% endfor %}
     
   };
@@ -791,6 +791,113 @@ Permisos para {{info_rol.get('nombre')}}
 </script>
 
 <script>
+    function actualizarBotonesPermisosModulo() {
+        document.querySelectorAll('.mod_block').forEach(block => {
+            const columns = new Set();
+
+            // 1. Obtener todas las columnas únicas dentro del block
+            block.querySelectorAll('.opciones_fila button[data-column]').forEach(btn => {
+                columns.add(btn.dataset.column);
+            });
+
+            // 2. Revisar por cada columna
+            columns.forEach(column => {
+                const allButtons = block.querySelectorAll(`.opciones_fila button[data-column="${column}"]`);
+                const unableButtons = block.querySelectorAll(`.opciones_fila button[data-column="${column}"].unable`);
+
+                const modOpt = block.querySelector(`.mod_opt[data-column="${column}"]`);
+                if (allButtons.length > 0 && allButtons.length === unableButtons.length) {
+                    if (modOpt) {
+                        modOpt.classList.add('unable');
+                    } 
+                } else {
+                    modOpt.classList.remove('unable');
+                }
+            });
+        });
+    }
+    
+    actualizarBotonesPermisosModulo();
+
+    document.querySelectorAll('.mod_opt').forEach(opt => {
+        opt.addEventListener('click', () => {
+            const moduloid = opt.closest('[data-moduloid]').dataset.moduloid;
+            const column = opt.dataset.column;
+            const cantButtons = document.querySelectorAll(`.mod_block[data-moduloid="${moduloid}"] .opciones_fila button[data-column="${column}"]`).length;
+            // const cantButtons_1 = document.querySelectorAll(`.mod_block[data-moduloid="${moduloid}"] .opciones_fila button[data-column="${column}"]:not(.unable)`).length;
+            const cantButtons_0 = document.querySelectorAll(`.mod_block[data-moduloid="${moduloid}"] .opciones_fila button[data-column="${column}"].unable`).length;
+            let value;
+            if (cantButtons == cantButtons_0) {
+                value = 1;
+            } else {
+                value = 0;
+            }
+            const rolid = {{rolid}};
+
+            // console.log(column , moduloid , rolid , value);
+            // console.log(cantButtons , cantButtons_1 , cantButtons_0 );
+
+
+            fetch('/actualizar_permiso_modulo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    moduloid: moduloid,
+                    column: column ,
+                    rolid: rolid ,
+                    value : value ,
+                })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Error al actualizar");
+                return response.json();
+            })
+            .then(data => {
+                // console.log("Actualizado:", data);
+                if (data.rpta) {
+                    const lista = data.rpta;
+                    for (const element of lista) {
+                        for (const column in element) {
+                            // console.log(column , element[column]);
+                            if (column != 'paginaid') {
+                                const pageButton = document.querySelector(`.pag_block[data-paginaid="${element['paginaid']}"] .opciones_fila button[data-column="${column}"]`);
+                                // console.log(pageButton);
+                                if (pageButton) {
+                                    if (element[column] == 1) {
+                                        pageButton.classList.remove('unable');
+                                    } else if (element[column] == 0) {
+                                        pageButton.classList.add('unable');                                
+                                    }
+                                }
+                                
+                            }
+                        }
+                    }
+                }
+                actualizarBotonesPermisosModulo();
+                // if (data.rpta == 1) {
+                //     opt.classList.remove('unable');
+                // } else {
+                //     opt.classList.add('unable');
+                // }
+            })
+            .catch(err => {
+                alert("Error al actualizar respuesta");
+                console.error(err);
+            });
+        });
+    });
+
+
+
+</script>
+
+
+
+
+<script>
     document.querySelectorAll('.opciones_fila button').forEach(opt => {
         opt.addEventListener('click', () => {
             const rolid = {{rolid}};
@@ -809,22 +916,24 @@ Permisos para {{info_rol.get('nombre')}}
                     rolid: rolid 
                 })
             })
-                .then(response => {
-                    if (!response.ok) throw new Error("Error al actualizar");
-                    return response.json();
-                })
-                .then(data => {
-                    // console.log("Actualizado:", data);
-                    if (data.rpta == 1) {
-                        opt.classList.remove('unable');
-                    } else {
-                        opt.classList.add('unable');
-                    }
-                })
-                .catch(err => {
-                    alert("Error al actualizar respuesta");
-                    console.error(err);
-                });
+            .then(response => {
+                if (!response.ok) throw new Error("Error al actualizar");
+                return response.json();
+            })
+            .then(data => {
+                // console.log("Actualizado:", data);
+                if (data.rpta == 1) {
+                    opt.classList.remove('unable');
+                } else {
+                    opt.classList.add('unable');
+                }
+                actualizarBotonesPermisosModulo();
+
+            })
+            .catch(err => {
+                alert("Error al actualizar respuesta");
+                console.error(err);
+            });
         });
     });
 

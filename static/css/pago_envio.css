@@ -24,6 +24,10 @@ body {
     color: #061142;
 }
 
+.value-td{
+    text-align: end;
+}
+
 /* Título principal */
 .titulo-envio {
     font-size: 32px;
@@ -131,7 +135,8 @@ body {
 .cabecera-opcion .texto {
     flex: 1;
     font-weight: 600;
-    text-align: center;
+    padding-left: 20px;
+    text-align: left;
     font-size: 15px;
 }
 
@@ -162,6 +167,7 @@ body {
     padding: 20px;
     min-width: 300px;
     max-width: 400px;
+    height: 100%;
 }
 
 .resumen-box h3 {

@@ -89,20 +89,24 @@ header.general_element {
     position: fixed;
     right: 0;
     top: 0;
-    width: 350px;
+    /* width: 350px; */
     z-index: 9999;
     color: white;
     height: fit-content;
+    /* background-color: color-mix(in srgb, var(--color-bg-admin) 60%, transparent 80%); */
     background-color: var(--color-bg-admin);
     display: grid;
     grid-template-areas:
         ' mu_i mu_n mu_o'
         ' mu_i mu_t mu_o'
     ;
+    column-gap: 15px;
     justify-items: flex-start;
     align-items: center;
     padding-top: 12px;
-    padding-right: 5px;
+    /* padding-left: 15px; */
+    /* padding-right: 5px; */
+    padding-inline: 15px;
     padding-bottom: 10px;
     border-bottom-left-radius: 15px;
 }
@@ -131,6 +135,7 @@ header.general_element {
 
 .user_out {
     grid-area: mu_o;
+    padding-inline: 5px;
 }
 
 .user_out i {

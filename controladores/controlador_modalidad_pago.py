@@ -2,7 +2,7 @@ from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select
 import controladores.bd as bd
 #####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####
 
-table_name = 'tipo_documento'
+table_name = 'modalidad_pago'
 
 def get_info_columns():
     return show_columns(table_name)
@@ -17,11 +17,7 @@ def exists_Activo():
 
 
 def delete_row( id ):
-    sql = f'''
-        delete from {table_name}
-        where id = {id}
-    '''
-    sql_execute(sql)
+    bd.delete_row_table(table_name , id)
 
 
 #####_ CAMBIAR SQL y DICT INTERNO _#####
@@ -40,46 +36,47 @@ def table_fetchall():
 def get_table():
     sql= f'''
         select 
-            tip.id ,
-            tip.nombre ,
-            tip.activo 
-        from {table_name} tip
-
+            est.id ,
+            est.nombre,
+            est.descripcion,
+            est.activo 
+        from {table_name} est
     '''
     columnas = {
-        'id': ['ID' , 0.5] , 
-        'nombre' : ['Nombre' , 4.5] , 
-        'activo' : ['Actividad' , 1] 
+        'id': ['ID' , 0.5 ] , 
+        'nombre' : ['Nombre' , 1 ] , 
+        'descripcion' : ['Descripcion' , 5.5] , 
+        'activo' : ['Actividad' , 3.5] , 
         }
     filas = sql_select_fetchall(sql)
     
     return columnas , filas
 
 
-######_ CRUD ESPECIFICAS _###### 
+######_ CAMBIAR PARAMETROS Y SQL INTERNO _###### 
 
 def unactive_row( id ):
     unactive_row_table(table_name , id)
 
 
-def insert_row( nombre ):
+def insert_row( nombre , descripcion = None ):
     sql = f'''
         INSERT INTO 
-            {table_name} 
-            ( nombre , activo )
+            {table_name} ( nombre , descripcion , activo )
         VALUES 
-            ( %s , 1 )
+            ( %s , %s , 1 )
     '''
-    sql_execute(sql,( nombre ))
+    sql_execute(sql,( nombre , descripcion ))
 
 
-def update_row( id , nombre ):
+def update_row( id , nombre , descripcion =None ):
     sql = f'''
         update {table_name} set 
-        nombre = %s 
+        nombre = %s ,
+        descripcion = %s
         where {get_primary_key()} = {id}
     '''
-    sql_execute(sql, (nombre ))
+    sql_execute(sql,(nombre , descripcion))
 
 
 #####_ ADICIONALES _#####
@@ -87,20 +84,17 @@ def update_row( id , nombre ):
 def get_options():
     sql= f'''
         select 
-            id ,
+            {get_primary_key()} ,
             nombre
-        from tipo_documento
+        from {table_name}
         where activo = 1
-        order by nombre asc
+        order by id asc
     '''
     filas = sql_select_fetchall(sql)
     
-    lista = [(fila['id'], fila["nombre"]) for fila in filas]
+    lista = [(fila[get_primary_key()], fila["nombre"]) for fila in filas]
 
     return lista
-
-
-
 
 
 

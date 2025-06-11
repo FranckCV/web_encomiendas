@@ -305,14 +305,14 @@ CREATE TABLE `empresa` (
   `color_pri` varchar(20) NOT NULL,
   `color_sec` varchar(20) NOT NULL,
   `color_ter` varchar(20) NOT NULL,
-  `porcentaje_garantia` decimal(9,2) NOT NULL
+  `porcentaje_recojo` decimal(9,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `empresa`
 --
 
-INSERT INTO `empresa` (`id`, `nombre`, `correo`, `nro_telefono`, `logo`, `color_pri`, `color_sec`, `color_ter`, `porcentaje_garantia`) VALUES
+INSERT INTO `empresa` (`id`, `nombre`, `correo`, `nro_telefono`, `logo`, `color_pri`, `color_sec`, `color_ter`, `porcentaje_recojo`) VALUES
 (1, 'New Olva', 'info@newolva.com', '+123 456 789', 'logo.png', '#1d4c82', '#13e2da', '#1b98e0', 0.00);
 
 -- --------------------------------------------------------

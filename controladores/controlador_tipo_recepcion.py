@@ -100,6 +100,19 @@ def get_options():
     return lista
 
 
+def get_options_dict():
+    sql= f'''
+        select 
+            {get_primary_key()} ,
+            nombre
+        from {table_name}
+        where activo = 1
+        order by nombre asc
+    '''
+    filas = sql_select_fetchall(sql)
+    
+    return filas
+
 
 
 

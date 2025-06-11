@@ -81,7 +81,7 @@ def get_options():
             id ,
             nombre
         from rol
-        where activo = 1 
+        where activo = 1 and id != 1 
         order by nombre asc
     '''
     filas = sql_select_fetchall(sql)

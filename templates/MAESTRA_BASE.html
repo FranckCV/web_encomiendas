@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/static/css/common_styles/all.min.css" />
     <link rel="stylesheet" href="/static/css/common_styles/fonts.css" />
     <link rel="stylesheet" href="/static/css/common_styles/common_style.css" />
+    <link rel="stylesheet" href="/static/css/validationForm.css">
     <link rel="stylesheet" href="/static/css/common_styles/fontawesome.min.css" />
     {% set emp_color_pri = main_information.get('color_pri') %}
     {% set emp_color_sec = main_information.get('color_sec') %}
@@ -71,9 +72,19 @@
       <img id="enlargedImage" class="enlarged-image" />
     </div>
 
+    <!-- <div id="overlayErrorFormModal">
+        <div id="error-form-modal">
+            <h4>Errores en el formulario:</h4>
+            <ul id="error-form-list"></ul>
+            <button onclick="document.getElementById('overlayErrorFormModal').style.display='none'">Cerrar</button>
+        </div>
+    </div> -->
+
+
     <script src="/static/js/common_scripts/bootstrap.bundle.min.js"></script>
     <script src="/static/js/common_scripts/bootstrap.min.js"></script>
     <script src="/static/js/common_scripts/common_script.js"></script>
+    <script src="/static/js/validationForm.js"></script>
 
     <script>
         const modalError = document.getElementById('modalError');
