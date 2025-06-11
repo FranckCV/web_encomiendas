@@ -1864,7 +1864,7 @@ paginas_simples = [
     'salida_informacion',
     'cambiar_contrasenia',
     'programacion_devolucion',
-    'Faq'
+    # 'Faq'
 ]
 
 
