@@ -41,12 +41,14 @@ from controladores import controlador_salida as controlador_salida
 from controladores import controlador_reclamo as controlador_reclamo
 from controladores import controlador_preguntas_frecuentes as controlador_pregunta_frecuente
 from controladores import controlador_regla_cargo as controlador_regla_cargo
+from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 from controladores import reporte_ingresos as reporte_ingresos
 from controladores.bd import sql_execute
 from controladores import controlador_transaccion_venta as controlador_transaccion_venta
 from controladores import controlador_detalle_venta as controlador_detalle_venta
 from controladores import controlador_metodo_pago_venta as controlador_metodo_pago_venta
 from controladores import controlador_articulo as controlador_articulo
+
 
 import hashlib
 import os
@@ -1242,7 +1244,33 @@ CONTROLADORES = {
             "crud_delete": True ,
             "crud_unactive": True ,
         }
-    }
+    },
+     "modalidad_pago": {
+        "active" : True ,
+        "titulo": "modalidad de pago",
+        "icon_page": 'fa-solid fa-truck-plane',
+        "nombre_tabla": "modalidad_pago",
+        "controlador": controlador_modalidad_pago,
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
     
 }
 
@@ -1872,6 +1900,7 @@ paginas_simples = [
     'salida_informacion',
     'cambiar_contrasenia',
     'programacion_devolucion',
+    'maestra_para_vb',
     # 'Faq'
 ]
 
@@ -2315,7 +2344,8 @@ def sucursales():
 
 @app.route('/tipos-envio')
 def tipos_envio():
-    return render_template('tipos_envio.html')
+    tipos_envios = controlador_tipo_empaque.get_options()
+    return render_template('tipos_envio.html', tipos_envios=tipos_envios)
 
 @app.route('/registro-envio')
 def registro_envio():
@@ -2335,6 +2365,10 @@ def registro_envio():
         
     )
 
+@app.route('/seguimiento_encomienda')
+def seguimiento_encomienda():
+    estado_encomienda = controlador_estado_encomienda.get_last_state()
+    return render_template('seguimiento.html',estado_encomienda=estado_encomienda)
 
 @app.route('/resumen_envio')
 def mostrar_resumen():
@@ -2342,7 +2376,9 @@ def mostrar_resumen():
 
 @app.route('/pagoenvio')
 def mostrar_pagoenvio():
-    return render_template('pago_envio.html') 
+    metodo_pago = controlador_metodo_pago.get_options()
+    return render_template('pago_envio.html', metodo_pago=metodo_pago
+                           ) 
 
 
 #########
@@ -2350,23 +2386,46 @@ def mostrar_pagoenvio():
 @app.route('/envio_masivo')
 def envio_masivo():
     nombre_doc = controlador_tipo_documento.get_options()
-    nombre_rep = controlador_tipo_recepcion.get_options()
-    # rutas_tarifas = controlador_tarifa_ruta.get_sucursales_origen_destino()
     departamento_origen = controlador_tarifa_ruta.get_departamentos_origen()
     articulos = controlador_contenido_paquete.get_options()
     empaque = controlador_tipo_empaque.get_options()
     condiciones = controlador_regla_cargo.get_condiciones_tarifa()
     tarifas = controlador_tarifa_ruta.get_tarifas_ruta_dict()
-    print(departamento_origen)
+    modalidad_pago = controlador_modalidad_pago.get_options()
     return render_template('envio_masivo.html', 
                            nombre_doc=nombre_doc,
-                           nombre_rep=nombre_rep,
                            departamento_origen = departamento_origen,
-                        #    rutasTarifas=json.dumps(rutas_tarifas), 
+                           modalidad_pago = modalidad_pago,
                            tarifas = json.dumps(tarifas),
                            empaque=empaque, 
                            articulos=articulos,
                            condiciones=condiciones)
+    
+@app.route('/api/recepcion', methods=["POST"])
+def recepcion():
+    try:
+        datos = request.get_json()
+        modalidad = datos.get('modalidad')
+        recepcion = controlador_tipo_recepcion.get_options_dict()
+        if int(modalidad) == 3:
+            data = (recepcion[1],)
+        else:
+            data = recepcion
+        res = {
+            'data': data,
+            'msg': "Se listó con éxito",
+            'status': 1
+        }
+
+        return jsonify(res)
+    except Exception as e:
+         res = {
+            'data': [],
+            'msg': f"Ocurrió un error al listar las provincias: {repr(e)}",
+            'status':-1
+        }
+         return jsonify(res)
+    
     
 @app.route('/api/provincia_origen',  methods=["POST"])
 def provincia_origen():
@@ -2396,7 +2455,6 @@ def distrito_origen():
         datos = request.get_json()
         prov = datos.get('prov')
         distritos = controlador_tarifa_ruta.get_distrito_origen(prov)
-        print(distritos)
         return {
             'data': distritos,
             'msg': "Se listó con éxito",
@@ -2418,12 +2476,13 @@ def departamento_destino():
         prov = datos.get('prov')
         dist = datos.get('dist')
         
-        codigo_origen = controlador_tarifa_ruta.get_ubigeo_origen(dep,prov,dist)
+        codigo_origen = controlador_tarifa_ruta.get_codigo_ubigeo(dep,prov,dist)
         
-        departamentos = controlador_tarifa_ruta.get_departamento_destino(codigo_origen)
+        departamentos = controlador_tarifa_ruta.get_departamento_destino(codigo_origen['codigo'])
         
         return {
             'data': departamentos,
+            'codigo': codigo_origen['codigo'],
             'msg': "Se listó con éxito",
             'status':1
         }
@@ -2436,10 +2495,7 @@ def departamento_destino():
     
 
 
-
-
-##################_ CLIENTE PAGE _################## 
-
+################# Sucursales ######################
 
 @app.route("/perfil")
 def perfil():

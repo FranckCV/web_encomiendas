@@ -98,6 +98,9 @@ def get_options():
 
 
 
-
-
-
+def get_last_state():
+    sql = '''
+            select id, nombre from estado_encomienda
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas
