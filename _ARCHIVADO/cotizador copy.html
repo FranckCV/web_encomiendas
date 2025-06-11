@@ -1,0 +1,260 @@
+{% extends "MAESTRA_GENERAL.html" %}
+
+
+{% block titulo %}
+Cotizador de Tarifas de Envío
+{% endblock %}
+
+
+{% block estilos %}
+
+<link rel="stylesheet" href="/static/css/cotizador.css">
+
+{% endblock %}
+
+
+{% block contenido %}
+
+<div class="container">
+    <div class="calculator-section">
+        <h2 class="section-title">COTIZADOR</h2>
+        
+        <form id="shipping-form">
+            <div class="form-group">
+                <label>¿DÓNDE TE ENCUENTRAS?</label>
+                <div class="form-row">
+                    <div class="form-col">
+                        <select id="origin-department" required>
+                            <option value="">Departamentos</option>
+                            {% for departamento in departamentos %}
+                            <option value="{{departamento}}">{{departamento}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-col">
+                        <select id="origin-province">
+                            <option value="">Provincias</option>
+                            <option value="" disabled>Selecciona un departamento </option>
+                            {% for provincia in provincias %}
+                            <option data-departamento="{{provincia[0]}}" value="{{provincia[1]}}">{{provincia[1]}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-col">
+                        <select id="origin-district">
+                            <option value="">Distritos</option>
+                            <option value="" disabled>Selecciona una provincia </option>
+                            {% for distrito in distritos %}
+                            <option data-provincia="{{distrito[2]}}" value="{{distrito[0]}}">{{distrito[3]}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>¿A DÓNDE LO LLEVAMOS?</label>
+                <div class="form-row">
+                    <div class="form-col">
+                        <select id="destination-department">
+                            <option value="">Departamento</option>
+                            <option value="lima">Lima</option>
+                            <option value="arequipa">Arequipa</option>
+                            <option value="cusco">Cusco</option>
+                            <option value="trujillo">La Libertad</option>
+                            <option value="piura">Piura</option>
+                        </select>
+                    </div>
+                    <div class="form-col">
+                        <select id="destination-province">
+                            <option value="">Provincia</option>
+                            <option value="lima">Lima</option>
+                            <option value="callao">Callao</option>
+                        </select>
+                    </div>
+                    <div class="form-col">
+                        <select id="destination-district">
+                            <option value="">Distrito</option>
+                            <option value="miraflores">Miraflores</option>
+                            <option value="san_isidro">San Isidro</option>
+                            <option value="surco">Santiago de Surco</option>
+                            <option value="san_borja">San Borja</option>
+                            <option value="la_molina">La Molina</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-col">
+                    <label>¿LO RECOGEMOS?</label>
+                    <select id="pickup-option">
+                        <option value="no">Sin recojo</option>
+                        <option value="yes">Con recojo</option>
+                    </select>
+                </div>
+                
+                <div class="form-col">
+                    <label>¿QUÉ QUIERES ENVIAR?</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="envelope" name="package-type" value="envelope" checked>
+                            <label for="envelope">Sobres</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="package" name="package-type" value="package">
+                            <label for="package">Paquetes</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>¿CUÁNTO PESA?</label>
+                <div class="form-row">
+                    <div class="form-col">
+                        <input type="number" id="weight" min="0" step="0.1" placeholder="Peso">
+                    </div>
+                    <div class="form-col">
+                        <select id="weight-unit">
+                            <option value="kg">Kilogramos (kg)</option>
+                            <option value="g">Gramos (g)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="price-section">
+                <div class="price-text">Precio estimado:</div>
+                <div class="price-amount" id="price-display">S/ 0.00</div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button type="button" class="btn" id="calculate-btn">COTIZAR</button>
+            </div>
+        </form>
+        
+        <div class="notes">
+            <p>Las tarifas son referenciales. Las tarifas incluyen IGV. Precios válidos solo para el Servicio Regular y Partners de Lima a Provincias y de Lima a Lima. No incluye cargo adicional del seguro para envíos mayores a S/101.00 soles y envíos valorados. Se considera paquete desde 501 gramos.</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+    
+</script>
+
+<!-- <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Simular carga de opciones en los selectores
+        function loadDepartments() {
+            // Aquí podrías cargar los departamentos desde una API o base de datos
+            console.log('Departamentos cargados');
+        }
+        
+        function updateProvinces(department) {
+            // Simular actualización de provincias según el departamento seleccionado
+            console.log(`Actualizando provincias para: ${department}`);
+        }
+        
+        function updateDistricts(province) {
+            // Simular actualización de distritos según la provincia seleccionada
+            console.log(`Actualizando distritos para: ${province}`);
+        }
+        
+        // Cargar departamentos al inicio
+        loadDepartments();
+        
+        // Eventos para actualizar provincias y distritos
+        document.getElementById('origin-department').addEventListener('change', function() {
+            updateProvinces(this.value);
+        });
+        
+        document.getElementById('destination-department').addEventListener('change', function() {
+            updateProvinces(this.value);
+        });
+        
+        document.getElementById('origin-province').addEventListener('change', function() {
+            updateDistricts(this.value);
+        });
+        
+        document.getElementById('destination-province').addEventListener('change', function() {
+            updateDistricts(this.value);
+        });
+        
+        // Cálculo de tarifa
+        document.getElementById('calculate-btn').addEventListener('click', function() {
+            // Obtener todos los valores del formulario
+            const originDept = document.getElementById('origin-department').value;
+            const originProv = document.getElementById('origin-province').value;
+            const originDist = document.getElementById('origin-district').value;
+            const destDept = document.getElementById('destination-department').value;
+            const destProv = document.getElementById('destination-province').value;
+            const destDist = document.getElementById('destination-district').value;
+            const pickup = document.getElementById('pickup-option').value;
+            const packageType = document.querySelector('input[name="package-type"]:checked').value;
+            const weight = parseFloat(document.getElementById('weight').value) || 0;
+            const weightUnit = document.getElementById('weight-unit').value;
+            
+            // Validar campos requeridos
+            if (!originDept || !originProv || !originDist || !destDept || !destProv || !destDist || weight <= 0) {
+                alert('Por favor complete todos los campos requeridos.');
+                return;
+            }
+            
+            // Convertir peso a kg si es necesario
+            let weightInKg = weightUnit === 'g' ? weight / 1000 : weight;
+            
+            // Calcular tarifa (esto es solo un ejemplo, deberías implementar tu lógica)
+            let price = calculateShippingRate(originDept, destDept, packageType, weightInKg, pickup);
+            
+            // Mostrar el precio calculado
+            document.getElementById('price-display').textContent = `S/ ${price.toFixed(2)}`;
+        });
+        
+        // Función para calcular la tarifa (ejemplo)
+        function calculateShippingRate(origin, destination, type, weight, pickup) {
+            // Tarifa base según origen y destino
+            let baseFee = 0;
+            
+            // Si es local (mismo departamento)
+            if (origin === destination) {
+                baseFee = 8;
+            } else {
+                // Si es a otro departamento
+                baseFee = 15;
+            }
+            
+            // Ajuste por tipo de paquete
+            let typeFactor = (type === 'envelope') ? 1 : 1.5;
+            
+            // Ajuste por peso
+            let weightFee = 0;
+            if (weight <= 0.5) {
+                weightFee = 0;
+            } else if (weight <= 1) {
+                weightFee = 3;
+            } else if (weight <= 3) {
+                weightFee = 6;
+            } else if (weight <= 5) {
+                weightFee = 10;
+            } else {
+                weightFee = 10 + (weight - 5) * 2;
+            }
+            
+            // Cargo por recojo
+            let pickupFee = (pickup === 'yes') ? 5 : 0;
+            
+            // Calcular tarifa total
+            let totalFee = (baseFee * typeFactor) + weightFee + pickupFee;
+            
+            return totalFee;
+        }
+    });
+</script> -->
+{% endblock %}

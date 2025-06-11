@@ -47,21 +47,18 @@ from controladores import controlador_transaccion_venta as controlador_transacci
 from controladores import controlador_detalle_venta as controlador_detalle_venta
 from controladores import controlador_metodo_pago_venta as controlador_metodo_pago_venta
 from controladores import controlador_articulo as controlador_articulo
-from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 
 
 import hashlib
 import os
 from werkzeug.utils import secure_filename
+from werkzeug.routing import MapAdapter
 import re
 import configuraciones
 from functools import wraps
 import inspect
-# import json
-# from flask_jwt import JWT, jwt_required, current_identity
-# import uuid
-# import base64
-# from datetime import datetime, date
+
+
 
 app = Flask(__name__, template_folder='templates')
 
@@ -124,44 +121,44 @@ def articulos_mas_vendidos():
 
 ###########_ FUNCIONES _#############
 
-def listar_admin_pages():
-    menu_keys = list(MENU_ADMIN.keys())
-    modules = []
-    for module in menu_keys:
-        pages_crud = []
-        pages_report = []
-        config = MENU_ADMIN.get(module)
-        active = config["active"]
-        if active is True:
-            name = config.get("name")
-            icon_module = get_icon_page(config.get("icon_page"))
-            dashboard = config.get("dashboard")
-            cruds = config.get("cruds")
-            reports = config.get("reports")
+# def listar_admin_pages():
+#     menu_keys = list(MENU_ADMIN.keys())
+#     modules = []
+#     for module in menu_keys:
+#         pages_crud = []
+#         pages_report = []
+#         config = MENU_ADMIN.get(module)
+#         active = config["active"]
+#         if active is True:
+#             name = config.get("name")
+#             icon_module = get_icon_page(config.get("icon_page"))
+#             dashboard = config.get("dashboard")
+#             cruds = config.get("cruds")
+#             reports = config.get("reports")
             
-            if cruds != [] and cruds is not None:
-                for page in cruds:
-                    config_page = CONTROLADORES.get(page)
-                    if config_page:
-                        p_active = config_page.get('active')
-                        if p_active is True:
-                            p_titulo = config_page.get('titulo')
-                            p_icon_page = get_icon_page(config_page.get('icon_page'))
-                            pages_crud.append([ page , p_titulo , p_icon_page ])
+#             if cruds != [] and cruds is not None:
+#                 for page in cruds:
+#                     config_page = CONTROLADORES.get(page)
+#                     if config_page:
+#                         p_active = config_page.get('active')
+#                         if p_active is True:
+#                             p_titulo = config_page.get('titulo')
+#                             p_icon_page = get_icon_page(config_page.get('icon_page'))
+#                             pages_crud.append([ page , p_titulo , p_icon_page ])
             
-            if reports != [] and reports is not None:
-                for page in reports:
-                    config_page = REPORTES.get(page)
-                    if config_page:
-                        p_active = config_page.get('active')
-                        if p_active is True:
-                            p_titulo = config_page.get('titulo')
-                            p_icon_page = get_icon_page(config_page.get('icon_page'))
-                            p_elements = config_page.get('elements')
-                            pages_report.append([ page , p_titulo , p_icon_page , p_elements ])
+#             if reports != [] and reports is not None:
+#                 for page in reports:
+#                     config_page = REPORTES.get(page)
+#                     if config_page:
+#                         p_active = config_page.get('active')
+#                         if p_active is True:
+#                             p_titulo = config_page.get('titulo')
+#                             p_icon_page = get_icon_page(config_page.get('icon_page'))
+#                             p_elements = config_page.get('elements')
+#                             pages_report.append([ page , p_titulo , p_icon_page , p_elements ])
             
-            modules.append([ name , icon_module , dashboard , pages_crud , pages_report , module])
-    return modules
+#             modules.append([ name , icon_module , dashboard , pages_crud , pages_report , module])
+#     return modules
 
 #Opciones para activar o desacticar
 def get_options_active():
@@ -203,21 +200,61 @@ def encrypt_sha256_string(str):
     return encstr
 
 # Crear response para login
-def resp_login( url_function , user_id , correo ):
-    resp = make_response(redirect_url(url_function))
-    resp.set_cookie('user_id', str(user_id))
-    resp.set_cookie('correo', correo)
-    return resp
+# def resp_login( url_function , user_id , correo ):
+#     resp = make_response(redirect_url(url_function))
+#     resp.set_cookie('user_id', str(user_id))
+#     resp.set_cookie('correo', correo)
+#     return resp
 
 
+# Crear response para login
+def resp_login( correo , contrasenia ):
+    usuario = controlador_usuario.get_usuario_por_correo(correo)
+    encpassword = encrypt_sha256_string(contrasenia)
+    if usuario and encpassword == usuario['contrasenia']:
+        resp = make_response(redirect_url('login'))
+        resp.set_cookie('user_id', str(usuario['id']))
+        resp.set_cookie('correo', correo)
+        return resp
+    else:
+        return rdrct_error(redirect_url('login') ,'LOGIN_INVALIDO')
+
+
+# Crear response para register
+def resp_register( correo, contrasenia , conf_contrasenia, telefono, num_documento, nombre_siglas, apellidos_razon, tipo_documentoid, tipo_clienteid ):
+    econtrasenia = encrypt_sha256_string(contrasenia)
+    econf_contrasenia = encrypt_sha256_string(conf_contrasenia)
+    if econf_contrasenia == econtrasenia:
+        if controlador_usuario.get_info_usuario_por_correo(correo) is None :
+            client_id = controlador_cliente.register_client( correo, telefono, num_documento, nombre_siglas, apellidos_razon, tipo_documentoid, tipo_clienteid )
+            user_id = controlador_usuario.register_user_client( correo , econtrasenia )
+            # return redirect_url('sign_up')
+            return resp_login( correo , contrasenia )
+        else:
+            return rdrct_error(redirect_url('sign_up') ,'Este correo ya fue registrado')
+    else:
+        return rdrct_error(redirect_url('sign_up') ,'Las contraseñas no coinciden')
+
+
+# Extraer función de un enlace
+def obtener_funcion_desde_url(app: Flask, url: str, method='GET'):
+    adapter: MapAdapter = app.url_map.bind("localhost")
+    try:
+        endpoint, args = adapter.match(url, method=method)
+        return endpoint  # nombre de la función de vista
+    except Exception as e:
+        return f"No se encontró ninguna función para la URL '{url}': {str(e)}"
+
+# Datos de usuario que ha iniciado sesión
 def getDatosUsuario():
-    user_id = request.cookies.get('user_id')
+    user_id = request.cookies.get('user_id') 
     correo = request.cookies.get('correo')
-    usuario = controlador_usuario.get_usuario_por_id(user_id)
-    if usuario and correo and usuario['correo'] == correo:
-        return usuario
-    else: 
-        return None
+    if user_id and correo:
+        usuario = controlador_usuario.get_usuario_por_id(user_id)
+        if usuario and correo and usuario['correo'] == correo:
+            return usuario
+    # else: 
+    return None
     
 
 def esSesionIniciada():
@@ -1665,20 +1702,29 @@ def validar_empleado():
             try:
                 user_id = request.cookies.get('user_id')
                 correo = request.cookies.get('correo')
-                usuario = controlador_usuario.get_usuario_empleado_por_id(user_id)
-
+                usuario = controlador_usuario.get_usuario_empleado_user_id(user_id)
                 if usuario and usuario['correo'] == correo and usuario['tipo_usuario'] == 'E' :
                     page = f(*args, **kwargs)
-
                     if page:
-     
-                        return page
+                        f_name = f.__name__
+                        l_kwarg = list(kwargs.values())
+                        f_kwarg = l_kwarg[0] if l_kwarg else None
+                        print(f_name , f_kwarg)
+                        # p_key = f_kwarg if f_kwarg and f_name != 'dashboard' else f_name
 
+                        try:
+                            # if (usuario['rolid'] == 1 and usuario['tipo_rolid'] == 1) or permiso.validar_acceso(usuario['rolid'] , p_key):
+                            if (usuario['rolid'] == 1 and usuario['tipo_rolid'] == 1) or permiso.validar_acceso(usuario['rolid'] , f_name , f_kwarg ):
+                                return page
+                            else:
+                                return rdrct_error( main_empleado_page() , 'Esta pagina no existe') 
+                        except Exception as e:
+                            return rdrct_error( redirect_url('login') , e) 
                     else:
                         return rdrct_error( main_empleado_page() , 'Esta pagina no existe') 
-                return rdrct_error(redirect_url('login') , 'LOGIN_INVALIDO') 
+                return rdrct_error( redirect_url('login') , 'LOGIN_INVALIDO') 
             except Exception as e:
-                return rdrct_error(redirect_url('login') , e) 
+                return rdrct_error( redirect_url('login') , e) 
         return wrapper
     return decorator
 
@@ -1709,18 +1755,23 @@ def validar_cliente():
 @app.context_processor
 def inject_cur_modulo_id():
     try:
-        path = request.path  
-        parts = path.strip('/').split('=')
-        key = parts[-1] 
-        page = parts[0]
-        if page == 'dashboard':
-            dataPage = permiso.get_modulo_key(key)
-            if dataPage:
-                return dict(cur_modulo_id=dataPage['id'])
-        else:
-            dataPage = permiso.get_pagina_key(key)
-            if dataPage:
-                return dict(cur_modulo_id=dataPage['moduloid'])
+        user_id = request.cookies.get('user_id')
+        correo = request.cookies.get('correo')
+        usuario = controlador_usuario.get_usuario_empleado_user_id(user_id)
+        if  usuario :
+            if usuario['correo'] == correo and usuario['tipo_usuario'] == 'E' :
+                path = request.path
+                parts = path.strip('/').split('=')
+                key = parts[-1] 
+                page = obtener_funcion_desde_url(app , path)
+                if page == 'dashboard':
+                    dataPage = permiso.get_modulo_key(key)
+                    if dataPage:
+                        return dict(cur_modulo_id=dataPage['id'])
+                else:
+                    dataPage = permiso.get_pagina_key(key)
+                    if dataPage:
+                        return dict(cur_modulo_id=dataPage['moduloid'])
         return dict(cur_modulo_id=None)
     except Exception as e:
         return dict(cur_modulo_id=None)
@@ -1728,20 +1779,34 @@ def inject_cur_modulo_id():
 
 @app.context_processor
 def inject_globals():
-    listar_pages_admin = listar_admin_pages()
-    modulos = permiso.get_lista_modulos()
-    tipos_paginas = permiso.get_lista_tipo_paginas()
-    menu_paginas = permiso.get_paginas()
-    options_pagination_crud , selected_option_crud = get_options_pagination_crud()
-    cookie_error = request.cookies.get('error')
-    user_id = request.cookies.get('user_id')
+    # listar_pages_admin = listar_admin_pages()
+    menu_modulos = []
+    menu_tipos_paginas = []
+    menu_paginas = []
+    menu_rolid = None
+
     main_information = controlador_empresa.get_information()
+    cookie_error = request.cookies.get('error')
+    options_pagination_crud , selected_option_crud = get_options_pagination_crud()
+    user_id = request.cookies.get('user_id')
     datosUsuario = getDatosUsuario()
     if datosUsuario:
         tipoUsuario = getDatosUsuario()['tipo_usuario']
+        print('extrae tipo')
         if tipoUsuario == 'E':
-            datosUsuario = controlador_usuario.get_usuario_empleado_por_id(user_id)
+            datosUsuario = controlador_usuario.get_usuario_empleado_user_id(user_id)
+            menu_rolid = datosUsuario['rolid']
+            if menu_rolid:
+                if menu_rolid == 1 :
+                    menu_modulos = permiso.get_lista_modulos()
+                    menu_tipos_paginas = permiso.get_lista_tipo_paginas()
+                    menu_paginas = permiso.get_paginas()
+                else:
+                    menu_modulos = permiso.get_modulos_rol(menu_rolid)
+                    menu_tipos_paginas = permiso.get_tipo_paginas_rol(menu_rolid)
+                    menu_paginas = permiso.get_paginas_permiso_rol(menu_rolid)
         elif tipoUsuario == 'C':
+            print('reconoce que es C')
             datosUsuario = controlador_usuario.get_usuario_cliente_por_id(user_id)
         else:
             datosUsuario = None
@@ -1750,8 +1815,8 @@ def inject_globals():
 
     return dict(
         # todo el sistema
-        URL_IMG_LOGO           = f'/static/img/img_empresa/{controlador_empresa.get_logo()}' ,
         # URL_IMG_LOGO           = f'/static/img/img_empresa/logo.png' ,
+        URL_IMG_LOGO           = f'/static/img/img_empresa/{controlador_empresa.get_logo()}' ,
         main_information = main_information ,
         cookie_error = cookie_error,
         datosUsuario = datosUsuario ,
@@ -1760,10 +1825,10 @@ def inject_globals():
         # paginas empleado
         options_pagination_crud = options_pagination_crud ,
         selected_option_crud = selected_option_crud ,
-        modulos= modulos ,
-        tipos_paginas = tipos_paginas ,
+        menu_modulos = menu_modulos ,
+        menu_tipos_paginas = menu_tipos_paginas , 
         menu_paginas = menu_paginas ,
-
+        menu_rolid = menu_rolid ,
         # paginas cliente
 
 
@@ -1806,7 +1871,6 @@ def inject_globals():
 
 paginas_simples = [ 
     "index" , 
-    'sign_up', 
     'tracking',
     'seguimiento',
     'recuperar_contrasenia',
@@ -1816,11 +1880,10 @@ paginas_simples = [
     'pagina_reclamo',
     'seguimiento_reclamo',
     'Metodo_pago',
-    'perfil',
     'prueba_seguimiento',
     'cajas',
     'cajas_prueba',
-    'articulos',
+    # 'articulos',
     'sobre_nosotros',
     'TerminosCondiciones',
     'salidas_programadas', #para eliminar
@@ -1828,7 +1891,7 @@ paginas_simples = [
     'salida_informacion',
     'cambiar_contrasenia',
     'programacion_devolucion',
-    'Faq'
+    # 'Faq'
 ]
 
 
@@ -1839,19 +1902,47 @@ for pagina in paginas_simples:
         lambda p=pagina: render_template(f"{p}.html")  # Renderiza la plantilla
     )
 
+@app.route("/sign_up")
+def sign_up():
+    user_id = request.cookies.get('user_id')
+    correo = request.cookies.get('correo')
+    if user_id and correo: 
+        usuario = controlador_usuario.get_usuario_por_id(user_id)
+        if usuario and usuario['correo'] == correo :
+            if usuario['tipo_usuario'] == 'E':
+                return main_empleado_page()
+            elif usuario['tipo_usuario'] == 'C' :
+                return main_cliente_page()
+            
+    opts_tipo_documento = controlador_tipo_documento.get_options()
+    opts_tipo_cliente = controlador_tipo_cliente.get_options()
+
+    render = render_template(
+        'sign_up.html' , 
+        opts_tipo_documento = opts_tipo_documento ,
+        opts_tipo_cliente = opts_tipo_cliente ,
+        )
+    resp = make_response(render)
+    resp.delete_cookie('user_id')
+    resp.delete_cookie('correo')
+    return resp
+
 
 @app.route("/login")
 def login():
     user_id = request.cookies.get('user_id')
     correo = request.cookies.get('correo')
-    usuario = controlador_usuario.get_usuario_por_id(user_id)
-    if usuario and correo and usuario['correo'] == correo :
-        if usuario['tipo_usuario'] == 'E':
-            return main_empleado_page()
-        elif usuario['tipo_usuario'] == 'C' :
-            return main_cliente_page()
-    # else:
-    return render_template('login.html')
+    if user_id and correo: 
+        usuario = controlador_usuario.get_usuario_por_id(user_id)
+        if usuario and usuario['correo'] == correo :
+            if usuario['tipo_usuario'] == 'E':
+                return main_empleado_page()
+            elif usuario['tipo_usuario'] == 'C' :
+                return main_cliente_page()
+    resp = make_response(render_template('login.html'))
+    resp.delete_cookie('user_id')
+    resp.delete_cookie('correo')
+    return resp
 
 
 @app.route("/logout")
@@ -1865,8 +1956,71 @@ def logout():
         return rdrct_error(redirect_login(),e)
 
 
-##################_ CLIENTE PAGE _################## 
+@app.route("/cotizador")
+def cotizador():
+    departamentos = controlador_tarifa_ruta.get_options_departamento_origen()
+    provincias = controlador_tarifa_ruta.get_options_provincia_origen()
+    distritos = controlador_tarifa_ruta.get_options_distrito_origen()
+    sucursales = controlador_tarifa_ruta.get_options_sucursal_origen() 
+    return render_template(
+        'cotizador.html' ,
+        departamentos = departamentos,
+        provincias = provincias,
+        distritos = distritos,
+        sucursales = sucursales,
+    )
 
+
+@app.route("/api/get_tarifa", methods=["POST"])
+def api_get_tarifa():
+    try:
+        data = request.get_json()
+        origen_id = data.get("origen_id")
+        destino_id = data.get("destino_id")
+        includeRecojo = data.get('recojo')
+
+        if origen_id is None or destino_id is None:
+            return jsonify({"error": "Faltan parámetros origen_id o destino_id"}), 400
+
+        tarifa = controlador_tarifa_ruta.get_tarifa_ids(origen_id, destino_id)
+
+        if includeRecojo == 1:
+            a = controlador_empresa.get_porcentaje_recojo()
+        else:
+            a = 0
+
+
+
+        if tarifa:
+            return jsonify(tarifa['tarifa'])  # solo número
+        else:
+            return jsonify(None)  # o {"tarifa": None}
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/datos_destino", methods=["GET"])
+def api_sucursales_por_ubigeo():
+    sucursal_id = request.args.get("sucursal_id")
+    if not sucursal_id:
+        return jsonify({"error": "ID de sucursal proporcionado"}), 400
+  
+    try:
+        departamentos = controlador_tarifa_ruta.get_options_departamento_destino(sucursal_id)
+        provincias = controlador_tarifa_ruta.get_options_provincia_destino(sucursal_id)
+        distritos = controlador_tarifa_ruta.get_options_distrito_destino(sucursal_id)
+        sucursales = controlador_tarifa_ruta.get_options_sucursal_destino(sucursal_id)
+        return jsonify({
+            "departamentos": departamentos ,
+            "provincias": provincias ,
+            "distritos": distritos ,
+            "sucursales": sucursales ,
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+    
 @app.route('/api/Faq')
 def api_Faq():
     columnas, filas = controlador_pregunta_frecuente.get_table()
@@ -1878,6 +2032,7 @@ def api_Faq():
 @app.route('/contactanos')
 def contactanos():
     return render_template('contactanos.html')
+
 
 @app.route('/enviar-formulario', methods=['POST'])
 def enviar_formulario():
@@ -1967,6 +2122,11 @@ def api_cajas():
     return jsonify(productSizes)
 
 
+@app.route("/articulos")
+def articulos():
+    return render_template('articulos.html')
+
+
 @app.route("/api/articulos")
 def api_articulos():
     filas = controlador_articulo.get_table_with_discount()
@@ -2025,60 +2185,12 @@ from controladores.bd import sql_select_fetchall
 def obtener_carrito():
     # clienteid = request.cookies.get("idlogin") or request.args.get("clienteid")
     clienteid = 1
-    tipo_comprobanteid = 2
+    # tipo_comprobanteid = 2
 
     if not clienteid:
         return jsonify({"error": "Cliente no identificado"}), 400
 
-    transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid, tipo_comprobanteid)
-    # print(f"transaccioooon {transaccion}")
-    if not transaccion:
-        return jsonify([])
-
-    num_serie = transaccion.get("num_serie")
-
-    sql = '''
-        SELECT 
-            dv.articuloid AS id,
-            a.nombre AS name,
-            CAST(a.precio AS DECIMAL(10,2)) AS originalPrice,
-            dv.cantidad AS quantity,
-            a.img as image,
-
-            -- Descuentos
-            MAX(CASE 
-                WHEN REGEXP_SUBSTR(des.nombre, '[0-9]+') IS NOT NULL AND 
-                     CAST(REGEXP_SUBSTR(des.nombre, '[0-9]+') AS UNSIGNED) = vol.min_vol THEN des_art.cantidad_descuento
-                ELSE NULL END) AS precio_unitario_2,
-
-            MAX(CASE 
-                WHEN REGEXP_SUBSTR(des.nombre, '[0-9]+') IS NOT NULL AND 
-                     CAST(REGEXP_SUBSTR(des.nombre, '[0-9]+') AS UNSIGNED) = vol.max_vol THEN des_art.cantidad_descuento
-                ELSE NULL END) AS precio_unitario_3,
-
-            vol.min_vol AS cantidad_precio_unitario_2,
-            vol.max_vol AS cantidad_precio_unitario_3
-
-        FROM detalle_venta dv
-        JOIN articulo a ON dv.articuloid = a.id
-        LEFT JOIN descuento_articulo des_art ON des_art.articuloid = a.id
-        LEFT JOIN descuento des ON des.id = des_art.descuentoid
-
-        LEFT JOIN (
-            SELECT 
-                da.articuloid,
-                MIN(CAST(REGEXP_SUBSTR(d.nombre, '[0-9]+') AS UNSIGNED)) AS min_vol,
-                MAX(CAST(REGEXP_SUBSTR(d.nombre, '[0-9]+') AS UNSIGNED)) AS max_vol
-            FROM descuento_articulo da
-            JOIN descuento d ON d.id = da.descuentoid
-            GROUP BY da.articuloid
-        ) AS vol ON vol.articuloid = a.id
-
-        WHERE dv.ventanum_serie = %s AND dv.ventatipo_comprobanteid = %s
-        GROUP BY dv.articuloid, a.nombre, a.precio, dv.cantidad, a.img, vol.min_vol, vol.max_vol
-    '''
-
-    datos = sql_select_fetchall(sql, (num_serie, tipo_comprobanteid))
+    datos = controlador_transaccion_venta.obtener_carrito_cliente(clienteid)
 
     if isinstance(datos, Exception):
         return jsonify({"error": str(datos)}), 500
@@ -2108,6 +2220,43 @@ def registrar_item_carrito():
         return jsonify({"mensaje": "Item registrado en carrito", "num_serie": num_serie}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route("/eliminar-item-carrito", methods=["POST"])
+def eliminar_item_carrito():
+    data = request.get_json()
+    clienteid = data.get("clienteid")
+    articuloid = data.get("articuloid")
+
+    if not clienteid or not articuloid:
+        return jsonify({"error": "Datos incompletos"}), 400
+
+    transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
+    if not transaccion:
+        return jsonify({"error": "No hay transacción activa"}), 404
+
+    num_serie = transaccion["num_serie"]
+    controlador_transaccion_venta.eliminar_detalle_venta(articuloid, num_serie)
+    controlador_transaccion_venta.actualizar_monto_total(num_serie)
+
+    return jsonify({"success": True})
+
+@app.route("/vaciar-carrito", methods=["POST"])
+def vaciar_carrito():
+    data = request.get_json()
+    clienteid = data.get("clienteid")
+
+    if not clienteid:
+        return jsonify({"error": "Cliente no identificado"}), 400
+
+    transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
+    if not transaccion:
+        return jsonify({"error": "No hay carrito"}), 404
+
+    num_serie = transaccion["num_serie"]
+    controlador_transaccion_venta.eliminar_todo_detalle_venta(num_serie)
+    controlador_transaccion_venta.actualizar_monto_total(num_serie)
+
+    return jsonify({"success": True})
 
 
 @app.route("/venta/registrar", methods=["POST"])
@@ -2160,16 +2309,24 @@ def registrar_venta():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/cotizador")
-def cotizador():
+@app.route("/faq")
+def Faq():
+    return render_template('Faq.html')
+
+
+@app.route("/sucursales")
+def sucursales():
     departamentos = controlador_ubigeo.get_options_departamento()
     provincias = controlador_ubigeo.get_options_provincia()
     distritos = controlador_ubigeo.get_options_distrito()
+    agencias = controlador_sucursal.get_agencias_data()
+
     return render_template(
-        'cotizador.html' ,
-        departamentos = departamentos,
-        provincias = provincias,
-        distritos = distritos,
+        'sucursales.html',
+        departamentos=departamentos,
+        provincias=provincias,
+        distritos=distritos,
+        agencias=agencias
     )
 
 
@@ -2326,122 +2483,69 @@ def departamento_destino():
             'msg': f"Ocurrió un error al listar las provincias: {repr(e)}",
             'status':-1
         }
-        
-@app.route('/api/provincia_destino',methods=["POST"])  
-def provincia_destino():
-    try:
-       datos = request.get_json()
-       dep = datos.get('dep')
-       codigo = datos.get('codigo')
-       
-       provincias = controlador_tarifa_ruta.get_provincia_destino(dep,codigo)
-       
-       data = {
-            'data': provincias,
-            'msg': "Se listó con éxito",
-            'status':1
-        }
-       return jsonify(data)
-       
-    except Exception as e:
-         data = {
-            'data': [],
-            'msg': f"Ocurrió un error al listar las provincias: {repr(e)}",
-            'status':-1
-        }
-         return jsonify(data)     
     
 
-@app.route('/api/distrito_destino',methods=["POST"])
-def distrito_destino():
-    try:
-        datos = request.get_json()
-        prov = datos.get('prov')
-        codigo = datos.get('codigo')
 
-        distritos = controlador_tarifa_ruta.get_distrito_destino(prov,codigo)
-        data = {
-            'data': distritos,
-            'msg': "Se listó con éxito",
-            'status':1
-        }
-        return jsonify(data)
-    except Exception as e:
-        data = {
-            'data': [],
-            'msg': f"Ocurrió un error al listar las provincias: {repr(e)}",
-            'status':-1
-        }
-        return jsonify(data)     
-    
-@app.route('/api/sucursal_destino',methods=["POST"])
-def sucursal_destino():
-    try:
-        datos = request.get_json()
-        origen = datos.get('cod_origen')
-        dep = datos.get('dep')
-        prov = datos.get('prov')
-        dist = datos.get('dist')
-        destino = controlador_tarifa_ruta.get_codigo_ubigeo(dep,prov,dist)
-
-        sucursales = controlador_tarifa_ruta.get_sucursal_destino(origen,destino['codigo'])
-        data = {
-            'data': sucursales,
-            'msg': "Se listó con éxito",
-            'status':1
-        }
-        return jsonify(data)
-    except Exception as e:
-        data = {
-            'data': [],
-            'msg': f"Ocurrió un error al listar las provincias: {repr(e)}",
-            'status':-1
-        }
-        return jsonify(data)     
-    
 ################# Sucursales ######################
 
-@app.route("/sucursales")
-def sucursales():
-    departamentos = controlador_ubigeo.get_options_departamento()
-    provincias = controlador_ubigeo.get_options_provincia()
-    distritos = controlador_ubigeo.get_options_distrito()
-    agencias = controlador_sucursal.get_agencias_data()
+@app.route("/perfil")
+def perfil():
+    return render_template('perfil.html')
 
-    return render_template(
-        'sucursales.html',
-        departamentos=departamentos,
-        provincias=provincias,
-        distritos=distritos,
-        agencias=agencias
-    )
 
 
 ##################_ METHOD POST GENERALES _################## 
+
+
+# @app.route("/procesar_login", methods=["POST"])
+# def procesar_login():
+#     try:
+#         correo = request.form["email"]
+#         password = request.form["password"]
+#         usuario = controlador_usuario.get_usuario_por_correo(correo)
+#         encpassword = encrypt_sha256_string(password)
+
+#         if usuario and encpassword == usuario['contrasenia']:
+#             resp = resp_login(
+#                 'login',
+#                 usuario['id'] ,
+#                 usuario['correo'] 
+#             )
+#             return resp
+#         else:
+#             return rdrct_error(redirect_url('login') ,'LOGIN_INVALIDO')
+#     except Exception as e:
+#         return rdrct_error(redirect_url('login')  , e)
+
 
 
 @app.route("/procesar_login", methods=["POST"])
 def procesar_login():
     try:
         correo = request.form["email"]
-        password = request.form["password"]
-        usuario = controlador_usuario.get_usuario_por_correo(correo)
-        encpassword = encrypt_sha256_string(password)
-        # print(encpassword)
-        # print(usuario)
-
-        if usuario and encpassword == usuario['contrasenia']:
-            resp = resp_login(
-                'login',
-                usuario['id'] ,
-                usuario['correo'] 
-            )
-            # controlador_usuario.actualizar_token(username, token)
-            return resp
-        else:
-            return rdrct_error(redirect_url('login') ,'LOGIN_INVALIDO')
+        contrasenia = request.form["password"]
+        resp = resp_login( correo , contrasenia )
+        return resp
     except Exception as e:
         return rdrct_error(redirect_url('login')  , e)
+
+
+@app.route("/procesar_register", methods=["POST"])
+def procesar_register():
+    try:
+        firma = inspect.signature(resp_register)
+
+        valores = []
+        for nombre, parametro in firma.parameters.items():
+            valor = request.form.get(nombre)
+            valores.append(valor)
+
+        return resp_register( *valores )
+
+    except Exception as e:
+        return rdrct_error(redirect_url('login')  , e)
+
+
 
 
 ##################_ PAGINAS EMPLEADO _################## 
@@ -2471,16 +2575,23 @@ def dashboard(module_name):
 # @validar_empleado()
 def crud_generico(tabla):
     config = CONTROLADORES.get(tabla)
-    if config:
-        active = config["active"]
+    page = permiso.get_pagina_key(tabla)
+    user_info = getDatosUsuario()
+    permisos = permiso.consult_permiso_rol(page['id'] , user_info['rolid'])
+
+    if config and page:
+        active = config["active"] and (page['activo'] == 1 or user_info['rolid'] == 1 )
+        tipo_paginaid = page['tipo_paginaid']
         no_crud = config.get('no_crud')
-        if active is True and (no_crud is None or no_crud is False):
-            icon_page_crud = get_icon_page(config.get("icon_page"))
-            titulo = config["titulo"]
-            controlador = config["controlador"]
+
+        if active is True and tipo_paginaid == 1 and (no_crud is None or no_crud is False):
+            icon_page_crud = get_icon_page(page.get("icono"))
+            titulo = f'{NOMBRE_CRUD_PAGE} {page["titulo"].lower() }' 
+
             nombre_tabla = config["nombre_tabla"]
             filters = config["filters"]
             fields_form = config["fields_form"]
+            controlador = config["controlador"]
 
             existe_activo = controlador.exists_Activo()
             columnas , filas = controlador.get_table()
@@ -2488,13 +2599,13 @@ def crud_generico(tabla):
             table_columns  = list(filas[0].keys()) if filas else []
             
             CRUD_FORMS = config["crud_forms"]
-            crud_list = CRUD_FORMS.get("crud_list")
-            crud_search = CRUD_FORMS.get("crud_search")
-            crud_consult = CRUD_FORMS.get("crud_consult")
-            crud_insert = CRUD_FORMS.get("crud_insert")
-            crud_update = CRUD_FORMS.get("crud_update")
-            crud_delete = CRUD_FORMS.get("crud_delete")
-            crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo
+            # crud_list = CRUD_FORMS.get("crud_list")
+            crud_search = CRUD_FORMS.get("crud_search") and   (permisos['search'] or user_info['rolid'] == 1 )
+            crud_consult = CRUD_FORMS.get("crud_consult") and (permisos['consult'] or user_info['rolid'] == 1 )
+            crud_insert = CRUD_FORMS.get("crud_insert") and   (permisos['insert'] or user_info['rolid'] == 1 )
+            crud_update = CRUD_FORMS.get("crud_update") and   (permisos['update'] or user_info['rolid'] == 1 )
+            crud_delete = CRUD_FORMS.get("crud_delete") and   (permisos['delete'] or user_info['rolid'] == 1 )
+            crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo and ( permisos['unactive'] or user_info['rolid'] == 1 )
 
             return render_template(
                 "CRUD.html" ,
@@ -2506,12 +2617,10 @@ def crud_generico(tabla):
                 primary_key    = primary_key ,
                 filters        = filters,
                 fields_form    = fields_form ,
-                # value_search   = value_search,
                 columnas       = columnas ,
                 key_columns    = list(columnas.keys()) ,
                 table_columns  = table_columns ,
-                # info_columns   = info_columns,
-                crud_list      = crud_list,
+                # crud_list      = crud_list,
                 crud_search    = crud_search,
                 crud_consult   = crud_consult,
                 crud_insert    = crud_insert,
@@ -2525,11 +2634,16 @@ def crud_generico(tabla):
 @validar_empleado()
 def reporte(report_name):
     config = REPORTES.get(report_name)
-    if config:
+    page = permiso.get_pagina_key(report_name)
+
+    if config and page:
         active = config["active"]
-        if active is True:
-            titulo = config["titulo"]
-            icon_page_crud = get_icon_page(config.get("icon_page"))
+        tipo_paginaid = page['tipo_paginaid']
+
+        if active is True and tipo_paginaid == 4 :
+            icon_page_crud = get_icon_page(page.get("icono"))
+            titulo = page["titulo"]
+
             filters = config["filters"]
             columnas , filas = config["table"]
             table_columns  = list(filas[0].keys()) if filas else []
@@ -2544,6 +2658,7 @@ def reporte(report_name):
                 key_columns    = list(columnas.keys()) ,
                 table_columns  = table_columns ,
                 crud_search    = True,
+                primary_key = None ,
                 # crud_consult   = True,
                 # crud_insert    = True,
                 # crud_update    = True,
@@ -2690,8 +2805,8 @@ def informacion_empresa():
 ##################_ PAGINAS EMPLEADO METHOD POST _################## 
 
 @app.route("/insert_row=<tabla>", methods=["POST"])
-# @validar_empleado()
-# @validar_error_crud()
+@validar_empleado()
+@validar_error_crud()
 def crud_insert(tabla):
     # try:
         config = CONTROLADORES.get(tabla)
@@ -2732,8 +2847,8 @@ def crud_insert(tabla):
 
 
 @app.route("/update_row=<tabla>", methods=["POST"])
-# @validar_empleado()
-# @validar_error_crud()
+@validar_empleado()
+@validar_error_crud()
 def crud_update(tabla):
     # try:
         config = CONTROLADORES.get(tabla)
@@ -2782,8 +2897,8 @@ def crud_update(tabla):
 
 
 @app.route("/delete_row=<tabla>", methods=["POST"])
-# @validar_empleado()
-# @validar_error_crud()
+@validar_empleado()
+@validar_error_crud()
 def crud_delete(tabla):
     config = CONTROLADORES.get(tabla)
     if not config:
@@ -2811,8 +2926,8 @@ def crud_delete(tabla):
 
 
 @app.route("/unactive_row=<tabla>", methods=["POST"])
-# @validar_empleado()
-# @validar_error_crud()
+@validar_empleado()
+@validar_error_crud()
 def crud_unactive(tabla):
     config = CONTROLADORES.get(tabla)
     if not config:
@@ -2884,35 +2999,28 @@ def actualizar_permiso():
         return jsonify({'success': False, 'error': str(e)})
 
 
+
 @app.route('/actualizar_permiso_modulo', methods=['POST'])
 def actualizar_permiso_modulo():
     data = request.get_json()
+
     moduloid = data.get('moduloid')
     column = data.get('column')
     rolid = data.get('rolid')
+    value = data.get('value')
 
     try:
-        permiso.change_permiso_modulo(column , moduloid , rolid)
+        # print('aaa')
+        permiso.change_permiso_modulo(column , moduloid , rolid , value)
+        # print('bbbb')
+        rpta_list = permiso.get_modulo_permiso_rol(rolid , moduloid)
+        # print('ccc')
         # rpta_column = permiso.consult_permiso_rol(moduloid , rolid)[column]
-        return jsonify({'success': True })
+        return jsonify({'success': True , 'rpta': rpta_list})
     except Exception as e:
         print("Error al actualizar permiso:", e)
         return jsonify({'success': False, 'error': str(e)})
 
-
-
-
-# @app.route('/actualizar_comentario', methods=['POST'])
-# def actualizar_comentario():
-#     data = request.get_json()
-#     id = data.get('id')
-#     comentario = data.get('comentario')
-#     try:
-#         controlador_evaluacion.actualizar_comentario_det_id(comentario , id)
-#         return jsonify({'success': True})
-#     except Exception as e:
-#         print("Error al actualizar comentario:", e)
-#         return jsonify({'success': False, 'error': str(e)})
 
 
 

@@ -92,30 +92,60 @@ body {
 .nav-link span {
     display: block;
     overflow: hidden;
-    /* white-space: nowrap; */
+    white-space: nowrap;
     text-overflow: ellipsis;
     width: 140px;
 }
 
-/* .nav-link:hover span {
-    width: 240px;
-} */
 
 
-.account-area {
+.account-block {
     display: flex;
     align-items: center;
-    gap: 10px;
-    border-radius: 100px;
-    padding-block: 5px;
-    padding-inline: 5px;
+    height: 50px;
     border: 1px solid white;
+    border-radius: 100px;
+}
+
+.account-block>* {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    border-radius: 100px;
     color: white;
 }
 
+.user_c .account-area {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.user_c .account-logout {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.account-logout {
+    /* border: 1px solid white; */
+    border-left: 0;
+    aspect-ratio: 1 / 1;
+    justify-content: center;
+}
+
+.account-logout:hover {
+    color: white;
+    background-color: var(--color-cancel);
+}
+
+.account-area {
+    gap: 10px;
+    padding-block: 5px;
+    padding-inline: 5px;
+}
+
 .user-icon {
-    width: 40px;
-    height: 40px;
+    height: 100%;
+    aspect-ratio: 1 / 1;
     border-radius: 50%;
     display: flex;
     align-items: center;

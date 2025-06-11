@@ -20,11 +20,7 @@ def delete_row(id):
 
 def get_table():
     sql = f'''
-        SELECT id, nombres_razon, direccion, correo, telefono, n_documento,
-               monto_indemnizado, titulo_incidencia, bien_contratado, monto_reclamado,
-               relacion, fecha_recojo, sucursal_id, descripcion, pedido,
-               causa_reclamoid, estado_reclamoid, tipo_indemnizacionid,
-               paquetetracking, ubigeocodigo, tipo_documentoid
+        SELECT *
         FROM {table_name}
     '''
     columnas = {
@@ -36,7 +32,7 @@ def get_table():
         'titulo_incidencia': ['Incidencia', 1.5],
         'monto_reclamado': ['Monto Reclamado', 1],
         'fecha_recojo': ['Fecha', 1],
-        'estado_reclamoid': ['Estado', 1],
+        # 'estado_reclamoid': ['Estado', 1],
         'sucursal_id': ['Sucursal', 1],
     }
     filas = sql_select_fetchall(sql)

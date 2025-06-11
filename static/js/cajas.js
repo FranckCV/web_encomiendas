@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       quantity: currentQuantity,
       unitPrice: unitPrice,
       // subtotal: unitPrice * currentQuantity,
-      // totalPrice: parseFloat(total),
+      totalPrice: parseFloat(total),
       name: data.name_product,
       image: data.image.split('/').pop(),
       originalPrice: precio_unitario_1,
@@ -276,6 +276,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         2
       )}\nTotal: S/ ${producto.totalPrice.toFixed(2)}`
     );
+
+    actualizarCantidadCarrito();
   });
 
   const style = document.createElement('style');

@@ -159,3 +159,18 @@ def get_reporte_ventas():
     
     return columnas, filas
 
+
+
+
+def register_client(correo, telefono, num_documento, nombre_siglas, apellidos_razon, tipo_documentoid, tipo_clienteid ):
+    sql = f'''
+        INSERT INTO cliente
+        (correo, telefono, num_documento, nombre_siglas, apellidos_razon, tipo_documentoid, tipo_clienteid )
+        VALUES
+            ( %s , %s , %s , %s , %s, %s, %s )
+    '''
+    id = sql_execute_lastrowid(sql,(correo, telefono, num_documento, nombre_siglas, apellidos_razon, tipo_documentoid, tipo_clienteid ))
+    return id
+
+
+

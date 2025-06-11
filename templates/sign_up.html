@@ -2,7 +2,6 @@
 
 {% block estilos %}
 <style>
-
     .inputs {
         grid-template-columns: repeat(6, 1fr);
     }
@@ -21,26 +20,38 @@
         grid-column: span 3;
     }
 
+    option {
+        color: black;
+    }
 
+    option[disabled] {
+        color: #b0b0b0;
+    }
 </style>
 {% endblock %}
 
 {% set TITULO_FORM = 'Registrate' %}
+{% set URL_POST = 'procesar_register' %}
 {% set URL_BG = 'bg4.jpg' %}
 
 {% block contenido_form %}
 
 <div class="input_box">
-    <select name="" id="">
+    <select required name="tipo_clienteid" id="tipo_clienteid">
         <option value="-1" selected disabled>Tipo de Cliente</option>
+        {% for opt in opts_tipo_cliente %}
+        <option value="{{opt[0]}}">{{opt[1]}}</option>
+        {% endfor %}
     </select>
     <!-- <i class="fa-solid fa-id-card"></i> -->
 </div>
 
 <div class="input_box">
-    <select name="" id="">
+    <select required name="tipo_documentoid" id="tipo_documentoid">
         <option value="-1" selected disabled>Tipo de Documento</option>
-
+        {% for opt in opts_tipo_documento %}
+        <option value="{{opt[0]}}">{{opt[1]}}</option>
+        {% endfor %}
     </select>
     <!-- <i class="fa-solid fa-id-card"></i> -->
 </div>
@@ -61,7 +72,7 @@
 </div>
 
 <div class="input_box">
-    <input type="email" name="telefono" id="telefono" placeholder="Telefono" required>
+    <input type="text" name="telefono" id="telefono" placeholder="Telefono" required>
     <i class="fa-solid fa-envelope"></i>
 </div>
 
@@ -71,19 +82,20 @@
 </div>
 
 <div class="input_box">
-    <input type="password" name="contraseña" id="contraseña" placeholder="Contraseña" required>
+    <input type="password" name="contrasenia" id="contrasenia" placeholder="Contraseña" required>
     <i class="fa-solid fa-lock"></i>
 </div>
 
 <div class="input_box">
-    <input type="password" name="conf_contraseña" id="conf_contraseña" placeholder="Confirmar Contraseña" required>
+    <input type="password" name="conf_contrasenia" id="conf_contrasenia" placeholder="Confirmar Contraseña" required>
     <i class="fa-solid fa-lock"></i>
 </div>
 {% endblock %}
 
 
 {% block pre_btn %}
-<p><input type="checkbox" id="verificacion">&nbsp;Al crear esta cuenta, aceptas nuestros <a href="{{ url_for('TerminosCondiciones') }}">Terminos &
+<p><input type="checkbox" id="verificacion">&nbsp;Al crear esta cuenta, aceptas nuestros <a
+        href="{{ url_for('TerminosCondiciones') }}">Terminos &
         Condiciones.</a></p>
 {% endblock %}
 
@@ -91,4 +103,93 @@
 
 {% block post_btn %}
 <p>¿Ya tienes una cuenta?&nbsp;<a href="{{url_for('login')}}">Inicia sesión</a></p>
+{% endblock %}
+
+
+{% block scripts %}
+<!-- <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.querySelector("form");
+        const tipoCliente = document.getElementById("tipo_clienteid");
+        const tipoDocumento = document.getElementById("tipo_documentoid");
+        const numDocumento = document.getElementById("num_documento");
+        const nombreSiglas = document.getElementById("nombre_siglas");
+        const apellidosRazon = document.getElementById("apellidos_razon");
+        const telefono = document.getElementById("telefono");
+        const correo = document.getElementById("correo");
+        const contrasenia = document.getElementById("contrasenia");
+        const confContrasenia = document.getElementById("conf_contrasenia");
+        const verificacion = document.getElementById("verificacion");
+
+        form.addEventListener("submit", (e) => {
+            let errores = [];
+
+            // Validar selects
+            if (tipoCliente.value === "-1") errores.push("Seleccione un tipo de cliente.");
+            if (tipoDocumento.value === "-1") errores.push("Seleccione un tipo de documento.");
+
+            // Validar campos obligatorios
+            if (numDocumento.value.trim().length < 5) errores.push("El número de documento es demasiado corto.");
+            if (nombreSiglas.value.trim().length < 2) errores.push("Ingrese su nombre o siglas.");
+            if (apellidosRazon.value.trim().length < 2) errores.push("Ingrese sus apellidos o razón social.");
+            if (telefono.value.trim().length < 7) errores.push("Ingrese un número de teléfono válido.");
+
+            // Validar correo
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.value.trim())) {
+                errores.push("El correo no tiene un formato válido.");
+            }
+
+            // Validar contraseñas
+            if (contrasenia.value.length < 6) errores.push("La contraseña debe tener al menos 6 caracteres.");
+            if (contrasenia.value !== confContrasenia.value) errores.push("Las contraseñas no coinciden.");
+
+            // Validar verificación
+            if (!verificacion.checked) errores.push("Debe aceptar los términos y condiciones.");
+
+            if (errores.length > 0) {
+                e.preventDefault();
+                alert("Errores en el formulario:\n\n" + errores.join("\n"));
+            }
+        });
+    });
+</script> -->
+
+<script>
+    document.querySelector('#tipo_clienteid').value = 1 ;
+    document.querySelector('#tipo_documentoid').value = 1 ;
+    document.querySelector('#num_documento').value = '3423' ;
+
+    document.querySelector('#nombre_siglas').value = 'wwqwqdwq' ;
+    document.querySelector('#apellidos_razon').value = '12121' ;
+
+    document.querySelector('#telefono').value = 'wrqwrw' ;
+    document.querySelector('#correo').value = 'qeqw@wwe' ;
+
+    document.querySelector('#contrasenia').value = 'wqqwqw' ;
+    document.querySelector('#conf_contrasenia').value = '123' ;
+</script>
+
+<script>
+    configurarValidacion({ tipo: "select", selector: "select", id: "tipo_clienteid" });
+    configurarValidacion({ tipo: "select", selector: "select", id: "tipo_documentoid" });
+    // configurarValidacion({ tipo: "email", selector: "input", id: "correo" });
+    
+    configurarValidacion({ tipo: "letras", selector: "input", id: "nombre_siglas" });
+    configurarValidacion({ tipo: "letras", selector: "input", id: "apellidos_razon" });
+
+    configurarValidacion({ tipo: "numeros", selector: "input", id: "telefono" });
+    configurarValidacion({ tipo: "email", selector: "input", id: "correo" });
+
+    // configurarValidacion({ tipo: "email", selector: "input", id: "correo" });
+    // configurarValidacion({ tipo: "email", selector: "input", id: "correo" });
+
+    configurarValidacion({ tipo: "checkbox", selector: "input", id: "verificacion" });
+
+
+    validarFormularioGlobal("form");
+
+</script>
+
+
+
 {% endblock %}

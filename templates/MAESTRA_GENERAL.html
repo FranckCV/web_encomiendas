@@ -8,7 +8,6 @@
 {% endblock %}
 <title>
   {% block titulo %}
-
   {% endblock %}| {{ SYSTEM_NAME }}
 </title>
 {% endblock %}
@@ -51,38 +50,43 @@
     </a>
   </nav>
 
-  <a href="{{ url_for('login') }}" class="account-area">
-    <div class="user-icon">
-      <!-- <i class="fa-regular fa-user"></i> -->
-      <i class="
+  <div class="account-block {% if tipoUsuario == 'C' %} user_c {% endif %}">
+    <a href="{{ url_for('login') }}" class="account-area">
+
+      <div class="user-icon">
+        <i class="
         {% if tipoUsuario == 'E' %}
-            {{ ICON_PAGE_PANEL }}
-          {% elif tipoUsuario == 'C' %}
-            
-          fa-solid fa-user
-
-          {% else %}
-            
-          fa-solid fa-user
-
-          {% endif %}
-        
-        ">
-
-      </i>
-    </div>
-    <div class="user-text">
-      <p>
-        {% if tipoUsuario == 'E' %}
-        Panel Administrativo
+          {{ ICON_PAGE_PANEL }}
         {% elif tipoUsuario == 'C' %}
-        Mi perfil
+          fa-solid fa-user
         {% else %}
-        Iniciar sesión
+          fa-regular fa-user
         {% endif %}
-      </p>
-    </div>
-  </a>
+        ">
+        </i>
+      </div>
+
+      <div class="user-text">
+        <p>
+          {% if tipoUsuario == 'E' %}
+          Panel Administrativo
+          {% elif tipoUsuario == 'C' %}
+          Mi perfil
+          {% else %}
+          Iniciar sesión
+          {% endif %}
+        </p>
+      </div>
+
+    </a>
+
+    {% if tipoUsuario == 'C' %}
+    <a class="account-logout" href="{{url_for('logout')}}">
+      <i class="fa-solid fa-right-from-bracket"></i>
+    </a>
+    {% endif %}
+  </div>
+
 </header>
 
 <div class="secondary-menu">
@@ -236,6 +240,7 @@
 <script src="/static/js/common_scripts/bootstrap.bundle.min.js"></script>
 <script src="/static/js/common_scripts/bootstrap.min.js"></script>
 <script src="/static/js/common_scripts/common_script.js"></script>
+<script src="/static/js/actualizar_carrito.js"></script>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
@@ -254,10 +259,10 @@
         }
       })
     })
+    actualizarCantidadCarrito();
   })
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-
 {% block scripts %}
 
 {% endblock %}

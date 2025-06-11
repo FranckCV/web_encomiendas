@@ -25,6 +25,7 @@ section.general_element {
     /* background-color: var(--white); */
     border-radius: 10px;
     padding: 20px;
+    padding-top: 0px;
     /* box-shadow: 0 3px 10px rgba(0,0,0,0.1); */
     /* margin-top: 20px; */
 }
@@ -86,6 +87,10 @@ select:focus, input:focus {
     border-color: var(--primary-color);
 }
 
+input[type="number"] {
+    text-align: end;
+}
+
 .radio-group {
     display: flex;
     gap: 20px;
@@ -107,7 +112,7 @@ select:focus, input:focus {
 }
 
 .price-section {
-    background-color: var(--secondary-color);
+    background-color: var(--color4);
     color: var(--white);
     padding: 15px 20px;
     border-radius: 5px;
@@ -120,10 +125,6 @@ select:focus, input:focus {
 .space_button {
     text-align: center;
     /* margin-top: 20px; */
-}
-
-.price-text {
-    /* font-size: 18px; */
 }
 
 .price-amount {

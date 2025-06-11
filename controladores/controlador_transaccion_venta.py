@@ -1,18 +1,19 @@
 from controladores.bd import (
     sql_execute_lastrowid,
     sql_execute,
-    sql_select_fetchone
+    sql_select_fetchone,
+    sql_select_fetchall
 )
 
 
-def obtener_transaccion_provisional(clienteid, tipo_comprobanteid=2):
+def obtener_transaccion_provisional(clienteid):
     sql = '''
         SELECT num_serie FROM transaccion_venta
-        WHERE clienteid = %s AND tipo_comprobanteid = %s AND estado = 0
+        WHERE clienteid = %s AND estado = 0
         ORDER BY num_serie DESC
         LIMIT 1
     '''
-    result = sql_select_fetchone(sql, (clienteid, tipo_comprobanteid))
+    result = sql_select_fetchone(sql, (clienteid,))
     
     # 🔒 Validación de error
     if isinstance(result, Exception):
@@ -37,14 +38,14 @@ def agregar_detalle_venta(articuloid, ventanum_serie, ventatipo_comprobanteid, c
     return sql_execute(sql, (articuloid, ventanum_serie, ventatipo_comprobanteid, cantidad))
 
 
-def actualizar_monto_total(ventanum_serie, ventatipo_comprobanteid):
+def actualizar_monto_total(ventanum_serie):
     sql = '''
         SELECT SUM(dv.cantidad * a.precio) AS total
         FROM detalle_venta dv
         JOIN articulo a ON dv.articuloid = a.id
-        WHERE dv.ventanum_serie = %s AND dv.ventatipo_comprobanteid = %s
+        WHERE dv.ventanum_serie = %s 
     '''
-    total = sql_select_fetchone(sql, (ventanum_serie, ventatipo_comprobanteid))
+    total = sql_select_fetchone(sql, (ventanum_serie,))
     if total and total.get("total") is not None:
         update_sql = '''
             UPDATE transaccion_venta
@@ -56,7 +57,7 @@ def actualizar_monto_total(ventanum_serie, ventatipo_comprobanteid):
 
 def registrar_detalle_venta(clienteid, tipo_comprobanteid, articuloid, cantidad):
     # Paso 1: Buscar si ya existe transacción provisional
-    transaccion = obtener_transaccion_provisional(clienteid, tipo_comprobanteid)
+    transaccion = obtener_transaccion_provisional(clienteid)
 
     if not transaccion:
         # Paso 2: Crear transacción provisional nueva
@@ -68,6 +69,122 @@ def registrar_detalle_venta(clienteid, tipo_comprobanteid, articuloid, cantidad)
     agregar_detalle_venta(articuloid, num_serie, tipo_comprobanteid, cantidad)
 
     # Paso 4: Actualizar total
-    actualizar_monto_total(num_serie, tipo_comprobanteid)
+    actualizar_monto_total(num_serie)
 
     return num_serie
+
+def obtener_carrito_cliente(clienteid: int):
+    transaccion = obtener_transaccion_provisional(clienteid)
+    if not transaccion:
+        return []
+
+    num_serie = transaccion.get("num_serie")
+
+    sql = '''
+        SELECT 
+            dv.articuloid AS id,
+            a.nombre AS name,
+            CAST(a.precio AS DECIMAL(10,2)) AS originalPrice,
+            dv.cantidad AS quantity,
+            a.img as image,
+
+            -- Descuentos
+            MAX(CASE 
+                WHEN REGEXP_SUBSTR(des.nombre, '[0-9]+') IS NOT NULL AND 
+                     CAST(REGEXP_SUBSTR(des.nombre, '[0-9]+') AS UNSIGNED) = vol.min_vol THEN des_art.cantidad_descuento
+                ELSE NULL END) AS precio_unitario_2,
+
+            MAX(CASE 
+                WHEN REGEXP_SUBSTR(des.nombre, '[0-9]+') IS NOT NULL AND 
+                     CAST(REGEXP_SUBSTR(des.nombre, '[0-9]+') AS UNSIGNED) = vol.max_vol THEN des_art.cantidad_descuento
+                ELSE NULL END) AS precio_unitario_3,
+
+            vol.min_vol AS cantidad_precio_unitario_2,
+            vol.max_vol AS cantidad_precio_unitario_3
+
+        FROM detalle_venta dv
+        JOIN articulo a ON dv.articuloid = a.id
+        LEFT JOIN descuento_articulo des_art ON des_art.articuloid = a.id
+        LEFT JOIN descuento des ON des.id = des_art.descuentoid
+
+        LEFT JOIN (
+            SELECT 
+                da.articuloid,
+                MIN(CAST(REGEXP_SUBSTR(d.nombre, '[0-9]+') AS UNSIGNED)) AS min_vol,
+                MAX(CAST(REGEXP_SUBSTR(d.nombre, '[0-9]+') AS UNSIGNED)) AS max_vol
+            FROM descuento_articulo da
+            JOIN descuento d ON d.id = da.descuentoid
+            GROUP BY da.articuloid
+        ) AS vol ON vol.articuloid = a.id
+
+        WHERE dv.ventanum_serie = %s
+        GROUP BY dv.articuloid, a.nombre, a.precio, dv.cantidad, a.img, vol.min_vol, vol.max_vol
+    '''
+
+    return sql_select_fetchall(sql, (num_serie,))
+
+def eliminar_detalle_venta(articuloid, ventanum_serie):
+    sql = '''
+        DELETE FROM detalle_venta
+        WHERE articuloid = %s AND ventanum_serie = %s
+    '''
+    return sql_execute(sql, (articuloid, ventanum_serie))
+
+
+def eliminar_todo_detalle_venta(ventanum_serie):
+    sql = '''
+        DELETE FROM detalle_venta
+        WHERE ventanum_serie = %s
+    '''
+    return sql_execute(sql, (ventanum_serie,))
+
+
+# def obtener_carrito_cliente_contipocomprobante(clienteid: int, tipo_comprobanteid: int = 2):
+#     transaccion = obtener_transaccion_provisional(clienteid, tipo_comprobanteid)
+#     if not transaccion:
+#         return []
+
+#     num_serie = transaccion.get("num_serie")
+
+#     sql = '''
+#         SELECT 
+#             dv.articuloid AS id,
+#             a.nombre AS name,
+#             CAST(a.precio AS DECIMAL(10,2)) AS originalPrice,
+#             dv.cantidad AS quantity,
+#             a.img as image,
+
+#             -- Descuentos
+#             MAX(CASE 
+#                 WHEN REGEXP_SUBSTR(des.nombre, '[0-9]+') IS NOT NULL AND 
+#                      CAST(REGEXP_SUBSTR(des.nombre, '[0-9]+') AS UNSIGNED) = vol.min_vol THEN des_art.cantidad_descuento
+#                 ELSE NULL END) AS precio_unitario_2,
+
+#             MAX(CASE 
+#                 WHEN REGEXP_SUBSTR(des.nombre, '[0-9]+') IS NOT NULL AND 
+#                      CAST(REGEXP_SUBSTR(des.nombre, '[0-9]+') AS UNSIGNED) = vol.max_vol THEN des_art.cantidad_descuento
+#                 ELSE NULL END) AS precio_unitario_3,
+
+#             vol.min_vol AS cantidad_precio_unitario_2,
+#             vol.max_vol AS cantidad_precio_unitario_3
+
+#         FROM detalle_venta dv
+#         JOIN articulo a ON dv.articuloid = a.id
+#         LEFT JOIN descuento_articulo des_art ON des_art.articuloid = a.id
+#         LEFT JOIN descuento des ON des.id = des_art.descuentoid
+
+#         LEFT JOIN (
+#             SELECT 
+#                 da.articuloid,
+#                 MIN(CAST(REGEXP_SUBSTR(d.nombre, '[0-9]+') AS UNSIGNED)) AS min_vol,
+#                 MAX(CAST(REGEXP_SUBSTR(d.nombre, '[0-9]+') AS UNSIGNED)) AS max_vol
+#             FROM descuento_articulo da
+#             JOIN descuento d ON d.id = da.descuentoid
+#             GROUP BY da.articuloid
+#         ) AS vol ON vol.articuloid = a.id
+
+#         WHERE dv.ventanum_serie = %s AND dv.ventatipo_comprobanteid = %s
+#         GROUP BY dv.articuloid, a.nombre, a.precio, dv.cantidad, a.img, vol.min_vol, vol.max_vol
+#     '''
+
+#     return sql_select_fetchall(sql, (num_serie, tipo_comprobanteid))

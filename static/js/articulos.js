@@ -258,6 +258,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     alert(
       `Agregaste ${producto.quantity} × ${producto.name} al carrito\nUnitario: S/ ${producto.unitPrice.toFixed(2)}\nTotal: S/ ${producto.totalPrice.toFixed(2)}`
     );
+
+    actualizarCantidadCarrito();
   });
 
   // Agregar estilos para descuentos activos

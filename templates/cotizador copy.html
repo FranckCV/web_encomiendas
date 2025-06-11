@@ -16,75 +16,76 @@ Cotizador de Tarifas de Envío
 {% block contenido %}
 
 <div class="container">
+    <h1 class="head_title titulo-cajas">
+        Cotizador de Tarifas de Envío
+    </h1>
+
     <div class="calculator-section">
-        <h2 class="section-title">COTIZADOR</h2>
-        
+        <!-- <h3 class="section-title">COTIZADOR</h3> -->
+
         <form id="shipping-form">
             <div class="form-group">
                 <label>¿DÓNDE TE ENCUENTRAS?</label>
                 <div class="form-row">
                     <div class="form-col">
+                        <input id="origin-code" required type="text" placeholder="Código de ubigeo" maxlength="6">
+                    </div>
+                    <div class="form-col">
                         <select id="origin-department" required>
-                            <option value="">Departamentos</option>
-                            {% for departamento in departamentos %}
-                            <option value="{{departamento}}">{{departamento}}</option>
-                            {% endfor %}
+                             <option value="">Departamentos</option>
+                            <!--{% for dept in departamentos %}
+                            {% set name = dept.get('departamento') %}
+                            <option value="{{ name }}">{{ name }}</option>
+                            {% endfor %} -->
                         </select>
                     </div>
                     <div class="form-col">
                         <select id="origin-province">
                             <option value="">Provincias</option>
                             <option value="" disabled>Selecciona un departamento </option>
-                            {% for provincia in provincias %}
-                            <option data-departamento="{{provincia[0]}}" value="{{provincia[1]}}">{{provincia[1]}}</option>
-                            {% endfor %}
+
                         </select>
                     </div>
                     <div class="form-col">
                         <select id="origin-district">
                             <option value="">Distritos</option>
                             <option value="" disabled>Selecciona una provincia </option>
-                            {% for distrito in distritos %}
-                            <option data-provincia="{{distrito[2]}}" value="{{distrito[0]}}">{{distrito[3]}}</option>
-                            {% endfor %}
+
                         </select>
                     </div>
                 </div>
             </div>
-            
+
             <div class="form-group">
                 <label>¿A DÓNDE LO LLEVAMOS?</label>
                 <div class="form-row">
                     <div class="form-col">
+                        <input id="destination-code" required type="text" placeholder="Código de ubigeo" maxlength="6">
+                    </div>
+                    <div class="form-col">
                         <select id="destination-department">
-                            <option value="">Departamento</option>
-                            <option value="lima">Lima</option>
-                            <option value="arequipa">Arequipa</option>
-                            <option value="cusco">Cusco</option>
-                            <option value="trujillo">La Libertad</option>
-                            <option value="piura">Piura</option>
+                            <option value="">Departamentos</option>
+                            <!-- {% for dept in departamentos %}
+                            {% set name = dept.get('departamento') %}
+                            <option value="{{ name }}">{{ name }}</option>
+                            {% endfor %} -->
                         </select>
                     </div>
                     <div class="form-col">
                         <select id="destination-province">
-                            <option value="">Provincia</option>
-                            <option value="lima">Lima</option>
-                            <option value="callao">Callao</option>
+                            <option value="">Provincias</option>
+                            <option value="" disabled>Selecciona un departamento </option>
                         </select>
                     </div>
                     <div class="form-col">
                         <select id="destination-district">
-                            <option value="">Distrito</option>
-                            <option value="miraflores">Miraflores</option>
-                            <option value="san_isidro">San Isidro</option>
-                            <option value="surco">Santiago de Surco</option>
-                            <option value="san_borja">San Borja</option>
-                            <option value="la_molina">La Molina</option>
+                            <option value="">Distritos</option>
+                            <option value="" disabled>Selecciona una provincia </option>
                         </select>
                     </div>
                 </div>
             </div>
-            
+
             <div class="form-row">
                 <div class="form-col">
                     <label>¿LO RECOGEMOS?</label>
@@ -93,7 +94,7 @@ Cotizador de Tarifas de Envío
                         <option value="yes">Con recojo</option>
                     </select>
                 </div>
-                
+
                 <div class="form-col">
                     <label>¿QUÉ QUIERES ENVIAR?</label>
                     <div class="radio-group">
@@ -108,7 +109,7 @@ Cotizador de Tarifas de Envío
                     </div>
                 </div>
             </div>
-            
+
             <div class="form-group">
                 <label>¿CUÁNTO PESA?</label>
                 <div class="form-row">
@@ -123,19 +124,29 @@ Cotizador de Tarifas de Envío
                     </div>
                 </div>
             </div>
-            
-            <div class="price-section">
-                <div class="price-text">Precio estimado:</div>
-                <div class="price-amount" id="price-display">S/ 0.00</div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 20px;">
-                <button type="button" class="btn" id="calculate-btn">COTIZAR</button>
+
+            <div class="form-group">
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="space_button">
+                            <button type="button" class="btn" id="calculate-btn">COTIZAR</button>
+                        </div>
+                    </div>
+
+                    <div class="form-col">
+                        <div class="price-section">
+                            <div class="price-text">Precio estimado:</div>
+                            <div class="price-amount" id="price-display">S/ 0.00</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </form>
-        
+
         <div class="notes">
-            <p>Las tarifas son referenciales. Las tarifas incluyen IGV. Precios válidos solo para el Servicio Regular y Partners de Lima a Provincias y de Lima a Lima. No incluye cargo adicional del seguro para envíos mayores a S/101.00 soles y envíos valorados. Se considera paquete desde 501 gramos.</p>
+            <p>Las tarifas son referenciales. Las tarifas incluyen IGV. Precios válidos solo para el Servicio Regular y
+                Partners de Lima a Provincias y de Lima a Lima. No incluye cargo adicional del seguro para envíos
+                mayores a S/101.00 soles y envíos valorados. Se considera paquete desde 501 gramos.</p>
         </div>
     </div>
 </div>
@@ -146,47 +157,195 @@ Cotizador de Tarifas de Envío
 {% block scripts %}
 
 <script>
+
+    // const originDept = document.getElementById('origin-department').value;
+    // const originProv = document.getElementById('origin-province').value;
+    // const originDist = document.getElementById('origin-district').value;
+    // const destDept = document.getElementById('destination-department').value;
+    // const destProv = document.getElementById('destination-province').value;
+    // const destDist = document.getElementById('destination-district').value;
+
+    const originCode = document.getElementById('origin-code');
+    const originDept = document.getElementById('origin-department');
+    const originProv = document.getElementById('origin-province');
+    const originDist = document.getElementById('origin-district');
+    const destCode = document.getElementById('destination-code');
+    const destDept = document.getElementById('destination-department');
+    const destProv = document.getElementById('destination-province');
+    const destDist = document.getElementById('destination-district');
+
+    const pickup = document.getElementById('pickup-option').value;
+    const packageType = document.querySelector('input[name="package-type"]:checked').value;
+    const weight = parseFloat(document.getElementById('weight').value) || 0;
+    const weightUnit = document.getElementById('weight-unit').value;
+    const btnCalculate = document.getElementById('calculate-btn');
+
+    let DEPARTAMENTOS = {{ departamentos | tojson }};
+    let PROVINCIAS = {{ provincias | tojson }};
+    let DISTRITOS = {{ distritos | tojson }};
     
+    
+    let DEPARTAMENTOS_RUTAS = {{ departamentos | tojson }};
+    // let PROVINCIAS_RUTAS = {{ provincias | tojson }};
+    // let DISTRITOS_RUTAS = {{ distritos | tojson }};
+    
+
+    function fillMainSelect(select, data , word) {
+        for (const key of data) {
+            let name = key[word];
+            select.innerHTML += `
+                <option value="${name}">
+                    ${name}
+                </option>
+            `
+        }
+    }
+
+    fillMainSelect(originDept , DEPARTAMENTOS , 'departamento');    
+
+
+    // fillMainSelect(originDept , DEPARTAMENTOS , 'departamento');
+
+    function addOptionsToSelect(s_dept, s_prov, s_dist, i_code, f_prov, f_dist) {
+        s_dept.addEventListener('change', () => {
+            s_prov.innerHTML = '';
+            if (s_dept.value == null || s_dept.value == '') {
+                s_prov.innerHTML = `
+                    <option value="">Provincias</option>
+                    <option value="" disabled>Selecciona un departamento </option>
+                `
+                i_code.value = null;
+                s_dist.innerHTML = `
+                    <option value="">Distritos</option>
+                    <option value="" disabled>Selecciona una provincia </option>
+                `
+            } else {
+                s_prov.innerHTML += `
+                    <option value="" disabled selected>Selecciona una provincia </option>
+                `
+                for (const key of f_prov) {
+                    if (key.departamento == s_dept.value) {
+                        s_prov.innerHTML += `
+                    <option value="${key.provincia}">
+                        ${key.provincia}
+                    </option>
+                `
+                    }
+                }
+            }
+        });
+
+        s_prov.addEventListener('change', () => {
+            s_dist.innerHTML = '';
+            if (s_prov.value == null || s_prov.value == '') {
+                s_dist.innerHTML += `
+                <option value="">Distritos</option>
+                <option value="" disabled>Selecciona una provincia </option>
+            `
+            } else {
+                s_dist.innerHTML += `
+                <option value="" disabled selected>Selecciona un distrito </option>
+            `
+                for (const key of f_dist) {
+                    if (key.provincia == s_prov.value) {
+                        s_dist.innerHTML += `
+                    <option value="${key.codigo}">
+                        ${key.distrito}
+                    </option>
+                `
+                    }
+                }
+            }
+        });
+
+        s_dist.addEventListener('change', () => {
+            i_code.value = '';
+            if (s_dist.value == null || s_dist.value == '') {
+                i_code.value = null;
+            } else {
+                for (const key of f_dist) {
+                    if (key.codigo == s_dist.value) {
+                        i_code.value = `${key.codigo}`;
+                    }
+                }
+            }
+        });
+    }
+
+    addOptionsToSelect(originDept, originProv, originDist, originCode, PROVINCIAS, DISTRITOS);
+    // addOptionsToSelect(destDept, destProv, destDist, destCode);
+
+
+
+
+
+
+
+
+
+    // originDept.addEventListener('change', () => {
+    //     originProv.innerHTML = '';
+    //     if (originDept.value == null || originDept.value == '') {
+    //         originProv.innerHTML += `
+    //             <option value="">Provincias</option>
+    //             <option value="" disabled>Selecciona un departamento </option>
+    //         `
+    //     } else {
+    //         originProv.innerHTML += `
+    //             <option value="" disabled selected>Selecciona un departamento </option>
+    //         `
+    //         for (const key of PROVINCIAS) {
+    //             if (key.departamento == originDept.value) {
+    //                 originProv.innerHTML += `
+    //                 <option value="${key.provincia}">
+    //                     ${key.provincia}
+    //                 </option>
+    //             `
+    //             }
+    //         }
+    //     }
+    // });
+
+    // originProv.addEventListener('change', () => {
+    //     originDist.innerHTML = '';
+    //     if (originProv.value == null || originProv.value == '') {
+    //         originDist.innerHTML += `
+    //             <option value="">Distritos</option>
+    //             <option value="" disabled>Selecciona una provincia </option>
+    //         `
+    //     } else {
+    //         originDist.innerHTML += `
+    //             <option value="" disabled selected>Selecciona una provincia </option>
+    //         `
+    //         for (const key of DISTRITOS) {
+    //             if (key.provincia == originProv.value) {
+    //                 originDist.innerHTML += `
+    //                 <option value="${key.codigo}">
+    //                     ${key.distrito}
+    //                 </option>
+    //             `
+    //             }
+    //         }
+    //     }
+    // });
+
+    // originDist.addEventListener('change', () => {
+    //     originCode.value = '';
+    //     if (originDist.value == null || originDist.value == '') {
+    //         originCode.value = null;
+    //     } else {
+    //         for (const key of DISTRITOS) {
+    //             if (key.codigo == originDist.value) {
+    //                 originCode.value = `${key.codigo}`;
+    //             }
+    //         }
+    //     }
+    // });
 </script>
 
 <!-- <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Simular carga de opciones en los selectores
-        function loadDepartments() {
-            // Aquí podrías cargar los departamentos desde una API o base de datos
-            console.log('Departamentos cargados');
-        }
-        
-        function updateProvinces(department) {
-            // Simular actualización de provincias según el departamento seleccionado
-            console.log(`Actualizando provincias para: ${department}`);
-        }
-        
-        function updateDistricts(province) {
-            // Simular actualización de distritos según la provincia seleccionada
-            console.log(`Actualizando distritos para: ${province}`);
-        }
-        
-        // Cargar departamentos al inicio
-        loadDepartments();
-        
-        // Eventos para actualizar provincias y distritos
-        document.getElementById('origin-department').addEventListener('change', function() {
-            updateProvinces(this.value);
-        });
-        
-        document.getElementById('destination-department').addEventListener('change', function() {
-            updateProvinces(this.value);
-        });
-        
-        document.getElementById('origin-province').addEventListener('change', function() {
-            updateDistricts(this.value);
-        });
-        
-        document.getElementById('destination-province').addEventListener('change', function() {
-            updateDistricts(this.value);
-        });
-        
+                
         // Cálculo de tarifa
         document.getElementById('calculate-btn').addEventListener('click', function() {
             // Obtener todos los valores del formulario
