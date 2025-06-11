@@ -2581,7 +2581,7 @@ def dashboard(module_name):
 
 
 @app.route("/crud=<tabla>")
-# @validar_empleado()
+@validar_empleado()
 def crud_generico(tabla):
     config = CONTROLADORES.get(tabla)
     page = permiso.get_pagina_key(tabla)
