@@ -32,7 +32,7 @@ def get_modulo_key(key):
         where mdl.key = %s
     '''
     filas = bd.sql_select_fetchone(sql,(key))
-    return  filas
+    return  filas if key else None
 
 
 def get_tipos_pagina_moduloid(id):
@@ -53,6 +53,23 @@ def get_tipos_pagina_moduloid(id):
 
 
 def get_pagina_key(key):
+    sql= f'''
+        select 
+            pag.id ,
+            pag.titulo ,
+            pag.icono ,
+            pag.activo ,
+            pag.key ,
+            pag.tipo_paginaid , 
+            pag.moduloid 
+        from pagina pag
+        where pag.key = %s
+    '''
+    filas = bd.sql_select_fetchone(sql,(key))
+    return  filas if key else None
+
+
+def get_permiso_pagina_key(key):
     sql= f'''
         select 
             pag.id ,
@@ -239,7 +256,75 @@ def update_pagina( id , titulo , icono , moduloid ):
 
 ############################################################
 
-def get_paginas_permiso_rol( rolid):
+
+def get_modulos_rol(rolid):
+    sql= f'''
+        SELECT 
+            mdl.id,
+            mdl.nombre,
+            mdl.icono,
+            mdl.key,
+            mdl.color,
+            mdl.activo,
+            mdl.img,
+            COUNT(CASE WHEN per.acceso = 1 THEN 1 END) AS cantidad_paginas_con_acceso
+        FROM pagina pag
+        INNER JOIN modulo mdl ON mdl.id = pag.moduloid
+        LEFT JOIN permiso per ON per.paginaid = pag.id AND per.rolid = {rolid}
+        WHERE pag.activo = 1
+        GROUP BY mdl.id, mdl.nombre, mdl.icono, mdl.key, mdl.color, mdl.activo, mdl.img
+        HAVING cantidad_paginas_con_acceso > 0
+        ORDER BY mdl.nombre
+    '''
+    data = bd.sql_select_fetchall(sql)
+    return  data
+
+
+def get_tipo_paginas_rol(rolid):
+    sql= f'''
+        SELECT 
+            tp.id,
+            tp.nombre,
+            m.id AS moduloid,
+            m.nombre AS modulo,
+            COUNT(CASE WHEN per.acceso = 1 THEN 1 END) AS cant
+        FROM tipo_pagina tp
+        CROSS JOIN modulo m
+        LEFT JOIN pagina p ON p.tipo_paginaid = tp.id AND p.moduloid = m.id AND p.activo = 1
+        LEFT JOIN permiso per ON per.paginaid = p.id AND per.rolid = {rolid}
+        GROUP BY tp.id, tp.nombre, m.id, m.nombre
+        HAVING cant > 0
+        ORDER BY m.nombre, tp.nombre;
+
+    '''
+    data = bd.sql_select_fetchall(sql)
+    return  data
+
+
+def get_modulo_permiso_rol(rolid , moduloid):
+    sql= f'''
+        SELECT 
+            pag.id as paginaid, 
+            per.acceso ,
+            per.search ,
+            per.consult ,
+            per.insert ,
+            per.update ,
+            per.delete ,
+            per.unactive 
+        FROM rol
+        CROSS JOIN pagina pag 
+        inner join modulo mdl on mdl.id = pag.moduloid
+        inner join tipo_pagina tip on tip.id = pag.tipo_paginaid
+        LEFT JOIN permiso per ON per.rolid = rol.id AND per.paginaid = pag.id
+        WHERE rol.id = {rolid} and rol.activo = 1  and pag.moduloid = {moduloid} 
+        order by pag.titulo
+    '''
+    data = bd.sql_select_fetchall(sql)
+    return  data
+
+
+def get_paginas_permiso_rol( rolid ):
     sql= f'''
         SELECT 
             pag.id , 
@@ -263,7 +348,7 @@ def get_paginas_permiso_rol( rolid):
         inner join modulo mdl on mdl.id = pag.moduloid
         inner join tipo_pagina tip on tip.id = pag.tipo_paginaid
         LEFT JOIN permiso per ON per.rolid = rol.id AND per.paginaid = pag.id
-        WHERE rol.id = {rolid} and rol.activo = 1 and pag.activo = 1
+        WHERE rol.id = {rolid} and rol.activo = 1 and pag.activo = 1 
         order by pag.titulo
     '''
     data = bd.sql_select_fetchall(sql)
@@ -274,12 +359,14 @@ def consult_permiso_rol( paginaid, rolid):
     sql= f'''
         SELECT 
             rol.* ,
+            rol.activo as rol_activo ,
             per.* ,
-            pag.*
+            pag.* ,
+            pag.activo as pag_activo 
         FROM rol
         CROSS JOIN pagina pag  
         LEFT JOIN permiso per ON per.rolid = rol.id AND per.paginaid = pag.id
-        WHERE rol.id = {rolid} and pag.id = {paginaid} and rol.activo = 1 and pag.activo = 1
+        WHERE rol.id = {rolid} and pag.id = {paginaid} and rol.activo = 1 
     '''
     data = bd.sql_select_fetchone(sql)
     return  data
@@ -293,132 +380,78 @@ def nuevo_permiso_pagina_rol( paginaid , rolid):
     bd.sql_execute(sql, (paginaid , rolid))
 
 
-def update_permiso_pagina(column , paginaid , rolid):
+def update_permiso_pagina(column , paginaid , rolid , value = None):
     sql = f'''
         update permiso set 
-        `{column}` = NOT `{column}`
+        `{column}` = {value if value is not None else f'NOT `{column}`' }
         where paginaid = {paginaid} and rolid = {rolid}
     '''
     bd.sql_execute(sql)
 
 
-def change_permiso_pagina(column , paginaid , rolid):
+def change_permiso_pagina(column , paginaid , rolid , value = None):
     data = consult_permiso_rol( paginaid , rolid)
-    # print(paginaid)
-    # print(rolid)
-    # print('pre if')
-    # print(data['paginaid'])
-    # print(data['rolid']) 
     if data['paginaid'] is not None and data['rolid'] is not None: 
-        # print('post if')
-        update_permiso_pagina(column , paginaid , rolid)
+        update_permiso_pagina(column , paginaid , rolid , value)
     else:
         nuevo_permiso_pagina_rol( paginaid , rolid)
-        update_permiso_pagina(column , paginaid , rolid)
+        update_permiso_pagina(column , paginaid , rolid , value)
 
 
-def change_permiso_modulo(column , moduloid , rolid):
+def change_permiso_modulo(column , moduloid , rolid , value = None):
     filas = get_paginas_moduloid(moduloid)
     for pagina in filas:
-        change_permiso_pagina(column , pagina['id'] , rolid)
+        change_permiso_pagina(column , pagina['id'] , rolid , value)
+    
+
+def validar_acceso(rolid , f_name , f_kwarg ):
+    if f_name == 'panel' :
+        return True
+    elif f_name == 'dashboard' :
+        menu_modulos = get_modulos_rol(rolid)
+        keys = [modulo['key'] for modulo in menu_modulos]
+        if f_kwarg in keys:
+            return True
+        return None
+    elif f_name == 'crud_generico' or f_name == 'reporte' or f_name.startswith('crud_') :
+        page = get_pagina_key(f_kwarg)
+        if page:
+            pag_id = page['id']
+            permiso_rol = consult_permiso_rol(pag_id , rolid)
+            if f_name.startswith('crud_') and f_name != 'crud_generico':
+                for op in ['insert' , 'update' , 'delete' , 'unactive']:
+                    if f_name == f'crud_{op}' and permiso_rol[op] == 1:
+                        return True
+            else:
+                acceso = permiso_rol['acceso']
+                return acceso if permiso_rol['pag_activo'] and permiso_rol['rol_activo'] else 0
+        return None
+    else :
+        page = get_pagina_key(f_name)
+        if page:
+            pag_id = page['id']
+            permiso_rol = consult_permiso_rol(pag_id , rolid)
+            acceso = permiso_rol['acceso']
+            return acceso if permiso_rol['pag_activo'] and permiso_rol['rol_activo'] else 0
+        return None
     
 
 
-    
+def get_permiso_rol( paginaid, rolid ):
+    sql= f'''
+        SELECT 
+            rol.* ,
+            rol.activo as rol_activo ,
+            per.* ,
+            pag.* ,
+            pag.activo as pag_activo 
+        FROM rol
+        CROSS JOIN pagina pag  
+        LEFT JOIN permiso per ON per.rolid = rol.id AND per.paginaid = pag.id
+        WHERE rol.id = {rolid} and pag.id = {paginaid} and rol.activo = 1 
+    '''
+    data = bd.sql_select_fetchone(sql)
+    return  data
 
 
-
-
-
-# #####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####
-
-
-# table_name = 'marca'
-
-# def get_info_columns():
-#     return bd.show_columns(table_name)
-
-
-# def get_primary_key():
-#     return bd.show_primary_key(table_name)
-
-
-# def exists_Activo():
-#     return bd.exists_column_Activo(table_name)
-
-
-# def delete_row( id ):
-#     bd.delete_row_table(table_name , id)
-
-
-# #####_ CAMBIAR SQL y DICT INTERNO _#####
-
-# def table_fetchall():
-#     sql= f'''
-#         select 
-#             id ,
-#             nombre
-#         from {table_name}
-#     '''
-#     resultados = bd.sql_select_fetchall(sql)
-    
-#     return resultados
-
-
-# def get_table():
-#     sql= f'''
-#         select 
-#             mar.id ,
-#             mar.nombre
-#         from {table_name} mar
-#     '''
-#     columnas = {
-#         'id': ['ID' , 0.5 ] , 
-#         'nombre' : ['Nombre' , 9.5] , 
-#         }
-#     filas = bd.sql_select_fetchall(sql)
-    
-#     return columnas , filas
-
-
-# ######_ CAMBIAR PARAMETROS Y SQL INTERNO _###### 
-
-# def unactive_row( id ):
-#     bd.unactive_row_table(table_name , id)
-
-
-# def insert_row( nombre ):
-#     sql = f'''
-#         INSERT INTO 
-#             {table_name} ( nombre )
-#         VALUES 
-#             ( %s )
-#     '''
-#     bd.sql_execute(sql,(nombre))
-
-
-# def update_row( id , nombre ):
-#     sql = f'''
-#         update {table_name} set 
-#         nombre = %s
-#         where {get_primary_key()} = {id}
-#     '''
-#     bd.sql_execute(sql,(nombre))
-
-
-# #####_ ADICIONALES _#####
-
-# def get_options_marca():
-#     sql= f'''
-#         select 
-#             id ,
-#             nombre
-#         from {table_name}
-#         order by nombre asc
-#     '''
-#     filas = bd.sql_select_fetchall(sql)
-    
-#     lista = [(fila["id"], fila["nombre"]) for fila in filas]
-
-#     return lista
 

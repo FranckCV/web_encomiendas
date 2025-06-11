@@ -12,13 +12,11 @@
 
 {% block estilos %}
 
-{% if esReporte %}
 <style>
   .td_content {
-    height: 30px;
+    min-height: 30px;
   }
 </style>
-{% endif %}
 
 {% endblock %}
 
@@ -31,11 +29,7 @@
     <i class="{{icon_page_crud}}"></i>
     {% endif %}
 
-    {% if esReporte %}
-    {{titulo }}
-    {% else %}
-    {{NOMBRE_CRUD_PAGE}} {{titulo | lower}}
-    {% endif %}
+    {{ titulo }}
   </h3>
 </div>
 

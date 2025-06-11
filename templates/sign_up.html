@@ -21,6 +21,13 @@
         grid-column: span 3;
     }
 
+    option {
+        color: black;
+    }
+    
+    option[disabled] {
+        color: #b0b0b0;
+    }
 
 </style>
 {% endblock %}
@@ -33,6 +40,9 @@
 <div class="input_box">
     <select name="" id="">
         <option value="-1" selected disabled>Tipo de Cliente</option>
+        {% for opt in opts_tipo_cliente %}
+        <option value="{{opt[0]}}">{{opt[1]}}</option>
+        {% endfor %}
     </select>
     <!-- <i class="fa-solid fa-id-card"></i> -->
 </div>
@@ -40,7 +50,9 @@
 <div class="input_box">
     <select name="" id="">
         <option value="-1" selected disabled>Tipo de Documento</option>
-
+        {% for opt in opts_tipo_documento %}
+        <option value="{{opt[0]}}">{{opt[1]}}</option>
+        {% endfor %}
     </select>
     <!-- <i class="fa-solid fa-id-card"></i> -->
 </div>

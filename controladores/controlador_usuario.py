@@ -169,17 +169,29 @@ def get_usuario_cliente_por_id(user_id):
             usu.correo ,
             usu.contrasenia ,
             usu.tipo_usuario ,
-            usu.activo 
+            usu.activo ,
+            cli.id as cli_id ,
+            cli.telefono ,
+            cli.num_documento ,
+            cli.nombre_siglas ,
+            cli.apellidos_razon ,
+            cli.tipo_documentoid ,
+            cli.tipo_clienteid ,
+            tdc.siglas as tdc_siglas,
+            tdc.nombre as tdc_nombre,
+            tcl.nombre as tcl_nombre
         from usuario usu
         inner join cliente cli on cli.correo = usu.correo
-        where usu.tipo_usuario = 'C' and usu.id = %s and usu.activo =1
+        left join tipo_documento tdc on tdc.id = cli.tipo_documentoid
+        left join tipo_cliente tcl on tcl.id = cli.tipo_clienteid
+        where usu.tipo_usuario = 'C' and usu.id = %s and usu.activo = 1;
     '''
 
     info = sql_select_fetchone(sql , (user_id))
     return info
 
 
-def get_usuario_empleado_por_id(user_id):
+def get_usuario_empleado_user_id(user_id):
     sql= f'''
         select 
             usu.id ,
@@ -192,6 +204,7 @@ def get_usuario_empleado_por_id(user_id):
             emp.apellidos ,
             emp.rolid ,
             rol.nombre as rol_nombre ,
+            rol.tipo_rolid ,
             tip.nombre as tip_nombre 
         from usuario usu
         inner join empleado emp on emp.correo = usu.correo
@@ -225,6 +238,7 @@ def get_report_usuarios():
     filas = sql_select_fetchall(sql)
     return columnas, filas
 
+
 def get_options():
     sql = '''
         SELECT 
@@ -238,3 +252,17 @@ def get_options():
     filas = sql_select_fetchall(sql)
     lista = [(fila['tipo_usuario'], fila['tipo_usuario']) for fila in filas]
     return lista
+
+
+def register_user( correo , contrasenia ):
+    sql = f'''
+        INSERT INTO 
+            usuario 
+            ( correo , contrasenia , tipo_usuario , activo )
+        VALUES 
+            ( %s , %s , 'C' , 1 )
+    '''
+    id = sql_execute_lastrowid(sql,( correo , contrasenia ))
+    return id
+
+

@@ -1,5 +1,5 @@
-INSERT INTO empresa (id, nombre, correo, nro_telefono, logo, color_pri, color_sec, color_ter) VALUES
-(1, 'New Olva', 'info@newolva.com', '+123 456 789', 'logo.png', '#1d4c82', '#13e2da', '#1b98e0');
+INSERT INTO empresa (id, nombre, correo, nro_telefono, logo, color_pri, color_sec, color_ter, `porcentaje_recojo`) VALUES
+(1, 'New Olva', 'info@newolva.com', '+123 456 789', 'logo.png', '#1d4c82', '#13e2da', '#1b98e0' , 5.00);
 
 
 INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo` , img) VALUES

@@ -108,7 +108,7 @@ CREATE TABLE empresa (
   color_pri           varchar(20) NOT NULL, 
   color_sec           varchar(20) NOT NULL, 
   color_ter           varchar(20) NOT NULL, 
-  porcentaje_garantia numeric(9, 2) NOT NULL, 
+  porcentaje_recojo numeric(9, 2) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE escala (
   sucursalid int(10) NOT NULL, 

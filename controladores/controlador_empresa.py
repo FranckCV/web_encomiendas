@@ -67,45 +67,20 @@ def table_fetchall():
 #     '''
 #     sql_execute(sql,(nombre))
 
-def update_row( nombre , correo , nro_telefono , logo, porcentaje_garantia , color_pri , color_sec , color_ter ):
+def update_row( nombre , correo , nro_telefono , logo, porcentaje_recojo , color_pri , color_sec , color_ter ):
     sql = f'''
         update {table_name} set 
         nombre = %s ,
         correo = %s ,
         nro_telefono = %s ,
         logo = %s ,
-        porcentaje_garantia = %s ,
+        porcentaje_recojo = %s ,
         color_pri = %s ,
         color_sec = %s ,
         color_ter = %s 
         where id = 1
     '''
-    sql_execute(sql,( nombre , correo , nro_telefono , logo, porcentaje_garantia , color_pri , color_sec , color_ter ))
-
-
-# def update_row( nombre , correo , nro_telefono , porcentaje_garantia , color_pri , color_sec , color_ter ):
-#     sql = f'''
-#         update {table_name} set 
-#         nombre = %s ,
-#         correo = %s ,
-#         nro_telefono = %s ,
-#         porcentaje_garantia = %s ,
-#         color_pri = %s ,
-#         color_sec = %s ,
-#         color_ter = %s 
-#         where id = 1
-#     '''
-#     sql_execute(sql,( nombre , correo , nro_telefono , porcentaje_garantia , color_pri , color_sec , color_ter ))
-
-
-# def update_img( logo ):
-#     sql = f'''
-#         update {table_name} set 
-#         logo = %s
-#         where id = 1
-#     '''
-#     sql_execute(sql,( logo ))
-
+    sql_execute(sql,( nombre , correo , nro_telefono , logo, porcentaje_recojo , color_pri , color_sec , color_ter ))
 
 
 def get_information():
@@ -134,7 +109,7 @@ def get_data():
             emp.nombre ,
             emp.correo ,
             emp.nro_telefono ,
-            emp.porcentaje_garantia , 
+            emp.porcentaje_recojo , 
             emp.logo,
             emp.color_pri ,
             emp.color_sec ,

@@ -73,15 +73,16 @@ def unactive_row( id ):
 #     sql_execute(sql,( titulo , icono , color ))
 
 
-def update_row( id , nombre , icono , color ):
+def update_row( id , nombre , icono , color , img):
     sql = f'''
         update modulo set 
             nombre = %s , 
             icono = %s , 
-            color = %s
+            color = %s ,
+            img = %s
         where id = %s
     '''
-    bd.sql_execute(sql,( nombre , icono , color , id ))
+    bd.sql_execute(sql,( nombre , icono , color ,img, id ))
 
 
 #####_ ADICIONALES _#####

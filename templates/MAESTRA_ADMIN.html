@@ -37,7 +37,7 @@
         </a>
     </div>
 
-    {% for modulo in modulos %}
+    {% for modulo in menu_modulos %}
     {% if modulo['id'] == cur_modulo_id %}
 
     <style>
@@ -90,18 +90,13 @@
 
     <div class="menu_option">
 
-        <!-- <a class="menu_title {{modulo['key']}}" href="{{url_for('dashboard', module_name = modulo['key'] )}}">
-            <p>{{ modulo['nombre'] }}</p>
-            <i class="{{ modulo['icono'] }}"></i>
-        </a> -->
-
         <a class="mod_title" href="{{url_for('dashboard', module_name = modulo['key'] )}}">
             <i class="{{ modulo.get('icono') }}"></i>
             <p> {{ modulo.get('nombre') }} </p>
         </a>
 
         <div class="menu_content">
-            {% for tipo_pag in tipos_paginas %}
+            {% for tipo_pag in menu_tipos_paginas %}
 
             {% if tipo_pag['moduloid'] == cur_modulo_id and tipo_pag['cant'] > 0 %}
             <div class="tip_block">
@@ -110,45 +105,42 @@
                 <div class="tip_content collapsed">
                     {% for page in menu_paginas %}
 
-                    {% if page['tipo_paginaid'] == tipo_pag['id'] and page['moduloid'] == cur_modulo_id %}
+                    {% if page['tipo_paginaid'] == tipo_pag['id'] and page['moduloid'] == cur_modulo_id    %}
+                        {% if (menu_rolid != 1 and page['acceso'] == 1) or menu_rolid == 1 %}
 
-                    {% if page['tipo_paginaid'] == 1 %}
-                    <a class="mu_page" href="{{url_for('crud_generico',tabla = page['key'] )}}">
-                        <i class="{{ page['icono'] or ICON_PAGE_CRUD }}"></i>
-                        <p>{{NOMBRE_CRUD_PAGE}} {{ page['titulo'] | lower }}</p>
-                    </a>
-                    {% elif page['tipo_paginaid'] == 2 %}
-                    <a class="mu_page" href="{{url_for(page['key'])}}">
-                        <i class="{{ page['icono'] }}"></i>
-                        <p>{{ page['titulo'] }}</p>
-                    </a>
-                    {% elif page['tipo_paginaid'] == 3 %}
+                            {% if page['tipo_paginaid'] == 1 %}
+                            <a class="mu_page" href="{{url_for('crud_generico',tabla = page['key'] )}}">
+                                <i class="{{ page['icono'] or ICON_PAGE_CRUD }}"></i>
+                                <p>{{NOMBRE_CRUD_PAGE}} {{ page['titulo'] | lower }}</p>
+                            </a>
+                            {% elif page['tipo_paginaid'] == 2 %}
+                            <a class="mu_page" href="{{url_for(page['key'])}}">
+                                <i class="{{ page['icono'] }}"></i>
+                                <p>{{ page['titulo'] }}</p>
+                            </a>
+                            {% elif page['tipo_paginaid'] == 3 %}
 
-                    {% elif page['tipo_paginaid'] == 4 %}
-                    <a class="mu_page" href="{{url_for('reporte',report_name = page['key'] )}}">
-                        <i class="{{ page['icono'] or ICON_PAGE_CRUD }}"></i>
-                        <p>{{ page['titulo'] }}</p>
-                    </a>
-                    {% elif page['tipo_paginaid'] == 5 %}
-
-                    {% endif %}
-
+                            {% elif page['tipo_paginaid'] == 4 %}
+                            <a class="mu_page" href="{{url_for('reporte',report_name = page['key'] )}}">
+                                <i class="{{ page['icono'] or ICON_PAGE_CRUD }}"></i>
+                                <p>{{ page['titulo'] }}</p>
+                            </a>
+                            {% elif page['tipo_paginaid'] == 5 %}
+                                aca debe haber un gráfico jsjsja lol
+                            {% endif %}
+                            
+                        {% endif %}
                     {% endif %}
 
                     {% endfor %}
-
+<!-- 
                     {% if tipo_pag['cant'] == 0 %}
                     <p class="text_none">Sin contenido</p>
-                    {% endif %}
+                    {% endif %} -->
                 </div>
             </div>
             {% endif %}
             {% endfor %}
-
-
-
-
-
 
         </div>
     </div>
