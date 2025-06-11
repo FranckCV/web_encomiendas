@@ -41,6 +41,7 @@ from controladores import controlador_salida as controlador_salida
 from controladores import controlador_reclamo as controlador_reclamo
 from controladores import controlador_preguntas_frecuentes as controlador_pregunta_frecuente
 from controladores import controlador_regla_cargo as controlador_regla_cargo
+from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 from controladores import reporte_ingresos as reporte_ingresos
 from controladores.bd import sql_execute
 from controladores import controlador_transaccion_venta as controlador_transaccion_venta
@@ -1891,6 +1892,7 @@ paginas_simples = [
     'salida_informacion',
     'cambiar_contrasenia',
     'programacion_devolucion',
+    'maestra_para_vb',
     # 'Faq'
 ]
 
