@@ -1,8 +1,6 @@
 {% extends 'MAESTRA_GENERAL.html' %}
 
-{% block titulo %}
-  Resumen de Envíos
-{% endblock %}
+{% block titulo %}Resumen de Envíos{% endblock %}
 
 {% block estilos %}
   <link rel="stylesheet" href="/static/css/resumen_envio.css" />
@@ -15,23 +13,17 @@
 
     <div class="steps-container">
       <div class="step completed">
-        <div class="circle">
-          <img src="/static/img/usuario.png" alt="Datos personales" />
-        </div>
+        <div class="circle"><img src="/static/img/usuario.png" alt="Datos personales" /></div>
         <p>Datos personales</p>
       </div>
       <div class="line"></div>
       <div class="step active">
-        <div class="circle">
-          <img src="/static/img/chek.png" alt="Confirma tus datos" />
-        </div>
+        <div class="circle"><img src="/static/img/chek.png" alt="Confirma tus datos" /></div>
         <p>Confirma tus datos</p>
       </div>
       <div class="line"></div>
       <div class="step">
-        <div class="circle">
-          <img src="/static/img/medio.png" alt="Medios de pago" />
-        </div>
+        <div class="circle"><img src="/static/img/medio.png" alt="Medios de pago" /></div>
         <p>Medios de pago</p>
       </div>
     </div>
@@ -41,7 +33,9 @@
     </div>
 
     <div>
-      <h5>Origen : <span id="origen-paquete"></span></h5>
+      <h5>Origen: 
+        <span id="origen-paquete"></span>
+      </h5>
     </div>
 
     <div class="tabla-scroll">
@@ -62,5 +56,19 @@
 {% endblock %}
 
 {% block scripts %}
+  <script>
+    // Inyectamos el array de envíos desde el servidor
+    const registros = {{ registros|tojson }};
+    // Mostramos el origen del primer envío
+    if (registros.length > 0) {
+      const o = registros[0].origen;
+      document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('origen-paquete').textContent =
+          `${o.departamento_origen} / ${o.provincia_origen} / ${o.distrito_origen}`;
+      });
+    }
+    // Hacemos disponible el array para el script de la tabla
+    window.REGISTROS = registros;
+  </script>
   <script src="{{ url_for('static', filename='js/resumen_envio.js') }}"></script>
 {% endblock %}

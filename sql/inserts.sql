@@ -8256,13 +8256,11 @@ values (28, 29, 80.00),
   (1, 28, 200.00),
   (2, 28, 180.00),
   (28, 59, 120.00),
-<<<<<<< HEAD
   (3,  5,  40.00),  
   (5,  1,  70.00),  
   (60, 28, 120.00);
 
-  
-=======
+
   (3, 5, 40.00),
   (5, 1, 70.00),
   (60, 28, 120.00);
@@ -8372,4 +8370,15 @@ INSERT INTO `permiso` (`paginaid`, `rolid`, `acceso`, `search`, `consult`, `inse
 (30, 13, 1, 0, 0, 0, 0, 0, 0),
 (31, 11, 1, 0, 0, 0, 0, 0, 0),
 (31, 13, 1, 0, 0, 0, 0, 0, 0);
->>>>>>> 9a756f02dc897d7fc93dc7acc964bcbb1a7196ab
+
+
+INSERT INTO `modalidad_pago` (`id`, `nombre`, `descripcion`, `activo`) VALUES
+(1, 'Remitente paga en línea',
+    'El remitente realiza el pago a través de medios electrónicos como tarjeta de crédito/débito, Yape u otras plataformas de pago en línea.',
+    1),
+(2, 'Remitente paga en sucursal',
+    'El remitente efectúa el pago directamente en la sucursal al momento de registrar el envío.',
+    1),
+(3, 'Destinatario paga contraentrega',
+    'El destinatario realiza el pago en el momento de recibir el paquete en su domicilio o sucursal.',
+    1);

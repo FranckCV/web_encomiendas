@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json  #, after_this_request, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort  #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import permiso as permiso
 from controladores import controlador_pagina as controlador_pagina
@@ -52,6 +52,7 @@ from controladores import controlador_modalidad_pago as controlador_modalidad_pa
 from controladores import controlador_encomienda as controlador_encomienda
 
 
+from decimal import Decimal
 
 import hashlib
 import os
@@ -2055,6 +2056,8 @@ def api_calculate_tarifa():
         return jsonify({"error": str(e)}), 500
 
 
+
+
 @app.route("/api/datos_destino", methods=["GET"])
 def api_sucursales_por_ubigeo():
     sucursal_id = request.args.get("sucursal_id")
@@ -2412,9 +2415,52 @@ def seguimiento_encomienda():
     estado_encomienda = controlador_estado_encomienda.get_last_state()
     return render_template('seguimiento.html',estado_encomienda=estado_encomienda)
 
-@app.route('/resumen_envio')
-def mostrar_resumen():
-    return render_template('resumen_envio.html') 
+
+
+@app.route('/resumen_envio', methods=['POST'])
+def resumen_envio():
+    # 1) Leemos directamente el JSON de la petición
+    data = request.get_json(force=True)
+    if not data or 'registros' not in data:
+        abort(400, description="No vinieron registros")
+
+    envios = data['registros']
+    include_recojo = data.get('includeRecojo', '0')
+
+    resultados = []
+    for envio in envios:
+        origen_id   = envio['origen']['sucursal_origen']
+        destino_id  = envio['destino']['sucursal_destino']
+        valor       = Decimal(str(envio['valorEnvio']))
+        peso        = Decimal(str(envio['peso']))
+
+        # 2) Tarifa base ruta
+        tarifa_row  = controlador_tarifa_ruta.get_tarifa_ids(origen_id, destino_id) or {}
+        tarifa_base = Decimal(str(tarifa_row.get('tarifa', 0)))
+
+        # 3) Reglas extra
+        regla_p       = controlador_regla_cargo.get_regla_cargo_condicion('P', float(peso)) or {}
+        regla_v       = controlador_regla_cargo.get_regla_cargo_condicion('V', float(valor)) or {}
+        porcentaje_p  = Decimal(str(regla_p.get('porcentaje', 0)))
+        porcentaje_v  = Decimal(str(regla_v.get('porcentaje', 0)))
+        porcentaje_r  = Decimal(str(controlador_empresa.get_porcentaje_recojo())) if include_recojo == '1' else Decimal('0')
+
+        # 4) Cálculo total
+        total = controlador_tarifa_ruta.calcularTarifaTotal(
+            tarifa_base,
+            peso,
+            porcentaje_r,
+            porcentaje_v,
+            porcentaje_p
+        )
+
+        envio_con_tarifa = envio.copy()
+        envio_con_tarifa['tarifa'] = total.quantize(Decimal('0.01'))
+        resultados.append(envio_con_tarifa)
+
+    # 5) Renderizamos la plantilla, pasándole la lista completa de envíos
+    return render_template('resumen_envio.html',
+                           registros=resultados)
 
 @app.route('/pagoenvio')
 def mostrar_pagoenvio():
@@ -2436,6 +2482,9 @@ def envio_masivo():
     modalidad_pago = controlador_modalidad_pago.get_options()
     peso = controlador_tipo_empaque.get_peso()
     valor_max = controlador_regla_cargo.get_max_valor()
+    valores = controlador_regla_cargo.get_rango()
+    porcentaje_peso = controlador_regla_cargo.get_porcentaje_peso()
+    
     return render_template('envio_masivo.html', 
                            nombre_doc=nombre_doc,
                            departamento_origen = departamento_origen,
@@ -2443,9 +2492,10 @@ def envio_masivo():
                            tarifas = json.dumps(tarifas),
                            empaque=empaque, 
                            articulos=articulos,
-                           condiciones=condiciones,
                            peso = peso,
-                           valor_max = valor_max
+                           valor_max = valor_max,
+                           valores=valores,
+                           porcentaje_peso=porcentaje_peso
                            )
     
 @app.route('/api/recepcion', methods=["POST"])
@@ -2514,22 +2564,38 @@ def distrito_origen():
             'status':-1
         }
     
-    
-@app.route('/api/departamento_destino',  methods=["POST"])
-def departamento_destino():
+@app.route('/api/sucursal_origen',  methods=["POST"])
+def sucursal_origen():
     try:
         datos = request.get_json()
         dep = datos.get('dep')
         prov = datos.get('prov')
         dist = datos.get('dist')
         
-        codigo_origen = controlador_tarifa_ruta.get_codigo_ubigeo(dep,prov,dist)
+        ubigeo = controlador_tarifa_ruta.get_codigo_ubigeo(dep,prov,dist)
+        sucursales = controlador_tarifa_ruta.get_sucursal_origen(ubigeo['codigo'])
+        return {
+            'data': sucursales,
+            'msg': "Se listó con éxito",
+            'status':1
+        }
+    except Exception as e:
+        return {
+            'data': [],
+            'msg': f"Ocurrió un error al listar las sucursales: {repr(e)}",
+            'status':-1
+        }
+    
+@app.route('/api/departamento_destino',  methods=["POST"])
+def departamento_destino():
+    try:
+        datos = request.get_json()
+        id_suc_origen = datos.get('suc_origen')
         
-        departamentos = controlador_tarifa_ruta.get_departamento_destino(codigo_origen['codigo'])
+        departamentos = controlador_tarifa_ruta.get_departamento_destino(id_suc_origen)
         
         return {
             'data': departamentos,
-            'codigo': codigo_origen['codigo'],
             'msg': "Se listó con éxito",
             'status':1
         }
@@ -2597,6 +2663,33 @@ def sucursal_destino():
         origen = datos.get('cod_origen')
         
         codigo_destino = controlador_tarifa_ruta.get_codigo_ubigeo(dep,prov,dist)
+        print(codigo_destino)
+        print(origen)
+        sucursales = controlador_tarifa_ruta.get_sucursal_destino(origen,codigo_destino['codigo'])
+        print(sucursales)
+        return {
+            'data': sucursales,
+            'msg': "Se listó con éxito",
+            'status':1
+        }
+    except Exception as e:
+        return {
+            'data': [],
+            'msg': f"Ocurrió un error al listar las departamentos: {repr(e)}",
+            'status':-1
+        }
+        
+        
+@app.route('/api/id_sucursal',  methods=["POST"])
+def id_sucursal():
+    try:
+        datos = request.get_json()
+        dep = datos.get('dep')
+        prov = datos.get('prov')
+        dist = datos.get('dist')
+        origen = datos.get('cod_origen')
+        
+        codigo_destino = controlador_tarifa_ruta.get_codigo_ubigeo(dep,prov,dist)
         
         sucursales = controlador_tarifa_ruta.get_sucursal_destino(origen,codigo_destino['codigo'])
         
@@ -2611,6 +2704,8 @@ def sucursal_destino():
             'msg': f"Ocurrió un error al listar las departamentos: {repr(e)}",
             'status':-1
         }
+        
+
 ################# Sucursales ######################
 
 @app.route("/perfil")

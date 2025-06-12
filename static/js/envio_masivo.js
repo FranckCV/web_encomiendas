@@ -28,36 +28,59 @@ const regexPositivos = /^[0-9]+(?:\.[0-9]+)?$/;
 
 const valorInput = document.getElementById('m-valorEnvio');
 
-// Crea o reutiliza tu función showError / clearError
-function showError(input, msg) {
-  let err = input.nextElementSibling;
-  if (!err || !err.classList.contains('error-msg')) {
-    err = document.createElement('small');
-    err.className = 'error-msg';
-    err.style.color = '#fc8181';
-    input.insertAdjacentElement('afterend', err);
-  }
+// Ajustamos showError / clearError para distinguir tipo de error
+function showError(input, msg, type = 'rango') {
+  let err = getErrorElem(input, type);
   err.textContent = msg;
   err.style.display = 'block';
   input.style.borderColor = '#fc8181';
 }
-function clearError(input) {
-  const err = input.nextElementSibling;
-  if (err && err.classList.contains('error-msg')) err.style.display = 'none';
-  input.style.borderColor = '';
+
+function clearError(input, type = 'rango') {
+  const err = getErrorElem(input, type);
+  if (err) err.style.display = 'none';
+  // solo limpiamos el borde si NO hay otro tipo de error visible
+  const otherType = type === 'rango' ? 'volumen' : 'rango';
+  const otherErr = getErrorElem(input, otherType);
+  if (!otherErr || otherErr.style.display === 'none') {
+    input.style.borderColor = '';
+  }
 }
 
-// Validación en tiempo real
 valorInput.addEventListener('input', () => {
-  const val = parseFloat(valorInput.value);
-  if (isNaN(val) || val < 0) {
+  const raw = valorInput.value.trim();
+  const val = parseFloat(raw);
+
+  if (raw === '') {
     clearError(valorInput);
-  } else if (val > MAX_VALOR) {
-    showError(valorInput, `El valor no puede exceder S/ ${MAX_VALOR}.`);
-  } else {
-    clearError(valorInput);
+    return;
   }
+
+  if (isNaN(val) || val <= 0) {
+    showError(valorInput, 'El valor debe ser mayor que 0.');
+    return;
+  }
+
+  if (val > MAX_VALOR) {
+    showError(valorInput, `El valor no puede exceder S/ ${MAX_VALOR}.`);
+    return;
+  }
+
+  clearError(valorInput);
 });
+
+
+function getErrorElem(input, type) {
+  const cls = `error-msg-${type}`;
+  let err = input.parentNode.querySelector(`.${cls}`);
+  if (!err) {
+    err = document.createElement('small');
+    err.className = cls;
+    err.style.color = '#fc8181';
+    input.insertAdjacentElement('afterend', err);
+  }
+  return err;
+}
 
 const MIN_CM = 5;
 const MAX_CM = 200;
@@ -71,31 +94,42 @@ const inputsDim = {
 
 Object.values(inputsDim).forEach(input => {
   input.addEventListener('input', () => {
-    const largo = parseFloat(inputsDim.largo.value) || 0;
-    const ancho = parseFloat(inputsDim.ancho.value) || 0;
-    const alto  = parseFloat(inputsDim.alto.value)  || 0;
-    const val   = parseFloat(input.value);
+    const val = parseFloat(input.value);
 
-    // 1) Validar rango individual
+    // 1) Validación individual de rango
     if (isNaN(val) || val < MIN_CM || val > MAX_CM) {
       showError(input, `Debe ingresar un valor entre ${MIN_CM} y ${MAX_CM} cm.`);
+      // Si individual falla, limpiamos mensajes de volumen en todos
+      Object.values(inputsDim).forEach(i => {
+        if (i !== input) clearError(i, 'volumen');
+      });
+      return;
     } else {
       clearError(input);
     }
 
-    // 2) Validar volumen total
-    const volumen = largo * ancho * alto;
-    if (largo && ancho && alto && volumen > MAX_VOLUMEN) {
-      // mostramos mensaje en el campo donde cambiaron
-      showError(input, `Volumen excesivo: ${volumen.toLocaleString()} cm³ (> ${MAX_VOLUMEN.toLocaleString()} cm³).`);
-    } else {
-      // limpiamos cualquier error de volumen
-      Object.values(inputsDim).forEach(i => clearError(i));
+    // 2) Solo si TODOS los campos están dentro de rango, validamos volumen
+    const largo = parseFloat(inputsDim.largo.value);
+    const ancho = parseFloat(inputsDim.ancho.value);
+    const alto  = parseFloat(inputsDim.alto.value);
+
+    if (
+      !isNaN(largo) && largo >= MIN_CM && largo <= MAX_CM &&
+      !isNaN(ancho) && ancho >= MIN_CM && ancho <= MAX_CM &&
+      !isNaN(alto)  && alto  >= MIN_CM && alto  <= MAX_CM
+    ) {
+      const volumen = largo * ancho * alto;
+      if (volumen > MAX_VOLUMEN) {
+        const msg = `Volumen excesivo: ${volumen.toLocaleString()} cm³ (> ${MAX_VOLUMEN.toLocaleString()} cm³).`;
+        // mostramos el error de volumen en **este** campo
+        showError(input, msg, 'volumen');
+      } else {
+        // limpiamos solo los errores de volumen (no tocamos errores de rango)
+        Object.values(inputsDim).forEach(i => clearError(i, 'volumen'));
+      }
     }
   });
 });
-
-
 
 
 
@@ -392,28 +426,37 @@ pinInputs.forEach((input, idx) => {
 
   let dist = document.getElementById('origen-distrito');
 
-  let dep_destino = document.getElementById('select-departamento');
-
   dist.addEventListener('change', () => {
-    cargarDeparDestino(dep.value, prov.value, dist.value);
+    console.log(dep.value, prov.value, dist.value);
+    cargarSucursales(dep.value, prov.value, dist.value);
+  }
+  );
+
+  let suc = document.getElementById('origen-sucursal');
+
+  suc.addEventListener('change', () => {
+    console.log(suc.value)
+    cargarDeparDestino(suc.value);
   }
   );
 
 
+  let dep_destino = document.getElementById('select-departamento');
+
   dep_destino.addEventListener('change', () => {
-    let codigo = document.getElementById('origen-sucursal-id').value;
+    let codigo = document.getElementById('origen-sucursal').value;
     cargarProvDestino(dep_destino.value, codigo)
   })
 
   let prov_destino = document.getElementById('select-provincia')
   prov_destino.addEventListener('change', () => {
-    let codigo = document.getElementById('origen-sucursal-id').value;
+    let codigo = document.getElementById('origen-sucursal').value;
     cargarDistDestino(prov_destino.value, codigo)
   })
 
   let dist_destino = document.getElementById('select-distrito')
   dist_destino.addEventListener('change', () => {
-    let codigo = document.getElementById('origen-sucursal-id').value;
+    let codigo = document.getElementById('origen-sucursal').value;
     cargarSucDestino(dep_destino.value, prov_destino.value, dist_destino.value, codigo)
   })
 
@@ -427,18 +470,18 @@ pinInputs.forEach((input, idx) => {
       });
     });
 
-
-  document
-    .querySelectorAll('.campos-envio > div')
-    .forEach(option => {
-      const radio = option.querySelector('input[type="radio"]');
-      if (!radio) return;
-
-      option.addEventListener('click', () => {
-        radio.checked = true;
-        radio.dispatchEvent(new Event('change'));
-      });
+document
+  .querySelectorAll('#tab-modalidad-pago .campos-envio > div')
+  .forEach(option => {
+    const radio = option.querySelector('input[type="radio"]');
+    if (!radio) return;
+    option.addEventListener('click', () => {
+      // Si ya estaba checked, no cambia el estado,
+      // pero forzamos el change igualmente y hacemos bubbling:
+      radio.checked = true;
+      radio.dispatchEvent(new Event('change', { bubbles: true }));
     });
+  });
 
 
   attachNumberFieldsValidation();
@@ -491,6 +534,8 @@ function cargarProvincias(depOrigen) {
       let distritosSelect = document.getElementById('origen-distrito');
       provinciasSelect.innerHTML = '<option disabled selected value="">Selecciona provincia</option>';
       distritosSelect.innerHTML = '<option disabled selected value="">Selecciona una provincia primero</option>';
+      let sucursalSelect = document.getElementById('origen-sucursal');
+      sucursalSelect.innerHTML = '<option disabled selected value="">Selecciona una provincia</option>';
 
       lista_provincia = diccionario.data;
       lista_provincia.forEach(prov => provinciasSelect.append(new Option(prov.provincia, prov.provincia)));
@@ -523,6 +568,8 @@ function cargarDistritos(provOrigen) {
     .then(diccionario => {
       let distritosSelect = document.getElementById('origen-distrito');
       distritosSelect.innerHTML = '<option disabled selected value="">Seleccione un distrito</option>';
+      let sucursalSelect = document.getElementById('origen-sucursal');
+      sucursalSelect.innerHTML = '<option disabled selected value="">Selecciona una distrito primero</option>';
 
       lista_distritos = diccionario.data;
       lista_distritos.forEach(dist => distritosSelect.append(new Option(dist.distrito, dist.distrito)));
@@ -542,12 +589,47 @@ function cargarDistritos(provOrigen) {
 
 
 
-function cargarDeparDestino(dep_origen, prov_origen, dist_origen) {
-  dict_ubigeo = {
+function cargarSucursales(dep_origen,prov_origen,dist_origen) {
+
+    dict_ubigeo = {
     'dep': dep_origen,
     'prov': prov_origen,//Un solo elemento, se debe poner en formato de diccionario
     'dist': dist_origen
   }
+
+  ruta = '/api/sucursal_origen'
+  fetch(ruta, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(dict_ubigeo)
+  })
+    .then(res => res.json())
+    .then(diccionario => {
+      let sucursalSelect = document.getElementById('origen-sucursal');
+      sucursalSelect.innerHTML = '<option disabled selected value="">Selecciona una sucursal</option>';
+
+      lista = diccionario.data;
+      lista.forEach(suc => sucursalSelect.append(new Option(suc.direccion, suc.id)));
+
+
+      let departamentoDestinoSelect = document.getElementById('select-departamento');
+      let provinciaDestinoSelect = document.getElementById('select-provincia');
+      let distritoDestinoSelect = document.getElementById('select-distrito');
+      let sucursalDestinoSelect = document.getElementById('select-sucursal');
+
+      departamentoDestinoSelect.innerHTML = '<option disabled selected value="">Seleccione un lugar de origen primero</option>';
+      provinciaDestinoSelect.innerHTML = '<option disabled selected value="">Seleccione un lugar de origen primero </option>';
+      distritoDestinoSelect.innerHTML = '<option disabled selected value="">Seleccione un lugar de origen primero </option>';
+      sucursalDestinoSelect.innerHTML = '<option disabled selected value="">Seleccione un lugar de origen primero </option>';
+    }
+    );
+}
+
+
+function cargarDeparDestino(id_origen) {
+  dict_ubigeo = {'suc_origen':id_origen}
 
   ruta = '/api/departamento_destino'
   fetch(ruta, {
@@ -563,7 +645,6 @@ function cargarDeparDestino(dep_origen, prov_origen, dist_origen) {
       let provinciasSelect = document.getElementById('select-provincia');
       let distritosSelect = document.getElementById('select-distrito');
       let sucursalSelect = document.getElementById('select-sucursal');
-      let codigo_origen = document.getElementById('origen-sucursal-id');
 
       departamentosSelect.innerHTML = '<option disabled selected value="">Seleccione un departamento</option>';
       provinciasSelect.innerHTML = '<option disabled selected value="">Seleccione un lugar de origen primero </option>';
@@ -573,7 +654,6 @@ function cargarDeparDestino(dep_origen, prov_origen, dist_origen) {
 
       lista_departamentos = diccionario.data;
 
-      codigo_origen.value = diccionario.codigo;
 
       lista_departamentos.forEach(dep => departamentosSelect.append(new Option(dep.departamento, dep.departamento)));
 
@@ -663,7 +743,7 @@ function cargarSucDestino(dep_destino, prov_destino, dist_destino, origen) {
 
 
       lista = diccionario.data;
-      lista.forEach(suc => sucursalSelect.append(new Option(suc.direccion, suc.direccion)));
+      lista.forEach(suc => sucursalSelect.append(new Option(suc.direccion, suc.id)));
     })
 }
 
@@ -687,17 +767,13 @@ function initTabs() {
 function mostrarCamposDestino() {
   const tipo = document.getElementById('m-tipoEntrega').value;
   const grupoDir = document.getElementById('grupo-direccion');
-  const grupoTienda = document.getElementById('grupo-tienda');
 
   if (tipo === '2') {
     grupoDir.style.display = 'flex';
-    grupoTienda.style.display = 'none';
   } else if (tipo === '1') {
     grupoDir.style.display = 'none';
-    grupoTienda.style.display = 'flex';
   } else {
     grupoDir.style.display = 'none';
-    grupoTienda.style.display = 'none';
   }
 }
 
@@ -760,6 +836,7 @@ function mostrarCamposReceptor() { //Funciona bien
 
 function cargarRecepcion(modalidad) {
   dict_modalidad = { 'modalidad': modalidad };
+  
   ruta = '/api/recepcion'
   fetch(ruta, {
     method: 'POST',
@@ -812,28 +889,26 @@ function isCurrentTabComplete() {
   const panel = document.querySelector('.tab-panel.active');
   if (!panel) return false;
 
-  // 1) Recorremos todos los inputs, selects y textareas visibles
+  // 1) Campos de texto / selects / textareas
   const fields = panel.querySelectorAll('input, select, textarea');
   for (const f of fields) {
-    // saltamos los que están ocultos
-    if (f.offsetParent === null) continue;
-    // saltamos la descripción (es opcional)
-    if (f.id === 'm-descripcionArticulo') continue;
-    // saltamos los radios individuales; validaremos el grupo al final
-    if (f.type === 'radio') continue;
-
-    // para todo lo demás, pedimos que no esté vacío
-    if (!f.value.trim()) {
-      return false;
-    }
+    if (f.offsetParent === null) continue;          // ocultos
+    if (f.id === 'm-descripcionArticulo') continue; // opcional
+    if (f.type === 'radio') continue;               // los validamos por grupos
+    if (!f.value.trim()) return false;
   }
 
-  // 2) Si en este panel hay un grupo de radios (modalidad de pago),
-  //    validamos que al menos uno esté chequeado.
-  const radios = panel.querySelectorAll('input[type="radio"][name="modalidad_pago"]');
-  if (radios.length) {
-    const anyChecked = Array.from(radios).some(r => r.checked);
-    if (!anyChecked) return false;
+  // 2) Validar dinámicamente **todos** los grupos de radios de esta pestaña
+  const radios = panel.querySelectorAll('input[type="radio"]');
+  const byName = {};
+  radios.forEach(r => {
+    if (r.name) byName[r.name] = true;
+  });
+  for (const name in byName) {
+    const group = panel.querySelectorAll(`input[type="radio"][name="${name}"]`);
+    if (group.length && !Array.from(group).some(r => r.checked)) {
+      return false;
+    }
   }
 
   return true;
@@ -965,18 +1040,29 @@ function attachTableActions() {
 
 // Recolección y llenado de datos
 function collectFormData() {
+  const sel = document.querySelector('input[name="modalidad_pago"]:checked');
+ const modalidadPagoValue = sel.value;  
+
   const destinatario = document.getElementById('m-tipoDocumento').value === '2'
     ? document.getElementById('m-razonSocial').value
     : document.getElementById('m-nombres').value + ' ' + document.getElementById('m-apellidos').value;
   return {
+    origen:{
+      departamento_origen : document.getElementById('origen-departamento').value,
+      provincia_origen : document.getElementById('origen-distrito').value,
+      distrito_origen : document.getElementById('origen-distrito').value,
+      sucursal_origen : document.getElementById('origen-sucursal').value
+    },
     tipoEntrega: document.querySelector(`#m-tipoEntrega option[value="${document.querySelector('#m-tipoEntrega').value}"]`).textContent,
     destino: {
       departamento: document.getElementById('select-departamento').value,
       provincia: document.getElementById('select-provincia').value,
-      distrito: document.getElementById('select-distrito').value
+      distrito: document.getElementById('select-distrito').value,
+      sucursal_destino : document.getElementById('select-sucursal')
+
     },
-    tipoEmpaque: document.querySelector(`#m-tipoEmpaque option[value="${document.querySelector('#m-tipoEmpaque').value}"]`).value,
-    tipoArticulo: document.querySelector(`#m-tipoArticulo option[value="${document.querySelector('#m-tipoArticulo').value}"]`).value,
+    tipoEmpaque: document.querySelector(`#m-tipoEmpaque option[value="${document.querySelector('#m-tipoEmpaque').value}"]`).textContent,
+    tipoArticulo: document.querySelector(`#m-tipoArticulo option[value="${document.querySelector('#m-tipoArticulo').value}"]`).textContent,
     folios: document.getElementById('m-folios').value,
     valorEnvio: document.getElementById('m-valorEnvio').value,
     peso: document.getElementById('m-peso').value,
@@ -984,7 +1070,7 @@ function collectFormData() {
     ancho: document.getElementById('m-ancho').value,
     alto: document.getElementById('m-alto').value,
     destinatario,
-    modalidadPago: document.querySelector('input[name="modalidad_pago"]:checked').value,
+    modalidadPago: document.querySelector(`label[for="${sel.id}"]`).textContent,
     clave: Array.from(document.querySelectorAll('.pin-input')).map(i => i.value).join('')
   };
 }
@@ -1027,26 +1113,37 @@ function fillFormData(r) {
 }
 
 function validateEnvio() {
-  const panel = document.querySelector('.tab-panel.active');
-  const fields = panel.querySelectorAll('input, select, textarea');
-
-  for (const f of fields) {
-    // ya ignoras los ocultos y la descripción opcional
-    if (f.offsetParent === null || f.id === 'm-descripcionArticulo') continue;
-    // ignorar los radios aquí, los validamos en bloque abajo
-    if (f.type === 'radio') continue;
-    if (!f.value.trim()) return false;
+  // Recorre cada pestaña
+  const panels = document.querySelectorAll('.tabs-content .tab-panel');
+  for (const panel of panels) {
+    // 1) Validar inputs, selects y textareas
+    const fields = panel.querySelectorAll('input, select, textarea');
+    for (const f of fields) {
+      if (f.offsetParent === null) continue;            // campo oculto
+      if (f.id === 'm-descripcionArticulo') continue;   // opcional
+      if (f.type === 'radio') continue;                 // radios los validamos después
+      if (!f.value.trim()) {
+        return false;
+      }
+    }
+   
+//    Buscamos todos los radios con required, agrupamos por name
+  const requiredRadios = Array.from(
+    document.querySelectorAll('.tab-panel input[type="radio"][required]')
+  );
+  const names = [...new Set(requiredRadios.map(r => r.name))];
+  for (const name of names) {
+    const grupo = document.querySelectorAll(`input[name="${name}"]`);
+    if (!Array.from(grupo).some(r => r.checked)) {
+      return false;
+    }
   }
 
-  // **Validación de radios** (por ejemplo, modalidad_pago en la primera pestaña)
-  const radios = panel.querySelectorAll('input[type="radio"][name="modalidad_pago"]');
-  if (radios.length) {
-    const algunoChequeado = Array.from(radios).some(r => r.checked);
-    if (!algunoChequeado) return false;
-  }
 
+  }
   return true;
 }
+
 
 
 // Agregar o editar envío
@@ -1082,10 +1179,8 @@ function clearForm(full = true) {
   const seccion = document.getElementById('seccion-masiva');
   if (!seccion) return;
 
+  // 1) Limpiar todos los campos… como ya lo tienes
   seccion.querySelectorAll('input, select, textarea').forEach(el => {
-    if (el.id === 'origen-sucursal-id' || el.id === 'destino-sucursal-id') {
-      return;
-    }
     if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
       el.value = '';
     }
@@ -1093,6 +1188,22 @@ function clearForm(full = true) {
       el.selectedIndex = 0;
     }
   });
+
+  // 2) Desmarcar los radios de modalidad_pago
+  document
+    .querySelectorAll('input[name="modalidad_pago"]')
+    .forEach(r => r.checked = false);
+
+  // 3) Resetear el select de tipoEntrega (Destino)
+  const recepcion = document.getElementById('m-tipoEntrega');
+  if (recepcion) {
+    recepcion.innerHTML = '<option disabled selected value="">Seleccione una modalidad de pago primero</option>';
+  }
+
+  // Si full === false, no tocamos los selects de origen (como ya haces)
+  if (full) {
+    unlockOrigen();
+  }
 }
 
 
@@ -1109,14 +1220,11 @@ function unlockOrigen() {
 
 const btnAdd = document.querySelector('.btn-agregar');
 btnAdd.addEventListener('click', e => {
-  e.preventDefault();  // por si acaso
-  // ¿está todo completo?
+  e.preventDefault();  
   if (!validateEnvio()) {
-    // aviso directo sin confirmación
     showModal({ message: 'Complete todos los campos visibles' });
     return;
   }
-  // si todo OK, pides confirmación
   showModal({
     message: '¿Agregar este envío?',
     onConfirm: guardarRegistro
@@ -1213,3 +1321,20 @@ function exportXLSX() {
   // 4. Disparar la descarga
   XLSX.writeFile(wb, 'envios_masivos.xlsx');
 }
+
+document
+  .getElementById('formulario-envio')
+  .addEventListener('submit', e => {
+    e.preventDefault();
+    // 1) Impedimos el envío si NO hay nada en registros
+    if (!registros || registros.length === 0) {
+      showModal({ message: 'Debes agregar al menos un envío antes de continuar.' });
+      return;
+    }
+    // 2) Si sí hay, volcamos el JSON al campo oculto...
+    const hidden = document.getElementById('registros_json');
+    hidden.value = JSON.stringify(registros);
+
+    // 3) Y finalmente lo enviamos de verdad:
+    e.target.submit();
+  });

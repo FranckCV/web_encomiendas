@@ -32,3 +32,24 @@ def get_regla_cargo_condicion( tipo_condicion , valor ):
 
 
 
+def get_rango():
+
+    sql = """
+      SELECT inferior, superior
+      FROM regla_cargo
+      WHERE tipo_condicion = 'V'
+    """
+    filas = sql_select_fetchall(sql)
+    # filas viene como [{ 'inferior': x, 'superior': y }, …]
+    return [(f['inferior'], f['superior']) for f in filas]
+
+def get_porcentaje_peso():
+
+    sql = """
+      SELECT porcentaje
+      FROM regla_cargo
+      WHERE tipo_condicion = 'P'
+      LIMIT 1
+    """
+    fila = sql_select_fetchone(sql)
+    return fila['porcentaje'] if fila and 'porcentaje' in fila else None
