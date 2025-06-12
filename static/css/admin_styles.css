@@ -182,6 +182,7 @@ aside.general_element {
     align-items: center;
     font-size: 70%;
     padding-block: 0;
+    overflow-y: hidden;
 }
 
 
@@ -216,15 +217,12 @@ aside .line_separator {
     flex-direction: column;
     width: 100%;
     gap: 10px;
-    padding-bottom: 25px;
-    /* padding-top: 5px; */
-    padding-top: 10px;
+    /* padding-bottom: 25px; */
+    /* padding-top: 10px; */
     padding-left: 0px;
-    /* padding-left: 10px; */
-    /* max-height: 0; */
     overflow-y: auto;
+    max-height: 62vh;
     transition: max-height 0.10s ease-in-out, opacity 0.10s ease-in-out;
-    /* opacity: 0; */
 }
 
 .menu_content::-webkit-scrollbar {
@@ -246,7 +244,7 @@ aside .line_separator {
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 0;
+    gap: 10px;
     max-height: min-content;
 }
 
@@ -349,7 +347,8 @@ aside .line_separator {
     justify-content: center;
     display: flex;
     z-index: 9999999;
-    background: linear-gradient(var(--color-bg-admin) 90%, transparent 100%);
+    /* background: linear-gradient(var(--color-bg-admin) 90%, transparent 100%); */
+    background: var(--color4);
     padding-block: 10px;
     padding-bottom: 20px;
 }
@@ -493,7 +492,8 @@ i {
     overflow-y: scroll;
     overflow-x: hidden;
     /* height: 52.5vh; */
-    max-height: 52.5vh;
+    /* max-height: 52.5vh; */
+    max-height: 60.5vh;
     width: calc(100vw - var(--width-aside) - 4.5vw);
     /* width: 100%; */
     /* width: 1000px; */
@@ -711,6 +711,7 @@ p.text_none {
 }
 
 .space_modal {
+    font-size: 77.5%;
     display: none;
     /* display: flex; */
     flex-direction: column;

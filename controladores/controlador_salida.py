@@ -37,25 +37,25 @@ def table_fetchall():
 def get_table():
     sql= f'''
         SELECT
-        s.id, 
-    CONCAT(e.nombre, ' ', e.apellidos) AS nom_conductor,
-    u.placa,
-    ub.departamento AS destino,
-    s.fecha,
-    s.hora,
-    u.capacidad,
-    CASE s.estado
-        WHEN 'P' THEN 'Pendiente (origen sucursal / domicilio)'
-        WHEN 'E' THEN 'En curso (en ruta)'
-        WHEN 'C' THEN 'Completada (destino sucursal / domicilio)'
-        WHEN 'X' THEN 'Cancelada'
-        ELSE 'Estado desconocido'
-    END AS estado
-FROM salida s
-INNER JOIN unidad u ON u.id = s.unidadid
-INNER JOIN empleado e ON e.id = s.conductor_principal
-INNER JOIN sucursal su ON su.id = s.destino_final
-INNER JOIN ubigeo ub ON ub.codigo = su.ubigeocodigo
+            s.id, 
+            CONCAT(e.nombre, ' ', e.apellidos) AS nom_conductor,
+            u.placa,
+            ub.departamento AS destino,
+            s.fecha,
+            s.hora,
+            u.capacidad,
+            CASE s.estado
+                WHEN 'P' THEN 'Pendiente (origen sucursal / domicilio)'
+                WHEN 'E' THEN 'En curso (en ruta)'
+                WHEN 'C' THEN 'Completada (destino sucursal / domicilio)'
+                WHEN 'X' THEN 'Cancelada'
+                ELSE 'Estado desconocido'
+            END AS estado
+        FROM salida s
+        LEFT JOIN unidad u ON u.id = s.unidadid
+        LEFT JOIN empleado e ON e.id = s.conductor_principal
+        LEFT JOIN sucursal su ON su.id = s.destino_final
+        LEFT JOIN ubigeo ub ON ub.codigo = su.ubigeocodigo
     '''
     columnas = {
         'id': ['ID' , 0.5 ] , 

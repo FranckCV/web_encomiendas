@@ -9,7 +9,7 @@
 {% endblock %}
 
 <title>
-    {% block titulo %}
+    {% block titulo %} {% if page_titulo %} {{page_titulo}} {% endif %}
     {% endblock %}| {{SYSTEM_NAME}}
 </title>
 

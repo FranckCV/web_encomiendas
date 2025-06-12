@@ -445,8 +445,8 @@ Permisos para {{info_rol.get('nombre')}}
     {% else %}
 
     <h3 class="crud_title">
-        <i class="ri-file-settings-fill"></i>
-        {{NOMBRE_ADMINPAGES_PAGE}}
+        <i class="{{page_icono}}"></i>
+        {{page_titulo}}
     </h3>
 
     {% endif %}
@@ -561,7 +561,7 @@ Permisos para {{info_rol.get('nombre')}}
                             </button>
                         </div>
 
-                        {% if page.get('tipo_paginaid') == 1 %}
+                        {% if page.get('tipo_paginaid') in [1,3] %}
                         <div class="opciones_fila">
                             <button data-column="search" class="btn_search {% if page.search is none or page.search == 0 %}unable{% endif %}" id="">
                                 <i class="{{ICON_SEARCH}}"></i>
@@ -744,16 +744,16 @@ Permisos para {{info_rol.get('nombre')}}
 
 
 
+{% endblock %}
+
+
+{% block scripts %}
+
 <div id="overlayModal" class="overlayModal">
     <div id="enlargedModal">
     </div>
 </div>
 
-
-{% endblock %}
-
-
-{% block scripts %}
 
 {% if fields_form_page and fields_form_modulo %}
 {% set fields_form_final = fields_form_page + fields_form_modulo %}
