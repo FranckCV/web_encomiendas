@@ -6346,13 +6346,12 @@ VALUES ('DNI', 'Documento Nacional de Identidad', 1),
   ('PAS', 'Pasaporte', 1);
 
 INSERT INTO tipo_comprobante (inicial, nombre, descripcion, activo)
-VALUES ('FT', 'F', 'Factura', 1),
-  ('BV', 'B', 'Boleta de Venta', 1),
-  ('NV', 'N', 'Nota de Venta', 1),
-  ('RC', 'R', 'Recibo', 1),
-  ('GR', 'G', 'Guía de Remisión', 1),
+VALUES ('F', 'Factura', 'Factura', 1),
+  ('BV', 'Boleta', 'Boleta de Venta', 1),
+  ('NV', 'Nota de venta', 'Nota de Venta', 1),
+  ('GR', 'Guia de remision', 'Guía de Remisión', 1),
   ('TI', 'T', 'Ticket', 1),
-  ('NC', 'C', 'Nota de Crédito', 1),
+  ('NC', 'Nota de crédito', 'Nota de Crédito', 1),
   ('ND', 'D', 'Nota de Débito', 1),
   ('OT', 'O', 'Otro', 1);
 
@@ -6759,6 +6758,11 @@ VALUES ('Persona Jurídica', 1);
 
 insert INTO `metodo_pago` (nombre, activo)
 VALUES ('Efectivo', 1);
+
+INSERT INTO `metodo_pago` (nombre, activo) VALUES 
+  ('Tarjeta de Crédito', 1),
+  ('Tarjeta de Débito', 1),
+  ('Yape',1);
 
 INSERT INTO `usuario` (`id`, `correo`, `contrasenia`, `tipo_usuario`, `activo`) VALUES
 (1, 'ana@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
@@ -8398,6 +8402,3 @@ INSERT INTO `modalidad_pago` (`id`, `nombre`, `descripcion`, `activo`) VALUES
 (3, 'Destinatario paga contraentrega',
     'El destinatario realiza el pago en el momento de recibir el paquete en su domicilio o sucursal.',
     1);
-=======
-  
->>>>>>> a5717a40e5703d8db39ce30cadd42349cb03bf33

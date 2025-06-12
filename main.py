@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort  #, after_this_request, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app  #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import permiso as permiso
 from controladores import controlador_pagina as controlador_pagina
@@ -51,8 +51,8 @@ from controladores import controlador_articulo as controlador_articulo
 from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 from controladores import controlador_encomienda as controlador_encomienda
 
-
-from decimal import Decimal
+import uuid, os, qrcode
+from decimal import Decimal, ROUND_HALF_UP
 
 import hashlib
 import os
@@ -65,6 +65,9 @@ import inspect
 
 
 app = Flask(__name__, template_folder='templates')
+app.secret_key = 'es-un-secreto'
+
+IGV_RATE = Decimal('0.18')
 
 STATE_0              = configuraciones.STATE_0
 STATE_1              = configuraciones.STATE_1
@@ -2282,20 +2285,18 @@ def seguimiento_encomienda():
 
 
 
+
 @app.route('/resumen_envio', methods=['POST'])
 def resumen_envio():
-    # lee JSON puro
     data = request.get_json(force=True)
     envios = data.get('registros')
     if not envios:
         abort(400, "No vinieron registros")
-    print(data)
+
     resultados = []
     for envio in envios:
         origen_id  = envio['origen']['sucursal_origen']
-        print(origen_id)
         destino_id = envio['destino']['sucursal_destino']
-        print(destino_id)
         valor      = Decimal(str(envio['valorEnvio']))
         peso       = Decimal(str(envio['peso']))
 
@@ -2315,17 +2316,62 @@ def resumen_envio():
         envio_con_tarifa = envio.copy()
         envio_con_tarifa['tarifa'] = total.quantize(Decimal('0.01'))
         resultados.append(envio_con_tarifa)
+    session['resumen_envios'] = resultados
 
-    # renderiza la plantilla con la lista de envíos ya tarifados
+    return redirect(url_for('resumen'))
+
+
+@app.route('/resumen')
+def resumen():
+    resultados = session.get('resumen_envios')
+    if not resultados:
+        return redirect(url_for('envio_masivo'))
+
     return render_template('resumen_envio.html', registros=resultados)
+
 
 
 @app.route('/pagoenvio')
 def mostrar_pagoenvio():
+    tipo_comprobante = controlador_tipo_comprobante.get_options_nombre()
+    
     metodo_pago = controlador_metodo_pago.get_options()
-    return render_template('pago_envio.html', metodo_pago=metodo_pago
+    return render_template('pago_envio.html', metodo_pago=metodo_pago,tipo_comprobante=tipo_comprobante
                            ) 
+@app.route('/pago_envio', methods=['GET', 'POST'])
+def pago_envio():
+    registros = session.get('resumen_envios')
+    if not registros:
+        return redirect(url_for('resumen'))
 
+    subtotal = sum(Decimal(str(r['tarifa'])) for r in registros)
+    subtotal = subtotal.quantize(Decimal('0.01'), ROUND_HALF_UP)
+    igv      = (subtotal * IGV_RATE).quantize(Decimal('0.01'), ROUND_HALF_UP)
+    total    = (subtotal + igv).quantize(Decimal('0.01'), ROUND_HALF_UP)
+
+    tipo_comprobante = controlador_tipo_comprobante.get_options_nombre()
+    metodo_pago      = controlador_metodo_pago.get_options()
+
+    modalidad_envio = registros[0].get('modalidadPago', '')
+
+    return render_template('pago_envio.html',
+                           registros=registros,
+                           cantidad_envios=len(registros),
+                           subtotal=subtotal,
+                           igv=igv,
+                           total=total,
+                           modalidad_envio=modalidad_envio,
+                           tipo_comprobante=tipo_comprobante,
+                           metodo_pago=metodo_pago)
+
+
+# @app.route('/scan/<token>', methods=['GET'])
+# def actualizar_estado(token):
+#     envio = controlador_paquete.buscar_por_token(token)
+#     if not envio:
+#         abort(404, "QR inválido")
+#     controlador_paquete.cambiar_estado(envio.id, nuevo_estado="en_transito")
+#     return render_template('confirmacion_estado.html', envio=envio)
 
 #########
 

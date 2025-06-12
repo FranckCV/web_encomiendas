@@ -95,7 +95,10 @@
 
     <div class="botones-acciones" style="margin-top: 1.5rem;">
       <a href="{{ url_for('tipos_envio') }}" class="btn-volver">VOLVER</a>
-      <button type="button" class="btn-continuar" id="btn-pagar">IR A PAGAR</button>
+      <form action="{{ url_for('pago_envio') }}" method="post">
+        <input type="hidden" name="registros" value="{{ registros|tojson }}">
+        <button type="submit" class="btn-continuar">IR A PAGAR</button>
+      </form>
     </div>
   </div>
 {% endblock %}
