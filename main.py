@@ -1801,7 +1801,6 @@ PAGINAS_SIMPLES = [
     'NoRecibimos',
     'pagina_reclamo',
     'seguimiento_reclamo',
-    'Metodo_pago',
     'prueba_seguimiento',
     'cajas',
     'cajas_prueba',
@@ -2177,6 +2176,66 @@ def vaciar_carrito():
     controlador_transaccion_venta.actualizar_monto_total(num_serie)
 
     return jsonify({"success": True})
+
+@app.route("/obtener-resumen-pago", methods=["GET"])
+def obtener_resumen_pago():
+    clienteid = 1  # O request.cookies.get("idlogin")
+
+    transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
+    if not transaccion:
+        return jsonify({"error": "No hay transacción activa"}), 404
+
+    num_serie = transaccion["num_serie"]
+    total = controlador_transaccion_venta.obtener_monto_total(num_serie)
+    detalles = controlador_transaccion_venta.obtener_carrito_cliente(clienteid)
+
+    cantidad_total = sum(item["quantity"] for item in detalles)
+    subtotal = float(total) / 1.18
+    igv = float(total) - subtotal
+
+    resumen = {
+        "cantidad": cantidad_total,
+        "subtotal": round(subtotal, 2),
+        "igv": round(igv, 2),
+        "total": round(float(total), 2)
+    }
+
+    # print(f"resumen : {resumen}")
+
+    return jsonify(resumen)
+
+@app.route("/metodo_pago")
+def metodo_pago():
+    clienteid = 1  # O request.cookies.get("idlogin")
+
+    transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
+    if not transaccion:
+        return redirect("/carrito")  # o muestra un mensaje apropiado
+
+    return render_template("metodo_pago.html")
+
+@app.route("/confirmar-pago", methods=["POST"])
+def confirmar_pago():
+    try:
+        clienteid = int(request.cookies.get("idlogin", 1))
+        transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
+
+        if not transaccion:
+            return jsonify({"error": "No hay transacción activa"}), 400
+
+        num_serie = transaccion["num_serie"]
+
+        # ✅ Actualizar estado a pagado (1)
+        sql = '''
+            UPDATE transaccion_venta SET estado = 1 WHERE num_serie = %s
+        '''
+        sql_execute(sql, (num_serie,))
+
+        return jsonify({"mensaje": "Pago confirmado"}), 200
+
+    except Exception as e:
+        print("Error en confirmar_pago:", e)
+        return jsonify({"error": "Ocurrió un error al procesar el pago"}), 500
 
 
 @app.route("/venta/registrar", methods=["POST"])
