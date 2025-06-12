@@ -210,8 +210,6 @@ def registrar_paginas_con_decorador(app, paginas, decorador):
         vista_decorada = decorador()(vista)
         app.add_url_rule(f"/{pagina}", pagina, vista_decorada)
 
-
-
 # Datos de usuario que ha iniciado sesión
 def getDatosUsuario():
     user_id = request.cookies.get('user_id') 
