@@ -949,7 +949,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-let registros = [];
+window.registros = [];
 let editingIndex = null;
 
 // Modales reutilizables
@@ -1047,6 +1047,14 @@ function collectFormData() {
     ? document.getElementById('m-razonSocial').value
     : document.getElementById('m-nombres').value + ' ' + document.getElementById('m-apellidos').value;
   return {
+    remitente :{
+      tipo_doc_remitente : document.getElementById('remitente-tipo-doc').value,
+      num_doc_remitente : document.getElementById('remitente-numero-doc').value,
+      num_tel_remitente : document.getElementById('remitente-telefono').value,
+      nombre_remitente : document.getElementById('remitente-nombre').value,
+        correo_remitente : document.getElementById('remitente-email').value,
+
+    },
     origen:{
       departamento_origen : document.getElementById('origen-departamento').value,
       provincia_origen : document.getElementById('origen-distrito').value,
@@ -1058,7 +1066,7 @@ function collectFormData() {
       departamento: document.getElementById('select-departamento').value,
       provincia: document.getElementById('select-provincia').value,
       distrito: document.getElementById('select-distrito').value,
-      sucursal_destino : document.getElementById('select-sucursal')
+      sucursal_destino : document.getElementById('select-sucursal').value
 
     },
     tipoEmpaque: document.querySelector(`#m-tipoEmpaque option[value="${document.querySelector('#m-tipoEmpaque').value}"]`).textContent,
@@ -1154,9 +1162,11 @@ function guardarRegistro() {
   }
   const envio = collectFormData();
   if (editingIndex !== null) {
-    registros[editingIndex] = envio;
+    window.registros[editingIndex] = envio;
     editingIndex = null;
-  } else registros.push(envio);
+  } else{
+  window.registros.push(envio);
+  }     
   renderTabla();
   clearForm(false);
   lockOrigen();
@@ -1322,19 +1332,39 @@ function exportXLSX() {
   XLSX.writeFile(wb, 'envios_masivos.xlsx');
 }
 
-document
-  .getElementById('formulario-envio')
-  .addEventListener('submit', e => {
-    e.preventDefault();
-    // 1) Impedimos el envío si NO hay nada en registros
-    if (!registros || registros.length === 0) {
-      showModal({ message: 'Debes agregar al menos un envío antes de continuar.' });
-      return;
-    }
-    // 2) Si sí hay, volcamos el JSON al campo oculto...
-    const hidden = document.getElementById('registros_json');
-    hidden.value = JSON.stringify(registros);
 
-    // 3) Y finalmente lo enviamos de verdad:
-    e.target.submit();
+
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('btn-continuar');
+
+  btn.addEventListener('click', async () => {
+    // 1) comprueba que haya al menos un envío registrado
+    if (!window.registros || registros.length === 0) {
+      return showModal({ message: 'Agrega al menos un envío antes de continuar.' });
+    }
+
+    try {
+      // 2) envía el JSON y fuerza application/json
+      const resp = await fetch('/resumen_envio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ registros })
+      });
+
+      if (!resp.ok) {
+        const txt = await resp.text();
+        throw new Error(`(${resp.status}) ${txt}`);
+      }
+
+      // 3) recibe el HTML renderizado y lo pinta
+      const html = await resp.text();
+      document.open();
+      document.write(html);
+      document.close();
+
+    } catch (err) {
+      console.error(err);
+      showModal({ message: 'No fue posible generar el resumen: ' + err.message });
+    }
   });
+});

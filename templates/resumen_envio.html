@@ -9,66 +9,70 @@
 
 {% block contenido %}
   <div class="container">
-    <h1 class="titulo-envio">REGISTRO DE ENVÍOS</h1>
+    <h1 class="titulo-envio">RESUMEN DE ENVÍOS</h1>
 
-    <div class="steps-container">
-      <div class="step completed">
-        <div class="circle"><img src="/static/img/usuario.png" alt="Datos personales" /></div>
-        <p>Datos personales</p>
-      </div>
-      <div class="line"></div>
-      <div class="step active">
-        <div class="circle"><img src="/static/img/chek.png" alt="Confirma tus datos" /></div>
-        <p>Confirma tus datos</p>
-      </div>
-      <div class="line"></div>
-      <div class="step">
-        <div class="circle"><img src="/static/img/medio.png" alt="Medios de pago" /></div>
-        <p>Medios de pago</p>
-      </div>
-    </div>
-
+    <!-- Origen único (tomamos el primero) -->
+    {% if registros %}
     <div class="header-resumen">
-      <h3>Resumen de envíos registrados</h3>
+      <h4>Origen:</h4>
+      <p>
+        {{ registros[0].origen.departamento_origen }}
+        / {{ registros[0].origen.provincia_origen }}
+        / {{ registros[0].origen.distrito_origen }}
+        (Sucursal ID {{ registros[0].origen.sucursal_origen }})
+      </p>
     </div>
-
-    <div>
-      <h5>Origen: 
-        <span id="origen-paquete"></span>
-      </h5>
-    </div>
+    {% endif %}
 
     <div class="tabla-scroll">
-      <div id="tableContent"></div>
+      <table class="tabla-resumen">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Entrega</th>
+            <th>Destino</th>
+            <th>Empaque</th>
+            <th>Valor (S/)</th>
+            <th>Peso (kg)</th>
+            <th>Dimensiones (cm)</th>
+            <th>Destinatario</th>
+            <th>Clave</th>
+            <th>Tarifa (S/)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in registros %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ r.tipoEntrega }}</td>
+            <td>
+              {{ r.destino.departamento }}/
+              {{ r.destino.provincia }}/
+              {{ r.destino.distrito }}
+              (Sucursal {{ r.destino.sucursal_destino }})
+            </td>
+            <td>
+              {% if r.folios %}
+                {{ r.folios }} folios (peso por folio aplicado)
+              {% else %}
+                {{ r.tipoEmpaque }} – {{ r.tipoArticulo }}
+              {% endif %}
+            </td>
+            <td>{{ r.valorEnvio }}</td>
+            <td>{{ r.peso }}</td>
+            <td>{{ r.largo }}×{{ r.ancho }}×{{ r.alto }}</td>
+            <td>{{ r.destinatario }}</td>
+            <td>{{ r.clave }}</td>
+            <td><strong>{{ r.tarifa }}</strong></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
 
-    <div class="paginacion">
-      <button class="btn-paginacion">Anterior</button>
-      <span class="pagina-actual">1</span>
-      <button class="btn-paginacion">Siguiente</button>
-    </div>
-
-    <div class="botones-acciones">
+    <div class="botones-acciones" style="margin-top: 1.5rem;">
       <a href="{{ url_for('tipos_envio') }}" class="btn-volver">VOLVER</a>
-      <button type="button" class="btn-continuar" id="btn-continuar">IR A PAGAR</button>
+      <button type="button" class="btn-continuar" id="btn-pagar">IR A PAGAR</button>
     </div>
   </div>
-{% endblock %}
-
-{% block scripts %}
-  <script>
-    // Inyectamos el array de envíos desde el servidor
-    const registros = {{ registros|tojson }};
-    // Mostramos el origen del primer envío
-    if (registros.length > 0) {
-      const o = registros[0].origen;
-      document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('origen-paquete').textContent =
-          `${o.departamento_origen} / ${o.provincia_origen} / ${o.distrito_origen}`;
-      });
-    }
-    // Hacemos disponible el array para el script de la tabla
-    window.REGISTROS = registros;
-  </script>
-  <script src="{{ url_for('static', filename='js/resumen_envio.js') }}"></script>
 {% endblock %}

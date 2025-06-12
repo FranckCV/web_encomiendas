@@ -2282,52 +2282,42 @@ def seguimiento_encomienda():
 
 
 
-
 @app.route('/resumen_envio', methods=['POST'])
 def resumen_envio():
-    # 1) Leemos directamente el JSON de la petición
+    # lee JSON puro
     data = request.get_json(force=True)
-    if not data or 'registros' not in data:
-        abort(400, description="No vinieron registros")
-
-    envios = data['registros']
-    include_recojo = data.get('includeRecojo', '0')
-
+    envios = data.get('registros')
+    if not envios:
+        abort(400, "No vinieron registros")
+    print(data)
     resultados = []
     for envio in envios:
-        origen_id   = envio['origen']['sucursal_origen']
-        destino_id  = envio['destino']['sucursal_destino']
-        valor       = Decimal(str(envio['valorEnvio']))
-        peso        = Decimal(str(envio['peso']))
+        origen_id  = envio['origen']['sucursal_origen']
+        print(origen_id)
+        destino_id = envio['destino']['sucursal_destino']
+        print(destino_id)
+        valor      = Decimal(str(envio['valorEnvio']))
+        peso       = Decimal(str(envio['peso']))
 
-        # 2) Tarifa base ruta
         tarifa_row  = controlador_tarifa_ruta.get_tarifa_ids(origen_id, destino_id) or {}
         tarifa_base = Decimal(str(tarifa_row.get('tarifa', 0)))
 
-        # 3) Reglas extra
-        regla_p       = controlador_regla_cargo.get_regla_cargo_condicion('P', float(peso)) or {}
-        regla_v       = controlador_regla_cargo.get_regla_cargo_condicion('V', float(valor)) or {}
-        porcentaje_p  = Decimal(str(regla_p.get('porcentaje', 0)))
-        porcentaje_v  = Decimal(str(regla_v.get('porcentaje', 0)))
-        porcentaje_r  = Decimal(str(controlador_empresa.get_porcentaje_recojo())) if include_recojo == '1' else Decimal('0')
+        regla_p      = controlador_regla_cargo.get_regla_cargo_condicion('P', float(peso)) or {}
+        regla_v      = controlador_regla_cargo.get_regla_cargo_condicion('V', float(valor)) or {}
+        porcentaje_p = Decimal(str(regla_p.get('porcentaje', 0)))
+        porcentaje_v = Decimal(str(regla_v.get('porcentaje', 0)))
+        porcentaje_r = Decimal(str(controlador_empresa.get_porcentaje_recojo()))
 
-        # 4) Cálculo total
         total = controlador_tarifa_ruta.calcularTarifaTotal(
-            tarifa_base,
-            peso,
-            porcentaje_r,
-            porcentaje_v,
-            porcentaje_p
+            tarifa_base, peso, porcentaje_r, porcentaje_v, porcentaje_p
         )
 
         envio_con_tarifa = envio.copy()
         envio_con_tarifa['tarifa'] = total.quantize(Decimal('0.01'))
         resultados.append(envio_con_tarifa)
 
-    # 5) Renderizamos la plantilla, pasándole la lista completa de envíos
-    return render_template('resumen_envio.html',
-                           registros=resultados)
-
+    # renderiza la plantilla con la lista de envíos ya tarifados
+    return render_template('resumen_envio.html', registros=resultados)
 
 
 @app.route('/pagoenvio')
@@ -2533,10 +2523,7 @@ def sucursal_destino():
         origen = datos.get('cod_origen')
         
         codigo_destino = controlador_tarifa_ruta.get_codigo_ubigeo(dep,prov,dist)
-        print(codigo_destino)
-        print(origen)
         sucursales = controlador_tarifa_ruta.get_sucursal_destino(origen,codigo_destino['codigo'])
-        print(sucursales)
         return {
             'data': sucursales,
             'msg': "Se listó con éxito",

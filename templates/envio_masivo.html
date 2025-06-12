@@ -41,7 +41,7 @@
 
     <p id="text-start">Recuerde que en los envíos masivos, los datos del remitente y del lugar de origen son los mismos para cada paquete. Si ya registró envíos, no puede cambiar el lugar de origen</p>
 
-    <form id="formulario-envio" class="formulario" method="post" action="{{ url_for('resumen_envio') }}" novalidate>
+    <form id="formulario-envio" class="formulario" method="post">
       <!-- SECCIÓN: QUIÉN ENVÍA -->
       <div id="seccion-quien-envia">
         <h2 class="titulo-seccion">Datos del remitente</h2>
@@ -442,7 +442,7 @@
 
       <div class="form-group buttons-center" style="margin-top: 30px;">
         <a href="{{ url_for('tipos_envio') }}" class="btn-volver">VOLVER</a>
-        <button type="submit" class="btn-continuar" id="btn-continuar">CONTINUAR</button>
+        <button type="button" class="btn-continuar" id="btn-continuar">CONTINUAR</button>
       </div>
     </form>
   </div>
@@ -493,6 +493,7 @@
 {% endblock %}
 
 {% block scripts %}
+
   <script>
     const PESOS     = {{ peso|tojson }};    
     const MAX_VALOR = {{ valor_max }};
