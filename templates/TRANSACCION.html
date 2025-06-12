@@ -2,13 +2,8 @@
 
 
 {% block titulo %}
-{% if esReporte %}
-{{titulo }}
-{% elif esTransaccion%}
-Programar {{titulo | lower}}
-{%else%}
-{{NOMBRE_CRUD_PAGE}} {{titulo | lower}}
-{% endif %}
+    {{titulo }}
+
 {% endblock %}
 
 
@@ -31,13 +26,7 @@ Programar {{titulo | lower}}
     <i class="{{icon_page_crud}}"></i>
     {% endif %}
 
-    {% if esReporte %}
     {{titulo }}
-    {%elif esTransaccion%}
-    Programar {{titulo | lower}}
-    {% else %}
-    {{NOMBRE_CRUD_PAGE}} {{titulo | lower}}
-    {% endif %}
   </h3>
 </div>
 
@@ -342,10 +331,6 @@ Programar {{titulo | lower}}
 
 
 
-<div id="overlayModal" class="overlayModal">
-  <div id="enlargedModal">
-  </div>
-</div>
 
 {% endblock %}
 
@@ -353,6 +338,10 @@ Programar {{titulo | lower}}
 
 {% block scripts %}
 
+<div id="overlayModal" class="overlayModal">
+  <div id="enlargedModal">
+  </div>
+</div>
 <script>
 
   const SELECT_OPTIONS = {

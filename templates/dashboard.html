@@ -132,7 +132,7 @@ Módulo de {{modulo['nombre'] | lower}}
     </h3>
 </div>
 
-
+{% if datosUsuario['rolid'] == 1 %}
 <div class="block_crud mod_cant">
     {% for tipo_pag in tipos_pag %}
 
@@ -143,6 +143,7 @@ Módulo de {{modulo['nombre'] | lower}}
     
     {% endfor %}
 </div>
+{% endif %}
 
 {% endblock %}
 

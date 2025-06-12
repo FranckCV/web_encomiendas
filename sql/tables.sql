@@ -160,7 +160,7 @@ CREATE TABLE modalidad_pago (
 CREATE TABLE modelo (
   id            int(11) NOT NULL AUTO_INCREMENT, 
   nombre        varchar(20) NOT NULL, 
-  activo        tinyint(1) NOT NULL, 
+  activo        tinyint(1) default 1 NOT NULL, 
   marcaid       int(11) NOT NULL, 
   tipo_unidadid int(10) NOT NULL, 
   PRIMARY KEY (id));
@@ -487,3 +487,4 @@ ALTER TABLE empleado_salida ADD CONSTRAINT FKempleado_s895470 FOREIGN KEY (emple
 ALTER TABLE escala ADD CONSTRAINT FKescala650496 FOREIGN KEY (salidaid) REFERENCES salida (id);
 ALTER TABLE escala ADD CONSTRAINT FKescala667165 FOREIGN KEY (sucursalid) REFERENCES sucursal (id);
 ALTER TABLE sucursal ADD CONSTRAINT FKsucursal756715 FOREIGN KEY (ubigeocodigo) REFERENCES ubigeo (codigo);
+alter table modalidad_pago add COLUMN descripcion text
