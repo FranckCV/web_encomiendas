@@ -2434,6 +2434,9 @@ def pago_envio():
 
 #########
 
+
+
+
 @app.route('/envio_masivo')
 def envio_masivo():
     nombre_doc = controlador_tipo_documento.get_options()
