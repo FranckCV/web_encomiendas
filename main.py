@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json  #, after_this_request, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app  #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import permiso as permiso
 from controladores import controlador_pagina as controlador_pagina
@@ -51,8 +51,9 @@ from controladores import controlador_modalidad_pago as controlador_modalidad_pa
 from controladores import controlador_encomienda as controlador_encomienda
 from controladores.bd import sql_execute
 
+import uuid, os, qrcode
+from decimal import Decimal, ROUND_HALF_UP
 
-from decimal import Decimal
 import hashlib
 import os
 from werkzeug.utils import secure_filename
@@ -72,6 +73,9 @@ app = Flask(__name__, template_folder='templates')
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+app.secret_key = 'es-un-secreto'
+
+IGV_RATE = Decimal('0.18')
 
 STATE_0              = configuraciones.STATE_0
 STATE_1              = configuraciones.STATE_1
@@ -1806,7 +1810,6 @@ PAGINAS_SIMPLES = [
     'NoRecibimos',
     'pagina_reclamo',
     'seguimiento_reclamo',
-    'Metodo_pago',
     'prueba_seguimiento',
     'cajas',
     'cajas_prueba',
@@ -1922,6 +1925,8 @@ def api_calculate_tarifa():
         return jsonify(respuesta)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
 
 
 @app.route("/api/datos_destino", methods=["GET"])
@@ -2179,6 +2184,66 @@ def vaciar_carrito():
 
     return jsonify({"success": True})
 
+@app.route("/obtener-resumen-pago", methods=["GET"])
+def obtener_resumen_pago():
+    clienteid = 1  # O request.cookies.get("idlogin")
+
+    transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
+    if not transaccion:
+        return jsonify({"error": "No hay transacción activa"}), 404
+
+    num_serie = transaccion["num_serie"]
+    total = controlador_transaccion_venta.obtener_monto_total(num_serie)
+    detalles = controlador_transaccion_venta.obtener_carrito_cliente(clienteid)
+
+    cantidad_total = sum(item["quantity"] for item in detalles)
+    subtotal = float(total) / 1.18
+    igv = float(total) - subtotal
+
+    resumen = {
+        "cantidad": cantidad_total,
+        "subtotal": round(subtotal, 2),
+        "igv": round(igv, 2),
+        "total": round(float(total), 2)
+    }
+
+    # print(f"resumen : {resumen}")
+
+    return jsonify(resumen)
+
+@app.route("/metodo_pago")
+def metodo_pago():
+    clienteid = 1  # O request.cookies.get("idlogin")
+
+    transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
+    if not transaccion:
+        return redirect("/carrito")  # o muestra un mensaje apropiado
+
+    return render_template("metodo_pago.html")
+
+@app.route("/confirmar-pago", methods=["POST"])
+def confirmar_pago():
+    try:
+        clienteid = int(request.cookies.get("idlogin", 1))
+        transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
+
+        if not transaccion:
+            return jsonify({"error": "No hay transacción activa"}), 400
+
+        num_serie = transaccion["num_serie"]
+
+        # ✅ Actualizar estado a pagado (1)
+        sql = '''
+            UPDATE transaccion_venta SET estado = 1 WHERE num_serie = %s
+        '''
+        sql_execute(sql, (num_serie,))
+
+        return jsonify({"mensaje": "Pago confirmado"}), 200
+
+    except Exception as e:
+        print("Error en confirmar_pago:", e)
+        return jsonify({"error": "Ocurrió un error al procesar el pago"}), 500
+
 
 @app.route("/venta/registrar", methods=["POST"])
 def registrar_venta():
@@ -2285,17 +2350,94 @@ def seguimiento_encomienda():
     return render_template('seguimiento.html',estado_encomienda=estado_encomienda)
 
 
-@app.route('/resumen_envio')
-def mostrar_resumen():
-    return render_template('resumen_envio.html') 
+
+
+@app.route('/resumen_envio', methods=['POST'])
+def resumen_envio():
+    data = request.get_json(force=True)
+    envios = data.get('registros')
+    if not envios:
+        abort(400, "No vinieron registros")
+
+    resultados = []
+    for envio in envios:
+        origen_id  = envio['origen']['sucursal_origen']
+        destino_id = envio['destino']['sucursal_destino']
+        valor      = Decimal(str(envio['valorEnvio']))
+        peso       = Decimal(str(envio['peso']))
+
+        tarifa_row  = controlador_tarifa_ruta.get_tarifa_ids(origen_id, destino_id) or {}
+        tarifa_base = Decimal(str(tarifa_row.get('tarifa', 0)))
+
+        regla_p      = controlador_regla_cargo.get_regla_cargo_condicion('P', float(peso)) or {}
+        regla_v      = controlador_regla_cargo.get_regla_cargo_condicion('V', float(valor)) or {}
+        porcentaje_p = Decimal(str(regla_p.get('porcentaje', 0)))
+        porcentaje_v = Decimal(str(regla_v.get('porcentaje', 0)))
+        porcentaje_r = Decimal(str(controlador_empresa.get_porcentaje_recojo()))
+
+        total = controlador_tarifa_ruta.calcularTarifaTotal(
+            tarifa_base, peso, porcentaje_r, porcentaje_v, porcentaje_p
+        )
+
+        envio_con_tarifa = envio.copy()
+        envio_con_tarifa['tarifa'] = total.quantize(Decimal('0.01'))
+        resultados.append(envio_con_tarifa)
+    session['resumen_envios'] = resultados
+
+    return redirect(url_for('resumen'))
+
+
+@app.route('/resumen')
+def resumen():
+    resultados = session.get('resumen_envios')
+    if not resultados:
+        return redirect(url_for('envio_masivo'))
+
+    return render_template('resumen_envio.html', registros=resultados)
+
 
 
 @app.route('/pagoenvio')
 def mostrar_pagoenvio():
+    tipo_comprobante = controlador_tipo_comprobante.get_options_nombre()
+    
     metodo_pago = controlador_metodo_pago.get_options()
-    return render_template('pago_envio.html', metodo_pago=metodo_pago
+    return render_template('pago_envio.html', metodo_pago=metodo_pago,tipo_comprobante=tipo_comprobante
                            ) 
+@app.route('/pago_envio', methods=['GET', 'POST'])
+def pago_envio():
+    registros = session.get('resumen_envios')
+    if not registros:
+        return redirect(url_for('resumen'))
 
+    subtotal = sum(Decimal(str(r['tarifa'])) for r in registros)
+    subtotal = subtotal.quantize(Decimal('0.01'), ROUND_HALF_UP)
+    igv      = (subtotal * IGV_RATE).quantize(Decimal('0.01'), ROUND_HALF_UP)
+    total    = (subtotal + igv).quantize(Decimal('0.01'), ROUND_HALF_UP)
+
+    tipo_comprobante = controlador_tipo_comprobante.get_options_nombre()
+    metodo_pago      = controlador_metodo_pago.get_options()
+
+    modalidad_envio = registros[0].get('modalidadPago', '')
+
+    return render_template('pago_envio.html',
+                           registros=registros,
+                           cantidad_envios=len(registros),
+                           subtotal=subtotal,
+                           igv=igv,
+                           total=total,
+                           modalidad_envio=modalidad_envio,
+                           tipo_comprobante=tipo_comprobante,
+                           metodo_pago=metodo_pago)
+
+
+# @app.route('/scan/<token>', methods=['GET'])
+# def actualizar_estado(token):
+#     envio = controlador_paquete.buscar_por_token(token)
+#     if not envio:
+#         abort(404, "QR inválido")
+#     controlador_paquete.cambiar_estado(envio.id, nuevo_estado="en_transito")
+#     return render_template('confirmacion_estado.html', envio=envio)
 
 #########
 
@@ -2310,6 +2452,9 @@ def envio_masivo():
     modalidad_pago = controlador_modalidad_pago.get_options()
     peso = controlador_tipo_empaque.get_peso()
     valor_max = controlador_regla_cargo.get_max_valor()
+    valores = controlador_regla_cargo.get_rango()
+    porcentaje_peso = controlador_regla_cargo.get_porcentaje_peso()
+    
     return render_template('envio_masivo.html', 
                            nombre_doc=nombre_doc,
                            departamento_origen = departamento_origen,
@@ -2317,9 +2462,10 @@ def envio_masivo():
                            tarifas = json.dumps(tarifas),
                            empaque=empaque, 
                            articulos=articulos,
-                           condiciones=condiciones,
                            peso = peso,
-                           valor_max = valor_max
+                           valor_max = valor_max,
+                           valores=valores,
+                           porcentaje_peso=porcentaje_peso
                            )
     
 
@@ -2388,22 +2534,38 @@ def distrito_origen():
             'status':-1
         }
     
-    
-@app.route('/api/departamento_destino',  methods=["POST"])
-def departamento_destino():
+@app.route('/api/sucursal_origen',  methods=["POST"])
+def sucursal_origen():
     try:
         datos = request.get_json()
         dep = datos.get('dep')
         prov = datos.get('prov')
         dist = datos.get('dist')
         
-        codigo_origen = controlador_tarifa_ruta.get_codigo_ubigeo(dep,prov,dist)
+        ubigeo = controlador_tarifa_ruta.get_codigo_ubigeo(dep,prov,dist)
+        sucursales = controlador_tarifa_ruta.get_sucursal_origen(ubigeo['codigo'])
+        return {
+            'data': sucursales,
+            'msg': "Se listó con éxito",
+            'status':1
+        }
+    except Exception as e:
+        return {
+            'data': [],
+            'msg': f"Ocurrió un error al listar las sucursales: {repr(e)}",
+            'status':-1
+        }
+    
+@app.route('/api/departamento_destino',  methods=["POST"])
+def departamento_destino():
+    try:
+        datos = request.get_json()
+        id_suc_origen = datos.get('suc_origen')
         
-        departamentos = controlador_tarifa_ruta.get_departamento_destino(codigo_origen['codigo'])
+        departamentos = controlador_tarifa_ruta.get_departamento_destino(id_suc_origen)
         
         return {
             'data': departamentos,
-            'codigo': codigo_origen['codigo'],
             'msg': "Se listó con éxito",
             'status':1
         }
@@ -2473,6 +2635,30 @@ def sucursal_destino():
         origen = datos.get('cod_origen')
         
         codigo_destino = controlador_tarifa_ruta.get_codigo_ubigeo(dep,prov,dist)
+        sucursales = controlador_tarifa_ruta.get_sucursal_destino(origen,codigo_destino['codigo'])
+        return {
+            'data': sucursales,
+            'msg': "Se listó con éxito",
+            'status':1
+        }
+    except Exception as e:
+        return {
+            'data': [],
+            'msg': f"Ocurrió un error al listar las departamentos: {repr(e)}",
+            'status':-1
+        }
+        
+        
+@app.route('/api/id_sucursal',  methods=["POST"])
+def id_sucursal():
+    try:
+        datos = request.get_json()
+        dep = datos.get('dep')
+        prov = datos.get('prov')
+        dist = datos.get('dist')
+        origen = datos.get('cod_origen')
+        
+        codigo_destino = controlador_tarifa_ruta.get_codigo_ubigeo(dep,prov,dist)
         
         sucursales = controlador_tarifa_ruta.get_sucursal_destino(origen,codigo_destino['codigo'])
         
@@ -2487,6 +2673,8 @@ def sucursal_destino():
             'msg': f"Ocurrió un error al listar las departamentos: {repr(e)}",
             'status':-1
         }
+        
+
 ################# Sucursales ######################
 
 

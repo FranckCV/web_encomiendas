@@ -491,3 +491,8 @@ ALTER TABLE empleado_salida ADD CONSTRAINT FKempleado_s895470 FOREIGN KEY (emple
 ALTER TABLE escala ADD CONSTRAINT FKescala650496 FOREIGN KEY (salidaid) REFERENCES salida (id);
 ALTER TABLE escala ADD CONSTRAINT FKescala667165 FOREIGN KEY (sucursalid) REFERENCES sucursal (id);
 ALTER TABLE sucursal ADD CONSTRAINT FKsucursal756715 FOREIGN KEY (ubigeocodigo) REFERENCES ubigeo (codigo);
+alter table modalidad_pago add COLUMN descripcion text
+
+ALTER TABLE `envios`
+  ADD COLUMN `qr_token` VARCHAR(64)   NOT NULL,
+  ADD COLUMN `qr_image` VARCHAR(255)  NOT NULL;

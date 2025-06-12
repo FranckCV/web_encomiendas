@@ -361,8 +361,8 @@
             return;
         }
 
-        const total = document.getElementById('totalAmount').textContent;
-        alert(`¡Redirigiendo al sistema de pago!\nTotal a pagar: ${total}`);
+        // Redirección
+        window.location.href = "/metodo_pago";
     }
 
     document.addEventListener("DOMContentLoaded", async () => {

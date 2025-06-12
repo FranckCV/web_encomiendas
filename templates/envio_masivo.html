@@ -39,9 +39,9 @@
       </div>
     </div>
 
-    <p id="text-start">Recuerde que en los envíos masivos, los datos del remitente y del lugar de origen son los mismos para cada paquete. Si ya registró envíos y quiere cambiar el lugar de origen, se eliminarán los registros de aquellos paquetes donde los destinos no existan para el nuevo origen.</p>
+    <p id="text-start">Recuerde que en los envíos masivos, los datos del remitente y del lugar de origen son los mismos para cada paquete. Si ya registró envíos, no puede cambiar el lugar de origen</p>
 
-    <form id="formulario-envio" class="formulario">
+    <form id="formulario-envio" class="formulario" method="post">
       <!-- SECCIÓN: QUIÉN ENVÍA -->
       <div id="seccion-quien-envia">
         <h2 class="titulo-seccion">Datos del remitente</h2>
@@ -106,8 +106,20 @@
                 <option disabled selected value="">Elija un departamento de origen primero</option>
               </select>
             </div>
-            <input type="hidden" id="origen-sucursal-id" value="" />
+
+
+                  <div class="campo-grupo" >
+                    <label>Sucursal *</label>
+                    <select id="origen-sucursal">
+                       <option disabled selected value="">Elija un departamento de origen primero</option>
+                    </select>
+                  </div>
+
+
           </div>
+
+
+
           <div class="acciones_origen">
             <div class="opciones_fila" style="display: none;">
               <button class="clickable-modal btn_cancel" id="modal_crud_update_{{ tabla }}_{{ id_pk }}">Cancelar</button>
@@ -117,6 +129,8 @@
               <button class="clickable-modal btn_update" id="modal_crud_update_{{ tabla }}_{{ id_pk }}"><i class="{{ ICON_UPDATE }}"></i> Editar</button>
             </div>
           </div>
+
+       
         </div>
       </div>
 
@@ -196,9 +210,9 @@
                 </div>     -->
 
                   <!-- Tienda: solo para agencia -->
-                  <div class="campo-grupo" id="grupo-tienda" style="display:none;">
+                  <div class="campo-grupo" id="grupo-tienda">
                     <label>Sucursal *</label>
-                    <select id="select-sucursal">
+                    <select id="select-sucursal" required>
                        <option disabled selected value="">Elija un departamento de origen primero</option>
                     </select>
                   </div>
@@ -269,7 +283,7 @@
                 <div class="campos-envio">
                   <div class="campo-grupo">
                     <label>Tipo de documento *</label>
-                    <select id="m-tipoDocumento" required onchange="mostrarCamposReceptor()">
+                    <select id="m-tipoDocumento" required onchange="mostrarCamposReceptor()" required>
                       <option disabled selected value="">Seleccione tipo de documento</option>
                       {% for fila in nombre_doc %}
                         <option value="{{ fila.0 }}">{{ fila.1 }}</option>
@@ -285,7 +299,7 @@
 
                   <div class="campo-grupo">
                     <label>Celular *</label>
-                    <input type="tel" id="m-celular" required placeholder="999999999" />
+                    <input type="tel" id="m-celular" required placeholder="999999999" required />
                     <small id="mensaje-validacion-telefono-dest" style="color: red; display: none;"></small>
                   </div>
 
@@ -323,16 +337,20 @@
                   <p id="clave-texto">Establezca una clave de 4 dígitos para proteger su envío. Esta clave será requerida para la entrega del paquete.</p>
 
                   <div class="pin-container">
-                    <input type="number" class="pin-input" maxlength="1" min="0" max="9" placeholder="•" data-index="0" />
-                    <input type="number" class="pin-input" maxlength="1" min="0" max="9" placeholder="•" data-index="1" />
-                    <input type="number" class="pin-input" maxlength="1" min="0" max="9" placeholder="•" data-index="2" />
-                    <input type="number" class="pin-input" maxlength="1" min="0" max="9" placeholder="•" data-index="3" />
+                    <input type="number" class="pin-input" maxlength="1" min="0" max="9" placeholder="•" data-index="0" required />
+                    <input type="number" class="pin-input" maxlength="1" min="0" max="9" placeholder="•" data-index="1" required />
+                    <input type="number" class="pin-input" maxlength="1" min="0" max="9" placeholder="•" data-index="2" required />
+                    <input type="number" class="pin-input" maxlength="1" min="0" max="9" placeholder="•" data-index="3" required />
                   </div>
                 </div>
               </div>
 
             </div>
           </div>
+
+
+  <input type="hidden" name="registros_json" id="registros_json" />
+
 
           <!-- Botones de acción -->
           <div class="form-actions">
@@ -341,9 +359,55 @@
           </div>
         </div>
 
-<div>
 
+        <div id="tarifario" class="tarifario" style="display:none; margin-top:1.5rem;">
+  <h4 class="tarifario-titulo">Taifa por envío</h4>
+
+  <!-- Tarifa base -->
+  <div class="tarifario-row" >
+    <div>
+    <div class="tarifario-label" id="label-base">Tarifa base</div>
+
+    </div>
+
+    <div class="tarifario-value" id="tarifa-base">S/ 0.00</div>
+  </div>
+
+  <!-- Rangos de valor declarado -->
+  {% for inf, sup in valores %}
+  <div class="tarifario-row">
+    <div>
+          <div class="tarifario-label" id="label-rango-{{ inf }}-{{ sup }}">Aumento por valor declarado</div>
+    <div class="tarifario-desc" id="desc-rango-{{ inf }}-{{ sup }}">
+    </div>
+      Valor entre S/ {{ inf }} – S/ {{ sup }}
+    </div>
+    <div class="tarifario-value" id="tarifa-valor-{{ inf }}-{{ sup }}">S/ 0.00</div>
+  </div>
+  {% endfor %}
+
+  <!-- Aumento por peso -->
+  <div class="tarifario-row">
+    <div>
+    <div class="tarifario-label" id="label-sobrepeso">Aumento por peso</div>
+    <div class="tarifario-desc" id="desc-sobrepeso">
+
+    </div>
+
+      Se aumenta {{ porcentaje_peso }} % por cada kg de más
+    </div>
+    <div class="tarifario-value" id="tarifa-sobrepeso">S/ 0.00</div>
+  </div>
+
+  <hr class="tarifario-separator">
+
+  <!-- Total -->
+  <div class="tarifario-row tarifario-total">
+    <div class="tarifario-label">Total a pagar</div>
+    <div class="tarifario-value" id="tarifa-total"><strong>S/ 0.00</strong></div>
+  </div>
 </div>
+
 
 
         <!-- Tabla de envíos -->
@@ -378,7 +442,7 @@
 
       <div class="form-group buttons-center" style="margin-top: 30px;">
         <a href="{{ url_for('tipos_envio') }}" class="btn-volver">VOLVER</a>
-        <button type="submit" class="btn-continuar" id="btn-continuar">CONTINUAR</button>
+        <button type="button" class="btn-continuar" id="btn-continuar">CONTINUAR</button>
       </div>
     </form>
   </div>
@@ -429,6 +493,7 @@
 {% endblock %}
 
 {% block scripts %}
+
   <script>
     const PESOS     = {{ peso|tojson }};    
     const MAX_VALOR = {{ valor_max }};
