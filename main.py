@@ -121,45 +121,6 @@ def articulos_mas_vendidos():
 
 ###########_ FUNCIONES _#############
 
-# def listar_admin_pages():
-#     menu_keys = list(MENU_ADMIN.keys())
-#     modules = []
-#     for module in menu_keys:
-#         pages_crud = []
-#         pages_report = []
-#         config = MENU_ADMIN.get(module)
-#         active = config["active"]
-#         if active is True:
-#             name = config.get("name")
-#             icon_module = get_icon_page(config.get("icon_page"))
-#             dashboard = config.get("dashboard")
-#             cruds = config.get("cruds")
-#             reports = config.get("reports")
-            
-#             if cruds != [] and cruds is not None:
-#                 for page in cruds:
-#                     config_page = CONTROLADORES.get(page)
-#                     if config_page:
-#                         p_active = config_page.get('active')
-#                         if p_active is True:
-#                             p_titulo = config_page.get('titulo')
-#                             p_icon_page = get_icon_page(config_page.get('icon_page'))
-#                             pages_crud.append([ page , p_titulo , p_icon_page ])
-            
-#             if reports != [] and reports is not None:
-#                 for page in reports:
-#                     config_page = REPORTES.get(page)
-#                     if config_page:
-#                         p_active = config_page.get('active')
-#                         if p_active is True:
-#                             p_titulo = config_page.get('titulo')
-#                             p_icon_page = get_icon_page(config_page.get('icon_page'))
-#                             p_elements = config_page.get('elements')
-#                             pages_report.append([ page , p_titulo , p_icon_page , p_elements ])
-            
-#             modules.append([ name , icon_module , dashboard , pages_crud , pages_report , module])
-#     return modules
-
 #Opciones para activar o desacticar
 def get_options_active():
     lista = [
@@ -1609,6 +1570,35 @@ TRANSACCIONES = {
         "filters": [
             
         ] ,
+        "fields_form" : [
+            ['id',          'ID',            'ID',             'text',   True,   False,   None],
+            ['nom_conductor','Conductor',    'Nombre del conductor', 'text', True, False,   None],
+            ['placa',       'Placa de unidad','Placa de unidad', 'text',   True,   True,    None],
+            ['destino',     'Destino',       'Destino',         'text',   True,   True,    None],
+            ['fecha',       'Fecha',         'YYYY-MM-DD',      'date',   True,   True,    None],
+            ['hora',        'Hora',          'HH:MM',           'time',   True,   True,    None],
+            ['capacidad',   'Capacidad',     'Capacidad en kg', 'number', True,  False,   None],
+            ['estado',      'Estado',        'Estado actual',   'text',   True,   False,   None],
+       ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": False ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": False ,
+        }
+    },
+    "transaccion_encomienda": {
+        "active" : False ,
+        "titulo": "encomiendas",
+        "nombre_tabla": "transaccion_encomienda",
+        # "controlador": controlador_encomienda,
+        "icon_page": 'fa-solid fa-boxes-packing',
+        "filters": [
+            
+        ] ,
        "fields_form" : [
             ['id',          'ID',            'ID',             'text',   True,   False,   None],
             ['nom_conductor','Conductor',    'Nombre del conductor', 'text', True, False,   None],
@@ -1624,7 +1614,7 @@ TRANSACCIONES = {
             "crud_list": True ,
             "crud_search": False ,
             "crud_consult": True ,
-            "crud_insert": True ,
+            "crud_insert": False ,
             "crud_update": True ,
             "crud_delete": True ,
             "crud_unactive": False ,
@@ -2589,7 +2579,7 @@ def crud_generico(tabla):
     permisos = permiso.consult_permiso_rol(page['id'] , user_info['rolid'])
 
     if config and page:
-        active = config["active"] and (page['activo'] == 1 or user_info['rolid'] == 1 )
+        active = config["active"] and (page['activo'] == 3 or user_info['rolid'] == 1 )
         tipo_paginaid = page['tipo_paginaid']
         no_crud = config.get('no_crud')
 
@@ -2639,6 +2629,66 @@ def crud_generico(tabla):
             )
 
 
+@app.route("/transaccion=<tabla>")
+@validar_empleado()
+def transaccion(tabla):
+    config = TRANSACCIONES.get(tabla)
+    page = permiso.get_pagina_key(tabla)
+    user_info = getDatosUsuario()
+    permisos = permiso.consult_permiso_rol(page['id'] , user_info['rolid'])
+
+    if config and page:
+        active = config["active"] and (page['activo'] == 1 or user_info['rolid'] == 1 )
+        tipo_paginaid = page['tipo_paginaid']
+        no_crud = config.get('no_crud')
+
+        if active is True and tipo_paginaid == 3 and (no_crud is None or no_crud is False):
+            icon_page_crud = get_icon_page(page.get("icono"))
+            titulo = f'{page["titulo"]}'
+
+            nombre_tabla = config["nombre_tabla"]
+            filters = config["filters"]
+            fields_form = config["fields_form"]
+            controlador = config["controlador"]
+
+            existe_activo = controlador.exists_Activo()
+            columnas , filas = controlador.get_table()
+            primary_key = controlador.get_primary_key()
+            table_columns  = list(filas[0].keys()) if filas else []
+            
+            CRUD_FORMS = config["crud_forms"]
+            # crud_list = CRUD_FORMS.get("crud_list")
+            crud_search = CRUD_FORMS.get("crud_search") and (permisos['search'] or user_info['rolid'] == 1 )
+            crud_consult = CRUD_FORMS.get("crud_consult") and (permisos['consult'] or user_info['rolid'] == 1 )
+            crud_insert = CRUD_FORMS.get("crud_insert") and   (permisos['insert'] or user_info['rolid'] == 1 )
+            crud_update = CRUD_FORMS.get("crud_update") and   (permisos['update'] or user_info['rolid'] == 1 )
+            crud_delete = CRUD_FORMS.get("crud_delete") and   (permisos['delete'] or user_info['rolid'] == 1 )
+            crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo and ( permisos['unactive'] or user_info['rolid'] == 1 )
+
+            return render_template(
+                "TRANSACCION.html" ,
+                tabla          = tabla ,
+                nombre_tabla   = nombre_tabla ,
+                icon_page_crud = icon_page_crud ,
+                titulo         = titulo ,
+                filas          = filas ,
+                primary_key    = primary_key ,
+                filters        = filters,
+                fields_form    = fields_form ,
+                columnas       = columnas ,
+                key_columns    = list(columnas.keys()) ,
+                table_columns  = table_columns ,
+                # crud_list      = crud_list,
+                crud_search    = crud_search,
+                crud_consult   = crud_consult,
+                crud_insert    = crud_insert,
+                crud_update    = crud_update,
+                crud_delete    = crud_delete,
+                crud_unactive  = crud_unactive,
+                esTransaccion = True ,
+            )
+
+    
 @app.route("/reporte=<report_name>")
 @validar_empleado()
 def reporte(report_name):
@@ -2666,8 +2716,8 @@ def reporte(report_name):
                 columnas       = columnas ,
                 key_columns    = list(columnas.keys()) ,
                 table_columns  = table_columns ,
+                primary_key    = None ,
                 crud_search    = True,
-                primary_key = None ,
                 # crud_consult   = True,
                 # crud_insert    = True,
                 # crud_update    = True,
@@ -2677,58 +2727,6 @@ def reporte(report_name):
             )
 
 
-@app.route("/transaccion=<tabla>")
-@validar_empleado()
-def crud_transaccion(tabla):
-    config = TRANSACCIONES.get(tabla)
-    if config:
-        active = config["active"]
-        if active is True :
-            icon_page_crud = get_icon_page(config.get("icon_page"))
-            titulo = config["titulo"]
-            controlador = config["controlador"]
-            nombre_tabla = config["nombre_tabla"]
-            filters = config["filters"]
-            fields_form = config["fields_form"]
-
-            existe_activo = controlador.exists_Activo()
-            columnas , filas = controlador.get_table()
-            primary_key = controlador.get_primary_key()
-            table_columns  = list(filas[0].keys()) if filas else []
-            
-            CRUD_FORMS = config["crud_forms"]
-            crud_list = CRUD_FORMS.get("crud_list")
-            crud_search = CRUD_FORMS.get("crud_search")
-            crud_consult = CRUD_FORMS.get("crud_consult")
-            crud_insert = CRUD_FORMS.get("crud_insert")
-            crud_update = CRUD_FORMS.get("crud_update")
-            crud_delete = CRUD_FORMS.get("crud_delete")
-            crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo
-
-            return render_template(
-                "CRUD_prueba.html" ,
-                tabla          = tabla ,
-                nombre_tabla   = nombre_tabla ,
-                icon_page_crud = icon_page_crud ,
-                titulo         = titulo ,
-                filas          = filas ,
-                primary_key    = primary_key ,
-                filters        = filters,
-                fields_form    = fields_form ,
-                columnas       = columnas ,
-                key_columns    = list(columnas.keys()) ,
-                table_columns  = table_columns ,
-                crud_list      = crud_list,
-                crud_search    = crud_search,
-                crud_consult   = crud_consult,
-                crud_insert    = crud_insert,
-                crud_update    = crud_update,
-                crud_delete    = crud_delete,
-                crud_unactive  = crud_unactive,
-                esTransaccion = True
-            )
-
-    
 @app.route("/seguimiento_empleado_prueba=<placa>")
 @validar_empleado()
 def seguimiento_empleado_prueba(placa):

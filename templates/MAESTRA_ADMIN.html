@@ -41,36 +41,46 @@
     {% if modulo['id'] == cur_modulo_id %}
 
     <style>
-        .tip_title {
-            color: color-mix(in srgb, {{modulo['color']}} 80%, white 45%) ;
+        /* .tip_title {
+          color: color-mix(in srgb, {{modulo['color']}} 80%, white 45%) ;
         }
         
         .tip_title:hover {
-            color: color-mix(in srgb, {{modulo['color']}} 80%, white 95%) ;
+          color: color-mix(in srgb, {{modulo['color']}} 80%, white 95%) ;
+        } */
+
+        .tip_title {
+          color: white ;
+          background-color: transparent;
+          padding-inline: 5px;
+        }
+        
+        .tip_title:hover {
+          color: color-mix(in srgb, {{modulo['color']}} 80%, white 45%) ;
         }
 
         .{{modulo['key']}}.menu_title:hover {
-            color: color-mix(in srgb , {{modulo['color']}} 95% , white 65%)  ;
-            /* color: color-mix(in srgb , {{modulo['color']}} 95% , white 05%)  ; */
-            /* filter: brightness(1.5); */
+          color: color-mix(in srgb , {{modulo['color']}} 95% , white 65%)  ;
+          /* color: color-mix(in srgb , {{modulo['color']}} 95% , white 05%)  ; */
+          /* filter: brightness(1.5); */
         }
 
         :root {
-            --color-page : color-mix(in srgb , {{modulo['color']}} 95% , white 65%) ;
+          --color-page : color-mix(in srgb , {{modulo['color']}} 95% , white 65%) ;
         }
 
         .mod_title {
-            display: flex;
-            align-items: center;
-            font-size: 120%;
-            padding-block: 7px;
-            padding-inline: 12px;
-            border-radius: 5px;
-            justify-self: flex-start;
-            gap: 10px;
-            cursor: pointer;
-            background-color: color-mix(in srgb, {{ modulo.get('color') }} 10%, transparent 30%) ; 
-            color: color-mix(in srgb, {{ modulo.get('color') }} 100%, white 30%)  ;
+          display: flex;
+          align-items: center;
+          font-size: 120%;
+          padding-block: 7px;
+          padding-inline: 12px;
+          border-radius: 5px;
+          justify-self: flex-start;
+          gap: 10px;
+          cursor: pointer;
+          background-color: color-mix(in srgb, {{ modulo.get('color') }} 10%, transparent 30%) ; 
+          color: color-mix(in srgb, {{ modulo.get('color') }} 100%, white 30%)  ;
         }
 
         .mod_title:hover {
@@ -119,7 +129,10 @@
                                 <p>{{ page['titulo'] }}</p>
                             </a>
                             {% elif page['tipo_paginaid'] == 3 %}
-
+                            <a class="mu_page" href="{{url_for('transaccion',tabla = page['key'] )}}">
+                                <i class="{{ page['icono'] or ICON_PAGE_CRUD }}"></i>
+                                <p>{{ page['titulo'] }}</p>
+                            </a>
                             {% elif page['tipo_paginaid'] == 4 %}
                             <a class="mu_page" href="{{url_for('reporte',report_name = page['key'] )}}">
                                 <i class="{{ page['icono'] or ICON_PAGE_CRUD }}"></i>

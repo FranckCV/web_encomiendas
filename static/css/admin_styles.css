@@ -13,8 +13,12 @@
 
     --table-size-space: 3px;
 
-    --color-bg-admin: color-mix(in srgb, var(--color4) 100%, #000000 0%);
     /* --color-bg-admin: var(--color14); */
+    /* --color-bg-admin: color-mix(in srgb, var(--color4) 100%, #000000 0%); */
+    /* --color-bg-admin: linear-gradient(180deg,rgba(10, 27, 46, 1) 44%, rgba(9, 100, 105, 1) 100%); */
+    /* --color-bg-admin: linear-gradient(170deg, var(--color4)  45%, color-mix(in srgb , var(--color-sec) 100% , var(--color4) 100% ) 100%); */
+    /* --color-bg-admin: linear-gradient(155deg, var(--color4)  30%, color-mix(in srgb , var(--color-sec) 100% , var(--color4) 100% ) 100%) ; */
+    --color-bg-admin: linear-gradient(165deg, var(--color4)  40%, color-mix(in srgb , var(--color-sec) 100% , var(--color4) 100% ) 100%) ;
 
     
 }
@@ -31,7 +35,8 @@ body {
         "ge_footer ge_footer"
     ;
     height: 100vh;
-    background-color: var(--color-background);
+    /* background-color: var(--color-background); */
+    background: var(--color-bg-admin);
 }
 
 
@@ -94,7 +99,9 @@ header.general_element {
     color: white;
     height: fit-content;
     /* background-color: color-mix(in srgb, var(--color-bg-admin) 60%, transparent 80%); */
-    background-color: var(--color-bg-admin);
+    /* background: var(--color-bg-admin);  */
+    background-color: var(--color4);
+    /* FONDO */
     display: grid;
     grid-template-areas:
         ' mu_i mu_n mu_o'
@@ -167,7 +174,8 @@ header.general_element {
 
 aside.general_element {
     padding: 15px;
-    background-color: var(--color-bg-admin);
+    /* background: var(--color-bg-admin);  */
+    /* FONDO */
     flex-direction: column;
     gap: 5px;
     top: 0;
@@ -361,7 +369,8 @@ section {
     gap: 5px;
     font-size: 75% !important;
     /* background-color: color-mix(in srgb, var(--color1) 80%, #fff 60% ); */
-    background-color: var(--color-bg-admin);
+    /* background: var(--color-bg-admin);  */
+    /* FONDO */
     padding: 0;
     padding-right: 10px;
     padding-block: 10px;
@@ -377,12 +386,15 @@ section {
     flex-direction: column;
     justify-content: start;
     align-items: center;
-    padding-block: 25px;
-    padding-inline: 25px;
-    background-color: var(--color-contrast);
+    padding-block: 20px;
+    padding-inline: 20px;
+    /* background-color: var(--color-contrast); */
+    /* background: linear-gradient(215deg,white 75%, transparent 100%) ; */
     /* border-radius: var(--border-radius-size); */
-    border-radius: 15px;
+    border-radius: 5px;
+    background: white;
     overflow-y: auto;
+    backdrop-filter: blur(20px);
 }
 
 .section_content::-webkit-scrollbar {
@@ -661,7 +673,7 @@ p.text_none {
 .crud_title i {
     /* font-size: 155%; */
     font-size: 40px;
-    color: var(--color1);
+    color: color-mix(in srgb, var(--color-base) 40%, var(--color-thr) 100%);
     justify-self: center;
 }
 
