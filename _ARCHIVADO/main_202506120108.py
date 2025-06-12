@@ -43,16 +43,16 @@ from controladores import controlador_preguntas_frecuentes as controlador_pregun
 from controladores import controlador_regla_cargo as controlador_regla_cargo
 from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 from controladores import reporte_ingresos as reporte_ingresos
+from controladores.bd import sql_execute
 from controladores import controlador_transaccion_venta as controlador_transaccion_venta
 from controladores import controlador_detalle_venta as controlador_detalle_venta
 from controladores import controlador_metodo_pago_venta as controlador_metodo_pago_venta
 from controladores import controlador_articulo as controlador_articulo
 from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 from controladores import controlador_encomienda as controlador_encomienda
-from controladores.bd import sql_execute
 
 
-from decimal import Decimal
+
 import hashlib
 import os
 from werkzeug.utils import secure_filename
@@ -63,15 +63,7 @@ from functools import wraps
 import inspect
 
 
-from flask_socketio import SocketIO, emit
-from time import sleep
-from threading import Thread
-
-
 app = Flask(__name__, template_folder='templates')
-app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, cors_allowed_origins="*")
-
 
 STATE_0              = configuraciones.STATE_0
 STATE_1              = configuraciones.STATE_1
@@ -1797,7 +1789,6 @@ def inject_globals():
 
 PAGINAS_SIMPLES = [ 
     "index" , 
-    'pagina_test_rastreo' ,
     'tracking',
     'seguimiento',
     'recuperar_contrasenia',
@@ -1894,6 +1885,8 @@ def cotizador():
         distritos = distritos,
         sucursales = sucursales,
     )
+
+from decimal import Decimal
 
 
 @app.route("/api/calculate_tarifa", methods=["POST"])
@@ -2714,6 +2707,17 @@ def reporte(report_name):
             )
 
 
+@app.route("/seguimiento_empleado_prueba=<placa>")
+@validar_empleado()
+def seguimiento_empleado_prueba(placa):
+    return render_template('seguimiento_empleado_prueba.html', placa=placa ,
+        cur_modulo_id = permiso.get_pagina_key('salida')['moduloid'] ,
+                           
+                           )
+
+
+
+
 @app.route("/administrar_paginas")
 @validar_empleado()
 def administrar_paginas():
@@ -3001,46 +3005,9 @@ def actualizar_permiso_modulo():
 
 
 
-@app.route("/api/seguimiento/<placa>", methods=["GET"])
-def api_seguimiento_vehiculo(placa):
-    try:
-        data = controlador_salida.get_salida_pendiente_placa(placa.upper())
-
-        if not data:
-            return jsonify({"error": "No hay salida activa para esta placa."}), 404
-
-        return jsonify(data[0])  # asumiendo solo una salida activa por placa
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route("/seguimiento_empleado_prueba=<placa>")
-@validar_empleado()
-def seguimiento_empleado_prueba(placa):
-    data = controlador_salida.get_info_salida_pendiente_placa(placa.upper())
-    return render_template(
-        'seguimiento_empleado_prueba.html', 
-        placa = placa ,
-        data = data ,
-        cur_modulo_id = permiso.get_pagina_key('salida')['moduloid'] ,
-        )
-
-
-@socketio.on("ubicacion_movil")
-def recibir_ubicacion(data):
-    emit("ubicacion_actualizada", data, broadcast=True)
-
-
-@app.route("/simulador_envio_ubicacion")
-def simulador_envio_ubicacion():
-    return render_template(
-        'simulador_envio_ubicacion.html', 
-        )
 
 if __name__ == "__main__":
-    # app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=True)
-    # Thread(target=enviar_posiciones).start()
-    socketio.run(app, host='0.0.0.0', port=8000, debug=True)
+    app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=True)
 
 
 

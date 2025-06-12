@@ -1,0 +1,207 @@
+{% extends 'MAESTRA_ADMIN.html' %}
+
+{% block estilos %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link rel="stylesheet" href="/static/css/seguimiento_empleado.css">
+{% endblock %}
+
+{% block contenido %}
+<div class="block_crud block_title" style="padding: 20px 10px 30px 10px; font-size: 1rem;">
+  <h3 class="crud_title">
+    <i class="fas fa-shipping-fast"></i>
+    Seguimiento por unidad
+  </h3>
+</div>
+<div class="container">
+
+  <div class="sidebar">
+
+    <div class="vehicle-info-card" id="vehicleInfoCard" style="display: none;">
+      <div class="vehicle-header">
+        <div class="vehicle-id" id="selectedVehicleId">{{ placa.upper() }}</div>
+        <div class="vehicle-status" id="selectedVehicleStatus">EN RUTA</div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Distancia Total</div>
+          <div class="info-value" id="vehicleDistance">450 km</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">TIEMPO ESTIMADO</div>
+          <div class="info-value" id="vehicleETA">6h 30m</div>
+        </div>
+      </div>
+
+      <div class="route-progress">
+        <div class="progress-label">
+          <span>Progreso del Viaje</span>
+          <span id="progressPercentage">34%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width: 34%"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="route-details" id="routeDetails" style="display: none;">
+      <div class="route-step">
+        <i class="fas fa-circle route-icon step-origin"></i>
+        <span id="routeOrigin">Origen: Chiclayo, Lambayeque</span>
+      </div>
+      <div class="route-step">
+        <i class="fas fa-truck route-icon step-current"></i>
+        <span id="currentLocation">Actual: Trujillo, La Libertad</span>
+      </div>
+      <div class="route-step">
+        <i class="fas fa-map-marker-alt route-icon step-destination"></i>
+        <span id="routeDestination">Destino: Lima, Lima</span>
+      </div>
+      <div class="route-step">
+        <i class="fas fa-user route-icon step-current"></i>
+        <span id="driverName">Conductor: Carlos Mendoza</span>
+      </div>
+      <div class="route-step">
+        <i class="fas fa-box route-icon step-current"></i>
+        <span id="cargoInfo">Carga: 25 toneladas</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="control-btn primary" id="locateMeBtn">
+        <i class="fas fa-crosshairs"></i>
+        Mi Ubicación GPS
+      </button>
+      <button class="control-btn" id="centerRouteBtn">
+        <i class="fas fa-route"></i>
+        Centrar en Ruta
+      </button>
+      <button class="control-btn" id="followVehicleBtn">
+        <i class="fas fa-video"></i>
+        Seguir Vehículo
+      </button>
+      <button class="control-btn" id="refreshBtn">
+        <i class="fas fa-sync-alt"></i>
+        Actualizar
+      </button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div id="map"></div>
+
+    <div class="map-overlay">
+      <button class="overlay-btn" id="satelliteBtn" title="Vista Satélite"><i class="fas fa-satellite"></i></button>
+      <button class="overlay-btn" id="fullscreenBtn" title="Pantalla Completa"><i class="fas fa-expand"></i></button>
+      <button class="overlay-btn" id="settingsBtn" title="Configuración"><i class="fas fa-cog"></i></button>
+    </div>
+
+    <div class="legend">
+      <h4><i class="fas fa-info-circle"></i> Leyenda</h4>
+      <div class="legend-item">
+        <div class="legend-line line-completed"></div>
+        <span>Ruta Completada</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-line line-pending"></div>
+        <span>Ruta Pendiente</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-icon icon-vehicle">
+          <i class="fas fa-truck"></i>
+        </div>
+        <span>Vehículo Actual</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-icon icon-origin">
+          <i class="fas fa-play"></i>
+        </div>
+        <span>Punto de Origen</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-icon icon-destination">
+          <i class="fas fa-flag"></i>
+        </div>
+        <span>Destino Final</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="notification" id="notification">
+  <i class="fas fa-check-circle"></i>
+  <span id="notificationText">Vehículo seleccionado</span>
+</div>
+{% endblock %}
+<!-- 1. Primero, agrega la placa como variable JavaScript al inicio del bloque scripts -->
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+  const placa = "{{ placa.upper() }}";
+  const ruta = {
+    origen: [{{ data[0].origen_latitud }}, {{ data[0].origen_longitud }}],
+    destino: [{{ data[0].destino_latitud }}, {{ data[0].destino_longitud }}],
+  };
+
+  let map = L.map('map').setView(ruta.origen, 13);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  const origenMarker = L.marker(ruta.origen).addTo(map).bindPopup("Origen").openPopup();
+  const destinoMarker = L.marker(ruta.destino).addTo(map).bindPopup("Destino");
+
+  const line = L.polyline([ruta.origen, ruta.destino], { color: 'blue' }).addTo(map);
+
+  const vehiculoMarker = L.marker(ruta.origen, {
+    icon: L.divIcon({
+      html: '<i class="fas fa-truck"></i>',
+      className: 'icon-vehicle',
+      iconSize: [25, 25]
+    })
+  }).addTo(map);
+
+  function calcularDistancia(lat1, lon1, lat2, lon2) {
+    const toRad = deg => deg * Math.PI / 180;
+    const R = 6371; // km
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat/2) ** 2 +
+              Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+              Math.sin(dLon/2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
+
+  function actualizarProgreso(pos) {
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
+    const actual = [lat, lng];
+
+    vehiculoMarker.setLatLng(actual);
+    map.setView(actual);
+
+    const total = calcularDistancia(...ruta.origen, ...ruta.destino);
+    const restante = calcularDistancia(lat, lng, ...ruta.destino);
+    let progreso = 100 - (restante / total) * 100;
+    progreso = Math.max(0, Math.min(progreso, 100)); // limitar entre 0 y 100
+
+    document.getElementById('progressPercentage').textContent = `${progreso.toFixed(1)}%`;
+    document.getElementById('progressFill').style.width = `${progreso.toFixed(1)}%`;
+  }
+
+  if ('geolocation' in navigator) {
+    navigator.geolocation.watchPosition(actualizarProgreso, err => {
+      console.error("Error de GPS:", err);
+    }, {
+      enableHighAccuracy: true,
+      maximumAge: 0,
+      timeout: 10000
+    });
+  } else {
+    alert("Tu navegador no soporta geolocalización.");
+  }
+</script>
+{% endblock %}

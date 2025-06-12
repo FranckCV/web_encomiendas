@@ -102,7 +102,59 @@ def get_table():
 #####_ ADICIONALES _#####
 
 
+def get_salida_pendiente_placa(placa):
+    sql= f'''
+        SELECT so.id AS salida_id, o.id AS origen_id, 
+        o.latitud AS origen_latitud, o.longitud AS origen_longitud, 
+        d.id AS destino_id, d.latitud AS destino_latitud, 
+        d.longitud AS destino_longitud, u.placa AS unidad_placa 
+        FROM salida so 
+        JOIN sucursal o ON o.id = so.origen_inicio 
+        JOIN sucursal d ON d.id = so.destino_final 
+        JOIN unidad u ON u.id = so.unidadid
+        where u.placa = %s and so.estado = 'E'
+    '''
+    
+    filas = sql_select_fetchall(sql,(placa))
+    
+    return filas
 
 
+def get_info_salida_pendiente_placa(placa):
+    sql= f'''
+        SELECT 
+            so.id AS salida_id,
+            o.id AS origen_id,
+            o.latitud AS origen_latitud,
+            o.longitud AS origen_longitud,
+            uo.departamento AS origen_departamento,
+            uo.provincia AS origen_provincia,
+            uo.distrito AS origen_distrito,
 
+            d.id AS destino_id,
+            d.latitud AS destino_latitud,
+            d.longitud AS destino_longitud,
+            ud.departamento AS destino_departamento,
+            ud.provincia AS destino_provincia,
+            ud.distrito AS destino_distrito,
+
+            u.placa AS unidad_placa,
+            CONCAT(c.nombre , ' ' , c.apellidos) AS conductor_nombre,
+            so.estado,
+            so.fecha,
+            so.hora
+        FROM salida so
+        JOIN sucursal o ON o.id = so.origen_inicio
+        JOIN ubigeo uo ON uo.codigo = o.ubigeocodigo
+        JOIN sucursal d ON d.id = so.destino_final
+        JOIN ubigeo ud ON ud.codigo = d.ubigeocodigo
+        JOIN unidad u ON u.id = so.unidadid
+        JOIN empleado c ON c.id = so.conductor_principal
+        WHERE u.placa = %s AND so.estado = 'E'
+
+    '''
+    
+    filas = sql_select_fetchall(sql,(placa))
+    
+    return filas
 
