@@ -102,6 +102,7 @@ VALUES (1, 'Mantenimientos'),
   (5, 'Gráficos');
 
 
+
 INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `tipo_paginaid`, `moduloid`) VALUES
 (1, 'tipos de unidades', 'fa-solid fa-truck-plane', 1, 'tipo_unidad', 1, 1),
 (2, 'marcas de unidades', 'fa-solid fa-car-side', 1, 'marca', 1, 1),
@@ -112,9 +113,9 @@ INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `tipo_paginaid`,
 (7, 'roles', 'fa-solid fa-user-shield', 1, 'rol', 1, 7),
 (8, 'métodos de pago', 'fa-solid fa-money-bill-wave', 1, 'metodo_pago', 1, 5),
 (9, 'empleados', 'fa-solid fa-address-card', 1, 'empleado', 1, 7),
-(10, 'tipos de clientes', 'fa-solid fa-layer-group', 1, 'tipo_cliente', 1, 3),
+(10, 'tipos de clientes', 'fa-solid fa-layer-group', 1, 'tipo_cliente', 1, 6),
 (11, 'usuarios', 'fa-solid fa-user', 1, 'usuario', 1, 6),
-(12, 'clientes', 'fa-solid fa-user', 1, 'cliente', 1, 3),
+(12, 'clientes', 'fa-solid fa-user', 1, 'cliente', 1, 6),
 (13, 'tipos de documentos', 'fa-solid fa-id-card', 1, 'tipo_documento', 1, 1),
 (14, 'tipos de comprobantes', 'fa-solid fa-file-lines', 1, 'tipo_comprobante', 1, 1),
 (15, 'tipos de indemnización', 'fa-solid fa-hand-holding-dollar', 1, 'tipo_indemnizacion', 1, 4),
@@ -124,17 +125,31 @@ INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `tipo_paginaid`,
 (19, 'articulos para encomiendas', 'fa-solid fa-box-open', 1, 'articulo', 1, 5),
 (20, 'estados de encomiendas', 'fa-solid fa-boxes-packing', 1, 'estado_encomienda', 1, 3),
 (21, 'tipos de roles', 'ri-file-user-fill', 1, 'tipo_rol', 1, 7),
-(22, 'Motivos de reclamo', NULL, 1, 'motivo_reclamo', 1, 4),
-(23, 'Causas de reclamo', NULL, 1, 'causa_reclamo', 1, 4),
+(22, 'Motivos de reclamo', '', 1, 'motivo_reclamo', 1, 4),
+(23, 'Causas de reclamo', '', 1, 'causa_reclamo', 1, 4),
 (24, 'Tarifas de ruta', 'fa-solid fa-dollar', 1, 'tarifa_ruta', 1, 1),
 (25, 'Sucursales', 'ri-store-3-line', 1, 'sucursal', 1, 1),
 (26, 'tipos de reclamos', 'fa-solid fa-book-open-reader', 1, 'tipo_reclamo', 1, 4),
-(27, 'Reporte', NULL, 1, 'aa', 4, 2),
 (28, 'Administración de páginas', 'ri-file-settings-fill', 1, 'administrar_paginas', 2, 6),
 (29, 'Información de la empresa', 'ri-file-lock-fill', 1, 'informacion_empresa', 2, 1),
 (30, 'Reclamo', 'fa fa-bullhorn', 1, 'reclamo', 1, 4),
-(31, 'Preguntas frecuentes', 'fa-solid fa-circle-question', 1, 'pregunsta_frecuente', 1, 4),
-(32, 'Listado de paquetes por estado actual y fecha', 'fa-solid fa-boxes', 1, 'paquete_estado_fecha', 4, 3);
+(31, 'Preguntas frecuentes', 'fa-solid fa-circle-question', 1, 'pregunta_frecuente', 1, 4),
+(32, 'Listado de paquetes por estado actual y fecha', 'fa-solid fa-boxes', 1, 'paquete_estado_fecha', 4, 3),
+(33, 'Salidas', 'fa-solid fa-van-shuttle', 1, 'salida', 3, 2),
+(34, 'Programación de encomiendas', 'fa-solid fa-boxes-packing', 1, 'transaccion_encomienda', 3, 3),
+(35, 'Programar nueva salida', 'fas fa-shipping-fast', 1, 'salida_informacion', 2, 2),
+(36, 'Reporte de horarios de sucursales', 'fa-solid fa-clock', 1, 'horarios_sucursal', 4, 1),
+(37, 'Reporte de ingresos por periodo', 'fa-solid fa-coins', 1, 'ingresos_periodo', 4, 1),
+(38, 'Reporte de uso de unidades', '', 1, '', 4, 1),
+(39, 'Listado de empleados por rol', 'fa-solid fa-user-tie', 1, 'listado_general_empleados_rol', 4, 7),
+(40, 'Reporte de Usuarios', 'fa-solid fa-users', 1, 'reporte_usuarios', 4, 6),
+(41, 'Lista de Artículos Más Vendidos', 'fa-solid fa-boxes-stacked', 1, 'articulos_mas_vendidos', 4, 5),
+(42, 'Reporte de Artículos que Necesitan Reposición', 'fa-solid fa-boxes-stacked', 1, 'articulos_reposicion', 4, 5),
+(43, 'Reporte de ventas por periodo', 'fa-solid fa-sack-dollar', 1, 'ventas_periodo', 4, 5),
+(44, 'Descuentos', 'fa-solid fa-percent', 1, 'descuento', 1, 5),
+(45, 'Descuentos de artículos', 'fa-solid fa-percent', 1, 'descuento_articulo', 1, 5),
+(46, 'detalle de un estado de reclamo', 'fa-solid fa-file', 1, 'detalle_reclamo', 1, 4),
+(47, 'Programación de devoluciones', 'ri-truck-line', 1, 'programacion_devolucion', 2, 3);
 
 
 INSERT INTO `tipo_rol` (`id`, `nombre`, `descripcion`, `activo`)
@@ -8260,6 +8275,7 @@ values (28, 29, 80.00),
   (5,  1,  70.00),  
   (60, 28, 120.00);
 
+<<<<<<< HEAD
 
   (3, 5, 40.00),
   (5, 1, 70.00),
@@ -8382,3 +8398,6 @@ INSERT INTO `modalidad_pago` (`id`, `nombre`, `descripcion`, `activo`) VALUES
 (3, 'Destinatario paga contraentrega',
     'El destinatario realiza el pago en el momento de recibir el paquete en su domicilio o sucursal.',
     1);
+=======
+  
+>>>>>>> a5717a40e5703d8db39ce30cadd42349cb03bf33

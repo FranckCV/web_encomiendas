@@ -160,7 +160,7 @@ CREATE TABLE modalidad_pago (
 CREATE TABLE modelo (
   id            int(11) NOT NULL AUTO_INCREMENT, 
   nombre        varchar(20) NOT NULL, 
-  activo        tinyint(1) NOT NULL, 
+  activo        tinyint(1) default 1 NOT NULL, 
   marcaid       int(11) NOT NULL, 
   tipo_unidadid int(10) NOT NULL, 
   PRIMARY KEY (id));

@@ -4,15 +4,18 @@
 <link rel="stylesheet" href="/static/css/salida_informacion.css">
 {% endblock estilos %}
 
-{% block contenido %}
+{% block titulo %}
+Programar nueva salida
+{% endblock %}
 
+{% block contenido %}
 
   <div class="container">
         <!-- Header -->
     <div class="block_crud block_title" style="padding: 20px 10px 30px 10px; font-size: 1rem;">
   <h3 class="crud_title">
-    <i class="fas fa-shipping-fast"></i> 
-    Programar nueva salida
+    <i class="{{page_icono}}"></i> 
+    {{page_titulo}}
   </h3>
 </div>
 

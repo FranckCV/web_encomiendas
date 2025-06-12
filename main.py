@@ -125,45 +125,6 @@ def articulos_mas_vendidos():
 
 ###########_ FUNCIONES _#############
 
-# def listar_admin_pages():
-#     menu_keys = list(MENU_ADMIN.keys())
-#     modules = []
-#     for module in menu_keys:
-#         pages_crud = []
-#         pages_report = []
-#         config = MENU_ADMIN.get(module)
-#         active = config["active"]
-#         if active is True:
-#             name = config.get("name")
-#             icon_module = get_icon_page(config.get("icon_page"))
-#             dashboard = config.get("dashboard")
-#             cruds = config.get("cruds")
-#             reports = config.get("reports")
-            
-#             if cruds != [] and cruds is not None:
-#                 for page in cruds:
-#                     config_page = CONTROLADORES.get(page)
-#                     if config_page:
-#                         p_active = config_page.get('active')
-#                         if p_active is True:
-#                             p_titulo = config_page.get('titulo')
-#                             p_icon_page = get_icon_page(config_page.get('icon_page'))
-#                             pages_crud.append([ page , p_titulo , p_icon_page ])
-            
-#             if reports != [] and reports is not None:
-#                 for page in reports:
-#                     config_page = REPORTES.get(page)
-#                     if config_page:
-#                         p_active = config_page.get('active')
-#                         if p_active is True:
-#                             p_titulo = config_page.get('titulo')
-#                             p_icon_page = get_icon_page(config_page.get('icon_page'))
-#                             p_elements = config_page.get('elements')
-#                             pages_report.append([ page , p_titulo , p_icon_page , p_elements ])
-            
-#             modules.append([ name , icon_module , dashboard , pages_crud , pages_report , module])
-#     return modules
-
 #Opciones para activar o desacticar
 def get_options_active():
     lista = [
@@ -204,14 +165,6 @@ def encrypt_sha256_string(str):
     return encstr
 
 # Crear response para login
-# def resp_login( url_function , user_id , correo ):
-#     resp = make_response(redirect_url(url_function))
-#     resp.set_cookie('user_id', str(user_id))
-#     resp.set_cookie('correo', correo)
-#     return resp
-
-
-# Crear response para login
 def resp_login( correo , contrasenia ):
     usuario = controlador_usuario.get_usuario_por_correo(correo)
     encpassword = encrypt_sha256_string(contrasenia)
@@ -222,7 +175,6 @@ def resp_login( correo , contrasenia ):
         return resp
     else:
         return rdrct_error(redirect_url('login') ,'LOGIN_INVALIDO')
-
 
 # Crear response para register
 def resp_register( correo, contrasenia , conf_contrasenia, telefono, num_documento, nombre_siglas, apellidos_razon, tipo_documentoid, tipo_clienteid ):
@@ -239,7 +191,6 @@ def resp_register( correo, contrasenia , conf_contrasenia, telefono, num_documen
     else:
         return rdrct_error(redirect_url('sign_up') ,'Las contraseñas no coinciden')
 
-
 # Extraer función de un enlace
 def obtener_funcion_desde_url(app: Flask, url: str, method='GET'):
     adapter: MapAdapter = app.url_map.bind("localhost")
@@ -248,6 +199,17 @@ def obtener_funcion_desde_url(app: Flask, url: str, method='GET'):
         return endpoint  # nombre de la función de vista
     except Exception as e:
         return f"No se encontró ninguna función para la URL '{url}': {str(e)}"
+
+# Registrar páginas simples en la app
+def registrar_paginas_con_decorador(app, paginas, decorador):
+    for pagina in paginas:
+        # Aplicar el decorador manualmente a la función
+        def vista(p=pagina):
+            return render_template(f"{p}.html")
+
+        # Decorar la vista y registrarla
+        vista_decorada = decorador()(vista)
+        app.add_url_rule(f"/{pagina}", pagina, vista_decorada)
 
 # Datos de usuario que ha iniciado sesión
 def getDatosUsuario():
@@ -278,7 +240,6 @@ def guardar_imagen_bd(tabla,ad,archivo):
         # nombre_final = f"{timestamp}_{filename_seguro}"
         upload_folder = f'static/img/img_{tabla}'
         nombre_final = f"{ad}{filename_seguro}"
-        print('IMG archivo:',nombre_final)
         ruta_completa = os.path.join(upload_folder, nombre_final)
         archivo.save(ruta_completa)
         return nombre_final
@@ -1224,32 +1185,7 @@ CONTROLADORES = {
             "crud_unactive": False ,
         }
     },
-    "tipo_paquete": {
-        "active" : True ,
-        "titulo": "tipos de paquetes",
-        "nombre_tabla": "tipo de paquete",
-        "controlador": controlador_contenido_paquete,
-        "icon_page": 'ri-box-3-fill',
-        "filters": [
-            ['activo', f'{TITLE_STATE}', get_options_active() ],
-        ] ,
-        "fields_form": [
-#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
-     "modalidad_pago": {
+    "modalidad_pago": {
         "active" : True ,
         "titulo": "modalidad de pago",
         "icon_page": 'fa-solid fa-truck-plane',
@@ -1279,27 +1215,61 @@ CONTROLADORES = {
 }
 
 
-REPORTES = {
-    "lista_unidades": {
-        "active" : True ,
-        'icon_page' : 'fa-solid fa-truck' ,
-        "titulo": "Listado de unidades",
-        "table" : controlador_unidad.get_report_test(),
+REPORTES = {   
+    # Administracion
+    "horarios_sucursal": {
+        "active": True,
+        "icon_page": "fa-solid fa-clock",
+        "titulo": "Reporte de horarios de sucursales",
+        "table": controlador_sucursal.get_report_horario(), 
         "filters": [
-            ['modeloid', 'Modelo', lambda: controlador_modelo.get_options() ],
-        ] ,
-        
+            # ['stock_min', 'Stock Mínimo', None, 'number'],
+        ],
     },
-    "lista_empleados": {
+    "ingresos_periodo": {
+        "active": True,
+        "icon_page": "fa-solid fa-coins",  # Puedes cambiar este ícono si quieres otro
+        "titulo": "Reporte de ingresos por periodo",
+        "table": reporte_ingresos.get_ingresos_diarios(),
+        "filters": [],  # No se requiere filtro por ahora
+    },
+    # Encomiendas
+    "paquete_estado_fecha": {
         "active" : True ,
-        'icon_page' : 'fa-solid fa-clipboard-user' ,
-        "titulo": "Listado de empleados",
-        "table" : controlador_empleado.get_report_test(),
+        'icon_page' : 'fa-solid fa-box' ,
+        "titulo": "Listado de paquetes por estado actual y fecha",
+        "table" : controlador_paquete.get_report_test(),
         "filters": [
-            ['rol_id', 'Rol', lambda: controlador_rol.get_options() ],
+            ['fecha', 'Fecha', None, 'interval_date' ],
         ] ,
-        
     },
+    
+    # Logistica
+
+    # Personal
+    "listado_general_empleados_rol": {
+        "active": True,
+        "icon_page": "fa-solid fa-user-tie",
+        "titulo": "Listado de empleados por rol",
+        "table": controlador_empleado.get_report_test(),
+        "filters": [
+            ['rol_id', 'Rol', lambda: controlador_rol.get_options()],
+        ],
+    },
+
+    # Seguridad
+    "reporte_usuarios": {
+        "active": True,
+        "icon_page": "fa-solid fa-users",
+        "titulo": "Reporte de Usuarios",
+        "table": controlador_usuario.get_report_usuarios(),
+        "filters": [
+            ['tipo_usuario', 'Tipo de Usuario', lambda: controlador_usuario.get_options()],
+            ['activo', 'Estado', lambda: [(1, "Activo"), (0, "Inactivo")]],
+        ],
+    },     
+    
+    # Ventas
     "ventas_periodo": {
         "active" : True ,
         'icon_page' : 'fa-solid fa-sack-dollar' ,
@@ -1311,43 +1281,6 @@ REPORTES = {
             # ['fecha', 'Fecha', None, 'date' ],
         ] ,
     },
-    "paquete_estado_fecha": {
-        "active" : True ,
-        'icon_page' : 'fa-solid fa-box' ,
-        "titulo": "Listado de paquetes por estado actual y fecha",
-        "table" : controlador_paquete.get_report_test(),
-        "filters": [
-            ['fecha', 'Fecha', None, 'interval_date' ],
-        ] ,
-    },
-    "listado_general_empleados_rol": {
-        "active": True,
-        "icon_page": "fa-solid fa-user-tie",
-        "titulo": "Listado de empleados por rol",
-        "table": controlador_empleado.get_report_test(),
-        "filters": [
-            ['rol_id', 'Rol', lambda: controlador_rol.get_options()],
-        ],
-    },
-
-    "ingresos_periodo": {
-        "active": True,
-        "icon_page": "fa-solid fa-coins",  # Puedes cambiar este ícono si quieres otro
-        "titulo": "Reporte de ingresos por periodo",
-        "table": reporte_ingresos.get_ingresos_diarios(),
-        "filters": [],  # No se requiere filtro por ahora
-    },
-
-    "reporte_usuarios": {
-        "active": True,
-        "icon_page": "fa-solid fa-users",
-        "titulo": "Reporte de Usuarios",
-        "table": controlador_usuario.get_report_usuarios(),
-        "filters": [
-            ['tipo_usuario', 'Tipo de Usuario', lambda: controlador_usuario.get_options()],
-            ['activo', 'Estado', lambda: [(1, "Activo"), (0, "Inactivo")]],
-        ],
-    },     
     "articulos_mas_vendidos": {
         "active": True,
         "icon_page": "fa-solid fa-boxes-stacked",
@@ -1366,16 +1299,20 @@ REPORTES = {
             ['stock_minimo', 'Stock Mínimo', lambda: controlador_articulo.get_stock_minimo_options(), 'select'],
         ],
     },
-    "horarios_sucursal": {
-        "active": True,
-        "icon_page": "fa-solid fa-clock",
-        "titulo": "Reporte de horarios de sucursales",
-        "table": controlador_sucursal.get_report_horario(), 
-        "filters": [
-            # ['stock_min', 'Stock Mínimo', None, 'number'],
-        ],
-    }
 
+
+    "lista_unidades": {
+        "active" : True ,
+        'icon_page' : 'fa-solid fa-truck' ,
+        "titulo": "Listado de unidades",
+        "table" : controlador_unidad.get_report_test(),
+        "filters": [
+            ['modeloid', 'Modelo', lambda: controlador_modelo.get_options() ],
+        ] ,
+        
+    },
+    
+    
 }
 
 
@@ -1537,72 +1474,6 @@ GRAFICOS = {
 }
 
 
-MENU_ADMIN = {
-    'administracion' : {
-        'active': True ,
-        'name' : 'Administración',
-        'icon_page' : 'fa-solid fa-user-tie',
-        'dashboard' : True,
-        'cruds' :     [ 'tipo_unidad' , 'marca' , 'modelo' , 'unidad' , 'sucursal','ubigeo','tarifa_ruta'],
-        'reports' :   [ 
-            'lista_unidades' , 
-        ],
-    },
-    'logistica' : {
-        'name' : 'Logística',
-        'active': True ,
-        'icon_page' : 'fa-solid fa-truck-front',
-        'dashboard' : True,
-        'cruds' :     [ 'ubigeo' ],
-        'reports' :   [ 'lista_unidades' ],
-    },
-    'encomienda' : {
-        'name' : 'Encomiendas',
-        'active': True ,
-        'icon_page' : 'fa-solid fa-box',
-        'dashboard' : True,
-        'cruds' :     [ 'estado_encomienda','tipo_paquete', 'tipo_cliente', 'cliente' ],
-        'reports' :   [ 
-            'envios_tipo' , 
-            'entregado_pendiente' ,
-            'top_envios' , 
-            ],
-    },
-    'atencion' : {
-        'name' : 'Atención al Cliente',
-        'active': True ,
-        'icon_page' : 'fa-solid fa-circle-question',
-        'dashboard' : True,
-        'cruds' :     [ 'tipo_indemnizacion','tipo_reclamo','motivo_reclamo','causa_reclamo','estado_reclamo','reclamo','pregunta_frecuente' ],
-        'reports' :   [ ],
-    },
-    'ventas' : {
-        'name' : 'Ventas',
-        'active': True ,
-        'icon_page' : 'fa-solid fa-file-invoice-dollar',
-        'dashboard' : True,
-        'cruds' :     ['tamaño_caja', 'metodo_pago', 'tipo_comprobante','descuento','descuento_articulo' ],
-        'reports' :   [ 'articulos_mas_vendidos'  ],
-    },
-    'seguridad' : {
-        'name' : 'Seguridad',
-        'active': True,
-        'icon_page' : 'fa-solid fa-shield-halved',
-        'dashboard' : True,
-        'cruds' :     [  ],
-        'dashboard' : False,
-    },
-    'personal' : {
-        'name' : 'Personal',   
-        'active': True ,
-        'icon_page' : 'fa-solid fa-briefcase',
-        'dashboard' : True,
-        'cruds' :     [ 'tipo_cargo' ],
-        'reports' :   [  ],
-    },
-}
-
-
 TRANSACCIONES = {
     "salida": {
         "active" : True ,
@@ -1613,7 +1484,7 @@ TRANSACCIONES = {
         "filters": [
             
         ] ,
-       "fields_form" : [
+        "fields_form" : [
             ['id',          'ID',            'ID',             'text',   True,   False,   None],
             ['nom_conductor','Conductor',    'Nombre del conductor', 'text', True, False,   None],
             ['placa',       'Placa de unidad','Placa de unidad', 'text',   True,   True,    None],
@@ -1623,7 +1494,6 @@ TRANSACCIONES = {
             ['capacidad',   'Capacidad',     'Capacidad en kg', 'number', True,  False,   None],
             ['estado',      'Estado',        'Estado actual',   'text',   True,   False,   None],
        ],
-
         "crud_forms": {
             "crud_list": True ,
             "crud_search": False ,
@@ -1641,7 +1511,6 @@ TRANSACCIONES = {
         "controlador": controlador_encomienda,
         "icon_page": 'fa-solid fa-boxes-packing',
         "filters": [
-            
         ] ,
        "fields_form" : [
             ['id',          'ID',            'ID',             'text',   True,   False,   None],
@@ -1752,8 +1621,6 @@ def validar_empleado():
                         f_name = f.__name__
                         l_kwarg = list(kwargs.values())
                         f_kwarg = l_kwarg[0] if l_kwarg else None
-                        print(f_name , f_kwarg)
-                        # p_key = f_kwarg if f_kwarg and f_name != 'dashboard' else f_name
 
                         try:
                             # if (usuario['rolid'] == 1 and usuario['tipo_rolid'] == 1) or permiso.validar_acceso(usuario['rolid'] , p_key):
@@ -1814,19 +1681,22 @@ def inject_cur_modulo_id():
                 else:
                     dataPage = permiso.get_pagina_key(key)
                     if dataPage:
-                        return dict(cur_modulo_id=dataPage['moduloid'])
+                        if dataPage['tipo_paginaid'] == 2:
+                            page_titulo = dataPage['titulo']
+                            page_icono  = dataPage['icono']
+                            return dict(
+                                cur_modulo_id = dataPage['moduloid'] ,
+                                page_titulo = page_titulo ,
+                                page_icono = page_icono ,
+                            )
+                        else:
+                            return dict(
+                                cur_modulo_id = dataPage['moduloid'] ,
+                            )
         return dict(cur_modulo_id=None)
     except Exception as e:
         return dict(cur_modulo_id=None)
 
-
-def print_controlador():
-    lst = list(CONTROLADORES.keys())
-    for crud in lst:
-        page = CONTROLADORES[crud]
-        titulo = page.get('titulo')
-        icono = page.get('icon_page')
-        print( f'( {titulo} , {icono} , 1 , {crud} , 1 , 1 )' )
 
 @app.context_processor
 def inject_globals():
@@ -1836,7 +1706,6 @@ def inject_globals():
     menu_paginas = []
     menu_rolid = None
 
-    # print_controlador()
 
     main_information = controlador_empresa.get_information()
     cookie_error = request.cookies.get('error')
@@ -1858,7 +1727,6 @@ def inject_globals():
                     menu_tipos_paginas = permiso.get_tipo_paginas_rol(menu_rolid)
                     menu_paginas = permiso.get_paginas_permiso_rol(menu_rolid)
         elif tipoUsuario == 'C':
-            print('reconoce que es C')
             datosUsuario = controlador_usuario.get_usuario_cliente_por_id(user_id)
         else:
             datosUsuario = None
@@ -1885,7 +1753,6 @@ def inject_globals():
 
 
         # constantes
-        MENU_ADMIN             = MENU_ADMIN,
         HABILITAR_ICON_PAGES   = HABILITAR_ICON_PAGES,
         SYSTEM_NAME            = main_information['nombre'],
         STATE_0                = STATE_0,   
@@ -1921,7 +1788,7 @@ def inject_globals():
 
 ###########_ PAGES _#############
 
-paginas_simples = [ 
+PAGINAS_SIMPLES = [ 
     "index" , 
     'tracking',
     'seguimiento',
@@ -1935,25 +1802,22 @@ paginas_simples = [
     'prueba_seguimiento',
     'cajas',
     'cajas_prueba',
-    # 'articulos',
     'sobre_nosotros',
     'TerminosCondiciones',
-    'salidas_programadas', #para eliminar
     'mapa_curds',
-    'salida_informacion',
     'cambiar_contrasenia',
-    'programacion_devolucion',
     'maestra_para_vb',
     # 'Faq'
 ]
 
 
-for pagina in paginas_simples:
+for pagina in PAGINAS_SIMPLES:
     app.add_url_rule(
         f"/{pagina}",  # URL
         pagina,        # Nombre de la función
         lambda p=pagina: render_template(f"{p}.html")  # Renderiza la plantilla
     )
+
 
 @app.route("/sign_up")
 def sign_up():
@@ -2048,9 +1912,7 @@ def api_calculate_tarifa():
         porcentaje_peso = Decimal(str(regla_p['porcentaje'])) if regla_p else Decimal('0')
         porcentaje_valor = Decimal(str(regla_v['porcentaje'])) if regla_v else Decimal('0')
 
-        # print(tarifa_ruta)
         respuesta = controlador_tarifa_ruta.calcularTarifaTotal( tarifa_ruta , peso , porcentaje_recojo , porcentaje_valor , porcentaje_peso )
-        # print(respuesta)
         return jsonify(respuesta)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -2119,8 +1981,8 @@ def enviar_formulario():
         
         return jsonify({'success': True})  # Solo devolvemos un estado de éxito sin mensaje
     except Exception as e:
-        print(f"Error al guardar mensaje: {e}")
         return jsonify({'success': False}), 500  # Solo devolvemos un estado de error
+
 
 @app.route('/api/tipo_cliente')
 def api_tipo_cliente():
@@ -2130,12 +1992,14 @@ def api_tipo_cliente():
     data = [{'id': o[0], 'nombre': o[1]} for o in opciones]
     return jsonify(data)
 
+
 @app.route('/api/sucursales_simple')
 def api_sucursales_simple():
     # from controladores import controlador_sucursal
     opciones = controlador_sucursal.get_ubigeo_sucursal()
     data = [{'id': o['id'], 'direccion': o['direccion_completa']} for o in opciones]
     return jsonify(data)
+
 
 @app.route('/api/tipo_documento')
 def api_tipo_documento():
@@ -2148,7 +2012,6 @@ def api_tipo_documento():
 @app.route("/api/cajas")
 def api_cajas():
     filas = controlador_articulo.get_table_cajas()
-    # print(filas)
     productSizes = {}
 
     for fila in filas:
@@ -2176,7 +2039,6 @@ def api_cajas():
                 "name": fila['nom_descuento'],  
                 "value": float(fila['cantidad_descuento'])
             })
-    # print(productSizes)
     return jsonify(productSizes)
 
 
@@ -2230,7 +2092,6 @@ def api_articulos():
     return jsonify(articulos)
 
 
-
 @app.route("/carrito")
 def carrito():
     return render_template('carrito.html')
@@ -2275,6 +2136,7 @@ def registrar_item_carrito():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @app.route("/eliminar-item-carrito", methods=["POST"])
 def eliminar_item_carrito():
     data = request.get_json()
@@ -2293,6 +2155,7 @@ def eliminar_item_carrito():
     controlador_transaccion_venta.actualizar_monto_total(num_serie)
 
     return jsonify({"success": True})
+
 
 @app.route("/vaciar-carrito", methods=["POST"])
 def vaciar_carrito():
@@ -2392,6 +2255,7 @@ def tipos_envio():
     tipos_envios = controlador_tipo_empaque.get_options()
     return render_template('tipos_envio.html', tipos_envios=tipos_envios)
 
+
 @app.route('/registro-envio')
 def registro_envio():
     nombre_doc = controlador_tipo_documento.get_options()
@@ -2410,10 +2274,12 @@ def registro_envio():
         
     )
 
+
 @app.route('/seguimiento_encomienda')
 def seguimiento_encomienda():
     estado_encomienda = controlador_estado_encomienda.get_last_state()
     return render_template('seguimiento.html',estado_encomienda=estado_encomienda)
+
 
 
 
@@ -2462,6 +2328,8 @@ def resumen_envio():
     return render_template('resumen_envio.html',
                            registros=resultados)
 
+
+
 @app.route('/pagoenvio')
 def mostrar_pagoenvio():
     metodo_pago = controlador_metodo_pago.get_options()
@@ -2498,6 +2366,7 @@ def envio_masivo():
                            porcentaje_peso=porcentaje_peso
                            )
     
+
 @app.route('/api/recepcion', methods=["POST"])
 def recepcion():
     try:
@@ -2544,8 +2413,7 @@ def provincia_origen():
         }
         return jsonify(res)
         
-    
-    
+        
 @app.route('/api/distrito_origen',  methods=["POST"])
 def distrito_origen():
     try:
@@ -2606,6 +2474,7 @@ def departamento_destino():
             'status':-1
         }
     
+
 @app.route('/api/provincia_destino',  methods=["POST"])
 def provincia_destino():
     try:
@@ -2653,6 +2522,7 @@ def distrito_destino():
         }
         return jsonify(res)
     
+
 @app.route('/api/sucursal_destino',  methods=["POST"])
 def sucursal_destino():
     try:
@@ -2708,36 +2578,13 @@ def id_sucursal():
 
 ################# Sucursales ######################
 
+
 @app.route("/perfil")
 def perfil():
     return render_template('perfil.html')
 
 
-
 ##################_ METHOD POST GENERALES _################## 
-
-
-# @app.route("/procesar_login", methods=["POST"])
-# def procesar_login():
-#     try:
-#         correo = request.form["email"]
-#         password = request.form["password"]
-#         usuario = controlador_usuario.get_usuario_por_correo(correo)
-#         encpassword = encrypt_sha256_string(password)
-
-#         if usuario and encpassword == usuario['contrasenia']:
-#             resp = resp_login(
-#                 'login',
-#                 usuario['id'] ,
-#                 usuario['correo'] 
-#             )
-#             return resp
-#         else:
-#             return rdrct_error(redirect_url('login') ,'LOGIN_INVALIDO')
-#     except Exception as e:
-#         return rdrct_error(redirect_url('login')  , e)
-
-
 
 @app.route("/procesar_login", methods=["POST"])
 def procesar_login():
@@ -2766,9 +2613,17 @@ def procesar_register():
         return rdrct_error(redirect_url('login')  , e)
 
 
-
-
 ##################_ PAGINAS EMPLEADO _################## 
+
+
+PAGINAS_SIMPLES_ADMIN = [ 
+    # 'panel' , 
+    'programacion_devolucion',
+    'salidas_programadas', #para eliminar
+    'salida_informacion',
+]
+
+registrar_paginas_con_decorador(app, PAGINAS_SIMPLES_ADMIN, validar_empleado)
 
 
 @app.route("/panel")
@@ -2800,7 +2655,7 @@ def crud_generico(tabla):
     permisos = permiso.consult_permiso_rol(page['id'] , user_info['rolid'])
 
     if config and page:
-        active = config["active"] and (page['activo'] == 1 or user_info['rolid'] == 1 )
+        active = config["active"] and (page['activo'] == 3 or user_info['rolid'] == 1 )
         tipo_paginaid = page['tipo_paginaid']
         no_crud = config.get('no_crud')
 
@@ -2850,6 +2705,66 @@ def crud_generico(tabla):
             )
 
 
+@app.route("/transaccion=<tabla>")
+@validar_empleado()
+def transaccion(tabla):
+    config = TRANSACCIONES.get(tabla)
+    page = permiso.get_pagina_key(tabla)
+    user_info = getDatosUsuario()
+    permisos = permiso.consult_permiso_rol(page['id'] , user_info['rolid'])
+
+    if config and page:
+        active = config["active"] and (page['activo'] == 1 or user_info['rolid'] == 1 )
+        tipo_paginaid = page['tipo_paginaid']
+        no_crud = config.get('no_crud')
+
+        if active is True and tipo_paginaid == 3 and (no_crud is None or no_crud is False):
+            icon_page_crud = get_icon_page(page.get("icono"))
+            titulo = f'{page["titulo"]}'
+
+            nombre_tabla = config["nombre_tabla"]
+            filters = config["filters"]
+            fields_form = config["fields_form"]
+            controlador = config["controlador"]
+
+            existe_activo = controlador.exists_Activo()
+            columnas , filas = controlador.get_table()
+            primary_key = controlador.get_primary_key()
+            table_columns  = list(filas[0].keys()) if filas else []
+            
+            CRUD_FORMS = config["crud_forms"]
+            # crud_list = CRUD_FORMS.get("crud_list")
+            crud_search = CRUD_FORMS.get("crud_search") and (permisos['search'] or user_info['rolid'] == 1 )
+            crud_consult = CRUD_FORMS.get("crud_consult") and (permisos['consult'] or user_info['rolid'] == 1 )
+            crud_insert = CRUD_FORMS.get("crud_insert") and   (permisos['insert'] or user_info['rolid'] == 1 )
+            crud_update = CRUD_FORMS.get("crud_update") and   (permisos['update'] or user_info['rolid'] == 1 )
+            crud_delete = CRUD_FORMS.get("crud_delete") and   (permisos['delete'] or user_info['rolid'] == 1 )
+            crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo and ( permisos['unactive'] or user_info['rolid'] == 1 )
+
+            return render_template(
+                "TRANSACCION.html" ,
+                tabla          = tabla ,
+                nombre_tabla   = nombre_tabla ,
+                icon_page_crud = icon_page_crud ,
+                titulo         = titulo ,
+                filas          = filas ,
+                primary_key    = primary_key ,
+                filters        = filters,
+                fields_form    = fields_form ,
+                columnas       = columnas ,
+                key_columns    = list(columnas.keys()) ,
+                table_columns  = table_columns ,
+                # crud_list      = crud_list,
+                crud_search    = crud_search,
+                crud_consult   = crud_consult,
+                crud_insert    = crud_insert,
+                crud_update    = crud_update,
+                crud_delete    = crud_delete,
+                crud_unactive  = crud_unactive,
+                esTransaccion = True ,
+            )
+
+    
 @app.route("/reporte=<report_name>")
 @validar_empleado()
 def reporte(report_name):
@@ -2877,8 +2792,8 @@ def reporte(report_name):
                 columnas       = columnas ,
                 key_columns    = list(columnas.keys()) ,
                 table_columns  = table_columns ,
+                primary_key    = None ,
                 crud_search    = True,
-                primary_key = None ,
                 # crud_consult   = True,
                 # crud_insert    = True,
                 # crud_update    = True,
@@ -2888,62 +2803,15 @@ def reporte(report_name):
             )
 
 
-@app.route("/transaccion=<tabla>")
-@validar_empleado()
-def crud_transaccion(tabla):
-    config = TRANSACCIONES.get(tabla)
-    if config:
-        active = config["active"]
-        if active is True :
-            icon_page_crud = get_icon_page(config.get("icon_page"))
-            titulo = config["titulo"]
-            controlador = config["controlador"]
-            nombre_tabla = config["nombre_tabla"]
-            filters = config["filters"]
-            fields_form = config["fields_form"]
-
-            existe_activo = controlador.exists_Activo()
-            columnas , filas = controlador.get_table()
-            primary_key = controlador.get_primary_key()
-            table_columns  = list(filas[0].keys()) if filas else []
-            
-            CRUD_FORMS = config["crud_forms"]
-            crud_list = CRUD_FORMS.get("crud_list")
-            crud_search = CRUD_FORMS.get("crud_search")
-            crud_consult = CRUD_FORMS.get("crud_consult")
-            crud_insert = CRUD_FORMS.get("crud_insert")
-            crud_update = CRUD_FORMS.get("crud_update")
-            crud_delete = CRUD_FORMS.get("crud_delete")
-            crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo
-
-            return render_template(
-                "CRUD_prueba.html" ,
-                tabla          = tabla ,
-                nombre_tabla   = nombre_tabla ,
-                icon_page_crud = icon_page_crud ,
-                titulo         = titulo ,
-                filas          = filas ,
-                primary_key    = primary_key ,
-                filters        = filters,
-                fields_form    = fields_form ,
-                columnas       = columnas ,
-                key_columns    = list(columnas.keys()) ,
-                table_columns  = table_columns ,
-                crud_list      = crud_list,
-                crud_search    = crud_search,
-                crud_consult   = crud_consult,
-                crud_insert    = crud_insert,
-                crud_update    = crud_update,
-                crud_delete    = crud_delete,
-                crud_unactive  = crud_unactive,
-                esTransaccion = True
-            )
-
-    
 @app.route("/seguimiento_empleado_prueba=<placa>")
 @validar_empleado()
 def seguimiento_empleado_prueba(placa):
-    return render_template('seguimiento_empleado_prueba.html', placa=placa)
+    return render_template('seguimiento_empleado_prueba.html', placa=placa ,
+        cur_modulo_id = permiso.get_pagina_key('salida')['moduloid'] ,
+                           
+                           )
+
+
 
 
 @app.route("/administrar_paginas")
@@ -3022,6 +2890,7 @@ def informacion_empresa():
         )
 
 
+
 ##################_ PAGINAS EMPLEADO METHOD POST _################## 
 
 @app.route("/insert_row=<tabla>", methods=["POST"])
@@ -3090,10 +2959,7 @@ def crud_update(tabla):
         for nombre, parametro in firma.parameters.items():
             if nombre in request.files:
                 archivo = request.files[nombre]
-                # print(archivo)
-                # print(archivo)
                 if archivo.filename != "":
-                    # print(nombre)
                     nuevo_nombre = guardar_imagen_bd(tabla,'' ,archivo)
                     valores.append(nuevo_nombre)
                 else:
@@ -3101,12 +2967,10 @@ def crud_update(tabla):
                     valores.append(request.form.get(f"{nombre}_actual"))
             else:
                 valor = request.form.get(nombre)
-                # print(valor)
                 if valor == '':
                     valor = None
                 valores.append(valor)
 
-        print(valores)
         controlador.update_row( *valores )
         if no_crud :
             return redirect(url_for(no_crud))
@@ -3215,7 +3079,6 @@ def actualizar_permiso():
         rpta_column = permiso.consult_permiso_rol(paginaid , rolid)[column]
         return jsonify({'success': True , 'rpta' : rpta_column})
     except Exception as e:
-        print("Error al actualizar permiso:", e)
         return jsonify({'success': False, 'error': str(e)})
 
 
@@ -3230,91 +3093,11 @@ def actualizar_permiso_modulo():
     value = data.get('value')
 
     try:
-        # print('aaa')
         permiso.change_permiso_modulo(column , moduloid , rolid , value)
-        # print('bbbb')
         rpta_list = permiso.get_modulo_permiso_rol(rolid , moduloid)
-        # print('ccc')
-        # rpta_column = permiso.consult_permiso_rol(moduloid , rolid)[column]
         return jsonify({'success': True , 'rpta': rpta_list})
     except Exception as e:
-        print("Error al actualizar permiso:", e)
         return jsonify({'success': False, 'error': str(e)})
-
-
-
-
-
-
-###################################CARRITO###########################
-# @app.route('/agregar_carrito', methods = ['POST'])
-# def agregar_carrito():
-    
-
-# @app.route('/seguimiento_empleado')
-# def seguimiento_empleado():
-#     vehicle_id = request.args.get('vehicle_id')
-#     return render_template('seguimiento.html', selected_vehicle_id=vehicle_id)
-
-
-
-
-@app.route("/colores")
-def colores():
-    html = '''
-    <link rel="stylesheet" href="../static/css/common_styles/common_style.css" />
-    <style>
-        body {
-            display: flex;
-            flex-wrap: wrap;
-            margin: 0;
-            gap: 0;
-            align-content: flex-start;
-            background: grey;
-        }
-        .color_block {
-            border: 1px solid black;
-            display: flex;
-            flex-direction: column;
-            height: 100px;
-            width:  9.85vw;
-            font-size: 15px;
-        }
-    </style>    
-'''
-
-    for color in ['-base' , '-sec' , '-thr' , '-contrast']:
-        text = f'--color{color}'
-        html += f'''
-        <div class="color_block">
-        <p>{text}</p> 
-        <div style="height: 100%; width: 100%; background-color: var({text})"></div>
-        </div>
-    '''
-        
-    for color in ['light-color' , 'dark-color' ]:
-        text = f'--{color}'
-        html += f'''
-        <div class="color_block">
-        <p>{text}</p> 
-        <div style="height: 100%; width: 100%; background-color: var({text})"></div>
-        </div>
-    '''
-        
-    for color in range(25):
-        text = f'--color{color}'
-        html += f'''
-        <div class="color_block">
-        <p>{text}</p> 
-        <div style="height: 100%; width: 100%; background-color: var({text})"></div>
-        </div>
-    '''
-    
-    html += '''
-        <input type="color" name="" id="">
-    '''
-
-    return html
 
 
 

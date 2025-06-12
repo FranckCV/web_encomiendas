@@ -413,7 +413,7 @@ def validar_acceso(rolid , f_name , f_kwarg ):
         if f_kwarg in keys:
             return True
         return None
-    elif f_name == 'crud_generico' or f_name == 'reporte' or f_name.startswith('crud_') :
+    elif f_name == 'crud_generico' or f_name == 'reporte' or f_name == 'transaccion' or f_name == 'grafico' or f_name.startswith('crud_') :
         page = get_pagina_key(f_kwarg)
         if page:
             pag_id = page['id']
