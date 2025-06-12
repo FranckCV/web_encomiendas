@@ -48,6 +48,9 @@ from controladores import controlador_transaccion_venta as controlador_transacci
 from controladores import controlador_detalle_venta as controlador_detalle_venta
 from controladores import controlador_metodo_pago_venta as controlador_metodo_pago_venta
 from controladores import controlador_articulo as controlador_articulo
+from controladores import controlador_modalidad_pago as controlador_modalidad_pago
+from controladores import controlador_encomienda as controlador_encomienda
+
 
 
 import hashlib
@@ -1620,8 +1623,47 @@ TRANSACCIONES = {
             "crud_unactive": False ,
         }
     },
-    
+    "transaccion_encomienda": {
+        "active" : True ,
+        "titulo": "encomiendas",
+        "nombre_tabla": "transaccion_encomienda",
+        "controlador": controlador_encomienda,
+        "icon_page": 'fa-solid fa-boxes-packing',
+        "filters": [
+            
+        ] ,
+       "fields_form" : [
+            ['id',          'ID',            'ID',             'text',   True,   False,   None],
+            ['nom_conductor','Conductor',    'Nombre del conductor', 'text', True, False,   None],
+            ['placa',       'Placa de unidad','Placa de unidad', 'text',   True,   True,    None],
+            ['destino',     'Destino',       'Destino',         'text',   True,   True,    None],
+            ['fecha',       'Fecha',         'YYYY-MM-DD',      'date',   True,   True,    None],
+            ['hora',        'Hora',          'HH:MM',           'time',   True,   True,    None],
+            ['capacidad',   'Capacidad',     'Capacidad en kg', 'number', True,  False,   None],
+            ['estado',      'Estado',        'Estado actual',   'text',   True,   False,   None],
+       ],
+
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": False ,
+            "crud_consult": True ,
+            "crud_insert": False ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": False ,
+        }
+    },
 }
+
+
+@app.route('/api/prueba')
+def prueba_cliente():
+    correo = 'fabianapm060126@gmail.com'
+    telefono = '906300986'
+    num_doc = '72426677'
+    nombre = 'Fabiana Mejía'
+    tipo_doc = 1
+    
 
 
 ###########_ REDIRECT _#############
@@ -2382,6 +2424,8 @@ def envio_masivo():
     condiciones = controlador_regla_cargo.get_condiciones_tarifa()
     tarifas = controlador_tarifa_ruta.get_tarifas_ruta_dict()
     modalidad_pago = controlador_modalidad_pago.get_options()
+    peso = controlador_tipo_empaque.get_peso()
+    valor_max = controlador_regla_cargo.get_max_valor()
     return render_template('envio_masivo.html', 
                            nombre_doc=nombre_doc,
                            departamento_origen = departamento_origen,
@@ -2389,7 +2433,10 @@ def envio_masivo():
                            tarifas = json.dumps(tarifas),
                            empaque=empaque, 
                            articulos=articulos,
-                           condiciones=condiciones)
+                           condiciones=condiciones,
+                           peso = peso,
+                           valor_max = valor_max
+                           )
     
 @app.route('/api/recepcion', methods=["POST"])
 def recepcion():
@@ -2453,7 +2500,7 @@ def distrito_origen():
     except Exception as e:
         return {
             'data': [],
-            'msg': f"Ocurrió un error al listar las provincias: {repr(e)}",
+            'msg': f"Ocurrió un error al listar las distritos: {repr(e)}",
             'status':-1
         }
     
@@ -2479,12 +2526,81 @@ def departamento_destino():
     except Exception as e:
         return {
             'data': [],
-            'msg': f"Ocurrió un error al listar las provincias: {repr(e)}",
+            'msg': f"Ocurrió un error al listar las departamentos: {repr(e)}",
             'status':-1
         }
     
-
-
+@app.route('/api/provincia_destino',  methods=["POST"])
+def provincia_destino():
+    try:
+        datos = request.get_json()
+        codigo = datos.get('codigo')
+        dep = datos.get('dep')
+        
+        
+        provincias = controlador_tarifa_ruta.get_provincia_destino(dep,codigo)
+        
+        return {
+            'data': provincias,
+            'msg': "Se listó con éxito",
+            'status':1
+        }
+    except Exception as e:
+        return {
+            'data': [],
+            'msg': f"Ocurrió un error al listar las provincias: {repr(e)}",
+            'status':-1
+        }
+        
+        
+@app.route('/api/distrito_destino',  methods=["POST"])
+def distrito_destino():
+    try:
+        datos = request.get_json()
+        codigo = datos.get('codigo')
+        prov = datos.get('prov')
+        
+        
+        distritos = controlador_tarifa_ruta.get_distrito_destino(prov,codigo)
+        
+        res = {
+            'data': distritos,
+            'msg': "Se listó con éxito",
+            'status':1
+        }
+        return jsonify(res)
+    except Exception as e:
+        res  = {
+            'data': [],
+            'msg': f"Ocurrió un error al listar las distritos: {repr(e)}",
+            'status':-1
+        }
+        return jsonify(res)
+    
+@app.route('/api/sucursal_destino',  methods=["POST"])
+def sucursal_destino():
+    try:
+        datos = request.get_json()
+        dep = datos.get('dep')
+        prov = datos.get('prov')
+        dist = datos.get('dist')
+        origen = datos.get('cod_origen')
+        
+        codigo_destino = controlador_tarifa_ruta.get_codigo_ubigeo(dep,prov,dist)
+        
+        sucursales = controlador_tarifa_ruta.get_sucursal_destino(origen,codigo_destino['codigo'])
+        
+        return {
+            'data': sucursales,
+            'msg': "Se listó con éxito",
+            'status':1
+        }
+    except Exception as e:
+        return {
+            'data': [],
+            'msg': f"Ocurrió un error al listar las departamentos: {repr(e)}",
+            'status':-1
+        }
 ################# Sucursales ######################
 
 @app.route("/perfil")

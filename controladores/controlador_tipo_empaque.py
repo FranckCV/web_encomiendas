@@ -110,3 +110,11 @@ def get_options():
 
 
 
+def get_peso():
+
+    try:
+        sql = "SELECT id, peso_maximo FROM tipo_empaque"
+        filas = sql_select_fetchall(sql)  
+        return { str(f['id']): f['peso_maximo'] for f in filas }
+    except Exception:
+        return {}

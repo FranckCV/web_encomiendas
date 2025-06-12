@@ -341,6 +341,11 @@
           </div>
         </div>
 
+<div>
+
+</div>
+
+
         <!-- Tabla de envíos -->
         <div class="tabla-envios">
           <div class="tabla-header">
@@ -425,6 +430,8 @@
 
 {% block scripts %}
   <script>
+    const PESOS     = {{ peso|tojson }};    
+    const MAX_VALOR = {{ valor_max }};
     const mode = new URLSearchParams(window.location.search).get('mode') || 'masivo';
   </script>
   <script src="{{ url_for('static', filename='js/envio_masivo.js') }}"></script>
