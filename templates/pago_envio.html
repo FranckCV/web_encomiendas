@@ -237,12 +237,68 @@
     }
   </script>
 
-<script>
+ <script>
     // Variables globales
-    let modalidadPago = {{ modalidad_pago }};
+    let modalidadPago = {{ modalidad_pago|default(0) }};
     let tipoComprobanteSeleccionado = null;
     let metodoPagoSeleccionado = null;
     let nombreMetodoPago = null;
+
+    function toggleSelection(label, tipo) {
+      // Remover selección visual anterior
+      document.querySelectorAll('input[name="' + tipo + '"]').forEach(function(input) {
+        input.closest('.opcion').style.borderColor = '#e1e8f5';
+        input.closest('.opcion').style.background = 'white';
+      });
+      
+      // Aplicar selección visual actual
+      label.style.borderColor = '#fbbd0a';
+      label.style.background = '#fefdf8';
+    }
+
+    function validarSelecciones() {
+      const comprobanteSeleccionado = document.querySelector('input[name="comprobante"]:checked');
+      tipoComprobanteSeleccionado = comprobanteSeleccionado ? comprobanteSeleccionado.value : null;
+      
+      if (modalidadPago === 1) {
+        const metodoSeleccionado = document.querySelector('input[name="metodo"]:checked');
+        metodoPagoSeleccionado = metodoSeleccionado ? metodoSeleccionado.value : null;
+        nombreMetodoPago = metodoSeleccionado ? metodoSeleccionado.dataset.nombre : null;
+        
+        // Ambos deben estar seleccionados para modalidad de pago
+        if (tipoComprobanteSeleccionado && metodoPagoSeleccionado) {
+          habilitarBoton();
+        } else {
+          deshabilitarBoton();
+        }
+      } else {
+        // Solo comprobante necesario para generar comprobante
+        if (tipoComprobanteSeleccionado) {
+          habilitarBoton();
+        } else {
+          deshabilitarBoton();
+        }
+      }
+    }
+
+    function habilitarBoton() {
+      const boton = document.getElementById('btn-accion');
+      boton.classList.remove('oculto');
+      boton.disabled = false;
+    }
+
+    function deshabilitarBoton() {
+      const boton = document.getElementById('btn-accion');
+      boton.disabled = true;
+    }
+
+    function accionPrincipal() {
+      if (modalidadPago === 1) {
+        mostrarModal();
+      } else {
+        generarComprobante();
+      }
+    }
 
     function toggleSelection(label, tipo) {
       // Remover selección visual anterior
@@ -317,60 +373,56 @@
 
     function configurarModalYape(titulo, contenido) {
       titulo.textContent = 'Confirmar pago con Yape';
-      contenido.innerHTML = `
-        <div style="text-align: center; margin-bottom: 20px;">
-          <img src="/static/img/yape-logo.png" alt="Yape" style="width: 100px; margin-bottom: 15px;" onerror="this.style.display='none'"/>
-          <p style="color: #0e1d63; font-size: 1.1em; margin-bottom: 10px;">
-            Realiza el pago de <strong>S/ {{ total }}</strong> y ingresa tu número de confirmación
-          </p>
-        </div>
-        <div class="form-group">
-          <label for="numeroConfirmacion">Número de Confirmación Yape:</label>
-          <input type="text" id="numeroConfirmacion" placeholder="Ej: 12345678" maxlength="8" required>
-        </div>
-        <div style="font-size: 0.9em; color: #666; text-align: left;">
-          <p><strong>Instrucciones:</strong></p>
-          <p>1. Abre tu app Yape</p>
-          <p>2. Realiza el pago por S/ {{ total }}</p>
-          <p>3. Ingresa el número de confirmación aquí</p>
-        </div>
-      `;
+      contenido.innerHTML = '<div style="text-align: center; margin-bottom: 20px;">' +
+        '<img src="/static/img/yape-logo.png" alt="Yape" style="width: 100px; margin-bottom: 15px;" onerror="this.style.display=\'none\'"/>' +
+        '<p style="color: #0e1d63; font-size: 1.1em; margin-bottom: 10px;">' +
+        'Realiza el pago de <strong>S/ {{ total }}</strong> y ingresa tu número de confirmación' +
+        '</p>' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label for="numeroConfirmacion">Número de Confirmación Yape:</label>' +
+        '<input type="text" id="numeroConfirmacion" placeholder="Ej: 12345678" maxlength="8" required>' +
+        '</div>' +
+        '<div style="font-size: 0.9em; color: #666; text-align: left;">' +
+        '<p><strong>Instrucciones:</strong></p>' +
+        '<p>1. Abre tu app Yape</p>' +
+        '<p>2. Realiza el pago por S/ {{ total }}</p>' +
+        '<p>3. Ingresa el número de confirmación aquí</p>' +
+        '</div>';
     }
 
     function configurarModalTarjeta(titulo, contenido) {
       titulo.textContent = 'Pago con Tarjeta';
-      contenido.innerHTML = `
-        <div style="text-align: center; margin-bottom: 20px;">
-          <p style="color: #0e1d63; font-size: 1.1em; margin-bottom: 15px;">
-            Monto a pagar: <strong>S/ {{ total }}</strong>
-          </p>
-        </div>
-        <div class="form-group">
-          <label for="numeroTarjeta">Número de Tarjeta:</label>
-          <input type="text" id="numeroTarjeta" placeholder="1234 5678 9012 3456" maxlength="19" required>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="fechaVencimiento">Fecha de Vencimiento:</label>
-            <input type="text" id="fechaVencimiento" placeholder="MM/AA" maxlength="5" required>
-          </div>
-          <div class="form-group">
-            <label for="cvv">CVV:</label>
-            <input type="text" id="cvv" placeholder="123" maxlength="3" required>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="nombreTitular">Nombre del Titular:</label>
-          <input type="text" id="nombreTitular" placeholder="Como aparece en la tarjeta" required>
-        </div>
-        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
-          <img src="/static/img/visa.png" alt="Visa" style="height: 25px;" onerror="this.style.display='none'"/>
-          <img src="/static/img/mastercard.png" alt="Mastercard" style="height: 25px;" onerror="this.style.display='none'"/>
-        </div>
-      `;
+      contenido.innerHTML = '<div style="text-align: center; margin-bottom: 20px;">' +
+        '<p style="color: #0e1d63; font-size: 1.1em; margin-bottom: 15px;">' +
+        'Monto a pagar: <strong>S/ {{ total }}</strong>' +
+        '</p>' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label for="numeroTarjeta">Número de Tarjeta:</label>' +
+        '<input type="text" id="numeroTarjeta" placeholder="1234 5678 9012 3456" maxlength="19" required>' +
+        '</div>' +
+        '<div class="form-row">' +
+        '<div class="form-group">' +
+        '<label for="fechaVencimiento">Fecha de Vencimiento:</label>' +
+        '<input type="text" id="fechaVencimiento" placeholder="MM/AA" maxlength="5" required>' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label for="cvv">CVV:</label>' +
+        '<input type="text" id="cvv" placeholder="123" maxlength="3" required>' +
+        '</div>' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label for="nombreTitular">Nombre del Titular:</label>' +
+        '<input type="text" id="nombreTitular" placeholder="Como aparece en la tarjeta" required>' +
+        '</div>' +
+        '<div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">' +
+        '<img src="/static/img/visa.png" alt="Visa" style="height: 25px;" onerror="this.style.display=\'none\'"/>' +
+        '<img src="/static/img/mastercard.png" alt="Mastercard" style="height: 25px;" onerror="this.style.display=\'none\'"/>' +
+        '</div>';
       
       // Agregar formato automático a los campos
-      setTimeout(() => {
+      setTimeout(function() {
         formatearCamposTarjeta();
       }, 100);
     }
@@ -465,19 +517,17 @@
       const contenido = document.getElementById('contenidoModal');
       const boton = document.querySelector('.btn-continuar-modal');
       
-      contenido.innerHTML = `
-        <div style="text-align: center; padding: 40px 20px;">
-          <div style="border: 4px solid #f3f3f3; border-top: 4px solid #fbbd0a; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-          <p style="color: #0e1d63; font-size: 1.1em;">Procesando pago...</p>
-          <p style="color: #666; font-size: 0.9em;">Por favor espera</p>
-        </div>
-        <style>
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        </style>
-      `;
+      contenido.innerHTML = '<div style="text-align: center; padding: 40px 20px;">' +
+        '<div style="border: 4px solid #f3f3f3; border-top: 4px solidrgb(1, 31, 97); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>' +
+        '<p style="color: #0e1d63; font-size: 1.1em;">Procesando pago...</p>' +
+        '<p style="color: #666; font-size: 0.9em;">Por favor espera</p>' +
+        '</div>' +
+        '<style>' +
+        '@keyframes spin {' +
+        '0% { transform: rotate(0deg); }' +
+        '100% { transform: rotate(360deg); }' +
+        '}' +
+        '</style>';
       
       boton.style.display = 'none';
     }
@@ -517,5 +567,4 @@
       }
     });
   </script>
-
 {% endblock %}
