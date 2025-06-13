@@ -1,786 +1,186 @@
 {% extends 'MAESTRA_ADMIN.html' %}
 
 {% block estilos %}
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel= "stylesheet" href="/static/css/seguimiento_empleado.css"
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link rel="stylesheet" href="/static/css/seguimiento_empleado.css">
+<style>
+  .leaflet-marker-icon.leaflet-interactive {
+    border-radius: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+</style>
 {% endblock %}
 
 {% block contenido %}
-    <div class="block_crud block_title" style="padding: 20px 10px 30px 10px; font-size: 1rem;">
+<div class="block_crud block_title" style="padding: 20px 10px 30px 10px; font-size: 1rem;">
   <h3 class="crud_title">
-    <i class="fas fa-shipping-fast"></i> 
+    <i class="fas fa-shipping-fast"></i>
     Seguimiento por unidad
   </h3>
 </div>
-  <div class="container">
+<div class="container">
 
-    <div class="sidebar">
+  <div class="sidebar">
+    {% set s = data[0] %}
 
-      <div class="vehicle-selector">
-        <div class="selector-label">
-          <i class="fas fa-truck"></i>
-          Seleccionar Vehículo en Tránsito
-        </div>
-        <select class="vehicle-select" id="vehicleSelect">
-          <option value="">-- Selecciona un vehículo --</option>
-        </select>
+    <div class="vehicle-info-card" id="vehicleInfoCard" style="display: block;">
+      <div class="vehicle-header">
+        <div class="vehicle-id">{{ s.unidad_placa }}</div>
+        <div class="vehicle-status">EN RUTA</div>
       </div>
 
-      <div class="vehicle-info-card" id="vehicleInfoCard" style="display: none;">
-        <div class="vehicle-header">
-          <div class="vehicle-id" id="selectedVehicleId">VH001</div>
-          <div class="vehicle-status" id="selectedVehicleStatus">ACTIVO</div>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="info-label">Salida:</div>
+          <div class="info-value">#{{ s.salida_id }}</div>
         </div>
-
-        <div class="info-grid">
-          <div class="info-item">
-            <div class="info-label">Distancia Total</div>
-            <div class="info-value" id="vehicleDistance">450 km</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">TIEMPO ESTIMADO</div>
-            <div class="info-value" id="vehicleETA">6h 30m</div>
-          </div>
+        <div class="info-item">
+          <div class="info-label">Fecha</div>
+          <div class="info-value">{{ s.fecha }}</div>
         </div>
-
-        <div class="route-progress">
-          <div class="progress-label">
-            <span>Progreso del Viaje</span>
-            <span id="progressPercentage">34%</span>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" id="progressFill" style="width: 34%"></div>
-          </div>
+        <div class="info-item">
+          <div class="info-label">Hora</div>
+          <div class="info-value">{{ s.hora }}</div>
         </div>
       </div>
 
-      <div class="route-details" id="routeDetails" style="display: none;">
-        <div class="route-step">
-          <i class="fas fa-circle route-icon step-origin"></i>
-          <span id="routeOrigin">Origen: Chiclayo, Lambayeque</span>
+      <div class="route-progress">
+        <div class="progress-label">
+          <span>Progreso del Viaje</span>
+          <span id="progressPercentage">0%</span>
         </div>
-        <div class="route-step">
-          <i class="fas fa-truck route-icon step-current"></i>
-          <span id="currentLocation">Actual: Trujillo, La Libertad</span>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width: 0%"></div>
         </div>
-        <div class="route-step">
-          <i class="fas fa-map-marker-alt route-icon step-destination"></i>
-          <span id="routeDestination">Destino: Lima, Lima</span>
-        </div>
-        <div class="route-step">
-          <i class="fas fa-user route-icon step-current"></i>
-          <span id="driverName">Conductor: Carlos Mendoza</span>
-        </div>
-        <div class="route-step">
-          <i class="fas fa-box route-icon step-current"></i>
-          <span id="cargoInfo">Carga: 25 toneladas</span>
-        </div>
-      </div>
-
-      <div class="controls">
-        <button class="control-btn primary" id="locateMeBtn">
-          <i class="fas fa-crosshairs"></i>
-          Mi Ubicación GPS
-        </button>
-        <button class="control-btn" id="centerRouteBtn">
-          <i class="fas fa-route"></i>
-          Centrar en Ruta
-        </button>
-        <button class="control-btn" id="followVehicleBtn">
-          <i class="fas fa-video"></i>
-          Seguir Vehículo
-        </button>
-        <button class="control-btn" id="refreshBtn">
-          <i class="fas fa-sync-alt"></i>
-          Actualizar
-        </button>
       </div>
     </div>
 
-    <div class="main-content">
-      <div id="map"></div>
-
-      <div class="map-overlay">
-        <button class="overlay-btn" id="satelliteBtn" title="Vista Satélite"><i class="fas fa-satellite"></i></button>
-        <button class="overlay-btn" id="fullscreenBtn" title="Pantalla Completa"><i class="fas fa-expand"></i></button>
-        <button class="overlay-btn" id="settingsBtn" title="Configuración"><i class="fas fa-cog"></i></button>
+    <div class="route-details" id="routeDetails" style="display: block;">
+      <div class="route-step">
+        <i class="fas fa-circle route-icon step-origin"></i>
+        <span>Origen: {{ s.origen_distrito }}, {{ s.origen_provincia }}</span>
       </div>
-
-      <div class="legend">
-        <h4><i class="fas fa-info-circle"></i> Leyenda</h4>
-        <div class="legend-item">
-          <div class="legend-line line-completed"></div>
-          <span>Ruta Completada</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-line line-pending"></div>
-          <span>Ruta Pendiente</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-icon icon-vehicle">
-            <i class="fas fa-truck"></i>
-          </div>
-          <span>Vehículo Actual</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-icon icon-origin">
-            <i class="fas fa-play"></i>
-          </div>
-          <span>Punto de Origen</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-icon icon-destination">
-            <i class="fas fa-flag"></i>
-          </div>
-          <span>Destino Final</span>
-        </div>
+      <div class="route-step">
+        <i class="fas fa-map-marker-alt route-icon step-destination"></i>
+        <span>Destino: {{ s.destino_distrito }}, {{ s.destino_provincia }}</span>
+      </div>
+      <div class="route-step">
+        <i class="fas fa-user route-icon step-current"></i>
+        <span>Conductor: {{ s.conductor_nombre }}</span>
       </div>
     </div>
+
   </div>
 
-  <div class="notification" id="notification">
-    <i class="fas fa-check-circle"></i>
-    <span id="notificationText">Vehículo seleccionado</span>
+  <div class="main-content">
+    <div id="map"></div>
+
   </div>
+</div>
+
+<div class="notification" id="notification">
+  <i class="fas fa-check-circle"></i>
+  <span id="notificationText">Vehículo seleccionado</span>
+</div>
 {% endblock %}
-<!-- 1. Primero, agrega la placa como variable JavaScript al inicio del bloque scripts -->
+
 {% block scripts %}
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
-  <script>
-    // Variable para la placa desde Flask
-    const placaSeleccionada = {{ placa|default('""')|tojson }};
-    
-    // Resto del código JavaScript...
-    let map
-    let userMarker
-    let vehicleMarker
-    let routeCompletedLine
-    let routePendingLine
-    let originMarker
-    let destinationMarker
-    let trackingInterval
-    let followingVehicle = false
-    let selectedVehicle = null
-    
-    // Datos de vehículos - MODIFICAR para usar placas reales
-    const vehicles = [
-      {
-        id: 'VH001', // Usar placa en lugar de VH001
-        driver: 'Carlos Mendoza',
-        status: 'active',
-        origin: 'Chiclayo, Lambayeque',
-        destination: 'Lima, Lima',
-        currentLocation: 'Trujillo, La Libertad',
-        progress: 0.34,
-        cargo: '25 toneladas',
-        totalDistance: 765,
-        eta: '6h 30m',
-        route: [
-          [-6.7706, -79.8409], // Chiclayo
-          [-7.2906, -79.0606], // Chimbote
-          [-8.1116, -79.0291], // Trujillo
-          [-9.0897, -78.6131], // Chimbote-Casma
-          [-10.7569, -77.8728], // Huarmey
-          [-11.0604, -77.6034], // Barranca
-          [-11.9059, -77.0395], // Huacho
-          [-12.0464, -77.0428] // Lima
-        ]
-      },
-      {
-        id: 'DEF-456',
-        driver: 'Ana García',
-        status: 'active',
-        origin: 'Lima, Lima',
-        destination: 'Arequipa, Arequipa',
-        currentLocation: 'Ica, Ica',
-        progress: 0.52,
-        cargo: '18 toneladas',
-        totalDistance: 1030,
-        eta: '5h 15m',
-        route: [
-          [-12.0464, -77.0428], // Lima
-          [-12.8797, -76.125], // Cañete
-          [-13.4089, -76.135], // Chincha
-          [-13.7103, -76.2038], // Pisco
-          [-14.0678, -75.7286], // Ica
-          [-14.8422, -74.9597], // Nazca
-          [-15.8422, -74.5597], // Puquio
-          [-16.409, -71.5375] // Arequipa
-        ]
-      },
-      // ... resto de vehículos
-    ];
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 
-    // MODIFICAR la función populateVehicleSelector
-    function populateVehicleSelector() {
-      const select = document.getElementById('vehicleSelect')
-      
-      // Si hay una placa seleccionada, solo mostrar esa opción y bloquear
-      if (placaSeleccionada) {
-        const vehiculo = vehicles.find(v => v.id === placaSeleccionada);
-        if (vehiculo) {
-          const option = document.createElement('option')
-          option.value = vehiculo.id
-          option.textContent = `${vehiculo.id} - ${vehiculo.driver} (${vehiculo.origin} → ${vehiculo.destination})`
-          option.selected = true
-          select.appendChild(option)
-          
-          // Bloquear el select
-          select.disabled = true
-          select.style.opacity = '0.7'
-          
-          // Seleccionar automáticamente el vehículo
-          setTimeout(() => {
-            selectVehicle(placaSeleccionada)
-            showNotification(`Seguimiento de vehículo ${placaSeleccionada}`)
-          }, 100)
-        } else {
-          // Si no existe la placa, mostrar mensaje de error
-          const option = document.createElement('option')
-          option.value = ""
-          option.textContent = `Vehículo ${placaSeleccionada} no encontrado`
-          select.appendChild(option)
-          select.disabled = true
-          showNotification(`Vehículo ${placaSeleccionada} no encontrado`, 'error')
-        }
-      } else {
-        // Comportamiento normal - mostrar todas las opciones
-        vehicles.forEach((vehicle) => {
-          const option = document.createElement('option')
-          option.value = vehicle.id
-          option.textContent = `${vehicle.id} - ${vehicle.driver} (${vehicle.origin} → ${vehicle.destination})`
-          select.appendChild(option)
-        })
-        
-        select.addEventListener('change', function () {
-          if (this.value) {
-            selectVehicle(this.value)
-          } else {
-            clearSelection()
-          }
-        })
-      }
-    }
+<script>
+  const placa = "{{ placa.upper() }}";
+  const ruta = {
+    origen: [{{ data[0].origen_latitud }}, {{ data[0].origen_longitud }}],
+    destino: [{{ data[0].destino_latitud }}, {{ data[0].destino_longitud }}],
+  };
 
-    // MODIFICAR el initMap para eliminar la lógica de URL params
-    function initMap() {
-      map = L.map('map').setView([-10.0, -76.0], 6)
-    
-      // Capa de mapa base
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-      }).addTo(map)
-    
-      // Poblar el selector de vehículos
-      populateVehicleSelector()
-    
-      // Actualizar posiciones cada 5 segundos
-      trackingInterval = setInterval(updateVehiclePosition, 5000)
-    }
+  let map = L.map('map').setView(ruta.origen, 13);
 
-     // Inicializar mapa
-    function initMap() {
-      map = L.map('map').setView([-10.0, -76.0], 6)
-    
-      // Capa de mapa base
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
-      }).addTo(map)
-    
-      // Poblar el selector de vehículos
-      populateVehicleSelector()
-    
-      // Verificar si hay un vehículo preseleccionado
-      const preselectedVehicle = getPreselectedVehicle();
-      if (preselectedVehicle) {
-        setTimeout(() => {
-          const select = document.getElementById('vehicleSelect');
-          select.value = preselectedVehicle;
-          selectVehicle(preselectedVehicle);
-          showNotification(`Cargando seguimiento de ${preselectedVehicle}`);
-        }, 100);
-      }
-    
-      // Actualizar posiciones cada 5 segundos
-      trackingInterval = setInterval(updateVehiclePosition, 5000)
-    }
-    
-    // Poblar selector de vehículos
-    function populateVehicleSelector() {
-      const select = document.getElementById('vehicleSelect')
-    
-      vehicles.forEach((vehicle) => {
-        const option = document.createElement('option')
-        option.value = vehicle.id
-        option.textContent = `${vehicle.id} - ${vehicle.driver} (${vehicle.origin} → ${vehicle.destination})`
-        select.appendChild(option)
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  const origenMarker = L.marker(ruta.origen).addTo(map).bindPopup("Origen").openPopup();
+  const destinoMarker = L.marker(ruta.destino).addTo(map).bindPopup("Destino");
+
+
+  const apiKey = "5b3ce3597851110001cf6248c53b45d45c094ed5846c1dd0cec6e2f6"; // 🔑 colócala aquí
+
+  function trazarRutaReal(origen, destino) {
+    fetch(`https://api.openrouteservice.org/v2/directions/driving-car?api_key=${apiKey}&start=${origen[1]},${origen[0]}&end=${destino[1]},${destino[0]}`)
+      .then(res => res.json())
+      .then(data => {
+        const coords = data.features[0].geometry.coordinates.map(c => [c[1], c[0]]);
+        L.polyline(coords, { color: 'blue', weight: 5 }).addTo(map);
       })
-    
-      select.addEventListener('change', function () {
-        if (this.value) {
-          selectVehicle(this.value)
-        } else {
-          clearSelection()
-        }
-      })
-    }
-    
-    // Seleccionar vehículo
-    function selectVehicle(vehicleId) {
-      selectedVehicle = vehicles.find((v) => v.id === vehicleId)
-      if (!selectedVehicle) return
-    
-      // Mostrar información del vehículo
-      showVehicleInfo()
-    
-      // Dibujar ruta en el mapa
-      drawRoute()
-    
-      // Centrar mapa en la ruta
-      centerOnRoute()
-    
-      showNotification(`Vehículo ${vehicleId} seleccionado`)
-    }
-    
-    // Mostrar información del vehículo
-    function showVehicleInfo() {
-      if (!selectedVehicle) return
-    
-      document.getElementById('vehicleInfoCard').style.display = 'block'
-      document.getElementById('routeDetails').style.display = 'block'
-    
-      // Actualizar información básica
-      document.getElementById('selectedVehicleId').textContent = selectedVehicle.id
-      document.getElementById('selectedVehicleStatus').textContent = selectedVehicle.status === 'active' ? 'EN TRÁNSITO' : 'DETENIDO'
-      document.getElementById('selectedVehicleStatus').className = `vehicle-status status-${selectedVehicle.status}`
-    
-      updateVehicleStats()
-      updateRouteInfo()
-    }
-    
-    // Actualizar estadísticas del vehículo
-    function updateVehicleStats() {
-      if (!selectedVehicle) return
-    
-      document.getElementById('vehicleDistance').textContent = `${selectedVehicle.totalDistance} km`
-      document.getElementById('vehicleETA').textContent = selectedVehicle.eta
-    
-      // Actualizar barra de progreso
-      const progressPercent = Math.round(selectedVehicle.progress * 100)
-      document.getElementById('progressPercentage').textContent = `${progressPercent}%`
-      document.getElementById('progressFill').style.width = `${progressPercent}%`
-    }
-    
-    // Actualizar información de ruta
-    function updateRouteInfo() {
-      if (!selectedVehicle) return
-    
-      document.getElementById('routeOrigin').textContent = `Origen: ${selectedVehicle.origin}`
-      document.getElementById('currentLocation').textContent = `Actual: ${selectedVehicle.currentLocation}`
-      document.getElementById('routeDestination').textContent = `Destino: ${selectedVehicle.destination}`
-      document.getElementById('driverName').textContent = `Conductor: ${selectedVehicle.driver}`
-      document.getElementById('cargoInfo').textContent = `Carga: ${selectedVehicle.cargo}`
-    }
-    
-    // Dibujar ruta en el mapa
-    function drawRoute() {
-      if (!selectedVehicle) return
-    
-      // Limpiar rutas anteriores
-      clearRoute()
-    
-      const route = selectedVehicle.route
-      const progress = selectedVehicle.progress
-      const currentIndex = Math.floor((route.length - 1) * progress)
-    
-      // Ruta completada (verde)
-      if (currentIndex > 0) {
-        const completedRoute = route.slice(0, currentIndex + 1)
-        routeCompletedLine = L.polyline(completedRoute, {
-          color: '#00b894',
-          weight: 6,
-          opacity: 0.8,
-          smoothFactor: 1
-        }).addTo(map)
-    
-        routeCompletedLine.bindPopup(`
-                        <div style="text-align: center;">
-                            <h4 style="color: #00b894; margin-bottom: 8px;">
-                                <i class="fas fa-check"></i> Ruta Completada
-                            </h4>
-                            <p><strong>Progreso:</strong> ${Math.round(progress * 100)}%</p>
-                            <p><strong>Distancia:</strong> ${Math.round(selectedVehicle.totalDistance * progress)} km</p>
-                        </div>
-                    `)
-      }
-    
-      // Ruta pendiente (azul)
-      if (currentIndex < route.length - 1) {
-        const pendingRoute = route.slice(currentIndex)
-        routePendingLine = L.polyline(pendingRoute, {
-          color: '#3498db',
-          weight: 6,
-          opacity: 0.8,
-          smoothFactor: 1,
-          dashArray: '10, 10'
-        }).addTo(map)
-    
-        routePendingLine.bindPopup(`
-                        <div style="text-align: center;">
-                            <h4 style="color: #3498db; margin-bottom: 8px;">
-                                <i class="fas fa-clock"></i> Ruta Pendiente
-                            </h4>
-                            <p><strong>Restante:</strong> ${Math.round((1 - progress) * 100)}%</p>
-                            <p><strong>Distancia:</strong> ${Math.round(selectedVehicle.totalDistance * (1 - progress))} km</p>
-                            <p><strong>ETA:</strong> ${selectedVehicle.eta}</p>
-                        </div>
-                    `)
-      }
-    
-      // Marcador de origen
-      originMarker = L.marker([route[0][0], route[0][1]], {
-        icon: L.divIcon({
-          html: `<div style="background: #74b9ff; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-play" style="color: white; font-size: 8px;"></i>
-                               </div>`,
-          iconSize: [26, 26],
-          iconAnchor: [13, 13]
-        })
-      }).addTo(map)
-    
-      originMarker.bindPopup(`
-                    <div style="text-align: center;">
-                        <h4 style="color: #74b9ff;">
-                            <i class="fas fa-play"></i> Punto de Origen
-                        </h4>
-                        <p><strong>${selectedVehicle.origin}</strong></p>
-                    </div>
-                `)
-    
-      // Marcador de destino
-      const lastPoint = route[route.length - 1]
-      destinationMarker = L.marker([lastPoint[0], lastPoint[1]], {
-        icon: L.divIcon({
-          html: `<div style="background: #e17055; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center;">
-                                <i class="fas fa-flag" style="color: white; font-size: 8px;"></i>
-                               </div>`,
-          iconSize: [26, 26],
-          iconAnchor: [13, 13]
-        })
-      }).addTo(map)
-    
-      destinationMarker.bindPopup(`
-                    <div style="text-align: center;">
-                        <h4 style="color: #e17055;">
-                            <i class="fas fa-flag"></i> Destino Final
-                        </h4>
-                        <p><strong>${selectedVehicle.destination}</strong></p>
-                    </div>
-                `)
-    
-      // Marcador del vehículo en su posición actual
-      updateVehicleMarker()
-    }
-    
-    // Actualizar marcador del vehículo
-    function updateVehicleMarker() {
-      if (!selectedVehicle) return
-    
-      // Remover marcador anterior
-      if (vehicleMarker) {
-        map.removeLayer(vehicleMarker)
-      }
-    
-      // Calcular posición actual basada en el progreso
-      const route = selectedVehicle.route
-      const progress = selectedVehicle.progress
-      const totalSegments = route.length - 1
-      const currentSegment = Math.floor(totalSegments * progress)
-      const segmentProgress = totalSegments * progress - currentSegment
-    
-      let currentLat, currentLng
-    
-      if (currentSegment >= totalSegments) {
-        // Ha llegado al destino
-        currentLat = route[route.length - 1][0]
-        currentLng = route[route.length - 1][1]
-      } else {
-        // Interpolación entre dos puntos
-        const point1 = route[currentSegment]
-        const point2 = route[currentSegment + 1]
-    
-        currentLat = point1[0] + (point2[0] - point1[0]) * segmentProgress
-        currentLng = point1[1] + (point2[1] - point1[1]) * segmentProgress
-      }
-    
-      // Crear marcador del vehículo
-      vehicleMarker = L.marker([currentLat, currentLng], {
-        icon: L.divIcon({
-          html: `<div style="background: #e74c3c; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; animation: pulse 2s infinite;">
-                                <i class="fas fa-truck" style="color: white; font-size: 12px;"></i>
-                               </div>`,
-          iconSize: [30, 30],
-          iconAnchor: [15, 15]
-        })
-      }).addTo(map)
-    
-      vehicleMarker.bindPopup(`
-                    <div style="text-align: center; min-width: 200px;">
-                        <h4 style="color: #e74c3c; margin-bottom: 10px; border-bottom: 2px solid #e74c3c; padding-bottom: 5px;">
-                            <i class="fas fa-truck"></i> ${selectedVehicle.id}
-                        </h4>
-                        <p><strong><i class="fas fa-user"></i> Conductor:</strong> ${selectedVehicle.driver}</p>
-                        <p><strong><i class="fas fa-map-marker-alt"></i> Ubicación:</strong> ${selectedVehicle.currentLocation}</p>
-                        <p><strong><i class="fas fa-percentage"></i> Progreso:</strong> ${Math.round(selectedVehicle.progress * 100)}%</p>
-                        <p><strong><i class="fas fa-clock"></i> ETA:</strong> ${selectedVehicle.eta}</p>
-                        <p><strong><i class="fas fa-box"></i> Carga:</strong> ${selectedVehicle.cargo}</p>
-                    </div>
-                `)
-    
-      // Si está siguiendo el vehículo, centrar el mapa
-      if (followingVehicle) {
-        map.setView([currentLat, currentLng], 10)
-      }
-    }
-    
-    // Limpiar ruta del mapa
-    function clearRoute() {
-      if (routeCompletedLine) {
-        map.removeLayer(routeCompletedLine)
-        routeCompletedLine = null
-      }
-      if (routePendingLine) {
-        map.removeLayer(routePendingLine)
-        routePendingLine = null
-      }
-      if (vehicleMarker) {
-        map.removeLayer(vehicleMarker)
-        vehicleMarker = null
-      }
-      if (originMarker) {
-        map.removeLayer(originMarker)
-        originMarker = null
-      }
-      if (destinationMarker) {
-        map.removeLayer(destinationMarker)
-        destinationMarker = null
-      }
-    }
-    
-    // Limpiar selección
-    function clearSelection() {
-      selectedVehicle = null
-      followingVehicle = false
-    
-      document.getElementById('vehicleInfoCard').style.display = 'none'
-      document.getElementById('routeDetails').style.display = 'none'
-    
-      clearRoute()
-      showNotification('Selección limpiada')
-    }
-    
-    // Centrar mapa en la ruta completa
-    function centerOnRoute() {
-      if (!selectedVehicle) return
-    
-      const bounds = L.latLngBounds(selectedVehicle.route)
-      map.fitBounds(bounds, { padding: [50, 50] })
-    }
-    
-    // Seguir vehículo
-    function toggleFollowVehicle() {
-      if (!selectedVehicle) {
-        showNotification('Selecciona un vehículo primero', 'error')
-        return
-      }
-    
-      followingVehicle = !followingVehicle
-      const btn = document.getElementById('followVehicleBtn')
-    
-      if (followingVehicle) {
-        btn.innerHTML = '<i class="fas fa-video-slash"></i> Dejar de Seguir'
-        btn.style.background = 'linear-gradient(45deg, #e74c3c, #c0392b)'
-        showNotification('Siguiendo vehículo en tiempo real')
-      } else {
-        btn.innerHTML = '<i class="fas fa-video"></i> Seguir Vehículo'
-        btn.style.background = 'rgba(255, 255, 255, 0.1)'
-        showNotification('Seguimiento desactivado')
-      }
-    }
-    
-    // Actualizar posición del vehículo (simulación)
-    function updateVehiclePosition() {
-      if (!selectedVehicle) return
-    
-      // Simular avance en la ruta
-      selectedVehicle.progress += 0.01 // Avanza 1% cada 5 segundos
-    
-      if (selectedVehicle.progress >= 1) {
-        selectedVehicle.progress = 0 // Reiniciar viaje
-        showNotification(`${selectedVehicle.id} completó su viaje y regresa`)
-      }
-    
-      // Actualizar ETA
-      const remainingProgress = 1 - selectedVehicle.progress
-      const avgSpeed = 60 // km/h promedio
-      const remainingDistance = selectedVehicle.totalDistance * remainingProgress
-      const remainingHours = remainingDistance / avgSpeed
-      const hours = Math.floor(remainingHours)
-      const minutes = Math.round((remainingHours - hours) * 60)
-      selectedVehicle.eta = `${hours}h ${minutes}m`
-    
-      // Actualizar ubicación actual basada en el progreso
-      updateCurrentLocation()
-    
-      // Actualizar interfaz
-      updateVehicleStats()
-      updateRouteInfo()
-      updateVehicleMarker()
-      drawRoute() // Redibujar para actualizar las líneas verde/azul
-    }
-    
-    // Actualizar ubicación actual basada en el progreso
-    function updateCurrentLocation() {
-      if (!selectedVehicle) return
-    
-      const cities = [
-        { name: selectedVehicle.origin, progress: 0 },
-        { name: 'En ruta', progress: 0.5 },
-        { name: selectedVehicle.destination, progress: 1 }
-      ]
-    
-      // Encontrar la ciudad más cercana al progreso actual
-      let currentCity = cities[0].name
-      for (let i = 0; i < cities.length; i++) {
-        if (selectedVehicle.progress >= cities[i].progress) {
-          currentCity = cities[i].name
-        }
-      }
-    
-      if (selectedVehicle.progress < 0.2) {
-        currentCity = `Saliendo de ${selectedVehicle.origin}`
-      } else if (selectedVehicle.progress > 0.8) {
-        currentCity = `Aproximándose a ${selectedVehicle.destination}`
-      } else {
-        currentCity = `En ruta hacia ${selectedVehicle.destination}`
-      }
-    
-      selectedVehicle.currentLocation = currentCity
-    }
-    
-    // Obtener ubicación del usuario
-    function getUserLocation() {
-      if (!navigator.geolocation) {
-        showNotification('Geolocalización no soportada', 'error')
-        return
-      }
-    
-      showNotification('Obteniendo ubicación GPS...')
-    
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude
-          const lng = position.coords.longitude
-    
-          // Remover marcador anterior
-          if (userMarker) {
-            map.removeLayer(userMarker)
-          }
-    
-          // Agregar nuevo marcador
-          userMarker = L.marker([lat, lng], {
-            icon: L.divIcon({
-              html: `<div style="background: #2ecc71; width: 18px; height: 18px; border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.4); animation: pulse 2s infinite;"></div>`,
-              iconSize: [24, 24],
-              iconAnchor: [12, 12]
-            })
-          }).addTo(map)
-    
-          userMarker.bindPopup(`
-                            <div style="text-align: center;">
-                                <h4 style="color: #2ecc71;">
-                                    <i class="fas fa-map-marker-alt"></i> Tu Ubicación
-                                </h4>
-                                <p><strong>Latitud:</strong> ${lat.toFixed(6)}</p>
-                                <p><strong>Longitud:</strong> ${lng.toFixed(6)}</p>
-                                <p style="margin-top: 10px; font-size: 12px; color: #7f8c8d;">
-                                    Precisión: ±${Math.round(position.coords.accuracy)}m
-                                </p>
-                            </div>
-                        `)
-    
-          map.setView([lat, lng], 12)
-          showNotification('¡Ubicación GPS obtenida correctamente!')
-        },
-        (error) => {
-          console.error('Error obteniendo ubicación:', error)
-          showNotification('Error al obtener ubicación GPS', 'error')
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 60000
-        }
-      )
-    }
-    
-    // Mostrar notificación
-    function showNotification(message, type = 'success') {
-      const notification = document.getElementById('notification')
-      const notificationText = document.getElementById('notificationText')
-    
-      notificationText.textContent = message
-      notification.style.background = type === 'success' ? '#00b894' : '#e17055'
-      notification.classList.add('show')
-    
-      setTimeout(() => {
-        notification.classList.remove('show')
-      }, 3000)
-    }
-    
-    // Event listeners
-    document.addEventListener('DOMContentLoaded', function () {
-      initMap()
-    
-      // Botones de control
-      document.getElementById('locateMeBtn').onclick = getUserLocation
-      document.getElementById('centerRouteBtn').onclick = centerOnRoute
-      document.getElementById('followVehicleBtn').onclick = toggleFollowVehicle
-    
-      document.getElementById('refreshBtn').onclick = () => {
-        if (selectedVehicle) {
-          updateVehiclePosition()
-          showNotification('Posición actualizada')
-        } else {
-          showNotification('Selecciona un vehículo primero', 'error')
-        }
-      }
-    
-      // Pantalla completa
-      document.getElementById('fullscreenBtn').onclick = () => {
-        if (document.fullscreenElement) {
-          document.exitFullscreen()
-        } else {
-          document.documentElement.requestFullscreen()
-        }
-      }
-    
-      // Vista satélite (simulada)
-      document.getElementById('satelliteBtn').onclick = () => {
-        showNotification('Vista satélite activada')
-      }
-    
-      document.getElementById('settingsBtn').onclick = () => {
-        showNotification('Panel de configuración en desarrollo')
-      }
+      .catch(err => {
+        console.error("Error al obtener ruta real:", err);
+      });
+  }
+
+
+  trazarRutaReal(ruta.origen, ruta.destino);
+
+  const vehiculoMarker = L.marker(ruta.origen, {
+    icon: L.divIcon({
+      html: '<i class="fas fa-truck"></i>',
+      className: 'icon-vehicle',
+      iconSize: [25, 25]
     })
-    
-    // Cleanup
-    window.addEventListener('beforeunload', () => {
-      if (trackingInterval) {
-        clearInterval(trackingInterval)
-      }
-    })
-  </script>
+  }).addTo(map);
+
+
+  const socket = io();
+
+  socket.on("ubicacion_actualizada", data => {
+    if (data.placa !== placa) return;
+
+    const actual = [data.lat, data.lng];
+    vehiculoMarker.setLatLng(actual);
+    map.setView(actual);
+
+    const total = calcularDistancia(...ruta.origen, ...ruta.destino);
+    const restante = calcularDistancia(data.lat, data.lng, ...ruta.destino);
+    let progreso = 100 - (restante / total) * 100;
+    progreso = Math.max(0, Math.min(progreso, 100));
+
+    document.getElementById('progressPercentage').textContent = `${progreso.toFixed(1)}%`;
+    document.getElementById('progressFill').style.width = `${progreso.toFixed(1)}%`;
+  });
+
+  function calcularDistancia(lat1, lon1, lat2, lon2) {
+    const toRad = deg => deg * Math.PI / 180;
+    const R = 6371; // km
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  function actualizarProgreso(pos) {
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
+    const actual = [lat, lng];
+
+    vehiculoMarker.setLatLng(actual);
+    map.setView(actual);
+
+    const total = calcularDistancia(...ruta.origen, ...ruta.destino);
+    const restante = calcularDistancia(lat, lng, ...ruta.destino);
+    let progreso = 100 - (restante / total) * 100;
+    progreso = Math.max(0, Math.min(progreso, 100)); // limitar entre 0 y 100
+
+    document.getElementById('progressPercentage').textContent = `${progreso.toFixed(1)}%`;
+    document.getElementById('progressFill').style.width = `${progreso.toFixed(1)}%`;
+  }
+
+
+</script>
 {% endblock %}

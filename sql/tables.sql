@@ -267,6 +267,7 @@ CREATE TABLE regla_cargo (
   superior       numeric(9, 2)  NULL, 
   porcentaje     numeric(9, 2) NOT NULL, 
   PRIMARY KEY (id));
+  
 CREATE TABLE rol (
   id          int(11) NOT NULL AUTO_INCREMENT, 
   nombre      varchar(250) NOT NULL, 
@@ -274,6 +275,7 @@ CREATE TABLE rol (
   activo      tinyint(1) DEFAULT 1 NOT NULL, 
   tipo_rolid  int(10) NOT NULL, 
   PRIMARY KEY (id));
+
 CREATE TABLE salida (
   id                  int(10) NOT NULL AUTO_INCREMENT, 
   fecha               date NOT NULL, 
@@ -282,9 +284,11 @@ CREATE TABLE salida (
   entrega             tinyint(1) NOT NULL, 
   estado              char(1) NOT NULL, 
   unidadid            int(10) NOT NULL, 
+  origen_inicio       int(11), 
   destino_final       int(10) NOT NULL, 
   conductor_principal int(11) NOT NULL, 
   PRIMARY KEY (id));
+
 CREATE TABLE seguimiento (
   estado_encomiendaid int(10) NOT NULL, 
   paquetetracking     int(11) NOT NULL, 

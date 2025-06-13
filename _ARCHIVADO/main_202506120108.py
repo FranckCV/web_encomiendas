@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app  #, after_this_request, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json  #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import permiso as permiso
 from controladores import controlador_pagina as controlador_pagina
@@ -43,23 +43,16 @@ from controladores import controlador_preguntas_frecuentes as controlador_pregun
 from controladores import controlador_regla_cargo as controlador_regla_cargo
 from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 from controladores import reporte_ingresos as reporte_ingresos
+from controladores.bd import sql_execute
 from controladores import controlador_transaccion_venta as controlador_transaccion_venta
 from controladores import controlador_detalle_venta as controlador_detalle_venta
 from controladores import controlador_metodo_pago_venta as controlador_metodo_pago_venta
 from controladores import controlador_articulo as controlador_articulo
 from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 from controladores import controlador_encomienda as controlador_encomienda
-<<<<<<< HEAD
-import BytesIO
-=======
-from controladores.bd import sql_execute
 
->>>>>>> a5248e50e599a75f3de493c58ca42d185657f115
-import uuid, os, qrcode
-from decimal import Decimal, ROUND_HALF_UP
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-from reportlab.lib.units import mm
+
+
 import hashlib
 import os
 from werkzeug.utils import secure_filename
@@ -70,18 +63,7 @@ from functools import wraps
 import inspect
 
 
-from flask_socketio import SocketIO, emit
-from time import sleep
-from threading import Thread
-
-
 app = Flask(__name__, template_folder='templates')
-app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, cors_allowed_origins="*")
-
-app.secret_key = 'es-un-secreto'
-
-IGV_RATE = Decimal('0.18')
 
 STATE_0              = configuraciones.STATE_0
 STATE_1              = configuraciones.STATE_1
@@ -1807,7 +1789,6 @@ def inject_globals():
 
 PAGINAS_SIMPLES = [ 
     "index" , 
-    'pagina_test_rastreo' ,
     'tracking',
     'seguimiento',
     'recuperar_contrasenia',
@@ -1816,6 +1797,7 @@ PAGINAS_SIMPLES = [
     'NoRecibimos',
     'pagina_reclamo',
     'seguimiento_reclamo',
+    'Metodo_pago',
     'prueba_seguimiento',
     'cajas',
     'cajas_prueba',
@@ -1904,6 +1886,8 @@ def cotizador():
         sucursales = sucursales,
     )
 
+from decimal import Decimal
+
 
 @app.route("/api/calculate_tarifa", methods=["POST"])
 def api_calculate_tarifa():
@@ -1931,8 +1915,6 @@ def api_calculate_tarifa():
         return jsonify(respuesta)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
-
 
 
 @app.route("/api/datos_destino", methods=["GET"])
@@ -2190,66 +2172,6 @@ def vaciar_carrito():
 
     return jsonify({"success": True})
 
-@app.route("/obtener-resumen-pago", methods=["GET"])
-def obtener_resumen_pago():
-    clienteid = 1  # O request.cookies.get("idlogin")
-
-    transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
-    if not transaccion:
-        return jsonify({"error": "No hay transacción activa"}), 404
-
-    num_serie = transaccion["num_serie"]
-    total = controlador_transaccion_venta.obtener_monto_total(num_serie)
-    detalles = controlador_transaccion_venta.obtener_carrito_cliente(clienteid)
-
-    cantidad_total = sum(item["quantity"] for item in detalles)
-    subtotal = float(total) / 1.18
-    igv = float(total) - subtotal
-
-    resumen = {
-        "cantidad": cantidad_total,
-        "subtotal": round(subtotal, 2),
-        "igv": round(igv, 2),
-        "total": round(float(total), 2)
-    }
-
-    # print(f"resumen : {resumen}")
-
-    return jsonify(resumen)
-
-@app.route("/metodo_pago")
-def metodo_pago():
-    clienteid = 1  # O request.cookies.get("idlogin")
-
-    transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
-    if not transaccion:
-        return redirect("/carrito")  # o muestra un mensaje apropiado
-
-    return render_template("metodo_pago.html")
-
-@app.route("/confirmar-pago", methods=["POST"])
-def confirmar_pago():
-    try:
-        clienteid = int(request.cookies.get("idlogin", 1))
-        transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
-
-        if not transaccion:
-            return jsonify({"error": "No hay transacción activa"}), 400
-
-        num_serie = transaccion["num_serie"]
-
-        # ✅ Actualizar estado a pagado (1)
-        sql = '''
-            UPDATE transaccion_venta SET estado = 1 WHERE num_serie = %s
-        '''
-        sql_execute(sql, (num_serie,))
-
-        return jsonify({"mensaje": "Pago confirmado"}), 200
-
-    except Exception as e:
-        print("Error en confirmar_pago:", e)
-        return jsonify({"error": "Ocurrió un error al procesar el pago"}), 500
-
 
 @app.route("/venta/registrar", methods=["POST"])
 def registrar_venta():
@@ -2356,169 +2278,19 @@ def seguimiento_encomienda():
     return render_template('seguimiento.html',estado_encomienda=estado_encomienda)
 
 
-
-
-@app.route('/resumen_envio', methods=['POST'])
-def resumen_envio():
-    data = request.get_json(force=True)
-    envios = data.get('registros')
-    print(envios)
-    if not envios:
-        abort(400, "No vinieron registros")
-
-    resultados = []
-    for envio in envios:
-        origen_id  = envio['origen']['sucursal_origen']
-        destino_id = envio['destino']['sucursal_destino']
-        valor      = Decimal(str(envio['valorEnvio']))
-        peso       = Decimal(str(envio['peso']))
-
-        tarifa_row  = controlador_tarifa_ruta.get_tarifa_ids(origen_id, destino_id) or {}
-        tarifa_base = Decimal(str(tarifa_row.get('tarifa', 0)))
-
-        regla_p      = controlador_regla_cargo.get_regla_cargo_condicion('P', float(peso)) or {}
-        regla_v      = controlador_regla_cargo.get_regla_cargo_condicion('V', float(valor)) or {}
-        porcentaje_p = Decimal(str(regla_p.get('porcentaje', 0)))
-        porcentaje_v = Decimal(str(regla_v.get('porcentaje', 0)))
-        porcentaje_r = Decimal(str(controlador_empresa.get_porcentaje_recojo()))
-
-        total = controlador_tarifa_ruta.calcularTarifaTotal(
-            tarifa_base, peso, porcentaje_r, porcentaje_v, porcentaje_p
-        )
-
-        envio_con_tarifa = envio.copy()
-        envio_con_tarifa['tarifa'] = total.quantize(Decimal('0.01'))
-        resultados.append(envio_con_tarifa)
-        print(resultados)
-    session['resumen_envios'] = resultados
-
-    return redirect(url_for('resumen'))
-
-
-@app.route('/resumen')
-def resumen():
-    resultados = session.get('resumen_envios')
-    if not resultados:
-        return redirect(url_for('envio_masivo'))
-
-    return render_template('resumen_envio.html', registros=resultados)
-
-
-
-
-
-
+@app.route('/resumen_envio')
+def mostrar_resumen():
+    return render_template('resumen_envio.html') 
 
 
 @app.route('/pagoenvio')
 def mostrar_pagoenvio():
-    tipo_comprobante = controlador_tipo_comprobante.get_options_nombre()
-    
     metodo_pago = controlador_metodo_pago.get_options()
-    return render_template('pago_envio.html', metodo_pago=metodo_pago,tipo_comprobante=tipo_comprobante
+    return render_template('pago_envio.html', metodo_pago=metodo_pago
                            ) 
-@app.route('/pago_envio', methods=['GET', 'POST'])
-def pago_envio():
-    registros = session.get('resumen_envios')
-    if not registros:
-        return redirect(url_for('resumen'))
 
-    subtotal = sum(Decimal(str(r['tarifa'])) for r in registros)
-    subtotal = subtotal.quantize(Decimal('0.01'), ROUND_HALF_UP)
-    igv      = (subtotal * IGV_RATE).quantize(Decimal('0.01'), ROUND_HALF_UP)
-    total    = (subtotal + igv).quantize(Decimal('0.01'), ROUND_HALF_UP)
-
-    tipo_comprobante = controlador_tipo_comprobante.get_options_nombre()
-    metodo_pago      = controlador_metodo_pago.get_options()
-
-    modalidadPago = registros[0].get('modalidadPago', '')
-    print(modalidadPago)
-
-    return render_template('pago_envio.html',
-                           registros=registros,
-                           cantidad_envios=len(registros),
-                           subtotal=subtotal,
-                           igv=igv,
-                           total=total,
-                           modalidadPago=modalidadPago,
-                           tipo_comprobante=tipo_comprobante,
-                           metodo_pago=metodo_pago)
-
-
-@app.route('/insertar_envio', methods=['POST'])
-def insertar_envio():
-    try:
-        data = request.get_json()
-        if not data:
-            return jsonify({
-                'status': 'error',
-                'message': 'No se recibió un JSON válido'
-            }), 400
-
-        tipo_comprobante = data.get('tipo_comprobante')
-        registros = session.get('resumen_envios')
-        if not registros:
-            return jsonify({
-                'status': 'error',
-                'message': 'No hay envíos en sesión'
-            }), 400
-
-        remitente = registros[0].get('remitente', {})
-        # Construcción de cliente_data con validaciones mínimas
-        nombre = remitente.get('nombre_remitente', '')
-        partes = nombre.split() if nombre else []
-        cliente_data = {
-            'correo':        remitente.get('correo_remitente', ''),
-            'telefono':      remitente.get('num_tel_remitente', ''),
-            'num_documento': remitente.get('num_doc_remitente', ''),
-            'nombre_siglas': partes[0] if partes else '',
-            'apellidos_razon': ' '.join(partes[1:]) if len(partes) > 1 else '',
-            'tipo_documentoid': int(remitente.get('tipo_doc_remitente', 1)),
-            'tipo_clienteid':   2 if remitente.get('tipo_doc_remitente') == 2 else 1
-        }
-
-        num_serie = controlador_encomienda.crear_transaccion_y_paquetes(
-            registros, cliente_data, tipo_comprobante
-        )
-        app.logger.info(f"Transacción creada con número de serie: {num_serie}")
-
-        return jsonify({
-            'status': 'success',
-            'message': 'Transacción creada correctamente',
-            'num_serie': num_serie
-        }), 201
-
-    except ValueError as ve:
-        # Por ejemplo, casting fallido
-        app.logger.warning(f"Bad request: {ve}")
-        return jsonify({
-            'status': 'error',
-            'message': str(ve)
-        }), 400
-
-    except Exception as e:
-        import traceback
-        traceback.print_exc()              
-        return jsonify({
-            'status': 'error',
-            'message': str(e),
-            'trace': traceback.format_exc() 
-        }), 500
-
-
-
-# @app.route('/scan/<token>', methods=['GET'])
-# def actualizar_estado(token):
-#     envio = controlador_paquete.buscar_por_token(token)
-#     if not envio:
-#         abort(404, "QR inválido")
-#     controlador_paquete.cambiar_estado(envio.id, nuevo_estado="en_transito")
-#     return render_template('confirmacion_estado.html', envio=envio)
 
 #########
-
-
-
 
 @app.route('/envio_masivo')
 def envio_masivo():
@@ -2531,9 +2303,6 @@ def envio_masivo():
     modalidad_pago = controlador_modalidad_pago.get_options()
     peso = controlador_tipo_empaque.get_peso()
     valor_max = controlador_regla_cargo.get_max_valor()
-    valores = controlador_regla_cargo.get_rango()
-    porcentaje_peso = controlador_regla_cargo.get_porcentaje_peso()
-    
     return render_template('envio_masivo.html', 
                            nombre_doc=nombre_doc,
                            departamento_origen = departamento_origen,
@@ -2541,10 +2310,9 @@ def envio_masivo():
                            tarifas = json.dumps(tarifas),
                            empaque=empaque, 
                            articulos=articulos,
+                           condiciones=condiciones,
                            peso = peso,
-                           valor_max = valor_max,
-                           valores=valores,
-                           porcentaje_peso=porcentaje_peso
+                           valor_max = valor_max
                            )
     
 
@@ -2613,38 +2381,22 @@ def distrito_origen():
             'status':-1
         }
     
-@app.route('/api/sucursal_origen',  methods=["POST"])
-def sucursal_origen():
+    
+@app.route('/api/departamento_destino',  methods=["POST"])
+def departamento_destino():
     try:
         datos = request.get_json()
         dep = datos.get('dep')
         prov = datos.get('prov')
         dist = datos.get('dist')
         
-        ubigeo = controlador_tarifa_ruta.get_codigo_ubigeo(dep,prov,dist)
-        sucursales = controlador_tarifa_ruta.get_sucursal_origen(ubigeo['codigo'])
-        return {
-            'data': sucursales,
-            'msg': "Se listó con éxito",
-            'status':1
-        }
-    except Exception as e:
-        return {
-            'data': [],
-            'msg': f"Ocurrió un error al listar las sucursales: {repr(e)}",
-            'status':-1
-        }
-    
-@app.route('/api/departamento_destino',  methods=["POST"])
-def departamento_destino():
-    try:
-        datos = request.get_json()
-        id_suc_origen = datos.get('suc_origen')
+        codigo_origen = controlador_tarifa_ruta.get_codigo_ubigeo(dep,prov,dist)
         
-        departamentos = controlador_tarifa_ruta.get_departamento_destino(id_suc_origen)
+        departamentos = controlador_tarifa_ruta.get_departamento_destino(codigo_origen['codigo'])
         
         return {
             'data': departamentos,
+            'codigo': codigo_origen['codigo'],
             'msg': "Se listó con éxito",
             'status':1
         }
@@ -2714,30 +2466,6 @@ def sucursal_destino():
         origen = datos.get('cod_origen')
         
         codigo_destino = controlador_tarifa_ruta.get_codigo_ubigeo(dep,prov,dist)
-        sucursales = controlador_tarifa_ruta.get_sucursal_destino(origen,codigo_destino['codigo'])
-        return {
-            'data': sucursales,
-            'msg': "Se listó con éxito",
-            'status':1
-        }
-    except Exception as e:
-        return {
-            'data': [],
-            'msg': f"Ocurrió un error al listar las departamentos: {repr(e)}",
-            'status':-1
-        }
-        
-        
-@app.route('/api/id_sucursal',  methods=["POST"])
-def id_sucursal():
-    try:
-        datos = request.get_json()
-        dep = datos.get('dep')
-        prov = datos.get('prov')
-        dist = datos.get('dist')
-        origen = datos.get('cod_origen')
-        
-        codigo_destino = controlador_tarifa_ruta.get_codigo_ubigeo(dep,prov,dist)
         
         sucursales = controlador_tarifa_ruta.get_sucursal_destino(origen,codigo_destino['codigo'])
         
@@ -2752,8 +2480,6 @@ def id_sucursal():
             'msg': f"Ocurrió un error al listar las departamentos: {repr(e)}",
             'status':-1
         }
-        
-
 ################# Sucursales ######################
 
 
@@ -2979,6 +2705,17 @@ def reporte(report_name):
                 # crud_unactive  = True,
                 esReporte      = True ,
             )
+
+
+@app.route("/seguimiento_empleado_prueba=<placa>")
+@validar_empleado()
+def seguimiento_empleado_prueba(placa):
+    return render_template('seguimiento_empleado_prueba.html', placa=placa ,
+        cur_modulo_id = permiso.get_pagina_key('salida')['moduloid'] ,
+                           
+                           )
+
+
 
 
 @app.route("/administrar_paginas")
@@ -3268,46 +3005,9 @@ def actualizar_permiso_modulo():
 
 
 
-@app.route("/api/seguimiento/<placa>", methods=["GET"])
-def api_seguimiento_vehiculo(placa):
-    try:
-        data = controlador_salida.get_salida_pendiente_placa(placa.upper())
-
-        if not data:
-            return jsonify({"error": "No hay salida activa para esta placa."}), 404
-
-        return jsonify(data[0])  # asumiendo solo una salida activa por placa
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route("/seguimiento_empleado_prueba=<placa>")
-@validar_empleado()
-def seguimiento_empleado_prueba(placa):
-    data = controlador_salida.get_info_salida_pendiente_placa(placa.upper())
-    return render_template(
-        'seguimiento_empleado_prueba.html', 
-        placa = placa ,
-        data = data ,
-        cur_modulo_id = permiso.get_pagina_key('salida')['moduloid'] ,
-        )
-
-
-@socketio.on("ubicacion_movil")
-def recibir_ubicacion(data):
-    emit("ubicacion_actualizada", data, broadcast=True)
-
-
-@app.route("/simulador_envio_ubicacion")
-def simulador_envio_ubicacion():
-    return render_template(
-        'simulador_envio_ubicacion.html', 
-        )
 
 if __name__ == "__main__":
-    # app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=True)
-    # Thread(target=enviar_posiciones).start()
-    socketio.run(app, host='0.0.0.0', port=8000, debug=True)
+    app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=True)
 
 
 

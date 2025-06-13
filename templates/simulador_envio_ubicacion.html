@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador de Ubicación</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background: #f2f2f2;
+    }
+    .form-box {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, button {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1976d2;
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-box">
+  <h2>Simulador de envío de coordenadas</h2>
+  <label for="placa">Placa del vehículo</label>
+  <input type="text" id="placa" placeholder="Ej. ABC123" required>
+
+  <label for="lat">Latitud</label>
+  <input type="number" id="lat" step="0.001" placeholder="-6.77" value="-6.77" required>
+
+  <label for="lng">Longitud</label>
+  <input type="number" id="lng" step="0.001" value="-79.87" required>
+
+  <button onclick="enviarUbicacion()">Enviar ubicación</button>
+</div>
+
+<script>
+  const socket = io(); // conectar al servidor de Flask-SocketIO
+
+  function enviarUbicacion() {
+    const placa = document.getElementById("placa").value.trim().toUpperCase();
+    const lat = parseFloat(document.getElementById("lat").value);
+    const lng = parseFloat(document.getElementById("lng").value);
+
+    if (!placa || isNaN(lat) || isNaN(lng)) {
+      alert("Completa todos los campos correctamente.");
+      return;
+    }
+
+    const data = { placa, lat, lng };
+    console.log("Enviando:", data);
+    socket.emit("ubicacion_movil", data);
+  }
+  document.querySelectorAll('input[type="number"]').forEach(input => {
+    input.addEventListener('input', function () {
+       enviarUbicacion(); 
+    });
+  });
+</script>
+
+</body>
+</html>
