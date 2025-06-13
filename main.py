@@ -50,10 +50,12 @@ from controladores import controlador_metodo_pago_venta as controlador_metodo_pa
 from controladores import controlador_articulo as controlador_articulo
 from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 from controladores import controlador_encomienda as controlador_encomienda
-
+import BytesIO
 import uuid, os, qrcode
 from decimal import Decimal, ROUND_HALF_UP
-
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import mm
 import hashlib
 import os
 from werkzeug.utils import secure_filename
@@ -2349,6 +2351,7 @@ def seguimiento_encomienda():
 def resumen_envio():
     data = request.get_json(force=True)
     envios = data.get('registros')
+    print(envios)
     if not envios:
         abort(400, "No vinieron registros")
 
@@ -2375,6 +2378,7 @@ def resumen_envio():
         envio_con_tarifa = envio.copy()
         envio_con_tarifa['tarifa'] = total.quantize(Decimal('0.01'))
         resultados.append(envio_con_tarifa)
+        print(resultados)
     session['resumen_envios'] = resultados
 
     return redirect(url_for('resumen'))
@@ -2387,6 +2391,11 @@ def resumen():
         return redirect(url_for('envio_masivo'))
 
     return render_template('resumen_envio.html', registros=resultados)
+
+
+
+
+
 
 
 
@@ -2411,7 +2420,8 @@ def pago_envio():
     tipo_comprobante = controlador_tipo_comprobante.get_options_nombre()
     metodo_pago      = controlador_metodo_pago.get_options()
 
-    modalidad_envio = registros[0].get('modalidadPago', '')
+    modalidadPago = registros[0].get('modalidadPago', '')
+    print(modalidadPago)
 
     return render_template('pago_envio.html',
                            registros=registros,
@@ -2419,9 +2429,71 @@ def pago_envio():
                            subtotal=subtotal,
                            igv=igv,
                            total=total,
-                           modalidad_envio=modalidad_envio,
+                           modalidadPago=modalidadPago,
                            tipo_comprobante=tipo_comprobante,
                            metodo_pago=metodo_pago)
+
+
+@app.route('/insertar_envio', methods=['POST'])
+def insertar_envio():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'status': 'error',
+                'message': 'No se recibió un JSON válido'
+            }), 400
+
+        tipo_comprobante = data.get('tipo_comprobante')
+        registros = session.get('resumen_envios')
+        if not registros:
+            return jsonify({
+                'status': 'error',
+                'message': 'No hay envíos en sesión'
+            }), 400
+
+        remitente = registros[0].get('remitente', {})
+        # Construcción de cliente_data con validaciones mínimas
+        nombre = remitente.get('nombre_remitente', '')
+        partes = nombre.split() if nombre else []
+        cliente_data = {
+            'correo':        remitente.get('correo_remitente', ''),
+            'telefono':      remitente.get('num_tel_remitente', ''),
+            'num_documento': remitente.get('num_doc_remitente', ''),
+            'nombre_siglas': partes[0] if partes else '',
+            'apellidos_razon': ' '.join(partes[1:]) if len(partes) > 1 else '',
+            'tipo_documentoid': int(remitente.get('tipo_doc_remitente', 1)),
+            'tipo_clienteid':   2 if remitente.get('tipo_doc_remitente') == 2 else 1
+        }
+
+        num_serie = controlador_encomienda.crear_transaccion_y_paquetes(
+            registros, cliente_data, tipo_comprobante
+        )
+        app.logger.info(f"Transacción creada con número de serie: {num_serie}")
+
+        return jsonify({
+            'status': 'success',
+            'message': 'Transacción creada correctamente',
+            'num_serie': num_serie
+        }), 201
+
+    except ValueError as ve:
+        # Por ejemplo, casting fallido
+        app.logger.warning(f"Bad request: {ve}")
+        return jsonify({
+            'status': 'error',
+            'message': str(ve)
+        }), 400
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()              
+        return jsonify({
+            'status': 'error',
+            'message': str(e),
+            'trace': traceback.format_exc() 
+        }), 500
+
 
 
 # @app.route('/scan/<token>', methods=['GET'])

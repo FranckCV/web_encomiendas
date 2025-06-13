@@ -1,6 +1,4 @@
-const { rutasTarifas } = window.CONFIG_ENVIO || {};
 
-const STORAGE_KEY = "envios_masivos";
 
 let editIndex = -1;
 let pasoActual = 1;
@@ -465,6 +463,7 @@ pinInputs.forEach((input, idx) => {
     .forEach(radio => {
       radio.addEventListener('change', () => {
         if (radio.checked) {
+          console.log(radio.value)
           cargarRecepcion(radio.value);
         }
       });
@@ -835,6 +834,13 @@ function mostrarCamposReceptor() { //Funciona bien
 /************************************************************************************************************************************************* */
 
 function cargarRecepcion(modalidad) {
+  console.log('oaa');
+  console.log(modalidad);
+  
+  if (modalidad == '') {
+    console.log(modalidad)
+    return false
+  }
   dict_modalidad = { 'modalidad': modalidad };
   
   ruta = '/api/recepcion'
@@ -1005,7 +1011,7 @@ function renderTabla() {
       `<td>${r.valorEnvio}</td>` +
       `<td>${r.peso}</td>` +
       `<td>${r.largo} cm x ${r.ancho} cm x ${r.alto} cm</td>` +
-      `<td>${r.destinatario}</td>` +
+      `<td>${r.destinatario.nombre_destinatario}</td>` +
       `<td>${r.modalidadPago}</td>` +
       `<td>${r.clave}</td>` +
       `<td>` +
@@ -1040,13 +1046,13 @@ function attachTableActions() {
 
 // Recolección y llenado de datos
 function collectFormData() {
-  const sel = document.querySelector('input[name="modalidad_pago"]:checked');
- const modalidadPagoValue = sel.value;  
 
-  const destinatario = document.getElementById('m-tipoDocumento').value === '2'
+
+  const nombreDestinatario = document.getElementById('m-tipoDocumento').value === '2'
     ? document.getElementById('m-razonSocial').value
     : document.getElementById('m-nombres').value + ' ' + document.getElementById('m-apellidos').value;
   return {
+    modo : mode,
     remitente :{
       tipo_doc_remitente : document.getElementById('remitente-tipo-doc').value,
       num_doc_remitente : document.getElementById('remitente-numero-doc').value,
@@ -1062,6 +1068,7 @@ function collectFormData() {
       sucursal_origen : document.getElementById('origen-sucursal').value
     },
     tipoEntrega: document.querySelector(`#m-tipoEntrega option[value="${document.querySelector('#m-tipoEntrega').value}"]`).textContent,
+    tipoEntregaId:document.getElementById('m-tipoEntrega').value,
     destino: {
       departamento: document.getElementById('select-departamento').value,
       provincia: document.getElementById('select-provincia').value,
@@ -1070,15 +1077,23 @@ function collectFormData() {
 
     },
     tipoEmpaque: document.querySelector(`#m-tipoEmpaque option[value="${document.querySelector('#m-tipoEmpaque').value}"]`).textContent,
+    tipoEmpaqueId: document.getElementById('m-tipoEmpaque').value,
     tipoArticulo: document.querySelector(`#m-tipoArticulo option[value="${document.querySelector('#m-tipoArticulo').value}"]`).textContent,
+    tipoArticuloId: document.getElementById('m-tipoArticulo').value,
     folios: document.getElementById('m-folios').value,
     valorEnvio: document.getElementById('m-valorEnvio').value,
     peso: document.getElementById('m-peso').value,
     largo: document.getElementById('m-largo').value,
     ancho: document.getElementById('m-ancho').value,
     alto: document.getElementById('m-alto').value,
-    destinatario,
-    modalidadPago: document.querySelector(`label[for="${sel.id}"]`).textContent,
+    destinatario :{
+      tipo_doc_destinatario : document.getElementById('m-tipoDocumento').value,
+      num_doc_destinatario : document.getElementById('m-nroDocumento').value,
+      num_tel_destinatario : document.getElementById('m-celular').value,
+      nombre_destinatario : nombreDestinatario
+
+    },
+    modalidadPago: document.querySelector('input[name="modalidad_pago"]:checked').value,
     clave: Array.from(document.querySelectorAll('.pin-input')).map(i => i.value).join('')
   };
 }
@@ -1189,8 +1204,8 @@ function clearForm(full = true) {
   const seccion = document.getElementById('seccion-masiva');
   if (!seccion) return;
 
-  // 1) Limpiar todos los campos… como ya lo tienes
   seccion.querySelectorAll('input, select, textarea').forEach(el => {
+    if (el.type === 'radio') return;     // <-- saltamos los radios
     if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
       el.value = '';
     }
@@ -1199,18 +1214,15 @@ function clearForm(full = true) {
     }
   });
 
-  // 2) Desmarcar los radios de modalidad_pago
   document
     .querySelectorAll('input[name="modalidad_pago"]')
     .forEach(r => r.checked = false);
 
-  // 3) Resetear el select de tipoEntrega (Destino)
   const recepcion = document.getElementById('m-tipoEntrega');
   if (recepcion) {
     recepcion.innerHTML = '<option disabled selected value="">Seleccione una modalidad de pago primero</option>';
   }
 
-  // Si full === false, no tocamos los selects de origen (como ya haces)
   if (full) {
     unlockOrigen();
   }

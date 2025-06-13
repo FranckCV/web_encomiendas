@@ -96,7 +96,7 @@
 
 {% block contenido %}
   <div class="container metodo-pago">
-    <h1 class="titulo-envio">REGISTRO DE ENVÍOS</h1>
+    <h1 class="titulo-envio">PAGO DE ENVÍOS</h1>
 
     <div class="steps-container">
       <div class="step completed">
@@ -139,25 +139,25 @@
           </div>
         </div>
 
-        {% if modalidad_pago == 1 %}
-        <div>
-          <h2 class="subtitulo">Elige tu medio de pago</h2>
-          <div class="pago-content">
-            <div class="opciones-pago">
-              {% for fila in metodo_pago %}
-                <label class="opcion" onclick="toggleSelection(this, 'metodo')">
-                  <div class="cabecera-opcion">
-                    <input type="radio" name="metodo" onchange="validarSelecciones()" id="metodo_{{ fila.id }}" value="{{ fila.id }}" data-nombre="{{ fila.nombre }}" />
-                    <span class="texto">{{ fila.nombre }}</span>
-                  </div>
-                </label>
-              {% endfor %}
+        {% if modalidadPago == 1 %}
+          <div>
+            <h2 class="subtitulo">Elige tu medio de pago</h2>
+            <div class="pago-content">
+              <div class="opciones-pago">
+                {% for fila in metodo_pago %}
+                  <label class="opcion" onclick="toggleSelection(this, 'metodo')">
+                    <div class="cabecera-opcion">
+                      <input type="radio" name="metodo" onchange="validarSelecciones()" id="metodo_{{ fila.id }}" value="{{ fila.id }}" data-nombre="{{ fila.nombre }}" />
+                      <span class="texto">{{ fila.nombre }}</span>
+                    </div>
+                  </label>
+                {% endfor %}
+              </div>
             </div>
           </div>
-        </div>
         {% endif %}
       </div>
-      
+
       <div>
         <div class="resumen-box">
           <h3>Resumen de tu registro</h3>
@@ -175,12 +175,16 @@
               <td class="value-td">S/ {{ igv }}</td>
             </tr>
             <tr class="total">
-              <td><strong>Total:</strong></td>
-              <td class="value-td"><strong>S/ {{ total }}</strong></td>
+              <td>
+                <strong>Total:</strong>
+              </td>
+              <td class="value-td">
+                <strong>S/ {{ total }}</strong>
+              </td>
             </tr>
           </table>
         </div>
-        
+
         <div class="boton-pagar-container">
           <button id="btn-accion" class="btn-pagar oculto" disabled onclick="accionPrincipal()">
             {% if modalidad_pago == 1 %}
@@ -194,17 +198,13 @@
     </div>
   </div>
 
-  <!-- MODAL PARA PAGOS -->
   <div id="modalPago" class="modal-overlay">
     <div class="modal-content">
       <span class="modal-close" onclick="cerrarModal()">&times;</span>
       <h3 id="tituloModal">Completar Pago</h3>
-      
-      <!-- Contenido dinámico del modal -->
-      <div id="contenidoModal">
-        <!-- Se llena dinámicamente con JavaScript -->
-      </div>
-      
+
+      <div id="contenidoModal"></div>
+
       <button class="btn-continuar-modal" onclick="procesarPago()">CONTINUAR</button>
     </div>
   </div>
@@ -212,6 +212,39 @@
 
 {% block scripts %}
   <script>
+  function generarComprobante() {
+    const tipo_comprobante = document.querySelector('input[name="comprobante"]:checked').value;
+
+  const datos = {
+    tipo_comprobante: tipo_comprobante
+  };
+
+  fetch('/insertar_envio', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(datos)
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('Error enviando el comprobante');
+    return res.json();
+  })
+  .then(response => {
+    // por ejemplo, si Flask te devuelve { success: true, url: '/confirmacion' }
+    if (response.success && response.url) {
+      window.location.href = response.url;
+    } else {
+      alert('No se pudo generar el comprobante');
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Ocurrió un error al comunicar con el servidor.');
+  });
+}
+
+
     function toggleIcons(label) {
       document.querySelectorAll('.iconos-pago').forEach((group) => group.classList.add('oculto'))
       const iconos = label.querySelector('.iconos-pago')
@@ -235,9 +268,7 @@
     function cerrarModal() {
       document.getElementById('modalPago').style.display = 'none'
     }
-  </script>
 
- <script>
     // Variables globales
     let modalidadPago = {{ modalidad_pago|default(0) }};
     let tipoComprobanteSeleccionado = null;
@@ -532,21 +563,7 @@
       boton.style.display = 'none';
     }
 
-    function generarComprobante() {
-      // Función para cuando modalidad_pago != 1
-      alert('Generando comprobante...');
-      
-      // Aquí puedes enviar los datos al servidor
-      const datos = {
-        tipo_comprobante: tipoComprobanteSeleccionado,
-        modalidad: 'comprobante'
-      };
-      
-      console.log('Datos a enviar:', datos);
-      
-      // Redirigir o hacer petición AJAX
-      // window.location.href = '/generar-comprobante';
-    }
+
 
     function cerrarModal() {
       document.getElementById('modalPago').style.display = 'none';
@@ -566,5 +583,5 @@
         cerrarModal();
       }
     });
-  </script>
+</script>
 {% endblock %}

@@ -128,7 +128,7 @@ function renderTabla() {
         <td>${r.valorEnvio}</td>
         <td>${r.peso}</td>
         <td>${r.largo}×${r.ancho}×${r.alto}</td>
-        <td>${r.destinatario}</td>
+        <td>${r.destinatario.nombre_destinatario}</td>
         <td>${r.modalidadPago}</td>
         <td>${r.clave}</td>
         <td><strong>S/ ${r.tarifa}</strong></td>
