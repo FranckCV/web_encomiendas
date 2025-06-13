@@ -49,12 +49,8 @@ from controladores import controlador_metodo_pago_venta as controlador_metodo_pa
 from controladores import controlador_articulo as controlador_articulo
 from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 from controladores import controlador_encomienda as controlador_encomienda
-<<<<<<< HEAD
 import BytesIO
-=======
 from controladores.bd import sql_execute
-
->>>>>>> a5248e50e599a75f3de493c58ca42d185657f115
 import uuid, os, qrcode
 from decimal import Decimal, ROUND_HALF_UP
 from reportlab.lib.pagesizes import A4
