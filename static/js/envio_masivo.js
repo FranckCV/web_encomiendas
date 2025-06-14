@@ -1048,9 +1048,9 @@ function attachTableActions() {
 function collectFormData() {
 
 
-  const nombreDestinatario = document.getElementById('m-tipoDocumento').value === '2'
-    ? document.getElementById('m-razonSocial').value
-    : document.getElementById('m-nombres').value + ' ' + document.getElementById('m-apellidos').value;
+  // const nombreDestinatario = document.getElementById('m-tipoDocumento').value === '2'
+  //   ? document.getElementById('m-razonSocial').value
+  //   : document.getElementById('m-nombres').value + ' ' + document.getElementById('m-apellidos').value;
   return {
     modo : mode,
     remitente :{
@@ -1090,7 +1090,9 @@ function collectFormData() {
       tipo_doc_destinatario : document.getElementById('m-tipoDocumento').value,
       num_doc_destinatario : document.getElementById('m-nroDocumento').value,
       num_tel_destinatario : document.getElementById('m-celular').value,
-      nombre_destinatario : nombreDestinatario
+      nombre_destinatario : document.getElementById('m-tipoDocumento').value === '2'
+    ? document.getElementById('m-razonSocial').value
+    : document.getElementById('m-nombres').value + ' ' + document.getElementById('m-apellidos').value
 
     },
     modalidadPago: document.querySelector('input[name="modalidad_pago"]:checked').value,
