@@ -21,6 +21,12 @@ def get_primary_key():
 def exists_Activo():
     return exists_column_Activo(table_name)
 
+def delete_row( id ):
+    sql = f'''
+        delete from {table_name}
+        where id = {id}
+    '''
+    sql_execute(sql)
 
 
 #####_ CAMBIAR SQL y DICT INTERNO _#####
@@ -36,43 +42,69 @@ def table_fetchall():
     return resultados
 
 
-def get_table():
-    sql= f'''
-        SELECT
-        s.id, 
-    CONCAT(e.nombre, ' ', e.apellidos) AS nom_conductor,
-    u.placa,
-    ub.departamento AS destino,
-    s.fecha,
-    s.hora,
-    u.capacidad,
-    CASE s.estado
-        WHEN 'P' THEN 'Pendiente (origen sucursal / domicilio)'
-        WHEN 'E' THEN 'En curso (en ruta)'
-        WHEN 'C' THEN 'Completada (destino sucursal / domicilio)'
-        WHEN 'X' THEN 'Cancelada'
-        ELSE 'Estado desconocido'
-    END AS estado
-FROM salida s
-INNER JOIN unidad u ON u.id = s.unidadid
-INNER JOIN empleado e ON e.id = s.conductor_principal
-INNER JOIN sucursal su ON su.id = s.destino_final
-INNER JOIN ubigeo ub ON ub.codigo = su.ubigeocodigo
-    '''
-    columnas = {
-        'id': ['ID' , 0.5 ] , 
-        'nom_conductor' : ['Conductor' , 1 ] , 
-        'placa' : ['Placa' , 1] , 
-        'destino' : ['Destino' , 3.5] , 
-        'fecha' : ['Fecha' , 1.2] , 
-        'hora' : ['Hora' , 1] , 
-        'capacidad' : ['Capacidad' , 1.5] , 
-        'estado' : ['Estado' , 3.5] ,
 
-        }
+def get_table():
+    sql = '''
+            SELECT 
+            te.num_serie,
+            
+            CASE 
+                WHEN te.masivo = 1 THEN 'Masivo'
+                ELSE 'Individual'
+            END AS isMasivo,
+            te.recojo_casa,
+
+            te.monto_total,
+            CONCAT(
+                COALESCE(u.departamento, ''), ' ',
+                COALESCE(u.provincia, ''), ' ',
+                COALESCE(u.distrito, ''), ' ',
+                COALESCE(s.direccion, '')
+            ) AS sucursal_origen,
+
+            CASE 
+                WHEN te.estado_pago = 'P' THEN 'Pendiente'
+                WHEN te.estado_pago = 'C' THEN 'Cancelado'
+                ELSE 'Desconocido'
+            END AS pago,
+
+            te.fecha,
+            te.hora,
+
+            te.direccion_recojo,
+
+            COALESCE(tc.nombre, '') AS nom_tip_comprobante,
+
+            CONCAT(
+                COALESCE(c.nombre_siglas, ''), ' ',
+                COALESCE(c.apellidos_razon, '')
+            ) AS nombre_cliente
+
+        FROM transaccion_encomienda te
+        INNER JOIN cliente c ON c.id = te.clienteid
+        INNER JOIN tipo_comprobante tc ON tc.id = te.tipo_comprobanteid
+        INNER JOIN sucursal s ON s.id = te.id_sucursal_origen
+        INNER JOIN ubigeo u ON u.codigo = s.ubigeocodigo;
+    '''
+
+    columnas = {
+        'num_serie': ['N° Serie', 1],
+        'isMasivo': ['Tipo de envío', 1.2],
+        'monto_total': ['Monto Total', 1],
+        # 'recojo_casa': ['Recojo a Domicilio', 1.2],
+        'sucursal_origen': ['Sucursal Origen', 1.5],
+        'pago': ['Estado de Pago', 1],
+        'fecha': ['Fecha', 1],
+        'hora': ['Hora', 1],
+        # 'direccion': ['Dirección de Recojo', 2],
+        'nom_tip_comprobante': ['Tipo de Comprobante', 1.5],
+        'nombre_cliente': ['Cliente', 2],
+    }
+
     filas = sql_select_fetchall(sql)
     
-    return columnas , filas
+    return columnas, filas
+
 
 
 
@@ -81,6 +113,16 @@ INNER JOIN ubigeo ub ON ub.codigo = su.ubigeocodigo
         
 #     except Exception as e:
         
+def update_row( id , nombre ):
+    sql = f'''
+        update {table_name} set 
+        nombre = %s 
+        where {get_primary_key()} = {id}
+    '''
+    sql_execute(sql, (nombre ))
+
+    unactive_row_table(table_name , id)
+ 
 
 def insert_cliente(correo, telefono, num_doc, nombre, tipo_doc):
     # 1) Verificamos si ya existe

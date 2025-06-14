@@ -7977,59 +7977,41 @@ VALUES (1, 'Recibido', 1),
   (4, 'En revisión', 1),
   (5, 'Resuelto', 1);
 
-INSERT INTO estado_encomienda (`id`, `nombre`, `descripcion`, `activo`)
-VALUES (
-    1,
-    'En origen',
-    'Paquete en sucursal de origen',
-    1
-  ),
-  (2, 'En tránsito', 'Paquete en camino', 1),
-  (
-    3,
-    'En destino',
-    'Paquete en sucursal de destino',
-    1
-  ),
-  (4, 'Entregado', 'Paquete entregado', 1);
+INSERT INTO estado_encomienda (id, nombre, descripcion, activo, tipoEstado) VALUES
+(1, 'En origen', 'Paquete en sucursal de origen', 1, 'N'),
+(2, 'En tránsito', 'Paquete en camino', 1, 'N'),
+(3, 'En destino', 'Paquete en sucursal de destino', 1, 'N'),
+(4, 'Entregado', 'Paquete entregado con éxito', 1, 'N'),
+(5, 'Reprogramado', 'Entrega reprogramada por solicitud o causa externa', 1, 'E'),
+(6, 'Rechazado', 'Paquete rechazado por el destinatario', 1, 'E'),
+(7, 'Extraviado', 'No se encuentra el paquete', 1, 'E'),
+(8, 'Devuelto al origen', 'Paquete retornado a la sucursal de origen', 1, 'E'),
+(9, 'Incidencia en tránsito', 'Problemas en el traslado del paquete', 1, 'E');
 
-INSERT INTO detalle_estado (nombre, descripcion, activo, estado_encomiendaid)
-VALUES (
-    'Solicitud registrada',
-    'Se ha generado una orden de envío en el sistema.',
-    1,
-    1
-  ),
-  (
-    'Recepción física en oficina',
-    'El paquete ha sido recibido físicamente en la oficina de origen.',
-    1,
-    1
-  ),
-  (
-    'Validación de contenido',
-    'El contenido del paquete ha sido verificado por el personal.',
-    1,
-    1
-  ),
-  (
-    'Embalaje y etiquetado',
-    'El paquete fue embalado y etiquetado correctamente.',
-    1,
-    1
-  ),
-  (
-    'Esperando programación de ruta',
-    'El paquete está esperando asignación a una unidad de transporte.',
-    1,
-    1
-  ),
-  (
-    'Listo para despacho',
-    'El paquete está completamente preparado para salir de la oficina de origen.',
-    1,
-    1
-  );
+
+INSERT INTO detalle_estado (nombre, descripcion, activo, estado_encomiendaid) VALUES
+('En espera a que el remitente entregue el paquete a la sucursal de origen', 'Paquete recibido en la sucursal de origen', 1, 1),
+('Recepcionado en almacén de origen', 'Paquete recibido en la sucursal de origen', 1, 1),
+('Etiquetado y pesado', 'Paquete siendo registrado y etiquetado', 1, 1),
+('Clasificación para envío', 'Paquete clasificado según destino', 1, 1),
+('Listo para despacho', 'Paquete preparado para salir de la sucursal', 1, 1);
+
+INSERT INTO detalle_estado (nombre, descripcion, activo, estado_encomiendaid) VALUES
+('Salida de sucursal origen', 'Paquete ha salido rumbo a destino', 1, 2),
+('En ruta intermedia', 'Paquete en tránsito hacia la ciudad de destino', 1, 2),
+('Centro de distribución', 'Paquete temporalmente almacenado en un centro logístico', 1, 2),
+('Despacho hacia destino', 'Paquete salió del centro logístico hacia la sucursal de destino', 1, 2);
+
+INSERT INTO detalle_estado (nombre, descripcion, activo, estado_encomiendaid) VALUES
+('Recibido en sucursal de destino', 'Paquete llegó a la sucursal correspondiente', 1, 3),
+('En espera de recojo', 'Paquete está esperando al destinatario', 1, 3),
+('Confirmación de entrega próxima', 'Se notificó al destinatario para recojo o entrega domiciliaria', 1, 3);
+
+INSERT INTO detalle_estado (nombre, descripcion, activo, estado_encomiendaid) VALUES
+('Entregado en sucursal', 'El destinatario recogió el paquete en la sucursal', 1, 4),
+('Entregado en domicilio', 'El paquete fue entregado al destinatario en su domicilio', 1, 4),
+('Confirmación de entrega', 'Entrega confirmada por firma o foto', 1, 4);
+
 
 INSERT INTO detalle_estado (nombre, descripcion, activo, estado_encomiendaid)
 VALUES (

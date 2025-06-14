@@ -64,18 +64,30 @@ from werkzeug.routing import MapAdapter
 import configuraciones
 from functools import wraps
 import inspect
-
+from flask_mail import Mail, Message
+from correo import enviar_correo
 
 from flask_socketio import SocketIO, emit
 from time import sleep
 from threading import Thread
-
+import traceback
+ 
 
 app = Flask(__name__, template_folder='templates')
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 app.secret_key = 'es-un-secreto'
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'fabianapm060126@gmail.com'
+app.config['MAIL_PASSWORD'] = 'vagfqxdumpuboswj'
+    
+
+mail = Mail(app)
+
 
 IGV_RATE = Decimal('0.18')
 
@@ -1225,6 +1237,38 @@ CONTROLADORES = {
         }
     },
     
+    "paquete": {
+        "active" : True ,
+        "titulo": "unidades",
+        "nombre_tabla": "unidad",
+        "controlador": controlador_unidad,
+        "icon_page": 'fa-solid fa-truck-fast',
+        "filters": [
+            ['modeloid', 'Modelo', lambda: controlador_modelo.get_options() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
+            ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
+            ['modeloid',      'Nombre de Modelo', 'Elegir modelo', 'select',    True ,     True,          [lambda: controlador_modelo.get_options() , 'nom_modelo' ] ],
+            ['estado',        'Estado',           'Elegir estado', 'select',    True ,    True,           [lambda: controlador_unidad.get_options_estado() , 'estado' ]  ],
+            ['placa',         'Placa',            'Placa',         'text',      True ,     True,          True ],
+            ['mtc',           'MTC',              'MTC',           'text',      True ,     True,          True ],
+            ['tuc',           'TUC',              'TUC',           'text',      True ,     True,          True ],
+            ['capacidad',     'Capacidad',        'Capacidad',     'number',    True ,     True,          True ],
+            ['volumen',       'Volumen',          'Volumen',       'number',    True ,     True,          None ],
+            ['descripcion', 'Descripción',    'Descripción', 'textarea',  False,     True,          None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    
 }
 
 
@@ -1517,35 +1561,36 @@ TRANSACCIONES = {
             "crud_unactive": False ,
         }
     },
-    "transaccion_encomienda": {
-        "active" : True ,
-        "titulo": "encomiendas",
-        "nombre_tabla": "transaccion_encomienda",
-        "controlador": controlador_encomienda,
-        "icon_page": 'fa-solid fa-boxes-packing',
-        "filters": [
-        ] ,
-       "fields_form" : [
-            ['id',          'ID',            'ID',             'text',   True,   False,   None],
-            ['nom_conductor','Conductor',    'Nombre del conductor', 'text', True, False,   None],
-            ['placa',       'Placa de unidad','Placa de unidad', 'text',   True,   True,    None],
-            ['destino',     'Destino',       'Destino',         'text',   True,   True,    None],
-            ['fecha',       'Fecha',         'YYYY-MM-DD',      'date',   True,   True,    None],
-            ['hora',        'Hora',          'HH:MM',           'time',   True,   True,    None],
-            ['capacidad',   'Capacidad',     'Capacidad en kg', 'number', True,  False,   None],
-            ['estado',      'Estado',        'Estado actual',   'text',   True,   False,   None],
-       ],
+   "t_encomienda": {
+    "active": True,
+    "titulo": "Encomiendas",
+    "nombre_tabla": "transaccion_encomienda",
+    "controlador": controlador_encomienda,
+    "icon_page": "fa-solid fa-boxes-packing",
+    "filters": [],
+    
+    "fields_form": [
+        ['num_serie',         'N° Serie',           'Número de Serie',         'text',   True,  True,   None],
+        ['masivo',            'Tipo de Envío',      '1: Masivo / 0: Individual','number', True,  True,   None],
+        ['monto_total',       'Monto Total',        'Total a pagar',           'number', True,  True,   None],
+        ['recojo_casa',       'Recojo a Domicilio', '1: Sí / 0: No',           'number', True,  True,   None],
+        ['sucursal_origen','Sucursal Origen',    'ID de Sucursal',          'number', True,  True,   None],
+        ['estado_pago',       'Estado de Pago',     'P: Pendiente / C: Cancelado','text', True,  True,   None],
+        ['nom_tip_comprobante','Tipo Comprobante',   'Tipo Comprobante',     'number', True,  True,   None],
+        ['nombre_cliente',         'Cliente',            'Nombre del cliente',          'text', True,  True,   None]
+    ],
+    
+    "crud_forms": {
+        "crud_list": True,
+        "crud_search": False,
+        "crud_consult": True,
+        "crud_insert": False,
+        "crud_update": True,
+        "crud_delete": True,
+        "crud_unactive": False
+    }
+}
 
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": False ,
-            "crud_consult": True ,
-            "crud_insert": False ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": False ,
-        }
-    },
 }
 
 
@@ -1805,7 +1850,6 @@ PAGINAS_SIMPLES = [
     "index" , 
     'pagina_test_rastreo' ,
     'tracking',
-    'seguimiento',
     'recuperar_contrasenia',
     'libro_reclamaciones',
     'mis_envios',
@@ -1928,7 +1972,14 @@ def api_calculate_tarifa():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
+@app.route('/seguimiento')
+def seguimiento():
+    try:
+        estado = controlador_estado_encomienda.get_options()
+        return render_template('seguimiento.html',estado=estado)
+    except Exception as e:
+        return e
+        
 
 
 @app.route("/api/datos_destino", methods=["GET"])
@@ -2441,43 +2492,74 @@ def pago_envio():
                            metodo_pago=metodo_pago)
 
 
+
 @app.route('/insertar_envio', methods=['POST'])
 def insertar_envio():
     try:
+        nombre_empresa = controlador_empresa.get_nombre()
         data = request.get_json()
         if not data:
-            return jsonify({
-                'status': 'error',
-                'message': 'No se recibió un JSON válido'
-            }), 400
+            return jsonify({'status':'error','message':'No se recibió un JSON válido'}), 400
 
         tipo_comprobante = data.get('tipo_comprobante')
         registros = session.get('resumen_envios')
         if not registros:
-            return jsonify({
-                'status': 'error',
-                'message': 'No hay envíos en sesión'
-            }), 400
+            return jsonify({'status':'error','message':'No hay envíos en sesión'}), 400
 
         remitente = registros[0].get('remitente', {})
-        # Construcción de cliente_data con validaciones mínimas
-        nombre = remitente.get('nombre_remitente', '')
+        nombre = remitente.get('nombre_remitente','')
         partes = nombre.split() if nombre else []
         cliente_data = {
-            'correo':        remitente.get('correo_remitente', ''),
-            'telefono':      remitente.get('num_tel_remitente', ''),
-            'num_documento': remitente.get('num_doc_remitente', ''),
+            'correo':        remitente.get('correo_remitente',''),
+            'telefono':      remitente.get('num_tel_remitente',''),
+            'num_documento': remitente.get('num_doc_remitente',''),
             'nombre_siglas': partes[0] if partes else '',
-            'apellidos_razon': ' '.join(partes[1:]) if len(partes) > 1 else '',
-            'tipo_documentoid': int(remitente.get('tipo_doc_remitente', 1)),
-            'tipo_clienteid':   2 if remitente.get('tipo_doc_remitente') == 2 else 1
+            'apellidos_razon': ' '.join(partes[1:]) if len(partes)>1 else '',
+            'tipo_documentoid': int(remitente.get('tipo_doc_remitente',1)),
+            'tipo_clienteid':   2 if remitente.get('tipo_doc_remitente')==2 else 1
         }
 
+        # 1) Creamos transacción y paquetes
         num_serie = controlador_encomienda.crear_transaccion_y_paquetes(
             registros, cliente_data, tipo_comprobante
         )
-        app.logger.info(f"Transacción creada con número de serie: {num_serie}")
 
+        # 2) Generamos QR para cada paquete (no bloqueante)
+        if num_serie:
+            try:
+                generar_qr_paquetes(registros, num_serie)
+            except Exception as qr_err:
+                current_app.logger.warning(f"Error generando QR: {qr_err}")
+
+            # 3) Preparamos y enviamos el correo al remitente
+            destinatario_email = cliente_data['correo']
+            msg = Message(
+                subject=f"{nombre_empresa} Envío registrado: {num_serie}",
+                sender=app.config['MAIL_USERNAME'],
+                recipients=[destinatario_email]
+            )
+            msg.body = (
+                f"Hola {cliente_data['nombre_siglas']},\n\n"
+                f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
+                "Adjunto encontrarás los códigos QR para el seguimiento de cada paquete.\n\n"
+                f"¡Gracias por confiar en {nombre_empresa} "
+            )
+
+            for r in registros:
+                clave = r['clave']
+                qr_path = os.path.join(
+                    app.static_folder, 'comprobantes', clave, 'qr.png'
+                )
+                if os.path.exists(qr_path):
+                    with open(qr_path, 'rb') as f:
+                        qr_data = f.read()
+                    msg.attach(f"qr_{clave}.png", 'image/png', qr_data)
+                else:
+                    current_app.logger.warning(f"QR no encontrado para clave {clave}")
+
+            mail.send(msg)
+
+        current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
         return jsonify({
             'status': 'success',
             'message': 'Transacción creada correctamente',
@@ -2485,23 +2567,43 @@ def insertar_envio():
         }), 201
 
     except ValueError as ve:
-        # Por ejemplo, casting fallido
-        app.logger.warning(f"Bad request: {ve}")
-        return jsonify({
-            'status': 'error',
-            'message': str(ve)
-        }), 400
+        current_app.logger.warning(f"Bad request: {ve}")
+        return jsonify({'status':'error','message':str(ve)}), 400
 
     except Exception as e:
-        import traceback
-        traceback.print_exc()              
+        traceback.print_exc()
         return jsonify({
             'status': 'error',
-            'message': str(e),
-            'trace': traceback.format_exc() 
+            'message': 'Ocurrió un error al procesar el envío'
         }), 500
+        
+        
 
+def generar_qr_paquetes(registros, num_serie):
 
+    for r in registros:
+        clave = r['clave']
+
+        # 1) Decide qué va dentro del QR. Puede ser sólo la clave:
+        qr_data = clave 
+
+        # —o— si más adelante tendrás un endpoint de tracking:
+        # qr_data = url_for('track_paquete', clave=clave, _external=True)
+
+        # 2) Genera el QR
+        img = qrcode.make(qr_data)
+
+        # 3) Crea la carpeta si no existe
+        carpeta = os.path.join(
+            current_app.static_folder,
+            'comprobantes',
+            clave
+        )
+        os.makedirs(carpeta, exist_ok=True)
+
+        # 4) Guarda la imagen
+        ruta_qr = os.path.join(carpeta, 'qr.png')
+        img.save(ruta_qr)
 
 # @app.route('/scan/<token>', methods=['GET'])
 # def actualizar_estado(token):

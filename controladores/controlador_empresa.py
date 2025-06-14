@@ -148,4 +148,12 @@ def get_porcentaje_recojo():
     
     return info
 
-
+def get_nombre():
+    sql = """
+        SELECT 
+            emp.nombre
+        FROM empresa emp
+        WHERE id = 1
+    """
+    fila = sql_select_fetchone(sql)
+    return fila['nombre']

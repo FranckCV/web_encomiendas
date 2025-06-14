@@ -1094,6 +1094,7 @@ function collectFormData() {
 
     },
     modalidadPago: document.querySelector('input[name="modalidad_pago"]:checked').value,
+    
     clave: Array.from(document.querySelectorAll('.pin-input')).map(i => i.value).join('')
   };
 }

@@ -119,6 +119,7 @@ CREATE TABLE estado_encomienda (
   nombre      varchar(200) NOT NULL, 
   descripcion text NOT NULL, 
   activo      tinyint(1) NOT NULL, 
+  tipoEstado  char(1) not null,
   PRIMARY KEY (id));
 CREATE TABLE estado_reclamo (
   id     int(10) NOT NULL AUTO_INCREMENT, 
@@ -493,6 +494,9 @@ ALTER TABLE escala ADD CONSTRAINT FKescala650496 FOREIGN KEY (salidaid) REFERENC
 ALTER TABLE escala ADD CONSTRAINT FKescala667165 FOREIGN KEY (sucursalid) REFERENCES sucursal (id);
 ALTER TABLE sucursal ADD CONSTRAINT FKsucursal756715 FOREIGN KEY (ubigeocodigo) REFERENCES ubigeo (codigo);
 
+
 ALTER TABLE paquete
-  ADD COLUMN qr_token VARCHAR(64)   NOT NULL,
-  ADD COLUMN qr_image VARCHAR(255)  NOT NULL;
+ADD CONSTRAINT fk_transaccion
+FOREIGN KEY (transaccion_encomienda_num_serie)
+REFERENCES transaccion_encomienda(num_serie)
+ON DELETE CASCADE;

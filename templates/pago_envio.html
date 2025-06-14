@@ -212,18 +212,13 @@
 
 {% block scripts %}
   <script>
-  function generarComprobante() {
-    const tipo_comprobante = document.querySelector('input[name="comprobante"]:checked').value;
-
-  const datos = {
-    tipo_comprobante: tipo_comprobante
-  };
+function generarComprobante() {
+  const tipo_comprobante = document.querySelector('input[name="comprobante"]:checked').value;
+  const datos = { tipo_comprobante };
 
   fetch('/insertar_envio', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(datos)
   })
   .then(res => {
@@ -231,11 +226,14 @@
     return res.json();
   })
   .then(response => {
-    // por ejemplo, si Flask te devuelve { success: true, url: '/confirmacion' }
-    if (response.success && response.url) {
-      window.location.href = response.url;
+    if (response.status === 'success') {
+      // Aquí muestras el alert de éxito
+      alert(`¡Comprobante generado con éxito!\nNúmero de serie: ${response.num_serie}`);
+      // Si luego quieres redirigir, descomenta:
+      // window.location.href = `/comprobante/${response.num_serie}`;
     } else {
-      alert('No se pudo generar el comprobante');
+      // Si el back te envía mensaje de error:
+      alert(response.message || 'No se pudo generar el comprobante');
     }
   })
   .catch(err => {
@@ -243,6 +241,7 @@
     alert('Ocurrió un error al comunicar con el servidor.');
   });
 }
+
 
 
     function toggleIcons(label) {
