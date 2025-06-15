@@ -253,7 +253,7 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
         else:
             contenido_paqueteid = None  # se insertará como NULL
 
-        sql_execute(
+        sql_execute_lastrowid(
             """
             INSERT INTO paquete
             (clave, valor, peso, alto, largo, precio_ruta, ancho,
@@ -288,4 +288,6 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
                 num_serie,
             )
         )
+        
+        
         return num_serie

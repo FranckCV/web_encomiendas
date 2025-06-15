@@ -33,3 +33,18 @@ def get_report_test():
     filas = sql_select_fetchall(sql)
     
     return columnas, filas
+
+
+def buscar_paquete(tracking,anio):
+    sql = '''SELECT p.tracking, te.fecha 
+            FROM paquete p
+            INNER JOIN transaccion_encomienda te ON p.transaccion_encomienda_num_serie = te.num_serie
+            WHERE p.tracking = %s AND YEAR(te.fecha) = %s'''
+    fila = sql_execute_lastrowid(sql,(tracking,anio))
+    return fila
+
+
+# def get_data_by_tracking(tracking):
+#     sql = '''
+#         select * from paquete
+#     '''
