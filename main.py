@@ -2873,6 +2873,23 @@ def procesar_login():
         return rdrct_error(redirect_url('login')  , e)
 
 
+@app.route("/login_android", methods=["POST"])
+def login_android():
+    try:
+        data = request.get_json()
+        correo = data.get("correo")
+        contrasenia = data.get("contrasenia")
+        usuario = controlador_usuario.get_usuario_por_correo(correo)
+        encpassword = encrypt_sha256_string(contrasenia)
+        if usuario and encpassword == usuario['contrasenia']:
+            data = {
+                'message': 200
+            }
+            return jsonify(data)
+    except Exception as e:
+        return jsonify(e)
+
+
 @app.route("/procesar_register", methods=["POST"])
 def procesar_register():
     try:
@@ -3401,6 +3418,25 @@ def simulador_envio_ubicacion():
     return render_template(
         'simulador_envio_ubicacion.html', 
         )
+    
+##################################################################################
+@app.route("/buscar_paquete")
+def buscar_paquete():
+    tracking = request.args.get('tracking')
+    anio = request.args.get('anio')
+    paquete = controlador_paquete.buscar_paquete(tracking,anio)
+    if paquete is not None:
+        return redirect('seguimiento',tracking=paquete)
+    else:
+        return redirect('seguimiento',tracking=0)
+
+    
+    
+# @app.route("/seguimiento=<tracking>")
+# def seguimiento(tracking):
+    
+   
+    
 
 if __name__ == "__main__":
     # app.run(host='192.168.48.178', port=8000, debug=True, use_reloader=True)

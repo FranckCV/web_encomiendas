@@ -1091,7 +1091,7 @@ function collectFormData() {
       num_doc_destinatario : document.getElementById('m-nroDocumento').value,
       num_tel_destinatario : document.getElementById('m-celular').value,
       nombre_destinatario : document.getElementById('m-tipoDocumento').value === '2'
-    ? document.getElementById('m-razonSocial').value
+      ? document.getElementById('m-razonSocial').value
     : document.getElementById('m-nombres').value + ' ' + document.getElementById('m-apellidos').value
 
     },

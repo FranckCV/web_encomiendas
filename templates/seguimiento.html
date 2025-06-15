@@ -10,12 +10,13 @@
 
 {% block contenido %}
   <div class="contenedor">
+    <!---->
     <div class="header">
-      <div class="order-search">
-        <input type="text" placeholder="Nº de Orden" class="order-input" />
-        <input type="text" placeholder="Año de emisión" class="order-input" />
+      <form class="order-search" >
+        <input type="text" placeholder="Tracking" class="order-input" name="tracking"/>
+        <input type="text" placeholder="Año de emisión" class="order-input" name="anio" />
         <button class="search-btn">Buscar <i class="ri-arrow-right-line"></i></button>
-      </div>
+      </form>
     </div>
 
     <div class="container_estado">
