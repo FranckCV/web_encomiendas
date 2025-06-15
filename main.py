@@ -2562,6 +2562,133 @@ def insertar_envio():
         }), 500
         
         
+        
+@app.route('/insertar_envio_api', methods=['POST'])
+def insertar_envio_api():
+    try:
+        nombre_empresa = controlador_empresa.get_nombre()
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'status': 'error', 'message': 'No se recibió un JSON válido'}), 400
+
+        tipo_comprobante = data.get('tipo_comprobante')
+        registros = data.get('registros') 
+
+        if not registros or not isinstance(registros, list):
+            return jsonify({'status': 'error', 'message': 'No se encontraron registros válidos'}), 400
+
+        # Tomamos los datos del remitente desde el primer registro
+        remitente = registros[0].get('remitente', {})
+        nombre = remitente.get('nombre_remitente', '')
+        partes = nombre.split() if nombre else []
+
+        cliente_data = {
+            'correo':        remitente.get('correo_remitente', ''),
+            'telefono':      remitente.get('num_tel_remitente', ''),
+            'num_documento': remitente.get('num_doc_remitente', ''),
+            'nombre_siglas': partes[0] if partes else '',
+            'apellidos_razon': ' '.join(partes[1:]) if len(partes) > 1 else '',
+            'tipo_documentoid': int(remitente.get('tipo_doc_remitente', 1)),
+            'tipo_clienteid': 2 if remitente.get('tipo_doc_remitente') == 2 else 1
+        }
+
+        # 1) Crear transacción y paquetes
+        num_serie = controlador_encomienda.crear_transaccion_y_paquetes(
+            registros, cliente_data, tipo_comprobante
+        )
+
+        # 2) Generar QR para cada paquete
+        if num_serie:
+            try:
+                generar_qr_paquetes(registros, num_serie)
+            except Exception as qr_err:
+                current_app.logger.warning(f"Error generando QR: {qr_err}")
+
+            # 3) Enviar correo al remitente
+            destinatario_email = cliente_data['correo']
+            if destinatario_email:
+                msg = Message(
+                    subject=f"{nombre_empresa} Envío registrado: {num_serie}",
+                    sender=app.config['MAIL_USERNAME'],
+                    recipients=[destinatario_email]
+                )
+                msg.body = (
+                    f"Hola {cliente_data['nombre_siglas']},\n\n"
+                    f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
+                    "Adjunto encontrarás los códigos QR para el seguimiento de cada paquete.\n\n"
+                    f"¡Gracias por confiar en {nombre_empresa}!"
+                )
+
+                for r in registros:
+                    clave = r.get('clave')
+                    qr_path = os.path.join(app.static_folder, 'comprobantes', clave, 'qr.png')
+                    if os.path.exists(qr_path):
+                        with open(qr_path, 'rb') as f:
+                            qr_data = f.read()
+                        msg.attach(f"qr_{clave}.png", 'image/png', qr_data)
+                    else:
+                        current_app.logger.warning(f"QR no encontrado para clave {clave}")
+
+                mail.send(msg)
+
+        current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
+        return jsonify({
+            'status': 'success',
+            'message': 'Transacción creada correctamente',
+            'num_serie': num_serie
+        }), 201
+
+    except ValueError as ve:
+        current_app.logger.warning(f"Bad request: {ve}")
+        return jsonify({'status': 'error', 'message': str(ve)}), 400
+
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({
+            'status': 'error',
+            'message': 'Ocurrió un error al procesar el envío'
+        }), 500
+       
+##PARA PROBAR EL API E INSERTAR 
+# {
+#   "tipo_comprobante": 1,
+#   "registros": [
+#     {
+#       "modo": "individual",
+#       "clave": "4123",
+#       "valorEnvio": 80.0,
+#       "peso": 5.5,
+#       "alto": 40.0,
+#       "largo": 50.0,
+#       "ancho": 30.0,
+#       "tarifa": 25.5,
+#       "tipoEmpaqueId": 2,
+#       "tipoArticuloId": 3,
+#       "tipoEntregaId": 1,
+#       "estado_pago":"P",
+#       "origen": {
+#         "sucursal_origen": 3
+#       },
+#       "destino": {
+#         "sucursal_destino": 5
+#       },
+#       "destinatario": {
+#         "nombre_destinatario": "Juan Pérez",
+#         "tipo_doc_destinatario": 1,
+#         "num_doc_destinatario": "12345678",
+#         "num_tel_destinatario": "987654321"
+#       },
+#       "remitente": {
+#         "nombre_remitente": "Ana Torres",
+#         "correo_remitente": "ana@example.com",
+#         "num_tel_remitente": "987654320",
+#         "num_doc_remitente": "87654321",
+#         "tipo_doc_remitente": 1
+#       }
+#     }
+#   ]
+# }
 
 def generar_qr_paquetes(registros, num_serie):
 
@@ -3424,8 +3551,12 @@ def seguimiento():
         return e   
  
     
-# @app.route("/seguimiento=<tracking>")
-# def seguimiento(tracking):
+@app.route("/seguimiento=<tracking>")
+def seguimiento_tracking(tracking):
+    estados = controlador_estado_encomienda.get_states()
+    ultimo_estado = controlador_estado_encomienda.get_last_states(tracking)
+    
+    return render_template('seguimiento.html',estados=estados)
     
    
     

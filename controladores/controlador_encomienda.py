@@ -201,9 +201,9 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
         """
         INSERT INTO transaccion_encomienda
         (num_serie, masivo, descripcion, monto_total, recojo_casa,
-         id_sucursal_origen, estado_pago, fecha, hora,
-         direccion_recojo, clienteid, tipo_comprobanteid)
-        VALUES (%s,%s,%s,%s,0,%s,'P',%s,%s,%s,%s,%s)
+        id_sucursal_origen, fecha, hora,
+        direccion_recojo, clienteid, tipo_comprobanteid)
+        VALUES (%s, %s, %s, %s, 0, %s, %s, %s, %s, %s, %s)
         """,
         (
             num_serie,
@@ -218,6 +218,7 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
             tipo_comprobante
         )
     )
+
 
     # ——————————————————————————————
     # 3) Detalle de paquetes
@@ -235,9 +236,7 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
             current_app.logger.error(f"[Registro {idx}] Datos: {r!r}")
             raise
         
-        
-        qr_token = str(uuid.uuid4())
-        
+                
         dest = r['destinatario']
         tipo_doc_dest = int(dest.get('tipo_doc_destinatario', 1))
         num_doc_dest  = dest.get('num_doc_destinatario', '')
@@ -245,6 +244,7 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
         nombre_dest   = dest.get('nombre_destinatario', '')
 
         suc_dest_id = int(r['destino']['sucursal_destino'])
+        estado_pago = r.get('estado_pago', 'P') 
 
         # Preparar contenido_paqueteid para permitir NULL
         raw_contenido = r.get('tipoArticuloId')
@@ -253,19 +253,19 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
         else:
             contenido_paqueteid = None  # se insertará como NULL
 
-        sql_execute_lastrowid(
+        paquete_id = sql_execute_lastrowid(
             """
             INSERT INTO paquete
             (clave, valor, peso, alto, largo, precio_ruta, ancho,
             descripcion, direccion_destinatario, telefono_destinatario,
             num_documento_destinatario, sucursal_destino_id,
-            tipo_documento_destinatario_id, tipo_empaqueid,
+            tipo_documento_destinatario_id, tipo_empaqueid, 
             contenido_paqueteid, tipo_recepcionid,
             salidaid, transaccion_encomienda_num_serie,
-            qr_token, qr_image)
+            qr_url,estado_pago )
             VALUES
             (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
-            %s,%s,%s,%s,%s,%s,%s,%s,NULL,NULL)
+            %s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """,
             (
                 clave,
@@ -286,8 +286,25 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
                 int(r.get('tipoEntregaId',1) ),
                 None,               # salidaid → SQL NULL
                 num_serie,
+                None,
+                estado_pago
             )
         )
         
+        sql_execute(
+            """
+            INSERT INTO seguimiento
+            (paquetetracking, detalle_estadoid, fecha, hora, tipo_comprobanteid)
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+            (
+                paquete_id, 
+                1,         
+                date.today(),
+                datetime.now().strftime('%H:%M:%S'),
+                None
+            )
+        )
+
         
         return num_serie

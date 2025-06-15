@@ -98,9 +98,31 @@ def get_options():
 
 
 
-def get_last_state():
+def get_states():
     sql = '''
-            select id, nombre from estado_encomienda
+        select id, nombre from estado_encomienda where tipoEstado = 'N'
     '''
     filas = sql_select_fetchall(sql)
     return filas
+
+from datetime import datetime
+
+def get_last_states(tracking):
+    sql = '''
+        SELECT de.nombre, s.fecha, s.hora
+        FROM seguimiento s
+        INNER JOIN detalle_estado de ON de.id = s.detalle_estadoid
+        WHERE s.paquetetracking = %s
+        ORDER BY s.fecha DESC, s.hora DESC
+        LIMIT 1
+    '''
+    fila = sql_select_fetchone(sql, (tracking,))
+
+    if fila:
+        fecha = datetime.strptime(str(fila['fecha']), "%Y-%m-%d").strftime("%d/%m/%Y")
+        hora = datetime.strptime(str(fila['hora']), "%H:%M:%S").strftime("%H:%M")
+
+        fila['fecha'] = fecha
+        fila['hora'] = hora
+
+    return fila
