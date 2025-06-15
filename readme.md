@@ -52,6 +52,8 @@ Junior Pérez
 - usuarios
 - encomiendas
 - metodo_pago
+- carrito
+- pago
 
 
 
