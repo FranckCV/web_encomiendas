@@ -1972,15 +1972,6 @@ def api_calculate_tarifa():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/seguimiento')
-def seguimiento():
-    try:
-        estado = controlador_estado_encomienda.get_options()
-        return render_template('seguimiento.html',estado=estado)
-    except Exception as e:
-        return e
-        
-
 
 @app.route("/api/datos_destino", methods=["GET"])
 def api_sucursales_por_ubigeo():
@@ -2395,13 +2386,6 @@ def registro_envio():
         empaque=empaque
         
     )
-
-
-@app.route('/seguimiento_encomienda')
-def seguimiento_encomienda():
-    estado_encomienda = controlador_estado_encomienda.get_last_state()
-    return render_template('seguimiento.html',estado_encomienda=estado_encomienda)
-
 
 
 
@@ -3430,7 +3414,15 @@ def buscar_paquete():
     else:
         return redirect('seguimiento',tracking=0)
 
-    
+   
+@app.route('/seguimiento')
+def seguimiento():
+    try:
+        estado = controlador_estado_encomienda.get_options()
+        return render_template('seguimiento.html',estado=estado)
+    except Exception as e:
+        return e   
+ 
     
 # @app.route("/seguimiento=<tracking>")
 # def seguimiento(tracking):
