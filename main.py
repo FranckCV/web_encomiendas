@@ -49,7 +49,8 @@ from controladores import controlador_metodo_pago_venta as controlador_metodo_pa
 from controladores import controlador_articulo as controlador_articulo
 from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 from controladores import controlador_encomienda as controlador_encomienda
-import BytesIO
+# import BytesIO
+from itsdangerous import URLSafeSerializer
 from controladores.bd import sql_execute
 import uuid, os, qrcode
 from decimal import Decimal, ROUND_HALF_UP
@@ -1858,7 +1859,7 @@ PAGINAS_SIMPLES = [
     'sobre_nosotros',
     'TerminosCondiciones',
     'mapa_curds',
-    'cambiar_contrasenia',
+    # 'cambiar_contrasenia',
     'maestra_para_vb',
     # 'Faq'
 ]
@@ -3116,6 +3117,175 @@ def procesar_register():
     except Exception as e:
         return rdrct_error(redirect_url('login')  , e)
 
+####################3 RECUPERAR CONTRASENIA #########
+@app.route("/procesar_recuperacion", methods=["POST"])
+def procesar_recuperacion():
+    try:
+        email = request.form.get("email")
+        if not email:
+            return rdrct_error(redirect_url('recuperar_contrasenia'), 'Correo requerido')
+
+        usuario = controlador_usuario.get_usuario_por_correo(email)
+        if not usuario:
+            return rdrct_error(redirect_url('recuperar_contrasenia'), 'Correo no registrado')
+
+        serializer = URLSafeSerializer(app.secret_key)
+        token = serializer.dumps(email)
+        enlace = url_for('cambiar_contrasenia', token=token, _external=True)
+
+        # Contenido HTML bonito
+        html_body = f"""
+            <html>
+            <body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,sans-serif;">
+                <div style="max-width:600px;margin:30px auto;background-color:#ffffff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);padding:40px;">
+                <h2 style="color:#333333;text-align:center;">Recuperación de Contraseña</h2>
+                <p style="font-size:16px;line-height:1.6;color:#555;">
+                    Hola <strong>{usuario['correo']}</strong>,
+                </p>
+                <p style="font-size:16px;line-height:1.6;color:#555;">
+                    Recibimos una solicitud para restablecer tu contraseña. Para continuar, haz clic en el botón de abajo:
+                </p>
+                <div style="text-align:center;margin:30px 0;">
+                    <a href="{enlace}" style="background-color:#007BFF;color:white;padding:14px 28px;text-decoration:none;border-radius:6px;display:inline-block;font-weight:bold;">
+                    Restablecer contraseña
+                    </a>
+                </div>
+                <p style="font-size:15px;color:#666;">
+                    Si el botón no funciona, copia y pega el siguiente enlace en tu navegador:
+                </p>
+                <p style="font-size:14px;word-break:break-all;color:#007BFF;">
+                    <a href="{enlace}" style="color:#007BFF;text-decoration:none;">{enlace}</a>
+                </p>
+                <hr style="margin:30px 0;border:none;border-top:1px solid #eee;">
+                <p style="font-size:13px;color:#999;text-align:center;">
+                    Si tú no realizaste esta solicitud, puedes ignorar este mensaje. Tu contraseña permanecerá segura.
+                </p>
+                <p style="font-size:13px;color:#999;text-align:center;margin-top:10px;">
+                    — El equipo de <strong>{controlador_empresa.get_nombre()}</strong>
+                </p>
+                </div>
+            </body>
+            </html>
+            """
+
+        msg = Message(subject="Recupera tu contraseña",
+                      sender=app.config['MAIL_USERNAME'],
+                      recipients=[email],
+                      html=html_body)
+
+        mail.send(msg)
+
+        return redirect_url('login')
+
+    except Exception as e:
+        return rdrct_error(redirect_url('recuperar_contrasenia'), e)
+
+@app.route('/cambiar_contrasenia')
+def cambiar_contrasenia():
+    token = request.args.get('token')
+    user_id = request.cookies.get('user_id')
+
+    correo_recuperado = None
+    is_recuperando = False
+
+    if token:
+        try:
+            serializer = URLSafeSerializer(app.secret_key)
+            correo_recuperado = serializer.loads(token)
+            is_recuperando = True
+        except Exception:
+            return rdrct_error(redirect_url('login'), 'Token inválido')
+
+    elif user_id:
+        is_recuperando = False
+    else:
+        return redirect_url('login')
+
+    return render_template(
+        'cambiar_contrasenia.html',
+        token=correo_recuperado,
+        is_recuperando=is_recuperando
+    )
+
+
+@app.route("/procesar_cambio_contrasenia", methods=["POST"])
+def procesar_cambio_contrasenia():
+    try:
+        nueva = request.form.get("nueva_contrasena")
+        confirmar = request.form.get("confirmar_contrasena")
+        actual = request.form.get("contrasena_actual")
+        correo = request.cookies.get("correo")
+
+        # Intentar recuperar correo desde form si está visible
+        if not correo:
+            correo = request.form.get("correo")
+
+        # Token (recuperación por URL)
+        token = request.args.get("token")
+        if not correo and token:
+            try:
+                serializer = URLSafeSerializer(app.secret_key)
+                correo = serializer.loads(token)
+            except Exception:
+                return rdrct_error(redirect_url('cambiar_contrasenia'), 'Token inválido')
+
+        if not nueva or not confirmar or not correo:
+            return rdrct_error(redirect_url('cambiar_contrasenia'), 'Datos incompletos')
+
+        if nueva != confirmar:
+            return rdrct_error(redirect_url('cambiar_contrasenia'), 'Las nuevas contraseñas no coinciden')
+
+        usuario = controlador_usuario.get_usuario_por_correo(correo)
+        if not usuario:
+            return rdrct_error(redirect_url('login'), 'Usuario no encontrado')
+
+        # Solo se valida contraseña actual si hay sesión iniciada
+        if request.cookies.get("user_id"):
+            if not actual:
+                return rdrct_error(redirect_url('cambiar_contrasenia'), 'Falta contraseña actual')
+
+            actual_hash = encrypt_sha256_string(actual)
+            if usuario['contrasenia'] != actual_hash:
+                return rdrct_error(redirect_url('cambiar_contrasenia'), 'Contraseña actual incorrecta')
+
+        # Cambiar contraseña
+        nueva_hash = encrypt_sha256_string(nueva)
+        controlador_usuario.actualizar_contrasenia(usuario['id'], nueva_hash)
+
+        # Enviar correo de notificación
+        empresa = controlador_empresa.get_nombre()
+        html = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;">
+            <div style="max-width: 600px; background-color: white; padding: 25px; border-radius: 8px; margin: auto;">
+                <h2 style="color: #333;">Contraseña actualizada</h2>
+                <p>Hola <strong>{usuario['correo']}</strong>,</p>
+                <p>Te informamos que tu contraseña fue modificada correctamente.</p>
+                <p>Si tú no realizaste este cambio, por favor contacta de inmediato con el soporte técnico de <strong>{empresa}</strong>.</p>
+                <p style="font-size: 0.9em; color: #888;">Este es un mensaje automático, no respondas directamente a este correo.</p>
+                <p style="margin-top: 20px;">— El equipo de <strong>{empresa}</strong></p>
+            </div>
+        </body>
+        </html>
+        """
+        msg = Message(
+            subject="Tu contraseña fue actualizada",
+            sender=app.config['MAIL_USERNAME'],
+            recipients=[correo],
+            html=html
+        )
+        mail.send(msg)
+
+        # Cierre de sesión
+        resp = make_response(redirect_url('login'))
+        resp.set_cookie('correo', '', max_age=0)
+        resp.set_cookie('user_id', '', max_age=0)
+        return resp
+
+    except Exception as e:
+        return rdrct_error(redirect_url('cambiar_contrasenia'), e)
+
+######################
 
 ##################_ PAGINAS EMPLEADO _################## 
 
