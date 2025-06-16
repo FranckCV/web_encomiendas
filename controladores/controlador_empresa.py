@@ -157,3 +157,11 @@ def get_nombre():
     """
     fila = sql_select_fetchone(sql)
     return fila['nombre']
+
+def getDataComprobante():
+    sql='''
+        select e.nombre,e.ruc,e.nro_telefono,e.correo,e.igv,s.direccion from empresa e 
+        inner join sucursal s on s.id = e.id_sucursal
+            '''
+    fila = sql_select_fetchone(sql)
+    return fila

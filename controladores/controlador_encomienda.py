@@ -4,6 +4,8 @@ import uuid
 from datetime import date, datetime
 from decimal import Decimal, ROUND_HALF_UP
 import logging
+from decimal import Decimal
+
 from flask import current_app
 logger = logging.getLogger(__name__)
 
@@ -156,6 +158,7 @@ def insert_cliente(correo, telefono, num_doc, nombre, tipo_doc):
     return new_row['id']
 
 
+
 def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
     # 1) Cliente: obtener o crear
     row = sql_select_fetchone(
@@ -183,27 +186,38 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
             )
         )
 
-    # ——————————————————————————————
-    # 2) Cabecera de transacción
-    num_serie = str(uuid.uuid4())
-    masivo    = 1 if registros and registros[0].get('modo') == 'masivo' else 0
+    # 2) Obtener la serie del tipo de comprobante
+    result = sql_select_fetchone("SELECT inicial FROM tipo_comprobante WHERE id = %s", tipo_comprobante)
+    if not result:
+        raise ValueError("Tipo de comprobante no válido")
+    inicial = result['inicial'].strip().upper()
+    comprobante_serie = f"{inicial}001"
 
-    # Calculamos el total usando el campo 'tarifa' de cada registro
-    monto_total = sum(Decimal(r.get('tarifa', 0)) for r in registros)\
-                  .quantize(Decimal('0.01'), ROUND_HALF_UP)
+    # 3) Generar el nuevo correlativo
+    row = sql_select_fetchone(
+        """
+        SELECT MAX(CAST(num_serie AS UNSIGNED)) as numero
+        FROM transaccion_encomienda;
+        """
+    )
+    nuevo_correlativo = (row['numero'] if row and row['numero'] else 0) + 1
+    correlativo_str = str(nuevo_correlativo).zfill(6)
+    num_serie = correlativo_str
+    comprobante_serie_final = f"{comprobante_serie}-{correlativo_str}"
 
-    # Puedes poner aquí la descripción que quieras. 
-    # Por ejemplo: tipo de envío o simplemente cadena vacía.
-    descripcion     = f"Envío {'masivo' if masivo else 'individual'} #{num_serie}"
-    direccion_recojo = ''  # o tomarla de registros[0]['origen']['direccion'] si la tienes
+    # 4) Insertar transacción
+    masivo = 1 if registros and registros[0].get('modo') == 'masivo' else 0
+    monto_total = sum(Decimal(r.get('tarifa', 0)) for r in registros).quantize(Decimal('0.01'))
+    descripcion = f"Envío {'masivo' if masivo else 'individual'} #{comprobante_serie_final}"
+    direccion_recojo = ''
 
     sql_execute(
         """
         INSERT INTO transaccion_encomienda
         (num_serie, masivo, descripcion, monto_total, recojo_casa,
-        id_sucursal_origen, fecha, hora,
-        direccion_recojo, clienteid, tipo_comprobanteid)
-        VALUES (%s, %s, %s, %s, 0, %s, %s, %s, %s, %s, %s)
+         id_sucursal_origen, fecha, hora,
+         direccion_recojo, clienteid, tipo_comprobanteid, comprobante_serie)
+        VALUES (%s, %s, %s, %s, 0, %s, %s, %s, %s, %s, %s, %s)
         """,
         (
             num_serie,
@@ -215,43 +229,37 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
             datetime.now().strftime('%H:%M:%S'),
             direccion_recojo,
             cliente_id,
-            tipo_comprobante
+            tipo_comprobante,
+            comprobante_serie_final
         )
     )
 
-
-    # ——————————————————————————————
-    # 3) Detalle de paquetes
+    # 5) Insertar paquetes y seguimiento
+    trackings = []
     for idx, r in enumerate(registros):
-        try:
-            clave  = r['clave']
-            valor  = float(r.get('valorEnvio') or 0)
-            peso   = float(r.get('peso') or 0)
-            alto   = float(r.get('alto') or 0)
-            largo  = float(r.get('largo') or 0)
-            tarifa = float(r.get('tarifa') or 0)
-            ancho  = float(r.get('ancho') or 0)
-        except ValueError as ve:
-            current_app.logger.error(f"[Registro {idx}] Error conversión: {ve}")
-            current_app.logger.error(f"[Registro {idx}] Datos: {r!r}")
-            raise
-        
-                
+        clave = r['clave']
+        valor = float(r.get('valorEnvio') or 0)
+        peso = float(r.get('peso') or 0)
+        alto = float(r.get('alto') or 0)
+        largo = float(r.get('largo') or 0)
+        tarifa = float(r.get('tarifa') or 0)
+        ancho = float(r.get('ancho') or 0)
+
         dest = r['destinatario']
         tipo_doc_dest = int(dest.get('tipo_doc_destinatario', 1))
-        num_doc_dest  = dest.get('num_doc_destinatario', '')
-        tel_dest      = dest.get('num_tel_destinatario', '')
-        nombre_dest   = dest.get('nombre_destinatario', '')
+        num_doc_dest = dest.get('num_doc_destinatario', '')
+        tel_dest = dest.get('num_tel_destinatario', '')
+        nombre_contacto_destinatario = dest.get('nombre_contacto')
+        apellido_razon_destinatario = dest.get('apellido_razon')
 
         suc_dest_id = int(r['destino']['sucursal_destino'])
-        estado_pago = r.get('estado_pago', 'P') 
+        estado_pago = r.get('estado_pago', 'P')
+        modalidad_pago = r.get('modalidad_pago')
+ 
+        contenido_paqueteid = int(r.get('tipoArticuloId')) if r.get('tipoArticuloId') not in (None, '') else None
 
-        # Preparar contenido_paqueteid para permitir NULL
-        raw_contenido = r.get('tipoArticuloId')
-        if raw_contenido not in (None, ''):
-            contenido_paqueteid = int(raw_contenido)
-        else:
-            contenido_paqueteid = None  # se insertará como NULL
+        
+        cantidad_folios = r.get('cantidad_folios')
 
         paquete_id = sql_execute_lastrowid(
             """
@@ -259,13 +267,17 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
             (clave, valor, peso, alto, largo, precio_ruta, ancho,
             descripcion, direccion_destinatario, telefono_destinatario,
             num_documento_destinatario, sucursal_destino_id,
-            tipo_documento_destinatario_id, tipo_empaqueid, 
+            tipo_documento_destinatario_id, tipo_empaqueid,
             contenido_paqueteid, tipo_recepcionid,
             salidaid, transaccion_encomienda_num_serie,
-            qr_url,estado_pago )
+            qr_url, estado_pago, modalidad_pagoid,
+            nombres_contacto_destinatario, apellidos_razon_destinatario,
+            cantidad_folios)
             VALUES
-            (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
-            %s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            (%s, %s, %s, %s, %s, %s, %s,
+            %s, %s, %s, %s, %s, %s, %s,
+            %s, %s, %s, %s, %s, %s, %s,
+            %s, %s, %s)
             """,
             (
                 clave,
@@ -275,36 +287,155 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
                 largo,
                 tarifa,
                 ancho,
-                nombre_dest,         # descripción del paquete
-                '',                  # dirección_destinatario (vacío → NULL en la BDD)
+                '',  # descripcion
+                '',  # direccion_destinatario
                 tel_dest,
                 num_doc_dest,
                 suc_dest_id,
                 tipo_doc_dest,
                 int(r.get('tipoEmpaqueId', 1)),
-                contenido_paqueteid,       # None → SQL NULL
-                int(r.get('tipoEntregaId',1) ),
-                None,               # salidaid → SQL NULL
+                contenido_paqueteid,
+                int(r.get('tipoEntregaId', 1)),
+                None,  # salidaid
                 num_serie,
-                None,
-                estado_pago
-            )
-        )
-        
-        sql_execute(
-            """
-            INSERT INTO seguimiento
-            (paquetetracking, detalle_estadoid, fecha, hora, tipo_comprobanteid)
-            VALUES (%s, %s, %s, %s, %s)
-            """,
-            (
-                paquete_id, 
-                1,         
-                date.today(),
-                datetime.now().strftime('%H:%M:%S'),
-                None
+                None,  # qr_url
+                estado_pago,
+                modalidad_pago,
+                nombre_contacto_destinatario,
+                apellido_razon_destinatario,
+                cantidad_folios  
             )
         )
 
-        
-        return num_serie
+
+
+
+
+        sql_execute(
+            """
+            INSERT INTO seguimiento
+            (paquetetracking, detalle_estadoid, fecha, hora)
+            VALUES (%s, %s, %s, %s)
+            """,
+            (
+                paquete_id,
+                1,
+                date.today(),
+                datetime.now().strftime('%H:%M:%S'),
+            )
+        )
+        trackings.append(paquete_id)
+
+    return comprobante_serie_final, trackings
+
+
+
+
+
+def get_transaction_by_tracking(tracking):
+    sql = '''
+        SELECT 
+            tc.nombre AS tipo_comprobante,
+            te.comprobante_serie,
+            te.num_serie,
+            te.masivo,
+            te.descripcion,
+            te.monto_total,
+            te.fecha,
+            te.hora,
+            te.tipo_comprobanteid,
+            te.clienteid,
+            c.nombre_siglas,
+            c.apellidos_razon
+        FROM paquete p
+        INNER JOIN transaccion_encomienda te 
+            ON te.num_serie = p.transaccion_encomienda_num_serie
+        INNER JOIN cliente c 
+            ON c.id = te.clienteid
+        INNER JOIN tipo_comprobante tc 
+            ON tc.id = te.tipo_comprobanteid
+        WHERE p.tracking = %s
+    '''
+    fila = sql_select_fetchone(sql, (tracking,))
+    return fila
+
+
+
+def obtener_items_por_num_serie(num_serie):
+    transaccion = sql_select_fetchone("""
+        SELECT masivo, id_sucursal_origen
+        FROM transaccion_encomienda
+        WHERE num_serie = %s
+    """, (num_serie,))
+
+    if not transaccion:
+        raise ValueError("No se encontró la transacción para el número de serie dado")
+
+    masivo = transaccion['masivo']
+    sucursal_origen_id = transaccion['id_sucursal_origen']
+
+    origen = sql_select_fetchone("""
+        SELECT s.direccion AS sucursal, 
+               u.distrito AS distrito,
+               u.provincia AS provincia,
+               u.departamento AS departamento
+        FROM sucursal s
+        INNER JOIN ubigeo u ON u.codigo = s.ubigeocodigo
+        WHERE s.id = %s
+    """, (sucursal_origen_id,))
+
+    if not origen:
+        raise ValueError("Sucursal de origen no encontrada")
+
+    paquetes = sql_select_fetchall("""
+       SELECT
+            p.clave,
+            p.precio_ruta AS tarifa,
+            p.estado_pago,
+            s.direccion AS sucursal_destino,
+            u.distrito AS distrito_destino,
+            u.provincia AS provincia_destino,
+            u.departamento AS departamento_destino
+        FROM paquete p
+        JOIN sucursal s ON p.sucursal_destino_id = s.id
+        INNER JOIN ubigeo u ON u.codigo = s.ubigeocodigo
+        WHERE p.transaccion_encomienda_num_serie = %s
+    """, (num_serie,))
+
+    items = []
+    for p in paquetes:
+        destino = {
+            'sucursal': p['sucursal_destino'],
+            'distrito': p['distrito_destino'],
+            'provincia': p['provincia_destino'],
+            'departamento': p['departamento_destino']
+        }
+
+        quien_paga = 'Destinatario' if p['estado_pago'] == 'P' else 'Remitente'
+
+        items.append({
+            'clave': p['clave'],
+            'tarifa': float(p['tarifa']),
+            'quien_paga': quien_paga,
+            'origen': origen,
+            'destino': destino
+        })
+
+    return items, masivo
+
+
+
+
+def calcular_resumen_venta(monto_total, igv):
+    monto_total = Decimal(monto_total)
+    igv = Decimal(igv)
+
+    factor = (igv / Decimal(100)) + Decimal(1)
+    base_imponible = (monto_total / factor).quantize(Decimal('0.01'))
+    igv_valor = (monto_total - base_imponible).quantize(Decimal('0.01'))
+
+    return {
+        'base_imponible': base_imponible,
+        'igv': igv_valor,
+        'total': monto_total
+    }

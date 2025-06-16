@@ -174,3 +174,11 @@ def register_client(correo, telefono, num_documento, nombre_siglas, apellidos_ra
 
 
 
+def getDataClient(id):
+    sql = '''
+        select num_documento, nombre_siglas,apellidos_razon from cliente where id = %s
+    '''
+    fila = sql_select_fetchone(sql,id)
+    return fila
+    
+    

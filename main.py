@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app  #, after_this_request, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app,send_file #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import permiso as permiso
 from controladores import controlador_pagina as controlador_pagina
@@ -57,7 +57,6 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import mm
 import hashlib
-import os
 from werkzeug.utils import secure_filename
 from werkzeug.routing import MapAdapter
 # import re
@@ -66,12 +65,17 @@ from functools import wraps
 import inspect
 from flask_mail import Mail, Message
 from correo import enviar_correo
-
+from datetime import timedelta
 from flask_socketio import SocketIO, emit
 from time import sleep
 from threading import Thread
 import traceback
- 
+
+from num2words import num2words
+import pdfkit
+import os
+
+
 
 app = Flask(__name__, template_folder='templates')
 app.config['SECRET_KEY'] = 'secret!'
@@ -1594,14 +1598,6 @@ TRANSACCIONES = {
 }
 
 
-@app.route('/api/prueba')
-def prueba_cliente():
-    correo = 'fabianapm060126@gmail.com'
-    telefono = '906300986'
-    num_doc = '72426677'
-    nombre = 'Fabiana Mejía'
-    tipo_doc = 1
-    
 
 
 ###########_ REDIRECT _#############
@@ -2594,14 +2590,14 @@ def insertar_envio_api():
         }
 
         # 1) Crear transacción y paquetes
-        num_serie = controlador_encomienda.crear_transaccion_y_paquetes(
+        num_serie,trackings = controlador_encomienda.crear_transaccion_y_paquetes(
             registros, cliente_data, tipo_comprobante
         )
 
         # 2) Generar QR para cada paquete
         if num_serie:
             try:
-                generar_qr_paquetes(registros, num_serie)
+                generar_qr_paquetes(trackings)
             except Exception as qr_err:
                 current_app.logger.warning(f"Error generando QR: {qr_err}")
 
@@ -2620,15 +2616,16 @@ def insertar_envio_api():
                     f"¡Gracias por confiar en {nombre_empresa}!"
                 )
 
-                for r in registros:
-                    clave = r.get('clave')
-                    qr_path = os.path.join(app.static_folder, 'comprobantes', clave, 'qr.png')
+                for r in trackings:
+                    tracking = r
+                    qr_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'qr.png')
                     if os.path.exists(qr_path):
                         with open(qr_path, 'rb') as f:
                             qr_data = f.read()
-                        msg.attach(f"qr_{clave}.png", 'image/png', qr_data)
+                        msg.attach(f"qr_{tracking}.png", 'image/png', qr_data)
                     else:
-                        current_app.logger.warning(f"QR no encontrado para clave {clave}")
+                        current_app.logger.warning(f"QR no encontrado para tracking {tracking}")
+
 
                 mail.send(msg)
 
@@ -2636,7 +2633,7 @@ def insertar_envio_api():
         return jsonify({
             'status': 'success',
             'message': 'Transacción creada correctamente',
-            'num_serie': num_serie
+            'comprobante_serie': num_serie
         }), 201
 
     except ValueError as ve:
@@ -2652,7 +2649,7 @@ def insertar_envio_api():
        
 ##PARA PROBAR EL API E INSERTAR 
 # {
-#   "tipo_comprobante": 1,
+#   "tipo_comprobante": 2,
 #   "registros": [
 #     {
 #       "modo": "individual",
@@ -2663,10 +2660,11 @@ def insertar_envio_api():
 #       "largo": 50.0,
 #       "ancho": 30.0,
 #       "tarifa": 25.5,
-#       "tipoEmpaqueId": 2,
+#       "tipoEmpaqueId": 1,
 #       "tipoArticuloId": 3,
 #       "tipoEntregaId": 1,
 #       "estado_pago":"P",
+#       "modalidad_pago":"1",
 #       "origen": {
 #         "sucursal_origen": 3
 #       },
@@ -2674,7 +2672,8 @@ def insertar_envio_api():
 #         "sucursal_destino": 5
 #       },
 #       "destinatario": {
-#         "nombre_destinatario": "Juan Pérez",
+#         "nombre_contacto": "Juan",
+#         "apellido_razon": "Pérez",
 #         "tipo_doc_destinatario": 1,
 #         "num_doc_destinatario": "12345678",
 #         "num_tel_destinatario": "987654321"
@@ -2690,41 +2689,99 @@ def insertar_envio_api():
 #   ]
 # }
 
-def generar_qr_paquetes(registros, num_serie):
 
-    for r in registros:
-        clave = r['clave']
+def generar_qr_paquetes(trackings):
+    for tracking in trackings:
+        
+        qr_data = str(tracking)  # o puedes usar: f"https://tusitio.com/seguimiento={tracking}"
 
-        # 1) Decide qué va dentro del QR. Puede ser sólo la clave:
-        qr_data = clave 
-
-        # —o— si más adelante tendrás un endpoint de tracking:
-        # qr_data = url_for('track_paquete', clave=clave, _external=True)
-
-        # 2) Genera el QR
+        # 2) Generar QR
         img = qrcode.make(qr_data)
 
-        # 3) Crea la carpeta si no existe
+        # 3) Crear carpeta del paquete
         carpeta = os.path.join(
             current_app.static_folder,
             'comprobantes',
-            clave
+            str(tracking)
         )
         os.makedirs(carpeta, exist_ok=True)
 
-        # 4) Guarda la imagen
+        # 4) Guardar imagen QR
         ruta_qr = os.path.join(carpeta, 'qr.png')
         img.save(ruta_qr)
 
-# @app.route('/scan/<token>', methods=['GET'])
-# def actualizar_estado(token):
-#     envio = controlador_paquete.buscar_por_token(token)
-#     if not envio:
-#         abort(404, "QR inválido")
-#     controlador_paquete.cambiar_estado(envio.id, nuevo_estado="en_transito")
-#     return render_template('confirmacion_estado.html', envio=envio)
+        # 5) Actualizar el campo qr_url en la base de datos (opcional pero útil)
+        qr_rel_path = f"comprobantes/{tracking}/qr.png"
+        sql_execute(
+            "UPDATE paquete SET qr_url = %s WHERE tracking = %s",
+            (qr_rel_path, tracking)
+        )
 
-#########
+
+@app.route('/generar_boleta', methods=['POST'])
+def generar_boleta_post():
+    tracking = request.json.get('tracking')
+    if not tracking:
+        return "Falta el campo 'tracking'", 400
+    return redirect(url_for('generar_comprobante', tracking=tracking))
+
+
+@app.route('/comprobante=<int:tracking>')
+def generar_comprobante(tracking):
+    carpeta = os.path.join("static", "comprobantes", str(tracking))
+    ruta_pdf = os.path.join(carpeta, "comprobante.pdf")
+
+    if not os.path.exists(ruta_pdf):
+        try:
+            transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
+            if not transaccion or not isinstance(transaccion, dict):
+                return "Transacción no encontrada", 404
+
+            empresa = controlador_empresa.getDataComprobante()
+            tipo_comprobante     = transaccion['tipo_comprobante']
+            comprobante_serie    = transaccion['comprobante_serie']
+            num_serie            = transaccion['num_serie']
+            cliente              = {
+                'nombre_siglas': transaccion['nombre_siglas'],
+                'apellidos_razon': transaccion['apellidos_razon']
+            }
+
+            items, masivo = controlador_encomienda.obtener_items_por_num_serie(num_serie)
+            resumen = controlador_encomienda.calcular_resumen_venta(transaccion['monto_total'], empresa['igv'])
+
+            os.makedirs(carpeta, exist_ok=True)
+            qr_path = url_for('static', filename=f"comprobantes/{tracking}/qr.png", _external=True)
+
+            html = render_template("comprobante.html",
+                transaccion=transaccion,
+                cliente=cliente,
+                empresa=empresa,
+                tipo_comprobante=tipo_comprobante,
+                comprobante_serie=comprobante_serie,
+                items=items,
+                resumen=resumen,
+                qr_path=qr_path,
+                masivo=masivo
+            )
+
+            ruta_wkhtmltopdf = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+            config = pdfkit.configuration(wkhtmltopdf=ruta_wkhtmltopdf)
+            options = {
+                'page-size': 'A6',
+                'margin-top': '5mm',
+                'margin-right': '5mm',
+                'margin-bottom': '5mm',
+                'margin-left': '5mm',
+                'encoding': "UTF-8",
+            }
+
+            pdfkit.from_string(html, ruta_pdf, configuration=config, options=options)
+
+        except Exception as e:
+            return f"Error al generar PDF: {e}", 500
+
+    return send_file(ruta_pdf, as_attachment=False)
+
 
 
 
@@ -2999,6 +3056,49 @@ def login_android():
             return jsonify(data)
     except Exception as e:
         return jsonify(e)
+    
+@app.route('/salidas_android', methods=['POST'])
+def salidas_android():
+    try:
+        data = request.get_json()
+        correo = data.get('correo')
+
+        if not correo:
+            return jsonify({'error': 'El campo "correo" es requerido'}), 400
+
+        datos = controlador_sucursal.get_data_exit(correo)
+
+        if not datos:
+            return jsonify({'error': 'No se encontró información para el correo proporcionado'}), 404
+
+        fecha_str = datos['fecha'].strftime('%Y-%m-%d') if hasattr(datos['fecha'], 'strftime') else str(datos['fecha'])
+
+        if isinstance(datos['hora'], timedelta):
+            total_seconds = int(datos['hora'].total_seconds())
+            hours = total_seconds // 3600
+            minutes = (total_seconds % 3600) // 60
+            seconds = total_seconds % 60
+            hora_str = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+        else:
+            hora_str = str(datos['hora'])
+
+        res = {
+            'id': datos['id'],
+            'fecha': fecha_str,
+            'hora': hora_str,
+            'estado': datos['estado'],
+            'latitud_origen': float(datos['latitud_origen']),
+            'longitud_origen': float(datos['longitud_origen']),
+            'latitud_destino': float(datos['latitud_destino']),
+            'longitud_destino': float(datos['longitud_destino'])
+        }
+
+        return jsonify(res), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 
 
 @app.route("/procesar_register", methods=["POST"])
@@ -3530,16 +3630,17 @@ def simulador_envio_ubicacion():
         'simulador_envio_ubicacion.html', 
         )
     
-##################################################################################
-@app.route("/buscar_paquete")
+@app.route("/buscar_paquete", methods=['POST'])
 def buscar_paquete():
-    tracking = request.args.get('tracking')
-    anio = request.args.get('anio')
-    paquete = controlador_paquete.buscar_paquete(tracking,anio)
+    tracking = request.form.get('tracking')
+    anio = request.form.get('anio')
+    paquete = controlador_paquete.buscar_paquete(tracking, anio)
+    print(paquete)
     if paquete is not None:
-        return redirect('seguimiento',tracking=paquete)
+        return redirect(url_for('seguimiento_tracking', tracking=paquete))
     else:
-        return redirect('seguimiento',tracking=0)
+        return redirect(url_for('seguimiento_tracking', tracking=0))
+
 
    
 @app.route('/seguimiento')
@@ -3555,10 +3656,13 @@ def seguimiento():
 def seguimiento_tracking(tracking):
     estados = controlador_estado_encomienda.get_states()
     ultimo_estado = controlador_estado_encomienda.get_last_states(tracking)
-    
-    return render_template('seguimiento.html',estados=estados)
+    comprobantes = controlador_estado_encomienda.get_comprobantes(tracking)
+    datos = controlador_estado_encomienda.get_data_package(tracking)
+    return render_template('seguimiento.html',estados=estados,ultimo_estado=ultimo_estado,comprobantes=comprobantes,datos=datos,tracking=tracking )
     
    
+
+
     
 
 if __name__ == "__main__":

@@ -10,6 +10,7 @@ CREATE TABLE transaccion_encomienda (
   fecha              date NOT NULL, 
   hora               time NOT NULL, 
   direccion_recojo   varchar(255), 
+  comprobante_serie  char(255) NOT NULL UNIQUE, 
   clienteid          int(10) NOT NULL, 
   tipo_comprobanteid int(10) NOT NULL, 
   PRIMARY KEY (num_serie));
@@ -19,6 +20,7 @@ CREATE TABLE detalle_estado (
   descripcion         text, 
   activo              tinyint(1) DEFAULT 1 NOT NULL, 
   estado_encomiendaid int(4) NOT NULL, 
+  tipo_comprobanteid  int(10), 
   PRIMARY KEY (id));
 CREATE TABLE cliente (
   id               int(10) NOT NULL AUTO_INCREMENT, 
@@ -102,11 +104,10 @@ CREATE TABLE empleado_salida (
   PRIMARY KEY (salidaid, 
   empleadoid));
 CREATE TABLE seguimiento (
-  paquetetracking    int(11) NOT NULL, 
-  detalle_estadoid   int(10) NOT NULL, 
-  fecha              date NOT NULL, 
-  hora               time NOT NULL, 
-  tipo_comprobanteid int(10) NOT NULL, 
+  paquetetracking  int(11) NOT NULL, 
+  detalle_estadoid int(10) NOT NULL, 
+  fecha            date NOT NULL, 
+  hora             time NOT NULL, 
   PRIMARY KEY (paquetetracking, 
   detalle_estadoid));
 CREATE TABLE transaccion_venta (
@@ -284,17 +285,18 @@ CREATE TABLE tipo_cliente (
   activo tinyint(1) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE empresa (
-  id                  int(11) NOT NULL AUTO_INCREMENT, 
-  nombre              varchar(200) NOT NULL, 
-  correo              varchar(250) NOT NULL, 
-  nro_telefono        varchar(20) NOT NULL, 
-  logo                text NOT NULL, 
-  color_pri           varchar(20) NOT NULL, 
-  color_sec           varchar(20) NOT NULL, 
-  color_ter           varchar(20) NOT NULL, 
-  porcentaje_garantia numeric(9, 2) NOT NULL, 
-  porcentaje_recojo   numeric(9, 2) NOT NULL, 
-  igv                 numeric(9, 2) NOT NULL, 
+  id                int(11) NOT NULL AUTO_INCREMENT, 
+  nombre            varchar(200) NOT NULL, 
+  correo            varchar(250) NOT NULL, 
+  nro_telefono      varchar(20) NOT NULL, 
+  logo              text NOT NULL, 
+  color_pri         varchar(20) NOT NULL, 
+  color_sec         varchar(20) NOT NULL, 
+  color_ter         varchar(20) NOT NULL, 
+  porcentaje_recojo numeric(9, 2) NOT NULL, 
+  ruc               char(11) NOT NULL, 
+  id_sucursal       int(11) NOT NULL, 
+  igv               numeric(9, 2) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE permiso (
   paginaid int(11) NOT NULL, 
@@ -423,14 +425,16 @@ CREATE TABLE paquete (
   clave                            char(4) NOT NULL, 
   valor                            numeric(9, 2) NOT NULL, 
   peso                             numeric(9, 2) NOT NULL, 
-  qr_url                           int(11), 
-  alto                             numeric(9, 2),
-  cantidad_folios                  int(11) NOT NULL, 
+  qr_url                           text, 
+  alto                             numeric(9, 2), 
+  cantidad_folios                  int(11), 
   estado_pago                      char(1) NOT NULL, 
   largo                            numeric(9, 2), 
   precio_ruta                      numeric(9, 2) NOT NULL, 
   ancho                            numeric(9, 2), 
   descripcion                      text, 
+  nombres_contacto_destinatario    varchar(255) NOT NULL, 
+  apellidos_razon_destinatario     varchar(255) NOT NULL, 
   direccion_destinatario           varchar(255), 
   telefono_destinatario            varchar(20) NOT NULL, 
   num_documento_destinatario       varchar(25) NOT NULL, 
@@ -441,6 +445,7 @@ CREATE TABLE paquete (
   tipo_recepcionid                 int(11) NOT NULL, 
   salidaid                         int(10), 
   transaccion_encomienda_num_serie char(255), 
+  modalidad_pagoid                 int(11) NOT NULL, 
   PRIMARY KEY (tracking));
 ALTER TABLE sucursal ADD CONSTRAINT FKsucursal756715 FOREIGN KEY (ubigeocodigo) REFERENCES ubigeo (codigo);
 ALTER TABLE escala ADD CONSTRAINT FKescala667165 FOREIGN KEY (sucursalid) REFERENCES sucursal (id);
@@ -485,7 +490,6 @@ ALTER TABLE mensaje_contacto ADD CONSTRAINT FKmensaje_co839897 FOREIGN KEY (sucu
 ALTER TABLE detalle_reclamo ADD CONSTRAINT FKdetalle_re335454 FOREIGN KEY (estado_reclamoid) REFERENCES estado_reclamo (id);
 ALTER TABLE seguimiento_reclamo ADD CONSTRAINT FKseguimient693109 FOREIGN KEY (reclamoid) REFERENCES reclamo (id);
 ALTER TABLE seguimiento_reclamo ADD CONSTRAINT FKseguimient644896 FOREIGN KEY (detalle_reclamoid) REFERENCES detalle_reclamo (id);
-ALTER TABLE seguimiento ADD CONSTRAINT FKseguimient92123 FOREIGN KEY (tipo_comprobanteid) REFERENCES tipo_comprobante (id);
 ALTER TABLE seguimiento ADD CONSTRAINT FKseguimient567863 FOREIGN KEY (detalle_estadoid) REFERENCES detalle_estado (id);
 ALTER TABLE seguimiento ADD CONSTRAINT FKseguimient381900 FOREIGN KEY (paquetetracking) REFERENCES paquete (tracking);
 ALTER TABLE reclamo ADD CONSTRAINT FKreclamo680466 FOREIGN KEY (paquetetracking) REFERENCES paquete (tracking);
@@ -496,3 +500,5 @@ ALTER TABLE paquete ADD CONSTRAINT FKpaquete691155 FOREIGN KEY (salidaid) REFERE
 ALTER TABLE paquete ADD CONSTRAINT FKpaquete992725 FOREIGN KEY (tipo_documento_destinatario_id) REFERENCES tipo_documento (id);
 ALTER TABLE paquete ADD CONSTRAINT FKpaquete329420 FOREIGN KEY (contenido_paqueteid) REFERENCES contenido_paquete (id);
 ALTER TABLE paquete ADD CONSTRAINT FKpaquete94264 FOREIGN KEY (tipo_empaqueid) REFERENCES tipo_empaque (id);
+ALTER TABLE paquete ADD CONSTRAINT FKpaquete940812 FOREIGN KEY (modalidad_pagoid) REFERENCES modalidad_pago (id);
+ALTER TABLE detalle_estado ADD CONSTRAINT FKdetalle_es208359 FOREIGN KEY (tipo_comprobanteid) REFERENCES tipo_comprobante (id);

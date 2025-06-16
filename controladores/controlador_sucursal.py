@@ -326,3 +326,26 @@ def get_options_ubigeo_sucursal():
     return filas
 
 
+def get_data_exit(correo):
+    sql = '''
+        select s.id,
+        s.fecha,
+        s.hora,
+        s.estado,
+        so.latitud as latitud_origen,
+        so.longitud as longitud_origen,
+        sd.latitud as latitud_destino,
+        sd.longitud as longitud_destino
+        from empleado_salida es
+        inner join salida s on s.id = es.salidaid
+        inner join empleado e on e.id = es.empleadoid
+        inner join sucursal so on so.id = s.origen_incio
+        inner join sucursal sd on sd.id = s.destino_final
+        where e.correo=%s and s.estado = 'P'
+        order by CURRENT_DATE DESC
+        limit 1
+    '''
+    fila = sql_select_fetchone(sql,correo)
+    print(fila)
+    return fila
+    

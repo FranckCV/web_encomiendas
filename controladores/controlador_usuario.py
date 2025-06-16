@@ -138,6 +138,8 @@ def get_usuario_por_correo(correo):
     return info
 
 
+
+
 def get_usuario_por_id(user_id):
     sql= f'''
         select 

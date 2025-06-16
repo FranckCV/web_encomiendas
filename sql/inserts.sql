@@ -1,25 +1,32 @@
-INSERT INTO `empresa` (
-    `id`,
-    `nombre`,
-    `correo`,
-    `nro_telefono`,
-    `logo`,
-    `color_pri`,
-    `color_sec`,
-    `color_ter`,
-    `porcentaje_recojo`
-  )
+INSERT INTO empresa (
+    id,
+    ruc,
+    nombre,
+    id_sucursal,
+    correo,
+    nro_telefono,
+    logo,
+    color_pri,
+    color_sec,
+    color_ter,
+    porcentaje_recojo,
+    igv
+)
 VALUES (
     1,
+    20512528458,
     'New Olva',
+    54,                 
     'info@newolva.com',
     '+123 456 789',
     'logo.png',
     '#1d4c82',
     '#13e2da',
     '#1b98e0',
-    5.00
-  );
+    5.00,
+    18.00              
+);
+
 
 INSERT INTO `modulo` (
     `id`,
@@ -8170,3 +8177,20 @@ VALUES (
     1,
     1
 );
+
+INSERT INTO empleado (nombre, apellidos, correo, n_documento, rolid) VALUES
+('Carlos', 'Ramírez León', 'carlos.ramirez@transportes.com', 'D12345678', 1),
+('Lucía', 'Mendoza Ruiz', 'lucia.mendoza@transportes.com', 'B98765432', 1),
+('Pedro', 'Sánchez Huamán', 'pedro.sanchez@transportes.com', 'C76543210', 1),
+('Ana', 'Torres Rivas', 'ana.torres@transportes.com', 'A11223344', 1),
+('Luis', 'Castillo Valverde', 'luis.castillo@transportes.com', 'E55667788', 1),
+('María', 'López Espinoza', 'maria.lopez@transportes.com', 'F99887766', 1),
+('Javier', 'Gómez Paredes', 'javier.gomez@transportes.com', 'G33445566', 1),
+('Sofía', 'Fernández Quispe', 'sofia.fernandez@transportes.com', 'H77889900', 1);
+
+INSERT INTO salida (fecha, hora, recojo, entrega, estado, unidadid, destino_final, conductor_principal, origen_incio) VALUES
+('2025-06-16', '07:30:00', 1, 0, 'P', 1, 2, 5, 3),
+('2025-06-16', '08:15:00', 1, 1, 'P', 2, 2, 6, 5),
+('2025-06-16', '09:00:00', 0, 1, 'P', 3, 3, 5, 6),
+('2025-06-16', '10:45:00', 1, 0, 'P', 4, 4, 7, 5),
+('2025-06-16', '11:30:00', 1, 1, 'P', 5, 4, 7, 7);

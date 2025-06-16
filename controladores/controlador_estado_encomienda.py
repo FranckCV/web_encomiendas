@@ -126,3 +126,78 @@ def get_last_states(tracking):
         fila['hora'] = hora
 
     return fila
+
+
+
+def get_comprobantes(tracking):
+    sql = '''
+        SELECT tc.nombre AS tipo_comprobante
+        FROM seguimiento s
+        inner join detalle_estado de on de.id = s.detalle_estadoid
+        INNER JOIN tipo_comprobante tc ON tc.id = de.tipo_comprobanteid
+        WHERE s.paquetetracking = %s
+    '''
+    filas = sql_select_fetchall(sql, tracking)
+    return filas if filas else []
+
+
+def get_data_package(tracking):
+    sql = '''
+        SELECT 
+            ud.departamento AS departamento_destino,
+            ud.provincia AS provincia_destino,
+            ud.distrito AS distrito_destino,
+            p.direccion_destinatario AS direccion_destino,
+            uo.departamento AS departamento_origen,
+            uo.provincia AS provincia_origen,
+            uo.distrito AS distrito_origen,
+            tipE.nombre AS tipo_empaque,
+            cp.nombre AS contenido_paquete,
+            CONCAT(c.nombre_siglas, ' ', c.apellidos_razon) AS remitente,
+            p.num_documento_destinatario,
+            CASE 
+                WHEN p.estado_pago = 0 THEN 'Pendiente'
+                WHEN p.estado_pago = 1 THEN 'Cancelado'
+                ELSE 'Desconocido'
+            END AS estado_pago,
+            te.monto_total
+        FROM paquete p
+        INNER JOIN transaccion_encomienda te ON te.num_serie = p.transaccion_encomienda_num_serie
+        INNER JOIN sucursal so ON so.id = te.id_sucursal_origen
+        INNER JOIN ubigeo uo ON uo.codigo = so.ubigeocodigo
+        INNER JOIN sucursal sd ON sd.id = p.sucursal_destino_id
+        INNER JOIN ubigeo ud ON ud.codigo = sd.ubigeocodigo
+        INNER JOIN tipo_empaque tipE ON tipE.id = p.tipo_empaqueid
+        LEFT JOIN contenido_paquete cp ON cp.id = p.contenido_paqueteid
+        INNER JOIN cliente c ON c.id = te.clienteid
+        WHERE p.tracking = %s;
+    '''
+
+    row = sql_select_fetchone(sql, (tracking,))
+
+    if row:
+        
+        contenido = row['contenido_paquete']
+        row['contenido_paquete'] = contenido.capitalize() if contenido else ''
+
+        origen = ' - '.join([
+            row['departamento_origen'].capitalize(),
+            row['provincia_origen'].capitalize(),
+            row['distrito_origen'].capitalize()
+        ])
+        row['direccion_origen'] = origen
+
+        destino = ' - '.join([
+            row['departamento_destino'].capitalize(),
+            row['provincia_destino'].capitalize(),
+            row['distrito_destino'].capitalize()
+        ])
+        if row['direccion_destino']:
+            destino += f", {row['direccion_destino'].capitalize()}"
+        row['direccion_destino'] = destino
+
+        for k in ['departamento_origen', 'provincia_origen', 'distrito_origen',
+                  'departamento_destino', 'provincia_destino', 'distrito_destino']:
+            row.pop(k, None)
+
+    return row
