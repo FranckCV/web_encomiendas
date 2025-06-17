@@ -78,3 +78,26 @@
 
 
 
+
+INSERT INTO `transaccion_encomienda` (`num_serie`, `masivo`, `descripcion`, `monto_total`, `recojo_casa`, `id_sucursal_origen`, `fecha`, `hora`, `direccion_recojo`, `comprobante_serie`, `clienteid`, `tipo_comprobanteid`) VALUES
+('000001', 0, 'Envío individual #F001-000001', 25.50, 0, 3, '2025-06-16', '22:04:22', '', 'F001-000001', 6, 1),
+('000002', 0, 'Envío individual #F001-000002', 25.50, 0, 3, '2025-06-16', '22:10:07', '', 'F001-000002', 6, 1),
+('000003', 0, 'Envío individual #F001-000003', 25.50, 0, 3, '2025-06-17', '00:52:35', '', 'F001-000003', 6, 1);
+
+
+INSERT INTO `paquete` (`tracking`, `clave`, `valor`, `peso`, `qr_url`, `alto`, `cantidad_folios`, `estado_pago`, `largo`, `precio_ruta`, `ancho`, `descripcion`, `nombres_contacto_destinatario`, `apellidos_razon_destinatario`, `direccion_destinatario`, `telefono_destinatario`, `num_documento_destinatario`, `sucursal_destino_id`, `tipo_documento_destinatario_id`, `tipo_empaqueid`, `contenido_paqueteid`, `tipo_recepcionid`, `salidaid`, `transaccion_encomienda_num_serie`, `modalidad_pagoid`) VALUES
+(2, '4123', 80.00, 5.50, 'comprobantes/2/qr.png', 40.00, NULL, 'P', 50.00, 25.50, 30.00, '', 'Juan', 'Pérez', '', '987654321', '12345678', 5, 1, 1, 3, 1, NULL, '000002', 1),
+(3, '4123', 80.00, 5.50, 'comprobantes/3/qr.png', 40.00, NULL, 'P', 50.00, 25.50, 30.00, '', 'Juan', 'Pérez', '', '987654321', '12345678', 5, 1, 1, 3, 1, NULL, '000003', 1);
+
+
+INSERT INTO `seguimiento` (`paquetetracking`, `detalle_estadoid`, `fecha`, `hora`, `tipo_comprobanteid`) VALUES
+(2, 1, '2025-06-16', '22:10:07', NULL),
+(2, 2, '2025-06-17', '00:16:36', NULL),
+(2, 3, '2025-06-17', '00:16:42', NULL),
+(2, 4, '2025-06-17', '00:19:50', 2),
+(2, 5, '2025-06-17', '00:20:30', NULL),
+(2, 6, '2025-06-17', '00:23:16', NULL),
+(2, 7, '2025-06-17', '00:23:20', NULL),
+(3, 1, '2025-06-17', '00:52:35', NULL),
+(3, 2, '2025-06-17', '01:03:08', NULL),
+(3, 3, '2025-06-17', '01:09:24', NULL);
