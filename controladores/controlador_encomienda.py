@@ -44,67 +44,59 @@ def table_fetchall():
     return resultados
 
 
-
 def get_table():
     sql = '''
-            SELECT 
+        SELECT 
             te.num_serie,
-            
+
             CASE 
                 WHEN te.masivo = 1 THEN 'Masivo'
                 ELSE 'Individual'
-            END AS isMasivo,
-            te.recojo_casa,
+            END AS tipo_envio,
 
             te.monto_total,
+
             CONCAT(
-                COALESCE(u.departamento, ''), ' ',
-                COALESCE(u.provincia, ''), ' ',
-                COALESCE(u.distrito, ''), ' ',
-                COALESCE(s.direccion, '')
+                u.departamento, '/', u.provincia, '/', u.distrito, ' - ', s.direccion
             ) AS sucursal_origen,
 
             CASE 
-                WHEN te.estado_pago = 'P' THEN 'Pendiente'
-                WHEN te.estado_pago = 'C' THEN 'Cancelado'
-                ELSE 'Desconocido'
-            END AS pago,
+                WHEN te.recojo_casa = 1 THEN 'Sí'
+                ELSE 'No'
+            END AS recojo_casa,
 
             te.fecha,
             te.hora,
 
             te.direccion_recojo,
 
-            COALESCE(tc.nombre, '') AS nom_tip_comprobante,
+            tc.nombre AS tipo_comprobante,
 
             CONCAT(
-                COALESCE(c.nombre_siglas, ''), ' ',
-                COALESCE(c.apellidos_razon, '')
-            ) AS nombre_cliente
+                COALESCE(c.nombre_siglas, ''), ' ', COALESCE(c.apellidos_razon, '')
+            ) AS cliente
 
         FROM transaccion_encomienda te
         INNER JOIN cliente c ON c.id = te.clienteid
         INNER JOIN tipo_comprobante tc ON tc.id = te.tipo_comprobanteid
         INNER JOIN sucursal s ON s.id = te.id_sucursal_origen
-        INNER JOIN ubigeo u ON u.codigo = s.ubigeocodigo;
+        INNER JOIN ubigeo u ON u.codigo = s.ubigeocodigo
+        ORDER BY te.fecha DESC, te.hora DESC
     '''
 
     columnas = {
         'num_serie': ['N° Serie', 1],
-        'isMasivo': ['Tipo de envío', 1.2],
-        'monto_total': ['Monto Total', 1],
-        # 'recojo_casa': ['Recojo a Domicilio', 1.2],
-        'sucursal_origen': ['Sucursal Origen', 1.5],
-        'pago': ['Estado de Pago', 1],
+        'tipo_envio': ['Tipo de Envío', 1.2],
+        'monto_total': ['Monto Total S/.', 1],
+        'sucursal_origen': ['Sucursal Origen', 2],
+        'recojo_casa': ['¿Recojo en casa?', 1],
         'fecha': ['Fecha', 1],
         'hora': ['Hora', 1],
-        # 'direccion': ['Dirección de Recojo', 2],
-        'nom_tip_comprobante': ['Tipo de Comprobante', 1.5],
-        'nombre_cliente': ['Cliente', 2],
+        'tipo_comprobante': ['Comprobante', 1.5],
+        'cliente': ['Cliente', 2],
     }
 
     filas = sql_select_fetchall(sql)
-    
     return columnas, filas
 
 
