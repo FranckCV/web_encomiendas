@@ -27,7 +27,7 @@ def get_report_test():
         'tracking'      : ['Tracking', 0.5],
         'con_nombre'    : ['Contenido de paquete', 1.5],
         'estado_nombre' : ['Estado Actual de paquete', 1.5],
-        'fecha_txt'     : ['Fecha de envio', 2],
+        'fecha'     : ['Fecha de envio', 2],
     }
     
     filas = sql_select_fetchall(sql)

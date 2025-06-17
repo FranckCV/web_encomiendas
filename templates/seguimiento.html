@@ -77,47 +77,24 @@
               <div class="step-label">{{ state.nombre }}</div>
               <input type="hidden" value="{{ state.id }}" />
 
-              <div class="timeline">
-                <div class="timeline-item active">
-                  <div class="timeline-dot"></div>
-                  <div class="timeline-line"></div>
-                  <div class="timeline-content">
-                    <div class="timeline-title">En origen</div>
-                    <div class="timeline-date">25/04/25 - 09:27</div>
-                    <div class="timeline-location">Recibido en agencia Arequipa</div>
-                  </div>
-                </div>
+        
+                <div class="timeline">
+  {% if state.id in detalles_por_estado %}
+    {% for det in detalles_por_estado[state.id] %}
+      <div class="timeline-item active">
+        <div class="timeline-dot"></div>
+        <div class="timeline-line"></div>
+        <div class="timeline-content">
+          <div class="timeline-title">{{ det.nombre }}</div>
+          <div class="timeline-date">{{ det.fecha }} - {{ det.hora }}</div>
 
-                <div class="timeline-item active">
-                  <div class="timeline-dot"></div>
-                  <div class="timeline-line"></div>
-                  <div class="timeline-content">
-                    <div class="timeline-title">En tránsito</div>
-                    <div class="timeline-date">26/04/25 - 07:35</div>
-                    <div class="timeline-location">En ruta hacia destino</div>
-                  </div>
-                </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
 
-                <div class="timeline-item active">
-                  <div class="timeline-dot"></div>
-                  <div class="timeline-line"></div>
-                  <div class="timeline-content">
-                    <div class="timeline-title">En destino</div>
-                    <div class="timeline-date">28/04/25 - 18:20</div>
-                    <div class="timeline-location">Agencia Lima Centro</div>
-                  </div>
-                </div>
 
-                <div class="timeline-item active">
-                  <div class="timeline-dot"></div>
-                  <div class="timeline-line"></div>
-                  <div class="timeline-content">
-                    <div class="timeline-title">Entregado</div>
-                    <div class="timeline-date">29/04/25 - 14:57</div>
-                    <div class="timeline-location">Entregado a FABIANA LUCIA PAUCAR MEJIA con DNI 7242857</div>
-                  </div>
-                </div>
-              </div>
 
               
             </div>
