@@ -2148,32 +2148,47 @@ def carrito():
 
 @app.route("/obtener-carrito", methods=["GET"])
 def obtener_carrito():
-    # clienteid = request.cookies.get("idlogin") or request.args.get("clienteid")
-    clienteid = 1
-    # tipo_comprobanteid = 2
+    clientecorreo = request.cookies.get('correo')
+    if not clientecorreo:
+        return jsonify({"error": "No se encontró la cookie de correo"}), 400
 
+    cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
+    if not cliente:
+        return jsonify({"error": "Cliente no encontrado"}), 404
+
+    clienteid = cliente.get("id")
     if not clienteid:
-        return jsonify({"error": "Cliente no identificado"}), 400
+        return jsonify({"error": "Cliente sin ID válido"}), 400
 
     datos = controlador_transaccion_venta.obtener_carrito_cliente(clienteid)
-
     if isinstance(datos, Exception):
         return jsonify({"error": str(datos)}), 500
 
     return jsonify(datos)
 
-
 @app.route("/registrar-item-carrito", methods=["POST"])
 def registrar_item_carrito():
     data = request.get_json()
+    # print(f"{data}")
+    # for i in range (1,3):
+    #     print(f"{i}. {data}")
     articuloid = data.get("articuloid")
     cantidad = data.get("cantidad")
     tipo_comprobanteid = 2  # Provisionalmente fijo
 
     # clienteid = request.cookies.get("idlogin")
-    clienteid = data.get("clienteid")
-    if not clienteid or not articuloid or not cantidad:
-        return jsonify({"error": "Datos incompletos"}), 400
+    # clienteid = data.get("clienteid", 1)
+    clientecorreo = request.cookies.get('correo')
+    if not clientecorreo:
+        return jsonify({"error": "No se encontró la cookie de correo"}), 400
+
+    cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
+    if not cliente:
+        return jsonify({"error": "Cliente no encontrado"}), 404
+
+    clienteid = cliente.get("id")
+    if not clienteid:
+        return jsonify({"error": "Cliente sin ID válido"}), 400
 
     try:
         num_serie = controlador_transaccion_venta.registrar_detalle_venta(
@@ -2190,11 +2205,20 @@ def registrar_item_carrito():
 @app.route("/eliminar-item-carrito", methods=["POST"])
 def eliminar_item_carrito():
     data = request.get_json()
-    clienteid = data.get("clienteid")
+    # clienteid = data.get("clienteid")
     articuloid = data.get("articuloid")
 
-    if not clienteid or not articuloid:
-        return jsonify({"error": "Datos incompletos"}), 400
+    clientecorreo = request.cookies.get('correo')
+    if not clientecorreo:
+        return jsonify({"error": "No se encontró la cookie de correo"}), 400
+
+    cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
+    if not cliente:
+        return jsonify({"error": "Cliente no encontrado"}), 404
+
+    clienteid = cliente.get("id")
+    if not clienteid:
+        return jsonify({"error": "Cliente sin ID válido"}), 400
 
     transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
     if not transaccion:
@@ -2210,10 +2234,18 @@ def eliminar_item_carrito():
 @app.route("/vaciar-carrito", methods=["POST"])
 def vaciar_carrito():
     data = request.get_json()
-    clienteid = data.get("clienteid")
+    # clienteid = data.get("clienteid")
+    clientecorreo = request.cookies.get('correo')
+    if not clientecorreo:
+        return jsonify({"error": "No se encontró la cookie de correo"}), 400
 
+    cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
+    if not cliente:
+        return jsonify({"error": "Cliente no encontrado"}), 404
+
+    clienteid = cliente.get("id")
     if not clienteid:
-        return jsonify({"error": "Cliente no identificado"}), 400
+        return jsonify({"error": "Cliente sin ID válido"}), 400
 
     transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
     if not transaccion:
@@ -2227,7 +2259,19 @@ def vaciar_carrito():
 
 @app.route("/obtener-resumen-pago", methods=["GET"])
 def obtener_resumen_pago():
-    clienteid = 1  # O request.cookies.get("idlogin")
+    # clienteid = 1  # O request.cookies.get("idlogin")
+
+    clientecorreo = request.cookies.get('correo')
+    if not clientecorreo:
+        return jsonify({"error": "No se encontró la cookie de correo"}), 400
+
+    cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
+    if not cliente:
+        return jsonify({"error": "Cliente no encontrado"}), 404
+
+    clienteid = cliente.get("id")
+    if not clienteid:
+        return jsonify({"error": "Cliente sin ID válido"}), 400
 
     transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
     if not transaccion:
@@ -2254,7 +2298,18 @@ def obtener_resumen_pago():
 
 @app.route("/metodo_pago")
 def metodo_pago():
-    clienteid = 1  # O request.cookies.get("idlogin")
+    # clienteid = 1  # O request.cookies.get("idlogin")
+    clientecorreo = request.cookies.get('correo')
+    if not clientecorreo:
+        return jsonify({"error": "No se encontró la cookie de correo"}), 400
+
+    cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
+    if not cliente:
+        return jsonify({"error": "Cliente no encontrado"}), 404
+
+    clienteid = cliente.get("id")
+    if not clienteid:
+        return jsonify({"error": "Cliente sin ID válido"}), 400
 
     transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
     if not transaccion:
@@ -2265,15 +2320,28 @@ def metodo_pago():
 @app.route("/confirmar-pago", methods=["POST"])
 def confirmar_pago():
     try:
-        clienteid = int(request.cookies.get("idlogin", 1))
-        transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
+        # Obtener el correo desde las cookies
+        clientecorreo = request.cookies.get("correo")
+        if not clientecorreo:
+            return jsonify({"error": "No se encontró el correo del cliente"}), 400
 
+        # Buscar cliente por correo
+        cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
+        if not cliente:
+            return jsonify({"error": "Cliente no encontrado"}), 404
+
+        clienteid = cliente.get("id")
+        if not clienteid:
+            return jsonify({"error": "Cliente sin ID válido"}), 400
+
+        # Obtener transacción provisional
+        transaccion = controlador_transaccion_venta.obtener_transaccion_provisional(clienteid)
         if not transaccion:
             return jsonify({"error": "No hay transacción activa"}), 400
 
         num_serie = transaccion["num_serie"]
 
-        # ✅ Actualizar estado a pagado (1)
+        # Actualizar estado a pagado
         sql = '''
             UPDATE transaccion_venta SET estado = 1 WHERE num_serie = %s
         '''

@@ -181,4 +181,6 @@ def getDataClient(id):
     fila = sql_select_fetchone(sql,id)
     return fila
     
-    
+def get_cliente_por_correo(correo):
+    sql = "SELECT * FROM cliente WHERE correo = %s"
+    return sql_select_fetchone(sql, (correo,))
