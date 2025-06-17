@@ -1,223 +1,384 @@
 {% extends 'MAESTRA_GENERAL.html' %}
 {% block estilos %}
-  <link rel="stylesheet" href="/static/css/libro_reclamaciones.css" />
+<link rel="stylesheet" href="/static/css/libro_reclamaciones.css" />
+<style>
+  form * {
+    font-size: 100%;
+  }
+</style>
 {% endblock %}
+
+{% block titulo %}
+Libro de reclamaciones
+{% endblock %}
+
 {% block contenido %}
-  <div class="contenedor">
-    <h1 class="titulo">LIBRO DE RECLAMACIONES</h1>
+<div class="contenedor">
+  <h1 class="titulo">LIBRO DE RECLAMACIONES</h1>
 
-    <div class="form-container">
-      <form id="reclamacionesForm">
-        <div class="section">
-          <h2 class="section-title">Información Personal</h2>
+  <div class="form-container">
+    <form id="reclamacionesForm" enctype="multipart/form-data" method="post" action="{{url_for('registrar_reclamo')}}">
+      <div class="section">
+        <h2 class="section-title">Información Personal</h2>
 
-          <div class="filas-1">
-            <div class="form-group largo">
-              <label for="nombresCompletos">Nombres Completos / Razón Social <span class="required">*</span></label>
-              <input type="text" id="nombresCompletos" name="nombresCompletos" required />
-            </div>
-            <div class="form-group">
-              <label for="tipoDocumento">Tipo de Documento <span class="required">*</span></label>
-              <select id="tipoDocumento" name="tipoDocumento" required>
-                <option value="">Seleccione...</option>
-                <option value="dni">DNI</option>
-                <option value="ce">Carné de Extranjería</option>
-                <option value="pasaporte">Pasaporte</option>
-                <option value="ruc">RUC</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="numeroDocumento">Número de Documento <span class="required">*</span></label>
-              <input type="text" id="numeroDocumento" name="numeroDocumento" required />
-            </div>
+        <div class="filas-1">
+          <div class="form-group largo">
+            <label for="nombresCompletos">Nombres Completos / Razón Social <span class="required">*</span></label>
+            <input type="text" id="nombresCompletos" name="nombres_razon" required />
           </div>
-          <div class="filas">
-            <div class="form-group">
-              <label for="departamento">Departamento <span class="required">*</span></label>
-              <select id="departamento" name="departamento" required>
-                <option value="">Seleccione...</option>
-                <option value="lima">Lima</option>
-                <option value="arequipa">Arequipa</option>
-                <option value="cusco">Cusco</option>
-                <option value="trujillo">La Libertad</option>
-                <option value="piura">Piura</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="provincia">Provincia <span class="required">*</span></label>
-              <select id="provincia" name="provincia" required>
-                <option value="">Seleccione...</option>
-                <option value="lima">Lima</option>
-                <option value="callao">Callao</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="distrito">Distrito <span class="required">*</span></label>
-              <select id="distrito" name="distrito" required>
-                <option value="">Seleccione...</option>
-                <option value="miraflores">Miraflores</option>
-                <option value="san-isidro">San Isidro</option>
-                <option value="surco">Santiago de Surco</option>
-              </select>
-            </div>
+          <div class="form-group">
+            <label for="tipoDocumento">Tipo de Documento <span class="required">*</span></label>
+            <select id="tipoDocumento" name="tipo_documentoid" required>
+              <option value="" disabled selected>Tipos de documento</option>
+              {% for tipo in opts_tipo_documento %}
+              <option value="{{tipo['id']}}" data-siglas="{{tipo['id']}}">{{tipo['nombre']}}</option>
+              {% endfor %}
+            </select>
           </div>
+
+          <div class="form-group">
+            <label for="numeroDocumento">Número de Documento <span class="required">*</span></label>
+            <input type="text" id="numeroDocumento" name="n_documento" required />
+          </div>
+        </div>
+
+        <div class="filas">
+          <div class="form-group">
+            <label for="departamento">Departamento <span class="required">*</span></label>
+            <select id="departamento" name="departamento" required>
+              <option value="">Departamentos</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="provincia">Provincia <span class="required">*</span></label>
+            <select id="provincia" name="provincia" required>
+              <option value="">Provincias</option>
+              <option value="" disabled>Selecciona un departamento </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="distrito">Distrito <span class="required">*</span></label>
+            <select id="distrito" name="distrito" required>
+              <option value="">Distritos</option>
+              <option value="" disabled>Selecciona una provincia </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="direccion">Dirección <span class="required">*</span></label>
+          <input type="text" id="direccion" name="direccion" required />
+        </div>
+
+        <div class="filas-2">
+          <!-- <div class="form-group" id="ref">
+            <label for="referencia">Referencia</label>
+            <input type="text" id="referencia" name="referencia" />
+          </div> -->
+
+          <div class="form-group" id="mail">
+            <label for="correo">Correo Electrónico <span class="required">*</span></label>
+            <input type="email" id="correo" name="correo" required />
+          </div>
+
+          <div class="form-group">
+            <label for="telefono">Teléfono <span class="required">*</span></label>
+            <input type="tel" id="telefono" name="telefono" required />
+          </div>
+
+        </div>
+      </div>
+
+      <!-- INFORMACIÓN DE LA INCIDENCIA -->
+      <div class="section">
+        <h2 class="section-title">Información de la Incidencia</h2>
+
+        <div class="filas">
+          <div class="form-group">
+            <label for="numeroTracking">Número de Tracking <span class="required">*</span></label>
+            <input type="text" id="numeroTracking" name="paquetetracking" />
+          </div>
+
+          <div class="form-group">
+            <label for="sucursal">Sucursal</label>
+            <select id="sucursal" name="sucursal_id">
+              <option value="">Sucursales</option>
+              <option value="" disabled>Selecciona un distrito </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="fechaRecepcion">Fecha de Recepción <span class="required">*</span></label>
+            <input type="date" id="fechaRecepcion" name="fecha_recepcion" />
+          </div>
+        </div>
+
+        <div class="filas">
+          <div class="form-group">
+            <label for="tipoIncidencia">Tipo de Incidencia <span class="required">*</span></label>
+            <select id="tipoIncidencia" name="tipoIncidencia" required>
+              <option value="">Tipos</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="motivoIncidencia">Motivo de Incidencia <span class="required">*</span></label>
+            <select id="motivoIncidencia" name="motivoIncidencia" required>
+              <option value="">Motivos</option>
+              <option value="" disabled>Selecciona un tipo de incidencia</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="causaIncidencia">Causa de Incidencia <span class="required">*</span></label>
+            <select id="causaIncidencia" name="causa_reclamoid" required>
+              <option value="">Causas</option>
+              <option value="" disabled>Selecciona un motivo de incidencia</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="filas">
+          <div class="form-group">
+            <label for="bienContratado">Bien Contratado <span class="required">*</span></label>
+            <select id="bienContratado" name="bien_contratado" required>
+              <option value="" disabled selected>Bienes contratados</option>
+              {% for ele in bienes_contratados %}
+              <option value="{{ele[0]}}">{{ele[1]}}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="montoReclamado">Monto Reclamado (S/.) <span class="required">*</span></label>
+            <input type="number" id="montoReclamado" name="monto_reclamado" step="0.01" min="0" required/>
+          </div>
+        </div>
+        <div class="form-grid">
           <div class="form-group full-width">
-            <label for="direccion">Dirección <span class="required">*</span></label>
-            <input type="text" id="direccion" name="direccion" required />
+            <label for="descripcionIncidencia">Descripción de la Incidencia <span class="required">*</span></label>
+            <textarea id="descripcionIncidencia" name="descripcion" required
+              placeholder="Describa detalladamente su incidencia..."></textarea>
           </div>
 
-          <div class="filas-5">
-            <div class="form-group" id="ref">
-              <label for="referencia">Referencia</label>
-              <input type="text" id="referencia" name="referencia" />
-            </div>
-
-            <div class="form-group" id="mail">
-              <label for="correo">Correo Electrónico <span class="required">*</span></label>
-              <input type="email" id="correo" name="correo" required />
-            </div>
-
-            <div class="form-group" >
-              <label for="telefono">Teléfono <span class="required">*</span></label>
-              <input type="tel" id="telefono" name="telefono" required />
-            </div>
-          </div>
-        </div>
-
-        <!-- INFORMACIÓN DE LA INCIDENCIA -->
-        <div class="section">
-          <h2 class="section-title">Información de la Incidencia</h2>
-
-          <div class="filas">
-            <div class="form-group">
-              <label for="numeroTracking">Número de Tracking</label>
-              <input type="text" id="numeroTracking" name="numeroTracking" />
-            </div>
-
-            <div class="form-group">
-              <label for="tienda">Tienda</label>
-              <select id="tienda" name="tienda">
-                <option value="">Seleccione...</option>
-                <option value="tienda-central">Tienda Central</option>
-                <option value="tienda-norte">Tienda Norte</option>
-                <option value="tienda-sur">Tienda Sur</option>
-                <option value="tienda-este">Tienda Este</option>
-                <option value="online">Tienda Online</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="fechaRecojo">Fecha de Recojo</label>
-              <input type="date" id="fechaRecojo" name="fechaRecojo" />
-            </div>
+          <div class="form-group full-width">
+            <label for="detallesIncidencia">Detalles de Incidencia</label>
+            <textarea id="detallesIncidencia" name="detalles"
+              placeholder="Proporcione detalles adicionales si los considera necesarios..."></textarea>
           </div>
 
-          <div class="filas">
-            <div class="form-group">
-              <label for="tipoIncidencia">Tipo de Incidencia <span class="required">*</span></label>
-              <select id="tipoIncidencia" name="tipoIncidencia" required>
-                <option value="">Seleccione...</option>
-                <option value="reclamo">Reclamo</option>
-                <option value="queja">Queja</option>
-                <option value="sugerencia">Sugerencia</option>
-                <option value="felicitacion">Felicitación</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="motivoIncidencia">Motivo de Incidencia <span class="required">*</span></label>
-              <select id="motivoIncidencia" name="motivoIncidencia" required>
-                <option value="">Seleccione...</option>
-                <option value="producto-defectuoso">Producto Defectuoso</option>
-                <option value="mal-servicio">Mal Servicio</option>
-                <option value="demora-entrega">Demora en Entrega</option>
-                <option value="facturacion">Problema de Facturación</option>
-                <option value="atencion-cliente">Atención al Cliente</option>
-                <option value="otro">Otro</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="causaIncidencia">Causa de Incidencia</label>
-              <select id="causaIncidencia" name="causaIncidencia">
-                <option value="">Seleccione...</option>
-                <option value="error-personal">Error del Personal</option>
-                <option value="falla-sistema">Falla del Sistema</option>
-                <option value="problema-proveedor">Problema con Proveedor</option>
-                <option value="falta-stock">Falta de Stock</option>
-                <option value="otro">Otro</option>
-              </select>
-            </div>
+          <div class="form-group full-width">
+            <label for="pedidoSugerencia">Pedido/Sugerencia</label>
+            <textarea id="pedidoSugerencia" name="pedido"
+              placeholder="¿Qué solicita o sugiere para resolver esta incidencia?"></textarea>
           </div>
 
-          <div class="filas">
-            <div class="form-group">
-              <label for="bienContratado">Bien Contratado</label>
-              <select id="bienContratado" name="bienContratado">
-                <option value="">Seleccione...</option>
-                <option value="producto">Producto</option>
-                <option value="servicio">Servicio</option>
-                <option value="ambos">Producto y Servicio</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="montoReclamado">Monto Reclamado (S/.)</label>
-              <input type="number" id="montoReclamado" name="montoReclamado" step="0.01" min="0" />
-            </div>
-          </div>
-          <div class="form-grid">
-            <div class="form-group full-width">
-              <label for="descripcionIncidencia">Descripción de la Incidencia <span class="required">*</span></label>
-              <textarea id="descripcionIncidencia" name="descripcionIncidencia" required placeholder="Describa detalladamente su incidencia..."></textarea>
-            </div>
-
-            <div class="form-group full-width">
-              <label for="detallesIncidencia">Detalles de Incidencia</label>
-              <textarea id="detallesIncidencia" name="detallesIncidencia" placeholder="Proporcione detalles adicionales si los considera necesarios..."></textarea>
-            </div>
-
-            <div class="form-group full-width">
-              <label for="pedidoSugerencia">Pedido/Sugerencia</label>
-              <textarea id="pedidoSugerencia" name="pedidoSugerencia" placeholder="¿Qué solicita o sugiere para resolver esta incidencia?"></textarea>
-            </div>
-
-            <div class="form-group full-width">
-              <label for="imagenIncidencia">Subir Imagen (Opcional)</label>
-              <div class="file-upload">
-                <input type="file" id="imagenIncidencia" name="imagenIncidencia" accept="image/*" />
-                <div class="file-upload-button">📷 Seleccionar imagen de evidencia</div>
-              </div>
+          <div class="form-group full-width">
+            <label for="imagenIncidencia">Subir Imagen (Opcional)</label>
+            <div class="file-upload">
+              <input type="file" id="imagenIncidencia" name="foto" accept="image/*" />
+              <div class="file-upload-button">📷 Seleccionar imagen de evidencia</div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="submit-section">
-          <button type="submit" class="btn-agregar">Registrar reclamo</button>
-        </div>
-      </form>
-    </div>
+      <div class="submit-section">
+        <button type="submit" class="btn-agregar">Registrar reclamo</button>
+      </div>
+    </form>
   </div>
+</div>
 {% endblock %}
 
-{% block script %}
-  <script>
+{% block scripts %}
+
+<script>
+
+
+
+
+  function validateInputDecimal(input) {
+    let timeout = null;
+    clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+        const valor = input.value;
+        const num = parseFloat(valor);
+
+        if (!isNaN(num)) {
+            input.value = num.toFixed(2);
+        } else {
+            input.value = '0.00';
+        }
+    }, 600); // espera 800 ms después del último input
+  }
+
+  const inputMonto = document.querySelector('input#montoReclamado');
+  inputMonto.addEventListener("input", function () {
+    validateInputDecimal(inputMonto);
+  });
+
+  inputMonto.addEventListener("blur", function () {
+    validateInputDecimal(inputMonto);
+  });
+
+
+
+  function fillMainSelect(select, data, value, label) {
+    for (const key of data) {
+      select.innerHTML += `
+                <option value="${key[value]}">
+                    ${key[label]}
+                </option>
+            `
+    }
+  }
+
+  function fillSecondarySelect(select, data, value, label, select_main, comparation) {
+    for (const key of data) {
+      if (key[comparation] == select_main.value) {
+        select.innerHTML += `
+                    <option value="${key[value]}">
+                        ${key[label]}
+                    </option>
+                `
+      }
+
+    }
+  }
+
+  function resetSelect(select, option1, option2) {
+    select.innerHTML = `
+            <option value="">${option1}</option>
+            <option value="" disabled>${option2}</option>
+        `
+  }
+
+  function prepareSelect(select, option) {
+    select.innerHTML = `
+            <option value="" disabled selected>${option}</option>
+        `
+  }
+
+  function addOptionsToSelect(s_dept, s_prov, s_dist, s_suc, f_prov, f_dist, f_suc) {
+    s_dept.addEventListener('change', () => {
+      s_prov.innerHTML = '';
+      if (s_dept.value == null || s_dept.value == '') {
+        resetSelect(s_prov, 'Provincias', 'Selecciona un departamento');
+      } else {
+        prepareSelect(s_prov, 'Selecciona una provincia');
+        fillSecondarySelect(s_prov, f_prov, 'provincia', 'provincia', s_dept, 'departamento');
+      }
+      resetSelect(s_dist, 'Distritos', 'Selecciona una provincia');
+      resetSelect(s_suc, 'Sucursales', 'Selecciona un distrito');
+    });
+
+    s_prov.addEventListener('change', () => {
+      s_dist.innerHTML = '';
+      if (s_prov.value == null || s_prov.value == '') {
+        resetSelect(s_dist, 'Distritos', 'Selecciona una provincia');
+      } else {
+        prepareSelect(s_dist, 'Selecciona un distrito');
+        fillSecondarySelect(s_dist, f_dist, 'codigo', 'distrito', s_prov, 'provincia');
+      }
+      resetSelect(s_suc, 'Sucursales', 'Selecciona un distrito');
+    });
+
+    s_dist.addEventListener('change', () => {
+      s_suc.innerHTML = '';
+      if (s_dist.value == null || s_dist.value == '') {
+        resetSelect(s_suc, 'Sucursales', 'Selecciona un distrito');
+      } else {
+        prepareSelect(s_suc, 'Selecciona una sucursal');
+        fillSecondarySelect(s_suc, f_suc, 'id', 'nom_sucursal', s_dist, 'codigo');
+      }
+    });
+
+  }
+
+
+
+
+  function addOptionsToSelect_reclamo(s_tipo, s_motivo, s_causa, f_motivo, f_causa) {
+    
+    s_tipo.addEventListener('change', () => {
+      s_motivo.innerHTML = '';
+      if (s_tipo.value == null || s_tipo.value == '') {
+        resetSelect(s_motivo, 'Motivos', 'Selecciona un motivo');
+      } else {
+        prepareSelect(s_motivo, 'Selecciona un motivo de incidencia');
+        fillSecondarySelect(s_motivo, f_motivo, 'id', 'nombre', s_tipo, 'tip_id');
+      }
+      resetSelect(s_causa, 'Causas', 'Selecciona un motivo de incidencia');
+    });
+
+    s_motivo.addEventListener('change', () => {
+      s_causa.innerHTML = '';
+      if (s_motivo.value == null || s_motivo.value == '') {
+        resetSelect(s_causa, 'Causas', 'Selecciona un motivo de incidencia');
+      } else {
+        prepareSelect(s_causa, 'Selecciona una causa de incidencia');
+        fillSecondarySelect(s_causa, f_causa, 'id', 'nombre', s_motivo, 'mot_id');
+      }
+    });
+
+  }
+
+
+
+  const selectDept = document.getElementById('departamento');
+  const selectProv = document.getElementById('provincia');
+  const selectDist = document.getElementById('distrito');
+  const selectSuc = document.getElementById('sucursal');
+
+  let DEPARTAMENTOS = {{ departamentos | tojson }};
+  let PROVINCIAS = {{ provincias | tojson }};
+  let DISTRITOS = {{ distritos | tojson }};
+  let SUCURSALES = {{ sucursales | tojson }};
+
+
+  fillMainSelect(selectDept, DEPARTAMENTOS, 'departamento', 'departamento');
+
+  addOptionsToSelect(selectDept, selectProv, selectDist, selectSuc, PROVINCIAS, DISTRITOS, SUCURSALES);
+
+  const selectTipo = document.getElementById('tipoIncidencia');
+  const selectMotivo = document.getElementById('motivoIncidencia');
+  const selectCausa = document.getElementById('causaIncidencia');
+
+  let r_tipos = {{ tipos_reclamo | tojson }};
+  let r_motivos = {{ motivos_reclamo | tojson }};
+  let r_causas = {{ causas_reclamo | tojson }};
+
+  fillMainSelect(selectTipo, r_tipos, 'id', 'nombre');
+  addOptionsToSelect_reclamo(selectTipo, selectMotivo, selectCausa, r_motivos, r_causas);
+
+
+  document.getElementById('imagenIncidencia').addEventListener('change', function (e) {
+    const fileName = e.target.files[0]?.name
+    const button = document.querySelector('.file-upload-button')
+    if (fileName) {
+      button.textContent = `📷 ${fileName}`
+    } else {
+      button.textContent = '📷 Seleccionar imagen de evidencia'
+    }
+  });
+
+
+
+
+
+
+</script>
+
+<!-- <script>
     document.getElementById('reclamacionesForm').addEventListener('submit', function (e) {
       e.preventDefault()
       alert('Formulario enviado correctamente. Recibirá una respuesta en un plazo máximo de 30 días calendario.')
     })
     
-    document.getElementById('imagenIncidencia').addEventListener('change', function (e) {
-      const fileName = e.target.files[0]?.name
-      const button = document.querySelector('.file-upload-button')
-      if (fileName) {
-        button.textContent = `📷 ${fileName}`
-      } else {
-        button.textContent = '📷 Seleccionar imagen de evidencia'
-      }
-    })
-  </script>
+    
+  </script> -->
 {% endblock %}

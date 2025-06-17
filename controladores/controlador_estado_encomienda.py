@@ -1,6 +1,7 @@
 from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select_fetchone , sql_execute , sql_execute_lastrowid , show_columns , show_primary_key , exists_column_Activo , unactive_row_table
 import controladores.bd as bd
 #####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####
+from datetime import datetime
 
 table_name = 'estado_encomienda'
 
@@ -131,10 +132,9 @@ def get_last_states(tracking):
 
 def get_comprobantes(tracking):
     sql = '''
-        SELECT tc.nombre AS tipo_comprobante
+         SELECT tc.nombre AS tipo_comprobante
         FROM seguimiento s
-        inner join detalle_estado de on de.id = s.detalle_estadoid
-        INNER JOIN tipo_comprobante tc ON tc.id = de.tipo_comprobanteid
+        INNER JOIN tipo_comprobante tc ON tc.id = s.tipo_comprobanteid
         WHERE s.paquetetracking = %s
     '''
     filas = sql_select_fetchall(sql, tracking)
@@ -201,3 +201,60 @@ def get_data_package(tracking):
             row.pop(k, None)
 
     return row
+
+
+def get_estados_insertados(tracking):
+    sql = '''
+    select distinct de.estado_encomiendaid from seguimiento s
+    inner join detalle_estado de on de.id = s.detalle_estadoid
+    where s.paquetetracking=%s
+    '''
+    fila = sql_select_fetchall(sql,tracking)
+    return fila
+
+
+def get_detalles_estado_by_tracking(tracking):
+    sql = '''
+    select de.estado_encomiendaid, de.nombre,.s.fecha,s.hora from seguimiento s
+    inner join detalle_estado de on de.id = s.detalle_estadoid
+    where s.paquetetracking = %s
+    '''
+    fila = sql_select_fetchall(sql,tracking)
+    return fila
+
+
+def insertar_seguimiento(tracking, detalle_estado, tipo_comprobanteid=None):
+    try:
+        ahora = datetime.now()
+        fecha = ahora.date()
+        hora = ahora.time().strftime("%H:%M:%S")
+
+        if tipo_comprobanteid is not None:
+            sql = '''
+                INSERT INTO seguimiento (paquetetracking, detalle_estadoid, fecha, hora, tipo_comprobanteid)
+                VALUES (%s, %s, %s, %s, %s)
+            '''
+            valores = (tracking, detalle_estado, fecha, hora, tipo_comprobanteid)
+        else:
+            sql = '''
+                INSERT INTO seguimiento (paquetetracking, detalle_estadoid, fecha, hora)
+                VALUES (%s, %s, %s, %s)
+            '''
+            valores = (tracking, detalle_estado, fecha, hora)
+
+        sql_execute(sql, valores)
+        return True
+
+    except Exception as e:
+        print(f"Error al insertar seguimiento: {e}")
+        return False
+
+
+def get_estados_restantes(tracking):
+    sql = '''
+        select de.id,de.nombre from detalle_estado de
+where de.id not in (select detalle_estadoid from seguimiento where paquetetracking = %s)
+limit 1
+    '''
+    filas = sql_select_fetchall(sql,tracking)
+    return filas

@@ -61,14 +61,14 @@ def get_table():
 
     columnas = {
         'id': ['ID', 0.5],
-        'abreviatura': ['Abreviatura', 0.75],
-        'codigo_postal': ['C. Postal', 0.5],
+        'abreviatura': ['Abreviatura', 1],
+        'codigo_postal': ['C. Postal', 1], 
         'direccion': ['Dirección', 3],
         'ubigeo': ['Ubigeo', 2.5],
         # 'horario_l_v': ['Horario L-V', 2.5],
         # 'horario_s_d': ['Horario S-D', 2.5],
         # 'teléfono': ['Teléfono', 1.5],
-        'activo': ['Activo', 0.5]
+        'activo': ['Activo', 1]
     }
 
     filas = sql_select_fetchall(sql)
@@ -349,3 +349,19 @@ def get_data_exit(correo):
     print(fila)
     return fila
     
+
+
+def get_coordenadas_actual(id):
+    sql = '''
+        select
+        so.latitud as latitud_origen,
+        so.longitud as longitud_origen,
+        sd.latitud as latitud_destino,
+        sd.longitud as longitud_destino
+        from salida s
+        inner join sucursal so on so.id = s.origen_incio
+        inner join sucursal sd on sd.id = s.destino_final
+        where s.id = %s and s.estado = 'P' or 'T'
+    '''
+    fila = sql_select_fetchone(sql,id)
+    return fila

@@ -100,6 +100,20 @@ def get_options():
     return lista
 
 
+def get_options_dict():
+    sql= f'''
+        select 
+            id ,
+            CONCAT(siglas ,' - ', nombre) as nombre ,
+            siglas
+        from tipo_documento
+        where activo = 1
+        order by nombre asc
+    '''
+    filas = sql_select_fetchall(sql)
+
+    return filas
+
 
 
 

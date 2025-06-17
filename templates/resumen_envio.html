@@ -1,6 +1,8 @@
 {% extends 'MAESTRA_GENERAL.html' %}
 
-{% block titulo %}Resumen de Envíos{% endblock %}
+{% block titulo %}
+  Resumen de Envíos
+{% endblock %}
 
 {% block estilos %}
   <link rel="stylesheet" href="/static/css/resumen_envio.css" />
@@ -8,97 +10,116 @@
 {% endblock %}
 
 {% block contenido %}
-  <div class="container">
-    <h1 class="titulo-envio">RESUMEN DE ENVÍOS</h1>
+<div class="container">
+  <h1 class="titulo-envio">REGISTRO DE ENVÍOS</h1>
 
-<div class="steps-container">
-      <div class="step completed">
-        <div class="circle">
-          <img src="/static/img/usuario.png" alt="Datos personales" />
-        </div>
-        <p>Datos personales</p>
+  <div class="steps-container">
+    <div class="step completed">
+      <div class="circle">
+        <img src="/static/img/usuario.png" alt="Datos personales" />
       </div>
-      <div class="line"></div>
-      <div class="step active">
-        <div class="circle">
-          <img src="/static/img/chek.png" alt="Confirma tus datos" />
-        </div>
-        <p>Confirma tus datos</p>
+      <p>Datos personales</p>
+    </div>
+    <div class="line"></div>
+    <div class="step active">
+      <div class="circle">
+        <img src="/static/img/chek.png" alt="Confirma tus datos" />
       </div>
-      <div class="line"></div>
-      <div class="step">
-        <div class="circle">
-          <img src="/static/img/medio.png" alt="Medios de pago" />
-        </div>
-        <p>Medios de pago</p>
+      <p>Confirma tus datos</p>
+    </div>
+    <div class="line"></div>
+    <div class="step">
+      <div class="circle">
+        <img src="/static/img/medio.png" alt="Medios de pago" />
       </div>
-    </div>
-
-
-    {% if registros %}
-    <div class="header-resumen">
-      <h4>Origen:</h4>
-      <p>
-        {{ registros[0].origen.departamento_origen }}
-        / {{ registros[0].origen.provincia_origen }}
-        / {{ registros[0].origen.distrito_origen }}
-        (Sucursal ID {{ registros[0].origen.sucursal_origen }})
-      </p>
-    </div>
-    {% endif %}
-
-    <div class="tabla-scroll">
-      <table class="tabla-resumen">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Entrega</th>
-            <th>Destino</th>
-            <th>Empaque</th>
-            <th>Valor (S/)</th>
-            <th>Peso (kg)</th>
-            <th>Dimensiones (cm)</th>
-            <th>Destinatario</th>
-            <th>Clave</th>
-            <th>Tarifa (S/)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for r in registros %}
-          <tr>
-            <td>{{ loop.index }}</td>
-            <td>{{ r.tipoEntrega }}</td>
-            <td>
-              {{ r.destino.departamento }}/
-              {{ r.destino.provincia }}/
-              {{ r.destino.distrito }}
-              (Sucursal {{ r.destino.sucursal_destino }})
-            </td>
-            <td>
-              {% if r.folios %}
-                {{ r.folios }} folios (peso por folio aplicado)
-              {% else %}
-                {{ r.tipoEmpaque }} – {{ r.tipoArticulo }}
-              {% endif %}
-            </td>
-            <td>{{ r.valorEnvio }}</td>
-            <td>{{ r.peso }}</td>
-            <td>{{ r.largo }}×{{ r.ancho }}×{{ r.alto }}</td>
-            <td>{{ r.destinatario }}</td>
-            <td>{{ r.clave }}</td>
-            <td><strong>{{ r.tarifa }}</strong></td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-    <div class="botones-acciones" style="margin-top: 1.5rem;">
-      <a href="{{ url_for('tipos_envio') }}" class="btn-volver">VOLVER</a>
-      <form action="{{ url_for('pago_envio') }}" method="post">
-        <input type="hidden" name="registros" value="{{ registros|tojson }}">
-        <button type="submit" class="btn-continuar">IR A PAGAR</button>
-      </form>
+      <p>Medios de pago</p>
     </div>
   </div>
+
+  <div class="header-resumen" hidden>
+    <h2>Resumen de envíos registrados</h2>
+    <button class="btn-agregar" onclick="window.location.href='/registro-envio'">+ AGREGAR ENVÍOS</button>
+  </div>
+
+  <div class="tabla-scroll">
+    <table class="tabla-envios">
+      <thead>
+        <tr>
+          <th>Tipo Recepcion</th>
+          <th>Remitente</th>
+          <th>Destinatario</th>
+          <th>Destino</th>
+          <th>Tarifa</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          {% if data_envio.tipo_recepcion == '1' %}
+          <td>Recepción en sucursal</td>
+          {% else %}
+          <td>Recepción en domicilio</td>
+          {% endif %}
+          <td>
+            {{ data_envio.nombre_remitente }}<br />
+            <small>
+              {% if data_envio.tipo_documento_origen == '3' %}
+              Carne extranjería
+              {% elif data_envio.tipo_documento_origen == '1' %}
+              DNI
+              {% elif data_envio.tipo_documento_origen == '2' %}
+              Contribuyente
+              {% elif data_envio.tipo_documento_origen == '4' %}
+              Pasaporte
+              {% endif %}
+              <!-- {{ data_envio.tipo_documento_destino }} -->
+              
+              : {{ data_envio.dni_destino }}</small>
+          </td>
+          <td>
+            {{ data_envio.nombre_destinatario }}<br />
+            <small>
+              {% if data_envio.tipo_documento_destino == '3' %}
+              Carne extranjería
+              {% elif data_envio.tipo_documento_destino == '1' %}
+              DNI
+              {% elif data_envio.tipo_documento_destino == '2' %}
+              Contribuyente
+              {% elif data_envio.tipo_documento_destino == '4' %}
+              Pasaporte
+              {% endif %}
+              <!-- {{ data_envio.tipo_documento_destino }} -->
+              
+              : {{ data_envio.dni_destino }}</small>
+          </td>
+          <td>
+            {{ data_envio.distrito_destino_sucursal }}
+          </td>
+          <!-- <td>{{ data_envio.descripcion }}</td> -->
+          <td>S/ {{ (data_envio.valor_paquete | float) + (data_envio.tarifa | float) }}</td>
+
+          <td>
+            <button class="btn btn-delete" onclick="eliminar_storage()">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+    <!-- <div class="paginacion">
+      <button class="btn-paginacion">Anterior</button>
+      <span class="pagina-actual">1</span>
+      <button class="btn-paginacion">Siguiente</button>
+    </div> -->
+
+  <div class="botones-acciones">
+    <a href="{{ url_for('tipos_envio') }}" class="btn-volver">VOLVER</a>
+    <button type="button" class="btn-continuar" id="btn-continuar" onclick="window.location.href='{{ url_for('pagar_encomienda') }}'">IR A PAGAR</button>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/resumen_envio.js') }}"></script>
 {% endblock %}

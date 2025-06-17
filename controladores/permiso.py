@@ -407,7 +407,7 @@ def change_permiso_modulo(column , moduloid , rolid , value = None):
 def validar_acceso(rolid , f_name , f_kwarg ):
     if f_name == 'panel' :
         return True
-    elif f_name == 'dashboard' :
+    elif f_name == 'modulo' :
         menu_modulos = get_modulos_rol(rolid)
         keys = [modulo['key'] for modulo in menu_modulos]
         if f_kwarg in keys:
