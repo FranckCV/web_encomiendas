@@ -87,17 +87,18 @@ def update_row(nombre, descripcion, motivo_reclamoid, id):
 
 #####_ ADICIONALES _#####
 
-def get_options():
-    sql= f'''
-        SELECT 
-            id,
-            nombre
-        FROM {table_name}
-        where activo = 1
-        ORDER BY nombre asc
-    '''
-    filas = sql_select_fetchall(sql)
-    
-    lista = [(fila[get_primary_key()], fila['nombre']) for fila in filas]
 
-    return lista
+def get_options():
+    try:
+        sql = f'''
+            SELECT 
+                {get_primary_key()},
+                nombre
+            FROM {table_name}
+            ORDER BY nombre ASC
+        '''
+        filas = sql_select_fetchall(sql)
+        return [(fila[get_primary_key()], fila["nombre"]) for fila in filas]
+    except Exception as e:
+        print("❌ Error en get_options causa_reclamo:", e)
+        return []

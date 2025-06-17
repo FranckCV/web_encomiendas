@@ -85,19 +85,20 @@ def update_row( id , nombre ):
 #####_ ADICIONALES _#####
 
 def get_options():
-    sql= f'''
-        select 
-            id ,
-            nombre
-        from tipo_documento
-        where activo = 1
-        order by nombre asc
-    '''
-    filas = sql_select_fetchall(sql)
-    
-    lista = [(fila['id'], fila["nombre"]) for fila in filas]
-
-    return lista
+    try:
+        sql = f'''
+            SELECT 
+                {get_primary_key()},
+                nombre
+            FROM {table_name}
+            WHERE activo = 1
+            ORDER BY nombre ASC
+        '''
+        filas = sql_select_fetchall(sql)
+        return [(fila[get_primary_key()], fila["nombre"]) for fila in filas]
+    except Exception as e:
+        print(f"❌ Error en get_options de {table_name}:", e)
+        return []
 
 
 def get_options_dict():

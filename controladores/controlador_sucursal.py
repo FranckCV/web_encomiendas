@@ -115,19 +115,20 @@ def update_row(abreviatura, codigo_postal, direccion, ubigeocodigo, horario_l_v,
 
 #####_ ADICIONALES _#####
 def get_options():
-    sql= f'''
-        select 
-            {get_primary_key()} ,
-            direccion
-        from {table_name}
-        where activo = 1
-        order by direccion asc
-    '''
-    filas = sql_select_fetchall(sql)
-    
-    lista = [(fila[get_primary_key()], fila["direccion"]) for fila in filas]
-
-    return lista
+    try:
+        sql = f'''
+            SELECT 
+                {get_primary_key()},
+                direccion
+            FROM {table_name}
+            WHERE activo = 1
+            ORDER BY direccion ASC
+        '''
+        filas = sql_select_fetchall(sql)
+        return [(fila[get_primary_key()], fila["direccion"]) for fila in filas]
+    except Exception as e:
+        print(f"❌ Error en get_options de {table_name}:", e)
+        return []
 
 
 def get_agencias_data():

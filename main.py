@@ -50,6 +50,10 @@ from controladores import controlador_articulo as controlador_articulo
 from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 from controladores import controlador_encomienda as controlador_encomienda
 from controladores import controlador_encomiendasss as  controlador_encomiendasss
+from controladores import reporte_listar_enco 
+from controladores import reporte_reclamo_causa
+from controladores import reporte_UsoUnidades
+from controladores import reporte_Viajes_por_Unidad
 # import BytesIO
 from itsdangerous import URLSafeSerializer
 from controladores.bd import sql_execute
@@ -406,35 +410,46 @@ CONTROLADORES = {
         }
     },
     "reclamo": {
-        "active": True,
-        "id": "reclamo",
-        "titulo": "Reclamos",
-        "nombre_tabla": "reclamo",
-        "controlador": controlador_reclamo,  # Asegúrate de importar esto arriba
-        "icon_page": "fa-solid fa-file",  # Puedes cambiar el ícono
-        "filters": [],
-        "fields_form": [
-            ['id', 'ID', 'ID', 'text', True, False, None],
-            ['nombres_razon', 'Cliente', 'Cliente', 'text', True, True, None],
-            ['direccion', 'Dirección', 'Dirección', 'text', True, True, None],
-            ['correo', 'Correo', 'Correo', 'email', True, True, None],
-            ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
-            ['titulo_incidencia', 'Incidencia', 'Incidencia', 'text', True, True, None],
-            ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
-            ['fecha_recojo', 'Fecha de recojo', 'Fecha', 'date', True, True, None],
-            ['estado_reclamoid', 'Estado', 'Estado', 'select', True, True, [lambda: controlador_estado_reclamo.get_options(), 'nombre']],
-            ['sucursal_id', 'Sucursal', 'Sucursal', 'select', True, True, [lambda: controlador_sucursal.get_options(), 'direccion']]
-        ],
-        "crud_forms": {
-            "crud_list": True,
-            "crud_search": True,
-            "crud_consult": True,
-            "crud_insert": True,
-            "crud_update": True,
-            "crud_delete": True,
-            "crud_unactive": False
-        }
-    },
+    "active": True,
+    "id": "reclamo",
+    "titulo": "Reclamos",
+    "nombre_tabla": "reclamo",
+    "controlador": controlador_reclamo,
+    "icon_page": "fa-solid fa-file",
+    "filters": [],
+    "fields_form": [
+        ['id', 'ID', 'ID', 'text', True, False, None],
+        ['nombres_razon', 'Cliente', 'Cliente', 'text', True, True, None],
+        ['direccion', 'Dirección', 'Dirección', 'text', True, True, None],
+        ['correo', 'Correo', 'Correo', 'email', True, True, None],
+        ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
+        ['n_documento', 'N° Documento', '', 'text', True, True, None],
+        ['titulo_incidencia', 'Incidencia', '', 'text', True, True, None],
+        ['bien_contratado', 'Bien Contratado', '', 'text', True, True, None],
+        ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
+        ['monto_indemnizado', 'Monto Indemnizado', '0.00', 'number', True, True, None],
+        ['relacion', 'Relación con el bien', '', 'text', True, True, None],
+        ['fecha_recojo', 'Fecha de recojo', '', 'date', True, True, None],
+        ['descripcion', 'Descripción', '', 'textarea', True, True, None],
+        ['pedido', 'Pedido', '', 'text', True, True, None],
+        ['sucursal_id', 'Sucursal', '', 'select', True, True, [lambda: controlador_sucursal.get_options(), 'direccion']],
+        ['causa_reclamoid', 'Causa del Reclamo', '', 'select', True, True, [lambda: controlador_causa_reclamo.get_options(), 'nombre']],
+        ['tipo_indemnizacionid', 'Tipo de Indemnización', '', 'select', True, True, [lambda: controlador_tipo_indemnizacion.get_options(), 'nombre']],
+        ['paquetetracking', 'Tracking', '', 'text', True, True, None],
+        ['ubigeocodigo', 'Ubigeo', '', 'text', True, True, None],
+        ['tipo_documentoid', 'Tipo Documento', '', 'select', True, True, [lambda: controlador_tipo_documento.get_options(), 'nombre']]
+    ],
+    "crud_forms": {
+        "crud_list": True,
+        "crud_search": True,
+        "crud_consult": True,
+        "crud_insert": True,
+        "crud_update": True,
+        "crud_delete": True,
+        "crud_unactive": False
+    }
+},
+
     "pregunta_frecuente": {
         "active": True,
         "titulo": "preguntas frecuentes",
@@ -1390,6 +1405,37 @@ REPORTES = {
         ] ,
         
     },
+    "reporte_uso_unidades": {
+    "active" : True,
+    'icon_page': 'fa-solid fa-chart-line',
+    "titulo": "Reporte de uso de unidades",
+    "table" : reporte_UsoUnidades.get_reporte_uso_unidades(),
+    "filters": []
+},
+"viajes_por_unidad": {
+    "active": True,
+    "icon_page": "fa-solid fa-truck-fast",
+    "titulo": "Viajes por unidad",
+    "table": reporte_Viajes_por_Unidad.get_reporte_viajes_por_unidad(),  # 👈 FUNCIÓN EJECUTADA
+    "filters": []
+},
+
+"encomiendas_por_ruta": {
+    "active": True,
+    "icon_page": "fa-solid fa-boxes-packing",
+    "titulo": "Listado de encomiendas asignadas a rutas específicas ",
+    "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo(),
+    "filters": []
+},
+
+"reporte_reclamos_tipo_causa_periodo": {
+    "active": True,
+    "icon_page": "fa-solid fa-clipboard-list",
+    "titulo": "Reporte de reclamos por tipo, causa y periodo",
+    "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),
+    "filters": []
+},
+
     
     
 }
