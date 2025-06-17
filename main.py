@@ -68,7 +68,7 @@ import configuraciones
 from functools import wraps
 import inspect
 
-import BytesIO
+from io import BytesIO
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import mm
