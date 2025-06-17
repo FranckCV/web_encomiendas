@@ -49,6 +49,7 @@ from controladores import controlador_metodo_pago_venta as controlador_metodo_pa
 from controladores import controlador_articulo as controlador_articulo
 from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 from controladores import controlador_encomienda as controlador_encomienda
+from controladores import controlador_encomiendasss as  controlador_encomiendasss
 # import BytesIO
 from itsdangerous import URLSafeSerializer
 from controladores.bd import sql_execute
@@ -83,6 +84,9 @@ import traceback
 from num2words import num2words
 import pdfkit
 import os
+
+from collections import defaultdict
+
 
 
 
@@ -1254,7 +1258,7 @@ CONTROLADORES = {
         "active" : True ,
         "titulo": "unidades",
         "nombre_tabla": "unidad",
-        "controlador": controlador_unidad,
+        "controlador": controlador_paquete,
         "icon_page": 'fa-solid fa-truck-fast',
         "filters": [
             ['modeloid', 'Modelo', lambda: controlador_modelo.get_options() ],
@@ -2435,23 +2439,110 @@ def tipos_envio():
     return render_template('tipos_envio.html', tipos_envios=tipos_envios)
 
 
+
 @app.route('/registro-envio')
 def registro_envio():
+    data_envio = session.get('data_envio')
+    
+    if data_envio:
+        return redirect(url_for('mostrar_resumen_envio'))
     nombre_doc = controlador_tipo_documento.get_options()
     nombre_rep = controlador_tipo_recepcion.get_options()
-    sucursales = controlador_sucursal.get_ubigeo()
+    rutas_tarifas = controlador_tarifa_ruta.get_sucursales_origen_destino()
     articulos = controlador_contenido_paquete.get_options()
     empaque = controlador_tipo_empaque.get_options()
+    condiciones = controlador_regla_cargo.get_condiciones_tarifa()
+    tarifas = controlador_tarifa_ruta.get_tarifas_ruta_dict()
+    return render_template('registro_envio.html', 
+                           nombre_doc=nombre_doc,
+                           nombre_rep=nombre_rep,
+                           rutasTarifas=json.dumps(rutas_tarifas), 
+                           tarifas = json.dumps(tarifas),
+                           empaque=empaque, 
+                           articulos=articulos,
+                           condiciones=condiciones)
+    
 
-    return render_template(
-        'registro_envio.html',
-        nombre_doc=nombre_doc,
-        nombre_rep=nombre_rep,
-        sucursales=json.dumps(sucursales),
-        articulos=articulos,
-        empaque=empaque
+@app.route('/guardar_datos_envio', methods=['POST'])
+def guardar_datos_envio():
+    data = request.json  # datos enviados desde JS por fetch
+
+    # Guardar datos en la sesión
+    user = controlador_encomiendasss.consultar_tarifa(data['id_origen'], data['id_destino'])
+    data['tarifa'] = user
+    subtotal = round(float(user) + float(data['valor_paquete']), 2)
+    igv = round(subtotal * 0.18, 2)
+    total = round(subtotal + igv, 2)
+    data['total'] = total
+
+    session['data_envio'] = data
+
+    print("Datos guardados en la sesión:", data)
+
+    return jsonify({"redirect_url": url_for('mostrar_resumen_envio')})
+
+app.secret_key = 'clave_secreta_segura'  # deberías usar una segura en producción
+
+
+@app.route('/resumen_envio')
+def mostrar_resumen_envio():
+    data_envio = session.get('data_envio')
+    
+    if not data_envio:
+        return redirect(url_for('registro_envio'))  # si no hay datos, redirige
+
+    return render_template('resumen_envio.html', data_envio=data_envio)
+
+@app.route('/eliminar_envio', methods=['POST'])
+def eliminar_envio():
+    try:
+        # Limpiar los datos de la sesión
+        session.pop('data_envio', None)
+        return redirect(url_for('registro_envio'))
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route('/pagar_encomienda')
+def pagar_encomienda():
+    data_envio = session.get('data_envio')
+
+    
+    
+    if not data_envio:
+        return redirect(url_for('registro_envio'))
+
+    # Calcular valores si es necesario
+    subtotal = float(data_envio.get('valor_paquete', 0)) + float(data_envio.get('tarifa', 0))
+    igv = round(subtotal * 0.18, 2)
+    total = round(subtotal + igv, 2)
+
+    return render_template('pago_encomienda.html',
+                           data_envio=data_envio,
+                           subtotal=subtotal,
+                           igv=igv,
+                           total=total)
+    
+
+
+@app.route('/confirmar_pagoenco', methods=['POST'])
+def confirmar_pagoenco():
+    try:
+        data_envio = session.get('data_envio')
+        metodo_pago = request.form.get('metodo-pago')
+        clave = 123
+        if not data_envio:
+            return jsonify({"success": False, "message": "No hay datos de envío"}), 400
+
+        controlador_encomiendasss.insertar_pago_2(data_envio, metodo_pago, clave)
+
+        session.pop('data_envio', None)
+
+        return redirect(url_for('registro_envio'))
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
         
-    )
+    
 
 
 @app.route('/seguimiento_encomienda')
@@ -2760,13 +2851,10 @@ def insertar_envio_api():
 #   ]
 # }
 
-
 def generar_qr_paquetes(trackings):
     for tracking in trackings:
-        
-        qr_data = str(tracking)  # o puedes usar: f"https://tusitio.com/seguimiento={tracking}"
+        qr_data = f"http://192.168.100.15:8000/insertar_estado?tracking={tracking}"
 
-        # 2) Generar QR
         img = qrcode.make(qr_data)
 
         # 3) Crear carpeta del paquete
@@ -2781,7 +2869,7 @@ def generar_qr_paquetes(trackings):
         ruta_qr = os.path.join(carpeta, 'qr.png')
         img.save(ruta_qr)
 
-        # 5) Actualizar el campo qr_url en la base de datos (opcional pero útil)
+        # 5) Guardar ruta relativa del QR en la base de datos
         qr_rel_path = f"comprobantes/{tracking}/qr.png"
         sql_execute(
             "UPDATE paquete SET qr_url = %s WHERE tracking = %s",
@@ -4117,9 +4205,12 @@ def seguimiento_tracking(tracking):
     estados_actuales = controlador_estado_encomienda.get_estados_insertados(tracking)
     comprobantes = controlador_estado_encomienda.get_comprobantes(tracking)
     datos = controlador_estado_encomienda.get_data_package(tracking)
-    
     estados_usados = [e['estado_encomiendaid'] for e in estados_actuales]
-
+    detalles_estado = controlador_estado_encomienda.get_detalles_estado_by_tracking(tracking)
+    
+    detalles_por_estado = defaultdict(list)
+    for det in detalles_estado:
+        detalles_por_estado[det['estado_encomiendaid']].append(det)
     
     return render_template('seguimiento.html',
                            estados=estados,
@@ -4127,18 +4218,48 @@ def seguimiento_tracking(tracking):
                            comprobantes=comprobantes,
                            datos=datos,
                            tracking=tracking,
-                           estados_usados=estados_usados
+                           estados_usados=estados_usados,
+                           detalles_por_estado=detalles_por_estado
                            )
     
-   
+
+@app.route("/insertar_estado")
+def interfaz_insertar_estado():
+    tracking = request.args.get("tracking")
+
+    if not tracking:
+        return "Tracking no proporcionado", 400
+
+    detalles_estado = controlador_estado_encomienda.get_estados_restantes(tracking)
+
+    return render_template("simulacion_escaneo_qr.html",
+                           tracking=tracking,
+                           detalles_estado=detalles_estado)
 
 
-    
+@app.route('/api_insertar_estado', methods=['POST'])
+def insertar_detalle_estado():
+    try:
+        data = request.get_json()
+        tracking = data['tracking']
+        detalle_estado = data['detalle_estado']
+        tipo_comprobanteid = data.get('tipo_comprobanteid')  # opcional
+
+        exito = controlador_estado_encomienda.insertar_seguimiento(tracking, detalle_estado, tipo_comprobanteid)
+
+        if exito:
+            return jsonify({"status": 1, "mensaje": "Estado insertado correctamente"})
+        else:
+            return jsonify({"status": 0, "mensaje": "Error al insertar estado"}), 500
+
+    except Exception as e:
+        return jsonify({"status": -1, "mensaje": f"Excepción: {str(e)}"}), 500
+
 
 if __name__ == "__main__":
     # app.run(host='192.168.48.178', port=8000, debug=True, use_reloader=True)
     # Thread(target=enviar_posiciones).start()
-    socketio.run(app, host='0.0.0.0', port=8000, debug=True)
+    socketio.run(app, host='0.0.0.0', port=8001, debug=True)
 
 
 
