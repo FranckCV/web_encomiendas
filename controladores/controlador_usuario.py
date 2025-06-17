@@ -295,3 +295,4 @@ def get_info_usuario_por_correo(correo):
 def actualizar_contrasenia(usuario_id, nueva_contrasenia_hash):
     sql = "UPDATE usuario SET contrasenia = %s WHERE id = %s"
     sql_execute(sql, (nueva_contrasenia_hash, usuario_id))
+
