@@ -23,6 +23,7 @@ def get_primary_key():
 def exists_Activo():
     return exists_column_Activo(table_name)
 
+
 def delete_row( id ):
     sql = f'''
         delete from {table_name}
@@ -52,29 +53,29 @@ def get_table():
             CASE 
                 WHEN te.masivo = 1 THEN 'Masivo'
                 ELSE 'Individual'
-            END AS tipo_envio,
+            END AS masivo,
 
             te.monto_total,
-
-            CONCAT(
-                u.departamento, '/', u.provincia, '/', u.distrito, ' - ', s.direccion
-            ) AS sucursal_origen,
 
             CASE 
                 WHEN te.recojo_casa = 1 THEN 'Sí'
                 ELSE 'No'
             END AS recojo_casa,
 
+            CONCAT(
+                u.departamento, '/', u.provincia, '/', u.distrito, ' - ', s.direccion
+            ) AS nom_sucursal_origen,
+
             te.fecha,
             te.hora,
 
             te.direccion_recojo,
 
-            tc.nombre AS tipo_comprobante,
+            tc.nombre AS nom_tip_comprobante,
 
             CONCAT(
                 COALESCE(c.nombre_siglas, ''), ' ', COALESCE(c.apellidos_razon, '')
-            ) AS cliente
+            ) AS nombre_cliente 
 
         FROM transaccion_encomienda te
         INNER JOIN cliente c ON c.id = te.clienteid
@@ -85,15 +86,15 @@ def get_table():
     '''
 
     columnas = {
-        'num_serie': ['N° Serie', 1],
-        'tipo_envio': ['Tipo de Envío', 1.2],
+        'num_serie': ['N° Serie', 2],
+        'masivo': ['Tipo de Envío', 1.2], 
         'monto_total': ['Monto Total S/.', 1],
-        'sucursal_origen': ['Sucursal Origen', 2],
+        'nom_sucursal_origen': ['Sucursal Origen', 4],
         'recojo_casa': ['¿Recojo en casa?', 1],
         'fecha': ['Fecha', 1],
         'hora': ['Hora', 1],
-        'tipo_comprobante': ['Comprobante', 1.5],
-        'cliente': ['Cliente', 2],
+        'nom_tip_comprobante': ['Comprobante', 1.5],
+        'nombre_cliente': ['Cliente', 2],
     }
 
     filas = sql_select_fetchall(sql)

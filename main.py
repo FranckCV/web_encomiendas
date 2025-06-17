@@ -1604,8 +1604,7 @@ TRANSACCIONES = {
             ['masivo',            'Tipo de Envío',      '1: Masivo / 0: Individual','number', True,  True,   None],
             ['monto_total',       'Monto Total',        'Total a pagar',           'number', True,  True,   None],
             ['recojo_casa',       'Recojo a Domicilio', '1: Sí / 0: No',           'number', True,  True,   None],
-            ['sucursal_origen','Sucursal Origen',    'ID de Sucursal',          'number', True,  True,   None],
-            ['estado_pago',       'Estado de Pago',     'P: Pendiente / C: Cancelado','text', True,  True,   None],
+            ['nom_sucursal_origen','Sucursal Origen',    'ID de Sucursal',          'number', True,  True,   None],
             ['nom_tip_comprobante','Tipo Comprobante',   'Tipo Comprobante',     'number', True,  True,   None],
             ['nombre_cliente',         'Cliente',            'Nombre del cliente',          'text', True,  True,   None]
         ],
@@ -1613,18 +1612,60 @@ TRANSACCIONES = {
             "crud_list": True,
             "crud_search": False,
             "crud_consult": True,
-            "crud_insert": False,
+            "crud_insert": True,
             "crud_update": True,
             "crud_delete": True,
             "crud_unactive": False
         },
         "buttons": [
-            #
-            # ['num_serie',         'N° Serie',           'Número de Serie',         'text',   True,  True,   None],
+            [True, 'fa-solid fa-boxes', "#77D62E", 'transaccion', {"tabla": "::paquete", "pk_foreign": "num_serie"}],
         ],
         "options": [
- 
-            # ['num_serie',         'N° Serie',           'Número de Serie',         'text',   True,  True,   None],
+        ],
+    },
+    "paquete": {
+        "active": True,
+        "titulo": "Paquetes",
+        "nombre_tabla": "paquete",
+        "controlador": controlador_paquete,
+        "icon_page": "fa-solid fa-boxes",
+        "filters": [],
+        "fields_form": [
+        #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
+            ['tracking',                       'Tracking',             'Tracking',             'text',   False,  True,   None],
+            ['valor',                          'Valor',                'Valor',                'text',   False,  True,   None],
+            ['peso',                           'Peso',                 'Peso',                 'text',   False,  True,   None],
+            ['estado_pago',                    'Pago',                 'Pago',                 'text',   False,  True,   None],
+            ['nombres_contacto_destinatario',  'Nombre destinatario',  'Nombre destinatario',  'text',   False,  True,   None],
+            ['apellidos_razon_destinatario',   'Apellido/Razón',       'Apellido/Razón',       'text',   False,  True,   None],
+            ['num_documento_destinatario',     'Doc. Identidad',       'Doc. Identidadaa',     'text',   False,  True,   None],
+            ['tipo_documento',                 'Tipo Documento',       'Tipo Documento',       'text',   False,  True,   None],
+            ['tipo_empaque',                   'Empaque',              'Empaque',              'text',   False,  True,   None],
+            ['contenido_paquete',              'Contenido',            'Contenido',            'text',   False,  True,   None],
+            ['tipo_recepcion',                 'Recepción',            'Recepción',            'text',   False,  True,   None],
+            ['modalidad_pago',                 'Pago modalidad',       'Pago modalidad',       'text',   False,  True,   None],
+            ['direccion_destino',              'Dirección destino',    'Dirección destino',    'text',   False,  True,   None],
+            ['localidad',                      'Ubigeo destino',       'Ubigeo destino',       'text',   False,  True,   None],
+            ['num_serie',                      'N° Serie',             'N° Serie',             'text',   False,  True,   None],
+            ['fecha',                          'Fecha envío',          'Fecha envío',          'text',   False,  True,   None],
+            ['hora',                           'Hora envío',           'Hora envío',           'text',   False,  True,   None],
+            ['monto_total',                    'Total S/.',            'Total S/.',            'text',   False,  True,   None],
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": False,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": False
+        },
+        "buttons": [
+            [True, 'fa-solid fa-boxes', "#9856EE", 'seguimiento_tracking', {"tracking": "tracking"}],
+        ],
+        "options": [
+            [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Encomiendas', 'transaccion' , {"tabla": "::transaccion_encomienda" }],
+
         ],
     }
 
@@ -3841,9 +3882,10 @@ def crud_generico(tabla):
             )
 
 
-@app.route("/transaccion=<tabla>")
-# @validar_empleado()
-def transaccion(tabla):
+@app.route("/transaccion=<tabla>",defaults={'pk_foreign': None})
+@app.route("/transaccion=<tabla>/<pk_foreign>")
+@validar_empleado()
+def transaccion(tabla , pk_foreign):
     config = TRANSACCIONES.get(tabla)
     page = permiso.get_pagina_key(tabla)
     user_info = getDatosUsuario()
@@ -3866,7 +3908,10 @@ def transaccion(tabla):
             options = config['options']
 
             existe_activo = controlador.exists_Activo()
-            columnas , filas = controlador.get_table()
+            if pk_foreign is not None:
+                columnas , filas = controlador.get_table_pk_foreign(pk_foreign = pk_foreign)
+            else:
+                columnas , filas = controlador.get_table()
             primary_key = controlador.get_primary_key()
             table_columns  = list(filas[0].keys()) if filas else []
             
@@ -3902,6 +3947,7 @@ def transaccion(tabla):
                 esTransaccion = True ,
                 buttons = buttons ,
                 options = options ,
+                pk_foreign = pk_foreign if pk_foreign else None
             )
 
     

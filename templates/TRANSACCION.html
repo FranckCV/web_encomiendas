@@ -111,14 +111,36 @@
     {% endif %}
 
     {% for opt in options %}
-    <div class="col-2">
-      <a href="{{ url_for(opt[4]) }}" class="button" style="background-color: {{opt[2]}};">
-        <i class="{{opt[1]}}"></i>
-        <p>{{opt[3]}}</p>
-      </a>
-    </div>
+      <div class="col-2">
+        {% set mostrar_url = opt[0] %}
+        {% set icono = opt[1] %}
+        {% set color = opt[2] %}
+        {% set texto = opt[3] %}
+        {% set funcion = opt[4] %}
+        {% set parametros = {} %}
 
+        {% if mostrar_url and opt|length > 5 %}
+          {% set raw_params = opt[5] %}
+          {% for key, val in raw_params.items() %}
+            {% if val is string and val.startswith('::') %}
+              {% set _ = parametros.update({key: val[2:]}) %}
+            {% else %}
+              {% set _ = parametros.update({key: fila[val]}) %}
+            {% endif %}
+          {% endfor %}
+          <a href="{{ url_for(funcion, **parametros) }}" class="button" style="background-color: {{color}};">
+        {% else %}
+          <a href="{{ url_for(funcion) }}" class="button" style="background-color: {{color}};">
+        {% endif %}
+            <i class="{{ icono }}"></i>
+            <p>{{ texto }}</p>
+          </a>
+      </div>
     {% endfor %}
+
+
+
+
 
   </div>
 </div>
@@ -180,30 +202,34 @@
             <div class="acciones">
 
               {% for btn in buttons %}
-                <div class="opciones_fila">
-                  {% set mostrar_url = btn[0] %}
-                  {% set icono = btn[1] %}
-                  {% set color = btn[2] %}
-                  {% set funcion = btn[3] %}
-                  {% set parametros = {} %}
+              <div class="opciones_fila">
+                {% set mostrar_url = btn[0] %}
+                {% set icono = btn[1] %}
+                {% set color = btn[2] %}
+                {% set funcion = btn[3] %}
+                {% set parametros = {} %}
 
-                  {% if mostrar_url and btn|length > 4 %}
-                    {% set raw_params = btn[4] %}
-                    {% for key, val in raw_params.items() %}
+                {% if mostrar_url and btn|length > 4 %}
+                  {% set raw_params = btn[4] %}
+                  {% for key, val in raw_params.items() %}
+                    {% if val is string and val.startswith('::') %}
+                      {% set _ = parametros.update({key: val[2:]}) %}
+                    {% else %}
                       {% set _ = parametros.update({key: fila[val]}) %}
-                    {% endfor %}
-                    <a href="{{ url_for(funcion, **parametros) }}">
-                  {% elif funcion is none or funcion == '' %}
-                    <a href="#">
-                  {% else %}
-                    <a href="{{ url_for(funcion) }}">
-                  {% endif %}
-                      <button class="{{btn[5]}}" style="background-color: {{ color }};">
-                        <i class="{{ icono }}"></i>
-                      </button>
-                    </a>
-                </div>
-              {% endfor %}
+                    {% endif %}
+                  {% endfor %}
+                  <a href="{{ url_for(funcion, **parametros) }}">
+                {% elif funcion is none or funcion == '' %}
+                  <a href="#">
+                {% else %}
+                  <a href="{{ url_for(funcion) }}">
+                {% endif %}
+                    <button class="{{ btn[5] if btn|length > 5 else '' }}" style="background-color: {{ color }};">
+                      <i class="{{ icono }}"></i>
+                    </button>
+                  </a>
+              </div>
+            {% endfor %}
 
 
               {% if crud_consult %}                
