@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 const LISTA_ENVIOS = [];
 
-=======
->>>>>>> mainlocal
 const { rutasTarifas } = window.CONFIG_ENVIO || {};
 
 const STORAGE_KEY = "envios_masivos";
