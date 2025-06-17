@@ -1593,7 +1593,7 @@ TRANSACCIONES = {
     "transaccion_encomienda": {
         "active": True,
         "titulo": "Encomiendas",
-        "nombre_tabla": "transaccion_encomienda",
+        "nombre_tabla": "encomienda",
         "controlador": controlador_encomienda,
         "icon_page": "fa-solid fa-boxes-packing",
         "filters": [],
@@ -1618,11 +1618,11 @@ TRANSACCIONES = {
         },
         "buttons": [
             #
-            ['num_serie',         'N° Serie',           'Número de Serie',         'text',   True,  True,   None],
+            # ['num_serie',         'N° Serie',           'Número de Serie',         'text',   True,  True,   None],
         ],
         "options": [
-
-            ['num_serie',         'N° Serie',           'Número de Serie',         'text',   True,  True,   None],
+ 
+            # ['num_serie',         'N° Serie',           'Número de Serie',         'text',   True,  True,   None],
         ],
     }
 
