@@ -1574,14 +1574,23 @@ TRANSACCIONES = {
         "crud_forms": {
             "crud_list": True ,
             "crud_search": False ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
+            "crud_consult": False ,
+            "crud_insert": False ,
+            "crud_update": False ,
+            "crud_delete": True , 
             "crud_unactive": False ,
-        }
+        },
+        "buttons": [
+            # parametros - icon - color - enlace_function
+            [False,   f'{ICON_CONSULT}',   '#3165fd',  'salida_informacion'],
+            [False,   f'{ICON_UPDATE}',   '#ccac1c',  'salida_informacion'],
+        ],
+        "options": [
+            # icon - color - text - enlace_function
+            [False,   f'{ICON_INSERT}',   'green',  'Programar', 'salida_informacion'],
+        ],
     },
-    "t_encomienda": {
+    "transaccion_encomienda": {
         "active": True,
         "titulo": "Encomiendas",
         "nombre_tabla": "transaccion_encomienda",
@@ -1607,9 +1616,14 @@ TRANSACCIONES = {
             "crud_delete": True,
             "crud_unactive": False
         },
-        "buttons": {
-            
-        }
+        "buttons": [
+            #
+            ['num_serie',         'N° Serie',           'Número de Serie',         'text',   True,  True,   None],
+        ],
+        "options": [
+
+            ['num_serie',         'N° Serie',           'Número de Serie',         'text',   True,  True,   None],
+        ],
     }
 
 }
@@ -3828,7 +3842,7 @@ def crud_generico(tabla):
 
 
 @app.route("/transaccion=<tabla>")
-@validar_empleado()
+# @validar_empleado()
 def transaccion(tabla):
     config = TRANSACCIONES.get(tabla)
     page = permiso.get_pagina_key(tabla)
@@ -3848,6 +3862,8 @@ def transaccion(tabla):
             filters = config["filters"]
             fields_form = config["fields_form"]
             controlador = config["controlador"]
+            buttons = config['buttons']
+            options = config['options']
 
             existe_activo = controlador.exists_Activo()
             columnas , filas = controlador.get_table()
@@ -3884,6 +3900,8 @@ def transaccion(tabla):
                 crud_delete    = crud_delete,
                 crud_unactive  = crud_unactive,
                 esTransaccion = True ,
+                buttons = buttons ,
+                options = options ,
             )
 
     

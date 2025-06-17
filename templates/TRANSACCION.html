@@ -102,21 +102,23 @@
     <!-- <div class="col-2">
     </div> -->
     {% if crud_insert %}
-<div class="col-2">
-  {% if esTransaccion %}
-    <a href="{{ url_for('salida_informacion') }}" class="button btn_crud btn_insert">
-      <i class="{{ICON_INSERT}}"></i>
-      <p>{{NOMBRE_BTN_INSERT}}</p>
-    </a>
-  {% else %}
-    <button class="button clickable-modal btn_crud btn_insert" id="modal_crud_insert_{{tabla}}_">
-      <i class="{{ICON_INSERT}}"></i>
-      <p>{{NOMBRE_BTN_INSERT}}</p>
-    </button>
-  {% endif %}
-</div>
-{% endif %}
+    <div class="col-2">      
+      <button class="button clickable-modal btn_crud btn_insert" id="modal_crud_insert_{{tabla}}_">
+        <i class="{{ICON_INSERT}}"></i>
+        <p>{{NOMBRE_BTN_INSERT}}</p>
+      </button>
+    </div>
+    {% endif %}
 
+    {% for opt in options %}
+    <div class="col-2">
+      <a href="{{ url_for(opt[4]) }}" class="button" style="background-color: {{opt[2]}};">
+        <i class="{{opt[1]}}"></i>
+        <p>{{opt[3]}}</p>
+      </a>
+    </div>
+
+    {% endfor %}
 
   </div>
 </div>
@@ -177,24 +179,32 @@
           <td class="opciones_column">
             <div class="acciones">
 
-              {% if crud_consult %}
-                {% if esTransaccion %}
+              {% for btn in buttons %}
               <div class="opciones_fila">
-                <a href="{{ url_for('salida_informacion') }}" >
-                  <button class="btn_consult">
-                    <i class="{{ICON_CONSULT}}"></i>
+                <a href="{{ url_for(btn[3]) }}" >
+                  <button class="" style="background-color: {{btn[2]}};">
+                    <i class="{{btn[1]}}"></i>
                   </button>
                 </a>
               </div>
-                {% else %}
+              {% endfor %}
+
+              {% if fila['placa'] %}
+                <div class="opciones_fila">                
+                  <button class="btn btn-secondary btn-small btn-ver-mapa" style="padding: inherit;" title="Ver Mapa">
+                    <i class="fa-solid fa-location-dot"></i>
+                  </button>
+                </div>
+              {% endif %}
+
+
+              {% if crud_consult %}                
               <div class="opciones_fila">
                 <button class="clickable-modal btn_consult" id="modal_crud_consult_{{tabla}}_{{fila[primary_key]}}">
                   <i class="{{ICON_CONSULT}}"></i>
                 </button>
               </div>
-                {% endif %}
               {% endif %}
-
 
               {% if crud_unactive %}
               {% if fila['activo'] == 1 %}
@@ -213,19 +223,11 @@
               {% endif %}
 
               {% if crud_update %}
-                {% if esTransaccion %}
               <div class="opciones_fila">
-                <a href="{{ url_for('salida_informacion') }}" >
-                  <button class="btn_update">
-                    <i class="{{ICON_UPDATE}}"></i>
-                  </button>
-                </a>
+                <button class="clickable-modal btn_update" id="modal_crud_update_{{tabla}}_{{fila[primary_key]}}">
+                  <i class="{{ICON_UPDATE}}"></i>
+                </button>
               </div>
-                {% else %}
-                  <button class="clickable-modal btn_update" id="modal_crud_update_{{tabla}}_{{fila[primary_key]}}">
-                    <i class="{{ICON_UPDATE}}"></i>
-                  </button>
-                {% endif %}
               {% endif %}
 
               {% if crud_delete %}
@@ -235,26 +237,6 @@
                 </button>
               </div>
               {% endif %}
-
-
-            {% if esTransaccion %}
-            {% if fila['placa'] %}
-              <div class="opciones_fila">
-                <!-- <a href="{{ url_for('seguimiento_empleado_prueba', placa=fila['placa'] ) }}">
-                  <button  class="btn btn-secondary btn-small" style="padding: inherit;">
-                  <i class="fa-solid fa-location-dot"></i>
-                  </button>
-                </a> -->
-                
-                <button class="btn btn-secondary btn-small btn-ver-mapa" style="padding: inherit;" title="Ver Mapa">
-                  <i class="fa-solid fa-location-dot"></i>
-                </button>
-
-
-              </div>
-            {% endif %}
-            {% endif %}
-
 
             </div>
           </td>

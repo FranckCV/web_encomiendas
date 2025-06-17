@@ -86,7 +86,7 @@ def get_table():
         INNER JOIN cliente c ON c.id = te.clienteid
         INNER JOIN tipo_comprobante tc ON tc.id = te.tipo_comprobanteid
         INNER JOIN sucursal s ON s.id = te.id_sucursal_origen
-        INNER JOIN ubigeo u ON u.codigo = s.ubigeocodigo;
+        INNER JOIN ubigeo u ON u.codigo = s.ubigeocodigo
     '''
 
     columnas = {
