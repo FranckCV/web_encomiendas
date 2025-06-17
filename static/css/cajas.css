@@ -290,6 +290,7 @@
             font-size: 1.2rem;
             font-weight: bold;
             cursor: text;
+            color: white;
             transition: all 0.3s ease;
             -moz-appearance: textfield;
         }

@@ -5,15 +5,24 @@
 {% endblock %}
 
 {% set TITULO_FORM = 'Cambiar contraseña' %}
-{% set URL_POST = '' %}
+{% set URL_POST = 'procesar_cambio_contrasenia' %}
 {% set URL_BG = 'bg1.jpg' %}
+<!-- {% set is_cliente = not request.cookies.get('user_id') %} -->
+{% set correo_recuperado = token | default('') %}
 
 {% block contenido_form %}
 
+{% if is_recuperando %}
+<div class="input_box">
+    <input type="email" name="correo" id="correo" placeholder="Correo electrónico" value="{{ token }}" readonly required>
+    <i class="fa-solid fa-envelope"></i>
+</div>
+{% else %}
 <div class="input_box">
     <input type="password" name="contrasena_actual" id="contrasena_actual" placeholder="Contraseña actual" required>
     <i class="fa-solid fa-lock"></i>
 </div>
+{% endif %}
 
 <div class="input_box">
     <input type="password" name="nueva_contrasena" id="nueva_contrasena" placeholder="Nueva contraseña" required>
@@ -39,29 +48,35 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const formCambio = document.getElementById('form_cambio');
+document.addEventListener('DOMContentLoaded', function () {
+    const formCambio = document.getElementById('form_cambio');
 
-        formCambio.addEventListener('submit', function (event) {
-            event.preventDefault();
+    formCambio.addEventListener('submit', async function (event) {
+        event.preventDefault();
 
-            const actual = document.getElementById('contrasena_actual').value;
-            const nueva = document.getElementById('nueva_contrasena').value;
-            const confirmar = document.getElementById('confirmar_contrasena').value;
+        const actual = document.getElementById('contrasena_actual').value;
+        const nueva = document.getElementById('nueva_contrasena').value;
+        const confirmar = document.getElementById('confirmar_contrasena').value;
 
-            if (nueva !== confirmar) {
-                alert('La nueva contraseña no coincide con la confirmación');
-                return;
-            }
+        if (nueva !== confirmar) {
+            alert('La nueva contraseña no coincide con la confirmación');
+            return;
+        }
 
-            // Aquí puedes hacer la solicitud con fetch al backend
-            // incluyendo la contraseña actual y la nueva
+        const formData = new FormData(formCambio);
 
-            alert('Contraseña actualizada correctamente');
-
-            // Redirigir si lo deseas
-            // window.location.href = "{{ url_for('login') }}";
+        const res = await fetch("{{ url_for('procesar_cambio_contrasenia') }}", {
+            method: "POST",
+            body: formData
         });
+
+        if (res.redirected) {
+            window.location.href = res.url;
+        } else {
+            const data = await res.json();
+            alert(data.message || "Error desconocido");
+        }
     });
+});
 </script>
 {% endblock %}

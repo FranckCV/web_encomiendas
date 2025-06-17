@@ -148,4 +148,20 @@ def get_porcentaje_recojo():
     
     return info
 
+def get_nombre():
+    sql = """
+        SELECT 
+            emp.nombre
+        FROM empresa emp
+        WHERE id = 1
+    """
+    fila = sql_select_fetchone(sql)
+    return fila['nombre']
 
+def getDataComprobante():
+    sql='''
+        select e.nombre,e.ruc,e.nro_telefono,e.correo,e.igv,s.direccion from empresa e 
+        inner join sucursal s on s.id = e.id_sucursal
+            '''
+    fila = sql_select_fetchone(sql)
+    return fila

@@ -23,8 +23,9 @@ Bienvenido a {{SYSTEM_NAME}}
 
         <div class="tracking-container">
             <h2 class="tracking-title">Rastrea tu encomienda</h2>
-            <form class="tracking-form">
-                <input type="text" class="tracking-input" placeholder="Ingresa tu número de tracking">
+            <form class="tracking-form"  action="{{ url_for('buscar_paquete') }}" method="post">
+                <input type="text" class="tracking-input" placeholder="Ingresa tu número de tracking" name="tracking">
+                <input type="text" class="tracking-input" placeholder="Ingresa el año de registro" name="anio">
                 <button type="submit" class="tracking-btn">
                     <i class="fas fa-paper-plane"></i>
                 </button>

@@ -49,14 +49,17 @@ from controladores import controlador_metodo_pago_venta as controlador_metodo_pa
 from controladores import controlador_articulo as controlador_articulo
 from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 from controladores import controlador_encomienda as controlador_encomienda
+# import BytesIO
+from itsdangerous import URLSafeSerializer
 from controladores.bd import sql_execute
-
 import uuid, os, qrcode
 from decimal import Decimal, ROUND_HALF_UP
 
 from datetime import datetime
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import mm
 import hashlib
-import os
 from werkzeug.utils import secure_filename
 from werkzeug.routing import MapAdapter
 # import re
@@ -69,9 +72,18 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import mm
 
+from flask_mail import Mail, Message
+from correo import enviar_correo
+from datetime import timedelta
 from flask_socketio import SocketIO, emit
 from time import sleep
 from threading import Thread
+import traceback
+
+from num2words import num2words
+import pdfkit
+import os
+
 
 
 app = Flask(__name__, template_folder='templates')
@@ -79,6 +91,16 @@ app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 app.secret_key = 'es-un-secreto'
+
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'fabianapm060126@gmail.com'
+app.config['MAIL_PASSWORD'] = 'vagfqxdumpuboswj'
+    
+
+mail = Mail(app)
+
 
 IGV_RATE = Decimal('0.18')
 
@@ -1228,6 +1250,38 @@ CONTROLADORES = {
         }
     },
     
+    "paquete": {
+        "active" : True ,
+        "titulo": "unidades",
+        "nombre_tabla": "unidad",
+        "controlador": controlador_unidad,
+        "icon_page": 'fa-solid fa-truck-fast',
+        "filters": [
+            ['modeloid', 'Modelo', lambda: controlador_modelo.get_options() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
+            ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
+            ['modeloid',      'Nombre de Modelo', 'Elegir modelo', 'select',    True ,     True,          [lambda: controlador_modelo.get_options() , 'nom_modelo' ] ],
+            ['estado',        'Estado',           'Elegir estado', 'select',    True ,    True,           [lambda: controlador_unidad.get_options_estado() , 'estado' ]  ],
+            ['placa',         'Placa',            'Placa',         'text',      True ,     True,          True ],
+            ['mtc',           'MTC',              'MTC',           'text',      True ,     True,          True ],
+            ['tuc',           'TUC',              'TUC',           'text',      True ,     True,          True ],
+            ['capacidad',     'Capacidad',        'Capacidad',     'number',    True ,     True,          True ],
+            ['volumen',       'Volumen',          'Volumen',       'number',    True ,     True,          None ],
+            ['descripcion', 'Descripción',    'Descripción', 'textarea',  False,     True,          None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    
 }
 
 
@@ -1520,46 +1574,39 @@ TRANSACCIONES = {
             "crud_unactive": False ,
         }
     },
-    "transaccion_encomienda": {
-        "active" : True ,
-        "titulo": "encomiendas",
-        "nombre_tabla": "transaccion_encomienda",
-        "controlador": controlador_encomienda,
-        "icon_page": 'fa-solid fa-boxes-packing',
-        "filters": [
-        ] ,
-       "fields_form" : [
-            ['id',          'ID',            'ID',             'text',   True,   False,   None],
-            ['nom_conductor','Conductor',    'Nombre del conductor', 'text', True, False,   None],
-            ['placa',       'Placa de unidad','Placa de unidad', 'text',   True,   True,    None],
-            ['destino',     'Destino',       'Destino',         'text',   True,   True,    None],
-            ['fecha',       'Fecha',         'YYYY-MM-DD',      'date',   True,   True,    None],
-            ['hora',        'Hora',          'HH:MM',           'time',   True,   True,    None],
-            ['capacidad',   'Capacidad',     'Capacidad en kg', 'number', True,  False,   None],
-            ['estado',      'Estado',        'Estado actual',   'text',   True,   False,   None],
-       ],
+   "t_encomienda": {
+    "active": True,
+    "titulo": "Encomiendas",
+    "nombre_tabla": "transaccion_encomienda",
+    "controlador": controlador_encomienda,
+    "icon_page": "fa-solid fa-boxes-packing",
+    "filters": [],
+    
+    "fields_form": [
+        ['num_serie',         'N° Serie',           'Número de Serie',         'text',   True,  True,   None],
+        ['masivo',            'Tipo de Envío',      '1: Masivo / 0: Individual','number', True,  True,   None],
+        ['monto_total',       'Monto Total',        'Total a pagar',           'number', True,  True,   None],
+        ['recojo_casa',       'Recojo a Domicilio', '1: Sí / 0: No',           'number', True,  True,   None],
+        ['sucursal_origen','Sucursal Origen',    'ID de Sucursal',          'number', True,  True,   None],
+        ['estado_pago',       'Estado de Pago',     'P: Pendiente / C: Cancelado','text', True,  True,   None],
+        ['nom_tip_comprobante','Tipo Comprobante',   'Tipo Comprobante',     'number', True,  True,   None],
+        ['nombre_cliente',         'Cliente',            'Nombre del cliente',          'text', True,  True,   None]
+    ],
+    
+    "crud_forms": {
+        "crud_list": True,
+        "crud_search": False,
+        "crud_consult": True,
+        "crud_insert": False,
+        "crud_update": True,
+        "crud_delete": True,
+        "crud_unactive": False
+    }
+}
 
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": False ,
-            "crud_consult": True ,
-            "crud_insert": False ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": False ,
-        }
-    },
 }
 
 
-@app.route('/api/prueba')
-def prueba_cliente():
-    correo = 'fabianapm060126@gmail.com'
-    telefono = '906300986'
-    num_doc = '72426677'
-    nombre = 'Fabiana Mejía'
-    tipo_doc = 1
-    
 
 
 ###########_ REDIRECT _#############
@@ -1808,7 +1855,6 @@ PAGINAS_SIMPLES = [
     "index" , 
     'pagina_test_rastreo' ,
     'tracking',
-    'seguimiento',
     'recuperar_contrasenia',
     'libro_reclamaciones',
     'mis_envios',
@@ -1821,7 +1867,7 @@ PAGINAS_SIMPLES = [
     'sobre_nosotros',
     'TerminosCondiciones',
     'mapa_curds',
-    'cambiar_contrasenia',
+    # 'cambiar_contrasenia',
     'maestra_para_vb',
     # 'Faq'
 ]
@@ -2357,6 +2403,7 @@ def seguimiento_encomienda():
 def resumen_envio():
     data = request.get_json(force=True)
     envios = data.get('registros')
+    print(envios)
     if not envios:
         abort(400, "No vinieron registros")
 
@@ -2383,6 +2430,7 @@ def resumen_envio():
         envio_con_tarifa = envio.copy()
         envio_con_tarifa['tarifa'] = total.quantize(Decimal('0.01'))
         resultados.append(envio_con_tarifa)
+        print(resultados)
     session['resumen_envios'] = resultados
 
     return redirect(url_for('resumen'))
@@ -2420,7 +2468,8 @@ def pago_envio():
     tipo_comprobante = controlador_tipo_comprobante.get_options_nombre()
     metodo_pago      = controlador_metodo_pago.get_options()
 
-    modalidad_envio = registros[0].get('modalidadPago', '')
+    modalidadPago = registros[0].get('modalidadPago', '')
+    print(modalidadPago)
 
     return render_template('pago_envio.html',
                            registros=registros,
@@ -2428,20 +2477,321 @@ def pago_envio():
                            subtotal=subtotal,
                            igv=igv,
                            total=total,
-                           modalidad_envio=modalidad_envio,
+                           modalidadPago=modalidadPago,
                            tipo_comprobante=tipo_comprobante,
                            metodo_pago=metodo_pago)
 
 
-# @app.route('/scan/<token>', methods=['GET'])
-# def actualizar_estado(token):
-#     envio = controlador_paquete.buscar_por_token(token)
-#     if not envio:
-#         abort(404, "QR inválido")
-#     controlador_paquete.cambiar_estado(envio.id, nuevo_estado="en_transito")
-#     return render_template('confirmacion_estado.html', envio=envio)
 
-#########
+@app.route('/insertar_envio', methods=['POST'])
+def insertar_envio():
+    try:
+        nombre_empresa = controlador_empresa.get_nombre()
+        data = request.get_json()
+        if not data:
+            return jsonify({'status':'error','message':'No se recibió un JSON válido'}), 400
+
+        tipo_comprobante = data.get('tipo_comprobante')
+        registros = session.get('resumen_envios')
+        if not registros:
+            return jsonify({'status':'error','message':'No hay envíos en sesión'}), 400
+
+        remitente = registros[0].get('remitente', {})
+        nombre = remitente.get('nombre_remitente','')
+        partes = nombre.split() if nombre else []
+        cliente_data = {
+            'correo':        remitente.get('correo_remitente',''),
+            'telefono':      remitente.get('num_tel_remitente',''),
+            'num_documento': remitente.get('num_doc_remitente',''),
+            'nombre_siglas': partes[0] if partes else '',
+            'apellidos_razon': ' '.join(partes[1:]) if len(partes)>1 else '',
+            'tipo_documentoid': int(remitente.get('tipo_doc_remitente',1)),
+            'tipo_clienteid':   2 if remitente.get('tipo_doc_remitente')==2 else 1
+        }
+
+        # 1) Creamos transacción y paquetes
+        num_serie = controlador_encomienda.crear_transaccion_y_paquetes(
+            registros, cliente_data, tipo_comprobante
+        )
+
+        # 2) Generamos QR para cada paquete (no bloqueante)
+        if num_serie:
+            try:
+                generar_qr_paquetes(registros, num_serie)
+            except Exception as qr_err:
+                current_app.logger.warning(f"Error generando QR: {qr_err}")
+
+            # 3) Preparamos y enviamos el correo al remitente
+            destinatario_email = cliente_data['correo']
+            msg = Message(
+                subject=f"{nombre_empresa} Envío registrado: {num_serie}",
+                sender=app.config['MAIL_USERNAME'],
+                recipients=[destinatario_email]
+            )
+            msg.body = (
+                f"Hola {cliente_data['nombre_siglas']},\n\n"
+                f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
+                "Adjunto encontrarás los códigos QR para el seguimiento de cada paquete.\n\n"
+                f"¡Gracias por confiar en {nombre_empresa} "
+            )
+
+            for r in registros:
+                clave = r['clave']
+                qr_path = os.path.join(
+                    app.static_folder, 'comprobantes', clave, 'qr.png'
+                )
+                if os.path.exists(qr_path):
+                    with open(qr_path, 'rb') as f:
+                        qr_data = f.read()
+                    msg.attach(f"qr_{clave}.png", 'image/png', qr_data)
+                else:
+                    current_app.logger.warning(f"QR no encontrado para clave {clave}")
+
+            mail.send(msg)
+
+        current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
+        return jsonify({
+            'status': 'success',
+            'message': 'Transacción creada correctamente',
+            'num_serie': num_serie
+        }), 201
+
+    except ValueError as ve:
+        current_app.logger.warning(f"Bad request: {ve}")
+        return jsonify({'status':'error','message':str(ve)}), 400
+
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({
+            'status': 'error',
+            'message': 'Ocurrió un error al procesar el envío'
+        }), 500
+        
+        
+        
+@app.route('/insertar_envio_api', methods=['POST'])
+def insertar_envio_api():
+    try:
+        nombre_empresa = controlador_empresa.get_nombre()
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'status': 'error', 'message': 'No se recibió un JSON válido'}), 400
+
+        tipo_comprobante = data.get('tipo_comprobante')
+        registros = data.get('registros') 
+
+        if not registros or not isinstance(registros, list):
+            return jsonify({'status': 'error', 'message': 'No se encontraron registros válidos'}), 400
+
+        # Tomamos los datos del remitente desde el primer registro
+        remitente = registros[0].get('remitente', {})
+        nombre = remitente.get('nombre_remitente', '')
+        partes = nombre.split() if nombre else []
+
+        cliente_data = {
+            'correo':        remitente.get('correo_remitente', ''),
+            'telefono':      remitente.get('num_tel_remitente', ''),
+            'num_documento': remitente.get('num_doc_remitente', ''),
+            'nombre_siglas': partes[0] if partes else '',
+            'apellidos_razon': ' '.join(partes[1:]) if len(partes) > 1 else '',
+            'tipo_documentoid': int(remitente.get('tipo_doc_remitente', 1)),
+            'tipo_clienteid': 2 if remitente.get('tipo_doc_remitente') == 2 else 1
+        }
+
+        # 1) Crear transacción y paquetes
+        num_serie,trackings = controlador_encomienda.crear_transaccion_y_paquetes(
+            registros, cliente_data, tipo_comprobante
+        )
+
+        # 2) Generar QR para cada paquete
+        if num_serie:
+            try:
+                generar_qr_paquetes(trackings)
+            except Exception as qr_err:
+                current_app.logger.warning(f"Error generando QR: {qr_err}")
+
+            # 3) Enviar correo al remitente
+            destinatario_email = cliente_data['correo']
+            if destinatario_email:
+                msg = Message(
+                    subject=f"{nombre_empresa} Envío registrado: {num_serie}",
+                    sender=app.config['MAIL_USERNAME'],
+                    recipients=[destinatario_email]
+                )
+                msg.body = (
+                    f"Hola {cliente_data['nombre_siglas']},\n\n"
+                    f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
+                    "Adjunto encontrarás los códigos QR para el seguimiento de cada paquete.\n\n"
+                    f"¡Gracias por confiar en {nombre_empresa}!"
+                )
+
+                for r in trackings:
+                    tracking = r
+                    qr_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'qr.png')
+                    if os.path.exists(qr_path):
+                        with open(qr_path, 'rb') as f:
+                            qr_data = f.read()
+                        msg.attach(f"qr_{tracking}.png", 'image/png', qr_data)
+                    else:
+                        current_app.logger.warning(f"QR no encontrado para tracking {tracking}")
+
+
+                mail.send(msg)
+
+        current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
+        return jsonify({
+            'status': 'success',
+            'message': 'Transacción creada correctamente',
+            'comprobante_serie': num_serie
+        }), 201
+
+    except ValueError as ve:
+        current_app.logger.warning(f"Bad request: {ve}")
+        return jsonify({'status': 'error', 'message': str(ve)}), 400
+
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({
+            'status': 'error',
+            'message': 'Ocurrió un error al procesar el envío'
+        }), 500
+       
+##PARA PROBAR EL API E INSERTAR 
+# {
+#   "tipo_comprobante": 2,
+#   "registros": [
+#     {
+#       "modo": "individual",
+#       "clave": "4123",
+#       "valorEnvio": 80.0,
+#       "peso": 5.5,
+#       "alto": 40.0,
+#       "largo": 50.0,
+#       "ancho": 30.0,
+#       "tarifa": 25.5,
+#       "tipoEmpaqueId": 1,
+#       "tipoArticuloId": 3,
+#       "tipoEntregaId": 1,
+#       "estado_pago":"P",
+#       "modalidad_pago":"1",
+#       "origen": {
+#         "sucursal_origen": 3
+#       },
+#       "destino": {
+#         "sucursal_destino": 5
+#       },
+#       "destinatario": {
+#         "nombre_contacto": "Juan",
+#         "apellido_razon": "Pérez",
+#         "tipo_doc_destinatario": 1,
+#         "num_doc_destinatario": "12345678",
+#         "num_tel_destinatario": "987654321"
+#       },
+#       "remitente": {
+#         "nombre_remitente": "Ana Torres",
+#         "correo_remitente": "ana@example.com",
+#         "num_tel_remitente": "987654320",
+#         "num_doc_remitente": "87654321",
+#         "tipo_doc_remitente": 1
+#       }
+#     }
+#   ]
+# }
+
+
+def generar_qr_paquetes(trackings):
+    for tracking in trackings:
+        
+        qr_data = str(tracking)  # o puedes usar: f"https://tusitio.com/seguimiento={tracking}"
+
+        # 2) Generar QR
+        img = qrcode.make(qr_data)
+
+        # 3) Crear carpeta del paquete
+        carpeta = os.path.join(
+            current_app.static_folder,
+            'comprobantes',
+            str(tracking)
+        )
+        os.makedirs(carpeta, exist_ok=True)
+
+        # 4) Guardar imagen QR
+        ruta_qr = os.path.join(carpeta, 'qr.png')
+        img.save(ruta_qr)
+
+        # 5) Actualizar el campo qr_url en la base de datos (opcional pero útil)
+        qr_rel_path = f"comprobantes/{tracking}/qr.png"
+        sql_execute(
+            "UPDATE paquete SET qr_url = %s WHERE tracking = %s",
+            (qr_rel_path, tracking)
+        )
+
+
+@app.route('/generar_boleta', methods=['POST'])
+def generar_boleta_post():
+    tracking = request.json.get('tracking')
+    if not tracking:
+        return "Falta el campo 'tracking'", 400
+    return redirect(url_for('generar_comprobante', tracking=tracking))
+
+
+@app.route('/comprobante=<int:tracking>')
+def generar_comprobante(tracking):
+    carpeta = os.path.join("static", "comprobantes", str(tracking))
+    ruta_pdf = os.path.join(carpeta, "comprobante.pdf")
+
+    if not os.path.exists(ruta_pdf):
+        try:
+            transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
+            if not transaccion or not isinstance(transaccion, dict):
+                return "Transacción no encontrada", 404
+
+            empresa = controlador_empresa.getDataComprobante()
+            tipo_comprobante     = transaccion['tipo_comprobante']
+            comprobante_serie    = transaccion['comprobante_serie']
+            num_serie            = transaccion['num_serie']
+            cliente              = {
+                'nombre_siglas': transaccion['nombre_siglas'],
+                'apellidos_razon': transaccion['apellidos_razon']
+            }
+
+            items, masivo = controlador_encomienda.obtener_items_por_num_serie(num_serie)
+            resumen = controlador_encomienda.calcular_resumen_venta(transaccion['monto_total'], empresa['igv'])
+
+            os.makedirs(carpeta, exist_ok=True)
+            qr_path = url_for('static', filename=f"comprobantes/{tracking}/qr.png", _external=True)
+
+            html = render_template("plantilla_comprobante_pago.html",
+                transaccion=transaccion,
+                cliente=cliente,
+                empresa=empresa,
+                tipo_comprobante=tipo_comprobante,
+                comprobante_serie=comprobante_serie,
+                items=items,
+                resumen=resumen,
+                qr_path=qr_path,
+                masivo=masivo
+            )
+
+            ruta_wkhtmltopdf = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+            config = pdfkit.configuration(wkhtmltopdf=ruta_wkhtmltopdf)
+            options = {
+                'page-size': 'A6',
+                'margin-top': '5mm',
+                'margin-right': '5mm',
+                'margin-bottom': '5mm',
+                'margin-left': '5mm',
+                'encoding': "UTF-8",
+            }
+
+            pdfkit.from_string(html, ruta_pdf, configuration=config, options=options)
+
+        except Exception as e:
+            return f"Error al generar PDF: {e}", 500
+
+    return send_file(ruta_pdf, as_attachment=False)
+
 
 
 
@@ -2873,6 +3223,112 @@ def procesar_login():
         return rdrct_error(redirect_url('login')  , e)
 
 
+@app.route("/login_android", methods=["POST"])
+def login_android():
+    try:
+        data = request.get_json()
+        correo = data.get("correo")
+        contrasenia = data.get("contrasenia")
+        usuario = controlador_usuario.get_usuario_por_correo(correo)
+        encpassword = encrypt_sha256_string(contrasenia)
+        if usuario and encpassword == usuario['contrasenia']:
+            data = {
+                'message': 200
+            }
+            return jsonify(data)
+    except Exception as e:
+        return jsonify(e)
+    
+@app.route('/salidas_android', methods=['POST'])
+def salidas_android():
+    try:
+        data = request.get_json()
+        correo = data.get('correo')
+
+        if not correo:
+            return jsonify({'error': 'El campo "correo" es requerido'}), 400
+
+        datos = controlador_sucursal.get_data_exit(correo)
+
+        if not datos:
+            return jsonify({'error': 'No se encontró información para el correo proporcionado'}), 404
+
+        fecha_str = datos['fecha'].strftime('%Y-%m-%d') if hasattr(datos['fecha'], 'strftime') else str(datos['fecha'])
+
+        if isinstance(datos['hora'], timedelta):
+            total_seconds = int(datos['hora'].total_seconds())
+            hours = total_seconds // 3600
+            minutes = (total_seconds % 3600) // 60
+            seconds = total_seconds % 60
+            hora_str = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+        else:
+            hora_str = str(datos['hora'])
+
+        res = {
+            'id': datos['id'],
+            'fecha': fecha_str,
+            'hora': hora_str,
+            'estado': datos['estado'],
+            'latitud_origen': float(datos['latitud_origen']),
+            'longitud_origen': float(datos['longitud_origen']),
+            'latitud_destino': float(datos['latitud_destino']),
+            'longitud_destino': float(datos['longitud_destino'])
+        }
+
+        return jsonify(res), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+@app.route('/obtener_coordenadas', methods=['POST'])
+def obtener_coordenadas():
+    try:
+        data = request.get_json()
+
+        id_salida = data['salida']
+
+        coordenadas = controlador_sucursal.get_coordenadas_actual(id_salida)
+
+        if not coordenadas:
+            return jsonify({'error': 'No se encontraron coordenadas'}), 404
+
+        res = {
+            'id':id_salida,
+            'latitud_origen': coordenadas['latitud_origen'],
+            'longitud_origen': coordenadas['longitud_origen'],
+            'latitud_destino': coordenadas['latitud_destino'],
+            'longitud_destino': coordenadas['longitud_destino']
+        }
+        return jsonify(res)
+
+    except Exception as e:
+        print("❌ ERROR EN BACKEND:", repr(e))
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/seguimiento_unidad_prueba')
+def seguimiento_unidad_prueba():
+    lat1 = request.args.get('lat1')
+    lon1 = request.args.get('lon1')
+    lat2 = request.args.get('lat2')
+    lon2 = request.args.get('lon2')
+    id = request.args.get('id')
+    
+    # Podrías formar un "viaje" simple si tu HTML espera eso
+    data = [{
+        
+        'iniciolat_via': lat1,
+        'iniciolon_via': lon1,
+        'finlat_via': lat2,
+        'finlon_via': lon2,
+        'id':id
+    }]
+
+    return render_template('seguimiento_empleado.html', data=data)
+
+
+
 @app.route("/procesar_register", methods=["POST"])
 def procesar_register():
     try:
@@ -2888,6 +3344,175 @@ def procesar_register():
     except Exception as e:
         return rdrct_error(redirect_url('login')  , e)
 
+####################3 RECUPERAR CONTRASENIA #########
+@app.route("/procesar_recuperacion", methods=["POST"])
+def procesar_recuperacion():
+    try:
+        email = request.form.get("email")
+        if not email:
+            return rdrct_error(redirect_url('recuperar_contrasenia'), 'Correo requerido')
+
+        usuario = controlador_usuario.get_usuario_por_correo(email)
+        if not usuario:
+            return rdrct_error(redirect_url('recuperar_contrasenia'), 'Correo no registrado')
+
+        serializer = URLSafeSerializer(app.secret_key)
+        token = serializer.dumps(email)
+        enlace = url_for('cambiar_contrasenia', token=token, _external=True)
+
+        # Contenido HTML bonito
+        html_body = f"""
+            <html>
+            <body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,sans-serif;">
+                <div style="max-width:600px;margin:30px auto;background-color:#ffffff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.1);padding:40px;">
+                <h2 style="color:#333333;text-align:center;">Recuperación de Contraseña</h2>
+                <p style="font-size:16px;line-height:1.6;color:#555;">
+                    Hola <strong>{usuario['correo']}</strong>,
+                </p>
+                <p style="font-size:16px;line-height:1.6;color:#555;">
+                    Recibimos una solicitud para restablecer tu contraseña. Para continuar, haz clic en el botón de abajo:
+                </p>
+                <div style="text-align:center;margin:30px 0;">
+                    <a href="{enlace}" style="background-color:#007BFF;color:white;padding:14px 28px;text-decoration:none;border-radius:6px;display:inline-block;font-weight:bold;">
+                    Restablecer contraseña
+                    </a>
+                </div>
+                <p style="font-size:15px;color:#666;">
+                    Si el botón no funciona, copia y pega el siguiente enlace en tu navegador:
+                </p>
+                <p style="font-size:14px;word-break:break-all;color:#007BFF;">
+                    <a href="{enlace}" style="color:#007BFF;text-decoration:none;">{enlace}</a>
+                </p>
+                <hr style="margin:30px 0;border:none;border-top:1px solid #eee;">
+                <p style="font-size:13px;color:#999;text-align:center;">
+                    Si tú no realizaste esta solicitud, puedes ignorar este mensaje. Tu contraseña permanecerá segura.
+                </p>
+                <p style="font-size:13px;color:#999;text-align:center;margin-top:10px;">
+                    — El equipo de <strong>{controlador_empresa.get_nombre()}</strong>
+                </p>
+                </div>
+            </body>
+            </html>
+            """
+
+        msg = Message(subject="Recupera tu contraseña",
+                      sender=app.config['MAIL_USERNAME'],
+                      recipients=[email],
+                      html=html_body)
+
+        mail.send(msg)
+
+        return redirect_url('login')
+
+    except Exception as e:
+        return rdrct_error(redirect_url('recuperar_contrasenia'), e)
+
+@app.route('/cambiar_contrasenia')
+def cambiar_contrasenia():
+    token = request.args.get('token')
+    user_id = request.cookies.get('user_id')
+
+    correo_recuperado = None
+    is_recuperando = False
+
+    if token:
+        try:
+            serializer = URLSafeSerializer(app.secret_key)
+            correo_recuperado = serializer.loads(token)
+            is_recuperando = True
+        except Exception:
+            return rdrct_error(redirect_url('login'), 'Token inválido')
+
+    elif user_id:
+        is_recuperando = False
+    else:
+        return redirect_url('login')
+
+    return render_template(
+        'cambiar_contrasenia.html',
+        token=correo_recuperado,
+        is_recuperando=is_recuperando
+    )
+
+
+@app.route("/procesar_cambio_contrasenia", methods=["POST"])
+def procesar_cambio_contrasenia():
+    try:
+        nueva = request.form.get("nueva_contrasena")
+        confirmar = request.form.get("confirmar_contrasena")
+        actual = request.form.get("contrasena_actual")
+        correo = request.cookies.get("correo")
+
+        # Intentar recuperar correo desde form si está visible
+        if not correo:
+            correo = request.form.get("correo")
+
+        # Token (recuperación por URL)
+        token = request.args.get("token")
+        if not correo and token:
+            try:
+                serializer = URLSafeSerializer(app.secret_key)
+                correo = serializer.loads(token)
+            except Exception:
+                return rdrct_error(redirect_url('cambiar_contrasenia'), 'Token inválido')
+
+        if not nueva or not confirmar or not correo:
+            return rdrct_error(redirect_url('cambiar_contrasenia'), 'Datos incompletos')
+
+        if nueva != confirmar:
+            return rdrct_error(redirect_url('cambiar_contrasenia'), 'Las nuevas contraseñas no coinciden')
+
+        usuario = controlador_usuario.get_usuario_por_correo(correo)
+        if not usuario:
+            return rdrct_error(redirect_url('login'), 'Usuario no encontrado')
+
+        # Solo se valida contraseña actual si hay sesión iniciada
+        if request.cookies.get("user_id"):
+            if not actual:
+                return rdrct_error(redirect_url('cambiar_contrasenia'), 'Falta contraseña actual')
+
+            actual_hash = encrypt_sha256_string(actual)
+            if usuario['contrasenia'] != actual_hash:
+                return rdrct_error(redirect_url('cambiar_contrasenia'), 'Contraseña actual incorrecta')
+
+        # Cambiar contraseña
+        nueva_hash = encrypt_sha256_string(nueva)
+        controlador_usuario.actualizar_contrasenia(usuario['id'], nueva_hash)
+
+        # Enviar correo de notificación
+        empresa = controlador_empresa.get_nombre()
+        html = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;">
+            <div style="max-width: 600px; background-color: white; padding: 25px; border-radius: 8px; margin: auto;">
+                <h2 style="color: #333;">Contraseña actualizada</h2>
+                <p>Hola <strong>{usuario['correo']}</strong>,</p>
+                <p>Te informamos que tu contraseña fue modificada correctamente.</p>
+                <p>Si tú no realizaste este cambio, por favor contacta de inmediato con el soporte técnico de <strong>{empresa}</strong>.</p>
+                <p style="font-size: 0.9em; color: #888;">Este es un mensaje automático, no respondas directamente a este correo.</p>
+                <p style="margin-top: 20px;">— El equipo de <strong>{empresa}</strong></p>
+            </div>
+        </body>
+        </html>
+        """
+        msg = Message(
+            subject="Tu contraseña fue actualizada",
+            sender=app.config['MAIL_USERNAME'],
+            recipients=[correo],
+            html=html
+        )
+        mail.send(msg)
+
+        # Cierre de sesión
+        resp = make_response(redirect_url('login'))
+        resp.set_cookie('correo', '', max_age=0)
+        resp.set_cookie('user_id', '', max_age=0)
+        return resp
+
+    except Exception as e:
+        return rdrct_error(redirect_url('cambiar_contrasenia'), e)
+
+######################
 
 ##################_ PAGINAS EMPLEADO _################## 
 
@@ -3401,9 +4026,56 @@ def simulador_envio_ubicacion():
     return render_template(
         'simulador_envio_ubicacion.html', 
         )
+    
+@app.route("/buscar_paquete", methods=['POST'])
+def buscar_paquete():
+    tracking = request.form.get('tracking')
+    anio = request.form.get('anio')
+    paquete = controlador_paquete.buscar_paquete(tracking, anio)
+    print(paquete)
+    if paquete is not None:
+        return redirect(url_for('seguimiento_tracking', tracking=paquete))
+    else:
+        return redirect(url_for('seguimiento_tracking', tracking=0))
+
+
+   
+@app.route('/seguimiento')
+def seguimiento():
+    try:
+        estado = controlador_estado_encomienda.get_options()
+        return render_template('seguimiento.html',estado=estado)
+    except Exception as e:
+        return e   
+ 
+    
+@app.route("/seguimiento=<tracking>")
+def seguimiento_tracking(tracking):
+    estados = controlador_estado_encomienda.get_states()
+    ultimo_estado = controlador_estado_encomienda.get_last_states(tracking)
+    estados_actuales = controlador_estado_encomienda.get_estados_insertados(tracking)
+    comprobantes = controlador_estado_encomienda.get_comprobantes(tracking)
+    datos = controlador_estado_encomienda.get_data_package(tracking)
+    
+    estados_usados = [e['estado_encomiendaid'] for e in estados_actuales]
+
+    
+    return render_template('seguimiento.html',
+                           estados=estados,
+                           ultimo_estado=ultimo_estado,
+                           comprobantes=comprobantes,
+                           datos=datos,
+                           tracking=tracking,
+                           estados_usados=estados_usados
+                           )
+    
+   
+
+
+    
 
 if __name__ == "__main__":
-    # app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=True)
+    # app.run(host='192.168.48.178', port=8000, debug=True, use_reloader=True)
     # Thread(target=enviar_posiciones).start()
     socketio.run(app, host='0.0.0.0', port=8000, debug=True)
 

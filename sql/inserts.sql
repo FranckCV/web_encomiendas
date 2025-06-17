@@ -1,6 +1,31 @@
-
-INSERT INTO `empresa` (`id`, `nombre`, `correo`, `nro_telefono`, `logo`, `color_pri`, `color_sec`, `color_ter`, `porcentaje_recojo`, `ruc`, `id_sucursal`, `igv`) VALUES
-(1, 'New Olva', 'info@newolva.com', '+123 456 789', 'logo.png', '#1d4c82', '#13e2da', '#1b98e0', 5.00, '20675755667', 3, 18.00);
+INSERT INTO empresa (
+    id,
+    ruc,
+    nombre,
+    id_sucursal,
+    correo,
+    nro_telefono,
+    logo,
+    color_pri,
+    color_sec,
+    color_ter,
+    porcentaje_recojo,
+    igv
+)
+VALUES (
+    1,
+    20512528458,
+    'New Olva',
+    54,                 
+    'info@newolva.com',
+    '+123 456 789',
+    'logo.png',
+    '#1d4c82',
+    '#13e2da',
+    '#1b98e0',
+    5.00,
+    18.00              
+);
 
 
 INSERT INTO `modulo` (
@@ -7973,185 +7998,9 @@ VALUES (1, 'Recibido', 1),
   (4, 'En revisión', 1),
   (5, 'Resuelto', 1);
 
-INSERT INTO estado_encomienda (`id`, `nombre`, `descripcion`, `activo`)
-VALUES (
-    1,
-    'En origen',
-    'Paquete en sucursal de origen',
-    1
-  ),
-  (2, 'En tránsito', 'Paquete en camino', 1),
-  (
-    3,
-    'En destino',
-    'Paquete en sucursal de destino',
-    1
-  ),
-  (4, 'Entregado', 'Paquete entregado', 1);
 
-INSERT INTO detalle_estado (nombre, descripcion, activo, estado_encomiendaid)
-VALUES (
-    'Solicitud registrada',
-    'Se ha generado una orden de envío en el sistema.',
-    1,
-    1
-  ),
-  (
-    'Recepción física en oficina',
-    'El paquete ha sido recibido físicamente en la oficina de origen.',
-    1,
-    1
-  ),
-  (
-    'Validación de contenido',
-    'El contenido del paquete ha sido verificado por el personal.',
-    1,
-    1
-  ),
-  (
-    'Embalaje y etiquetado',
-    'El paquete fue embalado y etiquetado correctamente.',
-    1,
-    1
-  ),
-  (
-    'Esperando programación de ruta',
-    'El paquete está esperando asignación a una unidad de transporte.',
-    1,
-    1
-  ),
-  (
-    'Listo para despacho',
-    'El paquete está completamente preparado para salir de la oficina de origen.',
-    1,
-    1
-  );
 
-INSERT INTO detalle_estado (nombre, descripcion, activo, estado_encomiendaid)
-VALUES (
-    'Despachado de oficina origen',
-    'El paquete ha salido de la oficina de origen.',
-    1,
-    2
-  ),
-  (
-    'Abordo del transporte',
-    'La encomienda está siendo transportada hacia su destino.',
-    1,
-    2
-  ),
-  (
-    'Llegada a centro logístico intermedio',
-    'La encomienda llegó a una central intermedia para redistribución.',
-    1,
-    2
-  ),
-  (
-    'Cambio de transporte',
-    'El paquete ha sido trasladado a otra unidad de transporte.',
-    1,
-    2
-  ),
-  (
-    'Revisión de contenido por fiscalización',
-    'La encomienda fue revisada por control interno o externo.',
-    1,
-    2
-  ),
-  (
-    'Retardo por condiciones climáticas',
-    'Se ha producido un retraso en la ruta por causas climáticas.',
-    1,
-    2
-  ),
-  (
-    'Reanudación de tránsito',
-    'El paquete ha retomado su ruta hacia el destino final.',
-    1,
-    2
-  );
 
-INSERT INTO detalle_estado (nombre, descripcion, activo, estado_encomiendaid)
-VALUES (
-    'Arribo a oficina destino',
-    'El paquete ha llegado a la ciudad y oficina de destino.',
-    1,
-    3
-  ),
-  (
-    'Descarga y registro',
-    'El paquete ha sido descargado y registrado en el sistema.',
-    1,
-    3
-  ),
-  (
-    'Clasificación para entrega',
-    'El paquete fue clasificado y preparado para su entrega final.',
-    1,
-    3
-  ),
-  (
-    'Asignado a repartidor',
-    'El paquete ha sido asignado a un repartidor o mensajero.',
-    1,
-    3
-  ),
-  (
-    'Intento de entrega fallido',
-    'No se logró entregar el paquete en el primer intento.',
-    1,
-    3
-  ),
-  (
-    'Reprogramación de entrega',
-    'Se ha programado una nueva fecha para la entrega.',
-    1,
-    3
-  ),
-  (
-    'En espera en oficina destino',
-    'El destinatario puede recoger el paquete en la oficina.',
-    1,
-    3
-  );
-
-INSERT INTO detalle_estado (nombre, descripcion, activo, estado_encomiendaid)
-VALUES (
-    'Entregado a destinatario',
-    'El paquete fue entregado directamente al destinatario.',
-    1,
-    4
-  ),
-  (
-    'Entregado a tercero autorizado',
-    'La encomienda fue entregada a un familiar o persona autorizada.',
-    1,
-    4
-  ),
-  (
-    'Firma y documento registrados',
-    'Se registró la firma del receptor y su documento de identidad.',
-    1,
-    4
-  ),
-  (
-    'Confirmación vía sistema',
-    'El cliente ha confirmado la recepción mediante la aplicación.',
-    1,
-    4
-  ),
-  (
-    'Observación en entrega',
-    'Se dejó constancia de observaciones al momento de la entrega.',
-    1,
-    4
-  ),
-  (
-    'Entrega finalizada',
-    'El proceso de entrega se marcó como finalizado en el sistema.',
-    1,
-    4
-  );
 
 INSERT INTO detalle_reclamo (nombre, descripcion, estado_reclamoid)
 VALUES (
@@ -8288,3 +8137,73 @@ INSERT INTO `modalidad_pago` (`id`, `nombre`, `descripcion`, `activo`) VALUES
 (3, 'Destinatario paga contraentrega',
     'El destinatario realiza el pago en el momento de recibir el paquete en su domicilio o sucursal.',
     1);
+
+
+INSERT INTO estado_encomienda (id, nombre, descripcion, activo, tipoEstado) VALUES
+(1, 'En origen',   'La encomienda aún no ha salido de la sucursal de origen.',       1, 'N'),
+(2, 'En tránsito', 'La encomienda se encuentra viajando hacia su destino.',          1, 'N'),
+(3, 'En destino',  'La encomienda está en la sucursal de destino o en reparto.',     1, 'N'),
+(4, 'Entregado',   'La encomienda fue entregada satisfactoriamente al destinatario', 1, 'N');
+
+
+INSERT INTO detalle_estado (id, nombre, descripcion, activo, estado_encomiendaid) VALUES
+(1, 'Esperando recepción en agencia de origen', 'Aún no se ha recibido el paquete en la sucursal de origen. Esperando que el remitente lo entregue.', 1, 1),
+(2, 'Paquete recepcionado en agencia de origen', 'El paquete ha sido entregado por el remitente y registrado en el sistema.', 1, 1),
+(3, 'Validación de contenido y embalaje', 'El personal de agencia verifica el embalaje y las restricciones del contenido.', 1, 1),
+(4, 'Etiqueta de tracking generada', 'Se ha generado la etiqueta con código de seguimiento y se ha adherido al paquete.', 1, 1),
+(5, 'Clasificación interna', 'El paquete ha sido clasificado internamente según su destino final.', 1, 1),
+(6, 'Almacenado para despacho', 'El paquete está en la zona de salida esperando ser cargado en el vehículo de transporte.', 1, 1);
+INSERT INTO detalle_estado (id, nombre, descripcion, activo, estado_encomiendaid) VALUES
+(7, 'Cargado en unidad de transporte', 'El paquete ha sido cargado en la unidad de transporte interprovincial o interurbana.', 1, 2),
+(8, 'Salida de agencia de origen', 'El vehículo con el paquete ha salido de la agencia de origen.', 1, 2),
+(9, 'En tránsito intermedio', 'El paquete se encuentra en ruta, desplazándose hacia la ciudad de destino.', 1, 2),
+(10, 'Paso por centro logístico intermedio', 'El paquete ha pasado por un centro de distribución o nodo intermedio.', 1, 2),
+(11, 'Revisión en control de ruta', 'El paquete fue revisado por control en tránsito (ej. control de aduanas, pesaje, etc.).', 1, 2),
+(12, 'Próximo a llegar a destino', 'El transporte está llegando a la agencia de destino con el paquete a bordo.', 1, 2);
+INSERT INTO detalle_estado (id, nombre, descripcion, activo, estado_encomiendaid) VALUES
+(13, 'Recepcionado en agencia de destino', 'El paquete ha sido descargado y registrado en la sucursal de destino.', 1, 3),
+(14, 'Clasificación para reparto', 'El paquete ha sido clasificado y programado para reparto domiciliario.', 1, 3),
+(15, 'En espera de salida para reparto', 'El paquete está esperando ser cargado en la unidad de reparto local.', 1, 3),
+(16, 'En ruta de entrega', 'El paquete ha salido de la agencia y se encuentra en proceso de entrega al destinatario.', 1, 3),
+(17, 'Intento de entrega fallido', 'Se intentó la entrega pero no hubo respuesta o no se encontró al destinatario.', 1, 3);
+INSERT INTO detalle_estado (id, nombre, descripcion, activo, estado_encomiendaid) VALUES
+(18, 'Entregado al destinatario', 'El paquete fue entregado correctamente al destinatario registrado.', 1, 4),
+(19, 'Recibido por tercero autorizado', 'El paquete fue recibido por una persona autorizada diferente al destinatario.', 1, 4),
+(20, 'Firmado en conformidad', 'El destinatario o tercero firmó como constancia de la recepción.', 1, 4),
+(21, 'Entrega validada en sistema', 'La entrega fue confirmada en el sistema con hora y firma.', 1, 4);
+
+INSERT INTO transaccion_encomienda (
+    num_serie, masivo, descripcion, monto_total, recojo_casa,
+    id_sucursal_origen, fecha, hora,
+    direccion_recojo, clienteid, tipo_comprobanteid
+)
+VALUES (
+    'ENCO0001',
+    0,
+    'Envío regular Lima - Trujillo',
+    25.50,
+    0,
+    3,
+    CURRENT_DATE,
+    CURRENT_TIME,
+    'Av. Siempre Viva 742',
+    1,
+    1
+);
+
+INSERT INTO empleado (nombre, apellidos, correo, n_documento, rolid) VALUES
+('Carlos', 'Ramírez León', 'carlos.ramirez@transportes.com', 'D12345678', 1),
+('Lucía', 'Mendoza Ruiz', 'lucia.mendoza@transportes.com', 'B98765432', 1),
+('Pedro', 'Sánchez Huamán', 'pedro.sanchez@transportes.com', 'C76543210', 1),
+('Ana', 'Torres Rivas', 'ana.torres@transportes.com', 'A11223344', 1),
+('Luis', 'Castillo Valverde', 'luis.castillo@transportes.com', 'E55667788', 1),
+('María', 'López Espinoza', 'maria.lopez@transportes.com', 'F99887766', 1),
+('Javier', 'Gómez Paredes', 'javier.gomez@transportes.com', 'G33445566', 1),
+('Sofía', 'Fernández Quispe', 'sofia.fernandez@transportes.com', 'H77889900', 1);
+
+INSERT INTO salida (fecha, hora, recojo, entrega, estado, unidadid, destino_final_id, conductor_principal, origen_incio_id) VALUES
+('2025-06-16', '07:30:00', 1, 0, 'P', 1, 2, 5, 3),
+('2025-06-16', '08:15:00', 1, 1, 'P', 2, 2, 6, 5),
+('2025-06-16', '09:00:00', 0, 1, 'P', 3, 3, 5, 6),
+('2025-06-16', '10:45:00', 1, 0, 'P', 4, 4, 7, 5),
+('2025-06-16', '11:30:00', 1, 1, 'P', 5, 4, 7, 7);

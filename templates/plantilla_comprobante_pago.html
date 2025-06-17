@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ tipo_comprobante }} {{ comprobante_serie }}</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      font-size: 11px;
+      width: 280px;
+      margin: 0 auto;
+      color: #000;
+    }
+    .center {
+      text-align: center;
+    }
+    .bold {
+      font-weight: bold;
+    }
+    .line {
+      border-top: 1px dashed #000;
+      margin: 6px 0;
+    }
+    .section {
+      margin-bottom: 10px;
+    }
+    .totales td {
+      padding: 2px 0;
+    }
+    .qr {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .small {
+      font-size: 9px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="center bold">
+    {{ empresa.nombre.upper() }}<br>
+    {{ empresa.direccion }}<br>
+    RUC {{ empresa.ruc }}<br>
+    CENTRAL: {{ empresa.nro_telefono }}<br>
+    {{ empresa.correo }}<br>
+    <div class="line"></div>
+    {{ tipo_comprobante }} ELECTRÓNICA<br>
+    {{ comprobante_serie }}
+  </div>
+
+  <div class="section">
+    <strong>ADQUIRIENTE</strong><br>
+    DNI: {{ cliente.num_documento }}<br>
+    {{ cliente.nombre_siglas }} {{ cliente.apellidos_razon }}<br>
+    <strong>FECHA EMISIÓN:</strong> {{ transaccion.fecha }}<br>
+    <strong>FECHA VENC.:</strong> {{ transaccion.fecha }}<br>
+    <strong>MONEDA:</strong> SOLES<br>
+    <strong>IGV:</strong> {{ empresa.igv }}%
+  </div>
+
+  {% if transaccion.masivo %}
+  <div class="section">
+    <strong>Tipo de Envío:</strong> Masivo<br>
+    <strong>Total Paquetes:</strong> {{ items | length }}
+  </div>
+  {% else %}
+  <div class="section">
+    <strong>Tipo de Envío:</strong> Individual
+  </div>
+  {% endif %}
+
+  <div class="line"></div>
+  <strong>[ CANT. ] DESCRIPCIÓN</strong><br>
+  {% for item in items %}
+    [1] Servicio de transporte<br>
+    Clave: {{ item.clave }}<br>
+    Origen: {{ item.origen.departamento }} - {{ item.origen.provincia }} - {{ item.origen.distrito }}<br>
+    Destino: {{ item.destino.departamento }} - {{ item.destino.provincia }} - {{ item.destino.distrito }}<br>
+    Tarifa: S/ {{ item.tarifa }}<br>
+    Pagado por: {{ item.quien_paga }}<br>
+    <br>
+  {% endfor %}
+  <div class="line"></div>
+
+  <table class="totales" width="100%">
+    <tr><td>GRAVADA</td><td style="text-align:right">S/ {{ resumen.base_imponible }}</td></tr>
+    <tr><td>IGV</td><td style="text-align:right">S/ {{ resumen.igv }}</td></tr>
+    <tr><td><strong>TOTAL</strong></td><td style="text-align:right"><strong>S/ {{ resumen.total }}</strong></td></tr>
+  </table>
+
+  <!-- <div class="section">
+    <strong>IMPORTE EN LETRAS:</strong><br>
+    {{ monto_en_letras }}
+  </div> -->
+
+  <div class="qr">
+    <img src="{{ qr_path }}" alt="QR" width="120">
+  </div>
+
+</body>
+</html>

@@ -240,11 +240,17 @@
             {% if esTransaccion %}
             {% if fila['placa'] %}
               <div class="opciones_fila">
-                <a href="{{ url_for('seguimiento_empleado_prueba', placa=fila['placa'] ) }}">
+                <!-- <a href="{{ url_for('seguimiento_empleado_prueba', placa=fila['placa'] ) }}">
                   <button  class="btn btn-secondary btn-small" style="padding: inherit;">
                   <i class="fa-solid fa-location-dot"></i>
                   </button>
-                </a>
+                </a> -->
+                
+                <button class="btn btn-secondary btn-small btn-ver-mapa" style="padding: inherit;" title="Ver Mapa">
+                  <i class="fa-solid fa-location-dot"></i>
+                </button>
+
+
               </div>
             {% endif %}
             {% endif %}
@@ -371,5 +377,52 @@
   }
   // document.getElementById('fecha_fin').value = today;
 </script>
+
+
+<script>
+  //Para mapa
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.btn-ver-mapa').forEach(btn => {
+    btn.addEventListener('click', async function () {
+      const tr = this.closest('tr');
+      const id_salida = tr.dataset["{{ primary_key }}"]; // <- usa el primary_key
+
+      if (!id_salida) {
+        alert("ID de salida no encontrado.");
+        return;
+      }
+
+      try {
+        const response = await fetch("http://192.168.187.178:8000/obtener_coordenadas", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ salida: id_salida })
+        });
+
+        if (!response.ok) throw new Error("Error al obtener coordenadas");
+
+        const data = await response.json();
+
+        const params = new URLSearchParams({
+          lat1: data.latitud_origen,
+          lon1: data.longitud_origen,
+          lat2: data.latitud_destino,
+          lon2: data.longitud_destino,
+          id: data.id
+        });
+
+        // Redirige a la vista de mapa
+        window.location.href = `/seguimiento_unidad_prueba?${params.toString()}`;
+      } catch (error) {
+        console.error("Error al obtener coordenadas:", error);
+        alert("No se pudo cargar el mapa.");
+      }
+    });
+  });
+});
+</script>
+
 
 {% endblock %}

@@ -55,6 +55,7 @@
   display: flex;
   align-items: center;
   gap:20px;
+  margin: 30px 0px;
 }
 .img_estado{
   width: 10%;
@@ -82,7 +83,8 @@ border-radius: 0px;
 .status-content {
   flex-grow: 1;
   display: flex;
-  gap:200px;
+
+  justify-content: space-between;
 }
 #selection-document{
   font-size: 12px;
@@ -99,9 +101,19 @@ border-radius: 0px;
   gap:10px;
   flex-direction: column;
 }
+
+.ultimo_estado{
+  margin-right: 40px;
+}
+
+.lista_document{
+  font-size: 1.2rem;
+}
+
 .documents{
   display: flex;
   gap: 10px;
+  flex-direction: column;
 }
 h1 {
   color: rgb(4, 36, 69); 
@@ -135,7 +147,7 @@ h1 {
   margin-bottom: 20px;
 }
 .delivery-time {
-  color: #888;
+  color: #b6b3b3;
   text-align: right;
 }
 .progress-tracker {
@@ -143,46 +155,108 @@ h1 {
   justify-content: space-between;
 width: 100%;
   position: relative;
-  margin-top: 40px;
 }
+
 .progress-line {
   position: absolute;
   top: 24px;
   left: 0;
   right: 0;
   height: 3px;
-  background-color:color-mix(in srgb, var(--color4) 60%, rgb(37, 138, 192) 40%);
-
+  background-color: #b6b3b3; 
   z-index: 1;
 }
-.progress-step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
+
+.progress-line-fill {
+  position: absolute;
+  top: 24px;
+  left: 0;
+  height: 3px;
+  background-color:color-mix(in srgb, var(--color4) 30%, rgb(37, 138, 192) 80%);
   z-index: 2;
-  width: 25%;
+  transition: width 0.4s ease;
 }
+
+
+/* .progress-line {
+  position: absolute;
+  top: 24px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color:color-mix(in srgb, var(--color4) 60%, rgb(37, 138, 192) 40%);
+  z-index: 1;
+}
+
+/* 
 .step-icon {
   width: 50px;
   height: 50px;
   background-color:color-mix(in srgb, var(--color4) 60%, rgb(37, 138, 192) 40%);
-
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   margin-bottom: 10px;
 }
-.step-icon img {
-  width: 24px;
-  height: 24px;
-}
+
+
+
 .step-label {
   text-align: center;
   font-weight: bold;
   color: #333;
 }
+
+.check-icon {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+} */
+
+.progress-step {
+  /* display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative; */
+  z-index: 2;
+  /* width: 25%; */
+} 
+
+.step-icon {
+  width: 50px;
+  height: 50px;
+  background-color: #b6b3b3; /* base gris */
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+  transition: background-color 0.3s;
+  place-self: center;
+}
+
+.step-icon img {
+  width: 24px;
+  height: 24px;
+}
+.step-icon.completed {
+  background-color:color-mix(in srgb, var(--color4) 60%, rgb(37, 138, 192) 40%); /* azul si está completado */
+}
+
+.step-label {
+  text-align: center;
+  font-weight: bold;
+  color: #333;
+}
+
+.check-icon {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+
 .info-card {
   display: flex;
   flex-direction: row;
@@ -266,12 +340,7 @@ width: 100%;
   margin-right: 5px;
 }
 
-/* Iconos para los pasos de progreso */
-.check-icon {
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-}
+
 .details-container {
   margin-top: 30px;
   width: 95%;

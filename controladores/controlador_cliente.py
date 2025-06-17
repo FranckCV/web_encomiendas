@@ -187,3 +187,13 @@ def get_cliente_tipo_nro_documento(tipo_doc , nro_doc):
     '''
     resultados = sql_select_fetchone(sql,(tipo_doc , nro_doc))
     return resultados
+
+
+def getDataClient(id):
+    sql = '''
+        select num_documento, nombre_siglas,apellidos_razon from cliente where id = %s
+    '''
+    fila = sql_select_fetchone(sql,id)
+    return fila
+    
+    

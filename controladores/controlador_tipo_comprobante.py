@@ -117,6 +117,3 @@ def get_options_nombre():
     return lista
 
 
-
-
-
