@@ -1255,36 +1255,41 @@ CONTROLADORES = {
     },
     
     "paquete": {
-        "active" : True ,
-        "titulo": "unidades",
-        "nombre_tabla": "unidad",
-        "controlador": controlador_paquete,
-        "icon_page": 'fa-solid fa-truck-fast',
-        "filters": [
-            ['modeloid', 'Modelo', lambda: controlador_modelo.get_options() ],
-        ] ,
-        "fields_form": [
-#            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
-            ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
-            ['modeloid',      'Nombre de Modelo', 'Elegir modelo', 'select',    True ,     True,          [lambda: controlador_modelo.get_options() , 'nom_modelo' ] ],
-            ['estado',        'Estado',           'Elegir estado', 'select',    True ,    True,           [lambda: controlador_unidad.get_options_estado() , 'estado' ]  ],
-            ['placa',         'Placa',            'Placa',         'text',      True ,     True,          True ],
-            ['mtc',           'MTC',              'MTC',           'text',      True ,     True,          True ],
-            ['tuc',           'TUC',              'TUC',           'text',      True ,     True,          True ],
-            ['capacidad',     'Capacidad',        'Capacidad',     'number',    True ,     True,          True ],
-            ['volumen',       'Volumen',          'Volumen',       'number',    True ,     True,          None ],
-            ['descripcion', 'Descripción',    'Descripción', 'textarea',  False,     True,          None ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
+    "active": True,
+    "titulo": "Paquetes",
+    "nombre_tabla": "paquete",
+    "controlador": controlador_paquete,
+    "icon_page": "fa-solid fa-box",
+    "filters": [
+    ],
+    "fields_form": [
+        #   ID/NAME                        LABEL                         PLACEHOLDER                TYPE       REQUIRED  ABLE   DATOS
+        ['tracking',                      'Tracking',                   'Id',            'text',     False,    False, True],
+        ['valor',                         'Valor (S/.)',                'Valor',                   'number',   True,     True,  None],
+        ['peso',                          'Peso (kg)',                  'Peso',                    'number',   True,     True,  None],
+        ['estado_pago',                   'Estado de pago',             '0 = Pagado, 1 = Pendiente','select',  True,     True,  [['0', 'Pagado'], ['1', 'Pendiente']]],
+        ['nombres_contacto_destinatario', 'Nombres contacto',           'Nombres',                 'text',     True,     True,  None],
+        ['apellidos_razon_destinatario',  'Apellidos o Razón Social',   'Apellidos o Razón',       'text',     True,     True,  None],
+        ['num_documento_destinatario',    'N° Documento',               'Documento',               'text',     True,     True,  None],
+        ['tipo_documento_destinatario_id','Tipo de Documento',          'Elegir tipo',             'select',   True,     True,  [lambda: controlador_tipo_documento.get_options(), 'tipo_documento']],
+        ['tipo_empaqueid',                'Tipo de Empaque',            'Elegir tipo',             'select',   True,     True,  [lambda: controlador_tipo_empaque.get_options(), 'tipo_empaque']],
+        ['contenido_paqueteid',           'Contenido del Paquete',      'Elegir contenido',        'select',   False,    True,  [lambda: controlador_contenido_paquete.get_options(), 'contenido_paquete']],
+        ['tipo_recepcionid',              'Tipo de Recepción',          'Elegir recepción',        'select',   True,     True,  [lambda: controlador_tipo_recepcion.get_options(), 'tipo_recepcion']],
+        ['modalidad_pagoid',              'Modalidad de Pago',          'Elegir modalidad',        'select',   True,     True,  [lambda: controlador_modalidad_pago.get_options(), 'modalidad_pago']],
+        ['sucursal_destino_id',           'Sucursal Destino',           'Elegir sucursal',         'select',   True,     True,  [lambda: controlador_sucursal.get_options(), 'direccion_destino']],
+        ['descripcion',                   'Descripción',                'Descripción del paquete', 'textarea', False,    True,  None],
+    ],
+    "crud_forms": {
+        "crud_list": True,
+        "crud_search": True,
+        "crud_consult": True,
+        "crud_insert": True,
+        "crud_update": True,
+        "crud_delete": True,
+        "crud_unactive": True,
+    }
+}
+
     
 }
 
