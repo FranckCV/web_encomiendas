@@ -22,7 +22,8 @@
     --color18: color-mix(in srgb, var(--color-base) 60%, var(--color-sec) 20%);
     --color19: var(--color-thr);
     --color20: color-mix(in srgb, var(--color4) 100%, color-mix(in srgb, #00000069 100%, transparent 68%) 40%);
-
+    --color21: color-mix(in srgb, black 30%, var(--color-thr) 100%);
+    
     /* --color19: color-mix(in srgb, var(--color-base) 65%, var(--color-sec) 65%); */
     /* --color19: color-mix(in srgb, #00cee9 65%, color-mix(in srgb , #1d4c82 100% , white 70% ) 35%); */
     /* --color19: color-mix(in srgb, color-mix(in srgb, var(--color-base) 45%, var(--color-sec)) 90%, white 10%); */

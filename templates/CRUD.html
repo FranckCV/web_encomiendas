@@ -10,8 +10,26 @@
 
 <style>
   .td_content {
-    min-height: 30px;
-  }
+  min-height: 30px;
+  /* width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.td_content > * {
+  margin: 0;
+  padding: 0;
+  display: inline; /* importante: inline o inline-block */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+    line-height: 1.1; */
+
+}
+
+
 </style>
 
 {% endblock %}
@@ -147,7 +165,8 @@
           {% endif %}" 
           td_name="{{col_name}}">
             <div
-              class="td_content {% if (primary_key is iterable and primary_key is not string and col_name in primary_key) or (col_name == primary_key) %}  td_primary_key {% elif col_name == 'activo' %}   td_activo {% endif %}">
+              class="td_content {% if (primary_key is iterable and primary_key is not string and col_name in primary_key) or (col_name == primary_key) %}  td_primary_key {% elif col_name == 'activo' %}   td_activo {% endif %}"
+              >
               {% if col_name == 'activo' %}
               {% if fila[col_name] == 1 %}
               <p class="activo btn_active">{{STATE_1}}</p>
@@ -181,7 +200,7 @@
 
               {% if crud_consult %}
               <div class="opciones_fila">
-                <button class="clickable-modal btn_consult" id="modal_crud_consult_{{tabla}}_{{id_pk}}">
+                <button class="clickable-modal btn_consult" id="modal_crud_consult_{{tabla}}_{{id_pk}}" >
                   <i class="{{ICON_CONSULT}}"></i>
                 </button>
               </div>

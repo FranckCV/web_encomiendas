@@ -18,7 +18,13 @@
     /* --color-bg-admin: linear-gradient(180deg,rgba(10, 27, 46, 1) 44%, rgba(9, 100, 105, 1) 100%); */
     /* --color-bg-admin: linear-gradient(170deg, var(--color4)  45%, color-mix(in srgb , var(--color-sec) 100% , var(--color4) 100% ) 100%); */
     /* --color-bg-admin: linear-gradient(155deg, var(--color4)  30%, color-mix(in srgb , var(--color-sec) 100% , var(--color4) 100% ) 100%) ; */
-    --color-bg-admin: linear-gradient(165deg, var(--color4)  40%, color-mix(in srgb , var(--color-sec) 100% , var(--color4) 100% ) 100%) ;
+
+    --color-bg-admin: linear-gradient(
+        165deg, 
+        var(--color4)  40%, 
+        color-mix(in srgb , var(--color-sec) 100% , var(--color4) 45% ) 100%
+        );
+
 
     
 }
@@ -43,7 +49,7 @@ body {
 .logo_admin {
     /* border-radius: 100px; */
     width: 100px;
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 
 }
 
@@ -494,7 +500,7 @@ i {
     /* height: 52.5vh; */
     /* max-height: 52.5vh; */
     max-height: 60.5vh;
-    width: calc(100vw - var(--width-aside) - 4.5vw);
+    /* width: calc(100vw - var(--width-aside) - 4.5vw); */
     /* width: 100%; */
     /* width: 1000px; */
     position: relative;
@@ -539,10 +545,22 @@ th:not(.opciones_column) {
 }
 
 th:not(.opciones_column):hover {
-    /* background-color: color(from var(--color3) srgb 20 40 60); */
-    background-color: color-mix(in srgb, var(--color3) 90%, #ffffff 20%);
-    scale: 1.01;
+    /* background-color: color-mix(in srgb, var(--color3) 90%, #ffffff 20%); */
+    color: var(--color-sec);
+    /* scale: 1.01; */
 }
+
+/* table th {
+    background-color: color-mix(in srgb, var(--color21) 30%, white 70%);
+    border: 1px solid var(--color21);
+    color: color-mix(in srgb, var(--color21) 80%, white 0%) ;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding-inline: 10px;
+    padding-block: 5px;
+    text-align: center;
+} */
 
 table th {
     background-color: var(--color3);
@@ -552,7 +570,6 @@ table th {
     z-index: 2;
     padding-inline: 10px;
     padding-block: 5px;
-    /* width: 70px ; */
     text-align: center;
 }
 
@@ -643,15 +660,39 @@ th.opciones_column {
     color: var(--color-contrast);
 }
 
-p.activo {
-    border-radius: var(--border-radius-size);
-    padding-inline: 10px;
-    width: fit-content;
-}
-
 p.text_none {
     color: rgb(166, 166, 166);
     text-align: center;
+}
+
+
+/* p.activo {
+    border-radius: var(--border-radius-size);
+    padding-inline: 10px;
+    width: fit-content;
+} */
+
+
+
+p.activo {
+    border-radius: 10px;
+    padding-inline: 10px;
+    width: fit-content;
+    background-color: white ;
+    font-weight: bold;
+    padding-block: 2px;
+}
+
+p.activo.btn_unactive {
+    border: 1px solid var(--color-unactive);
+    background-color: color-mix(in srgb, var(--color-unactive) 20%, white 100%) !important;
+    color: color-mix(in srgb, var(--color-unactive) 100%, #3d3d3d 20%);
+}
+
+p.activo.btn_active {
+    border: 1px solid var(--color-active);
+    background-color: color-mix(in srgb, var(--color-active) 40%, white 100%) !important;
+    color: color-mix(in srgb, var(--color-active) 100%, #3d3d3d 20%);
 }
 
 

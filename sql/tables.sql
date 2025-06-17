@@ -16,9 +16,9 @@ CREATE TABLE causa_reclamo (
   PRIMARY KEY (id));
 CREATE TABLE cliente (
   id               int(10) NOT NULL AUTO_INCREMENT, 
-  correo           varchar(250) NOT NULL UNIQUE, 
+  correo           varchar(250) NOT NULL, 
   telefono         varchar(15), 
-  num_documento    varchar(20) NOT NULL UNIQUE, 
+  num_documento    varchar(20) NOT NULL, 
   nombre_siglas    varchar(150) NOT NULL, 
   apellidos_razon  varchar(150) NOT NULL, 
   tipo_documentoid int(11) NOT NULL, 
@@ -79,10 +79,9 @@ CREATE TABLE detalle_reclamo (
   estado_reclamoid int(10) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE detalle_venta (
-  articuloid              int(10) NOT NULL, 
-  ventanum_serie          int(11) NOT NULL, 
-  ventatipo_comprobanteid int(10) NOT NULL, 
-  cantidad                int(10) NOT NULL, 
+  articuloid     int(10) NOT NULL, 
+  ventanum_serie int(11) NOT NULL, 
+  cantidad       int(10) NOT NULL, 
   PRIMARY KEY (articuloid, 
   ventanum_serie));
 CREATE TABLE empleado (
@@ -90,7 +89,7 @@ CREATE TABLE empleado (
   nombre      varchar(150) NOT NULL, 
   apellidos   varchar(150) NOT NULL, 
   correo      varchar(250) NOT NULL UNIQUE, 
-  n_documento varchar(11), 
+  n_documento varchar(11) NOT NULL, 
   rolid       int(11) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE empleado_salida (
@@ -108,6 +107,9 @@ CREATE TABLE empresa (
   color_sec         varchar(20) NOT NULL, 
   color_ter         varchar(20) NOT NULL, 
   porcentaje_recojo numeric(9, 2) NOT NULL, 
+  ruc               char(11) NOT NULL, 
+  id_sucursal       int(11) NOT NULL, 
+  igv               numeric(9, 2) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE escala (
   sucursalid int(10) NOT NULL, 
@@ -119,6 +121,7 @@ CREATE TABLE estado_encomienda (
   nombre      varchar(200) NOT NULL, 
   descripcion text NOT NULL, 
   activo      tinyint(1) NOT NULL, 
+  tipoEstado  char(1) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE estado_reclamo (
   id     int(10) NOT NULL AUTO_INCREMENT, 
@@ -153,14 +156,15 @@ CREATE TABLE metodo_pago_venta (
   metodo_pagoid    int(11) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE modalidad_pago (
-  id     int(11) NOT NULL AUTO_INCREMENT, 
-  nombre varchar(200) NOT NULL, 
-  activo tinyint(1) NOT NULL, 
+  id          int(11) NOT NULL AUTO_INCREMENT, 
+  nombre      varchar(200) NOT NULL, 
+  descripcion text, 
+  activo      tinyint(1) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE modelo (
   id            int(11) NOT NULL AUTO_INCREMENT, 
   nombre        varchar(20) NOT NULL, 
-  activo        tinyint(1) default 1 NOT NULL, 
+  activo        tinyint(1) NOT NULL, 
   marcaid       int(11) NOT NULL, 
   tipo_unidadid int(10) NOT NULL, 
   PRIMARY KEY (id));
@@ -182,7 +186,7 @@ CREATE TABLE motivo_reclamo (
 CREATE TABLE pagina (
   id            int(11) NOT NULL AUTO_INCREMENT, 
   titulo        varchar(150) NOT NULL, 
-  icono         varchar(150) NULL, 
+  icono         varchar(150) NOT NULL, 
   activo        tinyint(1) DEFAULT 1 NOT NULL, 
   `key`         varchar(150) NOT NULL, 
   tipo_paginaid int(11) NOT NULL, 
@@ -193,11 +197,16 @@ CREATE TABLE paquete (
   clave                            char(4) NOT NULL, 
   valor                            numeric(9, 2) NOT NULL, 
   peso                             numeric(9, 2) NOT NULL, 
-  alto                             numeric(9, 2) NOT NULL, 
-  largo                            numeric(9, 2) NOT NULL, 
+  qr_url                           text, 
+  alto                             numeric(9, 2), 
+  cantidad_folios                  int(11), 
+  estado_pago                      char(1) NOT NULL, 
+  largo                            numeric(9, 2), 
   precio_ruta                      numeric(9, 2) NOT NULL, 
-  ancho                            numeric(9, 2) NOT NULL, 
+  ancho                            numeric(9, 2), 
   descripcion                      text, 
+  nombres_contacto_destinatario    varchar(255) NOT NULL, 
+  apellidos_razon_destinatario     varchar(255) NOT NULL, 
   direccion_destinatario           varchar(255), 
   telefono_destinatario            varchar(20) NOT NULL, 
   num_documento_destinatario       varchar(25) NOT NULL, 
@@ -208,6 +217,7 @@ CREATE TABLE paquete (
   tipo_recepcionid                 int(11) NOT NULL, 
   salidaid                         int(10), 
   transaccion_encomienda_num_serie char(255), 
+  modalidad_pagoid                 int(11) NOT NULL, 
   PRIMARY KEY (tracking));
 CREATE TABLE paquete_descuento (
   paquetetracking int(11) NOT NULL, 
@@ -262,11 +272,10 @@ Quien recibe
 CREATE TABLE regla_cargo (
   id             int(4) NOT NULL AUTO_INCREMENT, 
   tipo_condicion char(1) NOT NULL, 
-  inferior       numeric(9, 2) NULL, 
-  superior       numeric(9, 2)  NULL, 
+  inferior       numeric(9, 2) NOT NULL, 
+  superior       numeric(9, 2), 
   porcentaje     numeric(9, 2) NOT NULL, 
   PRIMARY KEY (id));
-  
 CREATE TABLE rol (
   id          int(11) NOT NULL AUTO_INCREMENT, 
   nombre      varchar(250) NOT NULL, 
@@ -274,7 +283,6 @@ CREATE TABLE rol (
   activo      tinyint(1) DEFAULT 1 NOT NULL, 
   tipo_rolid  int(10) NOT NULL, 
   PRIMARY KEY (id));
-
 CREATE TABLE salida (
   id                  int(10) NOT NULL AUTO_INCREMENT, 
   fecha               date NOT NULL, 
@@ -283,17 +291,18 @@ CREATE TABLE salida (
   entrega             tinyint(1) NOT NULL, 
   estado              char(1) NOT NULL, 
   unidadid            int(10) NOT NULL, 
-  origen_inicio       int(11), 
-  destino_final       int(10) NOT NULL, 
+  origen_incio_id     int(11) NOT NULL, 
+  destino_final_id    int(10) NOT NULL, 
   conductor_principal int(11) NOT NULL, 
   PRIMARY KEY (id));
-
 CREATE TABLE seguimiento (
-  estado_encomiendaid int(10) NOT NULL, 
-  paquetetracking     int(11) NOT NULL, 
-  fecha_hora          date NOT NULL, 
-  PRIMARY KEY (estado_encomiendaid, 
-  paquetetracking));
+  paquetetracking    int(11) NOT NULL, 
+  detalle_estadoid   int(10) NOT NULL, 
+  fecha              date NOT NULL, 
+  hora               time NOT NULL, 
+  tipo_comprobanteid int(10), 
+  PRIMARY KEY (paquetetracking, 
+  detalle_estadoid));
 CREATE TABLE seguimiento_reclamo (
   reclamoid         int(10) NOT NULL, 
   detalle_reclamoid int(10) NOT NULL, 
@@ -392,22 +401,22 @@ CREATE TABLE transaccion_encomienda (
   masivo             tinyint(1) NOT NULL comment ' 1 si es envío masivo
 0 si es un empaque (paquete o sobre)
  ', 
-  descripcion        text NOT NULL, 
+  descripcion        text, 
   monto_total        numeric(9, 2), 
-  recojo_casa        tinyint(1) NOT NULL, 
+  recojo_casa        tinyint(1), 
   id_sucursal_origen int(11) NOT NULL, 
-  estado_pago        char(1) NOT NULL, 
   fecha              date NOT NULL, 
   hora               time NOT NULL, 
   direccion_recojo   varchar(255), 
+  comprobante_serie  char(255) NOT NULL UNIQUE, 
   clienteid          int(10) NOT NULL, 
   tipo_comprobanteid int(10) NOT NULL, 
   PRIMARY KEY (num_serie));
 CREATE TABLE transaccion_venta (
   num_serie          int(11) NOT NULL AUTO_INCREMENT, 
   tipo_comprobanteid int(10) NOT NULL, 
+  estado             tinyint(1) DEFAULT 0 NOT NULL, 
   monto_total        numeric(9, 2), 
-  estado             int(11) DEFAULT 0 NOT NULL, 
   fecha              date NOT NULL, 
   hora               time NOT NULL, 
   clienteid          int(10) NOT NULL, 
@@ -438,6 +447,18 @@ CREATE TABLE usuario (
   tipo_usuario char(1) NOT NULL, 
   activo       tinyint(1) NOT NULL, 
   PRIMARY KEY (id));
+ALTER TABLE seguimiento ADD CONSTRAINT FKseguimient92123 FOREIGN KEY (tipo_comprobanteid) REFERENCES tipo_comprobante (id);
+ALTER TABLE paquete ADD CONSTRAINT FKpaquete940812 FOREIGN KEY (modalidad_pagoid) REFERENCES modalidad_pago (id);
+ALTER TABLE paquete ADD CONSTRAINT FKpaquete94264 FOREIGN KEY (tipo_empaqueid) REFERENCES tipo_empaque (id);
+ALTER TABLE paquete ADD CONSTRAINT FKpaquete329420 FOREIGN KEY (contenido_paqueteid) REFERENCES contenido_paquete (id);
+ALTER TABLE paquete ADD CONSTRAINT FKpaquete992725 FOREIGN KEY (tipo_documento_destinatario_id) REFERENCES tipo_documento (id);
+ALTER TABLE paquete ADD CONSTRAINT FKpaquete691155 FOREIGN KEY (salidaid) REFERENCES salida (id);
+ALTER TABLE paquete ADD CONSTRAINT FKpaquete532667 FOREIGN KEY (tipo_recepcionid) REFERENCES tipo_recepcion (id);
+ALTER TABLE paquete ADD CONSTRAINT FKpaquete148321 FOREIGN KEY (transaccion_encomienda_num_serie) REFERENCES transaccion_encomienda (num_serie);
+ALTER TABLE paquete_descuento ADD CONSTRAINT FKpaquete_de604728 FOREIGN KEY (paquetetracking) REFERENCES paquete (tracking);
+ALTER TABLE reclamo ADD CONSTRAINT FKreclamo680466 FOREIGN KEY (paquetetracking) REFERENCES paquete (tracking);
+ALTER TABLE seguimiento ADD CONSTRAINT FKseguimient381900 FOREIGN KEY (paquetetracking) REFERENCES paquete (tracking);
+ALTER TABLE seguimiento ADD CONSTRAINT FKseguimient567863 FOREIGN KEY (detalle_estadoid) REFERENCES detalle_estado (id);
 ALTER TABLE seguimiento_reclamo ADD CONSTRAINT FKseguimient644896 FOREIGN KEY (detalle_reclamoid) REFERENCES detalle_reclamo (id);
 ALTER TABLE seguimiento_reclamo ADD CONSTRAINT FKseguimient693109 FOREIGN KEY (reclamoid) REFERENCES reclamo (id);
 ALTER TABLE detalle_reclamo ADD CONSTRAINT FKdetalle_re335454 FOREIGN KEY (estado_reclamoid) REFERENCES estado_reclamo (id);
@@ -446,7 +467,6 @@ ALTER TABLE mensaje_contacto ADD CONSTRAINT FKmensaje_co632658 FOREIGN KEY (tipo
 ALTER TABLE mensaje_contacto ADD CONSTRAINT FKmensaje_co868453 FOREIGN KEY (tipo_documentoid) REFERENCES tipo_documento (id);
 ALTER TABLE detalle_estado ADD CONSTRAINT FKdetalle_es814073 FOREIGN KEY (estado_encomiendaid) REFERENCES estado_encomienda (id);
 ALTER TABLE paquete_descuento ADD CONSTRAINT FKpaquete_de412901 FOREIGN KEY (descuentoid) REFERENCES descuento (id);
-ALTER TABLE paquete_descuento ADD CONSTRAINT FKpaquete_de604728 FOREIGN KEY (paquetetracking) REFERENCES paquete (tracking);
 ALTER TABLE descuento_articulo ADD CONSTRAINT FKdescuento_822045 FOREIGN KEY (articuloid) REFERENCES articulo (id);
 ALTER TABLE descuento_articulo ADD CONSTRAINT FKdescuento_629531 FOREIGN KEY (descuentoid) REFERENCES descuento (id);
 ALTER TABLE reclamo ADD CONSTRAINT FKreclamo970308 FOREIGN KEY (tipo_documentoid) REFERENCES tipo_documento (id);
@@ -454,7 +474,6 @@ ALTER TABLE reclamo ADD CONSTRAINT FKreclamo820690 FOREIGN KEY (causa_reclamoid)
 ALTER TABLE causa_reclamo ADD CONSTRAINT FKcausa_recl554759 FOREIGN KEY (motivo_reclamoid) REFERENCES motivo_reclamo (id);
 ALTER TABLE motivo_reclamo ADD CONSTRAINT FKmotivo_rec334818 FOREIGN KEY (tipo_reclamoid) REFERENCES tipo_reclamo (id);
 ALTER TABLE reclamo ADD CONSTRAINT FKreclamo555298 FOREIGN KEY (ubigeocodigo) REFERENCES ubigeo (codigo);
-ALTER TABLE paquete ADD CONSTRAINT FKpaquete94264 FOREIGN KEY (tipo_empaqueid) REFERENCES tipo_empaque (id);
 ALTER TABLE permiso ADD CONSTRAINT FKpermiso814160 FOREIGN KEY (rolid) REFERENCES rol (id);
 ALTER TABLE permiso ADD CONSTRAINT FKpermiso451923 FOREIGN KEY (paginaid) REFERENCES pagina (id);
 ALTER TABLE pagina ADD CONSTRAINT FKpagina193794 FOREIGN KEY (moduloid) REFERENCES modulo (id);
@@ -463,20 +482,13 @@ ALTER TABLE transaccion_encomienda ADD CONSTRAINT FKtransaccio308913 FOREIGN KEY
 ALTER TABLE cliente ADD CONSTRAINT FKcliente404372 FOREIGN KEY (tipo_clienteid) REFERENCES tipo_cliente (id);
 ALTER TABLE transaccion_venta ADD CONSTRAINT FKtransaccio293973 FOREIGN KEY (tipo_comprobanteid) REFERENCES tipo_comprobante (id);
 ALTER TABLE transaccion_encomienda ADD CONSTRAINT FKtransaccio662746 FOREIGN KEY (tipo_comprobanteid) REFERENCES tipo_comprobante (id);
-ALTER TABLE reclamo ADD CONSTRAINT FKreclamo680466 FOREIGN KEY (paquetetracking) REFERENCES paquete (tracking);
 ALTER TABLE pagina ADD CONSTRAINT FKpagina910561 FOREIGN KEY (tipo_paginaid) REFERENCES tipo_pagina (id);
-ALTER TABLE paquete ADD CONSTRAINT FKpaquete329420 FOREIGN KEY (contenido_paqueteid) REFERENCES contenido_paquete (id);
 ALTER TABLE cliente ADD CONSTRAINT FKcliente66106 FOREIGN KEY (tipo_documentoid) REFERENCES tipo_documento (id);
 ALTER TABLE rol ADD CONSTRAINT FKrol677440 FOREIGN KEY (tipo_rolid) REFERENCES tipo_rol (id);
 ALTER TABLE tarifa_ruta ADD CONSTRAINT FKtarifa_rut28234 FOREIGN KEY (sucursal_destino_id) REFERENCES sucursal (id);
 ALTER TABLE tarifa_ruta ADD CONSTRAINT FKtarifa_rut972797 FOREIGN KEY (sucursal_origen_id) REFERENCES sucursal (id);
-ALTER TABLE paquete ADD CONSTRAINT FKpaquete992725 FOREIGN KEY (tipo_documento_destinatario_id) REFERENCES tipo_documento (id);
-ALTER TABLE paquete ADD CONSTRAINT FKpaquete691155 FOREIGN KEY (salidaid) REFERENCES salida (id);
-ALTER TABLE paquete ADD CONSTRAINT FKpaquete532667 FOREIGN KEY (tipo_recepcionid) REFERENCES tipo_recepcion (id);
-ALTER TABLE seguimiento ADD CONSTRAINT FKseguimient381900 FOREIGN KEY (paquetetracking) REFERENCES paquete (tracking);
 ALTER TABLE articulo ADD CONSTRAINT FKarticulo307124 FOREIGN KEY (tamaño_cajaid) REFERENCES tamanio_caja (id);
 ALTER TABLE empleado ADD CONSTRAINT FKempleado961716 FOREIGN KEY (rolid) REFERENCES rol (id);
-ALTER TABLE paquete ADD CONSTRAINT FKpaquete148321 FOREIGN KEY (transaccion_encomienda_num_serie) REFERENCES transaccion_encomienda (num_serie);
 ALTER TABLE metodo_pago_venta ADD CONSTRAINT FKmetodo_pag702897 FOREIGN KEY (metodo_pagoid) REFERENCES metodo_pago (id);
 ALTER TABLE unidad ADD CONSTRAINT FKunidad608127 FOREIGN KEY (modeloid) REFERENCES modelo (id);
 ALTER TABLE modelo ADD CONSTRAINT FKmodelo83299 FOREIGN KEY (tipo_unidadid) REFERENCES tipo_unidad (id);
@@ -484,15 +496,9 @@ ALTER TABLE modelo ADD CONSTRAINT FKmodelo121578 FOREIGN KEY (marcaid) REFERENCE
 ALTER TABLE reclamo ADD CONSTRAINT FKreclamo501927 FOREIGN KEY (tipo_indemnizacionid) REFERENCES tipo_indemnizacion (id);
 ALTER TABLE detalle_venta ADD CONSTRAINT FKdetalle_ve86549 FOREIGN KEY (ventanum_serie) REFERENCES transaccion_venta (num_serie);
 ALTER TABLE detalle_venta ADD CONSTRAINT FKdetalle_ve532256 FOREIGN KEY (articuloid) REFERENCES articulo (id);
-ALTER TABLE seguimiento ADD CONSTRAINT FKseguimient915034 FOREIGN KEY (estado_encomiendaid) REFERENCES detalle_estado (id);
 ALTER TABLE salida ADD CONSTRAINT FKsalida314397 FOREIGN KEY (unidadid) REFERENCES unidad (id);
 ALTER TABLE empleado_salida ADD CONSTRAINT FKempleado_s707218 FOREIGN KEY (salidaid) REFERENCES salida (id);
 ALTER TABLE empleado_salida ADD CONSTRAINT FKempleado_s895470 FOREIGN KEY (empleadoid) REFERENCES empleado (id);
 ALTER TABLE escala ADD CONSTRAINT FKescala650496 FOREIGN KEY (salidaid) REFERENCES salida (id);
 ALTER TABLE escala ADD CONSTRAINT FKescala667165 FOREIGN KEY (sucursalid) REFERENCES sucursal (id);
 ALTER TABLE sucursal ADD CONSTRAINT FKsucursal756715 FOREIGN KEY (ubigeocodigo) REFERENCES ubigeo (codigo);
-alter table modalidad_pago add COLUMN descripcion text
-
-ALTER TABLE `envios`
-  ADD COLUMN `qr_token` VARCHAR(64)   NOT NULL,
-  ADD COLUMN `qr_image` VARCHAR(255)  NOT NULL;

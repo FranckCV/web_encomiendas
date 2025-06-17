@@ -1,3 +1,5 @@
+const LISTA_ENVIOS = [];
+
 const { rutasTarifas } = window.CONFIG_ENVIO || {};
 
 const STORAGE_KEY = "envios_masivos";
@@ -862,9 +864,6 @@ function cargarRecepcion(modalidad) {
 
 
 
-
-
-
 function mostrarModalEliminarTodo() {
   const modal = document.getElementById('modalConfirmacion');
   const mensajeParrafo = modal.querySelector('p');
@@ -1334,37 +1333,137 @@ function exportXLSX() {
 
 
 
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('btn-continuar');
+// document.addEventListener('DOMContentLoaded', () => {
+//   const btn = document.getElementById('btn-continuar');
 
-  btn.addEventListener('click', async () => {
-    // 1) comprueba que haya al menos un envío registrado
-    if (!window.registros || registros.length === 0) {
-      return showModal({ message: 'Agrega al menos un envío antes de continuar.' });
+//   btn.addEventListener('click', async () => {
+//     // 1) comprueba que haya al menos un envío registrado
+//     if (!window.registros || registros.length === 0) {
+//       return showModal({ message: 'Agrega al menos un envío antes de continuar.' });
+//     }
+
+//     try {
+//       // 2) envía el JSON y fuerza application/json
+//       const resp = await fetch('/resumen_envio', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({ registros })
+//       });
+
+//       if (!resp.ok) {
+//         const txt = await resp.text();
+//         throw new Error(`(${resp.status}) ${txt}`);
+//       }
+
+//       // 3) recibe el HTML renderizado y lo pinta
+//       const html = await resp.text();
+//       document.open();
+//       document.write(html);
+//       document.close();
+
+//     } catch (err) {
+//       console.error(err);
+//       showModal({ message: 'No fue posible generar el resumen: ' + err.message });
+//     }
+//   });
+// });
+document.querySelector(".btn-agregar").addEventListener("click", function () {
+  const claveInputs = document.querySelectorAll(".pin-input");
+  const clave = Array.from(claveInputs).map(input => input.value).join("");
+
+  // if (clave.length !== 4 || clave.includes("")) {
+  //   alert("Ingrese una clave de 4 dígitos.");
+  //   return;
+  // }
+
+  const envio = {
+    clave,
+    valorEnvio: parseFloat(document.getElementById("m-valorEnvio").value),
+    peso: parseFloat(document.getElementById("m-peso").value),
+    largo: parseFloat(document.getElementById("m-largo").value),
+    ancho: parseFloat(document.getElementById("m-ancho").value),
+    alto: parseFloat(document.getElementById("m-alto").value),
+    descripcion: document.getElementById("m-descripcionArticulo").value || "",
+    // tarifa: 0, // esta función la debes definir tú
+    telefono_destinatario: document.getElementById("m-celular").value,
+    tipo_doc_destinatario: parseInt(document.getElementById("m-tipoDocumento").value),
+    tipo_empaqueid: parseInt(document.getElementById("m-tipoEmpaque").value),
+    contenido_paqueteid: parseInt(document.getElementById("m-tipoArticulo").value),
+    tipo_recepcionid: parseInt(document.getElementById("m-tipoEntrega").value),
+    destino: {
+      num_doc_destinatario: document.getElementById("m-nroDocumento").value,
+      sucursal_destino: parseInt(document.getElementById("select-sucursal").value)
+    },
+    origen: {
+      sucursal_origen: parseInt(document.getElementById("origen-sucursal").value)
     }
+  };
 
-    try {
-      // 2) envía el JSON y fuerza application/json
-      const resp = await fetch('/resumen_envio', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ registros })
-      });
+  LISTA_ENVIOS.push(envio);
+  actualizarTablaEnvios(); // opcional para mostrar en pantalla
+  limpiarCampos(); // opcional para limpiar los inputs
+  console.log("Envíos registrados:", LISTA_ENVIOS);
+});
 
-      if (!resp.ok) {
-        const txt = await resp.text();
-        throw new Error(`(${resp.status}) ${txt}`);
-      }
-
-      // 3) recibe el HTML renderizado y lo pinta
-      const html = await resp.text();
-      document.open();
-      document.write(html);
-      document.close();
-
-    } catch (err) {
-      console.error(err);
-      showModal({ message: 'No fue posible generar el resumen: ' + err.message });
-    }
+function limpiarCampos() {
+  const ids = [
+    "m-valorEnvio", "m-peso", "m-largo", "m-ancho", "m-alto", "m-descripcionArticulo",
+    "m-nroDocumento", "m-celular", "m-nombres", "m-apellidos"
+  ];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
   });
+
+  document.querySelectorAll(".pin-input").forEach(input => input.value = "");
+}
+
+document.getElementById("btn-continuar").addEventListener("click", async function () {
+  try {
+    const remitente = {
+      tipo_doc_remitente: document.getElementById("remitente-tipo-doc").value,
+      num_doc_remitente: document.getElementById("remitente-numero-doc").value,
+      num_tel_remitente: document.getElementById("remitente-telefono").value,
+      nombre_remitente: document.getElementById("remitente-nombre").value,
+      correo: document.getElementById("remitente-email").value
+    };
+
+    const modalidad_pago = document.querySelector("input[name='modalidad_pago']:checked")?.value || null;
+
+    const tipo_comprobante = 1; // O puedes obtenerlo de algún select/radio adicional si existe
+
+    // Envíos agregados (asumimos que los fuiste acumulando en JS)
+    const envios = window.LISTA_ENVIOS || []; // si usas una lista JS interna
+
+    // if (envios.length === 0) {
+    //   alert("Debe agregar al menos un envío.");
+    //   return;
+    // }
+
+    const resumenEnvios = {
+      remitente,
+      modalidad_pago,
+      tipo_comprobante,
+      envios
+    };
+
+    const response = await fetch("/generar_comprobante", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(resumenEnvios)
+    });
+
+    const data = await response.json();
+    if (data.ok) {
+      alert("Comprobante registrado exitosamente");
+      // window.location.href = `/ver_comprobante/${data.serie}`;
+    } else {
+      alert("Error al registrar comprobante.");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error inesperado.");
+  }
 });

@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Encomiendas - Administración</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #64748b;
+            --success-color: #059669;
+            --danger-color: #dc2626;
+            --warning-color: #d97706;
+            --info-color: #0891b2;
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --sidebar-bg: #1e293b;
+            --sidebar-active: #334155;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --radius: 8px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .nav-section {
+            padding: 1rem;
+        }
+
+        .nav-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.25rem;
+            border-radius: var(--radius);
+            color: #e2e8f0;
+            text-decoration: none;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-badge {
+            background: var(--primary-color);
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            margin-left: auto;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .page-header {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-left: auto;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .user-details h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .user-details p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            background: var(--bg-secondary);
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .filter-select {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--bg-secondary);
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Table */
+        .table-container {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table thead {
+            background: #f8fafc;
+        }
+
+        .table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        .table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: var(--success-color);
+        }
+
+        .status-inactive {
+            background: #fee2e2;
+            color: var(--danger-color);
+        }
+
+        /* Action Buttons */
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-view {
+            background: #e0f2fe;
+            color: var(--info-color);
+        }
+
+        .btn-view:hover {
+            background: #b3e5fc;
+        }
+
+        .btn-edit {
+            background: #fff3cd;
+            color: var(--warning-color);
+        }
+
+        .btn-edit:hover {
+            background: #ffe69c;
+        }
+
+        .btn-delete {
+            background: #ffebee;
+            color: var(--danger-color);
+        }
+
+        .btn-delete:hover {
+            background: #ffcdd2;
+        }
+
+        /* Pagination */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pagination-info {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .pagination {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .page-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover {
+            background: var(--bg-primary);
+        }
+
+        .page-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Tooltips */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-primary);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 1000;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-shipping-fast"></i>
+                    <span>EncomiendaApp</span>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Panel</div>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Administración</div>
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-truck"></i>
+                    <span>Gestionar Marcas</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-tools"></i>
+                    <span>Mantenimientos</span>
+                    <span class="nav-badge">8</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-cogs"></i>
+                    <span>Funcionalidades</span>
+                    <span class="nav-badge">1</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reportes</span>
+                    <span class="nav-badge">2</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-top">
+                    <h1 class="page-title">
+                        <i class="fas fa-truck"></i>
+                        Gestionar marcas de unidades
+                    </h1>
+                    <div class="user-info">
+                        <div class="user-avatar">AR</div>
+                        <div class="user-details">
+                            <h4>Ana Ramírez</h4>
+                            <p>SuperAdministrador</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" placeholder="Buscar por nombre de marca..." id="searchInput">
+                    </div>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="">Todos los estados</option>
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                    </select>
+                    <a href="#" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Agregar Marca
+                    </a>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td>1</td>
+                            <td>Volvo</td>
+                            <td><span class="status-badge status-active">Activo</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="action-btn btn-view tooltip" data-tooltip="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="action-btn btn-edit tooltip" data-tooltip="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn btn-delete tooltip" data-tooltip="Eliminar" onclick="confirmDelete('Volvo')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Iveco</td>
+                            <td><span class="status-badge status-active">Activo</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="action-btn btn-view tooltip" data-tooltip="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="action-btn btn-edit tooltip" data-tooltip="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn btn-delete tooltip" data-tooltip="Eliminar" onclick="confirmDelete('Iveco')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Scania</td>
+                            <td><span class="status-badge status-active">Activo</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="action-btn btn-view tooltip" data-tooltip="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="action-btn btn-edit tooltip" data-tooltip="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn btn-delete tooltip" data-tooltip="Eliminar" onclick="confirmDelete('Scania')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Mercedes-Benz</td>
+                            <td><span class="status-badge status-active">Activo</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="action-btn btn-view tooltip" data-tooltip="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="action-btn btn-edit tooltip" data-tooltip="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn btn-delete tooltip" data-tooltip="Eliminar" onclick="confirmDelete('Mercedes-Benz')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>DAF</td>
+                            <td><span class="status-badge status-active">Activo</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="action-btn btn-view tooltip" data-tooltip="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="action-btn btn-edit tooltip" data-tooltip="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn btn-delete tooltip" data-tooltip="Eliminar" onclick="confirmDelete('DAF')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>Renault Trucks</td>
+                            <td><span class="status-badge status-active">Activo</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="action-btn btn-view tooltip" data-tooltip="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="action-btn btn-edit tooltip" data-tooltip="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn btn-delete tooltip" data-tooltip="Eliminar" onclick="confirmDelete('Renault Trucks')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>Hino</td>
+                            <td><span class="status-badge status-active">Activo</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="action-btn btn-view tooltip" data-tooltip="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="action-btn btn-edit tooltip" data-tooltip="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn btn-delete tooltip" data-tooltip="Eliminar" onclick="confirmDelete('Hino')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>Mitsubishi</td>
+                            <td><span class="status-badge status-active">Activo</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="action-btn btn-view tooltip" data-tooltip="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="action-btn btn-edit tooltip" data-tooltip="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn btn-delete tooltip" data-tooltip="Eliminar" onclick="confirmDelete('Mitsubishi')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td>Isuzu</td>
+                            <td><span class="status-badge status-active">Activo</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="action-btn btn-view tooltip" data-tooltip="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="action-btn btn-edit tooltip" data-tooltip="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn btn-delete tooltip" data-tooltip="Eliminar" onclick="confirmDelete('Isuzu')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                <div class="pagination-container">
+                    <div class="pagination-info">
+                        Mostrando 1-9 de 12 registros
+                    </div>
+                    <div class="pagination">
+                        <button class="page-btn" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const tableBody = document.getElementById('tableBody');
+
+        function filterTable() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value.toLowerCase();
+            const rows = tableBody.getElementsByTagName('tr');
+
+            for (let row of rows) {
+                const name = row.cells[1].textContent.toLowerCase();
+                const status = row.cells[2].textContent.toLowerCase();
+                
+                const matchesSearch = name.includes(searchTerm);
+                const matchesStatus = !statusFilter || status.includes(statusFilter);
+                
+                row.style.display = matchesSearch && matchesStatus ? '' : 'none';
+            }
+        }
+
+        searchInput.addEventListener('input', filterTable);
+        statusFilter.addEventListener('change', filterTable);
+
+        // Confirm delete
+        function confirmDelete(brandName) {
+            if (confirm(`¿Estás seguro de que deseas eliminar la marca "${brandName}"?`)) {
+                // Here you would make the actual delete request
+                alert(`Marca "${brandName}" eliminada exitosamente`);
+            }
+        }
+
+        // Add some interactive effects
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                if (!this.classList.contains('btn-delete')) {
+                    // Add a subtle animation for non-delete buttons
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
