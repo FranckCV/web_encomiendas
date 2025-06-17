@@ -50,6 +50,10 @@ from controladores import controlador_articulo as controlador_articulo
 from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 from controladores import controlador_encomienda as controlador_encomienda
 from controladores import controlador_encomiendasss as  controlador_encomiendasss
+from controladores import reporte_listar_enco 
+from controladores import reporte_reclamo_causa
+from controladores import reporte_UsoUnidades
+from controladores import reporte_Viajes_por_Unidad
 # import BytesIO
 from itsdangerous import URLSafeSerializer
 from controladores.bd import sql_execute
@@ -406,35 +410,46 @@ CONTROLADORES = {
         }
     },
     "reclamo": {
-        "active": True,
-        "id": "reclamo",
-        "titulo": "Reclamos",
-        "nombre_tabla": "reclamo",
-        "controlador": controlador_reclamo,  # Asegúrate de importar esto arriba
-        "icon_page": "fa-solid fa-file",  # Puedes cambiar el ícono
-        "filters": [],
-        "fields_form": [
-            ['id', 'ID', 'ID', 'text', True, False, None],
-            ['nombres_razon', 'Cliente', 'Cliente', 'text', True, True, None],
-            ['direccion', 'Dirección', 'Dirección', 'text', True, True, None],
-            ['correo', 'Correo', 'Correo', 'email', True, True, None],
-            ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
-            ['titulo_incidencia', 'Incidencia', 'Incidencia', 'text', True, True, None],
-            ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
-            ['fecha_recojo', 'Fecha de recojo', 'Fecha', 'date', True, True, None],
-            ['estado_reclamoid', 'Estado', 'Estado', 'select', True, True, [lambda: controlador_estado_reclamo.get_options(), 'nombre']],
-            ['sucursal_id', 'Sucursal', 'Sucursal', 'select', True, True, [lambda: controlador_sucursal.get_options(), 'direccion']]
-        ],
-        "crud_forms": {
-            "crud_list": True,
-            "crud_search": True,
-            "crud_consult": True,
-            "crud_insert": True,
-            "crud_update": True,
-            "crud_delete": True,
-            "crud_unactive": False
-        }
-    },
+    "active": True,
+    "id": "reclamo",
+    "titulo": "Reclamos",
+    "nombre_tabla": "reclamo",
+    "controlador": controlador_reclamo,
+    "icon_page": "fa-solid fa-file",
+    "filters": [],
+    "fields_form": [
+        ['id', 'ID', 'ID', 'text', True, False, None],
+        ['nombres_razon', 'Cliente', 'Cliente', 'text', True, True, None],
+        ['direccion', 'Dirección', 'Dirección', 'text', True, True, None],
+        ['correo', 'Correo', 'Correo', 'email', True, True, None],
+        ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
+        ['n_documento', 'N° Documento', '', 'text', True, True, None],
+        ['titulo_incidencia', 'Incidencia', '', 'text', True, True, None],
+        ['bien_contratado', 'Bien Contratado', '', 'text', True, True, None],
+        ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
+        ['monto_indemnizado', 'Monto Indemnizado', '0.00', 'number', True, True, None],
+        ['relacion', 'Relación con el bien', '', 'text', True, True, None],
+        ['fecha_recojo', 'Fecha de recojo', '', 'date', True, True, None],
+        ['descripcion', 'Descripción', '', 'textarea', True, True, None],
+        ['pedido', 'Pedido', '', 'text', True, True, None],
+        ['sucursal_id', 'Sucursal', '', 'select', True, True, [lambda: controlador_sucursal.get_options(), 'direccion']],
+        ['causa_reclamoid', 'Causa del Reclamo', '', 'select', True, True, [lambda: controlador_causa_reclamo.get_options(), 'nombre']],
+        ['tipo_indemnizacionid', 'Tipo de Indemnización', '', 'select', True, True, [lambda: controlador_tipo_indemnizacion.get_options(), 'nombre']],
+        ['paquetetracking', 'Tracking', '', 'text', True, True, None],
+        ['ubigeocodigo', 'Ubigeo', '', 'text', True, True, None],
+        ['tipo_documentoid', 'Tipo Documento', '', 'select', True, True, [lambda: controlador_tipo_documento.get_options(), 'nombre']]
+    ],
+    "crud_forms": {
+        "crud_list": True,
+        "crud_search": True,
+        "crud_consult": True,
+        "crud_insert": True,
+        "crud_update": True,
+        "crud_delete": True,
+        "crud_unactive": False
+    }
+},
+
     "pregunta_frecuente": {
         "active": True,
         "titulo": "preguntas frecuentes",
@@ -1390,6 +1405,37 @@ REPORTES = {
         ] ,
         
     },
+    "reporte_uso_unidades": {
+    "active" : True,
+    'icon_page': 'fa-solid fa-chart-line',
+    "titulo": "Reporte de uso de unidades",
+    "table" : reporte_UsoUnidades.get_reporte_uso_unidades(),
+    "filters": []
+},
+"viajes_por_unidad": {
+    "active": True,
+    "icon_page": "fa-solid fa-truck-fast",
+    "titulo": "Viajes por unidad",
+    "table": reporte_Viajes_por_Unidad.get_reporte_viajes_por_unidad(),  # 👈 FUNCIÓN EJECUTADA
+    "filters": []
+},
+
+"encomiendas_por_ruta": {
+    "active": True,
+    "icon_page": "fa-solid fa-boxes-packing",
+    "titulo": "Listado de encomiendas asignadas a rutas específicas ",
+    "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo(),
+    "filters": []
+},
+
+"reporte_reclamos_tipo_causa_periodo": {
+    "active": True,
+    "icon_page": "fa-solid fa-clipboard-list",
+    "titulo": "Reporte de reclamos por tipo, causa y periodo",
+    "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),
+    "filters": []
+},
+
     
     
 }
@@ -1574,17 +1620,28 @@ TRANSACCIONES = {
         "crud_forms": {
             "crud_list": True ,
             "crud_search": False ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
+            "crud_consult": False ,
+            "crud_insert": False ,
+            "crud_update": False ,
+            "crud_delete": True , 
             "crud_unactive": False ,
-        }
+        },
+        "buttons": [
+            # parametros - icon - color - enlace_function
+            [False,   f'{ICON_CONSULT}',   '#3165fd',  'salida_informacion', {} , ''],
+            [False,   f'{ICON_UPDATE}',   '#ccac1c',  'salida_informacion', {} , ''],
+            # [True,   f'fa-solid fa-location-dot',   'grey',  'seguimiento_empleado_prueba' , {"placa": "placa"}],
+            [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa'], 
+        ],
+        "options": [
+            # icon - color - text - enlace_function
+            [False,   f'{ICON_INSERT}',   'green',  'Programar', 'salida_informacion'],
+        ],
     },
     "transaccion_encomienda": {
         "active": True,
         "titulo": "Encomiendas",
-        "nombre_tabla": "transaccion_encomienda",
+        "nombre_tabla": "encomienda",
         "controlador": controlador_encomienda,
         "icon_page": "fa-solid fa-boxes-packing",
         "filters": [],
@@ -1593,8 +1650,7 @@ TRANSACCIONES = {
             ['masivo',            'Tipo de Envío',      '1: Masivo / 0: Individual','number', True,  True,   None],
             ['monto_total',       'Monto Total',        'Total a pagar',           'number', True,  True,   None],
             ['recojo_casa',       'Recojo a Domicilio', '1: Sí / 0: No',           'number', True,  True,   None],
-            ['sucursal_origen','Sucursal Origen',    'ID de Sucursal',          'number', True,  True,   None],
-            ['estado_pago',       'Estado de Pago',     'P: Pendiente / C: Cancelado','text', True,  True,   None],
+            ['nom_sucursal_origen','Sucursal Origen',    'ID de Sucursal',          'number', True,  True,   None],
             ['nom_tip_comprobante','Tipo Comprobante',   'Tipo Comprobante',     'number', True,  True,   None],
             ['nombre_cliente',         'Cliente',            'Nombre del cliente',          'text', True,  True,   None]
         ],
@@ -1602,14 +1658,61 @@ TRANSACCIONES = {
             "crud_list": True,
             "crud_search": False,
             "crud_consult": True,
-            "crud_insert": False,
+            "crud_insert": True,
             "crud_update": True,
             "crud_delete": True,
             "crud_unactive": False
         },
-        "buttons": {
-            
-        }
+        "buttons": [
+            [True, 'fa-solid fa-boxes', "#77D62E", 'transaccion', {"tabla": "::paquete", "pk_foreign": "num_serie"}],
+        ],
+        "options": [
+        ],
+    },
+    "paquete": {
+        "active": True,
+        "titulo": "Paquetes",
+        "nombre_tabla": "paquete",
+        "controlador": controlador_paquete,
+        "icon_page": "fa-solid fa-boxes",
+        "filters": [],
+        "fields_form": [
+        #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
+            ['tracking',                       'Tracking',             'Tracking',             'text',   False,  True,   None],
+            ['valor',                          'Valor',                'Valor',                'text',   False,  True,   None],
+            ['peso',                           'Peso',                 'Peso',                 'text',   False,  True,   None],
+            ['estado_pago',                    'Pago',                 'Pago',                 'text',   False,  True,   None],
+            ['nombres_contacto_destinatario',  'Nombre destinatario',  'Nombre destinatario',  'text',   False,  True,   None],
+            ['apellidos_razon_destinatario',   'Apellido/Razón',       'Apellido/Razón',       'text',   False,  True,   None],
+            ['num_documento_destinatario',     'Doc. Identidad',       'Doc. Identidadaa',     'text',   False,  True,   None],
+            ['tipo_documento',                 'Tipo Documento',       'Tipo Documento',       'text',   False,  True,   None],
+            ['tipo_empaque',                   'Empaque',              'Empaque',              'text',   False,  True,   None],
+            ['contenido_paquete',              'Contenido',            'Contenido',            'text',   False,  True,   None],
+            ['tipo_recepcion',                 'Recepción',            'Recepción',            'text',   False,  True,   None],
+            ['modalidad_pago',                 'Pago modalidad',       'Pago modalidad',       'text',   False,  True,   None],
+            ['direccion_destino',              'Dirección destino',    'Dirección destino',    'text',   False,  True,   None],
+            ['localidad',                      'Ubigeo destino',       'Ubigeo destino',       'text',   False,  True,   None],
+            ['num_serie',                      'N° Serie',             'N° Serie',             'text',   False,  True,   None],
+            ['fecha',                          'Fecha envío',          'Fecha envío',          'text',   False,  True,   None],
+            ['hora',                           'Hora envío',           'Hora envío',           'text',   False,  True,   None],
+            ['monto_total',                    'Total S/.',            'Total S/.',            'text',   False,  True,   None],
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": False,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": False
+        },
+        "buttons": [
+            [True, 'fa-solid fa-boxes', "#9856EE", 'seguimiento_tracking', {"tracking": "tracking"}],
+        ],
+        "options": [
+            [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Encomiendas', 'transaccion' , {"tabla": "::transaccion_encomienda" }],
+
+        ],
     }
 
 }
@@ -3825,9 +3928,10 @@ def crud_generico(tabla):
             )
 
 
-@app.route("/transaccion=<tabla>")
+@app.route("/transaccion=<tabla>",defaults={'pk_foreign': None})
+@app.route("/transaccion=<tabla>/<pk_foreign>")
 @validar_empleado()
-def transaccion(tabla):
+def transaccion(tabla , pk_foreign):
     config = TRANSACCIONES.get(tabla)
     page = permiso.get_pagina_key(tabla)
     user_info = getDatosUsuario()
@@ -3846,9 +3950,14 @@ def transaccion(tabla):
             filters = config["filters"]
             fields_form = config["fields_form"]
             controlador = config["controlador"]
+            buttons = config['buttons']
+            options = config['options']
 
             existe_activo = controlador.exists_Activo()
-            columnas , filas = controlador.get_table()
+            if pk_foreign is not None:
+                columnas , filas = controlador.get_table_pk_foreign(pk_foreign = pk_foreign)
+            else:
+                columnas , filas = controlador.get_table()
             primary_key = controlador.get_primary_key()
             table_columns  = list(filas[0].keys()) if filas else []
             
@@ -3882,6 +3991,9 @@ def transaccion(tabla):
                 crud_delete    = crud_delete,
                 crud_unactive  = crud_unactive,
                 esTransaccion = True ,
+                buttons = buttons ,
+                options = options ,
+                pk_foreign = pk_foreign if pk_foreign else None
             )
 
     

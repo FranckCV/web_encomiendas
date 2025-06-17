@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Paquetes de Encomienda</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            background: #3498db;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .header-content h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .header-content p {
+            color: #bdc3c7;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 20px;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .search-btn:hover {
+            background: #2980b9;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 120px;
+        }
+
+        .add-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s;
+        }
+
+        .add-btn:hover {
+            background: #229954;
+        }
+
+        .table-container {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e0e6ed;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: #34495e;
+            color: white;
+        }
+
+        th {
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 1px solid #2c3e50;
+        }
+
+        th:last-child {
+            text-align: center;
+            width: 180px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #ecf0f1;
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        tbody tr:nth-child(even):hover {
+            background: #e9ecef;
+        }
+
+        td {
+            padding: 15px 20px;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-activo {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pendiente {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-entregado {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-view {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-edit {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding: 20px 0;
+        }
+
+        .pagination-info {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .page-btn {
+            padding: 8px 12px;
+            border: 1px solid #bdc3c7;
+            background: white;
+            color: #2c3e50;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .page-btn:hover {
+            background: #ecf0f1;
+        }
+
+        .page-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .encomienda-info {
+            background: #e8f4f8;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .encomienda-details {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .encomienda-field {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .encomienda-field label {
+            font-size: 12px;
+            color: #6c757d;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .encomienda-field span {
+            font-size: 14px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .weight-badge {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .toolbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .search-container {
+                max-width: 100%;
+            }
+
+            .filters {
+                flex-wrap: wrap;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .encomienda-details {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 800px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">📦</div>
+            <div class="header-content">
+                <h1>Gestionar Paquetes de Encomienda</h1>
+                <p>Administra los paquetes asociados a la encomienda</p>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Información de la encomienda -->
+            <div class="encomienda-info">
+                <div class="encomienda-details">
+                    <div class="encomienda-field">
+                        <label>Número de Serie</label>
+                        <span id="numSerie">ENC-2024-001234</span>
+                    </div>
+                    <div class="encomienda-field">
+                        <label>Destino</label>
+                        <span>Lima, Perú</span>
+                    </div>
+                    <div class="encomienda-field">
+                        <label>Estado</label>
+                        <span class="status-badge status-activo">En Tránsito</span>
+                    </div>
+                    <div class="encomienda-field">
+                        <label>Total Paquetes</label>
+                        <span id="totalPaquetes">8</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Barra de herramientas -->
+            <div class="toolbar">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Buscar por código de paquete, descripción...">
+                    <button class="search-btn">🔍</button>
+                </div>
+                <div class="filters">
+                    <select class="filter-select">
+                        <option value="">Todos los estados</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="entregado">Entregado</option>
+                        <option value="activo">En Tránsito</option>
+                    </select>
+                    <button class="add-btn">
+                        ➕ Agregar Paquete
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabla de paquetes -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Código Paquete</th>
+                            <th>Descripción</th>
+                            <th>Peso (kg)</th>
+                            <th>Dimensiones</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paquetesTable">
+                        <tr>
+                            <td>1</td>
+                            <td>PKG-001</td>
+                            <td>Documentos comerciales</td>
+                            <td>0.5</td>
+                            <td>30x20x5 cm</td>
+                            <td><span class="status-badge status-activo">En Tránsito</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="action-btn btn-view" title="Ver detalles">👁️</button>
+                                    <button class="action-btn btn-edit" title="Editar">✏️</button>
+                                    <button class="action-btn btn-delete" title="Eliminar">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>PKG-002</td>
+                            <td>Repuestos automotrices</td>
+                            <td>15.2</td>
+                            <td>50x30x25 cm</td>
+                            <td><span class="status-badge status-activo">En Tránsito</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="action-btn btn-view" title="Ver detalles">👁️</button>
+                                    <button class="action-btn btn-edit" title="Editar">✏️</button>
+                                    <button class="action-btn btn-delete" title="Eliminar">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>PKG-003</td>
+                            <td>Productos textiles</td>
+                            <td>8.7</td>
+                            <td>40x35x20 cm</td>
+                            <td><span class="status-badge status-entregado">Entregado</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="action-btn btn-view" title="Ver detalles">👁️</button>
+                                    <button class="action-btn btn-edit" title="Editar">✏️</button>
+                                    <button class="action-btn btn-delete" title="Eliminar">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>PKG-004</td>
+                            <td>Equipos electrónicos</td>
+                            <td>22.1</td>
+                            <td>60x40x30 cm</td>
+                            <td><span class="status-badge status-pendiente">Pendiente</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="action-btn btn-view" title="Ver detalles">👁️</button>
+                                    <button class="action-btn btn-edit" title="Editar">✏️</button>
+                                    <button class="action-btn btn-delete" title="Eliminar">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>PKG-005</td>
+                            <td>Medicamentos y suministros</td>
+                            <td>3.8</td>
+                            <td>25x20x15 cm</td>
+                            <td><span class="status-badge status-activo">En Tránsito</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="action-btn btn-view" title="Ver detalles">👁️</button>
+                                    <button class="action-btn btn-edit" title="Editar">✏️</button>
+                                    <button class="action-btn btn-delete" title="Eliminar">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>PKG-006</td>
+                            <td>Herramientas de trabajo</td>
+                            <td>12.4</td>
+                            <td>45x25x20 cm</td>
+                            <td><span class="status-badge status-activo">En Tránsito</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="action-btn btn-view" title="Ver detalles">👁️</button>
+                                    <button class="action-btn btn-edit" title="Editar">✏️</button>
+                                    <button class="action-btn btn-delete" title="Eliminar">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>PKG-007</td>
+                            <td>Productos alimenticios</td>
+                            <td>6.9</td>
+                            <td>35x25x18 cm</td>
+                            <td><span class="status-badge status-entregado">Entregado</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="action-btn btn-view" title="Ver detalles">👁️</button>
+                                    <button class="action-btn btn-edit" title="Editar">✏️</button>
+                                    <button class="action-btn btn-delete" title="Eliminar">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td>PKG-008</td>
+                            <td>Artículos de oficina</td>
+                            <td>4.2</td>
+                            <td>30x25x12 cm</td>
+                            <td><span class="status-badge status-pendiente">Pendiente</span></td>
+                            <td>
+                                <div class="actions">
+                                    <button class="action-btn btn-view" title="Ver detalles">👁️</button>
+                                    <button class="action-btn btn-edit" title="Editar">✏️</button>
+                                    <button class="action-btn btn-delete" title="Eliminar">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación -->
+            <div class="pagination">
+                <div class="pagination-info">
+                    Mostrando 8 registros por página | Total de paquetes: 8
+                </div>
+                <div class="pagination-controls">
+                    <button class="page-btn" disabled>‹</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn" disabled>›</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simular obtener el número de serie desde la URL
+        function getNumSerieFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('num_serie') || 'ENC-2024-001234';
+        }
+
+        // Inicializar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            const numSerie = getNumSerieFromURL();
+            document.getElementById('numSerie').textContent = numSerie;
+            
+            // Simular carga de datos basada en el num_serie
+            console.log('Cargando paquetes para encomienda:', numSerie);
+        });
+
+        // Funciones para los botones de acción
+        document.addEventListener('click', function(e) {
+            const target = e.target;
+            
+            if (target.classList.contains('btn-view')) {
+                const row = target.closest('tr');
+                const paqueteId = row.cells[0].textContent;
+                const codigoPaquete = row.cells[1].textContent;
+                console.log('Ver detalles del paquete:', codigoPaquete);
+                alert('Abrir modal de consulta para paquete: ' + codigoPaquete);
+            }
+            
+            if (target.classList.contains('btn-edit')) {
+                const row = target.closest('tr');
+                const paqueteId = row.cells[0].textContent;
+                const codigoPaquete = row.cells[1].textContent;
+                console.log('Editar paquete:', codigoPaquete);
+                alert('Abrir modal de edición para paquete: ' + codigoPaquete);
+            }
+            
+            if (target.classList.contains('btn-delete')) {
+                const row = target.closest('tr');
+                const paqueteId = row.cells[0].textContent;
+                const codigoPaquete = row.cells[1].textContent;
+                console.log('Eliminar paquete:', codigoPaquete);
+                if (confirm('¿Está seguro de que desea eliminar el paquete ' + codigoPaquete + '?')) {
+                    alert('Eliminar paquete: ' + codigoPaquete);
+                }
+            }
+            
+            if (target.classList.contains('add-btn')) {
+                const numSerie = document.getElementById('numSerie').textContent;
+                console.log('Agregar nuevo paquete a encomienda:', numSerie);
+                alert('Abrir modal para agregar nuevo paquete');
+            }
+        });
+
+        // Funcionalidad de búsqueda
+        document.querySelector('.search-input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            console.log('Buscar:', searchTerm);
+            // Aquí implementarías la lógica de búsqueda
+        });
+
+        // Funcionalidad de filtro
+        document.querySelector('.filter-select').addEventListener('change', function(e) {
+            const filterValue = e.target.value;
+            console.log('Filtrar por estado:', filterValue);
+            // Aquí implementarías la lógica de filtrado
+        });
+    </script>
+</body>
+</html>

@@ -102,20 +102,44 @@
     <!-- <div class="col-2">
     </div> -->
     {% if crud_insert %}
-<div class="col-2">
-  {% if esTransaccion %}
-    <a href="{{ url_for('salida_informacion') }}" class="button btn_crud btn_insert">
-      <i class="{{ICON_INSERT}}"></i>
-      <p>{{NOMBRE_BTN_INSERT}}</p>
-    </a>
-  {% else %}
-    <button class="button clickable-modal btn_crud btn_insert" id="modal_crud_insert_{{tabla}}_">
-      <i class="{{ICON_INSERT}}"></i>
-      <p>{{NOMBRE_BTN_INSERT}}</p>
-    </button>
-  {% endif %}
-</div>
-{% endif %}
+    <div class="col-2">      
+      <button class="button clickable-modal btn_crud btn_insert" id="modal_crud_insert_{{tabla}}_">
+        <i class="{{ICON_INSERT}}"></i>
+        <p>{{NOMBRE_BTN_INSERT}}</p>
+      </button>
+    </div>
+    {% endif %}
+
+    {% for opt in options %}
+      <div class="col-2">
+        {% set mostrar_url = opt[0] %}
+        {% set icono = opt[1] %}
+        {% set color = opt[2] %}
+        {% set texto = opt[3] %}
+        {% set funcion = opt[4] %}
+        {% set parametros = {} %}
+
+        {% if mostrar_url and opt|length > 5 %}
+          {% set raw_params = opt[5] %}
+          {% for key, val in raw_params.items() %}
+            {% if val is string and val.startswith('::') %}
+              {% set _ = parametros.update({key: val[2:]}) %}
+            {% else %}
+              {% set _ = parametros.update({key: fila[val]}) %}
+            {% endif %}
+          {% endfor %}
+          <a href="{{ url_for(funcion, **parametros) }}" class="button" style="background-color: {{color}};">
+        {% else %}
+          <a href="{{ url_for(funcion) }}" class="button" style="background-color: {{color}};">
+        {% endif %}
+            <i class="{{ icono }}"></i>
+            <p>{{ texto }}</p>
+          </a>
+      </div>
+    {% endfor %}
+
+
+
 
 
   </div>
@@ -177,24 +201,44 @@
           <td class="opciones_column">
             <div class="acciones">
 
-              {% if crud_consult %}
-                {% if esTransaccion %}
+              {% for btn in buttons %}
               <div class="opciones_fila">
-                <a href="{{ url_for('salida_informacion') }}" >
-                  <button class="btn_consult">
-                    <i class="{{ICON_CONSULT}}"></i>
-                  </button>
-                </a>
-              </div>
+                {% set mostrar_url = btn[0] %}
+                {% set icono = btn[1] %}
+                {% set color = btn[2] %}
+                {% set funcion = btn[3] %}
+                {% set parametros = {} %}
+
+                {% if mostrar_url and btn|length > 4 %}
+                  {% set raw_params = btn[4] %}
+                  {% for key, val in raw_params.items() %}
+                    {% if val is string and val.startswith('::') %}
+                      {% set _ = parametros.update({key: val[2:]}) %}
+                    {% else %}
+                      {% set _ = parametros.update({key: fila[val]}) %}
+                    {% endif %}
+                  {% endfor %}
+                  <a href="{{ url_for(funcion, **parametros) }}">
+                {% elif funcion is none or funcion == '' %}
+                  <a href="#">
                 {% else %}
+                  <a href="{{ url_for(funcion) }}">
+                {% endif %}
+                    <button class="{{ btn[5] if btn|length > 5 else '' }}" style="background-color: {{ color }};">
+                      <i class="{{ icono }}"></i>
+                    </button>
+                  </a>
+              </div>
+            {% endfor %}
+
+
+              {% if crud_consult %}                
               <div class="opciones_fila">
                 <button class="clickable-modal btn_consult" id="modal_crud_consult_{{tabla}}_{{fila[primary_key]}}">
                   <i class="{{ICON_CONSULT}}"></i>
                 </button>
               </div>
-                {% endif %}
               {% endif %}
-
 
               {% if crud_unactive %}
               {% if fila['activo'] == 1 %}
@@ -213,19 +257,11 @@
               {% endif %}
 
               {% if crud_update %}
-                {% if esTransaccion %}
               <div class="opciones_fila">
-                <a href="{{ url_for('salida_informacion') }}" >
-                  <button class="btn_update">
-                    <i class="{{ICON_UPDATE}}"></i>
-                  </button>
-                </a>
+                <button class="clickable-modal btn_update" id="modal_crud_update_{{tabla}}_{{fila[primary_key]}}">
+                  <i class="{{ICON_UPDATE}}"></i>
+                </button>
               </div>
-                {% else %}
-                  <button class="clickable-modal btn_update" id="modal_crud_update_{{tabla}}_{{fila[primary_key]}}">
-                    <i class="{{ICON_UPDATE}}"></i>
-                  </button>
-                {% endif %}
               {% endif %}
 
               {% if crud_delete %}
@@ -235,26 +271,6 @@
                 </button>
               </div>
               {% endif %}
-
-
-            {% if esTransaccion %}
-            {% if fila['placa'] %}
-              <div class="opciones_fila">
-                <!-- <a href="{{ url_for('seguimiento_empleado_prueba', placa=fila['placa'] ) }}">
-                  <button  class="btn btn-secondary btn-small" style="padding: inherit;">
-                  <i class="fa-solid fa-location-dot"></i>
-                  </button>
-                </a> -->
-                
-                <button class="btn btn-secondary btn-small btn-ver-mapa" style="padding: inherit;" title="Ver Mapa">
-                  <i class="fa-solid fa-location-dot"></i>
-                </button>
-
-
-              </div>
-            {% endif %}
-            {% endif %}
-
 
             </div>
           </td>
@@ -365,18 +381,6 @@
 
 <script src="/static/js/orderHeadTable.js"></script>
 <script src="/static/js/paginationCrud.js"></script>
-
-<script>
-  const today = new Date().toISOString().split('T')[0];
-  const date_solo = document.querySelector('input[type="date"][data-type="date"]')
-  if (date_solo) {
-    date_solo.value = today;
-  } else {
-    document.querySelector('input[type="date"][data-type="date_ini"]').value = today;
-    document.querySelector('input[type="date"][data-type="date_fin"]').value = today;
-  }
-  // document.getElementById('fecha_fin').value = today;
-</script>
 
 
 <script>
