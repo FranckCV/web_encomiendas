@@ -22,11 +22,11 @@ def get_report_test():
         ON tra.num_serie = paq.transaccion_encomienda_num_serie 
         INNER JOIN contenido_paquete con ON con.id = paq.contenido_paqueteid 
         INNER JOIN ( 
-        SELECT paquetetracking, MAX(estado_encomiendaid) AS max_detalle_estadoid 
+        SELECT paquetetracking, MAX(detalle_estadoid) AS max_detalle_estadoid 
         FROM seguimiento GROUP BY paquetetracking ) ult_seg ON ult_seg.paquetetracking = paq.tracking 
         INNER JOIN detalle_estado det ON det.id = ult_seg.max_detalle_estadoid 
         INNER JOIN estado_encomienda est ON est.id = det.estado_encomiendaid
-        ;
+        
 
     '''
     
@@ -34,7 +34,7 @@ def get_report_test():
         'tracking'      : ['Tracking', 0.5],
         'con_nombre'    : ['Contenido de paquete', 1.5],
         'estado_nombre' : ['Estado Actual de paquete', 1.5],
-        'fecha'     : ['Fecha de envio', 2],
+        'fecha_txt'     : ['Fecha de envio', 2],
     }
     
     filas = sql_select_fetchall(sql)
