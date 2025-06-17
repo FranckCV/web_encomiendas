@@ -186,7 +186,7 @@ CREATE TABLE motivo_reclamo (
 CREATE TABLE pagina (
   id            int(11) NOT NULL AUTO_INCREMENT, 
   titulo        varchar(150) NOT NULL, 
-  icono         varchar(150) NOT NULL, 
+  icono         varchar(150), 
   activo        tinyint(1) DEFAULT 1 NOT NULL, 
   `key`         varchar(150) NOT NULL, 
   tipo_paginaid int(11) NOT NULL, 
@@ -251,22 +251,23 @@ CREATE TABLE reclamo (
   telefono             char(9) NOT NULL, 
   n_documento          varchar(11) NOT NULL, 
   monto_indemnizado    numeric(9, 2), 
-  titulo_incidencia    varchar(150) NOT NULL, 
   bien_contratado      char(1) NOT NULL comment 'Producto (P)
 Servicio (S)
  ', 
   monto_reclamado      numeric(9, 2) NOT NULL, 
-  relacion             char(1) NOT NULL comment 'Quien envía
+  relacion             char(1) comment 'Quien envía
 Quien recibe
  ', 
-  fecha_recojo         date NOT NULL, 
+  fecha_recepcion      date NOT NULL, 
   sucursal_id          int(11) NOT NULL, 
   descripcion          text NOT NULL, 
-  pedido               text NOT NULL, 
+  detalles             text, 
+  pedido               text, 
+  foto                 text, 
   causa_reclamoid      int(11) NOT NULL, 
   tipo_indemnizacionid int(10), 
   paquetetracking      int(11) NOT NULL, 
-  ubigeocodigo         varchar(10) NOT NULL, 
+  ubigeocodigo         varchar(10), 
   tipo_documentoid     int(11) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE regla_cargo (

@@ -1856,7 +1856,6 @@ PAGINAS_SIMPLES = [
     'pagina_test_rastreo' ,
     'tracking',
     'recuperar_contrasenia',
-    'libro_reclamaciones',
     'mis_envios',
     'NoRecibimos',
     'pagina_reclamo',
@@ -1933,6 +1932,66 @@ def logout():
         return resp
     except Exception as e:
         return rdrct_error(redirect_login(),e)
+
+
+@app.route("/libro_reclamaciones")
+def libro_reclamaciones():
+    opts_tipo_documento = controlador_tipo_documento.get_options_dict()
+    departamentos = controlador_sucursal.get_options_departamento_sucursal()
+    provincias = controlador_sucursal.get_options_provincia_sucursal()
+    distritos = controlador_sucursal.get_options_distrito_sucursal()
+    sucursales = controlador_sucursal.get_options_ubigeo_sucursal()
+    tipos_reclamo = controlador_reclamo.get_dict_tipo_reclamo()
+    motivos_reclamo = controlador_reclamo.get_dict_motivo_reclamo()
+    causas_reclamo = controlador_reclamo.get_dict_causa_reclamo()
+    bienes_contratados = controlador_reclamo.get_list_bien_contratado()
+
+    return render_template(
+        'libro_reclamaciones.html' ,
+        opts_tipo_documento = opts_tipo_documento ,
+
+        departamentos = departamentos ,
+        provincias = provincias ,
+        distritos = distritos ,
+        sucursales = sucursales ,
+
+        tipos_reclamo =tipos_reclamo ,
+        motivos_reclamo = motivos_reclamo ,
+        causas_reclamo = causas_reclamo ,
+
+        bienes_contratados = bienes_contratados ,
+    )
+
+
+
+@app.route("/registrar_reclamo", methods=["POST"])
+def registrar_reclamo():
+    # try:
+
+        ahora = datetime.now()
+        formateado = ahora.strftime("%Y_%m_%d_%H_%M_%S")
+
+        firma = inspect.signature(controlador_reclamo.registrar_reclamo)
+
+        valores = []
+        for nombre, parametro in firma.parameters.items():
+            if nombre in request.files:
+                archivo = request.files[nombre]
+                if archivo.filename != "":
+                    nuevo_nombre = guardar_imagen_bd('reclamo' ,f'{formateado}_',archivo)
+                    valores.append(nuevo_nombre)
+                else:
+                    valores.append(request.form.get(f"{nombre}_actual"))
+            else:
+                valor = request.form.get(nombre)
+                valores.append(valor)
+
+        controlador_reclamo.registrar_reclamo( *valores )
+        return redirect(url_for('libro_reclamaciones'))
+
+
+    # except Exception as e:
+    #     return rdrct_error(redirect_url('main_page')  , e)
 
 
 @app.route("/cotizador")
@@ -2260,6 +2319,7 @@ def obtener_resumen_pago():
 
     return jsonify(resumen)
 
+
 @app.route("/metodo_pago")
 def metodo_pago():
     clienteid = 1  # O request.cookies.get("idlogin")
@@ -2269,6 +2329,7 @@ def metodo_pago():
         return redirect("/carrito")  # o muestra un mensaje apropiado
 
     return render_template("metodo_pago.html")
+
 
 @app.route("/confirmar-pago", methods=["POST"])
 def confirmar_pago():

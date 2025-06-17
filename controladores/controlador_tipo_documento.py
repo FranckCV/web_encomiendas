@@ -104,7 +104,7 @@ def get_options_dict():
     sql= f'''
         select 
             id ,
-            nombre ,
+            CONCAT(siglas ,' - ', nombre) as nombre ,
             siglas
         from tipo_documento
         where activo = 1

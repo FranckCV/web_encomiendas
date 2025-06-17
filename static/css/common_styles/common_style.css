@@ -390,7 +390,9 @@ i.d_i {
 }
 
 
-
+input[type="number"] {
+    text-align: right;
+}
 
 
 
