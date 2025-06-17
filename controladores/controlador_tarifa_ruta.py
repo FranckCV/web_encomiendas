@@ -272,6 +272,10 @@ def get_tarifas_ruta_dict():
 
 
 
+
+
+
+
 def get_options_departamento_origen():
     sql= f'''
         select distinct

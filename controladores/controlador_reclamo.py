@@ -99,6 +99,10 @@ def update_row(id, nombres_razon, direccion, correo, telefono, n_documento,
         id
     ))
 
+
+
+
+
 class ControladorReclamo:
     def get_info_columns(self):
         return get_info_columns()
@@ -120,3 +124,97 @@ class ControladorReclamo:
 
     def update_row(self, *args):
         return update_row(*args)
+
+
+
+BIEN_CONTRATADO = {
+    "P" : "Producto" ,
+    "S" : "Servicio" ,
+    "A" : "Producto y servicio" ,
+}
+
+
+def get_list_bien_contratado():
+    lst = BIEN_CONTRATADO.keys()
+    filas = []
+    for bien in lst:
+        filas.append([bien , BIEN_CONTRATADO[bien]])
+    return filas
+
+
+def get_dict_tipo_reclamo():
+    sql= f'''
+        select 
+            tip.id,
+            tip.nombre
+        from tipo_reclamo tip
+        where tip.activo = 1
+        order by tip.nombre
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas
+
+
+def get_dict_motivo_reclamo():
+    sql= f'''
+        select
+            mot.id ,
+            mot.nombre ,
+            tip.id as tip_id
+        from motivo_reclamo mot
+        inner join tipo_reclamo tip on tip.id = mot.tipo_reclamoid
+        where tip.activo = 1
+        order by mot.nombre
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas
+
+
+def get_dict_causa_reclamo():
+    sql= f'''
+        select
+            cau.id ,
+            cau.nombre ,
+            mot.id as mot_id ,
+            tip.id as tip_id
+        from causa_reclamo cau
+        inner join motivo_reclamo mot on mot.id = cau.motivo_reclamoid
+        inner join tipo_reclamo tip on tip.id = mot.tipo_reclamoid
+        where tip.activo = 1
+        order by cau.nombre
+
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas
+
+
+
+def registrar_reclamo(
+        nombres_razon, 
+        direccion, 
+        correo, telefono, 
+        n_documento, 
+        bien_contratado, 
+        monto_reclamado, 
+        fecha_recepcion, 
+        sucursal_id, 
+        descripcion, detalles, 
+        pedido, 
+        foto, 
+        causa_reclamoid, 
+        tipo_documentoid, 
+        paquetetracking, 
+
+        tipo_indemnizacionid = None, 
+        relacion = None, 
+        monto_indemnizado = None, 
+        ubigeocodigo = None
+    ):
+    sql = f'''
+        INSERT INTO reclamo (
+            nombres_razon, direccion, correo, telefono, n_documento, monto_indemnizado, bien_contratado, monto_reclamado, relacion, fecha_recepcion, sucursal_id, descripcion, detalles, pedido, foto, causa_reclamoid, tipo_indemnizacionid, paquetetracking, ubigeocodigo, tipo_documentoid
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    '''
+    sql_execute(sql, (
+        nombres_razon, direccion, correo, telefono, n_documento, monto_indemnizado, bien_contratado, monto_reclamado, relacion, fecha_recepcion, sucursal_id, descripcion, detalles, pedido, foto, causa_reclamoid, tipo_indemnizacionid, paquetetracking, ubigeocodigo, tipo_documentoid
+    ))
