@@ -107,7 +107,7 @@ CREATE TABLE seguimiento (
   detalle_estadoid   int(10) NOT NULL, 
   fecha              date NOT NULL, 
   hora               time NOT NULL, 
-  tipo_comprobanteid int(10) NOT NULL, 
+  tipo_comprobanteid int(10) NULL, 
   PRIMARY KEY (paquetetracking, 
   detalle_estadoid));
 CREATE TABLE transaccion_venta (

@@ -131,10 +131,9 @@ def get_last_states(tracking):
 
 def get_comprobantes(tracking):
     sql = '''
-        SELECT tc.nombre AS tipo_comprobante
+         SELECT tc.nombre AS tipo_comprobante
         FROM seguimiento s
-        inner join detalle_estado de on de.id = s.detalle_estadoid
-        INNER JOIN tipo_comprobante tc ON tc.id = de.tipo_comprobanteid
+        INNER JOIN tipo_comprobante tc ON tc.id = s.tipo_comprobanteid
         WHERE s.paquetetracking = %s
     '''
     filas = sql_select_fetchall(sql, tracking)
