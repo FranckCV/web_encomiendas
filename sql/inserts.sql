@@ -8188,7 +8188,7 @@ INSERT INTO empleado (nombre, apellidos, correo, n_documento, rolid) VALUES
 ('Javier', 'Gómez Paredes', 'javier.gomez@transportes.com', 'G33445566', 1),
 ('Sofía', 'Fernández Quispe', 'sofia.fernandez@transportes.com', 'H77889900', 1);
 
-INSERT INTO salida (fecha, hora, recojo, entrega, estado, unidadid, destino_final, conductor_principal, origen_incio) VALUES
+INSERT INTO salida (fecha, hora, recojo, entrega, estado, unidadid, destino_final_id, conductor_principal, origen_incio_id) VALUES
 ('2025-06-16', '07:30:00', 1, 0, 'P', 1, 2, 5, 3),
 ('2025-06-16', '08:15:00', 1, 1, 'P', 2, 2, 6, 5),
 ('2025-06-16', '09:00:00', 0, 1, 'P', 3, 3, 5, 6),

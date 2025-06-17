@@ -20,7 +20,6 @@ CREATE TABLE detalle_estado (
   descripcion         text, 
   activo              tinyint(1) DEFAULT 1 NOT NULL, 
   estado_encomiendaid int(4) NOT NULL, 
-  tipo_comprobanteid  int(10), 
   PRIMARY KEY (id));
 CREATE TABLE cliente (
   id               int(10) NOT NULL AUTO_INCREMENT, 
@@ -56,9 +55,9 @@ CREATE TABLE salida (
   entrega             tinyint(1) NOT NULL, 
   estado              char(1) NOT NULL, 
   unidadid            int(10) NOT NULL, 
-  destino_final       int(10) NOT NULL, 
+  destino_final_id    int(10) NOT NULL, 
   conductor_principal int(11) NOT NULL, 
-  origen_incio        int(11), 
+  origen_incio_id     int(11) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE tipo_rol (
   id          int(10) NOT NULL AUTO_INCREMENT, 
@@ -104,10 +103,11 @@ CREATE TABLE empleado_salida (
   PRIMARY KEY (salidaid, 
   empleadoid));
 CREATE TABLE seguimiento (
-  paquetetracking  int(11) NOT NULL, 
-  detalle_estadoid int(10) NOT NULL, 
-  fecha            date NOT NULL, 
-  hora             time NOT NULL, 
+  paquetetracking    int(11) NOT NULL, 
+  detalle_estadoid   int(10) NOT NULL, 
+  fecha              date NOT NULL, 
+  hora               time NOT NULL, 
+  tipo_comprobanteid int(10) NOT NULL, 
   PRIMARY KEY (paquetetracking, 
   detalle_estadoid));
 CREATE TABLE transaccion_venta (
@@ -501,4 +501,4 @@ ALTER TABLE paquete ADD CONSTRAINT FKpaquete992725 FOREIGN KEY (tipo_documento_d
 ALTER TABLE paquete ADD CONSTRAINT FKpaquete329420 FOREIGN KEY (contenido_paqueteid) REFERENCES contenido_paquete (id);
 ALTER TABLE paquete ADD CONSTRAINT FKpaquete94264 FOREIGN KEY (tipo_empaqueid) REFERENCES tipo_empaque (id);
 ALTER TABLE paquete ADD CONSTRAINT FKpaquete940812 FOREIGN KEY (modalidad_pagoid) REFERENCES modalidad_pago (id);
-ALTER TABLE detalle_estado ADD CONSTRAINT FKdetalle_es208359 FOREIGN KEY (tipo_comprobanteid) REFERENCES tipo_comprobante (id);
+ALTER TABLE seguimiento ADD CONSTRAINT FKseguimient92123 FOREIGN KEY (tipo_comprobanteid) REFERENCES tipo_comprobante (id);
