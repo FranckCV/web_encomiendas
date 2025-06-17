@@ -1581,7 +1581,7 @@ TRANSACCIONES = {
             "crud_unactive": False ,
         }
     },
-    "t_encomienda": {
+    "transaccion_encomienda": {
         "active": True,
         "titulo": "Encomiendas",
         "nombre_tabla": "transaccion_encomienda",
