@@ -1560,9 +1560,7 @@ TRANSACCIONES = {
         "nombre_tabla": "salida",
         "controlador": controlador_salida,
         "icon_page": 'fa-solid fa-van-shuttle',
-        "filters": [
-            
-        ] ,
+        "filters": [] ,
         "fields_form" : [
             ['id',          'ID',            'ID',             'text',   True,   False,   None],
             ['nom_conductor','Conductor',    'Nombre del conductor', 'text', True, False,   None],
@@ -1583,14 +1581,13 @@ TRANSACCIONES = {
             "crud_unactive": False ,
         }
     },
-   "t_encomienda": {
+    "t_encomienda": {
         "active": True,
         "titulo": "Encomiendas",
         "nombre_tabla": "transaccion_encomienda",
         "controlador": controlador_encomienda,
         "icon_page": "fa-solid fa-boxes-packing",
         "filters": [],
-        
         "fields_form": [
             ['num_serie',         'N° Serie',           'Número de Serie',         'text',   True,  True,   None],
             ['masivo',            'Tipo de Envío',      '1: Masivo / 0: Individual','number', True,  True,   None],
@@ -1601,7 +1598,6 @@ TRANSACCIONES = {
             ['nom_tip_comprobante','Tipo Comprobante',   'Tipo Comprobante',     'number', True,  True,   None],
             ['nombre_cliente',         'Cliente',            'Nombre del cliente',          'text', True,  True,   None]
         ],
-        
         "crud_forms": {
             "crud_list": True,
             "crud_search": False,
@@ -1610,6 +1606,9 @@ TRANSACCIONES = {
             "crud_update": True,
             "crud_delete": True,
             "crud_unactive": False
+        },
+        "buttons": {
+            
         }
     }
 
