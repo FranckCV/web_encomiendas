@@ -156,7 +156,9 @@ INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `tipo_paginaid`,
 (44, 'Descuentos', 'fa-solid fa-percent', 1, 'descuento', 1, 5),
 (45, 'Descuentos de artículos', 'fa-solid fa-percent', 1, 'descuento_articulo', 1, 5),
 (46, 'detalle de un estado de reclamo', 'fa-solid fa-file', 1, 'detalle_reclamo', 1, 4),
-(47, 'Programación de devoluciones', 'ri-truck-line', 1, 'programacion_devolucion', 2, 3);
+(47, 'Programación de devoluciones', 'ri-truck-line', 1, 'programacion_devolucion', 2, 3),
+(48, 'Escaneo de qr', 'fa-solid fa-qrcode', 1, 'interfaz_insertar_estado', 2, 2),
+(49, 'Paquetes', 'fa-solid fa-boxes', 1, 'paquete', 3, 3);
 
 
 INSERT INTO `tipo_rol` (`id`, `nombre`, `descripcion`, `activo`)

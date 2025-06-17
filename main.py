@@ -1406,38 +1406,35 @@ REPORTES = {
         
     },
     "reporte_uso_unidades": {
-    "active" : True,
-    'icon_page': 'fa-solid fa-chart-line',
-    "titulo": "Reporte de uso de unidades",
-    "table" : reporte_UsoUnidades.get_reporte_uso_unidades(),
-    "filters": []
-},
-"viajes_por_unidad": {
-    "active": True,
-    "icon_page": "fa-solid fa-truck-fast",
-    "titulo": "Viajes por unidad",
-    "table": reporte_Viajes_por_Unidad.get_reporte_viajes_por_unidad(),  # 👈 FUNCIÓN EJECUTADA
-    "filters": []
-},
+        "active" : True,
+        'icon_page': 'fa-solid fa-chart-line',
+        "titulo": "Reporte de uso de unidades",
+        "table" : reporte_UsoUnidades.get_reporte_uso_unidades(),
+        "filters": []
+    },
+    "viajes_por_unidad": {
+        "active": True,
+        "icon_page": "fa-solid fa-truck-fast",
+        "titulo": "Viajes por unidad",
+        "table": reporte_Viajes_por_Unidad.get_reporte_viajes_por_unidad(),  # 👈 FUNCIÓN EJECUTADA
+        "filters": []
+    },
 
-"encomiendas_por_ruta": {
-    "active": True,
-    "icon_page": "fa-solid fa-boxes-packing",
-    "titulo": "Listado de encomiendas asignadas a rutas específicas ",
-    "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo(),
-    "filters": []
-},
+    "encomiendas_por_ruta": {
+        "active": True,
+        "icon_page": "fa-solid fa-boxes-packing",
+        "titulo": "Listado de encomiendas asignadas a rutas específicas ",
+        "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo(),
+        "filters": []
+    },
 
-"reporte_reclamos_tipo_causa_periodo": {
-    "active": True,
-    "icon_page": "fa-solid fa-clipboard-list",
-    "titulo": "Reporte de reclamos por tipo, causa y periodo",
-    "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),
-    "filters": []
-},
-
-    
-    
+    "reporte_reclamos_tipo_causa_periodo": {
+        "active": True,
+        "icon_page": "fa-solid fa-clipboard-list",
+        "titulo": "Reporte de reclamos por tipo, causa y periodo",
+        "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),
+        "filters": []
+    },
 }
 
 
@@ -1647,11 +1644,11 @@ TRANSACCIONES = {
         "filters": [],
         "fields_form": [
             ['num_serie',         'N° Serie',           'Número de Serie',         'text',   True,  True,   None],
-            ['masivo',            'Tipo de Envío',      '1: Masivo / 0: Individual','number', True,  True,   None],
-            ['monto_total',       'Monto Total',        'Total a pagar',           'number', True,  True,   None],
-            ['recojo_casa',       'Recojo a Domicilio', '1: Sí / 0: No',           'number', True,  True,   None],
-            ['nom_sucursal_origen','Sucursal Origen',    'ID de Sucursal',          'number', True,  True,   None],
-            ['nom_tip_comprobante','Tipo Comprobante',   'Tipo Comprobante',     'number', True,  True,   None],
+            ['masivo',            'Tipo de Envío',      '1: Masivo / 0: Individual','text', True,  True,   None],
+            ['monto_total',       'Monto Total',        'Total a pagar',           'text', True,  True,   None],
+            ['recojo_casa',       'Recojo a Domicilio', '1: Sí / 0: No',           'text', True,  True,   None],
+            ['nom_sucursal_origen','Sucursal Origen',    'ID de Sucursal',          'text', True,  True,   None],
+            ['nom_tip_comprobante','Tipo Comprobante',   'Tipo Comprobante',     'text', True,  True,   None],
             ['nombre_cliente',         'Cliente',            'Nombre del cliente',          'text', True,  True,   None]
         ],
         "crud_forms": {
@@ -1675,7 +1672,7 @@ TRANSACCIONES = {
         "nombre_tabla": "paquete",
         "controlador": controlador_paquete,
         "icon_page": "fa-solid fa-boxes",
-        "filters": [],
+        "filters": [], 
         "fields_form": [
         #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
             ['tracking',                       'Tracking',             'Tracking',             'text',   False,  True,   None],
