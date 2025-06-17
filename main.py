@@ -1584,34 +1584,34 @@ TRANSACCIONES = {
         }
     },
    "t_encomienda": {
-    "active": True,
-    "titulo": "Encomiendas",
-    "nombre_tabla": "transaccion_encomienda",
-    "controlador": controlador_encomienda,
-    "icon_page": "fa-solid fa-boxes-packing",
-    "filters": [],
-    
-    "fields_form": [
-        ['num_serie',         'N° Serie',           'Número de Serie',         'text',   True,  True,   None],
-        ['masivo',            'Tipo de Envío',      '1: Masivo / 0: Individual','number', True,  True,   None],
-        ['monto_total',       'Monto Total',        'Total a pagar',           'number', True,  True,   None],
-        ['recojo_casa',       'Recojo a Domicilio', '1: Sí / 0: No',           'number', True,  True,   None],
-        ['sucursal_origen','Sucursal Origen',    'ID de Sucursal',          'number', True,  True,   None],
-        ['estado_pago',       'Estado de Pago',     'P: Pendiente / C: Cancelado','text', True,  True,   None],
-        ['nom_tip_comprobante','Tipo Comprobante',   'Tipo Comprobante',     'number', True,  True,   None],
-        ['nombre_cliente',         'Cliente',            'Nombre del cliente',          'text', True,  True,   None]
-    ],
-    
-    "crud_forms": {
-        "crud_list": True,
-        "crud_search": False,
-        "crud_consult": True,
-        "crud_insert": False,
-        "crud_update": True,
-        "crud_delete": True,
-        "crud_unactive": False
+        "active": True,
+        "titulo": "Encomiendas",
+        "nombre_tabla": "transaccion_encomienda",
+        "controlador": controlador_encomienda,
+        "icon_page": "fa-solid fa-boxes-packing",
+        "filters": [],
+        
+        "fields_form": [
+            ['num_serie',         'N° Serie',           'Número de Serie',         'text',   True,  True,   None],
+            ['masivo',            'Tipo de Envío',      '1: Masivo / 0: Individual','number', True,  True,   None],
+            ['monto_total',       'Monto Total',        'Total a pagar',           'number', True,  True,   None],
+            ['recojo_casa',       'Recojo a Domicilio', '1: Sí / 0: No',           'number', True,  True,   None],
+            ['sucursal_origen','Sucursal Origen',    'ID de Sucursal',          'number', True,  True,   None],
+            ['estado_pago',       'Estado de Pago',     'P: Pendiente / C: Cancelado','text', True,  True,   None],
+            ['nom_tip_comprobante','Tipo Comprobante',   'Tipo Comprobante',     'number', True,  True,   None],
+            ['nombre_cliente',         'Cliente',            'Nombre del cliente',          'text', True,  True,   None]
+        ],
+        
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": False,
+            "crud_consult": True,
+            "crud_insert": False,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": False
+        }
     }
-}
 
 }
 
