@@ -349,3 +349,19 @@ def get_data_exit(correo):
     print(fila)
     return fila
     
+
+
+def get_coordenadas_actual(id):
+    sql = '''
+        select
+        so.latitud as latitud_origen,
+        so.longitud as longitud_origen,
+        sd.latitud as latitud_destino,
+        sd.longitud as longitud_destino
+        from salida s
+        inner join sucursal so on so.id = s.origen_incio
+        inner join sucursal sd on sd.id = s.destino_final
+        where s.id = %s and s.estado = 'P' or 'T'
+    '''
+    fila = sql_select_fetchone(sql,id)
+    return fila

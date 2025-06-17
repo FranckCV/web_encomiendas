@@ -201,3 +201,13 @@ def get_data_package(tracking):
             row.pop(k, None)
 
     return row
+
+
+def get_estados_insertados(tracking):
+    sql = '''
+    select distinct de.estado_encomiendaid from seguimiento s
+    inner join detalle_estado de on de.id = s.detalle_estadoid
+    where s.paquetetracking=%s
+    '''
+    fila = sql_select_fetchall(sql,tracking)
+    return fila

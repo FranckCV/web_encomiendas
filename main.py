@@ -2753,7 +2753,7 @@ def generar_comprobante(tracking):
             os.makedirs(carpeta, exist_ok=True)
             qr_path = url_for('static', filename=f"comprobantes/{tracking}/qr.png", _external=True)
 
-            html = render_template("comprobante.html",
+            html = render_template("plantilla_comprobante_pago.html",
                 transaccion=transaccion,
                 cliente=cliente,
                 empresa=empresa,
@@ -3099,6 +3099,52 @@ def salidas_android():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+
+@app.route('/obtener_coordenadas', methods=['POST'])
+def obtener_coordenadas():
+    try:
+        data = request.get_json()
+
+        id_salida = data['salida']
+
+        coordenadas = controlador_sucursal.get_coordenadas_actual(id_salida)
+
+        if not coordenadas:
+            return jsonify({'error': 'No se encontraron coordenadas'}), 404
+
+        res = {
+            'id':id_salida,
+            'latitud_origen': coordenadas['latitud_origen'],
+            'longitud_origen': coordenadas['longitud_origen'],
+            'latitud_destino': coordenadas['latitud_destino'],
+            'longitud_destino': coordenadas['longitud_destino']
+        }
+        return jsonify(res)
+
+    except Exception as e:
+        print("❌ ERROR EN BACKEND:", repr(e))
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/seguimiento_unidad_prueba')
+def seguimiento_unidad_prueba():
+    lat1 = request.args.get('lat1')
+    lon1 = request.args.get('lon1')
+    lat2 = request.args.get('lat2')
+    lon2 = request.args.get('lon2')
+    id = request.args.get('id')
+    
+    # Podrías formar un "viaje" simple si tu HTML espera eso
+    data = [{
+        
+        'iniciolat_via': lat1,
+        'iniciolon_via': lon1,
+        'finlat_via': lat2,
+        'finlon_via': lon2,
+        'id':id
+    }]
+
+    return render_template('seguimiento_empleado.html', data=data)
 
 
 
@@ -3826,9 +3872,21 @@ def seguimiento():
 def seguimiento_tracking(tracking):
     estados = controlador_estado_encomienda.get_states()
     ultimo_estado = controlador_estado_encomienda.get_last_states(tracking)
+    estados_actuales = controlador_estado_encomienda.get_estados_insertados(tracking)
     comprobantes = controlador_estado_encomienda.get_comprobantes(tracking)
     datos = controlador_estado_encomienda.get_data_package(tracking)
-    return render_template('seguimiento.html',estados=estados,ultimo_estado=ultimo_estado,comprobantes=comprobantes,datos=datos,tracking=tracking )
+    
+    estados_usados = [e['estado_encomiendaid'] for e in estados_actuales]
+
+    
+    return render_template('seguimiento.html',
+                           estados=estados,
+                           ultimo_estado=ultimo_estado,
+                           comprobantes=comprobantes,
+                           datos=datos,
+                           tracking=tracking,
+                           estados_usados=estados_usados
+                           )
     
    
 
