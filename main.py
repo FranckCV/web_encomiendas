@@ -4259,7 +4259,7 @@ def insertar_detalle_estado():
 if __name__ == "__main__":
     # app.run(host='192.168.48.178', port=8000, debug=True, use_reloader=True)
     # Thread(target=enviar_posiciones).start()
-    socketio.run(app, host='0.0.0.0', port=8001, debug=True)
+    socketio.run(app, host='0.0.0.0', port=8000, debug=True)
 
 
 
