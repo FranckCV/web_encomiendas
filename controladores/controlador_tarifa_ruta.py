@@ -477,6 +477,8 @@ def get_options_select_sucursal_origen():
         order by 2
     '''
     filas = sql_select_fetchall(sql)
-    return filas
+    lista = [(fila['id'], fila["nombre"]) for fila in filas]
+
+    return lista
 
 

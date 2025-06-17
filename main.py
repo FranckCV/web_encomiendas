@@ -1648,9 +1648,9 @@ TRANSACCIONES = {
             ['recojo_casa',         'Recojo a Domicilio', 'Recojo de paquete',             'select',    True,  True,   [lambda: controlador_encomienda.get_select_recojo_casa(), 'nombre']],
             ['fecha',               'Fecha',              'Fecha',                     'date',      True,  True,   None],
             ['hora',                'Hora',               'Hora',                      'time',      True,  True,   None],
-            ['id_sucursal_origen',  'Sucursal de origen', '',                          'select',    True,  True,   [lambda: controlador_tarifa_ruta.get_options_select_sucursal_origen(), 'nombre']],
-            ['clienteid',           'Cliente',            '',                          'select',    True,  True,   [lambda: controlador_cliente.get_select_cliente(), 'nombre']],
-            ['tipo_comprobanteid', 'Tipo Comprobante',    '',                          'select',    True,  True,   [lambda: controlador_tipo_comprobante.get_options(), 'nombre']],
+            ['id_sucursal_origen',  'Sucursal de origen', 'Sucursales de origen',                          'select',    True,  True,   [lambda: controlador_tarifa_ruta.get_options_select_sucursal_origen(), 'nombre']],
+            ['clienteid',           'Cliente',            'Clientes',                          'select',    True,  True,   [lambda: controlador_cliente.get_select_cliente(), 'nombre']],
+            ['tipo_comprobanteid', 'Tipo Comprobante',    'Tipos de comprobante',                          'select',    True,  True,   [lambda: controlador_tipo_comprobante.get_options(), 'nombre']],
 
             ['comprobante_serie',   'Serie de Comprobante',    'Serie de Comprobante',            'text',    True,  True,   None],
             ['monto_total',         'Monto Total',        'Monto total',             'decimal_2', True,  True,   None],
@@ -1716,6 +1716,8 @@ TRANSACCIONES = {
             [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Encomiendas', 'transaccion' , {"tabla": "::transaccion_encomienda" }],
 
         ],
+        "transaccion" : True ,
+
     }
 
 }
@@ -4122,12 +4124,17 @@ def informacion_empresa():
 @validar_error_crud()
 def crud_insert(tabla):
     # try:
-        config = CONTROLADORES.get(tabla)
+        if tabla in CONTROLADORES.keys():    
+            config = CONTROLADORES.get(tabla)
+        elif tabla in TRANSACCIONES.keys():    
+            config = TRANSACCIONES.get(tabla)
+
         if not config:
             return "Tabla no soportada", 404
 
         active = config["active"]
         no_crud = config.get('no_crud')
+        transaccion = config.get('transaccion')
 
         if active is False:
             return "Tabla no soportada", 404

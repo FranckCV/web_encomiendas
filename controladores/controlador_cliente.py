@@ -210,7 +210,9 @@ def get_select_cliente():
         FROM cliente 
     '''
     filas = sql_select_fetchall(sql)
-    return filas
+    lista = [(fila['id'], fila["nombre"]) for fila in filas]
+
+    return lista
 
 
 
