@@ -237,8 +237,14 @@
               {% endif %}
 
 
-              {% if esTransaccion %}
+            {% if esTransaccion %}
+            {% if fila['placa'] %}
               <div class="opciones_fila">
+                <!-- <a href="{{ url_for('seguimiento_empleado_prueba', placa=fila['placa'] ) }}">
+                  <button  class="btn btn-secondary btn-small" style="padding: inherit;">
+                  <i class="fa-solid fa-location-dot"></i>
+                  </button>
+                </a> -->
                 
                 <button class="btn btn-secondary btn-small btn-ver-mapa" style="padding: inherit;" title="Ver Mapa">
                   <i class="fa-solid fa-location-dot"></i>
@@ -246,7 +252,7 @@
 
 
               </div>
-
+            {% endif %}
             {% endif %}
 
 

@@ -159,6 +159,16 @@ def insert_cliente(correo, telefono, num_doc, nombre, tipo_doc):
 
 
 
+# def registrar_encomienda(num_serie, masivo, descripcion, recojo_casa, id_sucursal_origen, estado_pago, fecha, hora, direccion_recojo, clienteid, tipo_comprobanteid) :
+#     sql = f'''
+#         INSERT INTO transaccion_encomienda
+#         (num_serie, masivo, descripcion, recojo_casa, id_sucursal_origen, estado_pago, fecha, hora, direccion_recojo, clienteid, tipo_comprobanteid) 
+#         VALUES
+#         (%, %s, %s, %s, %s, estado_pago, fecha, hora, direccion_recojo, clienteid, tipo_comprobanteid) 
+#     '''
+#     id = sql_execute_lastrowid(sql,(num_serie, masivo, descripcion, recojo_casa, id_sucursal_origen, estado_pago, fecha, hora, direccion_recojo, clienteid, tipo_comprobanteid) )
+#     return id
+
 def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
     # 1) Cliente: obtener o crear
     row = sql_select_fetchone(

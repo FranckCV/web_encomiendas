@@ -26,6 +26,14 @@ const tiposValidacion = {
         regex: /^\d{11}$/,
         mensaje: "RUC debe tener 11 dígitos"
     },
+    ce: {
+        regex: /^[a-zA-Z0-9]{9,12}$/,
+        mensaje: "Carnet de extranjería inválido"
+    },
+    pasaporte: {
+        regex: /^[a-zA-Z0-9]{6,12}$/,
+        mensaje: "Pasaporte inválido"
+    },
     checkbox: {
         mensaje: "Este campo debe estar marcado"
     },
@@ -40,6 +48,14 @@ const tiposValidacion = {
         regex: /^\d+(\.\d{1,6})?$/,
         mensaje: "Máximo 6 decimales"
     },
+    min8: {
+        regex: /^.{8,}$/,
+        mensaje: "Mínimo 8 caracteres"
+    },
+    match: {
+        mensaje: "Los campos no coinciden"
+    },
+
 
 };
 
@@ -49,9 +65,15 @@ function configurarValidacion({ tipo, selector, id }) {
     elementos.forEach(el => {
         el.dataset.tipo = tipo;
 
-        el.addEventListener("input", () => validarCampo(el, tipo));
+        el.addEventListener("input", () => {
+            const tipos = tipo.split(",");
+            let valido = true;
+            for (let t of tipos) {
+                const matchId = t.startsWith("match:") ? t.split(":")[1] : null;
+                if (!validarCampo(el, t, matchId)) valido = false;
+            }
+        });
 
-        // Crear mensaje de error si no existe
         let msgError = el.parentElement.querySelector(".mensaje-error");
         if (!msgError) {
             msgError = document.createElement("p");
@@ -61,7 +83,8 @@ function configurarValidacion({ tipo, selector, id }) {
     });
 }
 
-function validarCampo(el, tipo) {
+
+function validarCampo(el, tipo, matchId = null) {
     const msgError = el.parentElement.querySelector(".mensaje-error");
 
     if (tipo === "checkbox") {
@@ -81,7 +104,6 @@ function validarCampo(el, tipo) {
     if (tipo === "select") {
         const val = el.value;
         const isInvalid = val === "" || val === "-1" || el.options[el.selectedIndex]?.disabled;
-
         if (isInvalid) {
             el.classList.add("input-error");
             msgError.textContent = tiposValidacion[tipo].mensaje;
@@ -95,13 +117,31 @@ function validarCampo(el, tipo) {
         }
     }
 
-    // Validación normal (input, textarea)
-    const val = el.value.trim();
-    const { regex, mensaje } = tiposValidacion[tipo];
+    // 💡 match:compara valores
+    if (tipo.startsWith("match:")) {
+        const otroCampo = document.querySelector(`#${matchId}`);
+        const mismoValor = otroCampo && el.value === otroCampo.value;
+        if (!mismoValor) {
+            el.classList.add("input-error");
+            msgError.textContent = tiposValidacion["match"].mensaje;
+            msgError.style.display = "block";
+            return false;
+        } else {
+            el.classList.remove("input-error");
+            msgError.textContent = "";
+            msgError.style.display = "none";
+            return true;
+        }
+    }
 
-    if (val === "" || !regex.test(val)) {
+    // ✅ Validación normal con regex
+    const val = el.value.trim();
+    const tipoBase = tipo.includes(":") ? tipo.split(":")[0] : tipo; // por si es match:algo
+    const { regex, mensaje } = tiposValidacion[tipoBase] || {};
+
+    if (!regex || val === "" || !regex.test(val)) {
         el.classList.add("input-error");
-        msgError.textContent = mensaje;
+        msgError.textContent = mensaje || "Campo inválido";
         msgError.style.display = "block";
         return false;
     } else {
@@ -123,10 +163,15 @@ function validarFormularioGlobal(formSelector) {
 
         inputs.forEach(input => {
             const tipo = input.dataset.tipo;
-            if (tipo && tiposValidacion[tipo]) {
-                const esValido = validarCampo(input, tipo);
-                if (!esValido) validos = false;
+            if (tipo) {
+                const tipos = tipo.split(",");
+                for (let t of tipos) {
+                    const matchId = t.startsWith("match:") ? t.split(":")[1] : null;
+                    const esValido = validarCampo(input, t, matchId);
+                    if (!esValido) validos = false;
+                }
             }
+
         });
 
         if (!validos) {

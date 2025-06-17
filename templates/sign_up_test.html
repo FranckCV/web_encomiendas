@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulario de Registro</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    label { display: block; margin-top: 10px; }
+    input, select { padding: 5px; margin-top: 5px; width: 250px; }
+    .mensaje-error { color: red; font-size: 0.9em; display: none; }
+    .input-error { border: 1px solid red; }
+    .barra-carga {
+      display: none;
+      margin-top: 20px;
+      width: 100%;
+      height: 10px;
+      background: #eee;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .barra-carga > div {
+      height: 100%;
+      width: 0;
+      background: #28a745;
+      animation: cargar 2s linear forwards;
+    }
+    @keyframes cargar {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Registro de Persona</h2>
+
+  <form id="formularioRegistro">
+    <label for="tipo_doc">Tipo de Documento:</label>
+    <select id="tipo_doc" name="tipo_doc" data-tipo="select">
+      <option value="-1" disabled selected>Seleccione</option>
+      <option value="dni">DNI</option>
+      <option value="ce">Carnet de Extranjería</option>
+      <option value="pasaporte">Pasaporte</option>
+    </select>
+
+    <label for="num_documento">Número de Documento:</label>
+    <input type="text" id="num_documento" name="num_documento" />
+    
+    <label for="telefono">Celular:</label>
+    <input type="text" id="telefono" name="telefono" data-tipo="numeros" />
+
+    <button type="submit">Registrar</button>
+
+    <div class="barra-carga" id="barraCarga">
+      <div></div>
+    </div>
+  </form>
+  <script src="/static/js/validationForm.js"></script> <!-- Asegúrate de reemplazar con el nombre real -->
+
+  <script>
+    // Referencia tu función original para asignar el tipo según el select
+    const inputDoc = document.getElementById("num_documento");
+    const selectTipo = document.getElementById("tipo_doc");
+
+    selectTipo.addEventListener("change", () => {
+      const tipo = selectTipo.value;
+      inputDoc.dataset.tipo = tipo;
+    });
+
+    // Validaciones del celular
+    configurarValidacion({ tipo: "numeros", selector: "input", id: "telefono" });
+
+    // Validar el número empiece con 9
+    document.getElementById("telefono").addEventListener("input", e => {
+      const tel = e.target;
+      const msgError = tel.parentElement.querySelector(".mensaje-error");
+      if (!/^9\d{8}$/.test(tel.value)) {
+        tel.classList.add("input-error");
+        msgError.textContent = "Número debe empezar con 9 y tener 9 dígitos";
+        msgError.style.display = "block";
+      } else {
+        tel.classList.remove("input-error");
+        msgError.textContent = "";
+        msgError.style.display = "none";
+      }
+    });
+
+    // Validación global
+    validarFormularioGlobal("#formularioRegistro");
+
+    // Mostrar barra de carga en submit si todo es válido
+    document.getElementById("formularioRegistro").addEventListener("submit", e => {
+      const errores = document.querySelectorAll(".input-error");
+      if (errores.length === 0) {
+        const barra = document.getElementById("barraCarga");
+        barra.style.display = "block";
+      } else {
+        e.preventDefault();
+      }
+    });
+  </script>
+
+  <!-- Aquí importa tu script de validación antes de este script o al final si está separado -->
+</body>
+</html>

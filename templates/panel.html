@@ -43,7 +43,7 @@ Panel Administrativo
             box-shadow: 0px 0px 20px {{modulo.get('color')}};
         }
     </style>
-    <a href="{{url_for('dashboard',module_name = modulo.get('key') )}}" class="panel_cell cell_module" id="cell_module_{{modulo.get('id')}}" >
+    <a href="{{url_for('modulo',module_name = modulo.get('key') )}}" class="panel_cell cell_module" id="cell_module_{{modulo.get('id')}}" >
         <i style="color: {{modulo.get('color')}};" class="{{ modulo.get('icono') }}"></i>
         <div>{{ modulo.get('nombre') }}</div>
     </a>

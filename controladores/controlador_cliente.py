@@ -174,6 +174,21 @@ def register_client(correo, telefono, num_documento, nombre_siglas, apellidos_ra
 
 
 
+def get_cliente_tipo_nro_documento(tipo_doc , nro_doc):
+    sql = f'''
+        SELECT 
+            cl.*, 
+            td.nombre AS nom_tipodoc,
+            tc.nombre AS nom_tipocliente
+        FROM cliente cl
+        LEFT JOIN tipo_documento td ON cl.tipo_documentoid = td.id
+        LEFT JOIN tipo_cliente tc ON cl.tipo_clienteid = tc.id
+        where cl.tipo_documentoid = %s and cl.num_documento = %s
+    '''
+    resultados = sql_select_fetchone(sql,(tipo_doc , nro_doc))
+    return resultados
+
+
 def getDataClient(id):
     sql = '''
         select num_documento, nombre_siglas,apellidos_razon from cliente where id = %s

@@ -6766,6 +6766,20 @@ VALUES ('Persona Jurídica', 1);
 insert INTO `metodo_pago` (nombre, activo)
 VALUES ('Efectivo', 1);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 INSERT INTO `metodo_pago` (nombre, activo) VALUES 
   ('Tarjeta de Crédito', 1),
   ('Tarjeta de Débito', 1),
@@ -8109,7 +8123,6 @@ values (28, 29, 80.00),
   (3,  5,  40.00),  
   (5,  1,  70.00),  
   (60, 28, 120.00);
-
 
 
 

@@ -50,7 +50,7 @@
     <select required name="tipo_documentoid" id="tipo_documentoid">
         <option value="-1" selected disabled>Tipo de Documento</option>
         {% for opt in opts_tipo_documento %}
-        <option value="{{opt[0]}}">{{opt[1]}}</option>
+        <option value="{{opt['id']}}" data-siglas="{{opt['siglas']}}">{{opt['nombre']}}</option>
         {% endfor %}
     </select>
     <!-- <i class="fa-solid fa-id-card"></i> -->
@@ -73,7 +73,7 @@
 
 <div class="input_box">
     <input type="text" name="telefono" id="telefono" placeholder="Telefono" required>
-    <i class="fa-solid fa-envelope"></i>
+    <i class="fa-solid fa-phone"></i>
 </div>
 
 <div class="input_box">
@@ -154,7 +154,7 @@
     });
 </script> -->
 
-<script>
+<!-- <script>
     document.querySelector('#tipo_clienteid').value = 1 ;
     document.querySelector('#tipo_documentoid').value = 1 ;
     document.querySelector('#num_documento').value = '3423' ;
@@ -167,7 +167,7 @@
 
     document.querySelector('#contrasenia').value = 'wqqwqw' ;
     document.querySelector('#conf_contrasenia').value = '123' ;
-</script>
+</script> -->
 
 <script>
     configurarValidacion({ tipo: "select", selector: "select", id: "tipo_clienteid" });
@@ -180,11 +180,10 @@
     configurarValidacion({ tipo: "numeros", selector: "input", id: "telefono" });
     configurarValidacion({ tipo: "email", selector: "input", id: "correo" });
 
-    // configurarValidacion({ tipo: "email", selector: "input", id: "correo" });
-    // configurarValidacion({ tipo: "email", selector: "input", id: "correo" });
+    configurarValidacion({ tipo: "min8", selector: "input", id: "contrasenia" });
+    configurarValidacion({ tipo: "match:contrasenia", selector: "input", id: "conf_contrasenia" });
 
     configurarValidacion({ tipo: "checkbox", selector: "input", id: "verificacion" });
-
 
     validarFormularioGlobal("form");
 

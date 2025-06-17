@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app,send_file #, after_this_request, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app , send_file #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import permiso as permiso
 from controladores import controlador_pagina as controlador_pagina
@@ -49,11 +49,14 @@ from controladores import controlador_metodo_pago_venta as controlador_metodo_pa
 from controladores import controlador_articulo as controlador_articulo
 from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 from controladores import controlador_encomienda as controlador_encomienda
+from controladores import controlador_encomiendasss as  controlador_encomiendasss
 # import BytesIO
 from itsdangerous import URLSafeSerializer
 from controladores.bd import sql_execute
 import uuid, os, qrcode
 from decimal import Decimal, ROUND_HALF_UP
+
+from datetime import datetime
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import mm
@@ -64,6 +67,12 @@ from werkzeug.routing import MapAdapter
 import configuraciones
 from functools import wraps
 import inspect
+
+import BytesIO
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import mm
+
 from flask_mail import Mail, Message
 from correo import enviar_correo
 from datetime import timedelta
@@ -1732,7 +1741,7 @@ def inject_cur_modulo_id():
                 parts = path.strip('/').split('=')
                 key = parts[-1] 
                 page = obtener_funcion_desde_url(app , path)
-                if page == 'dashboard':
+                if page == 'modulo':
                     dataPage = permiso.get_modulo_key(key)
                     if dataPage:
                         return dict(cur_modulo_id=dataPage['id'])
@@ -1888,7 +1897,7 @@ def sign_up():
             elif usuario['tipo_usuario'] == 'C' :
                 return main_cliente_page()
             
-    opts_tipo_documento = controlador_tipo_documento.get_options()
+    opts_tipo_documento = controlador_tipo_documento.get_options_dict()
     opts_tipo_cliente = controlador_tipo_cliente.get_options()
 
     render = render_template(
@@ -2369,24 +2378,116 @@ def tipos_envio():
     return render_template('tipos_envio.html', tipos_envios=tipos_envios)
 
 
+
 @app.route('/registro-envio')
 def registro_envio():
+    data_envio = session.get('data_envio')
+    
+    if data_envio:
+        return redirect(url_for('mostrar_resumen_envio'))
     nombre_doc = controlador_tipo_documento.get_options()
     nombre_rep = controlador_tipo_recepcion.get_options()
-    sucursales = controlador_sucursal.get_ubigeo()
+    rutas_tarifas = controlador_tarifa_ruta.get_sucursales_origen_destino()
     articulos = controlador_contenido_paquete.get_options()
     empaque = controlador_tipo_empaque.get_options()
+    condiciones = controlador_regla_cargo.get_condiciones_tarifa()
+    tarifas = controlador_tarifa_ruta.get_tarifas_ruta_dict()
+    return render_template('registro_envio.html', 
+                           nombre_doc=nombre_doc,
+                           nombre_rep=nombre_rep,
+                           rutasTarifas=json.dumps(rutas_tarifas), 
+                           tarifas = json.dumps(tarifas),
+                           empaque=empaque, 
+                           articulos=articulos,
+                           condiciones=condiciones)
+    
 
-    return render_template(
-        'registro_envio.html',
-        nombre_doc=nombre_doc,
-        nombre_rep=nombre_rep,
-        sucursales=json.dumps(sucursales),
-        articulos=articulos,
-        empaque=empaque
+@app.route('/guardar_datos_envio', methods=['POST'])
+def guardar_datos_envio():
+    data = request.json  # datos enviados desde JS por fetch
+
+    # Guardar datos en la sesión
+    user = controlador_encomiendasss.consultar_tarifa(data['id_origen'], data['id_destino'])
+    data['tarifa'] = user
+    subtotal = round(float(user) + float(data['valor_paquete']), 2)
+    igv = round(subtotal * 0.18, 2)
+    total = round(subtotal + igv, 2)
+    data['total'] = total
+
+    session['data_envio'] = data
+
+    print("Datos guardados en la sesión:", data)
+
+    return jsonify({"redirect_url": url_for('mostrar_resumen_envio')})
+
+app.secret_key = 'clave_secreta_segura'  # deberías usar una segura en producción
+
+
+@app.route('/resumen_envio')
+def mostrar_resumen_envio():
+    data_envio = session.get('data_envio')
+    
+    if not data_envio:
+        return redirect(url_for('registro_envio'))  # si no hay datos, redirige
+
+    return render_template('resumen_envio.html', data_envio=data_envio)
+
+@app.route('/eliminar_envio', methods=['POST'])
+def eliminar_envio():
+    try:
+        # Limpiar los datos de la sesión
+        session.pop('data_envio', None)
+        return redirect(url_for('registro_envio'))
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route('/pagar_encomienda')
+def pagar_encomienda():
+    data_envio = session.get('data_envio')
+
+    
+    
+    if not data_envio:
+        return redirect(url_for('registro_envio'))
+
+    # Calcular valores si es necesario
+    subtotal = float(data_envio.get('valor_paquete', 0)) + float(data_envio.get('tarifa', 0))
+    igv = round(subtotal * 0.18, 2)
+    total = round(subtotal + igv, 2)
+
+    return render_template('pago_encomienda.html',
+                           data_envio=data_envio,
+                           subtotal=subtotal,
+                           igv=igv,
+                           total=total)
+    
+
+
+@app.route('/confirmar_pagoenco', methods=['POST'])
+def confirmar_pagoenco():
+    try:
+        data_envio = session.get('data_envio')
+        metodo_pago = request.form.get('metodo-pago')
+        clave = 123
+        if not data_envio:
+            return jsonify({"success": False, "message": "No hay datos de envío"}), 400
+
+        controlador_encomiendasss.insertar_pago_2(data_envio, metodo_pago, clave)
+
+        session.pop('data_envio', None)
+
+        return redirect(url_for('registro_envio'))
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
         
-    )
+    
 
+
+@app.route('/seguimiento_encomienda')
+def seguimiento_encomienda():
+    estado_encomienda = controlador_estado_encomienda.get_last_state()
+    return render_template('seguimiento.html',estado_encomienda=estado_encomienda)
 
 
 @app.route('/resumen_envio', methods=['POST'])
@@ -2435,12 +2536,6 @@ def resumen():
     return render_template('resumen_envio.html', registros=resultados)
 
 
-
-
-
-
-
-
 @app.route('/pagoenvio')
 def mostrar_pagoenvio():
     tipo_comprobante = controlador_tipo_comprobante.get_options_nombre()
@@ -2448,6 +2543,8 @@ def mostrar_pagoenvio():
     metodo_pago = controlador_metodo_pago.get_options()
     return render_template('pago_envio.html', metodo_pago=metodo_pago,tipo_comprobante=tipo_comprobante
                            ) 
+
+
 @app.route('/pago_envio', methods=['GET', 'POST'])
 def pago_envio():
     registros = session.get('resumen_envios')
@@ -2880,6 +2977,7 @@ def distrito_origen():
             'status':-1
         }
     
+
 @app.route('/api/sucursal_origen',  methods=["POST"])
 def sucursal_origen():
     try:
@@ -2902,6 +3000,7 @@ def sucursal_origen():
             'status':-1
         }
     
+
 @app.route('/api/departamento_destino',  methods=["POST"])
 def departamento_destino():
     try:
@@ -3021,7 +3120,177 @@ def id_sucursal():
         }
         
 
-################# Sucursales ######################
+def generar_boleta(datos: dict, qr_png: BytesIO) -> BytesIO:
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+    ancho, alto = A4
+    num_serie = str(uuid.uuid4())[:8]
+
+    # 1. Cabecera
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(20*mm, alto-20*mm, "New Olva S.A.C.")
+    c.setFont("Helvetica", 10)
+    c.drawString(20*mm, alto-25*mm, "RUC 20512528458  |  AV. MEXICO NRO. 1187, LIMA")
+    c.drawString(20*mm, alto-30*mm, f"BOLETA DE VENTA ELECTRÓNICA    Nº {num_serie}-{datos['numero']}")
+
+    # 2. Datos del adquiriente
+    y = alto-40*mm
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(20*mm, y, "ADQUIRIENTE")
+    c.setFont("Helvetica", 10)
+    c.drawString(20*mm, y-5*mm, f"DNI: {datos['cliente']['dni']}")
+    c.drawString(60*mm, y-5*mm, datos['cliente']['nombre'])
+
+    # 3. Detalle de la venta (tabla muy básica)
+    y -= 15*mm
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(20*mm, y, "Cant.")
+    c.drawString(35*mm, y, "Descripción")
+    c.drawString(120*mm, y, "P/U")
+    c.drawString(150*mm, y, "Total")
+    c.setFont("Helvetica", 10)
+    for i, item in enumerate(datos['items'], start=1):
+        y -= 6*mm
+        c.drawString(20*mm, y, str(item['cantidad']))
+        c.drawString(35*mm, y, item['descripcion'])
+        c.drawRightString(135*mm, y, f"{item['pu']:.2f}")
+        c.drawRightString(175*mm, y, f"{item['total']:.2f}")
+
+    # 4. Totales
+    y -= 12*mm
+    c.drawRightString(150*mm, y, "GRAVADA S/")
+    c.drawRightString(175*mm, y, f"{datos['gravada']:.2f}")
+    y -= 6*mm
+    c.drawRightString(150*mm, y, "IGV S/")
+    c.drawRightString(175*mm, y, f"{datos['igv']:.2f}")
+    y -= 6*mm
+    c.setFont("Helvetica-Bold", 11)
+    c.drawRightString(150*mm, y, "TOTAL S/")
+    c.drawRightString(175*mm, y, f"{datos['total']:.2f}")
+
+    # 5. Insertar el QR en la esquina inferior derecha
+    qr_x = ancho - 50*mm
+    qr_y = 20*mm
+    c.drawImage(qr_png, qr_x, qr_y, width=30*mm, height=30*mm)
+
+    c.showPage()
+    c.save()
+    buffer.seek(0)
+    return buffer
+
+
+def generar_qr_boleta(datos):
+    info_qr = f"{datos['serie']}-{datos['numero']}|{datos['total']}"
+    img = qrcode.make(info_qr)
+    output = BytesIO()
+    img.save(output, format="PNG")
+    output.seek(0)
+    return output
+
+
+
+# @app.route('/boleta/<int:numero>')
+# def ver_boleta(serie, numero):
+#     datos = obtener_datos_de_boleta(numero)  # tu lógica propia
+#     qr_png = generar_qr_boleta(datos)  # genera el QR y devuélvelo como BytesIO
+
+#     pdf_file = generar_boleta(datos, qr_png)
+    
+#     return send_file(
+#         pdf_file,
+#         as_attachment=False,  # True para forzar descarga
+#         download_name=f"boleta_{serie}-{numero}.pdf",
+#         mimetype='application/pdf'
+#     )
+
+
+# @app.route('/generar_comprobante', methods=['POST'])
+# def generar_comprobante():
+#     data = request.get_json()
+#     # session['resumen_envios'] = data  # opcional, si deseas persistirlo
+
+#     tipo_doc = int(data['remitente']['tipo_doc_remitente'])
+#     nro_doc = data['remitente']['num_doc_remitente']
+#     correo = data['remitente']['correo']
+#     telefono = data['remitente']['num_tel_remitente']
+#     nombre_siglas = data['remitente']['nombre_remitente']
+
+#     cliente = controlador_cliente.get_cliente_tipo_nro_documento(tipo_doc , nro_doc)
+#     if not cliente:
+#         cliente_id = controlador_cliente.register_client(correo, telefono, nro_doc, nombre_siglas, '', tipo_doc, 1 )
+#     else:
+#         cliente_id = cliente['id']
+
+#     num_serie = str(uuid.uuid4())[:8]  # o tu lógica de serie/numero
+#     # monto_total = sum(Decimal(str(r['tarifa'])) for r in data['envios'])
+#     now = datetime.now()
+#     sql = """
+#       INSERT INTO transaccion_encomienda
+#        (num_serie, masivo, descripcion, recojo_casa,
+#         id_sucursal_origen, estado_pago, fecha, hora,
+#         direccion_recojo, clienteid, tipo_comprobanteid)
+#       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+#     """
+#     params = (
+#       num_serie,
+#       1,  # masivo
+#       'Envíos masivos',
+#       1 if data['modalidad_pago']=='1' else 0,
+#       data['envios'][0]['origen']['sucursal_origen'],
+#       'P',  # pendiente
+#       now.date(), 
+#       now.time(),
+#       None,  # direccion_recojo si aplica
+#       cliente_id,
+#       int(data['tipo_comprobante'])
+#     )
+#     sql_execute(sql, params)
+
+
+#     for envio in data['envios']:
+#         # token = str(uuid.uuid4())
+#         # qr_png = make_qr(url_for('seguimiento', token=token, _external=True))
+#         # opcional: guarda qr_png en disco o en BLOB
+#         sql = """
+#         INSERT INTO paquete
+#             (tracking, clave, valor, peso, alto, largo, precio_ruta, ancho,
+#             descripcion, direccion_destinatario, telefono_destinatario,
+#             num_documento_destinatario, sucursal_destino_id,
+#             tipo_documento_destinatario_id, tipo_empaqueid,
+#             contenido_paqueteid, tipo_recepcionid, salidaid,
+#             transaccion_encomienda_num_serie, qr_token, qr_image)
+#         VALUES (%s, %s, %s, %s, %s, %s, %s, %s,
+#                 %s, %s, %s, %s, %s, %s, %s, %s,
+#                 %s, %s, %s, %s, %s)
+#         """
+#         params = (
+#             None,  # si es AUTO_INCREMENT
+#             envio['clave'],
+#             envio['valorEnvio'],
+#             envio['peso'],
+#             envio['alto'], envio['largo'],
+#             envio['tarifa'], envio['ancho'],
+#             envio.get('descripcion',''),
+#             envio.get('destino_text',''),
+#             envio.get('telefono_destinatario',''),
+#             envio['destino']['num_doc_destinatario'],
+#             envio['destino']['sucursal_destino'],
+#             envio['tipo_doc_destinatario'],
+#             envio['tipo_empaqueid'],
+#             envio.get('contenido_paqueteid'),
+#             envio.get('tipo_recepcionid'),
+#             None,  # salidaid
+#             num_serie,
+#             None , # token,
+#             None
+#             # qr_png.read()  # o la ruta si la guardas en FS
+#         )
+#         sql_execute(sql, params)
+
+
+
+
+
 
 
 @app.route("/perfil")
@@ -3352,13 +3621,13 @@ def panel():
     return render_template('panel.html')
 
 
-@app.route("/dashboard=<module_name>")
+@app.route("/modulo=<module_name>")
 @validar_empleado()
-def dashboard(module_name):
+def modulo(module_name):
     modulo = permiso.get_modulo_key(module_name)
     tipos_pag = permiso.get_tipos_pagina_moduloid(modulo['id'])
     return render_template(
-        'dashboard.html' , 
+        'MODULO.html' , 
         module_name = module_name , 
         modulo = modulo ,
         REPORTES = REPORTES ,
@@ -3929,7 +4198,7 @@ def insertar_detalle_estado():
 if __name__ == "__main__":
     # app.run(host='192.168.48.178', port=8000, debug=True, use_reloader=True)
     # Thread(target=enviar_posiciones).start()
-    socketio.run(app, host='0.0.0.0', port=8000, debug=True)
+    socketio.run(app, host='0.0.0.0', port=8001, debug=True)
 
 
 
