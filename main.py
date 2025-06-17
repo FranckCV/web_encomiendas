@@ -1643,13 +1643,19 @@ TRANSACCIONES = {
         "icon_page": "fa-solid fa-boxes-packing",
         "filters": [],
         "fields_form": [
-            ['num_serie',         'N° Serie',           'Número de Serie',         'text',   True,  True,   None],
-            ['masivo',            'Tipo de Envío',      '1: Masivo / 0: Individual','text', True,  True,   None],
-            ['monto_total',       'Monto Total',        'Total a pagar',           'text', True,  True,   None],
-            ['recojo_casa',       'Recojo a Domicilio', '1: Sí / 0: No',           'text', True,  True,   None],
-            ['nom_sucursal_origen','Sucursal Origen',    'ID de Sucursal',          'text', True,  True,   None],
-            ['nom_tip_comprobante','Tipo Comprobante',   'Tipo Comprobante',     'text', True,  True,   None],
-            ['nombre_cliente',         'Cliente',            'Nombre del cliente',          'text', True,  True,   None]
+            ['num_serie',           'N° Serie',           'Número de Serie',           'text',      True,  True,   None],
+            ['masivo',              'Tipo de Envío',      'Tipo de Envío', 'select',    True,  True,   [lambda: controlador_encomienda.get_select_tipo_envio(), 'nombre']],
+            ['recojo_casa',         'Recojo a Domicilio', 'Recojo de paquete',             'select',    True,  True,   [lambda: controlador_encomienda.get_select_recojo_casa(), 'nombre']],
+            ['fecha',               'Fecha',              'Fecha',                     'date',      True,  True,   None],
+            ['hora',                'Hora',               'Hora',                      'time',      True,  True,   None],
+            ['id_sucursal_origen',  'Sucursal de origen', '',                          'select',    True,  True,   [lambda: controlador_tarifa_ruta.get_options_select_sucursal_origen(), 'nombre']],
+            ['clienteid',           'Cliente',            '',                          'select',    True,  True,   [lambda: controlador_cliente.get_select_cliente(), 'nombre']],
+            ['tipo_comprobanteid', 'Tipo Comprobante',    '',                          'select',    True,  True,   [lambda: controlador_tipo_comprobante.get_options(), 'nombre']],
+
+            ['comprobante_serie',   'Serie de Comprobante',    'Serie de Comprobante',            'text',    True,  True,   None],
+            ['monto_total',         'Monto Total',        'Monto total',             'decimal_2', True,  True,   None],
+            ['direccion_recojo',    'Direccion de recojo',    'Direccion de recojo',            'text',    True,  True,   None],
+            ['descripcion',         'Descripcion',            'Descripcion',        'textarea',    True,  True,   None],
         ],
         "crud_forms": {
             "crud_list": True,
@@ -2048,7 +2054,7 @@ def libro_reclamaciones():
     departamentos = controlador_sucursal.get_options_departamento_sucursal()
     provincias = controlador_sucursal.get_options_provincia_sucursal()
     distritos = controlador_sucursal.get_options_distrito_sucursal()
-    sucursales = controlador_sucursal.get_options_ubigeo_sucursal()
+    sucursales = controlador_sucursal.get_options_ubigeo_sucursal() 
     tipos_reclamo = controlador_reclamo.get_dict_tipo_reclamo()
     motivos_reclamo = controlador_reclamo.get_dict_motivo_reclamo()
     causas_reclamo = controlador_reclamo.get_dict_causa_reclamo()

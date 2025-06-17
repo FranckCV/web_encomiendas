@@ -49,30 +49,31 @@ def get_table():
     sql = '''
         SELECT 
             te.num_serie,
+            te.masivo,
+            te.id_sucursal_origen,
+            te.monto_total,
+            te.fecha,
+            te.hora,
+            te.comprobante_serie,
+            te.clienteid,
+            te.tipo_comprobanteid,
+            te.monto_total,
+            te.recojo_casa,
+            te.direccion_recojo,
+            te.descripcion,
 
+            tc.nombre AS nom_tip_comprobante,
             CASE 
                 WHEN te.masivo = 1 THEN 'Masivo'
                 ELSE 'Individual'
-            END AS masivo,
-
-            te.monto_total,
-
+            END AS masivo_txt,
             CASE 
                 WHEN te.recojo_casa = 1 THEN 'Sí'
                 ELSE 'No'
-            END AS recojo_casa,
-
+            END AS recojo_casa_txt,
             CONCAT(
                 u.departamento, '/', u.provincia, '/', u.distrito, ' - ', s.direccion
             ) AS nom_sucursal_origen,
-
-            te.fecha,
-            te.hora,
-
-            te.direccion_recojo,
-
-            tc.nombre AS nom_tip_comprobante,
-
             CONCAT(
                 COALESCE(c.nombre_siglas, ''), ' ', COALESCE(c.apellidos_razon, '')
             ) AS nombre_cliente 
@@ -87,10 +88,10 @@ def get_table():
 
     columnas = {
         'num_serie': ['N° Serie', 2],
-        'masivo': ['Tipo de Envío', 1.2], 
+        'masivo_txt': ['Tipo de Envío', 1.2], 
         'monto_total': ['Monto Total S/.', 1],
         'nom_sucursal_origen': ['Sucursal Origen', 4],
-        'recojo_casa': ['¿Recojo en casa?', 1],
+        'recojo_casa_txt': ['¿Recojo en casa?', 1],
         'fecha': ['Fecha', 1],
         'hora': ['Hora', 1],
         'nom_tip_comprobante': ['Comprobante', 1.5],
@@ -442,3 +443,56 @@ def calcular_resumen_venta(monto_total, igv):
         'igv': igv_valor,
         'total': monto_total
     }
+
+
+
+
+def insert_row(
+        num_serie, 
+        masivo, 
+        id_sucursal_origen, 
+        fecha, 
+        hora, 
+        comprobante_serie, 
+        clienteid, 
+        tipo_comprobanteid,
+        monto_total = None, 
+        recojo_casa = None, 
+        direccion_recojo = None, 
+        descripcion = None
+        ):
+    sql = f'''
+        INSERT INTO {table_name} (
+        num_serie, masivo, descripcion, monto_total, recojo_casa, id_sucursal_origen, fecha, hora, direccion_recojo, comprobante_serie, clienteid, tipo_comprobanteid
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    '''
+    sql_execute(sql, (num_serie, masivo, descripcion, monto_total, recojo_casa, id_sucursal_origen, fecha, hora, direccion_recojo, comprobante_serie, clienteid, tipo_comprobanteid))
+
+MASIVO = {
+    0: 'Individual' ,
+    1: 'Masivo' ,
+}
+
+RECOJO_CASA = {
+    1: 'Si' ,
+    0: 'No' ,
+}
+
+
+def get_select_tipo_envio():
+    lst = MASIVO.keys()
+    filas = []
+    for ele in lst:
+        filas.append([ele , MASIVO[ele]])
+    return filas
+
+
+def get_select_recojo_casa():
+    lst = RECOJO_CASA.keys()
+    filas = []
+    for ele in lst:
+        filas.append([ele , RECOJO_CASA[ele]])
+    return filas
+
+
