@@ -14,7 +14,7 @@
 
 
   <div class="container">
-    <h1 class="titulo-envio">REGISTRO DE ENVÍOS MASIVOS</h1>
+    <h1 class="titulo-envio">REGISTRO DE ENVIOS</h1>
 
     <div class="steps-container">
       <div class="step active">
@@ -500,5 +500,6 @@
     const mode = new URLSearchParams(window.location.search).get('mode') || 'masivo';
   </script>
   <script src="{{ url_for('static', filename='js/envio_masivo.js') }}"></script>
+  
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script> 
 {% endblock %}
