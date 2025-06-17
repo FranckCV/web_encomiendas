@@ -180,29 +180,30 @@
             <div class="acciones">
 
               {% for btn in buttons %}
-              <div class="opciones_fila">
-                <a href="{{ url_for(btn[3]) }}" >
-                  <button class="" style="background-color: {{btn[2]}};">
-                    <i class="{{btn[1]}}"></i>
-                  </button>
-                </a>
-              </div>
-              {% endfor %}
+                <div class="opciones_fila">
+                  {% set mostrar_url = btn[0] %}
+                  {% set icono = btn[1] %}
+                  {% set color = btn[2] %}
+                  {% set funcion = btn[3] %}
+                  {% set parametros = {} %}
 
-              {% if fila['placa'] %}
-                <div class="opciones_fila">                
-                  <button class="btn btn-secondary btn-small btn-ver-mapa" style="padding: inherit;" title="Ver Mapa">
-                    <i class="fa-solid fa-location-dot"></i>
-                  </button>
+                  {% if mostrar_url and btn|length > 4 %}
+                    {% set raw_params = btn[4] %}
+                    {% for key, val in raw_params.items() %}
+                      {% set _ = parametros.update({key: fila[val]}) %}
+                    {% endfor %}
+                    <a href="{{ url_for(funcion, **parametros) }}">
+                  {% elif funcion is none or funcion == '' %}
+                    <a href="#">
+                  {% else %}
+                    <a href="{{ url_for(funcion) }}">
+                  {% endif %}
+                      <button class="{{btn[5]}}" style="background-color: {{ color }};">
+                        <i class="{{ icono }}"></i>
+                      </button>
+                    </a>
                 </div>
-                <!-- <div class="opciones_fila">
-                  <a href="{{ url_for('seguimiento_empleado_prueba', placa=fila['placa'] )}}">
-                    <button class="btn btn-secondary btn-small btn-ver-mapa" style="padding: inherit;" title="Ver Mapa">
-                      <i class="fa-solid fa-location-dot"></i>
-                    </button>
-                  </a>
-                </div> -->
-              {% endif %}
+              {% endfor %}
 
 
               {% if crud_consult %}                
@@ -354,18 +355,6 @@
 
 <script src="/static/js/orderHeadTable.js"></script>
 <script src="/static/js/paginationCrud.js"></script>
-
-<script>
-  const today = new Date().toISOString().split('T')[0];
-  const date_solo = document.querySelector('input[type="date"][data-type="date"]')
-  if (date_solo) {
-    date_solo.value = today;
-  } else {
-    document.querySelector('input[type="date"][data-type="date_ini"]').value = today;
-    document.querySelector('input[type="date"][data-type="date_fin"]').value = today;
-  }
-  // document.getElementById('fecha_fin').value = today;
-</script>
 
 
 <script>
