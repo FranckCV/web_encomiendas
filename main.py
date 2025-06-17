@@ -3116,88 +3116,88 @@ def generar_qr_boleta(datos):
 #     )
 
 
-@app.route('/generar_comprobante', methods=['POST'])
-def generar_comprobante():
-    data = request.get_json()
-    # session['resumen_envios'] = data  # opcional, si deseas persistirlo
+# @app.route('/generar_comprobante', methods=['POST'])
+# def generar_comprobante():
+#     data = request.get_json()
+#     # session['resumen_envios'] = data  # opcional, si deseas persistirlo
 
-    tipo_doc = int(data['remitente']['tipo_doc_remitente'])
-    nro_doc = data['remitente']['num_doc_remitente']
-    correo = data['remitente']['correo']
-    telefono = data['remitente']['num_tel_remitente']
-    nombre_siglas = data['remitente']['nombre_remitente']
+#     tipo_doc = int(data['remitente']['tipo_doc_remitente'])
+#     nro_doc = data['remitente']['num_doc_remitente']
+#     correo = data['remitente']['correo']
+#     telefono = data['remitente']['num_tel_remitente']
+#     nombre_siglas = data['remitente']['nombre_remitente']
 
-    cliente = controlador_cliente.get_cliente_tipo_nro_documento(tipo_doc , nro_doc)
-    if not cliente:
-        cliente_id = controlador_cliente.register_client(correo, telefono, nro_doc, nombre_siglas, '', tipo_doc, 1 )
-    else:
-        cliente_id = cliente['id']
+#     cliente = controlador_cliente.get_cliente_tipo_nro_documento(tipo_doc , nro_doc)
+#     if not cliente:
+#         cliente_id = controlador_cliente.register_client(correo, telefono, nro_doc, nombre_siglas, '', tipo_doc, 1 )
+#     else:
+#         cliente_id = cliente['id']
 
-    num_serie = str(uuid.uuid4())[:8]  # o tu lógica de serie/numero
-    # monto_total = sum(Decimal(str(r['tarifa'])) for r in data['envios'])
-    now = datetime.now()
-    sql = """
-      INSERT INTO transaccion_encomienda
-       (num_serie, masivo, descripcion, recojo_casa,
-        id_sucursal_origen, estado_pago, fecha, hora,
-        direccion_recojo, clienteid, tipo_comprobanteid)
-      VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """
-    params = (
-      num_serie,
-      1,  # masivo
-      'Envíos masivos',
-      1 if data['modalidad_pago']=='1' else 0,
-      data['envios'][0]['origen']['sucursal_origen'],
-      'P',  # pendiente
-      now.date(), 
-      now.time(),
-      None,  # direccion_recojo si aplica
-      cliente_id,
-      int(data['tipo_comprobante'])
-    )
-    sql_execute(sql, params)
+#     num_serie = str(uuid.uuid4())[:8]  # o tu lógica de serie/numero
+#     # monto_total = sum(Decimal(str(r['tarifa'])) for r in data['envios'])
+#     now = datetime.now()
+#     sql = """
+#       INSERT INTO transaccion_encomienda
+#        (num_serie, masivo, descripcion, recojo_casa,
+#         id_sucursal_origen, estado_pago, fecha, hora,
+#         direccion_recojo, clienteid, tipo_comprobanteid)
+#       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+#     """
+#     params = (
+#       num_serie,
+#       1,  # masivo
+#       'Envíos masivos',
+#       1 if data['modalidad_pago']=='1' else 0,
+#       data['envios'][0]['origen']['sucursal_origen'],
+#       'P',  # pendiente
+#       now.date(), 
+#       now.time(),
+#       None,  # direccion_recojo si aplica
+#       cliente_id,
+#       int(data['tipo_comprobante'])
+#     )
+#     sql_execute(sql, params)
 
 
-    for envio in data['envios']:
-        # token = str(uuid.uuid4())
-        # qr_png = make_qr(url_for('seguimiento', token=token, _external=True))
-        # opcional: guarda qr_png en disco o en BLOB
-        sql = """
-        INSERT INTO paquete
-            (tracking, clave, valor, peso, alto, largo, precio_ruta, ancho,
-            descripcion, direccion_destinatario, telefono_destinatario,
-            num_documento_destinatario, sucursal_destino_id,
-            tipo_documento_destinatario_id, tipo_empaqueid,
-            contenido_paqueteid, tipo_recepcionid, salidaid,
-            transaccion_encomienda_num_serie, qr_token, qr_image)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s)
-        """
-        params = (
-            None,  # si es AUTO_INCREMENT
-            envio['clave'],
-            envio['valorEnvio'],
-            envio['peso'],
-            envio['alto'], envio['largo'],
-            envio['tarifa'], envio['ancho'],
-            envio.get('descripcion',''),
-            envio.get('destino_text',''),
-            envio.get('telefono_destinatario',''),
-            envio['destino']['num_doc_destinatario'],
-            envio['destino']['sucursal_destino'],
-            envio['tipo_doc_destinatario'],
-            envio['tipo_empaqueid'],
-            envio.get('contenido_paqueteid'),
-            envio.get('tipo_recepcionid'),
-            None,  # salidaid
-            num_serie,
-            None , # token,
-            None
-            # qr_png.read()  # o la ruta si la guardas en FS
-        )
-        sql_execute(sql, params)
+#     for envio in data['envios']:
+#         # token = str(uuid.uuid4())
+#         # qr_png = make_qr(url_for('seguimiento', token=token, _external=True))
+#         # opcional: guarda qr_png en disco o en BLOB
+#         sql = """
+#         INSERT INTO paquete
+#             (tracking, clave, valor, peso, alto, largo, precio_ruta, ancho,
+#             descripcion, direccion_destinatario, telefono_destinatario,
+#             num_documento_destinatario, sucursal_destino_id,
+#             tipo_documento_destinatario_id, tipo_empaqueid,
+#             contenido_paqueteid, tipo_recepcionid, salidaid,
+#             transaccion_encomienda_num_serie, qr_token, qr_image)
+#         VALUES (%s, %s, %s, %s, %s, %s, %s, %s,
+#                 %s, %s, %s, %s, %s, %s, %s, %s,
+#                 %s, %s, %s, %s, %s)
+#         """
+#         params = (
+#             None,  # si es AUTO_INCREMENT
+#             envio['clave'],
+#             envio['valorEnvio'],
+#             envio['peso'],
+#             envio['alto'], envio['largo'],
+#             envio['tarifa'], envio['ancho'],
+#             envio.get('descripcion',''),
+#             envio.get('destino_text',''),
+#             envio.get('telefono_destinatario',''),
+#             envio['destino']['num_doc_destinatario'],
+#             envio['destino']['sucursal_destino'],
+#             envio['tipo_doc_destinatario'],
+#             envio['tipo_empaqueid'],
+#             envio.get('contenido_paqueteid'),
+#             envio.get('tipo_recepcionid'),
+#             None,  # salidaid
+#             num_serie,
+#             None , # token,
+#             None
+#             # qr_png.read()  # o la ruta si la guardas en FS
+#         )
+#         sql_execute(sql, params)
 
 
 
