@@ -161,3 +161,12 @@ def get_options_estado():
     ]
 
     return lista
+
+def get_capacidad_unidad():
+    sql = '''
+    select concat(tu.nombre,' ',m.nombre),capacidad from unidad u
+inner join modelo m on m.id = u.modeloid
+inner join tipo_unidad tu on tu.id = m.tipo_unidadid
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas

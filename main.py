@@ -68,7 +68,7 @@ import configuraciones
 from functools import wraps
 import inspect
 
-import BytesIO
+from io import BytesIO
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import mm
@@ -3755,8 +3755,6 @@ def procesar_cambio_contrasenia():
 PAGINAS_SIMPLES_ADMIN = [ 
     # 'panel' , 
     'programacion_devolucion',
-    'salidas_programadas', #para eliminar
-    'salida_informacion',
 ]
 
 registrar_paginas_con_decorador(app, PAGINAS_SIMPLES_ADMIN, validar_empleado)
@@ -4344,6 +4342,13 @@ def insertar_detalle_estado():
 
     except Exception as e:
         return jsonify({"status": -1, "mensaje": f"Excepción: {str(e)}"}), 500
+    
+    
+@app.route('/salida_informacion')
+def salida_informacion():
+    unidades = controlador_unidad.get_capacidad_unidad()
+    return render_template('salida_informacion.html',unidades=unidades)
+
 
 
 if __name__ == "__main__":
