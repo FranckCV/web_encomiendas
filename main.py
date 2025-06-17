@@ -1582,8 +1582,10 @@ TRANSACCIONES = {
         },
         "buttons": [
             # parametros - icon - color - enlace_function
-            [False,   f'{ICON_CONSULT}',   '#3165fd',  'salida_informacion'],
-            [False,   f'{ICON_UPDATE}',   '#ccac1c',  'salida_informacion'],
+            [False,   f'{ICON_CONSULT}',   '#3165fd',  'salida_informacion', {} , ''],
+            [False,   f'{ICON_UPDATE}',   '#ccac1c',  'salida_informacion', {} , ''],
+            # [True,   f'fa-solid fa-location-dot',   'grey',  'seguimiento_empleado_prueba' , {"placa": "placa"}],
+            [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa'], 
         ],
         "options": [
             # icon - color - text - enlace_function

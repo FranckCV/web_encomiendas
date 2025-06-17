@@ -292,7 +292,7 @@ CREATE TABLE salida (
   entrega             tinyint(1) NOT NULL, 
   estado              char(1) NOT NULL, 
   unidadid            int(10) NOT NULL, 
-  origen_incio_id     int(11) NOT NULL, 
+  origen_inicio_id     int(11) NOT NULL, 
   destino_final_id    int(10) NOT NULL, 
   conductor_principal int(11) NOT NULL, 
   PRIMARY KEY (id));
