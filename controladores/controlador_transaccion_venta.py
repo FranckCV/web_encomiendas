@@ -29,13 +29,13 @@ def crear_transaccion_provisional(tipo_comprobanteid, monto_total, clienteid):
     return sql_execute_lastrowid(sql, (tipo_comprobanteid, monto_total, clienteid))
 
 
-def agregar_detalle_venta(articuloid, ventanum_serie, ventatipo_comprobanteid, cantidad):
+def agregar_detalle_venta(articuloid, ventanum_serie, cantidad):
     sql = '''
-        INSERT INTO detalle_venta (articuloid, ventanum_serie, ventatipo_comprobanteid, cantidad)
-        VALUES (%s, %s, %s, %s)
+        INSERT INTO detalle_venta (articuloid, ventanum_serie, cantidad)
+        VALUES (%s, %s, %s)
         ON DUPLICATE KEY UPDATE cantidad = VALUES(cantidad)
     '''
-    return sql_execute(sql, (articuloid, ventanum_serie, ventatipo_comprobanteid, cantidad))
+    return sql_execute(sql, (articuloid, ventanum_serie, cantidad))
 
 def actualizar_monto_total(ventanum_serie):
     sql = '''
@@ -96,7 +96,7 @@ def registrar_detalle_venta(clienteid, tipo_comprobanteid, articuloid, cantidad)
         num_serie = transaccion["num_serie"]
 
     # Paso 3: Insertar detalle de venta
-    agregar_detalle_venta(articuloid, num_serie, tipo_comprobanteid, cantidad)
+    agregar_detalle_venta(articuloid, num_serie, cantidad)
 
     # Paso 4: Actualizar total
     actualizar_monto_total(num_serie)
