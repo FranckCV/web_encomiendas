@@ -50,6 +50,8 @@ from controladores import controlador_articulo as controlador_articulo
 from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 from controladores import controlador_encomienda as controlador_encomienda
 from controladores import controlador_encomiendasss as  controlador_encomiendasss
+from controladores import controlador_seguimiento as  controlador_seguimiento
+
 from controladores import reporte_listar_enco 
 from controladores import reporte_reclamo_causa
 from controladores import reporte_UsoUnidades
@@ -1704,10 +1706,39 @@ TRANSACCIONES = {
             "crud_unactive": False
         },
         "buttons": [
-            [True, 'fa-solid fa-boxes', "#9856EE", 'seguimiento_tracking', {"tracking": "tracking"}],
+            [True, 'fa-solid fa-route', "#9856EE", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"}],
+             [True, 'fa-solid fa-qrcode', "#B8CBD7", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"}],
         ],
         "options": [
             [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Encomiendas', 'transaccion' , {"tabla": "::transaccion_encomienda" }],
+
+        ],
+    },
+    "seguimiento": {
+        "active": True,
+        "titulo": "Seguimiento",
+        "nombre_tabla": "seguimiento",
+        "controlador": controlador_seguimiento,
+        "icon_page": "fa-solid fa-route",
+        "filters": [], 
+        "fields_form": [
+        #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
+            ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_seguimiento.get_options_dict() , 'nombre_det' ] ],
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": False,
+            "crud_consult": False,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": False
+        },
+        "buttons": [
+            
+        ],
+        "options": [
+            [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Encomiendas', 'transaccion' , {"tabla": "::paquete" }],
 
         ],
     }
@@ -2722,8 +2753,240 @@ def seguimiento_encomienda():
     estado_encomienda = controlador_estado_encomienda.get_last_state()
     return render_template('seguimiento.html',estado_encomienda=estado_encomienda)
 
+@app.route('/resumen_envio_prueba', methods=['POST'])
+def resumen_envio_prueba():
+    try:
+        # Obtener datos del request
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({
+                'error': 'No se recibieron datos',
+                'message': 'El request no contiene datos JSON válidos'
+            }), 400
+        
+        # Extraer información del payload
+        envios = data.get('envios', [])
+        remitente = data.get('remitente', {})
+        modalidad_pago = data.get('modalidad_pago', '')
+        tipo_envio = data.get('tipo_envio', 'individual')
+        
+        # Validaciones básicas
+        if not envios:
+            return render_template('resumen_envio.html', 
+                                 error_message='No se encontraron envíos para procesar',
+                                 envios=[],
+                                 remitente={},
+                                 modalidad_pago='',
+                                 tipo_envio='')
+        
+        # Procesar cada envío para calcular tarifas (ejemplo)
+        for i, envio in enumerate(envios):
+            origen_id  = envio['origen']['sucursal_origen']
+            destino_id = envio['destino']['sucursal_destino']
+            valor      = Decimal(str(envio['valorEnvio']))
+            peso       = Decimal(str(envio['peso']))
 
-@app.route('/resumen_envio', methods=['POST'])
+            tarifa_row  = controlador_tarifa_ruta.get_tarifa_ids(origen_id, destino_id) or {}
+            tarifa_base = Decimal(str(tarifa_row.get('tarifa', 0)))
+
+            regla_p      = controlador_regla_cargo.get_regla_cargo_condicion('P', float(peso)) or {}
+            regla_v      = controlador_regla_cargo.get_regla_cargo_condicion('V', float(valor)) or {}
+            porcentaje_p = Decimal(str(regla_p.get('porcentaje', 0)))
+            porcentaje_v = Decimal(str(regla_v.get('porcentaje', 0)))
+            porcentaje_r = Decimal(str(controlador_empresa.get_porcentaje_recojo()))
+
+            total = controlador_tarifa_ruta.calcularTarifaTotal(
+                tarifa_base, peso, porcentaje_r, porcentaje_v, porcentaje_p
+            )
+            envios[i]['tarifa'] = total
+            
+            # Asegurar que todos los campos necesarios existan
+            envios[i] = normalizar_envio(envio)
+        
+        # Log para debugging
+        print(f"Procesando {len(envios)} envíos de tipo {tipo_envio}")
+        print(f"Remitente: {remitente.get('nombre_remitente', 'No especificado')}")
+        
+        # Renderizar la plantilla con los datos
+        return render_template('resumen_envio_prueba.html',
+                             envios=envios,
+                             remitente=remitente,
+                             modalidad_pago=modalidad_pago,
+                             tipo_envio=tipo_envio,
+                             error_message=None)
+        
+    except Exception as e:
+        print(f"Error en resumen_envio: {str(e)}")
+        return render_template('resumen_envio_prueba.html',
+                             error_message=f'Error interno del servidor: {str(e)}',
+                             envios=[],
+                             remitente={},
+                             modalidad_pago='',
+                             tipo_envio='')
+
+@app.route('/pago_envio_prueba', methods=['POST'])
+def pago_envio_prueba():
+    try:
+        # Obtener datos del formulario o de la sesión
+        envios_data = request.form.get('envios_data')
+        remitente_data = request.form.get('remitente_data')
+        modalidad_pago = request.form.get('modalidad_pago')
+        tipo_envio = request.form.get('tipo_envio')
+        
+        print(f"Datos recibidos del formulario:")
+        print(f"- envios_data: {envios_data[:100] if envios_data else 'None'}...")
+        print(f"- remitente_data: {remitente_data[:100] if remitente_data else 'None'}...")
+        print(f"- modalidad_pago: {modalidad_pago}")
+        print(f"- tipo_envio: {tipo_envio}")
+        
+        # Si no vienen del formulario, obtener de la sesión
+        if not envios_data:
+            print("No hay datos en formulario, obteniendo de sesión...")
+            envios = session.get('resumen_envios', [])
+            remitente = session.get('remitente_data', {})
+            modalidad_pago = session.get('modalidad_pago', '')
+            tipo_envio = session.get('tipo_envio', 'individual')
+        else:
+            try:
+                # Convertir de JSON string a objetos Python
+                envios = json.loads(envios_data) if envios_data else []
+                remitente = json.loads(remitente_data) if remitente_data else {}
+                
+                print(f"Datos parseados correctamente:")
+                print(f"- Número de envíos: {len(envios)}")
+                print(f"- Remitente: {remitente.get('nombre_remitente', 'No especificado')}")
+                
+            except json.JSONDecodeError as e:
+                print(f"Error parseando JSON: {e}")
+                print(f"Datos problemáticos - envios_data: {envios_data}")
+                print(f"Datos problemáticos - remitente_data: {remitente_data}")
+                
+                # Intentar obtener de la sesión como fallback
+                envios = session.get('resumen_envios', [])
+                remitente = session.get('remitente_data', {})
+                modalidad_pago = session.get('modalidad_pago', modalidad_pago or '')
+                tipo_envio = session.get('tipo_envio', tipo_envio or 'individual')
+                
+                if not envios:
+                    return jsonify({
+                        'error': 'Error en formato de datos',
+                        'message': 'Los datos enviados no tienen un formato válido'
+                    }), 400
+        
+        if not envios:
+            print("No se encontraron envíos, redirigiendo...")
+            return redirect(url_for('tipos_envio'))
+        
+        # Calcular total a pagar
+        total_pagar = 0
+        for envio in envios:
+            try:
+                tarifa = float(envio.get('tarifa', 0))
+                total_pagar += tarifa
+            except (ValueError, TypeError):
+                print(f"Error calculando tarifa para envío: {envio}")
+                pass
+        
+        print(f"Total a pagar calculado: S/ {total_pagar}")
+        
+        # Guardar datos para el proceso de pago
+        session['datos_pago'] = {
+            'envios': envios,
+            'remitente': remitente,
+            'modalidad_pago': modalidad_pago,
+            'tipo_envio': tipo_envio,
+            'total_pagar': total_pagar
+        }
+        
+        print(f"Datos guardados en sesión, renderizando template...")
+        
+        return render_template('pago_envio_prueba.html',
+                             envios=envios,
+                             remitente=remitente,
+                             modalidad_pago=modalidad_pago,
+                             tipo_envio=tipo_envio,
+                             total_pagar=total_pagar)
+        
+    except Exception as e:
+        print(f"Error general en pago_envio_prueba: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        
+        return jsonify({
+            'error': 'Error procesando pago',
+            'message': str(e)
+        }), 500
+
+# Función auxiliar para debug
+def debug_request_data():
+    """Función para hacer debug de los datos recibidos"""
+    print("=== DEBUG REQUEST DATA ===")
+    print(f"Method: {request.method}")
+    print(f"Content-Type: {request.content_type}")
+    print(f"Form data: {dict(request.form)}")
+    print(f"JSON data: {request.get_json(silent=True)}")
+    print(f"Raw data: {request.data}")
+    print("=" * 30)
+
+
+
+def normalizar_envio(envio):
+    """
+    Normaliza los datos del envío para asegurar que todos los campos existan
+    """
+    campos_default = {
+        'tipoEntrega': '',
+        'tipoEntregaId': '',
+        'valorEnvio': 0,
+        'peso': 0,
+        'largo': 0,
+        'ancho': 0,
+        'alto': 0,
+        'folios': '',
+        'descripcion': '',
+        'clave': '',
+        'tarifa': 0,
+        'tipoEmpaque': '',
+        'tipoArticulo': '',
+        'destino': {
+            'departamento': '',
+            'provincia': '',
+            'distrito': '',
+            'sucursal_destino': '',
+            'direccion': ''
+        },
+        'origen': {
+            'departamento_origen': '',
+            'provincia_origen': '',
+            'distrito_origen': '',
+            'sucursal_origen': ''
+        },
+        'destinatario': {
+            'nombre_destinatario': '',
+            'num_doc_destinatario': '',
+            'num_tel_destinatario': ''
+        }
+    }
+    
+    # Combinar datos default con los datos recibidos
+    envio_normalizado = {**campos_default, **envio}
+    
+    # Normalizar objetos anidados
+    if 'destino' in envio:
+        envio_normalizado['destino'] = {**campos_default['destino'], **envio.get('destino', {})}
+    
+    if 'origen' in envio:
+        envio_normalizado['origen'] = {**campos_default['origen'], **envio.get('origen', {})}
+        
+    if 'destinatario' in envio:
+        envio_normalizado['destinatario'] = {**campos_default['destinatario'], **envio.get('destinatario', {})}
+    
+    return envio_normalizado
+
+
+"""
+@app.route('/resumen_envio_prueba', methods=['POST'])
 def resumen_envio():
     data = request.get_json(force=True)
     envios = data.get('registros')
@@ -2758,7 +3021,7 @@ def resumen_envio():
     session['resumen_envios'] = resultados
 
     return redirect(url_for('resumen'))
-
+"""
 
 @app.route('/resumen')
 def resumen():
@@ -3025,7 +3288,7 @@ def insertar_envio_api():
 
 def generar_qr_paquetes(trackings):
     for tracking in trackings:
-        qr_data = f"http://192.168.100.15:8000/insertar_estado?tracking={tracking}"
+        qr_data = f"http://192.168.136.178:8000/insertar_estado?tracking={tracking}"
 
         img = qrcode.make(qr_data)
 
