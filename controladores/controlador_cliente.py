@@ -200,3 +200,20 @@ def get_cliente_por_correo(correo):
     sql = "SELECT * FROM cliente WHERE correo = %s"
     return sql_select_fetchone(sql, (correo,))
     
+
+
+def get_select_cliente():
+    sql= f'''
+        SELECT 
+            id, 
+            CONCAT(nombre_siglas,' ',apellidos_razon) as nombre
+        FROM cliente 
+    '''
+    filas = sql_select_fetchall(sql)
+    lista = [(fila['id'], fila["nombre"]) for fila in filas]
+
+    return lista
+
+
+
+

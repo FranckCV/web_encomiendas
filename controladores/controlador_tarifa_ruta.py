@@ -459,3 +459,26 @@ def get_sucursal_origen(ubigeo):
         return filas
     except Exception as e:
         return e
+    
+
+
+
+
+def get_options_select_sucursal_origen():
+    sql= f'''
+        select distinct
+            ori.id as id ,
+            concat(ori.abreviatura,' / ', ori.direccion) as nombre
+        from tarifa_ruta tar 
+        inner join sucursal ori on ori.id = tar.sucursal_origen_id 
+        inner join sucursal des on des.id = tar.sucursal_destino_id 
+        inner join ubigeo uori on uori.codigo = ori.ubigeocodigo 
+        inner join ubigeo udes on udes.codigo = des.ubigeocodigo
+        order by 2
+    '''
+    filas = sql_select_fetchall(sql)
+    lista = [(fila['id'], fila["nombre"]) for fila in filas]
+
+    return lista
+
+
