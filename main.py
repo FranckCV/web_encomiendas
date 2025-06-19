@@ -3264,6 +3264,95 @@ def insertar_envio_api():
             'message': 'Ocurrió un error al procesar el envío'
         }), 500
        
+@app.route('/insertar_envio_api_222222', methods=['POST'])
+def insertar_envio_api_22222():
+    try:
+        nombre_empresa = controlador_empresa.get_nombre()
+        data = request.get_json()
+        # print(data)
+        if not data:
+            return jsonify({'status': 'error', 'message': 'No se recibió un JSON válido'}), 400
+
+        tipo_comprobante = data.get('tipo_comprobante')
+        registros = data.get('registros') 
+
+        if not registros or not isinstance(registros, list):
+            return jsonify({'status': 'error', 'message': 'No se encontraron registros válidos'}), 400
+
+        # Tomamos los datos del remitente desde el primer registro
+        remitente = registros[0].get('remitente', {})
+        nombre = remitente.get('nombre_remitente', '')
+        partes = nombre.split() if nombre else []
+
+        cliente_data = {
+            'correo':        remitente.get('correo_remitente', ''),
+            'telefono':      remitente.get('num_tel_remitente', ''),
+            'num_documento': remitente.get('num_doc_remitente', ''),
+            'nombre_siglas': partes[0] if partes else '',
+            'apellidos_razon': ' '.join(partes[1:]) if len(partes) > 1 else '',
+            'tipo_documentoid': int(remitente.get('tipo_doc_remitente', 1)),
+            'tipo_clienteid': 2 if remitente.get('tipo_doc_remitente') == 2 else 1
+        }
+        # print(f'REGISTROS -> {registros}')
+        # print(f'CLIENTE_DATA -> {cliente_data}')
+        # print(f'tipo_comprobante -> {tipo_comprobante}')
+        # 1) Crear transacción y paquetes
+        num_serie,trackings = controlador_encomienda.crear_transaccion_y_paquetes(
+            registros, cliente_data, tipo_comprobante
+        )
+
+        # 2) Generar QR para cada paquete
+        if num_serie:
+            try:
+                generar_qr_paquetes(trackings)
+            except Exception as qr_err:
+                current_app.logger.warning(f"Error generando QR: {qr_err}")
+
+            # 3) Enviar correo al remitente
+            destinatario_email = cliente_data['correo']
+            if destinatario_email:
+                msg = Message(
+                    subject=f"{nombre_empresa} Envío registrado: {num_serie}",
+                    sender=app.config['MAIL_USERNAME'],
+                    recipients=[destinatario_email]
+                )
+                msg.body = (
+                    f"Hola {cliente_data['nombre_siglas']},\n\n"
+                    f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
+                    "Adjunto encontrarás los códigos QR para el seguimiento de cada paquete.\n\n"
+                    f"¡Gracias por confiar en {nombre_empresa}!"
+                )
+
+                for r in trackings:
+                    tracking = r
+                    qr_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'qr.png')
+                    if os.path.exists(qr_path):
+                        with open(qr_path, 'rb') as f:
+                            qr_data = f.read()
+                        msg.attach(f"qr_{tracking}.png", 'image/png', qr_data)
+                    else:
+                        current_app.logger.warning(f"QR no encontrado para tracking {tracking}")
+
+
+                mail.send(msg)
+
+        current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
+        return jsonify({
+            'status': 'success',
+            'message': 'Transacción creada correctamente',
+            'comprobante_serie': num_serie
+        }), 201
+
+    except ValueError as ve:
+        current_app.logger.warning(f"Bad request: {ve}")
+        return jsonify({'status': 'error', 'message': str(ve)}), 400
+
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({
+            'status': 'error',
+            'message': 'Ocurrió un error al procesar el envío'
+        }), 500
 ##PARA PROBAR EL API E INSERTAR 
 # {
 #   "tipo_comprobante": 2,
