@@ -42,13 +42,15 @@ def get_table():
         SELECT 
             tr.sucursal_origen_id,
             tr.sucursal_destino_id,
-            so.abreviatura AS sucursal_origen,
-            sd.abreviatura AS sucursal_destino,
+            concat(so.abreviatura,' - ',uo.departamento,' / ',uo.provincia,' / ',uo.distrito) AS sucursal_origen,
+            concat(sd.abreviatura,'-',ud.departamento,' / ',ud.provincia,' / ',ud.distrito) AS sucursal_destino,
             tr.tarifa
         FROM 
             tarifa_ruta tr
         INNER JOIN sucursal so ON so.id = tr.sucursal_origen_id
-        INNER JOIN sucursal sd ON sd.id = tr.sucursal_destino_id;
+        INNER JOIN sucursal sd ON sd.id = tr.sucursal_destino_id
+        inner join ubigeo uo on uo.codigo = so.ubigeocodigo
+        inner join ubigeo ud on ud.codigo = sd.ubigeocodigo
     '''
 
     columnas = {

@@ -18,7 +18,7 @@
       display: none;
       justify-content: center;
       align-items: center;
-      z-index: 1000;
+      z-index: 9999;
     }
     
     .modal-content {
@@ -434,13 +434,13 @@
           <!-- Para modalidades 2 y 3: Solo mensaje informativo -->
           <div class="mensaje-simple">
             {% if modalidad_pago == '2' %}
-              <h3>📋 Generar Rótulo de Envío</h3>
+              <h3> Generar Rótulo de Envío</h3>
               <p>Se generará tu rótulo de envío. El pago se realizará en la sucursal al momento del registro.</p>
             {% elif modalidad_pago == '3' %}
-              <h3>📋 Generar Rótulo de Envío</h3>
+              <h3>Generar Rótulo de Envío</h3>
               <p>Se generará tu rótulo de envío. El destinatario realizará el pago al momento de recibir el paquete.</p>
             {% else %}
-              <h3>📋 Generar Rótulo de Envío</h3>
+              <h3>Generar Rótulo de Envío</h3>
               <p>Se generará tu rótulo de envío.</p>
             {% endif %}
           </div>
@@ -668,12 +668,12 @@
 
       console.log('Generando rótulo con datos:', datos);
 
-      fetch('/insertar_envio_rotulo', {
+      fetch('/insertar_envio_api', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(datos)
       })
-      .then(res => {
+      .then(res => { 
         console.log('Response status:', res.status);
         if (!res.ok) throw new Error('Error generando el rótulo');
         return res.json();
@@ -726,7 +726,7 @@
         </div>
         <div class="form-group">
           <label for="numeroConfirmacion">Número de Confirmación Yape:</label>
-          <input type="text" id="numeroConfirmacion" placeholder="Ej: 12345678" maxlength="8" required>
+          <input type="text" id="numeroConfirmacion" placeholder="Ej: 982345678" maxlength="9" required>
         </div>
         <div style="font-size: 0.9em; color: #666; text-align: left;">
           <p><strong>Instrucciones:</strong></p>
@@ -807,121 +807,167 @@
       }
     }
 
-    function procesarPagoYape() {
-      const numeroConfirmacion = document.getElementById('numeroConfirmacion').value;
-      
-      if (!numeroConfirmacion || numeroConfirmacion.length < 6) {
-        alert('Por favor ingresa un número de confirmación válido');
-        return;
-      }
-      
-      mostrarProcesando();
-      
-      const datosPago = {
-        tipo_comprobante: tipoComprobanteSeleccionado,
-        metodo_pago: metodoPagoSeleccionado,
-        numero_confirmacion: numeroConfirmacion,
-        monto: totalPagar,
-        envios: datosEnvios.envios,
-        remitente: datosEnvios.remitente
-      };
-      
-      setTimeout(() => {
-        fetch('/procesar_pago_yape', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(datosPago)
-        })
-        .then(res => res.json())
-        .then(response => {
-          if (response.status === 'success') {
-            mostrarAnimacionPago({
-              numeroOperacion: response.numero_operacion || '#YAPE-' + numeroConfirmacion,
-              monto: totalPagar,
-              metodo: 'Yape',
-              redirectUrl: response.redirect_url || '/confirmacion-pago'
-            });
-          } else {
-            alert(response.message || 'Error en el pago');
-            cerrarModal();
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          alert('Error al procesar el pago');
-          cerrarModal();
-        });
-      }, 2000);
-    }
 
-    function procesarPagoTarjeta() {
-      const numeroTarjeta = document.getElementById('numeroTarjeta').value;
-      const fechaVencimiento = document.getElementById('fechaVencimiento').value;
-      const cvv = document.getElementById('cvv').value;
-      const nombreTitular = document.getElementById('nombreTitular').value;
-      
-      // Validaciones básicas
-      if (!numeroTarjeta || numeroTarjeta.replace(/\s/g, '').length < 16) {
-        alert('Por favor ingresa un número de tarjeta válido');
-        return;
-      }
-      
-      if (!fechaVencimiento || fechaVencimiento.length < 5) {
-        alert('Por favor ingresa una fecha de vencimiento válida');
-        return;
-      }
-      
-      if (!cvv || cvv.length < 3) {
-        alert('Por favor ingresa un CVV válido');
-        return;
-      }
-      
-      if (!nombreTitular.trim()) {
-        alert('Por favor ingresa el nombre del titular');
-        return;
-      }
-      
-      mostrarProcesando();
-      
-      const datosPago = {
-        tipo_comprobante: tipoComprobanteSeleccionado,
-        metodo_pago: metodoPagoSeleccionado,
-        numero_tarjeta: numeroTarjeta.replace(/\s/g, ''),
-        fecha_vencimiento: fechaVencimiento,
-        cvv: cvv,
-        nombre_titular: nombreTitular,
-        monto: totalPagar,
-        envios: datosEnvios.envios,
-        remitente: datosEnvios.remitente
-      };
-      
-      setTimeout(() => {
-        fetch('/procesar_pago_tarjeta', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(datosPago)
-        })
-        .then(res => res.json())
-        .then(response => {
-          if (response.status === 'success') {
-            mostrarAnimacionPago({
-              numeroOperacion: response.numero_operacion || '#CARD-' + Date.now(),
-              monto: totalPagar,
-              metodo: 'Tarjeta de Crédito/Débito',
-              redirectUrl: response.redirect_url || '/confirmacion-pago'
-            });
-          } else {
-            alert(response.message || 'Error en el pago');
-            cerrarModal();
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          alert('Error al procesar el pago');
-          cerrarModal();
-        });
-      }, 3000);
+
+    function procesarPagoYape() {
+  try {
+    const numeroConfirmacion = document.getElementById('numeroConfirmacion').value;
+    
+    // Validaciones básicas
+    if (!numeroConfirmacion || numeroConfirmacion.length < 6) {
+      alert('Por favor ingresa un número de confirmación válido');
+      return;
     }
+    
+    // Verificar que las variables globales existan
+    if (typeof tipoComprobanteSeleccionado === 'undefined' || 
+        typeof metodoPagoSeleccionado === 'undefined' || 
+        typeof totalPagar === 'undefined' || 
+        typeof datosEnvios === 'undefined') {
+      throw new Error('Faltan datos requeridos para procesar el pago');
+    }
+    
+    // Mostrar indicador de procesamiento
+    if (typeof mostrarProcesando === 'function') {
+      mostrarProcesando();
+    }
+    
+    const datosPago = {
+      tipo_comprobante: tipoComprobanteSeleccionado,
+      metodo_pago: metodoPagoSeleccionado,
+      numero_confirmacion: numeroConfirmacion,
+      monto: totalPagar,
+      envios: datosEnvios.envios,
+      remitente: datosEnvios.remitente
+    };
+    
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/insertar_envio_api';
+    form.style.display = 'none';
+
+    // Crear input oculto con los datos
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'payload';
+    input.value = JSON.stringify(datosPago);
+    form.appendChild(input);
+
+    document.body.appendChild(form);
+    
+    // Enviar formulario
+    form.submit();
+    
+    // Limpiar el formulario del DOM después de un breve delay
+    setTimeout(() => {
+      if (form.parentNode) {
+        form.parentNode.removeChild(form);
+      }
+    }, 100);
+    
+  } catch (err) {
+    console.error("Error en el envío:", err);
+    
+    // Verificar si Utils está disponible
+    if (typeof Utils !== 'undefined' && typeof Utils.showModal === 'function') {
+      Utils.showModal({ message: "Error al procesar el envío: " + err.message });
+    } else {
+      alert("Error al procesar el envío: " + err.message);
+    }
+  }
+}
+
+
+function procesarPagoTarjeta() {
+  try {
+    const numeroTarjeta = document.getElementById('numeroTarjeta').value;
+    const fechaVencimiento = document.getElementById('fechaVencimiento').value;
+    const cvv = document.getElementById('cvv').value;
+    const nombreTitular = document.getElementById('nombreTitular').value;
+    
+    // Validaciones básicas
+    if (!numeroTarjeta || numeroTarjeta.replace(/\s/g, '').length < 16) {
+      alert('Por favor ingresa un número de tarjeta válido');
+      return;
+    }
+    
+    if (!fechaVencimiento || fechaVencimiento.length < 5) {
+      alert('Por favor ingresa una fecha de vencimiento válida');
+      return;
+    }
+    
+    // CVV puede ser 3 o 4 dígitos (American Express)
+    if (!cvv || cvv.length < 3 || cvv.length > 4) {
+      alert('Por favor ingresa un CVV válido (3 o 4 dígitos)');
+      return;
+    }
+    
+    if (!nombreTitular.trim()) {
+      alert('Por favor ingresa el nombre del titular');
+      return;
+    }
+    
+    // Verificar que las variables globales existan
+    if (typeof tipoComprobanteSeleccionado === 'undefined' || 
+        typeof metodoPagoSeleccionado === 'undefined' || 
+        typeof totalPagar === 'undefined' || 
+        typeof datosEnvios === 'undefined') {
+      throw new Error('Faltan datos requeridos para procesar el pago');
+    }
+    
+    // Mostrar indicador de procesamiento
+    if (typeof mostrarProcesando === 'function') {
+      mostrarProcesando();
+    }
+    
+    const datosPago = {
+      tipo_comprobante: tipoComprobanteSeleccionado,
+      metodo_pago: metodoPagoSeleccionado,
+      numero_tarjeta: numeroTarjeta.replace(/\s/g, ''),
+      fecha_vencimiento: fechaVencimiento,
+      cvv: cvv,
+      nombre_titular: nombreTitular,
+      monto: totalPagar,
+      envios: datosEnvios.envios,
+      remitente: datosEnvios.remitente
+    };
+    
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/insertar_envio_api';
+    form.style.display = 'none';
+
+    // Crear input oculto con los datos correctos
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'payload';
+    input.value = JSON.stringify(datosPago); // Corregido: era datosParaEnviar
+    form.appendChild(input);
+
+    document.body.appendChild(form);
+    
+    // Enviar formulario
+    form.submit();
+    
+    // Limpiar el formulario del DOM después de un breve delay
+    setTimeout(() => {
+      if (form.parentNode) {
+        form.parentNode.removeChild(form);
+      }
+    }, 100);
+    
+  } catch (err) {
+    console.error("Error en el envío:", err);
+    
+    // Verificar si Utils está disponible
+    if (typeof Utils !== 'undefined' && typeof Utils.showModal === 'function') {
+      Utils.showModal({ message: "Error al procesar el envío: " + err.message });
+    } else {
+      alert("Error al procesar el envío: " + err.message);
+    }
+  }
+}
+  
 
     function mostrarProcesando() {
       const contenido = document.getElementById('contenidoModal');

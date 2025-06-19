@@ -118,8 +118,8 @@ def get_options():
     try:
         sql = f'''
             SELECT 
-                {get_primary_key()},
-                direccion
+                id,
+                concat(abreviatura,'-',direccion) as direccion
             FROM {table_name}
             WHERE activo = 1
             ORDER BY direccion ASC

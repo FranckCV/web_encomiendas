@@ -266,7 +266,7 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
 
                 cantidad_folios = r.get('cantidad_folios')
 
-                paquete_id = sql_execute_lastrowid(
+                cursor.execute(
                     """
                     INSERT INTO paquete
                     (clave, valor, peso, alto, largo, precio_ruta, ancho,
@@ -312,6 +312,7 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
                     )
                 )
 
+                paquete_id = cursor.lastrowid
                 cursor.execute(
                     """
                     INSERT INTO seguimiento

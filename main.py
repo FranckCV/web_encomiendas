@@ -3178,19 +3178,28 @@ def insertar_envio():
 def insertar_envio_api():
     try:
         nombre_empresa = controlador_empresa.get_nombre()
-        data = request.get_json()
+        data = request.form.get('payload')
 
         if not data:
             return jsonify({'status': 'error', 'message': 'No se recibió un JSON válido'}), 400
 
-        tipo_comprobante = data.get('tipo_comprobante')
-        registros = data.get('registros') 
+        # Convertir el JSON a un diccionario
+        try:
+            data = json.loads(data)
+            print(data)
+        except json.JSONDecodeError as e:
+            return jsonify({'status': 'error', 'message': f'Error al decodificar JSON: {str(e)}'}), 400
 
-        if not registros or not isinstance(registros, list):
+        tipo_comprobante = data.get('tipo_comprobante')
+        print(tipo_comprobante)
+        
+
+        envios = data.get('envios') 
+        print(type(envios))
+        if not envios or not isinstance(envios, list):
             return jsonify({'status': 'error', 'message': 'No se encontraron registros válidos'}), 400
 
-        # Tomamos los datos del remitente desde el primer registro
-        remitente = registros[0].get('remitente', {})
+        remitente = envios[0].get('remitente', {})  
         nombre = remitente.get('nombre_remitente', '')
         partes = nombre.split() if nombre else []
 
@@ -3205,8 +3214,8 @@ def insertar_envio_api():
         }
 
         # 1) Crear transacción y paquetes
-        num_serie,trackings = controlador_encomienda.crear_transaccion_y_paquetes(
-            registros, cliente_data, tipo_comprobante
+        num_serie, trackings = controlador_encomienda.crear_transaccion_y_paquetes(
+            envios, cliente_data, tipo_comprobante  # Cambiar registros a envios
         )
 
         # 2) Generar QR para cada paquete
@@ -3241,7 +3250,6 @@ def insertar_envio_api():
                     else:
                         current_app.logger.warning(f"QR no encontrado para tracking {tracking}")
 
-
                 mail.send(msg)
 
         current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
@@ -3261,7 +3269,8 @@ def insertar_envio_api():
             'status': 'error',
             'message': 'Ocurrió un error al procesar el envío'
         }), 500
-       
+
+
 ##PARA PROBAR EL API E INSERTAR 
 # {
 #   "tipo_comprobante": 2,
@@ -3405,7 +3414,6 @@ def envio_masivo():
     articulos = controlador_contenido_paquete.get_options()
     empaque = controlador_tipo_empaque.get_options()
     condiciones = controlador_regla_cargo.get_condiciones_tarifa()
-    tarifas = controlador_tarifa_ruta.get_tarifas_ruta_dict()
     modalidad_pago = controlador_modalidad_pago.get_options()
     peso = controlador_tipo_empaque.get_peso()
     valor_max = controlador_regla_cargo.get_max_valor()
@@ -3416,7 +3424,6 @@ def envio_masivo():
                            nombre_doc=nombre_doc,
                            departamento_origen = departamento_origen,
                            modalidad_pago = modalidad_pago,
-                           tarifas = json.dumps(tarifas),
                            empaque=empaque, 
                            articulos=articulos,
                            peso = peso,
