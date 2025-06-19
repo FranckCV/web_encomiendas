@@ -1360,7 +1360,7 @@ REPORTES = {
         "titulo": "Reporte de Usuarios",
         "table": controlador_usuario.get_report_usuarios(),
         "filters": [
-            ['tipo_usuario', 'Tipo de Usuario', lambda: controlador_usuario.get_options()],
+            ['tipo_usuario', 'Tipo de Usuario', lambda: controlador_usuario.get_options_tipo_usuario()],
             ['activo', 'Estado', lambda: [(1, "Activo"), (0, "Inactivo")]],
         ],
     },     
