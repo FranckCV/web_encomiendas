@@ -173,6 +173,7 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
             )
             if row:
                 cliente_id = row['id']
+                # print(f"este es el cliente EXISTENTE miau {cliente_id}")
             else:
                 cliente_id = sql_execute_lastrowid(
                     """
@@ -191,7 +192,8 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
                         cliente_data['tipo_clienteid']
                     )
                 )
-
+                # print(f"este es el cliente NUEVO miau {cliente_id}") 
+            
             # 2) Obtener la serie del tipo de comprobante
             result = sql_select_fetchone("SELECT inicial FROM tipo_comprobante WHERE id = %s", tipo_comprobante)
             if not result:
@@ -206,6 +208,7 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
                 FROM transaccion_encomienda;
                 """
             )
+
             nuevo_correlativo = (row['numero'] if row and row['numero'] else 0) + 1
             correlativo_str = str(nuevo_correlativo).zfill(6)
             num_serie = correlativo_str
@@ -243,6 +246,7 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
             # 5) Insertar paquetes y seguimiento
             trackings = []
             for idx, r in enumerate(registros):
+                # print('ACA ES XDXD',idx , r)
                 clave = r['clave']
                 valor = float(r.get('valorEnvio') or 0)
                 peso = float(r.get('peso') or 0)
@@ -269,19 +273,23 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
                 cursor.execute(
                     """
                     INSERT INTO paquete
-                    (clave, valor, peso, alto, largo, precio_ruta, ancho,
-                    descripcion, direccion_destinatario, telefono_destinatario,
-                    num_documento_destinatario, sucursal_destino_id,
-                    tipo_documento_destinatario_id, tipo_empaqueid,
-                    contenido_paqueteid, tipo_recepcionid,
-                    salidaid, transaccion_encomienda_num_serie,
+                    (clave, valor, peso, 
+                    alto, largo, precio_ruta, 
+                    ancho, descripcion, direccion_destinatario, 
+                    telefono_destinatario, num_documento_destinatario, sucursal_destino_id,
+                    tipo_documento_destinatario_id, tipo_empaqueid, contenido_paqueteid, 
+                    tipo_recepcionid, salidaid, transaccion_encomienda_num_serie,
                     qr_url, estado_pago, modalidad_pagoid,
-                    nombres_contacto_destinatario, apellidos_razon_destinatario,
-                    cantidad_folios)
+                    nombres_contacto_destinatario, apellidos_razon_destinatario, cantidad_folios
+                    )
                     VALUES
-                    (%s, %s, %s, %s, %s, %s, %s,
-                    %s, %s, %s, %s, %s, %s, %s,
-                    %s, %s, %s, %s, %s, %s, %s,
+                    (%s, %s, %s, 
+                    %s, %s, %s, 
+                    %s,%s, %s, 
+                    %s, %s, %s, 
+                    %s, %s,%s, 
+                    %s, %s, %s, 
+                    %s, %s, %s,
                     %s, %s, %s)
                     """,
                     (
@@ -311,6 +319,7 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
                         cantidad_folios  
                     )
                 )
+                paquete_id = cursor.lastrowid
 
                 paquete_id = cursor.lastrowid
                 cursor.execute(

@@ -1360,7 +1360,7 @@ REPORTES = {
         "titulo": "Reporte de Usuarios",
         "table": controlador_usuario.get_report_usuarios(),
         "filters": [
-            ['tipo_usuario', 'Tipo de Usuario', lambda: controlador_usuario.get_options()],
+            ['tipo_usuario', 'Tipo de Usuario', lambda: controlador_usuario.get_options_tipo_usuario()],
             ['activo', 'Estado', lambda: [(1, "Activo"), (0, "Inactivo")]],
         ],
     },     
@@ -3212,7 +3212,9 @@ def insertar_envio_api():
             'tipo_documentoid': int(remitente.get('tipo_doc_remitente', 1)),
             'tipo_clienteid': 2 if remitente.get('tipo_doc_remitente') == 2 else 1
         }
-
+        # print(f'REGISTROS -> {registros}')
+        # print(f'CLIENTE_DATA -> {cliente_data}')
+        # print(f'tipo_comprobante -> {tipo_comprobante}')
         # 1) Crear transacción y paquetes
         num_serie, trackings = controlador_encomienda.crear_transaccion_y_paquetes(
             envios, cliente_data, tipo_comprobante  # Cambiar registros a envios

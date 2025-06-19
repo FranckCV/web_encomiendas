@@ -15,7 +15,7 @@ REQUISITOS FUNCIONALES
 
 ![alt text](/_img_readme/image-4.png)
 
-
+---
 ---
 
 TABLAS BD
