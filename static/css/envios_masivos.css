@@ -581,8 +581,12 @@ textarea:required:user-valid {
 #select-sucursal:user-invalid,
 input:required:user-invalid,
 select:required:user-invalid,
-textarea:required:user-invalid {
-  border-color: #fc8181; /* rojo */
+textarea:required:user-invalid
+.manually-invalid {
+  border-color: #fc8181;
+}
+.manually-invalid {
+  border-color: #fc8181 !important;
 }
 
 

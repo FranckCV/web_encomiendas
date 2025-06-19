@@ -93,7 +93,7 @@ class Validator {
     let err = this.getErrorElem(input, type);
     err.textContent = msg;
     err.style.display = 'block';
-    input.style.borderColor = '#fc8181';
+    input.classList.add('manually-invalid')
   }
 
   static clearError(input, type = 'rango') {
@@ -102,8 +102,9 @@ class Validator {
     const otherType = type === 'rango' ? 'volumen' : 'rango';
     const otherErr = this.getErrorElem(input, otherType);
     if (!otherErr || otherErr.style.display === 'none') {
-      input.style.borderColor = '';
+      // ╮（╯＿╰）╭
     }
+    input.classList.remove('manually-invalid')
   }
 
   static validateDocument(tipo, valor) {
@@ -138,12 +139,27 @@ class Validator {
   }
 
   static validateDimensions(largo, ancho, alto) {
-    const values = [largo, ancho, alto];
-    const allValid = values.every(val =>
-      !isNaN(val) && val >= CONFIG.MIN_CM && val <= CONFIG.MAX_CM
+    const values = [
+      { name: "largo", value: largo },
+      { name: "ancho", value: ancho },
+      { name: "alto", value: alto }
+    ];
+
+    const invalidValues = values.filter(v =>
+      isNaN(v.value) || v.value < CONFIG.MIN_CM || v.value > CONFIG.MAX_CM
     );
 
-    if (!allValid) return { valid: false, message: `Valores deben estar entre ${CONFIG.MIN_CM} y ${CONFIG.MAX_CM} cm.` };
+    if (invalidValues.length > 0) {
+      const detalles = invalidValues.map(v =>
+        `${v.name} (${v.value})`
+      ).join(", ");
+
+      return {
+        valid: false,
+        message: `Valores inválidos: ${detalles}. Deben estar entre ${CONFIG.MIN_CM} y ${CONFIG.MAX_CM} cm.`,
+        invalidFields: invalidValues.map(v => v.name)
+      };
+    }
 
     const volumen = largo * ancho * alto;
     if (volumen > CONFIG.MAX_VOLUMEN) {
@@ -155,6 +171,7 @@ class Validator {
 
     return { valid: true };
   }
+
 
   static isCurrentTabComplete() {
     const panel = document.querySelector('.tab-panel.active');
@@ -265,32 +282,37 @@ class FormManager {
     Object.values(inputsDim).forEach(input => {
       if (!input) return;
 
-      input.addEventListener('input', () => {
-        const val = parseFloat(input.value);
+      Object.values(inputsDim).forEach(input => {
+        input.addEventListener('input', () => {
+          const largo = parseFloat(inputsDim.largo.value);
+          const ancho = parseFloat(inputsDim.ancho.value);
+          const alto = parseFloat(inputsDim.alto.value);
 
-        if (isNaN(val) || val < CONFIG.MIN_CM || val > CONFIG.MAX_CM) {
-          Validator.showError(input, `Debe ingresar un valor entre ${CONFIG.MIN_CM} y ${CONFIG.MAX_CM} cm.`);
+          const result = Validator.validateDimensions(largo, ancho, alto);
+
           Object.values(inputsDim).forEach(i => {
-            if (i !== input) Validator.clearError(i, 'volumen');
+            Validator.clearError(i);
+            Validator.clearError(i, 'volumen');
           });
-          return;
-        } else {
-          Validator.clearError(input);
-        }
 
-        const largo = parseFloat(inputsDim.largo.value);
-        const ancho = parseFloat(inputsDim.ancho.value);
-        const alto = parseFloat(inputsDim.alto.value);
-
-        if (!isNaN(largo) && !isNaN(ancho) && !isNaN(alto)) {
-          const validation = Validator.validateDimensions(largo, ancho, alto);
-          if (!validation.valid) {
-            Validator.showError(input, validation.message, 'volumen');
-          } else {
-            Object.values(inputsDim).forEach(i => Validator.clearError(i, 'volumen'));
+          if (!result.valid) {
+            if (result.invalidFields) {
+              result.invalidFields.forEach(fieldName => {
+                const fieldInput = inputsDim[fieldName];
+                Validator.showError(
+                  fieldInput,
+                  `${fieldName} inválido: debe estar entre ${CONFIG.MIN_CM} y ${CONFIG.MAX_CM} cm.`
+                );
+              });
+            } else {
+              Object.values(inputsDim).forEach(i =>
+                Validator.showError(i, result.message, 'volumen')
+              );
+            }
           }
-        }
+        });
       });
+
     });
   }
 
