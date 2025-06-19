@@ -6358,10 +6358,10 @@ INSERT INTO tipo_comprobante (inicial, nombre, descripcion, activo,tipo_uso)
 VALUES ('F', 'Factura', 'Factura', 1,'V'),
   ('BV', 'Boleta', 'Boleta de Venta', 1,'V'),
   ('GR', 'Guia de remision', 'Guía de Remisión', 1,'T'),
-  ('TI', 'T', 'Ticket', 1),
+  ('TI', 'Ticket', 'Ticket', 1,'V'),
   ('NC', 'Nota de crédito', 'Nota de Crédito', 1,'R'),
   ('ND', 'D', 'Nota de Débito', 1,'R'),
-  ('OT', 'O', 'Otro', 1);
+  ('OT', 'O', 'Otro', 1,'V');
 
 INSERT INTO `tipo_recepcion` (`id`, `nombre`, `activo`)
 VALUES (1, 'Recepción en sucursal', 1),
