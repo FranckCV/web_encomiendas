@@ -243,22 +243,38 @@ def get_report_usuarios():
     }
 
     filas = sql_select_fetchall(sql)
+    
+    for fila in filas:
+        if fila['tipo_usuario'] == 'E':
+            fila['tipo_usuario'] = 'Empleado'
+        elif fila['tipo_usuario'] == 'C':
+            fila['tipo_usuario'] = 'Cliente'
+
     return columnas, filas
 
 
-def get_options():
+def get_options_tipo_usuario():
     sql = '''
         SELECT 
-            tipo_usuario,
-            tipo_usuario AS nombre
+            tipo_usuario
         FROM usuario
         WHERE activo = 1
         GROUP BY tipo_usuario
         ORDER BY tipo_usuario 
     '''
     filas = sql_select_fetchall(sql)
-    lista = [(fila['tipo_usuario'], fila['tipo_usuario']) for fila in filas]
+    
+    lista = []
+    for fila in filas:
+        tipo_usuario = fila['tipo_usuario']
+        
+        if tipo_usuario == 'E':
+            lista.append(('Empleado', 'Empleado'))
+        elif tipo_usuario == 'C':
+            lista.append(('Cliente', 'Cliente'))
+    
     return lista
+
 
 
 def register_user_client( correo , contrasenia ):
