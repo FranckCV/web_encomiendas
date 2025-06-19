@@ -1202,38 +1202,23 @@ class ShippingManager {
           tipo_envio: 'masivo'
         };
       }
+      // Crear un form "invisible"
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/resumen_envio_prueba';
+      form.style.display = 'none';
 
-      console.log('Enviando datos al resumen:', datosParaEnviar);
+      // Meter el JSON en un input oculto
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'payload';
+      input.value = JSON.stringify(datosParaEnviar);
+      form.appendChild(input);
 
-      const response = await fetch("/resumen_envio_prueba", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(datosParaEnviar)
-      });
+      document.body.appendChild(form);
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error del servidor:', errorText);
-        throw new Error(`Error ${response.status}: ${errorText}`);
-      }
-
-      // Verificar si la respuesta es HTML
-      const contentType = response.headers.get('content-type');
-      if (contentType && contentType.includes('text/html')) {
-        const html = await response.text();
-        document.open();
-        document.write(html);
-        document.close();
-      } else {
-        // Si es JSON, probablemente hay un error o redirección
-        const data = await response.json();
-        if (data.redirect_url) {
-          window.location.href = data.redirect_url;
-        } else {
-          Utils.showModal({ message: data.message || "Error inesperado" });
-        }
-      }
-
+      // Enviar el form → navega a /resumen_envio_prueba
+      form.submit();
     } catch (err) {
       console.error("Error en el envío:", err);
       Utils.showModal({ message: "Error al procesar el envío: " + err.message });

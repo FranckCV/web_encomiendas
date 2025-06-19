@@ -2764,8 +2764,13 @@ def seguimiento_encomienda():
 @app.route('/resumen_envio_prueba', methods=['POST'])
 def resumen_envio_prueba():
     try:
+        
+        raw = request.form.get('payload')
+        if not raw:
+            return "No se recibió payload", 400
+
         # Obtener datos del request
-        data = request.get_json()
+        data = json.loads(raw)
         
         if not data:
             return jsonify({
