@@ -1,8 +1,14 @@
 {% extends "MAESTRA_BASE.html" %}
 
 {% block estilos_html %}
-        
     <link rel="stylesheet" href="/static/css/login_form.css">
+    <style>
+        .input-error {
+            border-color: red;
+            box-shadow: 0 0 4px red;
+        }
+
+    </style>
     <style>
         {% if URL_BG %}
         body {
@@ -56,7 +62,6 @@ method="POST" action="{{url_for(URL_POST)}}"
 
 
 {% block scripts_html %}
-
     {% block scripts %}
     {% endblock %}
 

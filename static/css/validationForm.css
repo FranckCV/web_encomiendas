@@ -1,0 +1,12 @@
+.mensaje-error {
+    color: #ffbaba;
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+}
+
+.input-error {
+    border-color: #ff161698 !important;
+    box-shadow: 0 5px 10px #ff30309c;
+}
+

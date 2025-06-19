@@ -1,1036 +1,1910 @@
-const { rutasTarifas } = window.CONFIG_ENVIO || {};
-
-const STORAGE_KEY = "envios_masivos";
-
-let editIndex = -1;
-let pasoActual = 1;
-
-// Teléfono
-const regexTelefono = /^9\d{8}$/;
-// Documentos
-const regexDNI = /^\d{8}$/;
-const regexRUC = /^(10|20)\d{9}$/;
-const regexPasaporte = /^[A-Z0-9]{6,12}$/i;
-const regexCE = /^[A-Z0-9]{9,12}$/i;
-// Nombre completo
-const regexNombre = /^[a-zA-ZÁÉÍÓÚáéíóúÑñ ]{2,60}$/;
-// Correo
-const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-// Dirección
-const regexDireccion = /^[a-zA-Z0-9\sáéíóúÁÉÍÓÚñÑ\-,.#°º()]{5,100}$/;
-//Razón
-const regexRazon = /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s\.\-&]{2,100}$/;
-
-
-function attachNumeroDocValidation(idTipo, idNumero, idMensaje) {
-  const tipoSel = document.getElementById(idTipo);
-  const inputNum = document.getElementById(idNumero);
-  const spanMsg = document.getElementById(idMensaje);
-
-  function validar() {
-    const tipo = tipoSel.value;
-    const valor = inputNum.value.trim();
-    let valido = false;
-    let texto = '';
-
-    switch (tipo) {
-      case '1': // DNI
-        valido = regexDNI.test(valor);
-        texto = 'Debe tener 8 dígitos.';
-        break;
-      case '2': // RUC
-        valido = regexRUC.test(valor);
-        texto = 'Debe comenzar con 10 o 20 y tener 11 dígitos.';
-        break;
-      case '3': // Carné de Extranjería
-        valido = regexCE.test(valor);
-        texto = 'Debe tener 9–12 caracteres alfanuméricos.';
-        break;
-      case '4': // Pasaporte
-        valido = regexPasaporte.test(valor);
-        texto = 'Debe tener 6–12 caracteres alfanuméricos.';
-        break;
-      default:
-        texto = 'Seleccione tipo de documento.';
-        break;
-    }
-
-    if (valor === '') {
-      spanMsg.style.display = 'none';
-      inputNum.style.borderColor = '';
-    } else if (valido) {
-      spanMsg.style.display = 'none';
-      inputNum.style.borderColor = '#48bb78';
-    } else {
-      spanMsg.style.display = 'block';
-      spanMsg.textContent = texto;
-      inputNum.style.borderColor = '#fc8181';
-    }
+// ===========================
+// CONFIGURACIÓN Y CONSTANTES
+// ===========================
+const CONFIG = {
+  STORAGE_KEY: "envios_masivos",
+  MIN_CM: 5,
+  MAX_CM: 200,
+  MAX_VOLUMEN: 1000000,
+  MAX_VALOR: 50000, // Asumiendo un valor máximo
+  REGEX: {
+    telefono: /^9\d{8}$/,
+    dni: /^\d{8}$/,
+    ruc: /^(10|20)\d{9}$/,
+    pasaporte: /^[A-Z0-9]{6,12}$/i,
+    ce: /^[A-Z0-9]{9,12}$/i,
+    nombre: /^[\p{L} '-]{2,60}$/u,
+    email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+    direccion: /^[a-zA-Z0-9\sáéíóúÁÉÍÓÚñÑ\-,.#°º()]{5,100}$/,
+    apellido: /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+(?:[ '\-][A-Za-zÁÉÍÓÚáéíóúÑñ]+)*$/,
+    razonSocial: /^[A-Za-z0-9ÁÉÍÓÚáéíóúÑñ&\.\-,() ]{2,100}$/,
+    positivos: /^[0-9]+(?:\.[0-9]+)?$/
   }
-
-  // Asocia eventos
-  inputNum.addEventListener('input', validar);
-  tipoSel.addEventListener('change', () => {
-    if (inputNum.value.trim() !== '') {
-      validar();
-    }
-  });
-}
-
-
-function attachTelefonoValidation(idInputTel, idMensajeTel) {
-  const inputTel = document.getElementById(idInputTel);
-  const spanMsg = document.getElementById(idMensajeTel);
-
-  inputTel.addEventListener('input', () => {
-    const valor = inputTel.value.trim();
-    const valido = regexTelefono.test(valor);
-
-    if (valor === '') {
-      spanMsg.style.display = 'none';
-      inputTel.style.borderColor = '';
-    } else if (valido) {
-      spanMsg.style.display = 'none';
-      inputTel.style.borderColor = '#48bb78';
-    } else {
-      spanMsg.style.display = 'block';
-      spanMsg.textContent = 'El teléfono debe comenzar con 9 y tener 9 dígitos.';
-      inputTel.style.borderColor = '#fc8181';
-    }
-  });
-}
-
-
-function attachNombreValidation(idInputName, idMensajeName) {
-  const inputName = document.getElementById(idInputName);
-  const spanMsg = document.getElementById(idMensajeName);
-
-  inputName.addEventListener('input', () => {
-    const valor = inputName.value.trim();
-    const valido = regexNombre.test(valor);
-
-    if (valor === '') {
-      spanMsg.style.display = 'none';
-      inputName.style.borderColor = '';
-    } else if (valido) {
-      spanMsg.style.display = 'none';
-      inputName.style.borderColor = '#48bb78';
-    } else {
-      spanMsg.style.display = 'block';
-      spanMsg.textContent = 'Solo se permiten letras y espacios (mínimo 2 caracteres).';
-      inputName.style.borderColor = '#fc8181';
-    }
-  });
-}
-
-
-function attachRazonValidation(idInputRazon, idMensajeRazon) {
-  const inputRazon = document.getElementById(idInputRazon);
-  const spanMsg = document.getElementById(idMensajeRazon);
-
-  inputRazon.addEventListener('input', () => {
-    const valor = inputRazon.value.trim();
-    const valido = regexRazon.test(valor);
-
-    if (valor === '') {
-      spanMsg.style.display = 'none';
-      inputRazon.style.borderColor = '';
-    } else if (valido) {
-      spanMsg.style.display = 'none';
-      inputRazon.style.borderColor = '#48bb78';
-    } else {
-      spanMsg.style.display = 'block';
-      spanMsg.textContent = 'Razón social inválida (2–100 caracteres alfanum.).';
-      inputRazon.style.borderColor = '#fc8181';
-    }
-  });
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-
-  initTabs();
-  mostrarCamposDestino();
-  toggleFolios();
-  toggleArticulos();
-  mostrarCamposReceptor();
-  cargarOrigenes();
-  actualizarTabla();
-
-  let dep = document.getElementById('origen-departamento');
-
-  dep.addEventListener('change', ()=>{
-    cargarProvincias(dep.value);
-  }
-  );
-
-
-  let prov = document.getElementById('origen-provincia');
-
-  prov.addEventListener('change', ()=>{
-    cargarDistritos(prov.value);
-
-  });
-
-  let dist = document.getElementById('origen-distrito');
-
-  let dep_destino = document.getElementById('select-departamento');
-
-  dist.addEventListener('change',()=>{
-    cargarDeparDestino(dep.value,prov.value,dist.value);
-    dep_destino.disabled=false;  
-  }
-);
-
-
-  attachNumeroDocValidation(
-    'remitente-tipo-doc',
-    'remitente-numero-doc',
-    'mensaje-validacion-numero'
-  );
-
-  attachTelefonoValidation(
-    'remitente-telefono',
-    'mensaje-validacion-telefono'
-  );
-
-  attachNombreValidation(
-    'remitente-nombre',
-    'mensaje-validacion-nombre'
-  );
-
-  attachNumeroDocValidation(
-    'm-tipoDocumento',
-    'm-nroDocumento',
-    'mensaje-validacion-numero-dest'
-  );
-
-  attachTelefonoValidation(
-    'm-celular',
-    'mensaje-validacion-telefono-dest'
-  );
-
-  attachNombreValidation(
-    'm-nombres',
-    'mensaje-validacion-nombre-dest'
-  );
-
-  attachNombreValidation(
-    'm-apellidos',
-    'mensaje-validacion-apellidos-dest'
-  );
-
-  attachRazonValidation(
-    'm-razonSocial',
-    'mensaje-validacion-razon-dest'
-  );
-
-  attachNombreValidation(
-    'm-contacto',
-    'mensaje-validacion-contacto-dest'
-  );
-
-
-});
-
-let origenSeleccionado = null;
-let eventosRegistrados = {
-  origen: false,
-  destino: false
 };
 
+// Variables globales
+let LISTA_ENVIOS = [];
+let editIndex = -1;
+let pasoActual = 1;
+let origenSeleccionado = null;
+let eventosRegistrados = { origen: false, destino: false };
+let editingIndex = null;
+window.registros = [];
 
+// ===========================
+// UTILIDADES GENERALES
+// ===========================
+class Utils {
+  static showModal({ message = '', onConfirm = null, onCancel = null }) {
+    const modal = document.getElementById('modalConfirmacion');
+    const texto = modal.querySelector('p');
+    const btnOk = modal.querySelector('.btn_acept');
+    const btnCancel = modal.querySelector('.btn_cancel');
 
+    texto.textContent = message;
 
-function cargarProvincias(depOrigen){
-
-  dict_dep = {'dep':depOrigen}
-  ruta = '/api/provincia_origen'
-  fetch(ruta,{
-    method : 'POST',
-    headers : {
-      'Content-Type' : 'application/json'
-    },
-    body : JSON.stringify(dict_dep)
-  })
-  .then(res=>res.json())
-  .then(diccionario=>{
-      let provinciasSelect = document.getElementById('origen-provincia');
-      let distritosSelect = document.getElementById('origen-distrito');
-      provinciasSelect.innerHTML = '<option value="">Selecciona provincia</option>';
-      distritosSelect.innerHTML = '<option value="">Selecciona una provincia primero</option>';
-
-    lista_provincia = diccionario.data;
-    lista_provincia.forEach(prov => provinciasSelect.append(new Option(prov.provincia, prov.provincia)));
-  }
-  );
-}
-
-function cargarDistritos(provOrigen){
-  dict_prov = {'prov':provOrigen} //Un solo elemento, se debe poner en formato de diccionario
-  ruta = '/api/distrito_origen'
-  fetch(ruta,{
-    method : 'POST',
-    headers : {
-      'Content-Type' : 'application/json'
-    },
-    body : JSON.stringify(dict_prov)
-  })
-  .then(res => res.json())
-  .then(diccionario=>{
-    let distritosSelect = document.getElementById('origen-distrito');
-    distritosSelect.innerHTML = '<option disabled selected value="">Seleccione un distrito</option>';
-
-    lista_distritos = diccionario.data;
-    lista_distritos.forEach(dist => distritosSelect.append(new Option(dist.distrito,dist.distrito)));
-
-  } )
-}
-
-
-
-function cargarDeparDestino(dep_origen,prov_origen,dist_origen){
-  dict_ubigeo = {'dep':dep_origen,
-                 'prov':prov_origen,//Un solo elemento, se debe poner en formato de diccionario
-                 'dist':dist_origen}
-
-  ruta = '/api/departamento_destino'
-  fetch(ruta,{
-    method : 'POST',
-    headers : {
-      'Content-Type' : 'application/json'
-    },
-    body : JSON.stringify(dict_ubigeo)
-  })
-  .then(res => res.json())
-  .then(diccionario=>{
-    let departamentosSelect = document.getElementById('select-departamento');
-    let provinciasSelect = document.getElementById('select-provincia');
-    let distritosSelect = document.getElementById('select-distrito');
-
-    departamentosSelect.innerHTML = '<option disabled selected value="">Seleccione un departamento</option>';
-    provinciasSelect.innerHTML = '<option disabled selected value="">Seleccione un departamnento primero</option>';
-    distritosSelect.innerHTML = '<option disabled selected value="">Seleccione un departamnento primero</option>';
-
-
-    lista_departamentos = diccionario.data;
-    lista_departamentos.forEach(dep => departamentosSelect.append(new Option(dep.departamento,dep.departamento)));
-
-  } )
-}
-
-function cargarOrigenes(){
-  
-}
-
-// function cargarOrigenes() {
-//   const selectDep = document.getElementById('origen-departamento');
-//   const selectProv = document.getElementById('origen-provincia');
-//   const selectDist = document.getElementById('origen-distrito');
-
-//   selectDep.innerHTML = `<option disabled selected value="">Seleccione departamento</option>`;
-//   selectProv.innerHTML = `<option disabled selected value="">Seleccione provincia</option>`;
-//   selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
-
-//   const origenesUnicos = Object.keys(rutasTarifas);
-//   const departamentos = [...new Set(origenesUnicos.map(k => k.split('|')[0]))];
-//   departamentos.forEach(dep => selectDep.append(new Option(dep, dep)));
-
-//   if (!eventosRegistrados.origen) {
-//     selectDep.addEventListener('change', () => {
-//       selectProv.innerHTML = `<option disabled selected value="">Seleccione provincia</option>`;
-//       selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
-//       const dep = selectDep.value;
-
-//       const provincias = origenesUnicos
-//         .filter(k => k.startsWith(dep + '|'))
-//         .map(k => k.split('|')[1]);
-//       [...new Set(provincias)].forEach(prov => selectProv.append(new Option(prov, prov)));
-//     });
-
-//     selectProv.addEventListener('change', () => {
-//       selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
-//       const dep = selectDep.value;
-//       const prov = selectProv.value;
-
-//       const distritos = origenesUnicos
-//         .filter(k => k.startsWith(`${dep}|${prov}|`))
-//         .map(k => k.split('|')[2]);
-//       [...new Set(distritos)].forEach(dist => selectDist.append(new Option(dist, dist)));
-//     });
-
-//     selectDist.addEventListener('change', () => {
-//       const dep = selectDep.value;
-//       const prov = selectProv.value;
-//       const dist = selectDist.value;
-
-//       origenSeleccionado = `${dep}|${prov}|${dist}`;
-
-//       const destinos = rutasTarifas[origenSeleccionado];
-//       if (destinos && destinos.length > 0) {
-//         const sucursalOrigenId = destinos[0].id_origen || destinos[0].id_origen_sucursal || '';
-//         if (sucursalOrigenId) {
-//           document.getElementById('origen-sucursal-id').value = sucursalOrigenId;
-//         }
-//       }
-
-//       cargarDestinos(origenSeleccionado);
-//     });
-
-//     eventosRegistrados.origen = true;
-//   }
-// }
-
-function cargarDestinos(origenKey) {
-  const destinos = rutasTarifas[origenKey] || [];
-
-  const selectDep = document.getElementById('select-departamento');
-  const selectProv = document.getElementById('select-provincia');
-  const selectDist = document.getElementById('select-distrito');
-  const selectSucursal = document.getElementById('select-sucursal');
-
-  selectDep.innerHTML = `<option disabled selected value="">Seleccione departamento</option>`;
-  selectProv.innerHTML = `<option disabled selected value="">Seleccione provincia</option>`;
-  selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
-  selectSucursal.innerHTML = `<option disabled selected value="">Seleccione sucursal</option>`;
-
-  const deps = [...new Set(destinos.map(d => d.departamento))];
-  deps.forEach(dep => selectDep.append(new Option(dep, dep)));
-
-  if (!eventosRegistrados.destino) {
-    selectDep.addEventListener('change', () => {
-      selectProv.innerHTML = `<option disabled selected value="">Seleccione provincia</option>`;
-      selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
-      selectSucursal.innerHTML = `<option disabled selected value="">Seleccione sucursal</option>`;
-
-      const dep = selectDep.value;
-      const provs = destinos.filter(d => d.departamento === dep).map(d => d.provincia);
-      [...new Set(provs)].forEach(prov => selectProv.append(new Option(prov, prov)));
-    });
-
-    selectProv.addEventListener('change', () => {
-      selectDist.innerHTML = `<option disabled selected value="">Seleccione distrito</option>`;
-      selectSucursal.innerHTML = `<option disabled selected value="">Seleccione sucursal</option>`;
-
-      const dep = selectDep.value;
-      const prov = selectProv.value;
-      const dists = destinos
-        .filter(d => d.departamento === dep && d.provincia === prov)
-        .map(d => d.distrito);
-      [...new Set(dists)].forEach(dist => selectDist.append(new Option(dist, dist)));
-    });
-
-    selectDist.addEventListener('change', () => {
-      const dep = selectDep.value;
-      const prov = selectProv.value;
-      const dist = selectDist.value;
-
-      const sucursales = destinos.filter(d =>
-        d.departamento === dep &&
-        d.provincia === prov &&
-        d.distrito === dist
-      );
-
-      selectSucursal.innerHTML = `<option disabled selected value="">Seleccione sucursal</option>`;
-      sucursales.forEach(s => {
-        const opt = new Option(s.direccion, s.id);
-        selectSucursal.appendChild(opt);
-      });
-
-      if (sucursales.length > 0) {
-        document.getElementById('destino-sucursal-id').value = sucursales[0].id;
-        selectSucursal.value = sucursales[0].id;
-      }
-
-      selectSucursal.addEventListener('change', () => {
-        document.getElementById('destino-sucursal-id').value = selectSucursal.value;
-      });
-    });
-
-    eventosRegistrados.destino = true;
-  }
-}
-
-/************************************************************ GENERALES ************************************************************************ */
-function initTabs() {
-  const tabButtons = document.querySelectorAll('.tab-btn');
-  const tabPanels = document.querySelectorAll('.tab-panel');
-
-  tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      tabButtons.forEach(b => b.classList.remove('active'));
-      tabPanels.forEach(p => p.classList.remove('active'));
-
-      btn.classList.add('active');
-      const nextTab = document.getElementById('tab-' + btn.dataset.tab);
-      nextTab.classList.add('active');
-    });
-  });
-}
-
-function mostrarCamposDestino() {
-  const tipo = document.getElementById('m-tipoEntrega').value;
-  const grupoDir = document.getElementById('grupo-direccion');
-  const grupoTienda = document.getElementById('grupo-tienda');
-
-  if (tipo === '2') {
-    grupoDir.style.display = 'flex';
-    grupoTienda.style.display = 'none';
-  } else if (tipo === '1') {
-    grupoDir.style.display = 'none';
-    grupoTienda.style.display = 'flex';
-  } else {
-    grupoDir.style.display = 'none';
-    grupoTienda.style.display = 'none';
-  }
-}
-
-function toggleFolios() { //Funciona bien
-  const tipo = document.getElementById('m-tipoEmpaque').value;
-  const grupoFolios = document.getElementById('grupo-folios');
-  grupoFolios.style.display = (tipo === '2') ? 'flex' : 'none';
-  grupoFolios.querySelector('input').setAttribute('required','');
-
-}
-
-function toggleArticulos() { //Funciona bien 
-  const tipo = document.getElementById('m-tipoEmpaque').value;
-  const grupoArticulos = document.getElementById('grupo-articulos');
-  grupoArticulos.style.display = (tipo === '1') ? 'flex' : 'none';
-  grupoArticulos.querySelector('select').setAttribute('required','');
-}
-
-function mostrarCamposReceptor() { //Funciona bien
-  const tipo = document.getElementById('m-tipoDocumento').value;
-  const camposRazon = document.getElementById('campo-razon-ruc');
-  const camposContacto = document.getElementById('campo-contacto-ruc');
-  const camposNombres = document.getElementById('campos-nombres');
-  const camposApellidos = document.getElementById('campos-apellidos');
-
-  const razon = document.getElementById('m-razonSocial');
-  const contacto = document.getElementById('m-contacto');
-  const nombres = document.getElementById('m-nombres');
-  const apellidos = document.getElementById('m-apellidos');
-
-  if (tipo === '2') {
-    camposRazon.style.display = 'flex';
-    camposContacto.style.display = 'flex';
-    camposNombres.style.display = 'none';
-    camposApellidos.style.display = 'none';
-
-    razon.required = true;
-    contacto.required = true;
-    nombres.required = false;
-    apellidos.required = false;
-  } else if (tipo === '') {
-    camposContacto.style.display = 'none';
-    camposRazon.style.display = 'none';
-    camposNombres.style.display = 'none';
-    camposApellidos.style.display = 'none';
-  } else {
-    camposContacto.style.display = 'none';
-    camposRazon.style.display = 'none';
-    camposNombres.style.display = 'flex';
-    camposApellidos.style.display = 'flex';
-
-    razon.required = false;
-    contacto.required = false;
-    nombres.required = true;
-    apellidos.required = true;
-  }
-}
-
-/************************************************************************************************************************************************* */
-
-function validarRequeridos() {
-  const contenedor = document.querySelector('.tabs-content');
-  if (!contenedor) return true;
-
-  const camposReq = contenedor.querySelectorAll('input[required], select[required], textarea[required]');
-
-  for (let campo of camposReq) {
-    const tipo = campo.tagName.toLowerCase();
-    let valor = '';
-
-    if (tipo === 'select') {
-      valor = campo.value;
-    // } else if (tipo === 'input' || tipo === 'textarea') {
-    } else if (tipo === 'input' ) {
-      valor = campo.value.trim();
+    if (typeof onConfirm === 'function') {
+      btnOk.style.display = 'inline-block';
+      btnOk.textContent = 'Continuar';
+      btnOk.onclick = () => { modal.style.display = 'none'; onConfirm(); };
+      btnCancel.textContent = 'Cancelar';
+    } else {
+      btnOk.style.display = 'none';
+      btnCancel.textContent = 'Entendido';
     }
 
-    if (!valor) {
-      campo.style.borderColor = '#fc8181';
+    btnCancel.onclick = () => {
+      modal.style.display = 'none';
+      if (onCancel) onCancel();
+    };
 
-      const msgSpanId = campo.getAttribute('aria-describedby')
-        || campo.getAttribute('data-error-span')
-        || null;
-      if (msgSpanId) {
-        const spanMsg = document.getElementById(msgSpanId);
-        if (spanMsg) {
-          spanMsg.style.display = 'block';
-          spanMsg.textContent = 'Este campo es obligatorio.';
+    modal.style.display = 'flex';
+  }
+
+  static showWarning(message, onConfirm) {
+    this.showModal({ message, onConfirm });
+  }
+
+  static cerrarModal() {
+    const modal = document.getElementById('modalConfirmacion');
+    modal.style.display = 'none';
+    const confirmarBtn = document.getElementById('confirmarBtn');
+    confirmarBtn.replaceWith(confirmarBtn.cloneNode(true));
+  }
+}
+
+// ===========================
+// VALIDACIONES
+// ===========================
+class Validator {
+  static getErrorElem(input, type = 'rango') {
+    const cls = `error-msg-${type}`;
+    let err = input.parentNode.querySelector(`.${cls}`);
+    if (!err) {
+      err = document.createElement('small');
+      err.className = cls;
+      err.style.color = '#fc8181';
+      input.insertAdjacentElement('afterend', err);
+    }
+    return err;
+  }
+
+  static showError(input, msg, type = 'rango') {
+    let err = this.getErrorElem(input, type);
+    err.textContent = msg;
+    err.style.display = 'block';
+    input.classList.add('manually-invalid')
+  }
+
+  static clearError(input, type = 'rango') {
+    const err = this.getErrorElem(input, type);
+    if (err) err.style.display = 'none';
+    const otherType = type === 'rango' ? 'volumen' : 'rango';
+    const otherErr = this.getErrorElem(input, otherType);
+    if (!otherErr || otherErr.style.display === 'none') {
+      // ╮（╯＿╰）╭
+    }
+    input.classList.remove('manually-invalid')
+  }
+
+  static validateDocument(tipo, valor) {
+    const regex = CONFIG.REGEX;
+    switch (tipo) {
+      case '1': return { valid: regex.dni.test(valor), message: 'Debe tener 8 dígitos.' };
+      case '2': return { valid: regex.ruc.test(valor), message: 'Debe comenzar con 10 o 20 y tener 11 dígitos.' };
+      case '3': return { valid: regex.ce.test(valor), message: 'Debe tener 9-12 caracteres alfanuméricos.' };
+      case '4': return { valid: regex.pasaporte.test(valor), message: 'Debe tener 6-12 caracteres alfanuméricos.' };
+      default: return { valid: false, message: 'Seleccione tipo de documento.' };
+    }
+  }
+
+  static validatePhone(telefono) {
+    return CONFIG.REGEX.telefono.test(telefono);
+  }
+
+  static validateEmail(email) {
+    return CONFIG.REGEX.email.test(email);
+  }
+
+  static validateName(nombre) {
+    return CONFIG.REGEX.nombre.test(nombre);
+  }
+
+  static validateAddress(direccion) {
+    return CONFIG.REGEX.direccion.test(direccion);
+  }
+
+  static validatePositiveNumber(value) {
+    return CONFIG.REGEX.positivos.test(value);
+  }
+
+  static validateDimensions(largo, ancho, alto) {
+    const values = [
+      { name: "largo", value: largo },
+      { name: "ancho", value: ancho },
+      { name: "alto", value: alto }
+    ];
+
+    const invalidValues = values.filter(v =>
+      isNaN(v.value) || v.value < CONFIG.MIN_CM || v.value > CONFIG.MAX_CM
+    );
+
+    if (invalidValues.length > 0) {
+      const detalles = invalidValues.map(v =>
+        `${v.name} (${v.value})`
+      ).join(", ");
+
+      return {
+        valid: false,
+        message: `Valores inválidos: ${detalles}. Deben estar entre ${CONFIG.MIN_CM} y ${CONFIG.MAX_CM} cm.`,
+        invalidFields: invalidValues.map(v => v.name)
+      };
+    }
+
+    const volumen = largo * ancho * alto;
+    if (volumen > CONFIG.MAX_VOLUMEN) {
+      return {
+        valid: false,
+        message: `Volumen excesivo: ${volumen.toLocaleString()} cm³ (> ${CONFIG.MAX_VOLUMEN.toLocaleString()} cm³).`
+      };
+    }
+
+    return { valid: true };
+  }
+
+
+  static isCurrentTabComplete() {
+    const panel = document.querySelector('.tab-panel.active');
+    if (!panel) return false;
+
+    const fields = panel.querySelectorAll('input, select, textarea');
+    for (const f of fields) {
+      if (f.offsetParent === null) continue;
+      if (f.id === 'm-descripcionArticulo') continue;
+      if (f.type === 'radio') continue;
+      if (!f.value.trim()) return false;
+    }
+
+    const radios = panel.querySelectorAll('input[type="radio"]');
+    const byName = {};
+    radios.forEach(r => {
+      if (r.name) byName[r.name] = true;
+    });
+    for (const name in byName) {
+      const group = panel.querySelectorAll(`input[type="radio"][name="${name}"]`);
+      if (group.length && !Array.from(group).some(r => r.checked)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  static validarRequeridos() {
+    const contenedor = document.querySelector('.tabs-content');
+    if (!contenedor) return true;
+
+    const camposReq = contenedor.querySelectorAll('input[required], select[required], textarea[required]');
+
+    for (let campo of camposReq) {
+      const tipo = campo.tagName.toLowerCase();
+      let valor = '';
+
+      if (tipo === 'select') {
+        valor = campo.value;
+      } else if (tipo === 'input' || tipo === 'textarea') {
+        valor = campo.value.trim();
+      }
+
+      if (!valor) {
+        campo.style.borderColor = '#fc8181';
+        campo.focus();
+        return false;
+      } else {
+        campo.style.borderColor = '';
+      }
+    }
+
+    return true;
+  }
+}
+
+// ===========================
+// GESTIÓN DE FORMULARIOS
+// ===========================
+class FormManager {
+  static setupValidationListeners() {
+    this.setupValueValidation();
+    this.setupDimensionValidation();
+    this.setupDocumentValidation();
+    this.setupPhoneValidation();
+    this.setupNameValidation();
+    this.setupEmailValidation();
+    this.setupAddressValidation();
+    this.setupNumberFieldsValidation();
+    this.setupPinInputs();
+  }
+
+  static setupValueValidation() {
+    const valorInput = document.getElementById('m-valorEnvio');
+    if (!valorInput) return;
+
+    valorInput.addEventListener('input', () => {
+      const raw = valorInput.value.trim();
+      const val = parseFloat(raw);
+
+      if (raw === '') {
+        Validator.clearError(valorInput);
+        return;
+      }
+
+      if (isNaN(val) || val <= 0) {
+        Validator.showError(valorInput, 'El valor debe ser mayor que 0.');
+        return;
+      }
+
+      if (val > CONFIG.MAX_VALOR) {
+        Validator.showError(valorInput, `El valor no puede exceder S/ ${CONFIG.MAX_VALOR}.`);
+        return;
+      }
+
+      Validator.clearError(valorInput);
+    });
+  }
+
+  static setupDimensionValidation() {
+    const inputsDim = {
+      largo: document.getElementById('m-largo'),
+      ancho: document.getElementById('m-ancho'),
+      alto: document.getElementById('m-alto')
+    };
+
+    Object.values(inputsDim).forEach(input => {
+      if (!input) return;
+
+      Object.values(inputsDim).forEach(input => {
+        input.addEventListener('input', () => {
+          const largo = parseFloat(inputsDim.largo.value);
+          const ancho = parseFloat(inputsDim.ancho.value);
+          const alto = parseFloat(inputsDim.alto.value);
+
+          const result = Validator.validateDimensions(largo, ancho, alto);
+
+          Object.values(inputsDim).forEach(i => {
+            Validator.clearError(i);
+            Validator.clearError(i, 'volumen');
+          });
+
+          if (!result.valid) {
+            if (result.invalidFields) {
+              result.invalidFields.forEach(fieldName => {
+                const fieldInput = inputsDim[fieldName];
+                Validator.showError(
+                  fieldInput,
+                  `${fieldName} inválido: debe estar entre ${CONFIG.MIN_CM} y ${CONFIG.MAX_CM} cm.`
+                );
+              });
+            } else {
+              Object.values(inputsDim).forEach(i =>
+                Validator.showError(i, result.message, 'volumen')
+              );
+            }
+          }
+        });
+      });
+
+    });
+  }
+
+  static setupDocumentValidation() {
+    // Remitente
+    const tipoDocRemitente = document.getElementById('remitente-tipo-doc');
+    const numeroDocRemitente = document.getElementById('remitente-numero-doc');
+    const mensajeDocRemitente = document.getElementById('mensaje-validacion-numero');
+
+    if (numeroDocRemitente && tipoDocRemitente) {
+      this.setupDocumentField(tipoDocRemitente, numeroDocRemitente, mensajeDocRemitente);
+    }
+
+    // Destinatario
+    const tipoDocDestinatario = document.getElementById('m-tipoDocumento');
+    const numeroDocDestinatario = document.getElementById('m-nroDocumento');
+    const mensajeDocDestinatario = document.getElementById('mensaje-validacion-numero-dest');
+
+    if (numeroDocDestinatario && tipoDocDestinatario) {
+      this.setupDocumentField(tipoDocDestinatario, numeroDocDestinatario, mensajeDocDestinatario);
+    }
+  }
+
+  static setupDocumentField(tipoSelect, numeroInput, mensajeElement) {
+    numeroInput.addEventListener('input', () => {
+      const tipo = tipoSelect.value;
+      const valor = numeroInput.value.trim();
+      const validation = Validator.validateDocument(tipo, valor);
+
+      if (valor === '') {
+        if (mensajeElement) mensajeElement.style.display = 'none';
+        numeroInput.style.borderColor = '';
+      } else if (validation.valid) {
+        if (mensajeElement) mensajeElement.style.display = 'none';
+        numeroInput.style.borderColor = '#48bb78';
+      } else {
+        if (mensajeElement) {
+          mensajeElement.style.display = 'block';
+          mensajeElement.textContent = validation.message;
+        }
+        numeroInput.style.borderColor = '#fc8181';
+      }
+    });
+
+    tipoSelect.addEventListener('change', () => {
+      const valorActual = numeroInput.value.trim();
+      if (valorActual !== '') {
+        numeroInput.dispatchEvent(new Event('input'));
+      }
+    });
+  }
+
+  static setupPhoneValidation() {
+    // Teléfono remitente
+    const telefonoRemitente = document.getElementById('remitente-telefono');
+    const mensajeTelefono = document.getElementById('mensaje-validacion-telefono');
+
+    if (telefonoRemitente) {
+      this.setupPhoneField(telefonoRemitente, mensajeTelefono);
+    }
+
+    // Teléfono destinatario
+    const telefonoDestinatario = document.getElementById('m-celular');
+    const mensajeTelefonoDest = document.getElementById('mensaje-validacion-telefono-dest');
+
+    if (telefonoDestinatario) {
+      this.setupPhoneField(telefonoDestinatario, mensajeTelefonoDest);
+    }
+  }
+
+  static setupPhoneField(input, messageElement) {
+    input.addEventListener('input', () => {
+      const telefono = input.value.trim();
+      const valido = Validator.validatePhone(telefono);
+
+      if (telefono === '') {
+        if (messageElement) messageElement.style.display = 'none';
+        input.style.borderColor = '';
+      } else if (valido) {
+        if (messageElement) messageElement.style.display = 'none';
+        input.style.borderColor = '#48bb78';
+      } else {
+        if (messageElement) {
+          messageElement.style.display = 'block';
+          messageElement.textContent = 'El teléfono debe comenzar con 9 y tener 9 dígitos.';
+        }
+        input.style.borderColor = '#fc8181';
+      }
+    });
+  }
+
+  static setupNameValidation() {
+    const nombreRemitente = document.getElementById('remitente-nombre');
+    const mensajeNombre = document.getElementById('mensaje-validacion-nombre');
+
+    if (nombreRemitente) {
+      nombreRemitente.addEventListener('input', () => {
+        const nombre = nombreRemitente.value.trim();
+        const valido = Validator.validateName(nombre);
+
+        if (nombre === '') {
+          if (mensajeNombre) mensajeNombre.style.display = 'none';
+          nombreRemitente.style.borderColor = '';
+        } else if (valido) {
+          if (mensajeNombre) mensajeNombre.style.display = 'none';
+          nombreRemitente.style.borderColor = '#48bb78';
+        } else {
+          if (mensajeNombre) {
+            mensajeNombre.style.display = 'block';
+            mensajeNombre.textContent = 'Solo se permiten letras y espacios (mínimo 2 caracteres).';
+          }
+          nombreRemitente.style.borderColor = '#fc8181';
+        }
+      });
+    }
+  }
+
+  static setupEmailValidation() {
+    const emailRemitente = document.getElementById('remitente-email');
+    const mensajeEmail = document.getElementById('mensaje-validacion-email');
+
+    if (emailRemitente) {
+      emailRemitente.addEventListener('input', () => {
+        const email = emailRemitente.value.trim();
+        const valido = Validator.validateEmail(email);
+
+        if (email === '') {
+          if (mensajeEmail) mensajeEmail.style.display = 'none';
+          emailRemitente.style.borderColor = '';
+        } else if (valido) {
+          if (mensajeEmail) mensajeEmail.style.display = 'none';
+          emailRemitente.style.borderColor = '#48bb78';
+        } else {
+          if (mensajeEmail) {
+            mensajeEmail.style.display = 'block';
+            mensajeEmail.textContent = 'Debe ingresar un correo válido (ej. usuario@dominio.com).';
+          }
+          emailRemitente.style.borderColor = '#fc8181';
+        }
+      });
+    }
+  }
+
+  static setupAddressValidation() {
+    const direccionDestinatario = document.getElementById('m-direccion');
+    const mensajeDireccion = document.getElementById('mensaje-validacion-direccion');
+
+    if (direccionDestinatario) {
+      direccionDestinatario.addEventListener('input', () => {
+        const direccion = direccionDestinatario.value.trim();
+        const valido = Validator.validateAddress(direccion);
+
+        if (direccion === '') {
+          if (mensajeDireccion) mensajeDireccion.style.display = 'none';
+          direccionDestinatario.style.borderColor = '';
+        } else if (valido) {
+          if (mensajeDireccion) mensajeDireccion.style.display = 'none';
+          direccionDestinatario.style.borderColor = '#48bb78';
+        } else {
+          if (mensajeDireccion) {
+            mensajeDireccion.style.display = 'block';
+            mensajeDireccion.textContent = 'La dirección debe tener entre 5 y 100 caracteres válidos.';
+          }
+          direccionDestinatario.style.borderColor = '#fc8181';
+        }
+      });
+    }
+  }
+
+  static setupNumberFieldsValidation() {
+    document.querySelectorAll('input[type="number"]').forEach(input => {
+      const errorMsg = document.createElement('span');
+      errorMsg.style.color = '#fc8181';
+      errorMsg.style.display = 'none';
+      errorMsg.textContent = 'Sólo se permiten números enteros o decimales positivos.';
+      input.insertAdjacentElement('afterend', errorMsg);
+
+      input.addEventListener('input', () => {
+        const val = input.value.trim();
+        if (val === '' || Validator.validatePositiveNumber(val)) {
+          input.style.borderColor = '';
+          errorMsg.style.display = 'none';
+        } else {
+          input.style.borderColor = '#fc8181';
+          errorMsg.style.display = 'block';
+        }
+      });
+
+      input.addEventListener('keydown', e => {
+        if (['+', '-', 'e', 'E'].includes(e.key)) {
+          e.preventDefault();
+        }
+      });
+
+      input.addEventListener('paste', e => {
+        const paste = (e.clipboardData || window.clipboardData).getData('text');
+        if (/[+\-eE]/.test(paste)) {
+          e.preventDefault();
+        }
+      });
+    });
+  }
+
+  static setupPinInputs() {
+    const pinInputs = document.querySelectorAll('.pin-input');
+
+    pinInputs.forEach((input, idx) => {
+      input.addEventListener('input', e => {
+        if (e.target.value.length > 1) e.target.value = e.target.value.slice(0, 1);
+
+        if (e.target.value && idx < pinInputs.length - 1) {
+          pinInputs[idx + 1].focus();
+        }
+
+        const valores = Array.from(pinInputs).map(i => i.value);
+        if (valores.every(v => v.length === 1)) {
+          const pin = valores.join('');
+          console.log('PIN completo:', pin);
+          const hiddenField = document.getElementById('destino-sucursal-id');
+          if (hiddenField) hiddenField.value = pin;
+        }
+      });
+
+      input.addEventListener('keydown', e => {
+        if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'Tab', 'Enter'].includes(e.key)) {
+          e.preventDefault();
+        }
+      });
+
+      input.addEventListener('paste', e => {
+        e.preventDefault();
+        const digits = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 4);
+        digits.split('').forEach((d, i) => {
+          if (pinInputs[i]) pinInputs[i].value = d;
+        });
+        pinInputs[digits.length - 1]?.dispatchEvent(new Event('input'));
+      });
+    });
+  }
+
+  static clearForm(full = true) {
+    const seccion = document.getElementById('seccion-masiva');
+    if (!seccion) return;
+
+    seccion.querySelectorAll('input, select, textarea').forEach(el => {
+      if (el.type === 'radio') return;
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        el.value = '';
+      }
+      if (el.tagName === 'SELECT') {
+        el.selectedIndex = 0;
+      }
+    });
+
+    document.querySelectorAll('input[name="modalidad_pago"]').forEach(r => r.checked = false);
+
+    const recepcion = document.getElementById('m-tipoEntrega');
+    if (recepcion) {
+      recepcion.innerHTML = '<option disabled selected value="">Seleccione una modalidad de pago primero</option>';
+    }
+
+    if (full) {
+      this.unlockOrigen();
+    }
+  }
+
+  static lockOrigen() {
+    document.querySelectorAll('#seccion-origen select').forEach(el => el.disabled = true);
+  }
+
+  static unlockOrigen() {
+    document.querySelectorAll('#seccion-origen select').forEach(el => el.disabled = false);
+  }
+}
+
+// ===========================
+// GESTIÓN DE PESTAÑAS Y UI
+// ===========================
+class TabManager {
+  static initTabs() {
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabButtons.forEach(b => b.classList.remove('active'));
+        tabPanels.forEach(p => p.classList.remove('active'));
+
+        btn.classList.add('active');
+        const nextTab = document.getElementById('tab-' + btn.dataset.tab);
+        nextTab.classList.add('active');
+      });
+    });
+  }
+
+  static updateNextTabHint() {
+    const btns = Array.from(document.querySelectorAll('.tab-btn'));
+    const activeIndex = btns.findIndex(b => b.classList.contains('active'));
+    btns.forEach(b => b.classList.remove('pulse'));
+
+    if (activeIndex >= 0 && Validator.isCurrentTabComplete()) {
+      const next = btns[activeIndex + 1];
+      if (next) next.classList.add('pulse');
+    }
+  }
+
+  static setupTabHints() {
+    document.querySelectorAll('.tabs-content .tab-panel').forEach(panel => {
+      panel.addEventListener('input', this.updateNextTabHint, true);
+      panel.addEventListener('change', this.updateNextTabHint, true);
+    });
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.updateNextTabHint();
+      });
+    });
+
+    this.updateNextTabHint();
+  }
+}
+
+// ===========================
+// GESTIÓN DE UBICACIONES (API)
+// ===========================
+class LocationManager {
+  static async cargarProvincias(depOrigen) {
+    try {
+      const response = await fetch('/api/provincia_origen', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dep: depOrigen })
+      });
+
+      const data = await response.json();
+      this.updateSelect('origen-provincia', data.data, 'provincia', 'Selecciona provincia');
+      this.resetSelect('origen-distrito', 'Selecciona una provincia primero');
+      this.resetSelect('origen-sucursal', 'Selecciona una provincia');
+      this.resetDestinationSelects();
+    } catch (error) {
+      console.error('Error cargando provincias:', error);
+    }
+  }
+
+  static async cargarDistritos(provOrigen) {
+    try {
+      const response = await fetch('/api/distrito_origen', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prov: provOrigen })
+      });
+
+      const data = await response.json();
+      this.updateSelect('origen-distrito', data.data, 'distrito', 'Seleccione un distrito');
+      this.resetSelect('origen-sucursal', 'Selecciona un distrito primero');
+      this.resetDestinationSelects();
+    } catch (error) {
+      console.error('Error cargando distritos:', error);
+    }
+  }
+
+  static async cargarSucursales(dep_origen, prov_origen, dist_origen) {
+    try {
+      const response = await fetch('/api/sucursal_origen', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dep: dep_origen, prov: prov_origen, dist: dist_origen })
+      });
+
+      const data = await response.json();
+      this.updateSelect('origen-sucursal', data.data, 'direccion', 'Selecciona una sucursal', 'id');
+      this.resetDestinationSelects();
+    } catch (error) {
+      console.error('Error cargando sucursales:', error);
+    }
+  }
+
+  static async cargarDeparDestino(id_origen) {
+    try {
+      const response = await fetch('/api/departamento_destino', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ suc_origen: id_origen })
+      });
+
+      const data = await response.json();
+      this.updateSelect('select-departamento', data.data, 'departamento', 'Seleccione un departamento');
+      this.resetSelect('select-provincia', 'Seleccione un lugar de origen primero');
+      this.resetSelect('select-distrito', 'Seleccione un lugar de origen primero');
+      this.resetSelect('select-sucursal', 'Seleccione un lugar de origen primero');
+    } catch (error) {
+      console.error('Error cargando departamentos destino:', error);
+    }
+  }
+
+  static async cargarProvDestino(dep_origen, codigo) {
+    try {
+      const response = await fetch('/api/provincia_destino', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dep: dep_origen, codigo })
+      });
+
+      const data = await response.json();
+      this.updateSelect('select-provincia', data.data, 'provincia', 'Seleccione una provincia');
+      this.resetSelect('select-distrito', 'Seleccione una provincia primero');
+      this.resetSelect('select-sucursal', 'Seleccione una provincia primero');
+    } catch (error) {
+      console.error('Error cargando provincias destino:', error);
+    }
+  }
+
+  static async cargarDistDestino(prov, codigo) {
+    try {
+      const response = await fetch('/api/distrito_destino', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prov, codigo })
+      });
+
+      const data = await response.json();
+      this.updateSelect('select-distrito', data.data, 'distrito', 'Seleccione un distrito');
+      this.resetSelect('select-sucursal', 'Seleccione un distrito primero');
+    } catch (error) {
+      console.error('Error cargando distritos destino:', error);
+    }
+  }
+
+  static async cargarSucDestino(dep_destino, prov_destino, dist_destino, origen) {
+    try {
+      const response = await fetch('/api/sucursal_destino', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cod_origen: origen,
+          dep: dep_destino,
+          prov: prov_destino,
+          dist: dist_destino
+        })
+      });
+
+      const data = await response.json();
+      this.updateSelect('select-sucursal', data.data, 'direccion', 'Seleccione una sucursal', 'id');
+    } catch (error) {
+      console.error('Error cargando sucursales destino:', error);
+    }
+  }
+
+  static async cargarRecepcion(modalidad) {
+    if (!modalidad) return;
+
+    try {
+      const response = await fetch('/api/recepcion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ modalidad })
+      });
+
+      const data = await response.json();
+      this.updateSelect('m-tipoEntrega', data.data, 'nombre', 'Seleccione un tipo de recepción', 'id');
+    } catch (error) {
+      console.error('Error cargando tipos de recepción:', error);
+    }
+  }
+
+  static updateSelect(selectId, data, textField, placeholder, valueField = null) {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+
+    select.innerHTML = `<option disabled selected value="">${placeholder}</option>`;
+
+    if (data && Array.isArray(data)) {
+      data.forEach(item => {
+        const value = valueField ? item[valueField] : item[textField];
+        const text = item[textField];
+        select.appendChild(new Option(text, value));
+      });
+    }
+  }
+
+  static resetSelect(selectId, placeholder) {
+    const select = document.getElementById(selectId);
+    if (select) {
+      select.innerHTML = `<option disabled selected value="">${placeholder}</option>`;
+    }
+  }
+
+  static resetDestinationSelects() {
+    const selects = [
+      { id: 'select-departamento', text: 'Seleccione un lugar de origen primero' },
+      { id: 'select-provincia', text: 'Seleccione un lugar de origen primero' },
+      { id: 'select-distrito', text: 'Seleccione un lugar de origen primero' },
+      { id: 'select-sucursal', text: 'Seleccione un lugar de origen primero' }
+    ];
+
+    selects.forEach(({ id, text }) => this.resetSelect(id, text));
+  }
+
+  static setupLocationListeners() {
+    const elements = {
+      dep: document.getElementById('origen-departamento'),
+      prov: document.getElementById('origen-provincia'),
+      dist: document.getElementById('origen-distrito'),
+      suc: document.getElementById('origen-sucursal'),
+      depDestino: document.getElementById('select-departamento'),
+      provDestino: document.getElementById('select-provincia'),
+      distDestino: document.getElementById('select-distrito')
+    };
+
+    if (elements.dep) {
+      elements.dep.addEventListener('change', () => {
+        this.cargarProvincias(elements.dep.value);
+      });
+    }
+
+    if (elements.prov) {
+      elements.prov.addEventListener('change', () => {
+        this.cargarDistritos(elements.prov.value);
+      });
+    }
+
+    if (elements.dist) {
+      elements.dist.addEventListener('change', () => {
+        this.cargarSucursales(elements.dep.value, elements.prov.value, elements.dist.value);
+      });
+    }
+
+    if (elements.suc) {
+      elements.suc.addEventListener('change', () => {
+        this.cargarDeparDestino(elements.suc.value);
+      });
+    }
+
+    if (elements.depDestino) {
+      elements.depDestino.addEventListener('change', () => {
+        const codigo = document.getElementById('origen-sucursal').value;
+        this.cargarProvDestino(elements.depDestino.value, codigo);
+      });
+    }
+
+    if (elements.provDestino) {
+      elements.provDestino.addEventListener('change', () => {
+        const codigo = document.getElementById('origen-sucursal').value;
+        this.cargarDistDestino(elements.provDestino.value, codigo);
+      });
+    }
+
+    if (elements.distDestino) {
+      elements.distDestino.addEventListener('change', () => {
+        const codigo = document.getElementById('origen-sucursal').value;
+        this.cargarSucDestino(
+          elements.depDestino.value,
+          elements.provDestino.value,
+          elements.distDestino.value,
+          codigo
+        );
+      });
+    }
+
+    // Modalidad de pago
+    document.querySelectorAll('input[name="modalidad_pago"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (radio.checked) {
+          this.cargarRecepcion(radio.value);
+        }
+      });
+    });
+
+    // Click en opciones de modalidad de pago
+    document.querySelectorAll('#tab-modalidad-pago .campos-envio > div').forEach(option => {
+      const radio = option.querySelector('input[type="radio"]');
+      if (!radio) return;
+
+      option.addEventListener('click', () => {
+        radio.checked = true;
+        radio.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    });
+  }
+}
+
+// ===========================
+// GESTIÓN DE ENVÍOS
+// ===========================
+class ShippingManager {
+  static collectFormData() {
+    // Función auxiliar para obtener valores seguros
+    const getValue = (id) => {
+      const element = document.getElementById(id);
+      return element ? element.value.trim() : '';
+    };
+
+    const getSelectText = (id) => {
+      const select = document.getElementById(id);
+      return select?.selectedOptions[0]?.textContent?.trim() || '';
+    };
+
+    const getCheckedRadio = (name) => {
+      const radio = document.querySelector(`input[name="${name}"]:checked`);
+      return radio ? radio.value : '';
+    };
+
+    // Recolectar datos con validación
+    const formData = {
+      modo: typeof mode !== 'undefined' ? mode : null,
+      remitente: {
+        tipo_doc_remitente: getValue('remitente-tipo-doc'),
+        num_doc_remitente: getValue('remitente-numero-doc'),
+        num_tel_remitente: getValue('remitente-telefono'),
+        nombre_remitente: getValue('remitente-nombre'),
+        correo_remitente: getValue('remitente-email'),
+      },
+      origen: {
+        departamento_origen: getValue('origen-departamento'),
+        provincia_origen: getValue('origen-provincia'),
+        distrito_origen: getValue('origen-distrito'),
+        sucursal_origen: getValue('origen-sucursal')
+      },
+      tipoEntrega: getSelectText('m-tipoEntrega'),
+      tipoEntregaId: getValue('m-tipoEntrega'),
+      destino: {
+        departamento: getValue('select-departamento'),
+        provincia: getValue('select-provincia'),
+        distrito: getValue('select-distrito'),
+        sucursal_destino: getValue('select-sucursal'),
+        direccion: getValue('m-direccion') // Agregar dirección si es domicilio
+      },
+      tipoEmpaque: getSelectText('m-tipoEmpaque'),
+      tipoEmpaqueId: getValue('m-tipoEmpaque'),
+      tipoArticulo: getSelectText('m-tipoArticulo'),
+      tipoArticuloId: getValue('m-tipoArticulo'),
+      folios: getValue('m-folios') || null,
+      valorEnvio: parseFloat(getValue('m-valorEnvio')) || 0,
+      peso: parseFloat(getValue('m-peso')) || 0,
+      largo: parseFloat(getValue('m-largo')) || 0,
+      ancho: parseFloat(getValue('m-ancho')) || 0,
+      alto: parseFloat(getValue('m-alto')) || 0,
+      descripcion: getValue('m-descripcionArticulo'),
+      destinatario: {
+        tipo_doc_destinatario: getValue('m-tipoDocumento'),
+        num_doc_destinatario: getValue('m-nroDocumento'),
+        num_tel_destinatario: getValue('m-celular'),
+        nombre_destinatario: this.getDestinatarioName(),
+        razon_social: getValue('m-razonSocial'),
+        contacto: getValue('m-contacto'),
+        nombres: getValue('m-nombres'),
+        apellidos: getValue('m-apellidos')
+      },
+      modalidadPago: getCheckedRadio('modalidad_pago'),
+      clave: Array.from(document.querySelectorAll('.pin-input')).map(i => i.value || '').join('')
+    };
+
+    // Validar que los campos críticos no estén vacíos
+    const requiredFields = [
+      'tipoEntregaId', 'tipoEmpaqueId', 'valorEnvio', 'peso',
+      'largo', 'ancho', 'alto', 'modalidadPago'
+    ];
+
+    for (let field of requiredFields) {
+      if (!formData[field] && formData[field] !== 0) {
+        console.warn(`Campo requerido vacío: ${field}`);
+      }
+    }
+
+    console.log('Datos recolectados del formulario:', formData);
+    return formData;
+  }
+
+  static getSelectText(selectId) {
+    const select = document.getElementById(selectId);
+    return select?.selectedOptions[0]?.textContent || '';
+  }
+
+  static getDestinatarioName() {
+    const tipoDoc = document.getElementById('m-tipoDocumento')?.value;
+    if (tipoDoc === '2') {
+      return document.getElementById('m-razonSocial')?.value || '';
+    } else {
+      const nombres = document.getElementById('m-nombres')?.value || '';
+      const apellidos = document.getElementById('m-apellidos')?.value || '';
+      return `${nombres} ${apellidos}`.trim();
+    }
+  }
+
+  static recolectarDatosEnvio() {
+    return {
+      tipo_documento_origen: document.getElementById('remitente-tipo-doc')?.value || null,
+      dni_origen: document.getElementById('remitente-numero-doc')?.value.trim(),
+      cel_origen: document.getElementById('remitente-telefono')?.value.trim(),
+      nombre_remitente: document.getElementById('remitente-nombre')?.value.trim(),
+      email: document.getElementById('remitente-email')?.value.trim(),
+      id_origen: document.getElementById('origen-sucursal-id')?.value,
+      tipo_recepcion: document.getElementById('m-tipoEntrega')?.value || null,
+      cod_seguridad: document.getElementById('remitente-codigo')?.value.trim(),
+      id_destino: document.getElementById('destino-sucursal-id')?.value || null,
+      id_empaque: document.getElementById('m-tipoEmpaque')?.value,
+      valor_paquete: document.getElementById('m-valorEnvio')?.value,
+      peso: document.getElementById('m-peso')?.value,
+      largo: document.getElementById('m-largo')?.value,
+      ancho: document.getElementById('m-ancho')?.value,
+      alto: document.getElementById('m-alto')?.value,
+      descripcion: document.getElementById('m-descripcionArticulo')?.value.trim(),
+      tipo_documento_destino: document.getElementById('m-tipoDocumento')?.value,
+      dni_destino: document.getElementById('m-nroDocumento')?.value.trim(),
+      cel_destino: document.getElementById('m-celular')?.value.trim(),
+      nombre_destinatario: this.getDestinatarioName(),
+      contacto_destino: document.getElementById('m-contacto')?.value.trim(),
+      distrito_origen: document.getElementById('origen-distrito')?.value,
+      distrito_destino_sucursal: document.getElementById('select-distrito')?.value,
+      direccion_destino: document.getElementById('m-direccion')?.value.trim(),
+      folios: document.getElementById('m-folios')?.value ?
+        parseInt(document.getElementById('m-folios').value) : null,
+      tipo_articulo: document.getElementById('m-tipoArticulo')?.value,
+    };
+  }
+
+  static guardarRegistro() {
+    if (!this.validateEnvio()) {
+      Utils.showModal({ message: 'Complete todos los campos visibles' });
+      return;
+    }
+
+    const envio = this.collectFormData();
+
+    if (editingIndex !== null) {
+      window.registros[editingIndex] = envio;
+      editingIndex = null;
+    } else {
+      window.registros.push(envio);
+    }
+
+    TableManager.renderTabla();
+    FormManager.clearForm(false);
+    FormManager.lockOrigen();
+  }
+
+
+  static validateEnvio() {
+    function isHidden(el) {
+      while (el) {
+        if (el.style && el.style.display === 'none') {
+          return true;
+        }
+        el = el.parentElement;
+      }
+      return false;
+    }
+    const panels = document.querySelectorAll('.tabs-content .tab-panel');
+    console.log('Total de paneles:', panels.length);
+
+    for (const panel of panels) {
+      console.group(`Panel: ${panel.id}`);
+
+      const selectAndTextInputs = panel.querySelectorAll('select, input[type="text"], input[type="number"]');
+      console.log(`Campos encontrados: ${selectAndTextInputs.length}`);
+
+      const fieldDetails = [];
+
+      for (const f of selectAndTextInputs) {
+        if (f.id === 'm-descripcionArticulo') continue;
+        if (isHidden(f)) continue;
+        const fieldInfo = {
+          id: f.id || f.name,
+          type: f.tagName.toLowerCase() === 'select' ? 'select' : f.type,
+          value: f.value.trim(),
+          valid: !!f.value.trim()
+        };
+
+        fieldDetails.push(fieldInfo);
+
+        if (!fieldInfo.valid) {
+          console.warn(`Campo inválido: ${fieldInfo.id}`);
+          console.log('Detalles del campo:', fieldInfo);
+          console.groupEnd();
+          return false;
         }
       }
 
-      campo.focus();
-      return false;
+      console.log('Detalles de campos:', fieldDetails);
+
+      const requiredRadios = Array.from(
+        panel.querySelectorAll('input[type="radio"][required]')
+      );
+
+      const radioGroups = [...new Set(requiredRadios.map(r => r.name))];
+
+      console.log('Grupos de Radio Requeridos:', radioGroups);
+
+      for (const name of radioGroups) {
+        const grupo = panel.querySelectorAll(`input[name="${name}"]`);
+
+        const radioGroupInfo = {
+          name: name,
+          totalRadios: grupo.length,
+          checkedRadios: Array.from(grupo).filter(r => r.checked),
+          isValid: Array.from(grupo).some(r => r.checked)
+        };
+
+        console.log('Grupo de Radio:', radioGroupInfo);
+
+        if (grupo.length > 0 && !radioGroupInfo.isValid) {
+          console.warn(`Grupo de Radio "${name}" sin selección`);
+          console.groupEnd();
+          return false;
+        }
+      }
+
+      console.log('Validación de panel: ÉXITO');
+      console.groupEnd();
+    }
+
+    return true;
+  }
+
+  static startEdit(idx) {
+    editingIndex = idx;
+    this.fillFormData(window.registros[idx]);
+    document.querySelectorAll('#seccion-origen select').forEach(el => el.disabled = true);
+    const btnCancelEdit = document.querySelector('.btn-cancel-edit');
+    if (btnCancelEdit) btnCancelEdit.style.display = 'inline-block';
+  }
+
+  static cancelEdit() {
+    editingIndex = null;
+    FormManager.clearForm(true);
+    TabManager.updateNextTabHint();
+    const btnCancelEdit = document.querySelector('.btn-cancel-edit');
+    if (btnCancelEdit) btnCancelEdit.style.display = 'none';
+  }
+
+  static fillFormData(r) {
+    // Implementar llenado de formulario basado en los datos del registro
+    // Esta función necesitaría ser adaptada según la estructura exacta de tus datos
+    console.log('Llenando formulario con:', r);
+  }
+
+  static limpiarCampos() {
+    const ids = [
+      "m-valorEnvio", "m-peso", "m-largo", "m-ancho", "m-alto", "m-descripcionArticulo",
+      "m-nroDocumento", "m-celular", "m-nombres", "m-apellidos"
+    ];
+
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = "";
+    });
+
+    document.querySelectorAll(".pin-input").forEach(input => input.value = "");
+  }
+
+  static async enviarDatosResumen() {
+    try {
+      // Si es envío individual, recolectar datos del formulario actual
+      const btnAdd = document.querySelector('.btn-agregar');
+      const isIndividualShipment = btnAdd && window.getComputedStyle(btnAdd).display === 'none';
+
+      let datosParaEnviar;
+
+      if (isIndividualShipment) {
+        console.log('Procesando envío individual...');
+
+        // Validar formulario antes de continuar
+        if (!this.validateEnvio()) {
+          Utils.showModal({ message: 'Complete todos los campos visibles antes de continuar.' });
+          return;
+        }
+
+        // Recoger datos del formulario actual
+        const envioIndividual = this.collectFormData();
+        datosParaEnviar = {
+          envios: [envioIndividual],
+          remitente: envioIndividual.remitente,
+          modalidad_pago: envioIndividual.modalidadPago,
+          tipo_envio: 'individual'
+        };
+      } else {
+        // Envío masivo - usar registros existentes
+        if (!window.registros || window.registros.length === 0) {
+          Utils.showModal({ message: 'Agrega al menos un envío antes de continuar.' });
+          return;
+        }
+
+        datosParaEnviar = {
+          envios: window.registros,
+          remitente: window.registros[0]?.remitente || {},
+          modalidad_pago: window.registros[0]?.modalidadPago || '',
+          tipo_envio: 'masivo'
+        };
+      }
+      // Crear un form "invisible"
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/resumen_envio_prueba';
+      form.style.display = 'none';
+
+      // Meter el JSON en un input oculto
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'payload';
+      input.value = JSON.stringify(datosParaEnviar);
+      form.appendChild(input);
+
+      document.body.appendChild(form);
+
+      // Enviar el form → navega a /resumen_envio_prueba
+      form.submit();
+    } catch (err) {
+      console.error("Error en el envío:", err);
+      Utils.showModal({ message: "Error al procesar el envío: " + err.message });
+    }
+  }
+
+  // Mantener el método anterior para compatibilidad, pero que use el nuevo
+  static async continuarProceso() {
+    return this.enviarDatosResumen();
+  }
+
+  static async enviarDatos() {
+    return this.enviarDatosResumen();
+  }
+}
+// ===========================
+// GESTIÓN DE TABLA
+// ===========================
+class TableManager {
+  static renderTabla() {
+    const container = document.getElementById('tableContent');
+    if (!container) return;
+
+    if (window.registros.length === 0) {
+      container.innerHTML = '<div class="empty-state"><p>No hay envíos registrados aún</p><p>Comienza agregando tu primer envío</p></div>';
+      return;
+    }
+
+    let html = '<table><thead><tr>' +
+      '<th>#</th><th>Recepción</th><th>Destino</th><th>Paquete</th>' +
+      '<th>Valor</th><th>Peso</th><th>Dimensiones</th>' +
+      '<th>Destinatario</th><th>Modalidad pago</th><th>Clave</th><th>Acciones</th>' +
+      '</tr></thead><tbody>';
+
+    window.registros.forEach((r, i) => {
+      html += `<tr>` +
+        `<td>${i + 1}</td>` +
+        `<td>${r.tipoEntrega}</td>` +
+        `<td>${r.destino.departamento}/${r.destino.provincia}/${r.destino.distrito}</td>` +
+        `<td>${r.tipoEmpaque === '2' ? r.folios + ' folios' : r.tipoEmpaque + ' - ' + r.tipoArticulo}</td>` +
+        `<td>${r.valorEnvio}</td>` +
+        `<td>${r.peso}</td>` +
+        `<td>${r.largo} cm x ${r.ancho} cm x ${r.alto} cm</td>` +
+        `<td>${r.destinatario.nombre_destinatario}</td>` +
+        `<td>${r.modalidadPago}</td>` +
+        `<td>${r.clave}</td>` +
+        `<td>` +
+        ` <div class="btn-actions">` +
+        `<button class="btn-small btn-edit" data-index="${i}"><i class="fa fa-edit"></i></button>` +
+        `<button class="btn-small btn-delete" data-index="${i}"><i class="fa fa-trash"></i></button>` +
+        `</div>` +
+        `</td></tr>`;
+    });
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+    this.attachTableActions();
+  }
+
+  static attachTableActions() {
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = +btn.dataset.index;
+        Utils.showModal({
+          message: '¿Eliminar este envío?',
+          onConfirm: () => {
+            window.registros.splice(idx, 1);
+            this.renderTabla();
+          }
+        });
+      });
+    });
+
+    document.querySelectorAll('.btn-edit').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = +btn.dataset.index;
+        const warning = () => ShippingManager.startEdit(idx);
+
+        if (window.registros.length > 1) {
+          Utils.showWarning('Al editar se eliminarán registros con origen diferente. ¿Continuar?', warning);
+        } else {
+          warning();
+        }
+      });
+    });
+  }
+
+  static actualizarTabla() {
+    const tableContent = document.getElementById('tableContent');
+    const totalEnvios = document.getElementById('totalEnvios');
+    const pesoTotal = document.getElementById('pesoTotal');
+    const valorTotal = document.getElementById('valorTotal');
+
+    if (!tableContent) return;
+
+    const stored = localStorage.getItem(CONFIG.STORAGE_KEY);
+    const envios = stored ? JSON.parse(stored) : [];
+
+    if (envios.length === 0) {
+      tableContent.innerHTML = `
+        <div class="empty-state">
+          <p>No hay envíos registrados aún</p>
+          <p>Comienza agregando tu primer envío</p>
+        </div>
+      `;
+      if (totalEnvios) totalEnvios.textContent = '0';
+      if (pesoTotal) pesoTotal.textContent = '0';
+      if (valorTotal) valorTotal.textContent = '0.00';
+      return;
+    }
+
+    let sumaPeso = 0;
+    let sumaValor = 0;
+
+    let html = `
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Tipo</th><th>Destinatario</th><th>Destino</th>
+              <th>Descripción</th><th>Dimensiones</th><th>Peso</th><th>Valor</th><th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    envios.forEach((envio, index) => {
+      const paquete = envio.paquete || {};
+      const destino = envio.destino || {};
+      const destinatario = envio.destinatario || {};
+
+      sumaPeso += parseFloat(paquete.peso) || 0;
+      sumaValor += parseFloat(paquete.valorEnvio) || 0;
+
+      let nombreDest = '';
+      if (destinatario.tipoDocumento === '2') {
+        nombreDest = destinatario.razonSocial || '';
+      } else {
+        nombreDest = `${destinatario.nombres || ''} ${destinatario.apellidos || ''}`.trim();
+      }
+
+      html += `
+        <tr>
+          <td>${index + 1}</td>
+          <td><span class="badge">${destino.tipoEntregaNombre}</span></td>
+          <td>
+            <div><strong>${nombreDest}</strong></div>
+            <small>${destinatario.tipoDocumentoNombre || ''}: ${destinatario.nroDocumento || ''}</small>
+          </td>
+          <td>
+            <div>${destino.distrito || ''}</div>
+            <small>${destino.provincia || ''}, ${destino.departamento || ''}</small>
+          </td>
+          <td>
+            <div>${paquete.descripcion || ''}</div>
+            <small>${paquete.contenidoPaqueteNombre || ''} - ${paquete.tipoEmpaqueNombre || ''}</small>
+          </td>
+          <td><small>${paquete.largo || 0}x${paquete.ancho || 0}x${paquete.alto || 0} cm</small></td>
+          <td>${paquete.peso || 0} kg</td>
+          <td><strong>S/ ${(parseFloat(paquete.valorEnvio) || 0).toFixed(2)}</strong></td>
+          <td>
+            <div class="btn-actions">
+              <button class="btn-small btn-editar" onclick="editarEnvio(${index})"><i class="fa fa-edit"></i></button>
+              <button class="btn-small btn-eliminar" onclick="eliminarEnvio(${index})"><i class="fa fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+
+    html += `</tbody></table></div>`;
+    tableContent.innerHTML = html;
+
+    if (totalEnvios) totalEnvios.textContent = envios.length;
+    if (pesoTotal) pesoTotal.textContent = sumaPeso.toFixed(2);
+    if (valorTotal) valorTotal.textContent = sumaValor.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+}
+
+// ===========================
+// GESTIÓN DE EXPORT
+// ===========================
+class ExportManager {
+  static exportXLSX() {
+    if (!window.registros || window.registros.length === 0) {
+      return Utils.showModal({ message: 'No hay envíos para exportar.' });
+    }
+
+    const data = window.registros.map(e => ({
+      'Modalidad de Pago': e.modalidadPago,
+      'Tipo de Entrega': e.tipoEntrega,
+      'Depto. Destino': e.destino.departamento,
+      'Provincia Destino': e.destino.provincia,
+      'Distrito Destino': e.destino.distrito,
+      'Tipo de Empaque': e.tipoEmpaque,
+      'Tipo de Contenido': e.tipoArticulo || '',
+      '# Folios': e.folios || '',
+      'Valor (S/)': e.valorEnvio,
+      'Peso (kg)': e.peso,
+      'Largo (cm)': e.largo,
+      'Ancho (cm)': e.ancho,
+      'Alto (cm)': e.alto,
+      'Destinatario': e.destinatario.nombre_destinatario,
+      'Clave de seguridad': e.clave
+    }));
+
+    // Si XLSX está disponible globalmente
+    if (typeof XLSX !== 'undefined') {
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Envíos Masivos');
+      XLSX.writeFile(wb, 'envios_masivos.xlsx');
     } else {
-      campo.style.borderColor = '';
-      const msgSpanId = campo.getAttribute('aria-describedby')
-        || campo.getAttribute('data-error-span')
-        || null;
-      if (msgSpanId) {
-        const spanMsg = document.getElementById(msgSpanId);
-        if (spanMsg) spanMsg.style.display = 'none';
+      console.error('XLSX library not available');
+      Utils.showModal({ message: 'Error: Biblioteca de exportación no disponible.' });
+    }
+  }
+}
+
+// ===========================
+// GESTIÓN DE CAMPOS DINÁMICOS
+// ===========================
+class FieldManager {
+  static mostrarCamposDestino() {
+    const tipo = document.getElementById('m-tipoEntrega')?.value;
+    const grupoDir = document.getElementById('grupo-direccion');
+
+    if (grupoDir) {
+      grupoDir.style.display = (tipo === '2') ? 'flex' : 'none';
+    }
+  }
+
+  static toggleFolios() {
+    const tipo = document.getElementById('m-tipoEmpaque')?.value;
+    const grupoFolios = document.getElementById('grupo-folios');
+
+    if (grupoFolios) {
+      grupoFolios.style.display = (tipo === '2') ? 'flex' : 'none';
+      const input = grupoFolios.querySelector('input');
+      if (input) input.setAttribute('required', '');
+    }
+  }
+
+  static toggleArticulos() {
+    const tipo = document.getElementById('m-tipoEmpaque')?.value;
+    const grupoArticulos = document.getElementById('grupo-articulos');
+
+    if (grupoArticulos) {
+      grupoArticulos.style.display = (tipo === '1') ? 'flex' : 'none';
+      const select = grupoArticulos.querySelector('select');
+      if (select) select.setAttribute('required', '');
+    }
+  }
+
+  static mostrarCamposReceptor() {
+    const tipo = document.getElementById('m-tipoDocumento')?.value;
+    console.log(tipo)
+    const elementos = {
+      camposRazon: document.getElementById('campo-razon-ruc'),
+      camposContacto: document.getElementById('campo-contacto-ruc'),
+      camposNombres: document.getElementById('campos-nombres'),
+      camposApellidos: document.getElementById('campos-apellidos'),
+      razon: document.getElementById('m-razonSocial'),
+      contacto: document.getElementById('m-contacto'),
+      nombres: document.getElementById('m-nombres'),
+      apellidos: document.getElementById('m-apellidos')
+    };
+
+    // Ocultar todos primero
+    Object.values(elementos).forEach(el => {
+      if (el && el.style) el.style.display = 'none';
+      if (el && el.required !== undefined) el.required = false;
+    });
+
+    if (tipo == '2') {
+      // RUC - mostrar razón social y contacto
+      if (elementos.camposRazon) elementos.camposRazon.style.display = 'flex';
+      if (elementos.camposContacto) elementos.camposContacto.style.display = 'flex';
+      if (elementos.razon) elementos.razon.required = true;
+      if (elementos.contacto) elementos.contacto.required = true;
+    } else if (tipo && tipo !== '') {
+      // Otros documentos - mostrar nombres y apellidos
+      if (elementos.camposNombres) {
+        elementos.camposNombres.style.display = 'flex';
+        elementos.nombres.style.display = 'flex';
+        elementos.nombres.required = true;
+      }
+      if (elementos.camposApellidos) {
+        elementos.camposApellidos.style.display = 'flex';
+        elementos.apellidos.style.display = 'flex';
+        elementos.apellidos.required = true;
+      }
+    }
+  }
+}
+
+// ===========================
+// INICIALIZACIÓN Y EVENTOS
+// ===========================
+class AppInitializer {
+  static init() {
+    this.setupModeSpecificBehavior();
+    this.setupEventListeners();
+    this.initializeComponents();
+    this.setupButtonEvents();
+  }
+
+  static setupModeSpecificBehavior() {
+    if (typeof mode !== 'undefined' && (mode === 'caja' || mode === 'sobre')) {
+      const tipoEmpaque = document.getElementById('m-tipoEmpaque');
+      if (tipoEmpaque) {
+        tipoEmpaque.value = (mode === 'sobre' ? '2' : '1');
+        tipoEmpaque.disabled = true;
+
+        if (mode === 'sobre') {
+          FieldManager.toggleFolios();
+          const grupoArticulos = document.getElementById('grupo-articulos');
+          if (grupoArticulos) grupoArticulos.style.display = 'none';
+        } else {
+          FieldManager.toggleArticulos();
+          const grupoFolios = document.getElementById('grupo-folios');
+          if (grupoFolios) grupoFolios.style.display = 'none';
+        }
+
+        const tablaEnvios = document.querySelector('.tabla-envios');
+        const btnAgregar = document.querySelector('.btn-agregar');
+        if (tablaEnvios) tablaEnvios.style.display = 'none';
+        if (btnAgregar) btnAgregar.style.display = 'none';
       }
     }
   }
 
-  return true;
+  static setupEventListeners() {
+    // Listeners de campos dinámicos
+    const tipoEntrega = document.getElementById('m-tipoEntrega');
+    if (tipoEntrega) {
+      tipoEntrega.addEventListener('change', FieldManager.mostrarCamposDestino);
+    }
+
+    const tipoEmpaque = document.getElementById('m-tipoEmpaque');
+    if (tipoEmpaque) {
+      tipoEmpaque.addEventListener('change', () => {
+        FieldManager.toggleFolios();
+        FieldManager.toggleArticulos();
+      });
+    }
+
+    const tipoDocumento = document.getElementById('m-tipoDocumento');
+    if (tipoDocumento) {
+      tipoDocumento.addEventListener('change', FieldManager.mostrarCamposReceptor);
+    }
+  }
+
+  static initializeComponents() {
+    TabManager.initTabs();
+    TabManager.setupTabHints();
+    FormManager.setupValidationListeners();
+    LocationManager.setupLocationListeners();
+
+    // Inicializar campos dinámicos
+    FieldManager.mostrarCamposDestino();
+    FieldManager.toggleFolios();
+    FieldManager.toggleArticulos();
+    FieldManager.mostrarCamposReceptor();
+
+    // Renderizar tabla inicial
+    TableManager.renderTabla();
+  }
+
+  static setupButtonEvents() {
+    // Botón agregar
+    const btnAdd = document.querySelector('.btn-agregar');
+    if (btnAdd) {
+      btnAdd.addEventListener('click', e => {
+        e.preventDefault();
+        if (!ShippingManager.validateEnvio()) {
+          Utils.showModal({ message: 'Complete todos los campos visibles' });
+          return;
+        }
+        Utils.showModal({
+          message: '¿Agregar este envío?',
+          onConfirm: () => ShippingManager.guardarRegistro()
+        });
+      });
+    }
+
+    // Botón limpiar
+    const btnLimpiar = document.querySelector('.btn-limpiar');
+    if (btnLimpiar) {
+      btnLimpiar.addEventListener('click', e => {
+        e.preventDefault();
+
+        const fields = Array.from(
+          document.querySelectorAll('#seccion-masiva input, #seccion-masiva select, #seccion-masiva textarea')
+        );
+
+        const anyFilled = fields.some(f => f.value && f.value.trim() !== '');
+
+        if (!anyFilled) {
+          Utils.showModal({ message: 'No hay campos para limpiar.' });
+        } else {
+          ShippingManager.cancelEdit();
+        }
+      });
+    }
+
+    // Botón limpiar todos
+    const btnLimpiarTodos = document.querySelector('.btn-limpiar-todos');
+    if (btnLimpiarTodos) {
+      btnLimpiarTodos.addEventListener('click', () => {
+        if (window.registros.length === 0) {
+          Utils.showModal({ message: 'No hay registros para eliminar.' });
+        } else {
+          Utils.showModal({
+            message: '¿Eliminar todos los registros?',
+            onConfirm: () => {
+              window.registros = [];
+              TableManager.renderTabla();
+              FormManager.unlockOrigen();
+            }
+          });
+        }
+      });
+    }
+
+    // Botón exportar
+    const btnExportar = document.querySelector('.btn-exportar');
+    if (btnExportar) {
+      btnExportar.addEventListener('click', () => {
+        if (window.registros.length === 0) {
+          Utils.showModal({ message: 'No hay registros para exportar.' });
+        } else {
+          ExportManager.exportXLSX();
+        }
+      });
+    }
+
+    // Botón continuar
+    const btnContinuar = document.getElementById('btn-continuar');
+    if (btnContinuar) {
+      btnContinuar.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const selectsOrigen = document.querySelectorAll('#seccion-origen select');
+        const camposRemitente = document.querySelectorAll('#seccion_remitente select, #seccion_remitente input');
+
+        function destacarCampo(element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.style.transition = 'transform 0.3s ease';
+          element.style.transform = 'scale(1.05)';
+          setTimeout(() => {
+            element.style.transform = '';
+          }, 900);
+        }
+
+        let primerInvalido = null;
+
+        for (const select of selectsOrigen) {
+          if (select.value === '') {
+            primerInvalido = select;
+            break;
+          }
+        }
+
+        if (!primerInvalido) {
+          for (const campo of camposRemitente) {
+            if (!campo.matches(':user-valid')) {
+              primerInvalido = campo;
+              break;
+            }
+          }
+        }
+
+        if (!primerInvalido) {
+          await ShippingManager.enviarDatosResumen();
+        } else {
+          setTimeout(() => {
+            destacarCampo(primerInvalido);
+            setTimeout(() => {
+              Utils.showModal({ message: 'Complete todos los campos necesarios.' });
+            }, 1600)
+          }, 500)
+        }
+
+      });
+    }
+
+    // Botón cancelar edición
+    const btnCancelEdit = document.querySelector('.btn-cancel-edit');
+    if (btnCancelEdit) {
+      btnCancelEdit.style.display = 'none';
+      btnCancelEdit.addEventListener('click', () => {
+        ShippingManager.cancelEdit();
+      });
+    }
+  }
 }
 
+// ===========================
+// FUNCIONES LEGACY (para compatibilidad)
+// ===========================
 
+// Funciones globales mantenidas para compatibilidad con HTML existente
+function mostrarCamposDestino() {
+  FieldManager.mostrarCamposDestino();
+}
+
+function toggleFolios() {
+  FieldManager.toggleFolios();
+}
+
+function toggleArticulos() {
+  FieldManager.toggleArticulos();
+}
+
+function mostrarCamposReceptor() {
+  FieldManager.mostrarCamposReceptor();
+}
+
+function cargarProvincias(depOrigen) {
+  return LocationManager.cargarProvincias(depOrigen);
+}
+
+function cargarDistritos(provOrigen) {
+  return LocationManager.cargarDistritos(provOrigen);
+}
+
+function cargarSucursales(dep_origen, prov_origen, dist_origen) {
+  return LocationManager.cargarSucursales(dep_origen, prov_origen, dist_origen);
+}
+
+function cargarDeparDestino(id_origen) {
+  return LocationManager.cargarDeparDestino(id_origen);
+}
+
+function cargarProvDestino(dep_origen, codigo) {
+  return LocationManager.cargarProvDestino(dep_origen, codigo);
+}
+
+function cargarDistDestino(prov, codigo) {
+  return LocationManager.cargarDistDestino(prov, codigo);
+}
+
+function cargarSucDestino(dep_destino, prov_destino, dist_destino, origen) {
+  return LocationManager.cargarSucDestino(dep_destino, prov_destino, dist_destino, origen);
+}
+
+function cargarRecepcion(modalidad) {
+  return LocationManager.cargarRecepcion(modalidad);
+}
+
+function renderTabla() {
+  TableManager.renderTabla();
+}
+
+function exportXLSX() {
+  ExportManager.exportXLSX();
+}
 
 function mostrarModalConfirmacion() {
-  if (!validarRequeridos()) {
-    document.getElementById('modalValidacion').style.display = 'flex';
+  if (!Validator.validarRequeridos()) {
+    const modalValidacion = document.getElementById('modalValidacion');
+    if (modalValidacion) modalValidacion.style.display = 'flex';
     return;
   }
 
-  document.getElementById('modalConfirmacion').style.display = 'flex';
+  const modalConfirmacion = document.getElementById('modalConfirmacion');
+  if (modalConfirmacion) modalConfirmacion.style.display = 'flex';
 
   const confirmarBtn = document.getElementById('confirmarBtn');
-  confirmarBtn.replaceWith(confirmarBtn.cloneNode(true)); 
-  document.getElementById('confirmarBtn').addEventListener('click', () => {
-    cerrarModal();   
-    agregarEnvio(); 
-    
-  });
-} 
-
-function cerrarModal() {
-  document.getElementById('modalConfirmacion').style.display = 'none';
-  document.getElementById('modalValidacion').style.display = 'none';
+  if (confirmarBtn) {
+    confirmarBtn.replaceWith(confirmarBtn.cloneNode(true));
+    document.getElementById('confirmarBtn').addEventListener('click', () => {
+      Utils.cerrarModal();
+      agregarEnvio();
+    });
+  }
 }
-
 
 function agregarEnvio() {
+  // Implementación de agregar envío usando las nuevas clases
+  const envio = ShippingManager.collectFormData();
 
-  const m_tipoEntrega = document.getElementById('m-tipoEntrega');
-  const select_departamento = document.getElementById('select-departamento');
-  const select_provincia = document.getElementById('select-provincia');
-  const select_distrito = document.getElementById('select-distrito');
-  const m_direccion = document.getElementById('m-direccion');
-  const select_sucursal = document.getElementById('select-sucursal');
+  // Agregar a LISTA_ENVIOS para compatibilidad
+  LISTA_ENVIOS.push(envio);
 
-  // 2. Datos del paquete
-  const m_tipoEmpaque = document.getElementById('m-tipoEmpaque');
-  const m_tipoArticulo = document.getElementById('m-tipoArticulo');
-  const m_valorEnvio = document.getElementById('m-valorEnvio');
-  const m_peso = document.getElementById('m-peso');
-  const m_largo = document.getElementById('m-largo');
-  const m_ancho = document.getElementById('m-ancho');
-  const m_alto = document.getElementById('m-alto');
-  const m_folios = document.getElementById('m-folios');
-  const m_descripcionArticulo = document.getElementById('m-descripcionArticulo');
+  // También agregar a registros
+  if (!window.registros) window.registros = [];
+  window.registros.push(envio);
 
-  // 3. Datos del destinatario
-  const m_tipoDocumento = document.getElementById('m-tipoDocumento');
-  const m_nroDocumento = document.getElementById('m-nroDocumento');
-  const m_celular = document.getElementById('m-celular');
-  const m_razonSocial = document.getElementById('m-razonSocial');
-  const m_contacto = document.getElementById('m-contacto');
-  const m_nombres = document.getElementById('m-nombres');
-  const m_apellidos = document.getElementById('m-apellidos');
+  TableManager.actualizarTabla();
+  ShippingManager.limpiarCampos();
 
-  // 4. IDs y nombres de los <select>
-  const tipoEntregaId = m_tipoEntrega.value;
-  const tipoEntregaNombre = m_tipoEntrega.value
-    ? m_tipoEntrega.selectedOptions[0].text
-    : '';
-
-
-  const tipoEmpaqueId = m_tipoEmpaque.value;
-  const tipoEmpaqueNombre = m_tipoEmpaque.value
-    ? m_tipoEmpaque.selectedOptions[0].text
-    : '';
-  const contenidoPaqueteId = m_tipoArticulo.value;
-  const contenidoPaqueteNombre = m_tipoArticulo.value
-    ? m_tipoArticulo.selectedOptions[0].text
-    : '';
-  const tipoDocumentoId = m_tipoDocumento.value;
-  const tipoDocumentoNombre = m_tipoDocumento.value
-    ? m_tipoDocumento.selectedOptions[0].text
-    : '';
-
-  const selectDepOrigen = document.getElementById('origen-departamento');
-  const selectProvOrigen = document.getElementById('origen-provincia');
-  const selectDistOrigen = document.getElementById('origen-distrito');
-
-
-  const envio = {
-    origen: {
-      departamento: selectDepOrigen.value,
-      provincia: selectProvOrigen.value,
-      distrito: selectDistOrigen.value,
-      sucursalOrigenId: document.getElementById('origen-sucursal-id').value || null
-    },
-    destino: {
-      tipoEntregaId,
-      tipoEntregaNombre,
-      departamento: select_departamento.value,
-      provincia: select_provincia.value,
-      distrito: select_distrito.value,
-      direccion: m_direccion.value || '',
-      sucursalDestinoId: select_sucursal.value || null
-    },
-    paquete: {
-      tipoEmpaqueId,
-      tipoEmpaqueNombre,
-      contenidoPaqueteId,
-      contenidoPaqueteNombre,
-      valorEnvio: parseFloat(m_valorEnvio.value) || 0,
-      peso: parseFloat(m_peso.value) || 0,
-      largo: parseFloat(m_largo.value) || 0,
-      ancho: parseFloat(m_ancho.value) || 0,
-      alto: parseFloat(m_alto.value) || 0,
-      folios: m_folios.value
-        ? parseInt(m_folios.value)
-        : null,
-      descripcion: m_descripcionArticulo.value || ''
-    },
-    destinatario: {
-      tipoDocumento: tipoDocumentoId,
-      tipoDocumentoNombre,
-      nroDocumento: m_nroDocumento.value || '',
-      celular: m_celular.value || '',
-      razonSocial: m_razonSocial.value || '',
-      contacto: m_contacto.value || '',
-      nombres: m_nombres.value || '',
-      apellidos: m_apellidos.value || ''
-    }
-  };
-
-  let enviosActuales = [];
-  try {
-    const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (Array.isArray(data)) {
-      enviosActuales = data;
-    }
-  } catch (e) {
-    console.error("Error al parsear localStorage:", e);
-  }
-
-  if (editIndex >= 0) {
-    enviosActuales[editIndex] = envio;
-    editIndex = -1;   // restauramos a "no edición"
-    const btn = document.getElementById('btn-guardar');
-    if (btn) {
-      btn.textContent = 'Agregar'; // volvemos a texto original
-    }
-  } else {
-    enviosActuales.push(envio);
-  }
-
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(enviosActuales));
-  limpiarFormularioMasivo();
-  actualizarTabla();
+  console.log("Envío agregado:", envio);
 }
-
-
-
 
 function editarEnvio(index) {
-  const almacen = localStorage.getItem(STORAGE_KEY);
-  const envios = almacen ? JSON.parse(almacen) : [];
-  if (index < 0 || index >= envios.length) return;
-
-  const envio = envios[index];
-
-  const selectDepOrigen = document.getElementById('origen-departamento');
-  const selectProvOrigen = document.getElementById('origen-provincia');
-  const selectDistOrigen = document.getElementById('origen-distrito');
-
-  selectDepOrigen.value = envio.origen.departamento;
-  selectDepOrigen.dispatchEvent(new Event('change'));
-
-  selectProvOrigen.value = envio.origen.provincia;
-  selectProvOrigen.dispatchEvent(new Event('change'));
-
-
-  selectDistOrigen.value = envio.origen.distrito;
-  selectDistOrigen.dispatchEvent(new Event('change'));
-
-  document.getElementById('origen-sucursal-id').value = envio.origen.sucursalOrigenId || '';
-
-
-  const selectDepDest = document.getElementById('select-departamento');
-  const selectProvDest = document.getElementById('select-provincia');
-  const selectDistDest = document.getElementById('select-distrito');
-  const selectSucDest = document.getElementById('select-sucursal');
-
-  selectDepDest.value = envio.destino.departamento;
-  selectDepDest.dispatchEvent(new Event('change'));
-
-  selectProvDest.value = envio.destino.provincia;
-  selectProvDest.dispatchEvent(new Event('change'));
-
-  selectDistDest.value = envio.destino.distrito;
-  selectDistDest.dispatchEvent(new Event('change'));
-
-
-  selectSucDest.value = envio.destino.sucursalDestinoId || '';
-  document.getElementById('m-tipoEntrega').value = envio.paquete.tipoEntregaId;
-  document.getElementById('m-tipoEmpaque').value = envio.paquete.tipoEmpaqueId;
-  document.getElementById('m-tipoArticulo').value = envio.paquete.contenidoPaqueteId;
-  document.getElementById('m-valorEnvio').value = envio.paquete.valorEnvio;
-  document.getElementById('m-peso').value = envio.paquete.peso;
-  document.getElementById('m-largo').value = envio.paquete.largo;
-  document.getElementById('m-ancho').value = envio.paquete.ancho;
-  document.getElementById('m-alto').value = envio.paquete.alto;
-  document.getElementById('m-folios').value = envio.paquete.folios || '';
-  document.getElementById('m-descripcionArticulo').value = envio.paquete.descripcion || '';
-
-  document.getElementById('m-tipoDocumento').value = envio.destinatario.tipoDocumento;
-  document.getElementById('m-nroDocumento').value = envio.destinatario.nroDocumento;
-  document.getElementById('m-celular').value = envio.destinatario.celular;
-  document.getElementById('m-razonSocial').value = envio.destinatario.razonSocial || '';
-  document.getElementById('m-contacto').value = envio.destinatario.contacto || '';
-  document.getElementById('m-nombres').value = envio.destinatario.nombres || '';
-  document.getElementById('m-apellidos').value = envio.destinatario.apellidos || '';
-
-
-  editIndex = index;
-  const btn = document.getElementById('btn-guardar');
-  if (btn) {
-    btn.textContent = 'Guardar cambios';
-  }
+  ShippingManager.startEdit(index);
 }
-
-
 
 function eliminarEnvio(index) {
-  const almacen = localStorage.getItem(STORAGE_KEY);
-  const envios = almacen ? JSON.parse(almacen) : [];
-  if (index < 0 || index >= envios.length) return;
+  Utils.showModal({
+    message: '¿Eliminar este envío?',
+    onConfirm: () => {
+      // Eliminar de ambas listas para compatibilidad
+      if (LISTA_ENVIOS[index]) LISTA_ENVIOS.splice(index, 1);
+      if (window.registros[index]) window.registros.splice(index, 1);
 
-  envios.splice(index, 1);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(envios));
-  actualizarTabla();
-}
-
-
-
-
-function actualizarTabla() {
-  const tableContent = document.getElementById('tableContent');
-  const totalEnvios = document.getElementById('totalEnvios');
-  const pesoTotal = document.getElementById('pesoTotal');
-  // const valorTotal = document.getElementById('valorTotal');
-
-  const stored = localStorage.getItem(STORAGE_KEY);
-  const envios = stored ? JSON.parse(stored) : [];
-
-  if (envios.length === 0) {
-    tableContent.innerHTML = `
-      <div class="empty-state">
-        <p>No hay envíos registrados aún</p>
-        <p>Comienza agregando tu primer envío</p>
-      </div>
-    `;
-    totalEnvios.textContent = '0';
-    pesoTotal.textContent = '0';
-    // valorTotal.textContent = '0.00';
-    return;
-  }
-
-  let sumaPeso = 0;
-  // let sumaValor = 0;
-
-  let html = `
-    <div>
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Tipo</th>
-            <th>Destinatario</th>
-            <th>Destino</th>
-            <th>Descripción</th>
-            <th>Dimensiones</th>
-            <th>Peso</th>
-            <th>Valor</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-  `;
-
-  envios.forEach((envio, index) => {
-    const paquete = envio.paquete || {};
-    const destino = envio.destino || {};
-    const destinatario = envio.destinatario || {};
-
-    sumaPeso += parseFloat(paquete.peso) || 0;
-    sumaValor += parseFloat(paquete.valorEnvio) || 0;
-
-    let nombreDest = '';
-    if (destinatario.tipoDocumento === '2') {
-      nombreDest = destinatario.razonSocial || '';
-    } else {
-      nombreDest = `${destinatario.nombres || ''} ${destinatario.apellidos || ''}`.trim();
+      TableManager.actualizarTabla();
+      TableManager.renderTabla();
     }
-
-    let badgeClass = '';
-    if (destino.tipoEntrega === '1') {
-      badgeClass = 'badge-domicilio';
-    } else if (destino.tipoEntrega === '2') {
-      badgeClass = 'badge-agencia';
-    } else {
-      badgeClass = 'badge-domicilio';
-    }
-
-    html += `
-      <tr>
-        <td>${index + 1}</td>
-        <td><span class="badge ${badgeClass}">${destino.tipoEntregaNombre}</span></td>
-        <td>
-          <div><strong>${nombreDest}</strong></div>
-          <small style="color: #718096;">
-            ${destinatario.tipoDocumentoNombre || ''}: ${destinatario.nroDocumento || ''}
-          </small>
-        </td>
-        <td>
-          <div>${destino.distrito || ''}</div>
-          <small style="color: #718096;">
-            ${destino.provincia || ''}, ${destino.departamento || ''}
-          </small>
-        </td>
-        <td>
-          <div>${paquete.descripcion || ''}</div>
-          <small style="color: #718096;">
-            ${paquete.contenidoPaqueteNombre || ''} -
-            ${paquete.tipoEmpaqueNombre || ''}
-          </small>
-        </td>
-        <td>
-          <small>${paquete.largo || 0}x${paquete.ancho || 0}x${paquete.alto || 0} cm</small>
-        </td>
-        <td>${paquete.peso || 0} kg</td>
-        <td><strong>S/ ${(parseFloat(paquete.valorEnvio) || 0).toFixed(2)}</strong></td>
-        <td>
-          <div class="btn-actions">
-            <button class="btn-small btn-editar" onclick="editarEnvio(${index})" title="Editar">
-              <i class="fa fa-edit"></i>
-            </button>
-            <button class="btn-small btn-eliminar" onclick="eliminarEnvio(${index})" title="Eliminar">
-              <i class="fa fa-trash"></i>
-            </button>
-          </div>
-        </td>
-      </tr>
-    `;
   });
-
-  html += `
-        </tbody>
-      </table>
-    </div>
-  `;
-
-  tableContent.innerHTML = html;
-  totalEnvios.textContent = envios.length;
-  pesoTotal.textContent = sumaPeso.toFixed(2);
-  valorTotal.textContent = sumaValor.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
-
-
-
 
 function limpiarFormularioMasivo() {
-  document.getElementById('m-tipoEntrega').value = '';
-  document.getElementById('select-departamento').value = '';
-  document.getElementById('select-provincia').value = '';
-  document.getElementById('select-distrito').value = '';
-  document.getElementById('m-direccion').value = '';
-  document.getElementById('select-sucursal').value = '';
-
-  document.getElementById('m-tipoEmpaque').value = '';
-  document.getElementById('m-tipoArticulo').value = '';
-  document.getElementById('m-valorEnvio').value = '';
-  document.getElementById('m-peso').value = '';
-  document.getElementById('m-largo').value = '';
-  document.getElementById('m-ancho').value = '';
-  document.getElementById('m-alto').value = '';
-  document.getElementById('m-folios').value = '';
-  document.getElementById('m-descripcionArticulo').value = '';
-
-  document.getElementById('m-tipoDocumento').value = '';
-  document.getElementById('m-nroDocumento').value = '';
-  document.getElementById('m-celular').value = '';
-  document.getElementById('m-razonSocial').value = '';
-  document.getElementById('m-contacto').value = '';
-  document.getElementById('m-nombres').value = '';
-  document.getElementById('m-apellidos').value = '';
-
-  document.getElementById('grupo-direccion').style.display = 'none';
-  document.getElementById('grupo-tienda').style.display = 'none';
-  document.getElementById('grupo-articulos').style.display = 'none';
-  document.getElementById('grupo-folios').style.display = 'none';
-  document.getElementById('campos-nombres').style.display = 'none';
-  document.getElementById('campos-apellidos').style.display = 'none';
-  document.getElementById('campo-razon-ruc').style.display = '';
-  document.getElementById('campo-contacto-ruc').style.display = '';
-
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
-  document.querySelector('.tab-btn[data-tab="destino"]').classList.add('active');
-  document.getElementById('tab-destino').classList.add('active');
+  FormManager.clearForm();
 }
 
-
-
 function cerrarModal() {
-  document.getElementById('modalConfirmacion').style.display = 'none';
-  document.getElementById('modalValidacion').style.display = 'none';
-
+  Utils.cerrarModal();
 }
 
 function eliminarTodo() {
+  localStorage.removeItem(CONFIG.STORAGE_KEY);
+  LISTA_ENVIOS = [];
+  window.registros = [];
 
-  localStorage.removeItem(STORAGE_KEY);
-
-  if (typeof renderizarEnvios === 'function') {
-    renderizarEnvios([]);
-  } else {
-    const contenedorTabla = document.getElementById('tabla-envios-body');
-    if (contenedorTabla) {
-      contenedorTabla.innerHTML = '';
-    }
-  }
+  TableManager.actualizarTabla();
+  TableManager.renderTabla();
 
   editIndex = -1;
   const btn = document.getElementById('btn-guardar');
-  if (btn) {
-    btn.textContent = 'Guardar envío';
-  }
+  if (btn) btn.textContent = 'Guardar envío';
 
-  cerrarModal();
+  Utils.cerrarModal();
 }
-
 
 function mostrarModalEliminarTodo() {
-  const modal = document.getElementById('modalConfirmacion');
-  const mensajeParrafo = modal.querySelector('p');
-  const confirmarBtn  = modal.querySelector('#confirmarBtn');
-
-  mensajeParrafo.textContent = '¿Deseas ELIMINAR todos los envíos?';
-
-  confirmarBtn.textContent = 'Sí, eliminar';
-
-  confirmarBtn.replaceWith(confirmarBtn.cloneNode(true));
-  const nuevoConfirmar = modal.querySelector('#confirmarBtn');
-  nuevoConfirmar.addEventListener('click', eliminarTodoEnvios);
-
-  modal.style.display = 'flex';
+  Utils.showModal({
+    message: '¿Deseas ELIMINAR todos los envíos?',
+    onConfirm: eliminarTodo
+  });
 }
+
+function verificarAceptar() {
+  const btnAceptar = document.getElementById('btn-agregar');
+  if (btnAceptar) {
+    const estilo = window.getComputedStyle(btnAceptar);
+    if (estilo.display === 'none') {
+      ShippingManager.guardarRegistro();
+    } else {
+      console.log('El elemento no está oculto');
+    }
+  }
+}
+
+function recolectarDatosEnvio() {
+  return ShippingManager.recolectarDatosEnvio();
+}
+
+// ===========================
+// INICIALIZACIÓN DE LA APLICACIÓN
+// ===========================
+
+// Event listener principal para inicializar cuando el DOM esté listo
+document.addEventListener("DOMContentLoaded", function () {
+  console.log('Inicializando aplicación de envíos...');
+
+  try {
+    AppInitializer.init();
+    console.log('Aplicación inicializada correctamente');
+  } catch (error) {
+    console.error('Error al inicializar la aplicación:', error);
+  }
+});
+
+// Exportar clases principales para uso externo si es necesario
+window.ShippingApp = {
+  CONFIG,
+  Utils,
+  Validator,
+  FormManager,
+  TabManager,
+  LocationManager,
+  ShippingManager,
+  TableManager,
+  ExportManager,
+  FieldManager,
+  AppInitializer
+};

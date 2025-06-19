@@ -1,0 +1,71 @@
+<form id="registroForm">
+  <input type="text" name="nombre" placeholder="Nombre completo" required>
+  <input type="email" name="correo" placeholder="Correo electrónico" required>
+  <input type="text" name="documento" placeholder="N° Documento" required>
+  <input type="tel" name="telefono" placeholder="Teléfono" required>
+  <input type="password" name="password" placeholder="Contraseña" required>
+  <input type="password" name="confirm_password" placeholder="Confirmar contraseña" required>
+  <button type="submit">Registrar</button>
+</form>
+
+<div id="errores" style="color: red; margin-top: 1em;"></div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('registroForm');
+  const erroresDiv = document.getElementById('errores');
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault(); // Previene el envío si hay errores
+
+    const errores = [];
+    const nombre = form.nombre.value.trim();
+    const correo = form.correo.value.trim();
+    const documento = form.documento.value.trim();
+    const telefono = form.telefono.value.trim();
+    const password = form.password.value;
+    const confirmPassword = form.confirm_password.value;
+
+    // Validación de nombre
+    if (nombre.length < 3) {
+      errores.push("El nombre debe tener al menos 3 caracteres.");
+    }
+
+    // Validación de correo
+    const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regexCorreo.test(correo)) {
+      errores.push("Ingrese un correo válido.");
+    }
+
+    // Validación de documento (solo números y 8-12 caracteres)
+    if (!/^\d{8,12}$/.test(documento)) {
+      errores.push("Número de documento inválido. Debe contener entre 8 y 12 dígitos.");
+    }
+
+    // Validación de teléfono (mínimo 7 dígitos)
+    if (!/^\d{7,15}$/.test(telefono)) {
+      errores.push("Número de teléfono inválido.");
+    }
+
+    // Validación de contraseña
+    if (password.length < 6) {
+      errores.push("La contraseña debe tener al menos 6 caracteres.");
+    }
+
+    // Confirmar contraseña
+    if (password !== confirmPassword) {
+      errores.push("Las contraseñas no coinciden.");
+    }
+
+    // Mostrar errores
+    if (errores.length > 0) {
+      erroresDiv.innerHTML = errores.map(err => `<p>• ${err}</p>`).join('');
+    } else {
+      erroresDiv.innerHTML = '';
+      form.submit(); // Envía el formulario si todo está bien
+    }
+  });
+});
+
+</script>

@@ -1,244 +1,586 @@
 {% extends 'MAESTRA_GENERAL.html' %}
 
 {% block titulo %}
-Medios de Pago
+  Medios de Pago
 {% endblock %}
 
 {% block estilos %}
-<link rel="stylesheet" href="/static/css/pago_envio.css">
-<style>
-/* MODAL ESTILOS */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.5);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background-color: #ffffff;
-  border-radius: 15px;
-  padding: 30px;
-  width: 380px;
-  max-width: 90%;
-  text-align: center;
-  border: 4px solid #0E1D63;
-  position: relative;
-}
-
-.modal-content h3 {
-  color: #0E1D63;
-  margin-top: 10px;
-  margin-bottom: 15px;
-}
-
-.modal-content .opcion-modal {
-  border: 2px solid #dce3f5;
-  border-radius: 10px;
-  padding: 15px;
-  text-align: left;
-  margin-bottom: 15px;
-}
-
-.modal-content .opcion-modal input {
-  margin-right: 10px;
-}
-
-.modal-content img.logo-pago {
-  width: 120px;
-  margin: 10px 0;
-}
-
-.modal-content .logos-linea {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  padding-top: 10px;
-  justify-content: flex-start;
-}
-
-.modal-content .logos-linea img {
-  height: 25px;
-}
-
-.btn-continuar-modal {
-  background-color: #fbbd0a;
-  color: white;
-  font-weight: 700;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 25px;
-  width: 100%;
-  font-size: 16px;
-  cursor: pointer;
-  margin-top: 15px;
-}
-
-.modal-close {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 20px;
-  color: #0E1D63;
-  cursor: pointer;
-}
-</style>
+  <link rel="stylesheet" href="/static/css/pago_envio.css" />
+  <style>
+    /* MODAL ESTILOS */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    
+    .modal-content {
+      background-color: #ffffff;
+      border-radius: 15px;
+      padding: 30px;
+      width: 380px;
+      max-width: 90%;
+      text-align: center;
+      border: 4px solid #0e1d63;
+      position: relative;
+    }
+    
+    .modal-content h3 {
+      color: #0e1d63;
+      margin-top: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .modal-content .opcion-modal {
+      border: 2px solid #dce3f5;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: left;
+      margin-bottom: 15px;
+    }
+    
+    .modal-content .opcion-modal input {
+      margin-right: 10px;
+    }
+    
+    .modal-content img.logo-pago {
+      width: 120px;
+      margin: 10px 0;
+    }
+    
+    .modal-content .logos-linea {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding-top: 10px;
+      justify-content: flex-start;
+    }
+    
+    .modal-content .logos-linea img {
+      height: 25px;
+    }
+    
+    .btn-continuar-modal {
+      background-color: #fbbd0a;
+      color: white;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 25px;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      color: #0e1d63;
+      cursor: pointer;
+    }
+    .btn_metodo {
+      background-color: white;
+    }
+  </style>
 {% endblock %}
 
 {% block contenido %}
-<div class="navigation-links">
-  <a href="{{ url_for('mostrar_resumen') }}" class="back-link">← Regresar</a>
-</div>
+  <div class="container metodo-pago">
+    <h1 class="titulo-envio">PAGO DE ENVÍOS</h1>
 
-<div class="container metodo-pago">
-  <h1 class="titulo-envio">REGISTRO DE ENVÍOS</h1>
-
-  <div class="steps-container">
-    <div class="step completed">
-      <div class="circle"><img src="/static/img/usuario.png" alt="Paso 1" /></div>
-      <p>Datos personales</p>
-    </div>
-    <div class="line"></div>
-    <div class="step completed">
-      <div class="circle"><img src="/static/img/chek.png" alt="Paso 2" /></div>
-      <p>Confirma tus datos</p>
-    </div>
-    <div class="line"></div>
-    <div class="step active">
-      <div class="circle"><img src="/static/img/medio.png" alt="Paso 3" /></div>
-      <p>Medios de pago</p>
-    </div>
-  </div>
-
-  <h2 class="subtitulo">Elige tu medio de pago</h2>
-
-  <div class="pago-content">
-    <div class="opciones-pago">
-      <!-- Opcion con tarjetas -->
-      <label class="opcion" onclick="toggleIcons(this)">
-        <div class="cabecera-opcion">
-          <input type="radio" name="metodo" onchange="habilitarBotonPagar()" />
-          <span class="texto">Pago con tarjeta de crédito, débito y Yape.</span>
-          <img src="/static/img/metodo_pago.png" alt="Tarjeta" class="icono" />
+    <div class="steps-container">
+      <div class="step completed">
+        <div class="circle">
+          <img src="/static/img/usuario.png" alt="Paso 1" />
         </div>
-        <div class="iconos-pago oculto">
-          <img src="/static/img/visa.webp" alt="Visa" class="icono-tarjeta" />
-          <img src="/static/img/mastercard.jpg" alt="Mastercard" class="icono-tarjeta" />
-          <img src="/static/img/Yape-v2.webp" alt="Yape" class="icono-tarjeta" />
+        <p>Datos personales</p>
+      </div>
+      <div class="line"></div>
+      <div class="step completed">
+        <div class="circle">
+          <img src="/static/img/chek.png" alt="Paso 2" />
         </div>
-      </label>
-
-      <!-- Opcion en bancos -->
-      <label class="opcion" onclick="hideAllIcons()">
-        <div class="cabecera-opcion">
-          <input type="radio" name="metodo" onchange="habilitarBotonPagar()" />
-          <span class="texto">Pago en efectivo.</span>
-          <img src="/static/img/empleado_oficina.png" alt="Banco" class="icono" />
+        <p>Confirma tus datos</p>
+      </div>
+      <div class="line"></div>
+      <div class="step active">
+        <div class="circle">
+          <img src="/static/img/medio.png" alt="Paso 3" />
         </div>
-      </label>
+        <p>Medios de pago</p>
+      </div>
     </div>
-     
-    <div class="resumen-box">
-      <h3>Resumen de tu registro</h3>
-      <table>
-        <tr><td>Cantidad De Envíos:</td><td>2</td></tr>
-        <tr><td>Sub Total:</td><td>S/ 15.76</td></tr>
-        <tr><td>I.G.V.:</td><td>S/ 2.84</td></tr>
-        <tr class="total"><td><strong>Total:</strong></td><td><strong>S/ 18.60</strong></td></tr>
-      </table>
 
-      <div class="cupon-box">
-        <input type="text" placeholder="AÑADIR CUPÓN DE DESCUENTO" />
-        <button class="btn-validar">VALIDAR</button>
+    <div class="contenido">
+      <div>
+        <div>
+          <h2 class="subtitulo">Elige el tipo de comprobante</h2>
+          <div class="pago-content">
+            <div class="opciones-pago">
+              {% for fila in tipo_comprobante %}
+                <label class="opcion" onclick="toggleSelection(this, 'comprobante')">
+                  <div class="cabecera-opcion">
+                    <input type="radio" name="comprobante" onchange="validarSelecciones()" id="comp_{{ fila.0 }}" value="{{ fila.0 }}" />
+                    <span class="texto">{{ fila.1 }}</span>
+                  </div>
+                </label>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        {% if modalidadPago == 1 %}
+          <div>
+            <h2 class="subtitulo">Elige tu medio de pago</h2>
+            <div class="pago-content">
+              <div class="opciones-pago">
+                {% for fila in metodo_pago %}
+                  <label class="opcion" onclick="toggleSelection(this, 'metodo')">
+                    <div class="cabecera-opcion">
+                      <input type="radio" name="metodo" onchange="validarSelecciones()" id="metodo_{{ fila.id }}" value="{{ fila.id }}" data-nombre="{{ fila.nombre }}" />
+                      <span class="texto">{{ fila.nombre }}</span>
+                    </div>
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <div>
+        <div class="resumen-box">
+          <h3>Resumen de tu registro</h3>
+          <table>
+            <tr>
+              <td>Cantidad De Envíos:</td>
+              <td class="value-td">{{ registros|length }}</td>
+            </tr>
+            <tr>
+              <td>Sub Total:</td>
+              <td class="value-td">S/ {{ subtotal }}</td>
+            </tr>
+            <tr>
+              <td>I.G.V.:</td>
+              <td class="value-td">S/ {{ igv }}</td>
+            </tr>
+            <tr class="total">
+              <td>
+                <strong>Total:</strong>
+              </td>
+              <td class="value-td">
+                <strong>S/ {{ total }}</strong>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="boton-pagar-container">
+          <button id="btn-accion" class="btn-pagar oculto" disabled onclick="accionPrincipal()">
+            {% if modalidad_pago == 1 %}
+              PAGAR S/ {{ total }}
+            {% else %}
+              GENERAR COMPROBANTE
+            {% endif %}
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Botón PAGAR centrado -->
-  <div class="boton-pagar-container">
-    <button id="btn-pagar" class="btn-pagar oculto" disabled onclick="mostrarModal()">PAGAR S/ 18.60</button>
+  <div id="modalPago" class="modal-overlay">
+    <div class="modal-content">
+      <span class="modal-close" onclick="cerrarModal()">&times;</span>
+      <h3 id="tituloModal">Completar Pago</h3>
+
+      <div id="contenidoModal"></div>
+
+      <button class="btn-continuar-modal" onclick="procesarPago()">CONTINUAR</button>
+    </div>
   </div>
-</div>
-
-<!-- Modal -->
-<!-- Modal -->
-<div id="modalPago" class="modal-overlay">
-  <div class="modal-content">
-    <button class="modal-close" onclick="cerrarModal()">×</button>
-    <h2>Selecciona tu medio de pago</h2>
-
-    <!-- Opción 1 -->
-    <label class="modal-option">
-      <input type="radio" name="pago" />
-      <div class="option-text">
-        <strong>Tarjeta de crédito y débito</strong>
-        <div class="logos">
-          <img src="/static/img/visa.webp" alt="Visa">
-          <img src="/static/img/mastercard.jpg" alt="Mastercard">
-        </div>
-      </div>
-    </label>
-
-    <!-- Opción 2 -->
-    <label class="modal-option">
-      <input type="radio" name="pago" />
-      <div class="option-text">
-        <strong>Código QR usando billetera</strong>
-        <div class="logos">
-          <img src="/static/img/Yape-v2.webp" alt="Yape">
-          <img src="/static/img/plim.avif" alt="Plin">
-          <img src="/static/img/agora.png" alt="Agora">
-        </div>
-      </div>
-    </label>
-
-    <!-- Opción 3 -->
-    <label class="modal-option">
-      <input type="radio" name="pago" />
-      <div class="option-text">
-        <strong>Pago con Yape</strong>
-        <div class="logos">
-          <img src="/static/img/Yape-v2.webp" alt="Yape">
-        </div>
-      </div>
-    </label>
-
-    <button class="modal-btn-continuar">Continuar</button>
-  </div>
-</div>
-
 {% endblock %}
 
 {% block scripts %}
-<script>
-  function toggleIcons(label) {
-    document.querySelectorAll('.iconos-pago').forEach(group => group.classList.add('oculto'));
-    const iconos = label.querySelector('.iconos-pago');
-    if (iconos) iconos.classList.remove('oculto');
-  }
+  <script>
+function generarComprobante() {
+  const tipo_comprobante = document.querySelector('input[name="comprobante"]:checked').value;
+  const datos = { tipo_comprobante };
 
-  function hideAllIcons() {
-    document.querySelectorAll('.iconos-pago').forEach(group => group.classList.add('oculto'));
-  }
+  fetch('/insertar_envio', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(datos)
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('Error enviando el comprobante');
+    return res.json();
+  })
+  .then(response => {
+    if (response.status === 'success') {
+      // Aquí muestras el alert de éxito
+      alert(`¡Comprobante generado con éxito!\nNúmero de serie: ${response.num_serie}`);
+      // Si luego quieres redirigir, descomenta:
+      // window.location.href = `/comprobante/${response.num_serie}`;
+    } else {
+      // Si el back te envía mensaje de error:
+      alert(response.message || 'No se pudo generar el comprobante');
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Ocurrió un error al comunicar con el servidor.');
+  });
+}
 
-  function habilitarBotonPagar() {
-    const boton = document.getElementById("btn-pagar");
-    boton.classList.remove("oculto");
-    boton.disabled = false;
-  }
 
-  function mostrarModal() {
-    document.getElementById('modalPago').style.display = 'flex';
-  }
 
-  function cerrarModal() {
-    document.getElementById('modalPago').style.display = 'none';
-  }
+    function toggleIcons(label) {
+      document.querySelectorAll('.iconos-pago').forEach((group) => group.classList.add('oculto'))
+      const iconos = label.querySelector('.iconos-pago')
+      if (iconos) iconos.classList.remove('oculto')
+    }
+    
+    function hideAllIcons() {
+      document.querySelectorAll('.iconos-pago').forEach((group) => group.classList.add('oculto'))
+    }
+    
+    function habilitarBotonPagar() {
+      const boton = document.getElementById('btn-pagar')
+      boton.classList.remove('oculto')
+      boton.disabled = false
+    }
+    
+    function mostrarModal() {
+      document.getElementById('modalPago').style.display = 'flex'
+    }
+    
+    function cerrarModal() {
+      document.getElementById('modalPago').style.display = 'none'
+    }
+
+    // Variables globales
+    let modalidadPago = {{ modalidad_pago|default(0) }};
+    let tipoComprobanteSeleccionado = null;
+    let metodoPagoSeleccionado = null;
+    let nombreMetodoPago = null;
+
+    function toggleSelection(label, tipo) {
+      // Remover selección visual anterior
+      document.querySelectorAll('input[name="' + tipo + '"]').forEach(function(input) {
+        input.closest('.opcion').style.borderColor = '#e1e8f5';
+        input.closest('.opcion').style.background = 'white';
+      });
+      
+      // Aplicar selección visual actual
+      label.style.borderColor = '#fbbd0a';
+      label.style.background = '#fefdf8';
+    }
+
+    function validarSelecciones() {
+      const comprobanteSeleccionado = document.querySelector('input[name="comprobante"]:checked');
+      tipoComprobanteSeleccionado = comprobanteSeleccionado ? comprobanteSeleccionado.value : null;
+      
+      if (modalidadPago === 1) {
+        const metodoSeleccionado = document.querySelector('input[name="metodo"]:checked');
+        metodoPagoSeleccionado = metodoSeleccionado ? metodoSeleccionado.value : null;
+        nombreMetodoPago = metodoSeleccionado ? metodoSeleccionado.dataset.nombre : null;
+        
+        // Ambos deben estar seleccionados para modalidad de pago
+        if (tipoComprobanteSeleccionado && metodoPagoSeleccionado) {
+          habilitarBoton();
+        } else {
+          deshabilitarBoton();
+        }
+      } else {
+        // Solo comprobante necesario para generar comprobante
+        if (tipoComprobanteSeleccionado) {
+          habilitarBoton();
+        } else {
+          deshabilitarBoton();
+        }
+      }
+    }
+
+    function habilitarBoton() {
+      const boton = document.getElementById('btn-accion');
+      boton.classList.remove('oculto');
+      boton.disabled = false;
+    }
+
+    function deshabilitarBoton() {
+      const boton = document.getElementById('btn-accion');
+      boton.disabled = true;
+    }
+
+    function accionPrincipal() {
+      if (modalidadPago === 1) {
+        mostrarModal();
+      } else {
+        generarComprobante();
+      }
+    }
+
+    function toggleSelection(label, tipo) {
+      // Remover selección visual anterior
+      document.querySelectorAll(`input[name="${tipo}"]`).forEach(input => {
+        input.closest('.opcion').style.borderColor = '#e1e8f5';
+        input.closest('.opcion').style.background = 'white';
+      });
+      
+      // Aplicar selección visual actual
+      label.style.borderColor = '#fbbd0a';
+      label.style.background = '#fefdf8';
+    }
+
+    function validarSelecciones() {
+      const comprobanteSeleccionado = document.querySelector('input[name="comprobante"]:checked');
+      tipoComprobanteSeleccionado = comprobanteSeleccionado ? comprobanteSeleccionado.value : null;
+      
+      if (modalidadPago === 1) {
+        const metodoSeleccionado = document.querySelector('input[name="metodo"]:checked');
+        metodoPagoSeleccionado = metodoSeleccionado ? metodoSeleccionado.value : null;
+        nombreMetodoPago = metodoSeleccionado ? metodoSeleccionado.dataset.nombre : null;
+        
+        // Ambos deben estar seleccionados para modalidad de pago
+        if (tipoComprobanteSeleccionado && metodoPagoSeleccionado) {
+          habilitarBoton();
+        } else {
+          deshabilitarBoton();
+        }
+      } else {
+        // Solo comprobante necesario para generar comprobante
+        if (tipoComprobanteSeleccionado) {
+          habilitarBoton();
+        } else {
+          deshabilitarBoton();
+        }
+      }
+    }
+
+    function habilitarBoton() {
+      const boton = document.getElementById('btn-accion');
+      boton.classList.remove('oculto');
+      boton.disabled = false;
+    }
+
+    function deshabilitarBoton() {
+      const boton = document.getElementById('btn-accion');
+      boton.disabled = true;
+    }
+
+    function accionPrincipal() {
+      if (modalidadPago === 1) {
+        mostrarModal();
+      } else {
+        generarComprobante();
+      }
+    }
+
+    function mostrarModal() {
+      const modal = document.getElementById('modalPago');
+      const titulo = document.getElementById('tituloModal');
+      const contenido = document.getElementById('contenidoModal');
+      
+      // Configurar contenido según el método de pago
+      if (nombreMetodoPago && nombreMetodoPago.toLowerCase().includes('yape')) {
+        configurarModalYape(titulo, contenido);
+      } else {
+        configurarModalTarjeta(titulo, contenido);
+      }
+      
+      modal.style.display = 'flex';
+    }
+
+    function configurarModalYape(titulo, contenido) {
+      titulo.textContent = 'Confirmar pago con Yape';
+      contenido.innerHTML = '<div style="text-align: center; margin-bottom: 20px;">' +
+        '<img src="/static/img/yape-logo.png" alt="Yape" style="width: 100px; margin-bottom: 15px;" onerror="this.style.display=\'none\'"/>' +
+        '<p style="color: #0e1d63; font-size: 1.1em; margin-bottom: 10px;">' +
+        'Realiza el pago de <strong>S/ {{ total }}</strong> y ingresa tu número de confirmación' +
+        '</p>' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label for="numeroConfirmacion">Número de Confirmación Yape:</label>' +
+        '<input type="text" id="numeroConfirmacion" placeholder="Ej: 12345678" maxlength="8" required>' +
+        '</div>' +
+        '<div style="font-size: 0.9em; color: #666; text-align: left;">' +
+        '<p><strong>Instrucciones:</strong></p>' +
+        '<p>1. Abre tu app Yape</p>' +
+        '<p>2. Realiza el pago por S/ {{ total }}</p>' +
+        '<p>3. Ingresa el número de confirmación aquí</p>' +
+        '</div>';
+    }
+
+    function configurarModalTarjeta(titulo, contenido) {
+      titulo.textContent = 'Pago con Tarjeta';
+      contenido.innerHTML = '<div style="text-align: center; margin-bottom: 20px;">' +
+        '<p style="color: #0e1d63; font-size: 1.1em; margin-bottom: 15px;">' +
+        'Monto a pagar: <strong>S/ {{ total }}</strong>' +
+        '</p>' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label for="numeroTarjeta">Número de Tarjeta:</label>' +
+        '<input type="text" id="numeroTarjeta" placeholder="1234 5678 9012 3456" maxlength="19" required>' +
+        '</div>' +
+        '<div class="form-row">' +
+        '<div class="form-group">' +
+        '<label for="fechaVencimiento">Fecha de Vencimiento:</label>' +
+        '<input type="text" id="fechaVencimiento" placeholder="MM/AA" maxlength="5" required>' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label for="cvv">CVV:</label>' +
+        '<input type="text" id="cvv" placeholder="123" maxlength="3" required>' +
+        '</div>' +
+        '</div>' +
+        '<div class="form-group">' +
+        '<label for="nombreTitular">Nombre del Titular:</label>' +
+        '<input type="text" id="nombreTitular" placeholder="Como aparece en la tarjeta" required>' +
+        '</div>' +
+        '<div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">' +
+        '<img src="/static/img/visa.png" alt="Visa" style="height: 25px;" onerror="this.style.display=\'none\'"/>' +
+        '<img src="/static/img/mastercard.png" alt="Mastercard" style="height: 25px;" onerror="this.style.display=\'none\'"/>' +
+        '</div>';
+      
+      // Agregar formato automático a los campos
+      setTimeout(function() {
+        formatearCamposTarjeta();
+      }, 100);
+    }
+
+    function formatearCamposTarjeta() {
+      const numeroTarjeta = document.getElementById('numeroTarjeta');
+      const fechaVencimiento = document.getElementById('fechaVencimiento');
+      
+      if (numeroTarjeta) {
+        numeroTarjeta.addEventListener('input', function(e) {
+          let valor = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+          let formateado = valor.match(/.{1,4}/g)?.join(' ') || valor;
+          e.target.value = formateado;
+        });
+      }
+      
+      if (fechaVencimiento) {
+        fechaVencimiento.addEventListener('input', function(e) {
+          let valor = e.target.value.replace(/\D/g, '');
+          if (valor.length >= 2) {
+            valor = valor.substring(0,2) + '/' + valor.substring(2,4);
+          }
+          e.target.value = valor;
+        });
+      }
+    }
+
+    function procesarPago() {
+      if (nombreMetodoPago && nombreMetodoPago.toLowerCase().includes('yape')) {
+        procesarPagoYape();
+      } else {
+        procesarPagoTarjeta();
+      }
+    }
+
+    function procesarPagoYape() {
+      const numeroConfirmacion = document.getElementById('numeroConfirmacion').value;
+      
+      if (!numeroConfirmacion || numeroConfirmacion.length < 6) {
+        alert('Por favor ingresa un número de confirmación válido');
+        return;
+      }
+      
+      // Simular procesamiento
+      mostrarProcesando();
+      
+      setTimeout(() => {
+        alert('¡Pago confirmado exitosamente!');
+        // Aquí puedes redirigir o realizar otras acciones
+        window.location.href = '/confirmacion-pago';
+      }, 2000);
+    }
+
+    function procesarPagoTarjeta() {
+      const numeroTarjeta = document.getElementById('numeroTarjeta').value;
+      const fechaVencimiento = document.getElementById('fechaVencimiento').value;
+      const cvv = document.getElementById('cvv').value;
+      const nombreTitular = document.getElementById('nombreTitular').value;
+      
+      // Validaciones básicas
+      if (!numeroTarjeta || numeroTarjeta.replace(/\s/g, '').length < 16) {
+        alert('Por favor ingresa un número de tarjeta válido');
+        return;
+      }
+      
+      if (!fechaVencimiento || fechaVencimiento.length < 5) {
+        alert('Por favor ingresa una fecha de vencimiento válida');
+        return;
+      }
+      
+      if (!cvv || cvv.length < 3) {
+        alert('Por favor ingresa un CVV válido');
+        return;
+      }
+      
+      if (!nombreTitular.trim()) {
+        alert('Por favor ingresa el nombre del titular');
+        return;
+      }
+      
+      // Simular procesamiento de pago
+      mostrarProcesando();
+      
+      setTimeout(() => {
+        alert('¡Pago procesado exitosamente!');
+        // Aquí puedes redirigir o realizar otras acciones
+        window.location.href = '/confirmacion-pago';
+      }, 3000);
+    }
+
+    function mostrarProcesando() {
+      const contenido = document.getElementById('contenidoModal');
+      const boton = document.querySelector('.btn-continuar-modal');
+      
+      contenido.innerHTML = '<div style="text-align: center; padding: 40px 20px;">' +
+        '<div style="border: 4px solid #f3f3f3; border-top: 4px solidrgb(1, 31, 97); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>' +
+        '<p style="color: #0e1d63; font-size: 1.1em;">Procesando pago...</p>' +
+        '<p style="color: #666; font-size: 0.9em;">Por favor espera</p>' +
+        '</div>' +
+        '<style>' +
+        '@keyframes spin {' +
+        '0% { transform: rotate(0deg); }' +
+        '100% { transform: rotate(360deg); }' +
+        '}' +
+        '</style>';
+      
+      boton.style.display = 'none';
+    }
+
+
+
+    function cerrarModal() {
+      document.getElementById('modalPago').style.display = 'none';
+    }
+
+    // Cerrar modal al hacer clic fuera de él
+    document.addEventListener('click', function(e) {
+      const modal = document.getElementById('modalPago');
+      if (e.target === modal) {
+        cerrarModal();
+      }
+    });
+
+    // Cerrar modal con tecla Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        cerrarModal();
+      }
+    });
 </script>
 {% endblock %}

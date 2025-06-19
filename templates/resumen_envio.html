@@ -1,16 +1,15 @@
 {% extends 'MAESTRA_GENERAL.html' %}
 
 {% block titulo %}
-Resumen de Envíos
+  Resumen de Envíos
 {% endblock %}
 
 {% block estilos %}
-<link rel="stylesheet" href="/static/css/resumen_envio.css">
+  <link rel="stylesheet" href="/static/css/resumen_envio.css" />
+  <link rel="stylesheet" href="/static/css/envios_masivos.css" />
 {% endblock %}
 
 {% block contenido %}
-
-
 <div class="container">
   <h1 class="titulo-envio">REGISTRO DE ENVÍOS</h1>
 
@@ -37,10 +36,9 @@ Resumen de Envíos
     </div>
   </div>
 
-
-  <div class="header-resumen">
+  <div class="header-resumen" hidden>
     <h2>Resumen de envíos registrados</h2>
-    <button class="btn-agregar">+ AGREGAR ENVÍOS</button>
+    <button class="btn-agregar" onclick="window.location.href='/registro-envio'">+ AGREGAR ENVÍOS</button>
   </div>
 
   <div class="tabla-scroll">
@@ -48,39 +46,80 @@ Resumen de Envíos
       <thead>
         <tr>
           <th>Tipo Recepcion</th>
+          <th>Remitente</th>
           <th>Destinatario</th>
           <th>Destino</th>
-          <th>Direccion</th>
           <th>Tarifa</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td> </td>
-          <td></td>
+          {% if data_envio.tipo_recepcion == '1' %}
+          <td>Recepción en sucursal</td>
+          {% else %}
+          <td>Recepción en domicilio</td>
+          {% endif %}
           <td>
-            <button class="btn-editar">Editar</button>
-            <button class="btn-eliminar">Eliminar</button>
+            {{ data_envio.nombre_remitente }}<br />
+            <small>
+              {% if data_envio.tipo_documento_origen == '3' %}
+              Carne extranjería
+              {% elif data_envio.tipo_documento_origen == '1' %}
+              DNI
+              {% elif data_envio.tipo_documento_origen == '2' %}
+              Contribuyente
+              {% elif data_envio.tipo_documento_origen == '4' %}
+              Pasaporte
+              {% endif %}
+              <!-- {{ data_envio.tipo_documento_destino }} -->
+              
+              : {{ data_envio.dni_destino }}</small>
+          </td>
+          <td>
+            {{ data_envio.nombre_destinatario }}<br />
+            <small>
+              {% if data_envio.tipo_documento_destino == '3' %}
+              Carne extranjería
+              {% elif data_envio.tipo_documento_destino == '1' %}
+              DNI
+              {% elif data_envio.tipo_documento_destino == '2' %}
+              Contribuyente
+              {% elif data_envio.tipo_documento_destino == '4' %}
+              Pasaporte
+              {% endif %}
+              <!-- {{ data_envio.tipo_documento_destino }} -->
+              
+              : {{ data_envio.dni_destino }}</small>
+          </td>
+          <td>
+            {{ data_envio.distrito_destino_sucursal }}
+          </td>
+          <!-- <td>{{ data_envio.descripcion }}</td> -->
+          <td>S/ {{ (data_envio.valor_paquete | float) + (data_envio.tarifa | float) }}</td>
+
+          <td>
+            <button class="btn btn-delete" onclick="eliminar_storage()">Eliminar</button>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <div class="paginacion">
-    <button class="btn-paginacion">Anterior</button>
-    <span class="pagina-actual">1</span>
-    <button class="btn-paginacion">Siguiente</button>
-  </div>
+    <!-- <div class="paginacion">
+      <button class="btn-paginacion">Anterior</button>
+      <span class="pagina-actual">1</span>
+      <button class="btn-paginacion">Siguiente</button>
+    </div> -->
 
-<div class="botones-acciones">
-  <a href="{{ url_for('tipos_envio') }}" class="btn-volver">VOLVER</a>
-  <button type="button" class="btn-continuar" id="btn-continuar">IR A PAGAR</button>
+  <div class="botones-acciones">
+    <a href="{{ url_for('tipos_envio') }}" class="btn-volver">VOLVER</a>
+    <button type="button" class="btn-continuar" id="btn-continuar" onclick="window.location.href='{{ url_for('pagar_encomienda') }}'">IR A PAGAR</button>
+  </div>
 </div>
-</div>
+{% endblock %}
+
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/resumen_envio.js') }}"></script>
 {% endblock %}

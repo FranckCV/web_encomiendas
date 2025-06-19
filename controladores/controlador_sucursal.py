@@ -61,14 +61,14 @@ def get_table():
 
     columnas = {
         'id': ['ID', 0.5],
-        'abreviatura': ['Abreviatura', 0.75],
-        'codigo_postal': ['C. Postal', 0.5],
+        'abreviatura': ['Abreviatura', 1],
+        'codigo_postal': ['C. Postal', 1], 
         'direccion': ['Dirección', 3],
         'ubigeo': ['Ubigeo', 2.5],
         # 'horario_l_v': ['Horario L-V', 2.5],
         # 'horario_s_d': ['Horario S-D', 2.5],
         # 'teléfono': ['Teléfono', 1.5],
-        'activo': ['Activo', 0.5]
+        'activo': ['Activo', 1]
     }
 
     filas = sql_select_fetchall(sql)
@@ -115,19 +115,20 @@ def update_row(abreviatura, codigo_postal, direccion, ubigeocodigo, horario_l_v,
 
 #####_ ADICIONALES _#####
 def get_options():
-    sql= f'''
-        select 
-            {get_primary_key()} ,
-            direccion
-        from {table_name}
-        where activo = 1
-        order by direccion asc
-    '''
-    filas = sql_select_fetchall(sql)
-    
-    lista = [(fila[get_primary_key()], fila["direccion"]) for fila in filas]
-
-    return lista
+    try:
+        sql = f'''
+            SELECT 
+                {get_primary_key()},
+                direccion
+            FROM {table_name}
+            WHERE activo = 1
+            ORDER BY direccion ASC
+        '''
+        filas = sql_select_fetchall(sql)
+        return [(fila[get_primary_key()], fila["direccion"]) for fila in filas]
+    except Exception as e:
+        print(f"❌ Error en get_options de {table_name}:", e)
+        return []
 
 
 def get_agencias_data():
@@ -260,3 +261,108 @@ def get_report_horario():
 
     filas = sql_select_fetchall(sql)
     return columnas, filas
+
+
+
+
+
+
+
+def get_options_departamento_sucursal():
+    sql= f'''
+        SELECT DISTINCT 
+            ub.departamento 
+        FROM ubigeo ub
+        inner join sucursal su on ub.codigo = su.ubigeocodigo
+        where ub.activo = 1
+        order by ub.departamento
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas
+
+
+def get_options_provincia_sucursal():
+    sql= f'''
+        SELECT DISTINCT 
+            ub.departamento ,
+            ub.provincia
+        FROM ubigeo ub
+        inner join sucursal su on ub.codigo = su.ubigeocodigo
+        where ub.activo = 1
+        order by ub.departamento , ub.provincia
+    '''
+    filas = sql_select_fetchall(sql)
+    
+    # lista = [( fila["departamento"] , fila["provincia"]) for fila in filas]
+    lista = filas
+    return lista
+
+
+def get_options_distrito_sucursal():
+    sql= f'''
+        SELECT DISTINCT
+            ub.codigo , 
+            ub.departamento ,
+            ub.provincia ,
+            ub.distrito 
+        FROM ubigeo ub
+        inner join sucursal su on ub.codigo = su.ubigeocodigo
+        where ub.activo = 1
+        order by ub.departamento , ub.provincia , ub.distrito
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas
+
+
+def get_options_ubigeo_sucursal():
+    sql= f'''
+        SELECT 
+            ubi.codigo ,
+            suc.id ,
+            concat(suc.abreviatura,' / ', suc.direccion) as nom_sucursal
+        FROM `sucursal` suc
+        inner join ubigeo ubi on ubi.codigo = suc.ubigeocodigo
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas
+
+
+def get_data_exit(correo):
+    sql = '''
+        select s.id,
+        s.fecha,
+        s.hora,
+        s.estado,
+        so.latitud as latitud_origen,
+        so.longitud as longitud_origen,
+        sd.latitud as latitud_destino,
+        sd.longitud as longitud_destino
+        from empleado_salida es
+        inner join salida s on s.id = es.salidaid
+        inner join empleado e on e.id = es.empleadoid
+        inner join sucursal so on so.id = s.origen_incio
+        inner join sucursal sd on sd.id = s.destino_final
+        where e.correo=%s and s.estado = 'P'
+        order by CURRENT_DATE DESC
+        limit 1
+    '''
+    fila = sql_select_fetchone(sql,correo)
+    print(fila)
+    return fila
+    
+
+
+def get_coordenadas_actual(id):
+    sql = '''
+        select
+        so.latitud as latitud_origen,
+        so.longitud as longitud_origen,
+        sd.latitud as latitud_destino,
+        sd.longitud as longitud_destino
+        from salida s
+        inner join sucursal so on so.id = s.origen_incio
+        inner join sucursal sd on sd.id = s.destino_final
+        where s.id = %s and s.estado = 'P' or 'T'
+    '''
+    fila = sql_select_fetchone(sql,id)
+    return fila

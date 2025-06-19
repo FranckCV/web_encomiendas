@@ -4,7 +4,10 @@
         "plaintext": false,
         "markdown": false,
         "scminput": false,
-        "html": false
+        "html": false,
+          "twig.validate": false
+
     },
     "liveServer.settings.port": 5501
+    
 }

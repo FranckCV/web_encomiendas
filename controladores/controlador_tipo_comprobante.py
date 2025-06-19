@@ -101,8 +101,25 @@ def get_options():
 
     return lista
 
+def get_options_nombre():
+    sql= f'''
+        select 
+            id,
+            descripcion
+        from {table_name}
+        where activo = 1 and (id=2 or id=1)
+        order by descripcion asc
+    '''
+    filas = sql_select_fetchall(sql)
+    
+    lista = [(fila[get_primary_key()], fila["descripcion"]) for fila in filas]
+
+    return lista
 
 
-
-
-
+def get_tipo_comprobante_by_tipo():
+    sql = '''
+        select id,nombre from tipo_comprobante where tipo_uso = 'V'
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas

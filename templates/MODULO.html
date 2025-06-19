@@ -1,0 +1,157 @@
+{% extends "MAESTRA_ADMIN.html" %}
+
+
+{% block titulo %}
+
+Módulo de {{modulo['nombre'] | lower}}
+
+{% endblock %}
+
+
+{% block estilos %}
+
+
+<style>
+    .section_content {
+        padding: 15px;
+    }
+
+    .dashboard_title {
+        margin-bottom: 15px;
+    }
+
+    .block_banner , 
+    .block_banner::before {
+        border-radius: 15px;
+        height: 77.5vh;
+    }
+
+    .block_banner {
+        opacity: 0.85;
+        background-color: color-mix(in srgb, {{modulo['color']}} 80%, white 80%) ;
+        background-image: url('/static/img/img_modulo/{{modulo["img"]}}');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-blend-mode: luminosity;
+        position: relative;
+    }
+
+    .block_banner::before {
+        /* background: linear-gradient(360deg, color-mix(in srgb, {{modulo['color']}} 75%, black 100%) 0%, #ffffff77 100%); */
+        background: 
+        linear-gradient(360deg, color-mix(in srgb, {{modulo['color']}} 80%, #000000 40%) 0%, #ffffff 75%)
+        ;
+        content: "";
+        opacity: 0.65;
+        display: flex;
+
+    }
+
+    .block_banner .crud_title {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        color: white !important;
+        gap: 20px;
+        font-size: 225%;
+    }
+
+    .crud_title i {
+        color: white;
+    }
+
+
+    .mod_cant {
+        /* background-color: #d3d3d3; */
+        justify-content: flex-start;
+        justify-items: center;
+        display: flex;
+        gap: 0;
+        padding-inline: 3px;
+        width: 100%;
+        grid-area: mod_c;
+        padding-block: 5px;
+        gap: 20px;
+
+    }
+
+    /* .cant_block:first-of-type {
+        border: 0;
+    } */
+
+    .cant_block {
+        /* width: 100%; */
+        /* border-left: 1px solid grey; */
+        /* border: 1px solid rgb(214, 214, 214); */
+        /* border-left: 3px solid rgb(189, 189, 189); */
+        border-left: 3px solid {{ modulo['color'] }};
+        background-color: color-mix(in srgb, {{ modulo['color'] }} 15%, #f4f4f4 100%) ;
+        padding-inline: 15px;
+        padding-block: 7px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border-radius: 15px;
+        font-size: 120%;
+        /* background-color: #f4f4f4 ; */
+    }
+
+    .cant_content {
+        font-weight: bold;
+        font-size: 120%;
+    }
+
+    .cant_title {
+        /* font-size: 80%; */
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        /* width: 3.75vw; */
+        text-align: center;
+    }
+
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+{% endblock %}
+
+
+{% block contenido %}
+
+<!-- <div class="block_crud dashboard_title">
+    
+</div> -->
+
+<div class="block_crud block_banner">
+    <h3 class="crud_title">
+        <i class="{{ modulo['icono'] }}"></i>
+        Módulo de {{modulo['nombre'] | lower}}
+    </h3>
+</div>
+
+{% if datosUsuario['rolid'] == 1 %}
+<div class="block_crud mod_cant">
+    {% for tipo_pag in tipos_pag %}
+
+    <div class="cant_block">
+        <div class="cant_content"> {{ tipo_pag.get('cant') }} </div>
+        <div class="cant_title"> {{ tipo_pag.get('nombre') }} </div>
+    </div>
+    
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+
+
+{% block scripts %}
+
+
+
+
+{% endblock %}

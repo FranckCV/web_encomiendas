@@ -39,76 +39,95 @@ Registro de Envíos Masivos
 
   <form id="formulario-envio" class="formulario">
     <!-- SECCIÓN: QUIÉN ENVÍA -->
-    <div id="seccion-quien-envia" >
+    <div id="seccion-quien-envia">
       <h2 class="titulo-seccion">Datos del remitente</h2>
 
       <div id="seccion_remitente">
 
-            <div class="campo-grupo">
-              <select id="remitente-tipo-doc" required>
-                <option disabled selected value="">Seleccione tipo de documento</option>
-                {% for fila in nombre_doc %}
-                  <option value="{{ fila[0] }}">{{ fila[1] }}</option>
-                {% endfor %}
-              </select>
-            </div>
+        <div class="campo-grupo">
+          <select id="remitente-tipo-doc" required>
+            <option disabled selected value="">Seleccione tipo de documento</option>
+            {% for fila in nombre_doc %}
+            <option value="{{ fila[0] }}">{{ fila[1] }}</option>
+            {% endfor %}
+          </select>
+        </div>
 
-            <div class="campo-grupo">
-              <input type="text" id="remitente-numero-doc" placeholder="Número de documento" required>
-                <small id="mensaje-validacion-numero" style="color: red; display: none;"></small>
-
-            </div>
-
-            <div class="campo-grupo">
-              <input type="text" id="remitente-telefono" placeholder="Número de teléfono" required>
-                <small id="mensaje-validacion-telefono" style="color: red; display: none;"></small>
-
-            </div>
-
-            <div class="campo-grupo">
-              <input type="text" id="remitente-nombre" placeholder="Nombre completo/Razón social" required>
-              <small id="mensaje-validacion-nombre" style="color: red; display: none;"></small>
-
-            </div>
-
-            <div class="campo-grupo">
-              <input type="email" id="remitente-email" placeholder="Email" required>
-              <small id="mensaje-validacion-email" style="color: red; display: none;"></small>
-            </div>
+        <div class="campo-grupo">
+          <input type="text" id="remitente-numero-doc" placeholder="Número de documento" required>
+          <small id="mensaje-validacion-numero" style="color: red; display: none;"></small>
 
         </div>
+
+        <div class="campo-grupo">
+          <input type="text" id="remitente-telefono" placeholder="Número de teléfono" required>
+          <small id="mensaje-validacion-telefono" style="color: red; display: none;"></small>
+
+        </div>
+
+        <div class="campo-grupo">
+          <input type="text" id="remitente-nombre" placeholder="Nombre completo/Razón social" required>
+          <small id="mensaje-validacion-nombre" style="color: red; display: none;"></small>
+
+        </div>
+
+        <div class="campo-grupo">
+          <input type="email" id="remitente-email" placeholder="Email" required>
+          <small id="mensaje-validacion-email" style="color: red; display: none;"></small>
+        </div>
+
+      </div>
     </div>
-    <div id="desde-donde-envia" >
+    <div id="desde-donde-envia">
       <h2 class="titulo-seccion">Datos del lugar de origen</h2>
 
       <div id="seccion-origen">
-         <div class="campos-envio">
-              <div class="campo-grupo">
-                  <label>Departamento *</label>
-                  <select id="origen-departamento" required>
-                  </select>
-                </div>
-
-                <div class="campo-grupo">
-                  <label>Provincia *</label>
-                  <select id="origen-provincia" required>
-                  </select>
-                </div>
-
-                <div class="campo-grupo">
-                  <label>Distrito *</label>
-                  <select id="origen-distrito" required>
-                  </select>
-                </div>
-                <input type="hidden" id="origen-sucursal-id" value="">
+        <div class="campos-envio">
+          <div class="campo-grupo">
+            <label>Departamento *</label>
+            <select id="origen-departamento" required>
+            </select>
           </div>
+
+          <div class="campo-grupo">
+            <label>Provincia *</label>
+            <select id="origen-provincia" required>
+            </select>
+          </div>
+
+          <div class="campo-grupo">
+            <label>Distrito *</label>
+            <select id="origen-distrito" required>
+            </select>
+          </div>
+          <input type="hidden" id="origen-sucursal-id" value="">
         </div>
+      </div>
+    </div>
+    <!-- SECCIÓN: CODIGO DE SEGURIDAD -->
+    <div id="seccion-quien-envia">
+      <h2 class="titulo-seccion">Codigo de seguridad</h2>
+
+      <div id="seccion_remitente">
+
+        <div class="campo-grupo">
+          <input type="text" id="remitente-codigo" maxlength="4" placeholder="codigo" required>
+          <small id="mensaje-validacion-coddigo" style="color: red; display: none;"></small>
+
+        </div>
+        <div class="campo-grupo">
+          <input type="text" id="remitente-cod_confirmacio" maxlength="4" placeholder="Confirmacion codigo" required>
+          <small id="mensaje-validacion-confirmacio" style="color: red; display: none;"></small>
+
+        </div>
+      </div>
+      
     </div>
     <!-- SECCIÓN: ENVÍOS MASIVOS CON PESTAÑAS -->
     <div id="seccion-masiva" style="display: block;">
       <div class="seccion-masiva">
         <h2 class="titulo-seccion">Registro de encomiendas</h2>
-        
+
         <!-- Sistema de Pestañas -->
         <div class="tabs-container">
           <div class="tabs-nav">
@@ -125,7 +144,7 @@ Registro de Envíos Masivos
 
           <!-- Contenido de las pestañas -->
           <div class="tabs-content">
-            
+
             <!-- PESTAÑA DESTINO -->
             <div class="tab-panel active" id="tab-destino">
               <div class="campos-envio">
@@ -133,9 +152,9 @@ Registro de Envíos Masivos
                   <label>Tipo de recepción *</label>
                   <select id="m-tipoEntrega" required onchange="mostrarCamposDestino()">
                     <option disabled selected value="">Seleccione tipo de recepción</option>
-                      {% for fila in nombre_rep %}
-                        <option value="{{ fila[0] }}">{{ fila[1] }}</option>
-                      {% endfor %}
+                    {% for fila in nombre_rep %}
+                    <option value="{{ fila[0] }}">{{ fila[1] }}</option>
+                    {% endfor %}
                   </select>
                 </div>
 
@@ -149,7 +168,7 @@ Registro de Envíos Masivos
                 <div class="campo-grupo">
                   <label>Provincia *</label>
                   <select id="select-provincia" required>
-                  <option disabled selected value="">Elija lugar de origen primero</option>
+                    <option disabled selected value="">Elija lugar de origen primero</option>
 
                   </select>
                 </div>
@@ -157,7 +176,7 @@ Registro de Envíos Masivos
                 <div class="campo-grupo">
                   <label>Distrito *</label>
                   <select id="select-distrito" required>
-                         <option disabled selected value="">Elija lugar de origen primero</option>
+                    <option disabled selected value="">Elija lugar de origen primero</option>
                   </select>
                 </div>
 
@@ -168,7 +187,7 @@ Registro de Envíos Masivos
                   <small id="mensaje-validacion-direccion" style="color: red; display: none;"></small>
                 </div>
 
-               <!-- <div class="campo-grupo" id="grupo-referencia" style="display:none;">
+                <!-- <div class="campo-grupo" id="grupo-referencia" style="display:none;">
                   <label>Referencia</label>
                   <input type="text" id="m-referencia" placeholder="Entre calles, cerca de...">
                   <small id="mensaje-validacion-referencia" style="color: red; display: none;"></small>
@@ -180,7 +199,7 @@ Registro de Envíos Masivos
                   <select id="select-sucursal">
                   </select>
                 </div>
-                 <input type="hidden" id="destino-sucursal-id" value="">
+                <input type="hidden" id="destino-sucursal-id" value="">
               </div>
 
 
@@ -191,48 +210,48 @@ Registro de Envíos Masivos
               <div class="campos-envio">
                 <div class="campo-grupo">
                   <label>Tipo de empaque *</label>
-                    <select id="m-tipoEmpaque" required onchange="toggleFolios(); toggleArticulos();">
-                      <option disabled selected value="">Seleccione tipo de empaque</option>
-                      {% for fila in empaque %}
-                        <option value="{{ fila[0] }}">{{ fila[1] }}</option>
-                      {% endfor %}
+                  <select id="m-tipoEmpaque" required onchange="toggleFolios(); toggleArticulos();">
+                    <option disabled selected value="">Seleccione tipo de empaque</option>
+                    {% for fila in empaque %}
+                    <option value="{{ fila[0] }}">{{ fila[1] }}</option>
+                    {% endfor %}
                   </select>
                 </div>
-                
+
                 <div class="campo-grupo" id="grupo-articulos" style="display:none;">
-                      <label>Tipo de contenido *</label>
-                      <select id="m-tipoArticulo">
-                      <option disabled selected value="">Seleccione tipo de contenido</option>
-                      {% for fila in articulos %}
-                        <option value="{{ fila[0] }}">{{ fila[1] }}</option>
-                      {% endfor %}
-                      </select>
-                  </div>
+                  <label>Tipo de contenido *</label>
+                  <select id="m-tipoArticulo">
+                    <option disabled selected value="">Seleccione tipo de contenido</option>
+                    {% for fila in articulos %}
+                    <option value="{{ fila[0] }}">{{ fila[1] }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
 
                 <div class="campo-grupo">
                   <label>Valor del paquete (S/) *</label>
                   <input type="number" id="m-valorEnvio" step="0.01" min="0" placeholder="0.00" required>
-                   <small id="mensaje-validacion-email" style="color: red; display: none;"></small>
+                  <small id="mensaje-validacion-email" style="color: red; display: none;"></small>
                 </div>
-                
+
                 <div class="campo-grupo">
                   <label>Peso (kg) *</label>
                   <input type="number" id="m-peso" step="0.001" min="0.001" placeholder="0.00" required>
                   <small id="mensaje-validacion-email" style="color: red; display: none;"></small>
                 </div>
-                
+
                 <div class="campo-grupo">
                   <label>Largo (cm) *</label>
                   <input type="number" id="m-largo" step="0.1" min="0.1" placeholder="0.0" required>
                   <small id="mensaje-validacion-email" style="color: red; display: none;"></small>
                 </div>
-                
+
                 <div class="campo-grupo">
                   <label>Ancho (cm) *</label>
                   <input type="number" id="m-ancho" step="0.1" min="0.1" placeholder="0.0" required>
-                   <small id="mensaje-validacion-email" style="color: red; display: none;"></small>
+                  <small id="mensaje-validacion-email" style="color: red; display: none;"></small>
                 </div>
-                
+
                 <div class="campo-grupo">
                   <label>Alto (cm) *</label>
                   <input type="number" id="m-alto" step="0.1" min="0.1" placeholder="0.0" required>
@@ -245,7 +264,8 @@ Registro de Envíos Masivos
 
                 <div class="campo-grupo campo-descripcion">
                   <label>Descripción(Opcional)</label>
-                  <textarea id="m-descripcionArticulo" placeholder="Descripción detallada del contenido" required></textarea>
+                  <textarea id="m-descripcionArticulo" placeholder="Descripción detallada del contenido"
+                    required></textarea>
                 </div>
               </div>
             </div>
@@ -258,21 +278,22 @@ Registro de Envíos Masivos
                   <select id="m-tipoDocumento" required onchange="mostrarCamposReceptor()">
                     <option disabled selected value="">Seleccione tipo de documento</option>
                     {% for fila in nombre_doc %}
-                      <option value="{{ fila[0] }}">{{ fila[1] }}</option>
+                    <option value="{{ fila[0] }}">{{ fila[1] }}</option>
                     {% endfor %}
                   </select>
                 </div>
-                
+
                 <div class="campo-grupo">
                   <label>Nro de documento *</label>
                   <input type="text" id="m-nroDocumento" placeholder="Número de documento" required>
-                   <small id="mensaje-validacion-numero-dest" style="color: red; display: none;"></small>
+                  <small id="mensaje-validacion-numero-dest" style="color: red; display: none;"></small>
                 </div>
-                
+
                 <div class="campo-grupo">
                   <label>Celular *</label>
-                  <input type="tel" id="m-celular" required placeholder="999999999" pattern="[0-9]{9}" title="Ingrese 9 dígitos">
-                   <small id="mensaje-validacion-telefono-dest" style="color: red; display: none;"></small>
+                  <input type="tel" id="m-celular" required placeholder="999999999" pattern="[0-9]{9}"
+                    title="Ingrese 9 dígitos">
+                  <small id="mensaje-validacion-telefono-dest" style="color: red; display: none;"></small>
                 </div>
 
 
@@ -282,30 +303,30 @@ Registro de Envíos Masivos
                 <!-- Campos para RUC -->
 
 
-                    <div class="campo-grupo" id="campo-razon-ruc">
-                      <label>Razón Social *</label>
-                      <input type="text" id="m-razonSocial" placeholder="Nombre de la empresa">
-                      <span   id="mensaje-validacion-razon-dest"></span>
-                    </div>
+                <div class="campo-grupo" id="campo-razon-ruc">
+                  <label>Razón Social *</label>
+                  <input type="text" id="m-razonSocial" placeholder="Nombre de la empresa">
+                  <span id="mensaje-validacion-razon-dest"></span>
+                </div>
 
-                    <div class="campo-grupo"  id="campo-contacto-ruc">
-                      <label>Contacto *</label>
-                      <input type="text" id="m-contacto" placeholder="Persona de contacto">
-                      <span   id="mensaje-validacion-contacto-dest"></span>
-                    </div>
+                <div class="campo-grupo" id="campo-contacto-ruc">
+                  <label>Contacto *</label>
+                  <input type="text" id="m-contacto" placeholder="Persona de contacto">
+                  <span id="mensaje-validacion-contacto-dest"></span>
+                </div>
 
 
                 <!-- Campos para personas naturales -->
                 <div id="campos-nombres" class="campo-grupo" style="display:none;">
                   <label>Nombres *</label>
                   <input type="text" id="m-nombres" placeholder="Nombres completos">
-                  <span   id="mensaje-validacion-nombre-dest"></span>
+                  <span id="mensaje-validacion-nombre-dest"></span>
                 </div>
-                
+
                 <div id="campos-apellidos" class="campo-grupo" style="display:none;">
                   <label>Apellidos *</label>
                   <input type="text" id="m-apellidos" placeholder="Apellidos completos">
-                  <span   id="mensaje-validacion-apellido-dest"></span>
+                  <span id="mensaje-validacion-apellido-dest"></span>
 
                 </div>
 
@@ -314,33 +335,37 @@ Registro de Envíos Masivos
 
               </div>
             </div>
+            <button hidden><i class="fa-solid fa-arrow-right"></i></button>
           </div>
         </div>
-       </div> <!-- cierre de .seccion-masiva -->
+      </div> <!-- cierre de .seccion-masiva -->
 
-    <div class="form-group buttons-center" style="margin-top: 30px;">
-      <a href="{{ url_for('tipos_envio') }}" class="btn-volver">VOLVER</a>
-      <button type="button" class="btn-continuar" id="btn-continuar">CONTINUAR</button>
-    </div>
+      <div class="form-group buttons-center" style="margin-top: 30px;">
+        <a href="{{ url_for('tipos_envio') }}" class="btn-volver">VOLVER</a>
+        <button  type="button" class="btn-continuar" id="btn-continuar">CONTINUAR</button>
+      </div>
   </form>
-     
+
 </div>
 
 </style>
 
 {% endblock %}
-
 {% block scripts %}
 <script>
   window.CONFIG_ENVIO = {
     tiposDocumento: {{ nombre_doc | tojson }},
     tiposRecepcion: {{ nombre_rep | tojson }},
     tiposEmpaque: {{ empaque | tojson }},
-    sucursales: {{ sucursales | safe }},
-    articulos : {{ articulos | tojson }}
+    rutasTarifas: {{ rutasTarifas | safe }},
+    articulos : {{articulos | tojson}},
+    condiciones: {{ condiciones | tojson }},
+    tarifas :{{ tarifas | safe }}
   };
+
+
 </script>
+
+<!-- Este debe ir DESPUÉS del bloque anterior -->
 <script src="{{ url_for('static', filename='js/registro_paquete.js') }}"></script>
-
-
 {% endblock %}

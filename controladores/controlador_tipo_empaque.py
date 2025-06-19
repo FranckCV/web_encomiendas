@@ -93,7 +93,7 @@ def update_row( id , nombre , peso_maximo , unidad_medida ):
 def get_options():
     sql= f'''
         select 
-            {get_primary_key()} ,
+            id ,
             nombre
         from {table_name}
         where activo = 1
@@ -101,7 +101,7 @@ def get_options():
     '''
     filas = sql_select_fetchall(sql)
     
-    lista = [(fila[get_primary_key()], fila["nombre"]) for fila in filas]
+    lista = [(fila['id'], fila["nombre"]) for fila in filas]
 
     return lista
 
@@ -110,3 +110,11 @@ def get_options():
 
 
 
+def get_peso():
+
+    try:
+        sql = "SELECT id, peso_maximo FROM tipo_empaque"
+        filas = sql_select_fetchall(sql)  
+        return { str(f['id']): f['peso_maximo'] for f in filas }
+    except Exception:
+        return {}

@@ -8,11 +8,7 @@
 <div class="container">
     <div class="cart-section">
         <div class="cart-header">
-            <h1 class="cart-title"><i class="fa-solid fa-cart-shopping"></i> Carrito de Encomiendas</h1>
-            <div class="bulk-actions">
-                <button class="btn btn-primary" onclick="deleteSelected()">Eliminar Seleccionados</button>
-                <button class="btn btn-danger" onclick="clearCart()">Vaciar Carrito</button>
-            </div>
+            <h1 class="cart-title"><i class="fa-solid fa-cart-shopping"></i> Carrito de encomiendas</h1>
         </div>
 
         <div class="select-all-section">
@@ -20,6 +16,10 @@
                 <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
                 Seleccionar todos los productos
             </label>
+            <div class="bulk-actions">
+                <button class="btn btn-primary" onclick="deleteSelected()">Eliminar seleccionados</button>
+                <button class="btn btn-danger" onclick="clearCart()">Vaciar carrito</button>
+            </div>
         </div>
 
         <div id="cartItems">
@@ -127,56 +127,61 @@
         });
 
         cartContainer.innerHTML = cartData.map(item => `
-        <div class="cart-item ${item.selected ? 'selected' : ''}" data-id="${item.id}">
-            <div class="item-header">
-                <div class="item-info">
-                    <div class="item-info-grid">
+            <div class="cart-item ${item.selected ? 'selected' : ''}" data-id="${item.id}">
+                <div class="item-row">
+                    <!-- Checkbox -->
+                    <div class="item-check">
+                        <input type="checkbox" ${item.selected ? 'checked' : ''} onchange="toggleItemSelection(${item.id})">
+                    </div>
+
+                    <!-- Imagen + Nombre -->
+                    <div class="item-left">
                         <img src="/static/img/img_articulo/${item.image}" alt="imagen" class="item-thumbnail">
                         <div class="item-name">${item.name}</div>
-                        <div class="item-description">Sin descripción</div>
                     </div>
-                </div>
 
-
-                <div class="item-controls">
-                    <label>
-                        <input type="checkbox" ${item.selected ? 'checked' : ''} onchange="toggleItemSelection(${item.id})">
-                    </label>
-                    <div class="quantity-control">
-                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
-                        <input type="number" class="quantity-input" value="${item.quantity}" onchange="setQuantity(${item.id}, this.value)" min="1">
-                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
-                    </div>
-                    <i class="fa-solid fa-trash icon_trash" onclick="deleteItem(${item.id})"></i>
-                </div>
-            </div>
-            <div class="item-pricing">
-                <div class="price-info">
-                    <div class="price-label">Precio Unit.</div>
-                    <div class="price-value ${item.discount > 0 ? 'original-price' : ''}">
-                        S/ ${Number(item.originalPrice).toFixed(2)}
-                    </div>
-                </div>
-                ${item.discount > 0 ? `
+                    <!-- Precio original -->
                     <div class="price-info">
-                        <div class="price-label">Con Descuento</div>
-                        <div class="price-value discount-price">S/ ${Number(item.unitPrice).toFixed(2)}</div>
+                        <div class="price-label">Precio Unit.</div>
+                        <div class="price-value ${item.discount > 0 ? 'original-price' : ''}">
+                            S/ ${Number(item.originalPrice).toFixed(2)}
+                        </div>
                     </div>
-                    <div class="discount-badge">
-                        -${((item.discount / item.originalPrice) * 100).toFixed(0)}%
+
+                    <!-- Precio con descuento (si aplica) -->
+                    ${item.discount > 0 ? `
+                        <div class="price-info">
+                            <div class="price-label">Con Descuento</div>
+                            <div class="price-value discount-price">S/ ${Number(item.unitPrice).toFixed(2)}</div>
+                        </div>
+                        <div class="discount-badge">-${((item.discount / item.originalPrice) * 100).toFixed(0)}%</div>
+                    ` : '<div class="price-info"></div><div class="discount-badge" style="visibility: hidden">-20%</div>'}
+
+                    <!-- Subtotal -->
+                    <div class="price-info">
+                        <div class="price-label">Subtotal</div>
+                        <div class="price-value subtotal">S/ ${(item.totalPrice).toFixed(2)}</div>
                     </div>
-                ` : ''}
-                <div class="price-info">
-                    <div class="price-label">Cantidad</div>
-                    <div class="price-value">${item.quantity}</div>
-                </div>
-                <div class="price-info">
-                    <div class="price-label">Subtotal</div>
-                    <div class="price-value subtotal">S/ ${(item.totalPrice).toFixed(2)}</div>
+
+                    <!-- Cantidad -->
+                    <div class="price-info">
+                        <!-- <div class="price-label">Cantidad</div> -->
+                        <div class="quantity-control">
+                            <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                            <input type="text" class="quantity-input" value="${item.quantity}" onchange="setQuantity(${item.id}, this.value)" min="1">
+                            <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Botón de eliminar -->
+                    <div class="item-actions">
+                        <i class="fa-solid fa-trash icon_trash" onclick="deleteItem(${item.id})"></i>
+                    </div>
                 </div>
             </div>
-        </div>
-    `).join('');
+        `).join('');
+
+
         updateSummary();
     }
 
@@ -202,6 +207,7 @@
             localStorage.setItem('carrito', JSON.stringify(cartData));
             renderCart();
             await syncCarritoConServidor();
+            actualizarCantidadCarrito();
         }
     }
 
@@ -215,19 +221,35 @@
             localStorage.setItem('carrito', JSON.stringify(cartData));
             renderCart();
             await syncCarritoConServidor();
+            actualizarCantidadCarrito();
         }
     }
 
 
     async function deleteItem(id) {
         if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-            cartData = cartData.filter(item => item.id !== id);
-            localStorage.setItem('carrito', JSON.stringify(cartData));
-            renderCart();
-            await syncCarritoConServidor();
+            const clienteid = 1;  // o getCookie("idlogin")
+            try {
+                const res = await fetch("/eliminar-item-carrito", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ clienteid, articuloid: id })
+                });
+
+                if (res.ok) {
+                    cartData = cartData.filter(item => item.id !== id);
+                    localStorage.setItem('carrito', JSON.stringify(cartData));
+                    renderCart();
+                    actualizarCantidadCarrito();
+                } else {
+                    const error = await res.json();
+                    alert("Error al eliminar: " + (error.error || "desconocido"));
+                }
+            } catch (e) {
+                console.error("Fallo eliminando item:", e);
+            }
         }
     }
-
 
     function toggleItemSelection(id) {
         const item = cartData.find(item => item.id === id);
@@ -259,32 +281,65 @@
         }
     }
 
-    function deleteSelected() {
+    async function deleteSelected() {
+        const clienteid = 1;  // o getCookie("idlogin")
         const selectedItems = cartData.filter(item => item.selected);
         if (selectedItems.length === 0) {
             alert('No hay productos seleccionados para eliminar.');
             return;
         }
 
-        if (confirm(`¿Estás seguro de que deseas eliminar ${selectedItems.length} producto(s) seleccionado(s)?`)) {
+        if (confirm(`¿Deseas eliminar ${selectedItems.length} producto(s)?`)) {
+            for (const item of selectedItems) {
+                try {
+                    await fetch("/eliminar-item-carrito", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ clienteid, articuloid: item.id })
+                    });
+                } catch (e) {
+                    console.error(`Error al eliminar el artículo ${item.id}:`, e);
+                }
+            }
+
             cartData = cartData.filter(item => !item.selected);
             localStorage.setItem('carrito', JSON.stringify(cartData));
             renderCart();
+            actualizarCantidadCarrito();
         }
     }
 
-    function clearCart() {
+    async function clearCart() {
         if (cartData.length === 0) {
             alert('El carrito ya está vacío.');
             return;
         }
 
         if (confirm('¿Estás seguro de que deseas vaciar todo el carrito?')) {
-            cartData = [];
-            localStorage.setItem('carrito', JSON.stringify(cartData));
-            renderCart();
+            const clienteid = 1;  // o getCookie("idlogin")
+
+            try {
+                const res = await fetch("/vaciar-carrito", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ clienteid })
+                });
+
+                if (res.ok) {
+                    cartData = [];
+                    localStorage.setItem('carrito', JSON.stringify(cartData));
+                    renderCart();
+                    actualizarCantidadCarrito();
+                } else {
+                    const error = await res.json();
+                    alert("Error al vaciar: " + (error.error || "desconocido"));
+                }
+            } catch (e) {
+                console.error("Fallo al vaciar carrito:", e);
+            }
         }
     }
+
 
     function updateSummary() {
         const subtotal = cartData.reduce((sum, item) => sum + (item.originalPrice * item.quantity), 0);
@@ -306,14 +361,15 @@
             return;
         }
 
-        const total = document.getElementById('totalAmount').textContent;
-        alert(`¡Redirigiendo al sistema de pago!\nTotal a pagar: ${total}`);
+        // Redirección
+        window.location.href = "/metodo_pago";
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
         await cargarCarritoDesdeServidor();
         renderCart();
         await syncCarritoConServidor();
+        actualizarCantidadCarrito();
     });
 
 </script>

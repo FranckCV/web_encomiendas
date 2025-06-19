@@ -87,20 +87,16 @@ def update_row( id , nombre ):
 def get_options():
     sql= f'''
         select 
-            {get_primary_key()} ,
+            id ,
             nombre
-        from {table_name}
+        from tipo_cliente
         where activo = 1
         order by nombre asc
     '''
     filas = sql_select_fetchall(sql)
     
-    lista = [(fila[get_primary_key()], fila["nombre"]) for fila in filas]
+    lista = [(fila['id'], fila["nombre"]) for fila in filas]
 
     return lista
-
-
-
-
 
 

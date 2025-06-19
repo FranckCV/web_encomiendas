@@ -159,3 +159,61 @@ def get_reporte_ventas():
     
     return columnas, filas
 
+
+
+
+def register_client(correo, telefono, num_documento, nombre_siglas, apellidos_razon, tipo_documentoid, tipo_clienteid ):
+    sql = f'''
+        INSERT INTO cliente
+        (correo, telefono, num_documento, nombre_siglas, apellidos_razon, tipo_documentoid, tipo_clienteid )
+        VALUES
+            ( %s , %s , %s , %s , %s, %s, %s )
+    '''
+    id = sql_execute_lastrowid(sql,(correo, telefono, num_documento, nombre_siglas, apellidos_razon, tipo_documentoid, tipo_clienteid ))
+    return id
+
+
+
+def get_cliente_tipo_nro_documento(tipo_doc , nro_doc):
+    sql = f'''
+        SELECT 
+            cl.*, 
+            td.nombre AS nom_tipodoc,
+            tc.nombre AS nom_tipocliente
+        FROM cliente cl
+        LEFT JOIN tipo_documento td ON cl.tipo_documentoid = td.id
+        LEFT JOIN tipo_cliente tc ON cl.tipo_clienteid = tc.id
+        where cl.tipo_documentoid = %s and cl.num_documento = %s
+    '''
+    resultados = sql_select_fetchone(sql,(tipo_doc , nro_doc))
+    return resultados
+
+
+def getDataClient(id):
+    sql = '''
+        select num_documento, nombre_siglas,apellidos_razon from cliente where id = %s
+    '''
+    fila = sql_select_fetchone(sql,id)
+    return fila
+    
+def get_cliente_por_correo(correo):
+    sql = "SELECT * FROM cliente WHERE correo = %s"
+    return sql_select_fetchone(sql, (correo,))
+    
+
+
+def get_select_cliente():
+    sql= f'''
+        SELECT 
+            id, 
+            CONCAT(nombre_siglas,' ',apellidos_razon) as nombre
+        FROM cliente 
+    '''
+    filas = sql_select_fetchall(sql)
+    lista = [(fila['id'], fila["nombre"]) for fila in filas]
+
+    return lista
+
+
+
+

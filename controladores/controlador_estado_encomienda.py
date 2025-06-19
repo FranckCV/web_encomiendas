@@ -1,6 +1,7 @@
 from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select_fetchone , sql_execute , sql_execute_lastrowid , show_columns , show_primary_key , exists_column_Activo , unactive_row_table
 import controladores.bd as bd
 #####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####
+from datetime import datetime
 
 table_name = 'estado_encomienda'
 
@@ -98,6 +99,162 @@ def get_options():
 
 
 
+def get_states():
+    sql = '''
+        select id, nombre from estado_encomienda where tipoEstado = 'N'
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas
+
+from datetime import datetime
+
+def get_last_states(tracking):
+    sql = '''
+        SELECT de.nombre, s.fecha, s.hora
+        FROM seguimiento s
+        INNER JOIN detalle_estado de ON de.id = s.detalle_estadoid
+        WHERE s.paquetetracking = %s
+        ORDER BY s.fecha DESC, s.hora DESC
+        LIMIT 1
+    '''
+    fila = sql_select_fetchone(sql, (tracking,))
+
+    if fila:
+        fecha = datetime.strptime(str(fila['fecha']), "%Y-%m-%d").strftime("%d/%m/%Y")
+        hora = datetime.strptime(str(fila['hora']), "%H:%M:%S").strftime("%H:%M")
+
+        fila['fecha'] = fecha
+        fila['hora'] = hora
+
+    return fila
 
 
 
+def get_comprobantes(tracking):
+    sql = '''
+         SELECT tc.nombre AS tipo_comprobante
+        FROM seguimiento s
+        INNER JOIN tipo_comprobante tc ON tc.id = s.tipo_comprobanteid
+        WHERE s.paquetetracking = %s
+    '''
+    filas = sql_select_fetchall(sql, tracking)
+    return filas if filas else []
+
+
+def get_data_package(tracking):
+    sql = '''
+        SELECT 
+            ud.departamento AS departamento_destino,
+            ud.provincia AS provincia_destino,
+            ud.distrito AS distrito_destino,
+            p.direccion_destinatario AS direccion_destino,
+            uo.departamento AS departamento_origen,
+            uo.provincia AS provincia_origen,
+            uo.distrito AS distrito_origen,
+            tipE.nombre AS tipo_empaque,
+            cp.nombre AS contenido_paquete,
+            CONCAT(c.nombre_siglas, ' ', c.apellidos_razon) AS remitente,
+            p.num_documento_destinatario,
+            CASE 
+                WHEN p.estado_pago = 0 THEN 'Pendiente'
+                WHEN p.estado_pago = 1 THEN 'Cancelado'
+                ELSE 'Desconocido'
+            END AS estado_pago,
+            te.monto_total
+        FROM paquete p
+        INNER JOIN transaccion_encomienda te ON te.num_serie = p.transaccion_encomienda_num_serie
+        INNER JOIN sucursal so ON so.id = te.id_sucursal_origen
+        INNER JOIN ubigeo uo ON uo.codigo = so.ubigeocodigo
+        INNER JOIN sucursal sd ON sd.id = p.sucursal_destino_id
+        INNER JOIN ubigeo ud ON ud.codigo = sd.ubigeocodigo
+        INNER JOIN tipo_empaque tipE ON tipE.id = p.tipo_empaqueid
+        LEFT JOIN contenido_paquete cp ON cp.id = p.contenido_paqueteid
+        INNER JOIN cliente c ON c.id = te.clienteid
+        WHERE p.tracking = %s;
+    '''
+
+    row = sql_select_fetchone(sql, (tracking,))
+
+    if row:
+        
+        contenido = row['contenido_paquete']
+        row['contenido_paquete'] = contenido.capitalize() if contenido else ''
+
+        origen = ' - '.join([
+            row['departamento_origen'].capitalize(),
+            row['provincia_origen'].capitalize(),
+            row['distrito_origen'].capitalize()
+        ])
+        row['direccion_origen'] = origen
+
+        destino = ' - '.join([
+            row['departamento_destino'].capitalize(),
+            row['provincia_destino'].capitalize(),
+            row['distrito_destino'].capitalize()
+        ])
+        if row['direccion_destino']:
+            destino += f", {row['direccion_destino'].capitalize()}"
+        row['direccion_destino'] = destino
+
+        for k in ['departamento_origen', 'provincia_origen', 'distrito_origen',
+                  'departamento_destino', 'provincia_destino', 'distrito_destino']:
+            row.pop(k, None)
+
+    return row
+
+
+def get_estados_insertados(tracking):
+    sql = '''
+    select distinct de.estado_encomiendaid from seguimiento s
+    inner join detalle_estado de on de.id = s.detalle_estadoid
+    where s.paquetetracking=%s
+    '''
+    fila = sql_select_fetchall(sql,tracking)
+    return fila
+
+
+def get_detalles_estado_by_tracking(tracking):
+    sql = '''
+    select de.estado_encomiendaid, de.nombre,.s.fecha,s.hora from seguimiento s
+    inner join detalle_estado de on de.id = s.detalle_estadoid
+    where s.paquetetracking = %s
+    '''
+    fila = sql_select_fetchall(sql,tracking)
+    return fila
+
+
+def insertar_seguimiento(tracking, detalle_estado, tipo_comprobanteid=None):
+    try:
+        ahora = datetime.now()
+        fecha = ahora.date()
+        hora = ahora.time().strftime("%H:%M:%S")
+
+        if tipo_comprobanteid is not None:
+            sql = '''
+                INSERT INTO seguimiento (paquetetracking, detalle_estadoid, fecha, hora, tipo_comprobanteid)
+                VALUES (%s, %s, %s, %s, %s)
+            '''
+            valores = (tracking, detalle_estado, fecha, hora, tipo_comprobanteid)
+        else:
+            sql = '''
+                INSERT INTO seguimiento (paquetetracking, detalle_estadoid, fecha, hora)
+                VALUES (%s, %s, %s, %s)
+            '''
+            valores = (tracking, detalle_estado, fecha, hora)
+
+        sql_execute(sql, valores)
+        return True
+
+    except Exception as e:
+        print(f"Error al insertar seguimiento: {e}")
+        return False
+
+
+def get_estados_restantes(tracking):
+    sql = '''
+        select de.id,de.nombre from detalle_estado de
+where de.id not in (select detalle_estadoid from seguimiento where paquetetracking = %s)
+limit 1
+    '''
+    filas = sql_select_fetchall(sql,tracking)
+    return filas

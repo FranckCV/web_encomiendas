@@ -82,5 +82,15 @@ def get_options():
         ORDER BY nombre ASC
     '''
     filas = sql_select_fetchall(sql)
-    lista = [(fila[get_primary_key()], fila["nombre"]) for fila in filas]
-    return lista
+    # lista = [(fila['id'], fila["nombre"]) for fila in filas]
+    return filas
+
+
+
+
+def get_metodo_pago_online():
+    sql = '''
+        select id,nombre from metodo_pago where id != 1
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas

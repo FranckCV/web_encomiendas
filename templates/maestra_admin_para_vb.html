@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" href="{{URL_IMG_LOGO}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css" crossorigin="">
+    <link rel="stylesheet" href="/static/css/common_styles/bootstrap.min.css" />
+    <link rel="stylesheet" href="/static/css/common_styles/all.min.css" />
+    <link rel="stylesheet" href="/static/css/common_styles/fonts.css" />
+    <link rel="stylesheet" href="/static/css/common_styles/common_style.css" />
+    <link rel="stylesheet" href="/static/css/validationForm.css">
+    <link rel="stylesheet" href="/static/css/common_styles/fontawesome.min.css" />
+    {% set emp_color_pri = main_information.get('color_pri') %}
+    {% set emp_color_sec = main_information.get('color_sec') %}
+    {% set emp_color_ter = main_information.get('color_ter') %}
+
+    <style>
+        :root {
+            --color-contrast: #ffffff;
+            /* --color-base: #18076e; */
+            /* --color-base: #8a5105; */
+            /* --color-base: #107444; */
+            /* --color-sec: #00cee9; */
+            /* --color-sec: #f07305; */
+            /* --color-sec: #a20eff; */
+            /* --color-contrast: #fff; */
+            --color-base: {{ emp_color_pri }};
+            --color-sec:  {{ emp_color_sec }};
+            --color-thr:  {{ emp_color_ter }};
+            /* #1d4c82 #13e2da #1b98e0 */
+
+            /* --color-base: #1d4c82;
+            --color-sec:  #13e2da ;
+            --color-thr:  #1b98e0; */
+        }
+    </style>
+
+    <link rel="stylesheet" href="/static/css/admin_styles.css">
+</head>
+
+<body class="general_body">
+    
+    
+<header class="general_element">
+</header>
+
+<aside class="general_element" id="menu_aside" class="">
+    <div class="menu_img">
+        <a class="" href="{{ url_for('main_page') }}">
+            <img src="{{URL_IMG_LOGO}}" class="logo_admin">
+        </a>
+    </div>
+
+    <div class="menu_option">
+        <a class="menu_title" href="{{url_for('panel')}}">
+            <p>Panel</p>
+            
+            <i class="ri-dashboard-line"></i>
+        </a>
+    </div>
+
+    {% for modulo in menu_modulos %}
+    {% if modulo['id'] == cur_modulo_id %}
+
+    <style>
+        .tip_title {
+            color: color-mix(in srgb, {{modulo['color']}} 80%, white 45%) ;
+        }
+        
+        .tip_title:hover {
+            color: color-mix(in srgb, {{modulo['color']}} 80%, white 95%) ;
+        }
+
+        .{{modulo['key']}}.menu_title:hover {
+            color: color-mix(in srgb , {{modulo['color']}} 95% , white 65%)  ;
+            /* color: color-mix(in srgb , {{modulo['color']}} 95% , white 05%)  ; */
+            /* filter: brightness(1.5); */
+        }
+
+        :root {
+            --color-page : color-mix(in srgb , {{modulo['color']}} 95% , white 65%) ;
+        }
+
+        .mod_title {
+            display: flex;
+            align-items: center;
+            font-size: 120%;
+            padding-block: 7px;
+            padding-inline: 12px;
+            border-radius: 5px;
+            justify-self: flex-start;
+            gap: 10px;
+            cursor: pointer;
+            background-color: color-mix(in srgb, {{ modulo.get('color') }} 10%, transparent 30%) ; 
+            color: color-mix(in srgb, {{ modulo.get('color') }} 100%, white 30%)  ;
+        }
+
+        .mod_title:hover {
+            /* color: color-mix(in srgb, {{ modulo.get('color') }} 15%, white 10%) ;  */
+            background-color: color-mix(in srgb, {{ modulo.get('color') }} 100%, white 0%)  ;
+            /* color: var(--color-bg-admin); */
+            color: white;
+        }
+
+        .mod_title i {
+            font-size: 150%;
+        }
+
+    </style>
+
+    <div class="line_separator"></div>
+
+    <div class="menu_option">
+
+        <a class="mod_title" href="{{url_for('dashboard', module_name = modulo['key'] )}}">
+            <i class="{{ modulo.get('icono') }}"></i>
+            <p> {{ modulo.get('nombre') }} </p>
+        </a>
+
+        <div class="menu_content">
+            {% for tipo_pag in menu_tipos_paginas %}
+
+            {% if tipo_pag['moduloid'] == cur_modulo_id and tipo_pag['cant'] > 0 %}
+            <div class="tip_block">
+                <p class="tip_title">{{ tipo_pag['nombre'] }} - {{ tipo_pag['cant'] }}  </p>
+
+                <div class="tip_content collapsed">
+                    {% for page in menu_paginas %}
+
+                    {% if page['tipo_paginaid'] == tipo_pag['id'] and page['moduloid'] == cur_modulo_id    %}
+                        {% if (menu_rolid != 1 and page['acceso'] == 1) or menu_rolid == 1 %}
+
+                            {% if page['tipo_paginaid'] == 1 %}
+                            <a class="mu_page" href="{{url_for('crud_generico',tabla = page['key'] )}}">
+                                <i class="{{ page['icono'] or ICON_PAGE_CRUD }}"></i>
+                                <p>{{NOMBRE_CRUD_PAGE}} {{ page['titulo'] | lower }}</p>
+                            </a>
+                            {% elif page['tipo_paginaid'] == 2 %}
+                            <a class="mu_page" href="{{url_for(page['key'])}}">
+                                <i class="{{ page['icono'] }}"></i>
+                                <p>{{ page['titulo'] }}</p>
+                            </a>
+                            {% elif page['tipo_paginaid'] == 3 %}
+
+                            {% elif page['tipo_paginaid'] == 4 %}
+                            <a class="mu_page" href="{{url_for('reporte',report_name = page['key'] )}}">
+                                <i class="{{ page['icono'] or ICON_PAGE_CRUD }}"></i>
+                                <p>{{ page['titulo'] }}</p>
+                            </a>
+                            {% elif page['tipo_paginaid'] == 5 %}
+                                aca debe haber un gráfico jsjsja lol
+                            {% endif %}
+                            
+                        {% endif %}
+                    {% endif %}
+
+                    {% endfor %}
+<!-- 
+                    {% if tipo_pag['cant'] == 0 %}
+                    <p class="text_none">Sin contenido</p>
+                    {% endif %} -->
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+
+        </div>
+    </div>
+    {% endif %}
+
+    {% endfor %}
+
+</aside>
+
+<div class="menu_user">
+    <div class="user_icon">
+        <i class="fa-solid fa-user"></i>
+    </div>
+
+    <p class="user_name">{{datosUsuario['nombre']}} {{datosUsuario['apellidos']}} </p>
+    <p class="user_type">{{datosUsuario['tip_nombre']}} | {{datosUsuario['rol_nombre']}}</p>
+
+    <a class="user_out" href="{{url_for('logout')}}">
+        <i class="fa-solid fa-right-from-bracket"></i>
+    </a>
+</div>
+
+<section class="general_element">
+    <div class="section_content">
+        {% block contenido %}
+        {% endblock %}
+    </div>
+</section>
+
+<footer class="general_element">
+</footer>
+
+
+    {% if cookie_error %}
+    <div id="modalError" class="modal modalMsg modalError ver_modalMsg">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div class="modal-body">
+                    <p>{{cookie_error}}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="modal_button_cancelar" id="cancelarError">
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div id="overlayImage" class="overlayImage" onclick="closeImage()">
+      <img id="enlargedImage" class="enlarged-image" />
+    </div>
+
+    <!-- <div id="overlayErrorFormModal">
+        <div id="error-form-modal">
+            <h4>Errores en el formulario:</h4>
+            <ul id="error-form-list"></ul>
+            <button onclick="document.getElementById('overlayErrorFormModal').style.display='none'">Cerrar</button>
+        </div>
+    </div> -->
+
+
+    <script src="/static/js/common_scripts/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/common_scripts/bootstrap.min.js"></script>
+    <script src="/static/js/common_scripts/common_script.js"></script>
+    <script src="/static/js/validationForm.js"></script>
+
+    <script>
+        const modalError = document.getElementById('modalError');
+        if (modalError) {
+            function closeModalError() {
+                document.cookie = "error=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                modalError.classList.remove('ver_modalMsg');
+            }
+
+            modalError.querySelector('#cancelarError').onclick = function () {
+                closeModalError();
+            };
+
+            document.querySelectorAll('input[type="submit"]').forEach(button => {
+                button.onclick = function () {
+                    closeModalError();
+                }
+            });
+        }
+    </script>
+
+    <script>
+        function openImage(src) {
+        const overlay = document.getElementById('overlayImage');
+        const enlargedImage = document.getElementById('enlargedImage');
+
+        enlargedImage.src = src;
+        overlay.style.display = 'flex'; 
+        }
+
+        function closeImage() {
+        const overlay = document.getElementById('overlayImage');
+        overlay.style.display = 'none';
+        }
+
+
+        document.addEventListener('click', function(event) {
+        if (event.target.classList.contains('clickable-image')) {
+            openImage(event.target.src);
+        }
+        });
+    </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const tipTitles = document.querySelectorAll('.tip_title');
+    
+    tipTitles.forEach(title => {
+        // title.style.cursor = 'pointer';
+        
+        title.addEventListener('click', function() {
+            const tipContent = this.parentElement.querySelector('.tip_content');
+            
+            if (tipContent) {
+                tipContent.classList.toggle('collapsed');
+            }
+        });
+    });
+});
+</script>
+
+<script src="/static/js/crudModal.js"></script>
+
+</body>
+
+</html>

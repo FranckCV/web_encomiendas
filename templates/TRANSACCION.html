@@ -1,0 +1,432 @@
+{% extends "MAESTRA_ADMIN.html" %}
+
+
+{% block titulo %}
+    {{titulo }}
+
+{% endblock %}
+
+
+{% block estilos %}
+{% if esReporte %}
+<style>
+  .td_content {
+    height: 30px;
+  }
+</style>
+{% endif %}
+{% endblock %}
+
+
+{% block contenido %}
+<!--Nombre del crud-->
+<div class="block_crud">
+  <h3 class="crud_title">
+    {% if HABILITAR_ICON_PAGES %}
+    <i class="{{icon_page_crud}}"></i>
+    {% endif %}
+
+    {{titulo }}
+  </h3>
+</div>
+
+<!--Panel de búsqueda-->
+<div class="block_crud">
+  <div class="panel_row row">
+    {% if crud_search %}
+    <!-- {% if value_search %}
+    <div class="col-3">
+      <a class="button" href="{{ url_for('crud_generico', tabla = tabla) }}">
+        <i class="fa-solid fa-left-long"></i>
+        <p>Volver al listado principal</p>
+      </a>
+    </div>
+    {% endif %} -->
+
+    <div class="col">
+      <div class="input_search">
+        <div class="input-group">
+          <input required type="text" class="form-control" placeholder="Buscar {{ titulo | lower }}"
+            aria-label="Recipient's username" aria-describedby="button-addon2" id="value_search" name="value_search" />
+
+          <button class="btn" type="submit" id="button-addon2">
+            <i class="{{ICON_SEARCH}}"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {% endif %}
+
+    {% if filters != [] %}
+    {% for filter in filters %}
+    <!-- <div class="col-2">
+      <div class="form_field"> -->
+    {% if filter[3] == 'date' %}
+    <div class="col-2">
+      <div class="form_field">
+        <input type="date" data-type="date" name="{{filter[0]}}" id="{{filter[0]}}" class="filterSelect">
+      </div>
+    </div>
+    {% elif filter[3] == 'interval_date' %}
+    <div class="col-2">
+      <div class="form_field">
+        <input type="date" data-type="date_ini" name="{{filter[0]}}" id="{{filter[0]}}" class="filterSelect">
+      </div>
+    </div>
+    <div class="col-2">
+      <div class="form_field">
+        <input type="date" data-type="date_fin" name="{{filter[0]}}" id="{{filter[0]}}" class="filterSelect">
+      </div>
+    </div>
+    {% else %}
+    <div class="col-2">
+      <div class="form_field">
+        <select name="{{filter[0]}}" id="{{filter[0]}}" class="filterSelect">
+          <option value="" selected>{{filter[1]}}</option>
+          {% set datos = filter[2]() if filter[2] is callable else filter[2] %}
+
+          {% for option in datos %}
+          <option value="{{option[0]}}">{{option[1]}}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    {% endif %}
+
+
+
+    {% endfor %}
+    {% endif %}
+
+    <!-- <div class="col-2">
+    </div> -->
+    {% if crud_insert %}
+    <div class="col-2">      
+      <button class="button clickable-modal btn_crud btn_insert" id="modal_crud_insert_{{tabla}}_">
+        <i class="{{ICON_INSERT}}"></i>
+        <p>{{NOMBRE_BTN_INSERT}}</p>
+      </button>
+    </div>
+    {% endif %}
+
+    {% for opt in options %}
+      <div class="col-2">
+        {% set mostrar_url = opt[0] %}
+        {% set icono = opt[1] %}
+        {% set color = opt[2] %}
+        {% set texto = opt[3] %}
+        {% set funcion = opt[4] %}
+        {% set parametros = {} %}
+
+        {% if mostrar_url and opt|length > 5 %}
+          {% set raw_params = opt[5] %}
+          {% for key, val in raw_params.items() %}
+            {% if val is string and val.startswith('::') %}
+              {% set _ = parametros.update({key: val[2:]}) %}
+            {% else %}
+              {% set _ = parametros.update({key: fila[val]}) %}
+            {% endif %}
+          {% endfor %}
+          <a href="{{ url_for(funcion, **parametros) }}" class="button" style="background-color: {{color}};">
+        {% else %}
+          <a href="{{ url_for(funcion) }}" class="button" style="background-color: {{color}};">
+        {% endif %}
+            <i class="{{ icono }}"></i>
+            <p>{{ texto }}</p>
+          </a>
+      </div>
+    {% endfor %}
+
+
+
+
+
+  </div>
+</div>
+
+<!--Tabla-->
+<div class="block_crud block_table">
+  <div class="table-container">
+    <table cellspacing="0" class="table_listado">
+      <thead>
+        <tr>
+          {% for col in key_columns %}
+          <th {% if primary_key==col %} class="td_primary_key" {% elif col=='activo' %}
+            style="width: calc( 1 * var(--width-column) );" {% else %}
+            style="width: calc( {{columnas[col][1]}} * var(--width-column) );" {% endif %}>
+            <div class="th_content">
+              <p>
+                {{ columnas[col][0] }}
+              </p>
+            </div>
+          </th>
+          {% endfor %}
+
+          {% if crud_consult or crud_unactive or crud_update or crud_delete %}
+          <th class="opciones_column" style="width: calc( 0.5 * var(--width-column) );">
+            <p>
+              {{NOMBRE_OPTIONS_COL}}
+            </p>
+          </th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody id="productTableBody">
+        {% for fila in filas %}
+
+        <tr {% for col in table_columns %} data-{{col}}="{{fila[col]}}" {% endfor %}>
+          {% for col_name in key_columns %}
+          <td class="{% if primary_key == col_name %} td_primary_key {% endif %}" td_name="{{col_name}}">
+            <div
+              class="td_content {% if col_name == primary_key %} td_primary_key {% elif col_name == 'activo' %} td_activo {% endif %}">
+              {% if col_name == 'activo' %}
+              {% if fila[col_name] == 1 %}
+              <p class="activo btn_active">{{STATE_1}}</p>
+              {% else %}
+              <p class="activo btn_unactive">{{STATE_0}}</p>
+              {% endif %}
+              {% else %}
+              {% if fila[col_name] == None or fila[col_name] == '' %}
+              <p class="text_none">Sin {{columnas[col_name][0] | lower }}</p>
+              {% else %}
+              <p class="p_value">{{ fila[col_name] }}</p>
+              {% endif %}
+              {% endif %}
+            </div>
+          </td>
+          {% endfor %}
+
+          {% if crud_consult or crud_unactive or crud_update or crud_delete %}
+          <td class="opciones_column">
+            <div class="acciones">
+
+              {% for btn in buttons %}
+              <div class="opciones_fila">
+                {% set mostrar_url = btn[0] %}
+                {% set icono = btn[1] %}
+                {% set color = btn[2] %}
+                {% set funcion = btn[3] %}
+                {% set parametros = {} %}
+
+                {% if mostrar_url and btn|length > 4 %}
+                  {% set raw_params = btn[4] %}
+                  {% for key, val in raw_params.items() %}
+                    {% if val is string and val.startswith('::') %}
+                      {% set _ = parametros.update({key: val[2:]}) %}
+                    {% else %}
+                      {% set _ = parametros.update({key: fila[val]}) %}
+                    {% endif %}
+                  {% endfor %}
+                  <a href="{{ url_for(funcion, **parametros) }}">
+                {% elif funcion is none or funcion == '' %}
+                  <a href="#">
+                {% else %}
+                  <a href="{{ url_for(funcion) }}">
+                {% endif %}
+                    <button class="{{ btn[5] if btn|length > 5 else '' }}" style="background-color: {{ color }};">
+                      <i class="{{ icono }}"></i>
+                    </button>
+                  </a>
+              </div>
+            {% endfor %}
+
+
+              {% if crud_consult %}                
+              <div class="opciones_fila">
+                <button class="clickable-modal btn_consult" id="modal_crud_consult_{{tabla}}_{{fila[primary_key]}}">
+                  <i class="{{ICON_CONSULT}}"></i>
+                </button>
+              </div>
+              {% endif %}
+
+              {% if crud_unactive %}
+              {% if fila['activo'] == 1 %}
+              <div class="opciones_fila">
+                <button class="clickable-modal btn_active" id="modal_crud_unactive_{{tabla}}_{{fila[primary_key]}}">
+                  <i class="{{ICON_ACTIVE}}"></i>
+                </button>
+              </div>
+              {% else %}
+              <div class="opciones_fila">
+                <button class="clickable-modal btn_unactive" id="modal_crud_unactive_{{tabla}}_{{fila[primary_key]}}">
+                  <i class="{{ICON_UNACTIVE}}"></i>
+                </button>
+              </div>
+              {% endif %}
+              {% endif %}
+
+              {% if crud_update %}
+              <div class="opciones_fila">
+                <button class="clickable-modal btn_update" id="modal_crud_update_{{tabla}}_{{fila[primary_key]}}">
+                  <i class="{{ICON_UPDATE}}"></i>
+                </button>
+              </div>
+              {% endif %}
+
+              {% if crud_delete %}
+              <div class="opciones_fila">
+                <button class="clickable-modal btn_delete" id="modal_crud_delete_{{tabla}}_{{fila[primary_key]}}">
+                  <i class="{{ICON_DELETE}}"></i>
+                </button>
+              </div>
+              {% endif %}
+
+            </div>
+          </td>
+          {% endif %}
+
+        </tr>
+
+        {% endfor %}
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+<!--Paginación-->
+<div class="block_crud">
+  <div class="row pagination_block">
+    <div class="col-4">
+      <div class="form_field">
+        <p for="">Mostrar</p>
+        <select name="cant_pag" id="cant_pag">
+          {% for option in options_pagination_crud %}
+          <option value="{{ option }}" {% if option==selected_option_crud %}selected{% endif %}>{{ option }}</option>
+          {% endfor %}
+        </select>
+        <p for="">registros por página</p>
+
+
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="pagination" id="paginationControls">
+        <a href="javascript:void(0)" class="previous-page disable"><i class="fas fa-angle-left"></i></a>
+        <div id="pageNumbers" class="page-numbers"></div>
+        <a href="javascript:void(0)" class="next-page"><i class="fas fa-angle-right"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% if crud_consult or crud_unactive or crud_update or crud_delete %}
+
+{% for fila in filas %}
+
+
+{% if crud_unactive %}
+  {% set modo_modal = 'unactive' %}
+  {% include 'MODAL_FORM_CRUD.html' %}
+{% endif %}
+
+{% if crud_delete %}
+  {% set modo_modal = 'delete' %}
+  {% include 'MODAL_FORM_CRUD.html' %}
+
+{% endif %}
+
+{% if crud_consult %}
+  {% set modo_modal = 'consult' %}
+  {% include 'MODAL_FORM_CRUD.html' %}
+{% endif %}
+
+{% if crud_update %}
+  {% set modo_modal = 'update' %}
+  {% include 'MODAL_FORM_CRUD.html' %}
+{% endif %}
+
+
+{% endfor %}
+
+{% endif %}
+
+
+{% if crud_insert %}
+  {% set modo_modal = 'insert' %}
+  {% set fila = None %}
+  {% include 'MODAL_FORM_CRUD.html' %}
+{% endif %}
+
+
+
+
+{% endblock %}
+
+
+
+{% block scripts %}
+
+<div id="overlayModal" class="overlayModal">
+  <div id="enlargedModal">
+  </div>
+</div>
+<script>
+
+  const SELECT_OPTIONS = {
+    {% for campo in fields_form if campo[3] == 'select' %}
+    "{{campo[0]}}": [
+        {% for option in campo[6][0]() %}
+        { value: "{{option[0]}}", label: "{{option[1]}}" }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]{% if not loop.last %},{% endif %}
+    {% endfor %}
+  };
+  // console.log(SELECT_OPTIONS);
+
+</script>
+
+<script src="/static/js/orderHeadTable.js"></script>
+<script src="/static/js/paginationCrud.js"></script>
+
+
+<script>
+  //Para mapa
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.btn-ver-mapa').forEach(btn => {
+    btn.addEventListener('click', async function () {
+      const tr = this.closest('tr');
+      const id_salida = tr.dataset["{{ primary_key }}"]; // <- usa el primary_key
+
+      if (!id_salida) {
+        alert("ID de salida no encontrado.");
+        return;
+      }
+
+      try {
+        const response = await fetch("http://192.168.187.178:8000/obtener_coordenadas", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ salida: id_salida })
+        });
+
+        if (!response.ok) throw new Error("Error al obtener coordenadas");
+
+        const data = await response.json();
+
+        const params = new URLSearchParams({
+          lat1: data.latitud_origen,
+          lon1: data.longitud_origen,
+          lat2: data.latitud_destino,
+          lon2: data.longitud_destino,
+          id: data.id
+        });
+
+        // Redirige a la vista de mapa
+        window.location.href = `/seguimiento_unidad_prueba?${params.toString()}`;
+      } catch (error) {
+        console.error("Error al obtener coordenadas:", error);
+        alert("No se pudo cargar el mapa.");
+      }
+    });
+  });
+});
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Paquetes de Encomienda</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2d5aa0;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .header-content h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header-content p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .search-section {
+            padding: 25px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .search-btn {
+            background: #2d5aa0;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-btn:hover {
+            background: #1e3c72;
+        }
+
+        .add-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-btn:hover {
+            background: #218838;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #2d5aa0;
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        th:first-child {
+            width: 80px;
+            text-align: center;
+        }
+
+        th:last-child {
+            width: 200px;
+            text-align: center;
+        }
+
+        td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        tr:hover {
+            background: #e3f2fd;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            display: inline-block;
+            min-width: 80px;
+        }
+
+        .status-activo {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-enviado {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-entregado {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pendiente {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .btn-action {
+            width: 35px;
+            height: 35px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #138496;
+        }
+
+        .btn-states {
+            background: #6f42c1;
+            color: white;
+        }
+
+        .btn-states:hover {
+            background: #5a32a3;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-edit:hover {
+            background: #e0a800;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .pagination {
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .pagination-info {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .pagination-select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .pagination-btn {
+            width: 35px;
+            height: 35px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .pagination-btn:hover {
+            background: #e9ecef;
+        }
+
+        .pagination-btn.active {
+            background: #2d5aa0;
+            color: white;
+            border-color: #2d5aa0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            background: #2d5aa0;
+            color: white;
+            padding: 20px 25px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .modal-footer {
+            padding: 20px 25px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #2d5aa0;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e3c72;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #2d5aa0;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #2d5aa0;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -37px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            background: #2d5aa0;
+            border-radius: 50%;
+        }
+
+        .timeline-date {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .timeline-status {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .timeline-desc {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">📦</div>
+            <div class="header-content">
+                <h1>Gestionar paquetes de encomienda</h1>
+                <p id="encomiendaInfo">Encomienda #<span id="numSerie">--</span></p>
+            </div>
+        </div>
+
+        <div class="search-section">
+            <input type="text" class="search-input" placeholder="Buscar paquetes..." id="searchInput">
+            <button class="search-btn" onclick="buscarPaquetes()">
+                🔍 Buscar
+            </button>
+            <select class="pagination-select" id="estadoFilter">
+                <option value="">Todos los estados</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="enviado">Enviado</option>
+                <option value="entregado">Entregado</option>
+            </select>
+            <button class="add-btn" onclick="abrirModalAgregar()">
+                ➕ Agregar
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Código Paquete</th>
+                        <th>Descripción</th>
+                        <th>Peso (kg)</th>
+                        <th>Dimensiones</th>
+                        <th>Estado</th>
+                        <th>Fecha Creación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="paquetesTable">
+                    <tr>
+                        <td style="text-align: center;">1</td>
+                        <td>PKG-001-2025</td>
+                        <td>Documentos importantes</td>
+                        <td>0.5</td>
+                        <td>30x20x5 cm</td>
+                        <td><span class="status-badge status-enviado">Enviado</span></td>
+                        <td>15/06/2025 10:30</td>
+                        <td>
+                            <div class="actions">
+                                <button class="btn-action btn-view" onclick="verPaquete(1)" title="Ver detalles">👁</button>
+                                <button class="btn-action btn-states" onclick="verEstados(1)" title="Ver estados">📊</button>
+                                <button class="btn-action btn-edit" onclick="editarPaquete(1)" title="Editar">✏</button>
+                                <button class="btn-action btn-delete" onclick="eliminarPaquete(1)" title="Eliminar">🗑</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center;">2</td>
+                        <td>PKG-002-2025</td>
+                        <td>Productos electrónicos</td>
+                        <td>2.3</td>
+                        <td>40x30x15 cm</td>
+                        <td><span class="status-badge status-pendiente">Pendiente</span></td>
+                        <td>15/06/2025 11:45</td>
+                        <td>
+                            <div class="actions">
+                                <button class="btn-action btn-view" onclick="verPaquete(2)" title="Ver detalles">👁</button>
+                                <button class="btn-action btn-states" onclick="verEstados(2)" title="Ver estados">📊</button>
+                                <button class="btn-action btn-edit" onclick="editarPaquete(2)" title="Editar">✏</button>
+                                <button class="btn-action btn-delete" onclick="eliminarPaquete(2)" title="Eliminar">🗑</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center;">3</td>
+                        <td>PKG-003-2025</td>
+                        <td>Ropa y accesorios</td>
+                        <td>1.8</td>
+                        <td>50x40x20 cm</td>
+                        <td><span class="status-badge status-entregado">Entregado</span></td>
+                        <td>14/06/2025 16:20</td>
+                        <td>
+                            <div class="actions">
+                                <button class="btn-action btn-view" onclick="verPaquete(3)" title="Ver detalles">👁</button>
+                                <button class="btn-action btn-states" onclick="verEstados(3)" title="Ver estados">📊</button>
+                                <button class="btn-action btn-edit" onclick="editarPaquete(3)" title="Editar">✏</button>
+                                <button class="btn-action btn-delete" onclick="eliminarPaquete(3)" title="Eliminar">🗑</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination">
+            <div class="pagination-info">
+                Mostrar 
+                <select class="pagination-select">
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+                registros por página | Total de filas: 3
+            </div>
+            <div class="pagination-controls">
+                <button class="pagination-btn">❮</button>
+                <button class="pagination-btn active">1</button>
+                <button class="pagination-btn">❯</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ver Paquete -->
+    <div id="modalVer" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Detalles del Paquete</h3>
+                <button class="close" onclick="cerrarModal('modalVer')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Código del Paquete:</label>
+                    <input type="text" id="verCodigo" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Descripción:</label>
+                    <textarea id="verDescripcion" readonly></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Peso (kg):</label>
+                    <input type="text" id="verPeso" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Dimensiones:</label>
+                    <input type="text" id="verDimensiones" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Estado Actual:</label>
+                    <input type="text" id="verEstado" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Creación:</label>
+                    <input type="text" id="verFecha" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar/Agregar Paquete -->
+    <div id="modalEditar" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="tituloModal">Agregar Paquete</h3>
+                <button class="close" onclick="cerrarModal('modalEditar')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Código del Paquete:</label>
+                    <input type="text" id="editCodigo" placeholder="Ej: PKG-004-2025">
+                </div>
+                <div class="form-group">
+                    <label>Descripción:</label>
+                    <textarea id="editDescripcion" placeholder="Descripción del contenido del paquete"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Peso (kg):</label>
+                    <input type="number" id="editPeso" step="0.1" placeholder="0.0">
+                </div>
+                <div class="form-group">
+                    <label>Dimensiones (LxAxH cm):</label>
+                    <input type="text" id="editDimensiones" placeholder="Ej: 30x20x10 cm">
+                </div>
+                <div class="form-group">
+                    <label>Estado:</label>
+                    <select id="editEstado">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="enviado">Enviado</option>
+                        <option value="entregado">Entregado</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="cerrarModal('modalEditar')">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardarPaquete()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Estados del Paquete -->
+    <div id="modalEstados" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Estados del Paquete</h3>
+                <button class="close" onclick="cerrarModal('modalEstados')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="timeline" id="timelineEstados">
+                    <div class="timeline-item">
+                        <div class="timeline-date">17/06/2025 09:15</div>
+                        <div class="timeline-status">Entregado</div>
+                        <div class="timeline-desc">Paquete entregado al destinatario en la dirección especificada</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">16/06/2025 14:30</div>
+                        <div class="timeline-status">En tránsito</div>
+                        <div class="timeline-desc">Paquete en camino hacia el destino final</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">15/06/2025 10:30</div>
+                        <div class="timeline-status">Enviado</div>
+                        <div class="timeline-desc">Paquete despachado desde el centro de distribución</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">15/06/2025 08:00</div>
+                        <div class="timeline-status">Procesando</div>
+                        <div class="timeline-desc">Paquete registrado y en proceso de preparación</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Obtener número de serie de la URL
+        function obtenerNumSerie() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const numSerie = urlParams.get('num_serie') || 'ENC-2025-001';
+            document.getElementById('numSerie').textContent = numSerie;
+        }
+
+        // Datos de ejemplo
+        let paquetes = [
+            {
+                id: 1,
+                codigo: 'PKG-001-2025',
+                descripcion: 'Documentos importantes',
+                peso: 0.5,
+                dimensiones: '30x20x5 cm',
+                estado: 'enviado',
+                fecha: '15/06/2025 10:30'
+            },
+            {
+                id: 2,
+                codigo: 'PKG-002-2025',
+                descripcion: 'Productos electrónicos',
+                peso: 2.3,
+                dimensiones: '40x30x15 cm',
+                estado: 'pendiente',
+                fecha: '15/06/2025 11:45'
+            },
+            {
+                id: 3,
+                codigo: 'PKG-003-2025',
+                descripcion: 'Ropa y accesorios',
+                peso: 1.8,
+                dimensiones: '50x40x20 cm',
+                estado: 'entregado',
+                fecha: '14/06/2025 16:20'
+            }
+        ];
+
+        let modoEdicion = false;
+        let paqueteEditando = null;
+
+        // Funciones principales
+        function buscarPaquetes() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const estadoFilter = document.getElementById('estadoFilter').value;
+            
+            let paquetesFiltrados = paquetes.filter(paquete => {
+                const matchSearch = paquete.codigo.toLowerCase().includes(searchTerm) || 
+                                  paquete.descripcion.toLowerCase().includes(searchTerm);
+                const matchEstado = !estadoFilter || paquete.estado === estadoFilter;
+                return matchSearch && matchEstado;
+            });
+            
+            actualizarTabla(paquetesFiltrados);
+        }
+
+        function actualizarTabla(paquetesAMostrar = paquetes) {
+            const tbody = document.getElementById('paquetesTable');
+            tbody.innerHTML = '';
+            
+            paquetesAMostrar.forEach(paquete => {
+                const estadoClass = `status-${paquete.estado}`;
+                const estadoTexto = paquete.estado.charAt(0).toUpperCase() + paquete.estado.slice(1);
+                
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="text-align: center;">${paquete.id}</td>
+                        <td>${paquete.codigo}</td>
+                        <td>${paquete.descripcion}</td>
+                        <td>${paquete.peso}</td>
+                        <td>${paquete.dimensiones}</td>
+                        <td><span class="status-badge ${estadoClass}">${estadoTexto}</span></td>
+                        <td>${paquete.fecha}</td>
+                        <td>
+                            <div class="actions">
+                                <button class="btn-action btn-view" onclick="verPaquete(${paquete.id})" title="Ver detalles">👁</button>
+                                <button class="btn-action btn-states" onclick="verEstados(${paquete.id})" title="Ver estados">📊</button>
+                                <button class="btn-action btn-edit" onclick="editarPaquete(${paquete.id})" title="Editar">✏</button>
+                                <button class="btn-action btn-delete" onclick="eliminarPaquete(${paquete.id})" title="Eliminar">🗑</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function verPaquete(id) {
+            const paquete = paquetes.find(p => p.id === id);
+            if (!paquete) return;
+            
+            document.getElementById('verCodigo').value = paquete.codigo;
+            document.getElementById('verDescripcion').value = paquete.descripcion;
+            document.getElementById('verPeso').value = paquete.peso;
+            document.getElementById('verDimensiones').value = paquete.dimensiones;
+            document.getElementById('verEstado').value = paquete.estado.charAt(0).toUpperCase() + paquete.estado.slice(1);
+            document.getElementById('verFecha').value = paquete.fecha;
+            
+            document.getElementById('modalVer').style.display = 'block';
+        }
+
+        function editarPaquete(id) {
+            const paquete = paquetes.find(p => p.id === id);
+            if (!paquete) return;
+            
+            modoEdicion = true;
+            paqueteEditando = id;
+            
+            document.getElementById('tituloModal').textContent = 'Editar Paquete';
+            document.getElementById('editCodigo').value = paquete.codigo;
+            document.getElementById('editDescripcion').value = paquete.descripcion;
+            document.getElementById('editPeso').value = paquete.peso;
+            document.getElementById('editDimensiones').value = paquete.dimensiones;
+            document.getElementById('editEstado').value = paquete.estado;
+            
+            document.getElementById('modalEditar').style.display = 'block';
+        }
+
+        function abrirModalAgregar() {
+            modoEdicion = false;
+            paqueteEditando = null;
+            
+            document.getElementById('tituloModal').textContent = 'Agregar Paquete';
+            document.getElementById('editCodigo').value = '';
+            document.getElementById('editDescripcion').value = '';
+            document.getElementById('editPeso').value = '';
+            document.getElementById('editDimensiones').value = '';
+            document.getElementById('editEstado').value = 'pendiente';
+            
+            document.getElementById('modalEditar').style.display = 'block';
+        }
+
+        function guardarPaquete() {
+            const codigo = document.getElementById('editCodigo').value;
+            const descripcion = document.getElementById('editDescripcion').value;
+            const peso = parseFloat(document.getElementById('editPeso').value);
+            const dimensiones = document.getElementById('editDimensiones').value;
+            const estado = document.getElementById('editEstado').value;
+            
+            if (!codigo || !descripcion || !peso || !dimensiones) {
+                alert('Por favor, complete todos los campos obligatorios.');
+                return;
+            }
+            
+            if (modoEdicion) {
+                const index = paquetes.findIndex(p => p.id === paqueteEditando);
+                if (index !== -1) {
+                    paquetes[index] = {
+                        ...paquetes[index],
+                        codigo,
+                        descripcion,
+                        peso,
+                        dimensiones,
+                        estado
+                    };
+                }
+            } else {
+                const nuevoPaquete = {
+                    id: Math.max(...paquetes.map(p => p.id)) + 1,
+                    codigo,
+                    descripcion,
+                    peso,
+                    dimensiones,
+                    estado,
+                    fecha: new Date().toLocaleString('es-ES', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })
+                };
+                paquetes.push(nuevoPaquete);
+            }
+            
+            actualizarTabla();
+            cerrarModal('modalEditar');
+            alert(modoEdicion ? 'Paquete actualizado correctamente.' : 'Paquete agregado correctamente.');
+        }
+
+        function eliminarPaquete(id) {
+            if (confirm('¿Está seguro de que des

@@ -4,15 +4,18 @@
 <link rel="stylesheet" href="/static/css/salida_informacion.css">
 {% endblock estilos %}
 
-{% block contenido %}
+{% block titulo %}
+Programar nueva salida
+{% endblock %}
 
+{% block contenido %}
 
   <div class="container">
         <!-- Header -->
     <div class="block_crud block_title" style="padding: 20px 10px 30px 10px; font-size: 1rem;">
   <h3 class="crud_title">
-    <i class="fas fa-shipping-fast"></i> 
-    Programar nueva salida
+    <i class="{{page_icono}}"></i> 
+    {{page_titulo}}
   </h3>
 </div>
 
@@ -80,7 +83,7 @@
             <div class="tabs-nav">
                 <button class="tab-btn active" onclick="openTab(event, 'tab-vehiculo')">
                     <i class="fa-solid fa-truck"></i>
-                    Vehículo
+                    Unidad
                 </button>
                 <button class="tab-btn" onclick="openTab(event, 'tab-empleados')">
                     <i class="fa-solid fa-users"></i>
@@ -103,7 +106,7 @@
             <!-- Contenido Pestaña: Vehículo -->
             <div id="tab-vehiculo" class="tab-content active">
                 <div class="section">
-                    <h2 class="section-title">🚚 Selección de vehículo</h2>
+                    <h2 class="section-title">🚚 Selección de unidad</h2>
                     <div class="alert alert-error" id="errorVehiculo"></div>
                     
                     <table id="vehiculosTabla">

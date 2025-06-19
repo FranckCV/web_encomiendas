@@ -1,123 +1,198 @@
-{% extends 'MAESTRA_BASE.html' %}
+{% extends "MAESTRA_BASE.html" %}
 
 {% block estilos_html %}
-  <link rel="stylesheet" href="/static/css/admin_styles.css" />
 
-  {% block estilos %}
+<link rel="stylesheet" href="/static/css/admin_styles.css">
 
-  {% endblock %}
+{% block estilos %}
 
-  <title>
-    {% block titulo %}
-
-    {% endblock %}| {{ SYSTEM_NAME }}
-  </title>
 {% endblock %}
 
-{% block body_html %}
-  <header class="general_element"></header>
+<title>
+    {% block titulo %} {% if page_titulo %} {{page_titulo}} {% endif %}
+    {% endblock %}| {{SYSTEM_NAME}}
+</title>
 
-  <aside class="general_element" id="menu_aside" class="">
+{% endblock %}
+
+
+
+{% block body_html %}
+
+<header class="general_element">
+</header>
+
+<aside class="general_element" id="menu_aside" class="">
     <div class="menu_img">
-      <a class="" href="{{ url_for('main_page') }}"><img src="{{ URL_IMG_LOGO }}" class="logo_admin" /></a>
+        <a class="" href="{{ url_for('main_page') }}">
+            <img src="{{URL_IMG_LOGO}}" class="logo_admin">
+        </a>
     </div>
 
     <div class="menu_option">
-      <a class="menu_title" href="{{ url_for('panel') }}">
-        <p>Panel</p>
-
-        <i class="ri-dashboard-line"></i>
-      </a>
+        <a class="menu_title" href="{{url_for('panel')}}">
+            <p>Panel</p>
+            
+            <i class="ri-dashboard-line"></i>
+        </a>
     </div>
 
-    {% for modulo in modulos %}
-      {% if modulo.id == cur_modulo_id %}
-        <style>
+    {% for modulo in menu_modulos %}
+    {% if modulo['id'] == cur_modulo_id %}
+
+    <style>
+        /* .tip_title {
+          color: color-mix(in srgb, {{modulo['color']}} 80%, white 45%) ;
+        }
+        
+        .tip_title:hover {
+          color: color-mix(in srgb, {{modulo['color']}} 80%, white 95%) ;
+        } */
+
         .tip_title {
-            color: color-mix(in srgb, </style>
+          color: white ;
+          background-color: transparent;
+          padding-inline: 5px;
+        }
+        
+        .tip_title:hover {
+          color: color-mix(in srgb, {{modulo['color']}} 80%, white 45%) ;
+        }
 
-        <div class="line_separator"></div>
+        .{{modulo['key']}}.menu_title:hover {
+          color: color-mix(in srgb , {{modulo['color']}} 95% , white 65%)  ;
+          /* color: color-mix(in srgb , {{modulo['color']}} 95% , white 05%)  ; */
+          /* filter: brightness(1.5); */
+        }
 
-        <div class="menu_option">
-          <!--   <a class="menu_title {{modulo['key']}}" href="{{url_for('dashboard', module_name = modulo['key'] )}}">
-            <p>{{ modulo['nombre'] }}</p>
-            <i class="{{ modulo['icono'] }}"></i>
-        </a>   -->
+        :root {
+          --color-page : color-mix(in srgb , {{modulo['color']}} 95% , white 65%) ;
+        }
 
-          <a class="mod_title" href="{{ url_for('dashboard', module_name=modulo.key) }}">
+        .mod_title {
+          display: flex;
+          align-items: center;
+          font-size: 120%;
+          padding-block: 7px;
+          padding-inline: 12px;
+          border-radius: 5px;
+          justify-self: flex-start;
+          gap: 10px;
+          cursor: pointer;
+          background-color: color-mix(in srgb, {{ modulo.get('color') }} 10%, transparent 30%) ; 
+          color: color-mix(in srgb, {{ modulo.get('color') }} 100%, white 30%)  ;
+        }
+
+        .mod_title:hover {
+            /* color: color-mix(in srgb, {{ modulo.get('color') }} 15%, white 10%) ;  */
+            background-color: color-mix(in srgb, {{ modulo.get('color') }} 100%, white 0%)  ;
+            /* color: var(--color-bg-admin); */
+            color: white;
+        }
+
+        .mod_title i {
+            font-size: 150%;
+        }
+
+    </style>
+
+    <div class="line_separator"></div>
+
+    <div class="menu_option">
+
+        <a class="mod_title" href="{{url_for('modulo', module_name = modulo['key'] )}}">
             <i class="{{ modulo.get('icono') }}"></i>
-            <p>{{ modulo.get('nombre') }}</p>
-          </a>
+            <p> {{ modulo.get('nombre') }} </p>
+        </a>
 
-          <div class="menu_content">
-            {% for tipo_pag in tipos_paginas %}
-              {% if tipo_pag.moduloid == cur_modulo_id and tipo_pag.cant > 0 %}
-                <div class="tip_block">
-                  <p class="tip_title">{{ tipo_pag.nombre }} - {{ tipo_pag.cant }}</p>
+        <div class="menu_content">
+            {% for tipo_pag in menu_tipos_paginas %}
 
-                  <div class="tip_content collapsed">
+            {% if tipo_pag['moduloid'] == cur_modulo_id and tipo_pag['cant'] > 0 %}
+            <div class="tip_block">
+                <p class="tip_title">{{ tipo_pag['nombre'] }} - {{ tipo_pag['cant'] }}  </p>
+
+                <div class="tip_content collapsed">
                     {% for page in menu_paginas %}
-                      {% if page.tipo_paginaid == tipo_pag.id and page.moduloid == cur_modulo_id %}
-                        {% if page.tipo_paginaid == 1 %}
-                          <a class="mu_page" href="{{ url_for('crud_generico', tabla=page.key) }}">
-                            <i class="{{ page.icono or ICON_PAGE_CRUD }}"></i>
-                            <p>{{ NOMBRE_CRUD_PAGE }} {{ page.titulo|lower }}</p>
-                          </a>
-                        {% elif page.tipo_paginaid == 2 %}
-                          <a class="mu_page" href="{{ url_for(page.key) }}">
-                            <i class="{{ page.icono }}"></i>
-                            <p>{{ page.titulo }}</p>
-                          </a>
-                        {% elif page.tipo_paginaid == 3 %}
 
-                        {% elif page.tipo_paginaid == 4 %}
-                          <a class="mu_page" href="{{ url_for('reporte', report_name=page.key) }}">
-                            <i class="{{ page.icono or ICON_PAGE_CRUD }}"></i>
-                            <p>{{ page.titulo }}</p>
-                          </a>
-                        {% elif page.tipo_paginaid == 5 %}
+                    {% if page['tipo_paginaid'] == tipo_pag['id'] and page['moduloid'] == cur_modulo_id    %}
+                        {% if (menu_rolid != 1 and page['acceso'] == 1) or menu_rolid == 1 %}
 
+                            {% if page['tipo_paginaid'] == 1 %}
+                            <a class="mu_page" href="{{url_for('crud_generico',tabla = page['key'] )}}">
+                                <i class="{{ page['icono'] or ICON_PAGE_CRUD }}"></i>
+                                <p>{{NOMBRE_CRUD_PAGE}} {{ page['titulo'] | lower }}</p>
+                            </a>
+                            {% elif page['tipo_paginaid'] == 2 %}
+                            <a class="mu_page" href="{{url_for(page['key'])}}">
+                                <i class="{{ page['icono'] }}"></i>
+                                <p>{{ page['titulo'] }}</p>
+                            </a>
+                            {% elif page['tipo_paginaid'] == 3 %}
+                            <a class="mu_page" href="{{url_for('transaccion',tabla = page['key'] )}}">
+                                <i class="{{ page['icono'] or ICON_PAGE_CRUD }}"></i>
+                                <p>{{ page['titulo'] }}</p>
+                            </a>
+                            {% elif page['tipo_paginaid'] == 4 %}
+                            <a class="mu_page" href="{{url_for('reporte',report_name = page['key'] )}}">
+                                <i class="{{ page['icono'] or ICON_PAGE_CRUD }}"></i>
+                                <p>{{ page['titulo'] }}</p>
+                            </a>
+                            {% elif page['tipo_paginaid'] == 5 %}
+                                aca debe haber un gráfico jsjsja lol
+                            {% endif %}
+                            
                         {% endif %}
-                      {% endif %}
-                    {% endfor %}
-
-                    {% if tipo_pag.cant == 0 %}
-                      <p class="text_none">Sin contenido</p>
                     {% endif %}
-                  </div>
+
+                    {% endfor %}
+<!-- 
+                    {% if tipo_pag['cant'] == 0 %}
+                    <p class="text_none">Sin contenido</p>
+                    {% endif %} -->
                 </div>
-              {% endif %}
+            </div>
+            {% endif %}
             {% endfor %}
-          </div>
+
         </div>
-      {% endif %}
+    </div>
+    {% endif %}
+
     {% endfor %}
-  </aside>
 
-  <div class="menu_user">
+</aside>
+
+<div class="menu_user">
     <div class="user_icon">
-      <i class="fa-solid fa-user"></i>
+        <i class="fa-solid fa-user"></i>
     </div>
 
-    <p class="user_name">{{ datosUsuario.nombre }} {{ datosUsuario.apellidos }}</p>
-    <p class="user_type">{{ datosUsuario.tip_nombre }} | {{ datosUsuario.rol_nombre }}</p>
+    <p class="user_name">{{datosUsuario['nombre']}} {{datosUsuario['apellidos']}} </p>
+    <p class="user_type">{{datosUsuario['tip_nombre']}} | {{datosUsuario['rol_nombre']}}</p>
 
-    <a class="user_out" href="{{ url_for('logout') }}"><i class="fa-solid fa-right-from-bracket"></i></a>
-  </div>
+    <a class="user_out" href="{{url_for('logout')}}">
+        <i class="fa-solid fa-right-from-bracket"></i>
+    </a>
+</div>
 
-  <section class="general_element">
+<section class="general_element">
     <div class="section_content">
-      {% block contenido %}
-
-      {% endblock %}
+        {% block contenido %}
+        {% endblock %}
     </div>
-  </section>
+</section>
 
-  <footer class="general_element"></footer>
+<footer class="general_element">
+</footer>
+
 {% endblock %}
 
+
+
 {% block scripts_html %}
-  <script>
+
+<script>
     document.addEventListener('DOMContentLoaded', function() {
     const tipTitles = document.querySelectorAll('.tip_title');
     
@@ -135,9 +210,9 @@
 });
 </script>
 
-  <script src="/static/js/crudModal.js"></script>
+<script src="/static/js/crudModal.js"></script>
 
-  {% block scripts %}
+{% block scripts %}
+{% endblock %}
 
-  {% endblock %}
 {% endblock %}

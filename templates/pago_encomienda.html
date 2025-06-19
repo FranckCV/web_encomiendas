@@ -1,0 +1,151 @@
+{% extends "MAESTRA_GENERAL.html" %}
+
+{% block estilos %}
+<link rel="stylesheet" href="/static/css/cajas.css">
+<link rel="stylesheet" href="/static/css/metodo_pago.css">
+<!-- Font Awesome para iconos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block titulo %}
+Método de Pago - Caja Shalom
+{% endblock %}
+
+{% block contenido %}
+<div class="pago-container">
+    <div class="pago-content">
+        <div class="pago-header">
+            <h1>Elige tu medio de pago</h1>
+        </div>
+        <form action="/confirmar_pagoenco" method="post">
+
+        <div class="pago-options">
+            <!-- Opción de pago con tarjeta -->
+            <div class="pago-option">
+                <label class="option-container">
+                    <input type="radio" name="metodo-pago" id="tarjeta" checked value="2">
+                    <div class="option-content">
+                        <span class="option-text">Pago con tarjeta de crédito, débito y Yape.</span>
+                        <div class="payment-icons">
+                            <img src="/static/img/visa.webp" alt="Visa">
+                            <img src="/static/img/mastercard.jpg" alt="Mastercard">
+                            <img src="/static/img/yape.png" alt="Yape">
+                        </div>
+                        <div class="payment-icon">
+                            <i class="fa-solid fa-credit-card"></i>
+                        </div>
+                    </div>
+                </label>
+            </div>
+
+            <!-- Opción de pago por banco -->
+            <div class="pago-option">
+                <label class="option-container">
+                    <input type="radio" name="metodo-pago" id="banco" value="1">
+                    <div class="option-content">
+                        <span class="option-text">Pago en bancos y banca por internet.</span>
+                        <div class="payment-icon bank-icon">
+                            <i class="fa-solid fa-building-columns"></i>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Formulario de tarjeta (visible por defecto) -->
+        <div id="tarjeta-form" class="payment-form active">
+            <div class="form-group">
+                <label for="card-number">Número de Tarjeta</label>
+                <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19">
+            </div>
+            <div class="form-row">
+                <div class="form-group half">
+                    <label for="card-expiry">Fecha de Vencimiento</label>
+                    <input type="text" id="card-expiry" placeholder="MM/AA" maxlength="5">
+                </div>
+                <div class="form-group half">
+                    <label for="card-cvv">CVV</label>
+                    <input type="text" id="card-cvv" placeholder="123" maxlength="4">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="card-name">Nombre en la Tarjeta</label>
+                <input type="text" id="card-name" placeholder="NOMBRE APELLIDO">
+            </div>
+        </div>
+
+        <!-- Formulario de banco (oculto por defecto) -->
+        <div id="banco-form" class="payment-form">
+            <div class="bank-info">
+                <h3>Información de la Cuenta Bancaria</h3>
+                <div class="bank-detail">
+                    <p><strong>Banco:</strong> BCP</p>
+                    <p><strong>Titular:</strong> Cajas Shalom S.A.C.</p>
+                    <p><strong>Número de Cuenta:</strong> 123-456789-0-12</p>
+                    <p><strong>CCI:</strong> 002-123-456789012345-67</p>
+                </div>
+                <div class="bank-instructions">
+                    <p>1. Realiza la transferencia por el monto total.</p>
+                    <p>2. Envía el comprobante a <a href="mailto:pagos@cajasshalom.com">pagos@cajasshalom.com</a></p>
+                    <p>3. En un plazo máximo de 24 horas validaremos tu pago.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Se eliminó el botón de pago de aquí ya que se movió al resumen -->
+    </div>
+
+    <!-- Resumen de compra -->
+    <div class="resumen-compra">
+
+        
+        <div class="resumen-header">
+            <h2>Resumen de tu registro</h2>
+        </div>
+        <div class="resumen-content">
+                    <div class="resumen-item">
+            <span>Cantidad De Productos:</span>
+            <span>1</span>  <!-- Un solo envío -->
+        </div>
+        <div class="resumen-item">
+            <span>Sub Total:</span>
+            <span>S/ {{ '%.2f' | format(subtotal) }}</span>
+        </div>
+        <div class="resumen-item">
+            <span>I.G.V.:</span>
+            <span>S/ {{ '%.2f' | format(igv) }}</span>
+        </div>
+        <div class="resumen-item total">
+            <span>Total:</span>
+            <span>S/ {{ '%.2f' | format(total) }}</span>
+        </div>
+        
+
+        </div>
+        
+        <!-- Botón de pago colocado debajo del resumen -->
+        <div class="pago-button-container">
+            <button id="btn-pagar" class="btn-pagar" type="submit">
+            PAGAR S/ <span id="monto-pagar">{{ '%.2f' | format(total) }}</span>
+        </button>
+        </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="/static/js/metodo_pago_registro.js"></script>
+<script src="/static/js/pagoregis.js"></script>
+
+
+<script>
+
+</script>
+
+
+
+{% endblock %}

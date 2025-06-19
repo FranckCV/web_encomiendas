@@ -50,6 +50,7 @@ font-size: 1.5rem;
 .btn-primary {
     background: #1976d2;
     color: white;
+    font-size: 90%;
 }
 
 .btn-primary:hover {
@@ -60,6 +61,7 @@ font-size: 1.5rem;
 .btn-danger {
     background: #b2190e;
     color: white;
+    font-size: 90%;
 }
 
 .btn-danger:hover {
@@ -88,7 +90,7 @@ font-size: 1.5rem;
 .cart-item {
     background: #fafafa;
     border-radius: 12px;
-    padding: 20px;
+    padding-inline: 22px;
     margin-bottom: 15px;
     border: 2px solid rgba(128, 128, 128, 0.1);;
     transition: all 0.3s ease;
@@ -369,4 +371,100 @@ font-size: 1.5rem;
 .item-description {
     font-size: 0.95em;
     color: #666;
+}
+
+.item-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    justify-content: space-between;
+}
+
+.item-check {
+    flex-shrink: 0;
+}
+
+.item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 200px;
+}
+
+.item-thumbnail {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.item-name {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.price-info {
+    text-align: center;
+    min-width: 100px;
+}
+
+.price-value.original-price {
+    text-decoration: line-through;
+    color: #888;
+}
+
+.price-value.discount-price {
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+.discount-badge {
+    background-color: #4caf50;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.quantity-btn {
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.quantity-input {
+    width: 50px;
+    text-align: center;
+}
+
+.item-actions {
+    flex-shrink: 0;
+    margin-left: 10px;
+}
+
+.icon_trash {
+    color: #e53935;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: end;
+}
+
+.select-all-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
