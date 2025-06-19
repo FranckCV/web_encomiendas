@@ -6354,14 +6354,13 @@ VALUES ('DNI', 'Documento Nacional de Identidad', 1),
   ('CE', 'Carné de Extranjería', 1),
   ('PAS', 'Pasaporte', 1);
 
-INSERT INTO tipo_comprobante (inicial, nombre, descripcion, activo)
-VALUES ('F', 'Factura', 'Factura', 1),
-  ('BV', 'Boleta', 'Boleta de Venta', 1),
-  ('NV', 'Nota de venta', 'Nota de Venta', 1),
-  ('GR', 'Guia de remision', 'Guía de Remisión', 1),
+INSERT INTO tipo_comprobante (inicial, nombre, descripcion, activo,tipo_uso)
+VALUES ('F', 'Factura', 'Factura', 1,'V'),
+  ('BV', 'Boleta', 'Boleta de Venta', 1,'V'),
+  ('GR', 'Guia de remision', 'Guía de Remisión', 1,'T'),
   ('TI', 'T', 'Ticket', 1),
-  ('NC', 'Nota de crédito', 'Nota de Crédito', 1),
-  ('ND', 'D', 'Nota de Débito', 1),
+  ('NC', 'Nota de crédito', 'Nota de Crédito', 1,'R'),
+  ('ND', 'D', 'Nota de Débito', 1,'R'),
   ('OT', 'O', 'Otro', 1);
 
 INSERT INTO `tipo_recepcion` (`id`, `nombre`, `activo`)

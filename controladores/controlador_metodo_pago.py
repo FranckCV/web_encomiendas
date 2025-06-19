@@ -88,3 +88,9 @@ def get_options():
 
 
 
+def get_metodo_pago_online():
+    sql = '''
+        select id,nombre from metodo_pago where id != 1
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas

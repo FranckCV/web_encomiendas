@@ -117,3 +117,9 @@ def get_options_nombre():
     return lista
 
 
+def get_tipo_comprobante_by_tipo():
+    sql = '''
+        select id,nombre from tipo_comprobante where tipo_uso = 'V'
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas

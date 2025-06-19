@@ -401,18 +401,14 @@
             <h2 class="subtitulo">Elige el tipo de comprobante</h2>
             <div class="pago-content">
               <div class="opciones-pago">
+                {% for nom_comprobante in tipos_comprobante  %}
                 <label class="opcion" onclick="toggleSelection(this, 'comprobante')">
                   <div class="cabecera-opcion">
-                    <input type="radio" name="comprobante" onchange="validarSelecciones()" id="comp_1" value="1" />
-                    <span class="texto">Boleta de Venta</span>
+                    <input type="radio" name="comprobante" onchange="validarSelecciones()" id="{{nom_comprobante.id}}" value="1" />
+                    <span class="texto">{{nom_comprobante.nombre}}</span>
                   </div>
                 </label>
-                <label class="opcion" onclick="toggleSelection(this, 'comprobante')">
-                  <div class="cabecera-opcion">
-                    <input type="radio" name="comprobante" onchange="validarSelecciones()" id="comp_2" value="2" />
-                    <span class="texto">Factura</span>
-                  </div>
-                </label>
+                {% endfor %}
               </div>
             </div>
           </div>
@@ -422,18 +418,15 @@
             <h2 class="subtitulo">Elige tu medio de pago</h2>
             <div class="pago-content">
               <div class="opciones-pago">
+
+                {% for metodo in metodos_pago %}
                 <label class="opcion" onclick="toggleSelection(this, 'metodo')">
                   <div class="cabecera-opcion">
-                    <input type="radio" name="metodo" onchange="validarSelecciones()" id="metodo_yape" value="yape" data-nombre="Yape" />
-                    <span class="texto">📱 Yape</span>
+                    <input type="radio" name="metodo" onchange="validarSelecciones()" id="metodo.id" value="yape" data-nombre="Yape" />
+                    <span class="texto">{{metodo.nombre}}</span>
                   </div>
                 </label>
-                <label class="opcion" onclick="toggleSelection(this, 'metodo')">
-                  <div class="cabecera-opcion">
-                    <input type="radio" name="metodo" onchange="validarSelecciones()" id="metodo_tarjeta" value="tarjeta" data-nombre="Tarjeta de Crédito/Débito" />
-                    <span class="texto">💳 Tarjeta de Crédito/Débito</span>
-                  </div>
-                </label>
+                {% endfor %}
               </div>
             </div>
           </div>
@@ -549,7 +542,7 @@
       </div>
       
       <button class="success-button" onclick="continuarDespuesPago()">
-        Ver Comprobante
+        Descarga Comprobante
       </button>
     </div>
   </div>

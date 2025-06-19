@@ -503,3 +503,5 @@ ALTER TABLE empleado_salida ADD CONSTRAINT FKempleado_s895470 FOREIGN KEY (emple
 ALTER TABLE escala ADD CONSTRAINT FKescala650496 FOREIGN KEY (salidaid) REFERENCES salida (id);
 ALTER TABLE escala ADD CONSTRAINT FKescala667165 FOREIGN KEY (sucursalid) REFERENCES sucursal (id);
 ALTER TABLE sucursal ADD CONSTRAINT FKsucursal756715 FOREIGN KEY (ubigeocodigo) REFERENCES ubigeo (codigo);
+
+ALTER TABLE `tipo_comprobante` ADD `tipo_uso` CHAR(1) NULL DEFAULT NULL AFTER `activo`;

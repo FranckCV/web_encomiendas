@@ -2843,7 +2843,7 @@ def pago_envio_prueba():
         tipo_envio = request.form.get('tipo_envio')
         
         print(f"Datos recibidos del formulario:")
-        print(f"- envios_data: {envios_data[:100] if envios_data else 'None'}...")
+        print(f"- envios_data_form: {envios_data[:100] if envios_data else 'None'}...")
         print(f"- remitente_data: {remitente_data[:100] if remitente_data else 'None'}...")
         print(f"- modalidad_pago: {modalidad_pago}")
         print(f"- tipo_envio: {tipo_envio}")
@@ -2909,12 +2909,17 @@ def pago_envio_prueba():
         
         print(f"Datos guardados en sesión, renderizando template...")
         
+        tipos_comprobante = controlador_tipo_comprobante.get_tipo_comprobante_by_tipo()
+        metodos_pago = controlador_metodo_pago.get_metodo_pago_online()
+        
         return render_template('pago_envio_prueba.html',
                              envios=envios,
                              remitente=remitente,
                              modalidad_pago=modalidad_pago,
                              tipo_envio=tipo_envio,
-                             total_pagar=total_pagar)
+                             total_pagar=total_pagar,
+                             tipos_comprobante=tipos_comprobante,
+                             metodos_pago=metodos_pago)
         
     except Exception as e:
         print(f"Error general en pago_envio_prueba: {str(e)}")

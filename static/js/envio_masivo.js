@@ -139,20 +139,20 @@ class Validator {
 
   static validateDimensions(largo, ancho, alto) {
     const values = [largo, ancho, alto];
-    const allValid = values.every(val => 
+    const allValid = values.every(val =>
       !isNaN(val) && val >= CONFIG.MIN_CM && val <= CONFIG.MAX_CM
     );
-    
+
     if (!allValid) return { valid: false, message: `Valores deben estar entre ${CONFIG.MIN_CM} y ${CONFIG.MAX_CM} cm.` };
-    
+
     const volumen = largo * ancho * alto;
     if (volumen > CONFIG.MAX_VOLUMEN) {
-      return { 
-        valid: false, 
-        message: `Volumen excesivo: ${volumen.toLocaleString()} cm³ (> ${CONFIG.MAX_VOLUMEN.toLocaleString()} cm³).` 
+      return {
+        valid: false,
+        message: `Volumen excesivo: ${volumen.toLocaleString()} cm³ (> ${CONFIG.MAX_VOLUMEN.toLocaleString()} cm³).`
       };
     }
-    
+
     return { valid: true };
   }
 
@@ -264,7 +264,7 @@ class FormManager {
 
     Object.values(inputsDim).forEach(input => {
       if (!input) return;
-      
+
       input.addEventListener('input', () => {
         const val = parseFloat(input.value);
 
@@ -347,7 +347,7 @@ class FormManager {
     // Teléfono remitente
     const telefonoRemitente = document.getElementById('remitente-telefono');
     const mensajeTelefono = document.getElementById('mensaje-validacion-telefono');
-    
+
     if (telefonoRemitente) {
       this.setupPhoneField(telefonoRemitente, mensajeTelefono);
     }
@@ -355,7 +355,7 @@ class FormManager {
     // Teléfono destinatario
     const telefonoDestinatario = document.getElementById('m-celular');
     const mensajeTelefonoDest = document.getElementById('mensaje-validacion-telefono-dest');
-    
+
     if (telefonoDestinatario) {
       this.setupPhoneField(telefonoDestinatario, mensajeTelefonoDest);
     }
@@ -500,11 +500,11 @@ class FormManager {
     pinInputs.forEach((input, idx) => {
       input.addEventListener('input', e => {
         if (e.target.value.length > 1) e.target.value = e.target.value.slice(0, 1);
-        
+
         if (e.target.value && idx < pinInputs.length - 1) {
           pinInputs[idx + 1].focus();
         }
-        
+
         const valores = Array.from(pinInputs).map(i => i.value);
         if (valores.every(v => v.length === 1)) {
           const pin = valores.join('');
@@ -624,7 +624,7 @@ class LocationManager {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ dep: depOrigen })
       });
-      
+
       const data = await response.json();
       this.updateSelect('origen-provincia', data.data, 'provincia', 'Selecciona provincia');
       this.resetSelect('origen-distrito', 'Selecciona una provincia primero');
@@ -642,7 +642,7 @@ class LocationManager {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prov: provOrigen })
       });
-      
+
       const data = await response.json();
       this.updateSelect('origen-distrito', data.data, 'distrito', 'Seleccione un distrito');
       this.resetSelect('origen-sucursal', 'Selecciona un distrito primero');
@@ -659,7 +659,7 @@ class LocationManager {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ dep: dep_origen, prov: prov_origen, dist: dist_origen })
       });
-      
+
       const data = await response.json();
       this.updateSelect('origen-sucursal', data.data, 'direccion', 'Selecciona una sucursal', 'id');
       this.resetDestinationSelects();
@@ -675,7 +675,7 @@ class LocationManager {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ suc_origen: id_origen })
       });
-      
+
       const data = await response.json();
       this.updateSelect('select-departamento', data.data, 'departamento', 'Seleccione un departamento');
       this.resetSelect('select-provincia', 'Seleccione un lugar de origen primero');
@@ -693,7 +693,7 @@ class LocationManager {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ dep: dep_origen, codigo })
       });
-      
+
       const data = await response.json();
       this.updateSelect('select-provincia', data.data, 'provincia', 'Seleccione una provincia');
       this.resetSelect('select-distrito', 'Seleccione una provincia primero');
@@ -710,7 +710,7 @@ class LocationManager {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prov, codigo })
       });
-      
+
       const data = await response.json();
       this.updateSelect('select-distrito', data.data, 'distrito', 'Seleccione un distrito');
       this.resetSelect('select-sucursal', 'Seleccione un distrito primero');
@@ -731,7 +731,7 @@ class LocationManager {
           dist: dist_destino
         })
       });
-      
+
       const data = await response.json();
       this.updateSelect('select-sucursal', data.data, 'direccion', 'Seleccione una sucursal', 'id');
     } catch (error) {
@@ -741,14 +741,14 @@ class LocationManager {
 
   static async cargarRecepcion(modalidad) {
     if (!modalidad) return;
-    
+
     try {
       const response = await fetch('/api/recepcion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ modalidad })
       });
-      
+
       const data = await response.json();
       this.updateSelect('m-tipoEntrega', data.data, 'nombre', 'Seleccione un tipo de recepción', 'id');
     } catch (error) {
@@ -761,7 +761,7 @@ class LocationManager {
     if (!select) return;
 
     select.innerHTML = `<option disabled selected value="">${placeholder}</option>`;
-    
+
     if (data && Array.isArray(data)) {
       data.forEach(item => {
         const value = valueField ? item[valueField] : item[textField];
@@ -863,7 +863,7 @@ class LocationManager {
     document.querySelectorAll('#tab-modalidad-pago .campos-envio > div').forEach(option => {
       const radio = option.querySelector('input[type="radio"]');
       if (!radio) return;
-      
+
       option.addEventListener('click', () => {
         radio.checked = true;
         radio.dispatchEvent(new Event('change', { bubbles: true }));
@@ -945,7 +945,7 @@ class ShippingManager {
 
     // Validar que los campos críticos no estén vacíos
     const requiredFields = [
-      'tipoEntregaId', 'tipoEmpaqueId', 'valorEnvio', 'peso', 
+      'tipoEntregaId', 'tipoEmpaqueId', 'valorEnvio', 'peso',
       'largo', 'ancho', 'alto', 'modalidadPago'
     ];
 
@@ -1001,8 +1001,8 @@ class ShippingManager {
       distrito_origen: document.getElementById('origen-distrito')?.value,
       distrito_destino_sucursal: document.getElementById('select-distrito')?.value,
       direccion_destino: document.getElementById('m-direccion')?.value.trim(),
-      folios: document.getElementById('m-folios')?.value ? 
-               parseInt(document.getElementById('m-folios').value) : null,
+      folios: document.getElementById('m-folios')?.value ?
+        parseInt(document.getElementById('m-folios').value) : null,
       tipo_articulo: document.getElementById('m-tipoArticulo')?.value,
     };
   }
@@ -1012,45 +1012,96 @@ class ShippingManager {
       Utils.showModal({ message: 'Complete todos los campos visibles' });
       return;
     }
-    
+
     const envio = this.collectFormData();
-    
+
     if (editingIndex !== null) {
       window.registros[editingIndex] = envio;
       editingIndex = null;
     } else {
       window.registros.push(envio);
     }
-    
+
     TableManager.renderTabla();
     FormManager.clearForm(false);
     FormManager.lockOrigen();
   }
 
-  static validateEnvio() {
-    const panels = document.querySelectorAll('.tabs-content .tab-panel');
-    
-    for (const panel of panels) {
-      const fields = panel.querySelectorAll('input, select, textarea');
-      for (const f of fields) {
-        if (f.offsetParent === null) continue;
-        if (f.id === 'm-descripcionArticulo') continue;
-        if (f.type === 'radio') continue;
-        if (!f.value.trim()) return false;
-      }
 
-      const requiredRadios = Array.from(
-        document.querySelectorAll('.tab-panel input[type="radio"][required]')
-      );
-      const names = [...new Set(requiredRadios.map(r => r.name))];
-      for (const name of names) {
-        const grupo = document.querySelectorAll(`input[name="${name}"]`);
-        if (!Array.from(grupo).some(r => r.checked)) {
+  static validateEnvio() {
+    function isHidden(el) {
+      while (el) {
+        if (el.style && el.style.display === 'none') {
+          return true;
+        }
+        el = el.parentElement;
+      }
+      return false;
+    }
+    const panels = document.querySelectorAll('.tabs-content .tab-panel');
+    console.log('Total de paneles:', panels.length);
+
+    for (const panel of panels) {
+      console.group(`Panel: ${panel.id}`);
+
+      const selectAndTextInputs = panel.querySelectorAll('select, input[type="text"], input[type="number"]');
+      console.log(`Campos encontrados: ${selectAndTextInputs.length}`);
+
+      const fieldDetails = [];
+
+      for (const f of selectAndTextInputs) {
+        if (f.id === 'm-descripcionArticulo') continue;
+        if (isHidden(f)) continue;
+        const fieldInfo = {
+          id: f.id || f.name,
+          type: f.tagName.toLowerCase() === 'select' ? 'select' : f.type,
+          value: f.value.trim(),
+          valid: !!f.value.trim()
+        };
+
+        fieldDetails.push(fieldInfo);
+
+        if (!fieldInfo.valid) {
+          console.warn(`Campo inválido: ${fieldInfo.id}`);
+          console.log('Detalles del campo:', fieldInfo);
+          console.groupEnd();
           return false;
         }
       }
+
+      console.log('Detalles de campos:', fieldDetails);
+
+      const requiredRadios = Array.from(
+        panel.querySelectorAll('input[type="radio"][required]')
+      );
+
+      const radioGroups = [...new Set(requiredRadios.map(r => r.name))];
+
+      console.log('Grupos de Radio Requeridos:', radioGroups);
+
+      for (const name of radioGroups) {
+        const grupo = panel.querySelectorAll(`input[name="${name}"]`);
+
+        const radioGroupInfo = {
+          name: name,
+          totalRadios: grupo.length,
+          checkedRadios: Array.from(grupo).filter(r => r.checked),
+          isValid: Array.from(grupo).some(r => r.checked)
+        };
+
+        console.log('Grupo de Radio:', radioGroupInfo);
+
+        if (grupo.length > 0 && !radioGroupInfo.isValid) {
+          console.warn(`Grupo de Radio "${name}" sin selección`);
+          console.groupEnd();
+          return false;
+        }
+      }
+
+      console.log('Validación de panel: ÉXITO');
+      console.groupEnd();
     }
-    
+
     return true;
   }
 
@@ -1081,7 +1132,7 @@ class ShippingManager {
       "m-valorEnvio", "m-peso", "m-largo", "m-ancho", "m-alto", "m-descripcionArticulo",
       "m-nroDocumento", "m-celular", "m-nombres", "m-apellidos"
     ];
-    
+
     ids.forEach(id => {
       const el = document.getElementById(id);
       if (el) el.value = "";
@@ -1100,7 +1151,7 @@ class ShippingManager {
 
       if (isIndividualShipment) {
         console.log('Procesando envío individual...');
-        
+
         // Validar formulario antes de continuar
         if (!this.validateEnvio()) {
           Utils.showModal({ message: 'Complete todos los campos visibles antes de continuar.' });
@@ -1224,12 +1275,12 @@ class TableManager {
     document.querySelectorAll('.btn-delete').forEach(btn => {
       btn.addEventListener('click', () => {
         const idx = +btn.dataset.index;
-        Utils.showModal({ 
-          message: '¿Eliminar este envío?', 
-          onConfirm: () => { 
-            window.registros.splice(idx, 1); 
-            this.renderTabla(); 
-          } 
+        Utils.showModal({
+          message: '¿Eliminar este envío?',
+          onConfirm: () => {
+            window.registros.splice(idx, 1);
+            this.renderTabla();
+          }
         });
       });
     });
@@ -1238,7 +1289,7 @@ class TableManager {
       btn.addEventListener('click', () => {
         const idx = +btn.dataset.index;
         const warning = () => ShippingManager.startEdit(idx);
-        
+
         if (window.registros.length > 1) {
           Utils.showWarning('Al editar se eliminarán registros con origen diferente. ¿Continuar?', warning);
         } else {
@@ -1396,7 +1447,7 @@ class FieldManager {
   static toggleFolios() {
     const tipo = document.getElementById('m-tipoEmpaque')?.value;
     const grupoFolios = document.getElementById('grupo-folios');
-    
+
     if (grupoFolios) {
       grupoFolios.style.display = (tipo === '2') ? 'flex' : 'none';
       const input = grupoFolios.querySelector('input');
@@ -1407,7 +1458,7 @@ class FieldManager {
   static toggleArticulos() {
     const tipo = document.getElementById('m-tipoEmpaque')?.value;
     const grupoArticulos = document.getElementById('grupo-articulos');
-    
+
     if (grupoArticulos) {
       grupoArticulos.style.display = (tipo === '1') ? 'flex' : 'none';
       const select = grupoArticulos.querySelector('select');
@@ -1444,14 +1495,14 @@ class FieldManager {
     } else if (tipo && tipo !== '') {
       // Otros documentos - mostrar nombres y apellidos
       if (elementos.camposNombres) {
-        elementos.camposNombres.style.display = 'flex'; 
-        elementos.nombres.style.display='flex';
+        elementos.camposNombres.style.display = 'flex';
+        elementos.nombres.style.display = 'flex';
         elementos.nombres.required = true;
       }
-      if (elementos.camposApellidos){
-         elementos.camposApellidos.style.display = 'flex';
-         elementos.apellidos.style.display='flex';
-          elementos.apellidos.required = true;
+      if (elementos.camposApellidos) {
+        elementos.camposApellidos.style.display = 'flex';
+        elementos.apellidos.style.display = 'flex';
+        elementos.apellidos.required = true;
       }
     }
   }
@@ -1519,7 +1570,7 @@ class AppInitializer {
     TabManager.setupTabHints();
     FormManager.setupValidationListeners();
     LocationManager.setupLocationListeners();
-    
+
     // Inicializar campos dinámicos
     FieldManager.mostrarCamposDestino();
     FieldManager.toggleFolios();
@@ -1552,13 +1603,13 @@ class AppInitializer {
     if (btnLimpiar) {
       btnLimpiar.addEventListener('click', e => {
         e.preventDefault();
-        
+
         const fields = Array.from(
           document.querySelectorAll('#seccion-masiva input, #seccion-masiva select, #seccion-masiva textarea')
         );
-        
+
         const anyFilled = fields.some(f => f.value && f.value.trim() !== '');
-        
+
         if (!anyFilled) {
           Utils.showModal({ message: 'No hay campos para limpiar.' });
         } else {
@@ -1603,9 +1654,47 @@ class AppInitializer {
     if (btnContinuar) {
       btnContinuar.addEventListener('click', async (e) => {
         e.preventDefault();
-        
-        // Usar la nueva función unificada
-        await ShippingManager.enviarDatosResumen();
+        const selectsOrigen = document.querySelectorAll('#seccion-origen select');
+        const camposRemitente = document.querySelectorAll('#seccion_remitente select, #seccion_remitente input');
+
+        function destacarCampo(element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.style.transition = 'transform 0.3s ease';
+          element.style.transform = 'scale(1.05)';
+          setTimeout(() => {
+            element.style.transform = '';
+          }, 900);
+        }
+
+        let primerInvalido = null;
+
+        for (const select of selectsOrigen) {
+          if (select.value === '') {
+            primerInvalido = select;
+            break;
+          }
+        }
+
+        if (!primerInvalido) {
+          for (const campo of camposRemitente) {
+            if (!campo.matches(':user-valid')) {
+              primerInvalido = campo;
+              break;
+            }
+          }
+        }
+
+        if (!primerInvalido) {
+          await ShippingManager.enviarDatosResumen();
+        } else {
+          setTimeout(() => {
+            destacarCampo(primerInvalido);
+            setTimeout(() => {
+              Utils.showModal({ message: 'Complete todos los campos necesarios.' });
+            }, 1600)
+          }, 500)
+        }
+
       });
     }
 
@@ -1704,17 +1793,17 @@ function mostrarModalConfirmacion() {
 function agregarEnvio() {
   // Implementación de agregar envío usando las nuevas clases
   const envio = ShippingManager.collectFormData();
-  
+
   // Agregar a LISTA_ENVIOS para compatibilidad
   LISTA_ENVIOS.push(envio);
-  
+
   // También agregar a registros
   if (!window.registros) window.registros = [];
   window.registros.push(envio);
-  
+
   TableManager.actualizarTabla();
   ShippingManager.limpiarCampos();
-  
+
   console.log("Envío agregado:", envio);
 }
 
@@ -1729,7 +1818,7 @@ function eliminarEnvio(index) {
       // Eliminar de ambas listas para compatibilidad
       if (LISTA_ENVIOS[index]) LISTA_ENVIOS.splice(index, 1);
       if (window.registros[index]) window.registros.splice(index, 1);
-      
+
       TableManager.actualizarTabla();
       TableManager.renderTabla();
     }
@@ -1748,14 +1837,14 @@ function eliminarTodo() {
   localStorage.removeItem(CONFIG.STORAGE_KEY);
   LISTA_ENVIOS = [];
   window.registros = [];
-  
+
   TableManager.actualizarTabla();
   TableManager.renderTabla();
-  
+
   editIndex = -1;
   const btn = document.getElementById('btn-guardar');
   if (btn) btn.textContent = 'Guardar envío';
-  
+
   Utils.cerrarModal();
 }
 
@@ -1787,9 +1876,9 @@ function recolectarDatosEnvio() {
 // ===========================
 
 // Event listener principal para inicializar cuando el DOM esté listo
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   console.log('Inicializando aplicación de envíos...');
-  
+
   try {
     AppInitializer.init();
     console.log('Aplicación inicializada correctamente');
