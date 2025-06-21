@@ -6674,19 +6674,19 @@ VALUES (
   ),
   (
     'Caja S',
-    2.5,
+    3.0,
     100,
     1,
-    'caja S.png',
+    'caja_S.png',
     '20×30×12',
     3
   ),
   (
-    'Caja M',
-    3.2,
+    'Caja_M',
+    3.5,
     100,
     1,
-    'caja M.png',
+    'caja_M.png',
     '24×30×20',
     4
   ),
@@ -6695,7 +6695,7 @@ VALUES (
     4,
     100,
     1,
-    'caja L.png',
+    'caja_L.png',
     '30×42×23',
     5
   );
@@ -7945,16 +7945,16 @@ VALUES (
   );
 
 INSERT INTO DESCUENTO_articulo (DESCUENTOid, articuloid, cantidad_descuento)
-VALUES (1, 1, 1.5),
-  (1, 2, 1.8),
-  (1, 3, 2.0),
-  (1, 4, 2.2),
-  (1, 5, 2.5),
-  (2, 1, 3.5),
-  (2, 2, 3.8),
-  (2, 3, 4.0),
-  (2, 4, 4.3),
-  (2, 5, 4.5);
+VALUES (1, 1, 1.2),
+  (1, 2, 1.7),
+  (1, 3, 2.7),
+  (1, 4, 3.2),
+  (1, 5, 3.7),
+  (2, 1, 1.0),
+  (2, 2, 1.5),
+  (2, 3, 2.5),
+  (2, 4, 3.0),
+  (2, 5, 3.5);
 
 INSERT INTO tarifa_ruta (sucursal_origen_id, sucursal_destino_id, tarifa)
 VALUES (1, 2, 12.50),
