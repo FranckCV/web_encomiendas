@@ -2764,7 +2764,6 @@ def seguimiento_encomienda():
 @app.route('/resumen_envio_prueba', methods=['POST'])
 def resumen_envio_prueba():
     try:
-        
         raw = request.form.get('payload')
         if not raw:
             return "No se recibió payload", 400
@@ -2793,7 +2792,7 @@ def resumen_envio_prueba():
                                  modalidad_pago='',
                                  tipo_envio='')
         
-        # Procesar cada envío para calcular tarifas (ejemplo)
+        # Procesar cada envío para calcular tarifas
         for i, envio in enumerate(envios):
             origen_id  = envio['origen']['sucursal_origen']
             destino_id = envio['destino']['sucursal_destino']
@@ -2817,9 +2816,16 @@ def resumen_envio_prueba():
             # Asegurar que todos los campos necesarios existan
             envios[i] = normalizar_envio(envio)
         
+        # ✅ GUARDAR EN SESIÓN PARA EL SIGUIENTE PASO
+        session['resumen_envios'] = envios
+        session['remitente_data'] = remitente
+        session['modalidad_pago'] = modalidad_pago
+        session['tipo_envio'] = tipo_envio
+        
         # Log para debugging
         print(f"Procesando {len(envios)} envíos de tipo {tipo_envio}")
         print(f"Remitente: {remitente.get('nombre_remitente', 'No especificado')}")
+        print(f"Datos guardados en sesión para pago_envio_prueba")
         
         # Renderizar la plantilla con los datos
         return render_template('resumen_envio_prueba.html',
@@ -2830,13 +2836,14 @@ def resumen_envio_prueba():
                              error_message=None)
         
     except Exception as e:
-        print(f"Error en resumen_envio: {str(e)}")
-        return render_template('resumen_envio_prueba.html',
-                             error_message=f'Error interno del servidor: {str(e)}',
-                             envios=[],
-                             remitente={},
-                             modalidad_pago='',
-                             tipo_envio='')
+        print(f"Error en resumen_envio_prueba: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'error': 'Error procesando resumen',
+            'message': str(e)
+        }), 500
+
 
 @app.route('/pago_envio_prueba', methods=['POST'])
 def pago_envio_prueba():
@@ -3113,7 +3120,6 @@ def insertar_envio():
             'tipo_documentoid': int(remitente.get('tipo_doc_remitente',1)),
             'tipo_clienteid':   2 if remitente.get('tipo_doc_remitente')==2 else 1
         }
-
         # 1) Creamos transacción y paquetes
         num_serie = controlador_encomienda.crear_transaccion_y_paquetes(
             registros, cliente_data, tipo_comprobante
@@ -3169,37 +3175,44 @@ def insertar_envio():
         traceback.print_exc()
         return jsonify({
             'status': 'error',
-            'message': 'Ocurrió un error al procesar el envío'
+            'message': f'Ocurrió un error al procesar el envío: {repr(e)}'
         }), 500
-        
         
         
 @app.route('/insertar_envio_api', methods=['POST'])
 def insertar_envio_api():
     try:
-        nombre_empresa = controlador_empresa.get_nombre()
-        data = request.form.get('payload')
-
+        # Obtener datos JSON desde el frontend (tipo_comprobante y modalidad_pago)
+        data = request.get_json()
+        
         if not data:
-            return jsonify({'status': 'error', 'message': 'No se recibió un JSON válido'}), 400
-
-        # Convertir el JSON a un diccionario
-        try:
-            data = json.loads(data)
-            print(data)
-        except json.JSONDecodeError as e:
-            return jsonify({'status': 'error', 'message': f'Error al decodificar JSON: {str(e)}'}), 400
+            return jsonify({'status': 'error', 'message': 'No se recibieron datos'}), 400
 
         tipo_comprobante = data.get('tipo_comprobante')
-        print(tipo_comprobante)
+        modalidad_pago_seleccionada = data.get('metodo_pago')
+
+        # Validaciones básicas
+        if not tipo_comprobante:
+            return jsonify({'status': 'error', 'message': 'Tipo de comprobante es requerido'}), 400
         
+        if modalidad_pago_seleccionada is None:
+            return jsonify({'status': 'error', 'message': 'Modalidad de pago es requerida'}), 400
 
-        envios = data.get('envios') 
-        print(type(envios))
-        if not envios or not isinstance(envios, list):
-            return jsonify({'status': 'error', 'message': 'No se encontraron registros válidos'}), 400
+        # OBTENER DATOS COMPLETOS DE LA SESIÓN
+        datos_pago = session.get('datos_pago')
+        if not datos_pago:
+            return jsonify({'status': 'error', 'message': 'No se encontraron datos del envío en la sesión'}), 400
 
-        remitente = envios[0].get('remitente', {})  
+        envios = datos_pago.get('envios', [])
+        remitente = datos_pago.get('remitente', {})
+        
+        if not envios:
+            return jsonify({'status': 'error', 'message': 'No se encontraron envíos para procesar'}), 400
+
+        # PROCESAR IGUAL QUE TU insertar_envio_api ORIGINAL
+        nombre_empresa = controlador_empresa.get_nombre()
+        
+        # Preparar datos del cliente desde el remitente
         nombre = remitente.get('nombre_remitente', '')
         partes = nombre.split() if nombre else []
 
@@ -3212,22 +3225,21 @@ def insertar_envio_api():
             'tipo_documentoid': int(remitente.get('tipo_doc_remitente', 1)),
             'tipo_clienteid': 2 if remitente.get('tipo_doc_remitente') == 2 else 1
         }
-        # print(f'REGISTROS -> {registros}')
-        # print(f'CLIENTE_DATA -> {cliente_data}')
-        # print(f'tipo_comprobante -> {tipo_comprobante}')
-        # 1) Crear transacción y paquetes
+        print(envios)
+
+        # Crear la transacción con los envíos
         num_serie, trackings = controlador_encomienda.crear_transaccion_y_paquetes(
-            envios, cliente_data, tipo_comprobante  # Cambiar registros a envios
+            envios, cliente_data, tipo_comprobante
         )
 
-        # 2) Generar QR para cada paquete
+        # Generar QR para cada paquete
         if num_serie:
             try:
                 generar_qr_paquetes(trackings)
             except Exception as qr_err:
                 current_app.logger.warning(f"Error generando QR: {qr_err}")
 
-            # 3) Enviar correo al remitente
+            # Enviar correo al remitente
             destinatario_email = cliente_data['correo']
             if destinatario_email:
                 msg = Message(
@@ -3242,8 +3254,7 @@ def insertar_envio_api():
                     f"¡Gracias por confiar en {nombre_empresa}!"
                 )
 
-                for r in trackings:
-                    tracking = r
+                for tracking in trackings:
                     qr_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'qr.png')
                     if os.path.exists(qr_path):
                         with open(qr_path, 'rb') as f:
@@ -3254,23 +3265,29 @@ def insertar_envio_api():
 
                 mail.send(msg)
 
+        # LIMPIAR SESIÓN DESPUÉS DE PROCESAR
+        session.pop('datos_pago', None)
+        session.pop('resumen_envios', None)
+        session.pop('remitente_data', None)
+
         current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
+        
         return jsonify({
             'status': 'success',
-            'message': 'Transacción creada correctamente',
-            'comprobante_serie': num_serie
-        }), 201
-
-    except ValueError as ve:
-        current_app.logger.warning(f"Bad request: {ve}")
-        return jsonify({'status': 'error', 'message': str(ve)}), 400
+            'message': 'Envío procesado correctamente',
+            'num_serie': num_serie,
+            'trackings': trackings
+        }), 200
 
     except Exception as e:
+        current_app.logger.error(f"Error en insertar_envio: {str(e)}")
+        import traceback
         traceback.print_exc()
         return jsonify({
             'status': 'error',
             'message': 'Ocurrió un error al procesar el envío'
-        }), 500
+        }), 500        
+
 
 
 ##PARA PROBAR EL API E INSERTAR 

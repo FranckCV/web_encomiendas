@@ -6358,11 +6358,8 @@ INSERT INTO tipo_comprobante (inicial, nombre, descripcion, activo,tipo_uso)
 VALUES ('F', 'Factura', 'Factura', 1,'V'),
   ('BV', 'Boleta', 'Boleta de Venta', 1,'V'),
   ('GR', 'Guia de remision', 'Guía de Remisión', 1,'T'),
-  ('TI', 'Ticket', 'Ticket', 1,'V'),
   ('NC', 'Nota de crédito', 'Nota de Crédito', 1,'R'),
-  ('ND', 'D', 'Nota de Débito', 1,'R'),
-  ('OT', 'O', 'Otro', 1,'V');
-
+  ('ND', 'D', 'Nota de Débito', 1,'R');
 INSERT INTO `tipo_recepcion` (`id`, `nombre`, `activo`)
 VALUES (1, 'Recepción en sucursal', 1),
   (2, 'Recepción en domicilio', 1);
@@ -8173,24 +8170,7 @@ INSERT INTO detalle_estado (id, nombre, descripcion, activo, estado_encomiendaid
 (20, 'Firmado en conformidad', 'El destinatario o tercero firmó como constancia de la recepción.', 1, 4),
 (21, 'Entrega validada en sistema', 'La entrega fue confirmada en el sistema con hora y firma.', 1, 4);
 
-INSERT INTO transaccion_encomienda (
-    num_serie, masivo, descripcion, monto_total, recojo_casa,
-    id_sucursal_origen, fecha, hora,
-    direccion_recojo, clienteid, tipo_comprobanteid
-)
-VALUES (
-    'ENCO0001',
-    0,
-    'Envío regular Lima - Trujillo',
-    25.50,
-    0,
-    3,
-    CURRENT_DATE,
-    CURRENT_TIME,
-    'Av. Siempre Viva 742',
-    1,
-    1
-);
+
 
 INSERT INTO empleado (nombre, apellidos, correo, n_documento, rolid) VALUES
 ('Carlos', 'Ramírez León', 'carlos.ramirez@transportes.com', 'D12345678', 1),

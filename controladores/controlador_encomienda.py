@@ -192,16 +192,14 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
                         cliente_data['tipo_clienteid']
                     )
                 )
-                # print(f"este es el cliente NUEVO miau {cliente_id}") 
             
-            # 2) Obtener la serie del tipo de comprobante
+            print(cliente_id)
             result = sql_select_fetchone("SELECT inicial FROM tipo_comprobante WHERE id = %s", tipo_comprobante)
             if not result:
                 raise ValueError("Tipo de comprobante no válido")
             inicial = result['inicial'].strip().upper()
             comprobante_serie = f"{inicial}001"
 
-            # 3) Generar el nuevo correlativo
             row = sql_select_fetchone(
                 """
                 SELECT MAX(CAST(num_serie AS UNSIGNED)) as numero
@@ -215,18 +213,23 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
             comprobante_serie_final = f"{comprobante_serie}-{correlativo_str}"
 
             # 4) Insertar transacción
+            print(num_serie)
+            print(comprobante_serie_final)
             masivo = 1 if registros and registros[0].get('modo') == 'masivo' else 0
+            print(masivo)
             monto_total = sum(Decimal(r.get('tarifa', 0)) for r in registros).quantize(Decimal('0.01'))
+            print(monto_total)
             descripcion = f"Envío {'masivo' if masivo else 'individual'} #{comprobante_serie_final}"
+            print(descripcion)
             direccion_recojo = ''
 
             cursor.execute(
                 """
                 INSERT INTO transaccion_encomienda
-                (num_serie, masivo, descripcion, monto_total, recojo_casa,
+                (num_serie, masivo, descripcion, monto_total, 
                 id_sucursal_origen, fecha, hora,
                 direccion_recojo, clienteid, tipo_comprobanteid, comprobante_serie)
-                VALUES (%s, %s, %s, %s, 0, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
                     num_serie,
@@ -242,8 +245,9 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
                     comprobante_serie_final
                 )
             )
+            
+            print(cursor.lastrowid)
 
-            # 5) Insertar paquetes y seguimiento
             trackings = []
             for idx, r in enumerate(registros):
                 # print('ACA ES XDXD',idx , r)
@@ -259,12 +263,16 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
                 tipo_doc_dest = int(dest.get('tipo_doc_destinatario', 1))
                 num_doc_dest = dest.get('num_doc_destinatario', '')
                 tel_dest = dest.get('num_tel_destinatario', '')
-                nombre_contacto_destinatario = dest.get('nombre_contacto')
-                apellido_razon_destinatario = dest.get('apellido_razon')
-
+                if (tipo_doc_dest == 2):
+                    nombre_contacto_destinatario = dest.get('contacto')
+                    apellido_razon_destinatario = dest.get('razon_social')
+                else:
+                    nombre_contacto_destinatario = dest.get('nombres')
+                    apellido_razon_destinatario = dest.get('apellidos')
                 suc_dest_id = int(r['destino']['sucursal_destino'])
                 estado_pago = r.get('estado_pago', 'P')
-                modalidad_pago = r.get('modalidad_pago')
+                modalidad_pago = r.get('modalidadPago')
+                print('modalidad : ',modalidad_pago)
 
                 contenido_paqueteid = int(r.get('tipoArticuloId')) if r.get('tipoArticuloId') not in (None, '') else None
 
@@ -319,9 +327,9 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
                         cantidad_folios  
                     )
                 )
+                                
                 paquete_id = cursor.lastrowid
-
-                paquete_id = cursor.lastrowid
+                print(paquete_id)
                 cursor.execute(
                     """
                     INSERT INTO seguimiento
@@ -345,6 +353,7 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
     except Exception as e:
         # Rollback si ocurrió un error
         conexion.rollback()
+        print(str(e))
         return str(e)
 
     finally:

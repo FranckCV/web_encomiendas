@@ -316,6 +316,8 @@ class FormManager {
     });
   }
 
+
+
   static setupDocumentValidation() {
     // Remitente
     const tipoDocRemitente = document.getElementById('remitente-tipo-doc');
@@ -635,6 +637,7 @@ class TabManager {
   }
 }
 
+
 // ===========================
 // GESTIÓN DE UBICACIONES (API)
 // ===========================
@@ -914,6 +917,10 @@ class ShippingManager {
       const radio = document.querySelector(`input[name="${name}"]:checked`);
       return radio ? radio.value : '';
     };
+      let valorDireccion=''; // Agregar dirección si es domicilio
+      if(getValue('m-tipoEntrega')=='2'){
+           valorDireccion= document.getElementById('m-direccion').value
+        }
 
     // Recolectar datos con validación
     const formData = {
@@ -938,7 +945,7 @@ class ShippingManager {
         provincia: getValue('select-provincia'),
         distrito: getValue('select-distrito'),
         sucursal_destino: getValue('select-sucursal'),
-        direccion: getValue('m-direccion') // Agregar dirección si es domicilio
+        direccion : valorDireccion,
       },
       tipoEmpaque: getSelectText('m-tipoEmpaque'),
       tipoEmpaqueId: getValue('m-tipoEmpaque'),
@@ -985,6 +992,7 @@ class ShippingManager {
     const select = document.getElementById(selectId);
     return select?.selectedOptions[0]?.textContent || '';
   }
+
 
   static getDestinatarioName() {
     const tipoDoc = document.getElementById('m-tipoDocumento')?.value;
@@ -1495,8 +1503,14 @@ class FieldManager {
 
     if (tipo == '2') {
       // RUC - mostrar razón social y contacto
-      if (elementos.camposRazon) elementos.camposRazon.style.display = 'flex';
-      if (elementos.camposContacto) elementos.camposContacto.style.display = 'flex';
+      if (elementos.camposRazon) {
+        elementos.camposRazon.style.display = 'flex';
+        elementos.razon.style.display = 'flex';
+      }
+      if (elementos.camposContacto) {
+        elementos.camposContacto.style.display = 'flex';
+        elementos.contacto.style.display = 'flex';
+      }
       if (elementos.razon) elementos.razon.required = true;
       if (elementos.contacto) elementos.contacto.required = true;
     } else if (tipo && tipo !== '') {
@@ -1519,11 +1533,14 @@ class FieldManager {
 // INICIALIZACIÓN Y EVENTOS
 // ===========================
 class AppInitializer {
+  static reloadConfirmed = false;
   static init() {
     this.setupModeSpecificBehavior();
     this.setupEventListeners();
     this.initializeComponents();
     this.setupButtonEvents();
+    this.setupBeforeUnloadWarning();
+    // FormManager.limpiarAlRecargar();
   }
 
   static setupModeSpecificBehavior() {
@@ -1549,6 +1566,69 @@ class AppInitializer {
         if (btnAgregar) btnAgregar.style.display = 'none';
       }
     }
+  }
+  static hasFilledAll() {
+    const masiva = this.hasFilledFields('seccion-masiva');
+    const remitente = this.hasFilledFields('seccion_remitente');
+    const origen = this.hasFilledFields('seccion-origen');
+    return masiva || remitente || origen;
+  }
+
+  static hasFilledFields(seccion) {
+    const seccionMasiva = document.getElementById(seccion);
+    if (!seccionMasiva) return false;
+
+    const fields = seccionMasiva.querySelectorAll('input, select, textarea');
+
+    return Array.from(fields).some(field => {
+      if (field.type === 'radio') {
+        return field.checked;
+      }
+      return field.value && field.value.trim() !== '';
+    });
+  }
+
+  static setupBeforeUnloadWarning() {
+    // Para TODOS los intentos de salir/recargar (incluyendo botón del navegador)
+    window.addEventListener('beforeunload', (e) => {
+      if (this.reloadConfirmed) {
+        return;
+      }
+
+      if (this.hasFilledAll()) {
+        // Remover la lógica de modalShown aquí
+        // Para botón de recargar o cerrar pestaña - mostrar nativo
+        const message = '¿Estás seguro de que quieres salir? Perderás todo el progreso actual.';
+        e.preventDefault();
+        e.returnValue = message;
+        return message;
+      }
+    });
+
+    // Detectar teclas de recarga (F5 o Ctrl+R) - mantener separado
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
+        if (this.hasFilledAll()) {
+          e.preventDefault();
+          this.showReloadConfirmation();
+        }
+      }
+    });
+  }
+
+  static showReloadConfirmation() {
+    Utils.showModal({
+      message: '¿Estás seguro de que quieres recargar la página? Perderás todo el progreso actual.',
+      onConfirm: () => {
+        // Si confirma, recargar la página
+        this.reloadConfirmed = true;
+        window.location.reload();
+      },
+      onCancel: () => {
+        // No hacer nada, mantener la página
+        console.log('Recarga cancelada por el usuario');
+      }
+    });
   }
 
   static setupEventListeners() {
@@ -1714,6 +1794,7 @@ class AppInitializer {
       });
     }
   }
+
 }
 
 // ===========================

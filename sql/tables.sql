@@ -404,7 +404,7 @@ CREATE TABLE transaccion_encomienda (
  ', 
   descripcion        text, 
   monto_total        numeric(9, 2), 
-  recojo_casa        tinyint(1), 
+  recojo_casa        tinyint(1) DEFAULT 0, 
   id_sucursal_origen int(11) NOT NULL, 
   fecha              date NOT NULL, 
   hora               time NOT NULL, 
