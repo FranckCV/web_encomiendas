@@ -224,7 +224,7 @@
                 {% else %}
                   <a href="{{ url_for(funcion) }}">
                 {% endif %}
-                    <button class="{{ btn[5] if btn|length > 5 else '' }}" style="background-color: {{ color }};">
+                    <button class="{{ btn[5] if btn|length > 5 else '' }}" style="background-color: {{ color }};" id="{{fila[primary_key]}}">
                       <i class="{{ icono }}"></i>
                     </button>
                   </a>
@@ -388,8 +388,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.btn-ver-mapa').forEach(btn => {
     btn.addEventListener('click', async function () {
-      const tr = this.closest('tr');
-      const id_salida = tr.dataset["{{ primary_key }}"]; // <- usa el primary_key
+      const id_salida = btn.id;
 
       if (!id_salida) {
         alert("ID de salida no encontrado.");
@@ -397,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       try {
-        const response = await fetch("http://192.168.187.178:8000/obtener_coordenadas", {
+        const response = await fetch("http://192.168.100.15:8000/obtener_coordenadas", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

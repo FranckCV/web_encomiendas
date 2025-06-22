@@ -8188,3 +8188,7 @@ INSERT INTO salida (fecha, hora, recojo, entrega, estado, unidadid, destino_fina
 ('2025-06-16', '09:00:00', 0, 1, 'P', 3, 3, 5, 6),
 ('2025-06-16', '10:45:00', 1, 0, 'P', 4, 4, 7, 5),
 ('2025-06-16', '11:30:00', 1, 1, 'P', 5, 4, 7, 7);
+
+
+INSERT INTO `usuario` (`correo`, `contrasenia`, `tipo_usuario`, `activo`) 
+VALUES ('pedro.sanchez@transportes.com', SHA2('123456', 256), 'E', 1);

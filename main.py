@@ -86,7 +86,7 @@ from flask_socketio import SocketIO, emit
 from time import sleep
 from threading import Thread
 import traceback
-
+import socket
 from num2words import num2words
 import pdfkit
 import os
@@ -1630,7 +1630,7 @@ TRANSACCIONES = {
             [False,   f'{ICON_CONSULT}',   '#3165fd',  'salida_informacion', {} , ''],
             [False,   f'{ICON_UPDATE}',   '#ccac1c',  'salida_informacion', {} , ''],
             # [True,   f'fa-solid fa-location-dot',   'grey',  'seguimiento_empleado_prueba' , {"placa": "placa"}],
-            [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa'], 
+            [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa',], 
         ],
         "options": [
             # icon - color - text - enlace_function
@@ -3420,8 +3420,11 @@ def insertar_envio_api_22222():
 # }
 
 def generar_qr_paquetes(trackings):
+    hostname = socket.gethostname()
+    ip_address = socket.gethostbyname(hostname)
+    print(ip_address)
     for tracking in trackings:
-        qr_data = f"http://192.168.136.178:8000/insertar_estado?tracking={tracking}"
+        qr_data = f"http://192.168.100.15:8000/insertar_estado?tracking={tracking}"
 
         img = qrcode.make(qr_data)
 
@@ -4005,6 +4008,7 @@ def obtener_coordenadas():
         id_salida = data['salida']
 
         coordenadas = controlador_sucursal.get_coordenadas_actual(id_salida)
+        print('coordenas:',coordenadas)
 
         if not coordenadas:
             return jsonify({'error': 'No se encontraron coordenadas'}), 404
@@ -4014,13 +4018,32 @@ def obtener_coordenadas():
             'latitud_origen': coordenadas['latitud_origen'],
             'longitud_origen': coordenadas['longitud_origen'],
             'latitud_destino': coordenadas['latitud_destino'],
-            'longitud_destino': coordenadas['longitud_destino']
+            'longitud_destino': coordenadas['longitud_destino'],
+            "status":1
         }
         return jsonify(res)
 
     except Exception as e:
-        print("❌ ERROR EN BACKEND:", repr(e))
-        return jsonify({'error': str(e)}), 500
+        print("ERROR EN BACKEND:", repr(e))
+        return jsonify({'error': str(e),
+                        "status":-1}), 500
+
+@app.route('/cambiar_estado_salida', methods=['POST'])
+def cambiar_estado_salida():
+    try:
+        data = request.get_json()
+        if not data or 'id' not in data:
+            return jsonify({'success': False, 'message': 'Falta el campo "id" en el cuerpo JSON'}), 400
+
+        id_salida = data.get('id')
+        resultado = controlador_salida.change_state_exit(id_salida)
+        return jsonify(resultado)
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error del servidor: {str(e)}'}), 500
+
+
+
 
 @app.route('/seguimiento_unidad_prueba')
 def seguimiento_unidad_prueba():
@@ -4030,7 +4053,6 @@ def seguimiento_unidad_prueba():
     lon2 = request.args.get('lon2')
     id = request.args.get('id')
     
-    # Podrías formar un "viaje" simple si tu HTML espera eso
     data = [{
         
         'iniciolat_via': lat1,
@@ -4039,8 +4061,9 @@ def seguimiento_unidad_prueba():
         'finlon_via': lon2,
         'id':id
     }]
-
-    return render_template('seguimiento_empleado.html', data=data)
+    info = controlador_salida.get_data_by_id_salida(id)
+    print(info)
+    return render_template('seguimiento_empleado.html', data=data,info=info)
 
 
 

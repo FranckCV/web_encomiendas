@@ -1,4 +1,4 @@
-const API_URL = 'http://192.168.187.178:8000/obtener_coordenadas';
+const API_URL = 'http://192.168.100.15:8000/obtener_coordenadas';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBjGScX3XgV30r1tI31_Xa21gYQDH04caA",
@@ -13,7 +13,7 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-function mostrarMapaViaje(viajeIndex, viaje) {
+async function mostrarMapaViaje(viajeIndex, viaje) {
   const mapDiv = document.getElementById(`map-viaje-${viajeIndex}`) || document.getElementById("map");
   mapDiv.innerHTML = "";
 
@@ -25,58 +25,32 @@ function mostrarMapaViaje(viajeIndex, viaje) {
     zoom: 14,
   });
 
-  function crearMarcadorConInfo(pos, titulo, icono) {
-    const marker = new google.maps.Marker({
-      position: pos,
-      map,
-      title: titulo,
-      icon: icono
-    });
+  const inicio = {
+    lat: parseFloat(viaje.iniciolat_via),
+    lng: parseFloat(viaje.iniciolon_via)
+  };
 
-    const infoWindow = new google.maps.InfoWindow({
-      content: `<div style="font-weight:bold;">${titulo}</div>`
-    });
+  const fin = {
+    lat: parseFloat(viaje.finlat_via),
+    lng: parseFloat(viaje.finlon_via)
+  };
 
-    infoWindow.open(map, marker);
+  crearMarcadorConInfo(map, inicio, "Inicio del Viaje", "http://maps.google.com/mapfiles/ms/icons/green-dot.png");
+  crearMarcadorConInfo(map, fin, "Fin del Viaje", "http://maps.google.com/mapfiles/ms/icons/red-dot.png");
 
-    marker.addListener('click', () => {
-      infoWindow.open(map, marker);
-    });
+  await dibujarRutaPolyline(map, inicio, fin);
 
-    return marker;
-  }
-
-  // Marcadores de inicio y fin
-  crearMarcadorConInfo(
-    { lat: parseFloat(viaje.iniciolat_via), lng: parseFloat(viaje.iniciolon_via) },
-    "Inicio del Viaje",
-    "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
-  );
-
-  crearMarcadorConInfo(
-    { lat: parseFloat(viaje.finlat_via), lng: parseFloat(viaje.finlon_via) },
-    "Fin del Viaje",
-    "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
-  );
-
-
-// Ubicación en tiempo real desde Firebase (sin necesidad de dni)
-let marcadorFirebase = null;
+  let marcadorFirebase = null;
 let infoWindowFirebase = null;
 
-// Cambia 'vehiculo_actual' por el nodo que estés usando en Firebase
-const refFirebase = firebase.database().ref(`ubicaciones/6`);
-
-console.log('viaje',viaje.id)
+// Suponiendo que `viaje.id` contiene el ID de seguimiento en Firebase
+const refFirebase = firebase.database().ref(`ubicaciones/${viaje.id}`);
 
 refFirebase.on('value', snapshot => {
   const data = snapshot.val();
   if (data && data.latitud && data.longitud) {
     const lat = data.latitud;
     const lng = data.longitud;
-
-    console.log(lat)
-    console.log(lng)
 
     if (!marcadorFirebase) {
       marcadorFirebase = new google.maps.Marker({
@@ -93,7 +67,7 @@ refFirebase.on('value', snapshot => {
       });
 
       infoWindowFirebase.open(map, marcadorFirebase);
-      map.setCenter({ lat, lng });
+      map.setCenter({ lat, lng });  // Opcional: centrar en el vehículo
     } else {
       marcadorFirebase.setPosition({ lat, lng });
       infoWindowFirebase.setPosition({ lat, lng });
@@ -101,7 +75,75 @@ refFirebase.on('value', snapshot => {
   }
 });
 
+
 }
+
+function crearMarcadorConInfo(map, pos, titulo, icono) {
+  const marker = new google.maps.Marker({
+    position: pos,
+    map,
+    title: titulo,
+    icon: icono
+  });
+
+  const infoWindow = new google.maps.InfoWindow({
+    content: `<div style="font-weight:bold;">${titulo}</div>`
+  });
+
+  infoWindow.open(map, marker);
+  marker.addListener('click', () => {
+    infoWindow.open(map, marker);
+  });
+}
+
+
+async function dibujarRutaPolyline(map, inicio, fin) {
+  const API_KEY = 'AIzaSyBMLaqfr73_v_K7PfOhAq39cmjg7lKZT6o';  // Usa una API key válida con acceso a Routes API
+
+  const response = await fetch(`https://routes.googleapis.com/directions/v2:computeRoutes`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': API_KEY,
+      'X-Goog-FieldMask': 'routes.polyline.encodedPolyline'
+    },
+    body: JSON.stringify({
+      origin: {
+        location: {
+          latLng: { latitude: inicio.lat, longitude: inicio.lng }
+        }
+      },
+      destination: {
+        location: {
+          latLng: { latitude: fin.lat, longitude: fin.lng }
+        }
+      },
+      travelMode: "DRIVE"
+    })
+  });
+
+  const data = await response.json();
+  const ruta = data.routes?.[0];
+  const polylineEncoded = data.routes?.[0]?.polyline?.encodedPolyline;
+
+  if (polylineEncoded) {
+    const path = google.maps.geometry.encoding.decodePath(polylineEncoded);
+    const polyline = new google.maps.Polyline({
+      path,
+      geodesic: true,
+      strokeColor: "#1976D2",
+      strokeOpacity: 1.0,
+      strokeWeight: 5
+    });
+    polyline.setMap(map);
+
+
+
+  } else {
+    console.warn("No se pudo obtener la ruta desde Google Routes API");
+  }
+}
+
 
 // Inicializar automáticamente usando parámetros URL
 window.addEventListener('load', () => {
@@ -111,7 +153,7 @@ window.addEventListener('load', () => {
     iniciolon_via: params.get("lon1"),
     finlat_via: params.get("lat2"),
     finlon_via: params.get("lon2"),
-    incidentes: [] // podrías cargar desde backend si es necesario
+    id : params.get('id')
   };
 
   if (viaje.iniciolat_via && viaje.finlat_via) {
