@@ -8190,5 +8190,25 @@ INSERT INTO salida (fecha, hora, recojo, entrega, estado, unidadid, destino_fina
 ('2025-06-16', '11:30:00', 1, 1, 'P', 5, 4, 7, 7);
 
 
-INSERT INTO `usuario` (`correo`, `contrasenia`, `tipo_usuario`, `activo`) 
-VALUES ('pedro.sanchez@transportes.com', SHA2('123456', 256), 'E', 1);
+
+INSERT INTO usuario (correo, contrasenia, tipo_usuario, activo) VALUES
+('carlos.ramirez@transportes.com', SHA2('123456', 256), 'E', 1),
+('lucia.mendoza@transportes.com', SHA2('123456', 256), 'E', 1),
+('pedro.sanchez@transportes.com', SHA2('123456', 256), 'E', 1),
+('ana.torres@transportes.com', SHA2('123456', 256), 'E', 1),
+('luis.castillo@transportes.com', SHA2('123456', 256), 'E', 1),
+('maria.lopez@transportes.com', SHA2('123456', 256), 'E', 1),
+('javier.gomez@transportes.com', SHA2('123456', 256), 'E', 1),
+('sofia.fernandez@transportes.com', SHA2('123456', 256), 'E', 1);
+
+INSERT INTO empleado_salida (salidaid, empleadoid) VALUES 
+(1, 5), -- Pedro Sánchez Huamán (conductor principal de salida 1)
+(1, 3), -- Carlos Ramírez León
+(2, 6), -- Ana Torres Rivas (conductor principal de salida 2)
+(2, 4), -- Lucía Mendoza Ruiz
+(3, 5), -- Pedro Sánchez Huamán (conductor principal de salida 3)
+(3, 8), -- María López Espinoza
+(4, 7), -- Luis Castillo Valverde (conductor principal de salida 4)
+(4, 9), -- Javier Gómez Paredes
+(5, 7), -- Luis Castillo Valverde (conductor principal de salida 5)
+(5, 10); -- Sofía Fernández Quispe
