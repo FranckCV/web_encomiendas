@@ -51,7 +51,7 @@ from controladores import controlador_modalidad_pago as controlador_modalidad_pa
 from controladores import controlador_encomienda as controlador_encomienda
 from controladores import controlador_encomiendasss as  controlador_encomiendasss
 from controladores import controlador_seguimiento as  controlador_seguimiento
-
+from controladores import controlador_programacion_devolucion as controlador_programacion_devolucion
 from controladores import reporte_listar_enco 
 from controladores import reporte_reclamo_causa
 from controladores import reporte_UsoUnidades
@@ -2415,6 +2415,29 @@ def registrar_item_carrito():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/agregar-item-carrito", methods=["POST"])
+def registrar_item_carrito_json():
+    data = request.get_json()
+
+    articuloid = data.get("articuloid")
+    cantidad = data.get("cantidad")
+    clienteid = data.get("clienteid")
+    tipo_comprobanteid = 2  # Provisionalmente fijo
+
+    if not clienteid:
+        return jsonify({"error": "clienteid no proporcionado en el JSON"}), 400
+
+    try:
+        num_serie = controlador_transaccion_venta.registrar_detalle_venta(
+            clienteid=int(clienteid),
+            tipo_comprobanteid=tipo_comprobanteid,
+            articuloid=int(articuloid),
+            cantidad=int(cantidad)
+        )
+        return jsonify({"mensaje": "Item registrado en carrito", "num_serie": num_serie}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route("/eliminar-item-carrito", methods=["POST"])
 def eliminar_item_carrito():
@@ -3194,7 +3217,7 @@ def insertar_envio_api():
         # Validaciones básicas
         if not tipo_comprobante:
             return jsonify({'status': 'error', 'message': 'Tipo de comprobante es requerido'}), 400
-        
+        # modalidad_pago_seleccionada = 1
         if modalidad_pago_seleccionada is None:
             return jsonify({'status': 'error', 'message': 'Modalidad de pago es requerida'}), 400
 
@@ -4862,7 +4885,218 @@ def salida_informacion():
     unidades = controlador_unidad.get_capacidad_unidad()
     return render_template('salida_informacion.html',unidades=unidades)
 
+################PROGRAMACION DEVOLUCIONES############################
 
+@app.route("/buscar_paquete_devolucion", methods=["POST"])
+@validar_empleado()
+def buscar_paquete_devolucion():
+    """
+    Endpoint para buscar paquetes disponibles para devolución
+    """
+    try:
+        data = request.get_json()
+        tracking = data.get('criterio', '').strip()
+        
+        if not tracking:
+            return jsonify({
+                'success': False,
+                'message': 'Código de tracking requerido'
+            }), 400
+        
+        # Validar que sea un número
+        if not tracking.isdigit():
+            return jsonify({
+                'success': False,
+                'message': 'El código de tracking debe ser numérico'
+            }), 400
+        
+        paquete = controlador_programacion_devolucion.buscar_paquete(tracking)
+        
+        if paquete:
+            # Validar que el paquete pueda ser devuelto
+            puede_devolver = controlador_programacion_devolucion.validar_paquete_para_devolucion(paquete['tracking'])
+            
+            if puede_devolver:
+                return jsonify({
+                    'success': True,
+                    'paquete': paquete,
+                    'message': 'Paquete encontrado'
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'message': 'Este paquete no está disponible para devolución'
+                })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Paquete no encontrado'
+            })
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al buscar paquete: {str(e)}'
+        }), 500
+
+
+@app.route("/obtener_unidades_devolucion", methods=["POST"])
+@validar_empleado()
+def obtener_unidades_devolucion():
+    """
+    Endpoint para obtener unidades disponibles para devoluciones
+    """
+    try:
+        data = request.get_json()
+        tracking = data.get('tracking')
+        
+        if not tracking:
+            return jsonify({
+                'success': False,
+                'message': 'Tracking requerido para buscar unidades disponibles'
+            }), 400
+        
+        unidades = controlador_programacion_devolucion.obtener_unidades_disponibles(tracking)
+        
+        return jsonify({
+            'success': True,
+            'unidades': unidades
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener unidades: {str(e)}'
+        }), 500
+
+
+@app.route("/programar_devolucion", methods=["POST"])
+@validar_empleado()
+def programar_devolucion():
+    """
+    Endpoint para programar una devolución
+    """
+    try:
+        data = request.get_json()
+        tracking = data.get('tracking')
+        unidad_id = data.get('unidad_id')
+        
+        if not tracking or not unidad_id:
+            return jsonify({
+                'success': False,
+                'message': 'Tracking y unidad son requeridos'
+            }), 400
+        
+        # Validar que el paquete pueda ser devuelto
+        puede_devolver = controlador_programacion_devolucion.validar_paquete_para_devolucion(tracking)
+        
+        if not puede_devolver:
+            return jsonify({
+                'success': False,
+                'message': 'Este paquete no puede ser programado para devolución'
+            }), 400
+        
+        resultado = controlador_programacion_devolucion.programar_devolucion(tracking, unidad_id)
+        
+        if resultado['success']:
+            return jsonify(resultado)
+        else:
+            return jsonify(resultado), 400
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al programar devolución: {str(e)}'
+        }), 500
+
+
+@app.route("/historial_devoluciones", methods=["GET"])
+@validar_empleado()
+def historial_devoluciones():
+    """
+    Endpoint para obtener el historial de devoluciones
+    """
+    try:
+        limit = request.args.get('limit', 50, type=int)
+        
+        historial = controlador_programacion_devolucion.obtener_historial_devoluciones(limit)
+        
+        return jsonify({
+            'success': True,
+            'historial': historial
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener historial: {str(e)}'
+        }), 500
+
+
+@app.route("/estados_devolucion", methods=["GET"])
+@validar_empleado()
+def estados_devolucion():
+    """
+    Endpoint para obtener estados relacionados con devoluciones
+    """
+    try:
+        estados = controlador_programacion_devolucion.obtener_estados_devolucion()
+        
+        return jsonify({
+            'success': True,
+            'estados': estados
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener estados: {str(e)}'
+        }), 500
+
+
+# Opcional: Endpoint para validar un paquete específico
+@app.route("/validar_paquete_devolucion/<int:tracking>", methods=["GET"])
+@validar_empleado()
+def validar_paquete_devolucion_endpoint(tracking):
+    """
+    Endpoint para validar si un paquete específico puede ser devuelto
+    """
+    try:
+        puede_devolver = controlador_programacion_devolucion.validar_paquete_para_devolucion(tracking)
+        
+        return jsonify({
+            'success': True,
+            'puede_devolver': puede_devolver,
+            'tracking': tracking
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al validar paquete: {str(e)}'
+        }), 500
+
+
+@app.route("/obtener_paquetes_estado_17", methods=["GET"])
+@validar_empleado()
+def obtener_paquetes_estado_17():
+    """
+    Endpoint para obtener paquetes con detalle_estado_id = 17
+    """
+    try:
+        paquetes = controlador_programacion_devolucion.obtener_paquetes_estado_17()
+        
+        return jsonify({
+            'success': True,
+            'paquetes': paquetes
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener paquetes: {str(e)}'
+        }), 500
+##############################################
 
 if __name__ == "__main__":
     # app.run(host='192.168.48.178', port=8000, debug=True, use_reloader=True)

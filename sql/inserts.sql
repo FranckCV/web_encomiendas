@@ -8212,3 +8212,5 @@ INSERT INTO empleado_salida (salidaid, empleadoid) VALUES
 (4, 9), -- Javier Gómez Paredes
 (5, 7), -- Luis Castillo Valverde (conductor principal de salida 5)
 (5, 10); -- Sofía Fernández Quispe
+
+INSERT INTO `detalle_estado` (`id`, `nombre`, `descripcion`, `activo`, `estado_encomiendaid`) VALUES (NULL, 'Regresado a origen', 'No se reclamó así que se devolvió.', '1', '1');
