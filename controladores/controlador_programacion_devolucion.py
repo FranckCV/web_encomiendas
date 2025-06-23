@@ -4,7 +4,7 @@ from datetime import datetime
 # Función para buscar paquetes por tracking
 def buscar_paquete(tracking):
     """
-    Busca un paquete por número de tracking
+    Busca un paquete por número de tracking cuyo último estado sea detalle_estadoid = 17
     """
     sql = """
     SELECT 
@@ -32,16 +32,23 @@ def buscar_paquete(tracking):
     LEFT JOIN salida s ON p.salidaid = s.id
     LEFT JOIN unidad u_actual ON s.unidadid = u_actual.id
     LEFT JOIN modelo mo ON u_actual.modeloid = mo.id
-    LEFT JOIN seguimiento seg ON p.tracking = seg.paquetetracking
+    LEFT JOIN (
+        SELECT s1.*
+        FROM seguimiento s1
+        INNER JOIN (
+            SELECT paquetetracking, MAX(CONCAT(fecha, ' ', hora)) AS max_fh
+            FROM seguimiento
+            GROUP BY paquetetracking
+        ) ult ON s1.paquetetracking = ult.paquetetracking
+             AND CONCAT(s1.fecha, ' ', s1.hora) = ult.max_fh
+    ) seg ON p.tracking = seg.paquetetracking
     LEFT JOIN detalle_estado de ON seg.detalle_estadoid = de.id
     WHERE p.tracking = %s
     AND p.estado_pago != 'E'
-    ORDER BY seg.fecha DESC, seg.hora DESC
+    AND seg.detalle_estadoid = 17
     LIMIT 1
     """
     result = sql_select_fetchone(sql, (tracking,))
-    # print("Tracking:", tracking)
-    # print("Resultado:", result)
     return result
 
 # Función para obtener unidades disponibles para devolución
@@ -231,10 +238,10 @@ def obtener_historial_devoluciones(limit=50):
 
 def obtener_paquetes_estado_17():
     """
-    Obtiene los paquetes que tienen seguimiento con detalle_estado_id = 17
+    Obtiene los paquetes cuyo último seguimiento tiene detalle_estadoid = 17
     """
     sql = """
-    SELECT DISTINCT
+    SELECT 
         p.tracking,
         CONCAT(p.nombres_contacto_destinatario, ' ', p.apellidos_razon_destinatario) as destinatario,
         p.telefono_destinatario as telefono,
@@ -250,10 +257,18 @@ def obtener_paquetes_estado_17():
     INNER JOIN transaccion_encomienda te ON p.transaccion_encomienda_num_serie = te.num_serie
     INNER JOIN sucursal so ON te.id_sucursal_origen = so.id
     INNER JOIN sucursal sd ON p.sucursal_destino_id = sd.id
-    INNER JOIN seguimiento s ON p.tracking = s.paquetetracking
+    INNER JOIN (
+        SELECT s1.*
+        FROM seguimiento s1
+        INNER JOIN (
+            SELECT paquetetracking, MAX(CONCAT(fecha, ' ', hora)) as max_fecha_hora
+            FROM seguimiento
+            GROUP BY paquetetracking
+        ) ult ON s1.paquetetracking = ult.paquetetracking
+           AND CONCAT(s1.fecha, ' ', s1.hora) = ult.max_fecha_hora
+    ) s ON p.tracking = s.paquetetracking
     WHERE s.detalle_estadoid = 17
-    AND p.estado_pago NOT IN ('E', 'D')  -- No entregado ni en devolución
+    AND p.estado_pago NOT IN ('E', 'D')
     ORDER BY s.fecha DESC, s.hora DESC
     """
-    print(sql_select_fetchall(sql))
     return sql_select_fetchall(sql)
