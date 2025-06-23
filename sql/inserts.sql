@@ -10,7 +10,8 @@ INSERT INTO empresa (
     color_sec,
     color_ter,
     porcentaje_recojo,
-    igv
+    igv ,
+    actual 
 )
 VALUES (
     1,
@@ -24,7 +25,8 @@ VALUES (
     '#13e2da',
     '#1b98e0',
     5.00,
-    18.00              
+    18.00  ,
+    1 
 );
 
 

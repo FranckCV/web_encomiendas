@@ -110,6 +110,8 @@ CREATE TABLE empresa (
   ruc               char(11) NOT NULL, 
   id_sucursal       int(11) NOT NULL, 
   igv               numeric(9, 2) NOT NULL, 
+  actual            tinyint(1) DEFAULT 1 NOT NULL, 
+  fecha             date DEFAULT CURRENT_DATE NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE escala (
   sucursalid int(10) NOT NULL, 
@@ -189,6 +191,8 @@ CREATE TABLE pagina (
   icono         varchar(150), 
   activo        tinyint(1) DEFAULT 1 NOT NULL, 
   `key`         varchar(150) NOT NULL, 
+  mostrar       tinyint(1) DEFAULT 1, 
+  paginaid      int(11), 
   tipo_paginaid int(11) NOT NULL, 
   moduloid      int(11) NOT NULL, 
   PRIMARY KEY (id));
@@ -216,7 +220,7 @@ CREATE TABLE paquete (
   contenido_paqueteid              int(11), 
   tipo_recepcionid                 int(11) NOT NULL, 
   salidaid                         int(10), 
-  transaccion_encomienda_num_serie char(255), 
+  transaccion_encomienda_num_serie int(11), 
   modalidad_pagoid                 int(11) NOT NULL, 
   PRIMARY KEY (tracking));
 CREATE TABLE paquete_descuento (
@@ -235,6 +239,7 @@ CREATE TABLE permiso (
   `update` tinyint(1) NOT NULL, 
   `delete` tinyint(1) NOT NULL, 
   unactive tinyint(1) NOT NULL, 
+  otro     text DEFAULT '{}', 
   PRIMARY KEY (paginaid, 
   rolid));
 CREATE TABLE pregunta_frecuente (
@@ -292,9 +297,9 @@ CREATE TABLE salida (
   entrega             tinyint(1) NOT NULL, 
   estado              char(1) NOT NULL, 
   unidadid            int(10) NOT NULL, 
-  origen_inicio_id     int(11) NOT NULL, 
   destino_final_id    int(10) NOT NULL, 
   conductor_principal int(11) NOT NULL, 
+  origen_inicio_id    int(11) NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE seguimiento (
   paquetetracking    int(11) NOT NULL, 
@@ -398,7 +403,7 @@ CREATE TABLE tipo_unidad (
   activo      tinyint(1) DEFAULT 1 NOT NULL, 
   PRIMARY KEY (id));
 CREATE TABLE transaccion_encomienda (
-  num_serie          char(255) NOT NULL, 
+  num_serie          int(11) NOT NULL AUTO_INCREMENT, 
   masivo             tinyint(1) NOT NULL comment ' 1 si es envío masivo
 0 si es un empaque (paquete o sobre)
  ', 

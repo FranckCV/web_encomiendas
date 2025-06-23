@@ -1,0 +1,945 @@
+{% extends "MAESTRA_ADMIN.html" %}
+
+
+{% block titulo %}
+
+{% if rolid %}
+Permisos para {{info_rol.get('nombre')}}
+{% else %}
+{{NOMBRE_ADMINPAGES_PAGE}}
+{% endif %}
+
+{% endblock %}
+
+
+{% block estilos %}
+<style>
+    .section_content {
+        gap: 20px;
+        /* padding: 25px;
+        padding-right: 10px;
+        padding-bottom: 10px; */
+    }
+
+    .block_admin {
+        display: grid;
+        grid-template-columns: 4fr 1fr;
+        gap: 20px;
+    }
+
+    .block_admin>* {
+        height: 79.5vh;
+        /* background-color: #dfdfdf5e; */
+        background-color: var(--color9);
+        overflow-y: auto;
+        border-radius: 15px;
+        padding-block: 10px;
+    }
+
+    .block_rol {
+        background-color: var(--color3);
+        padding-inline: 10px;
+        color: white;
+        gap: 10px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .block_rol::-webkit-scrollbar {
+        width: 5px;
+        height: 8px;
+    }
+
+    .block_rol::-webkit-scrollbar-thumb {
+        background-color: var(--color-sec);
+        border-radius: var(--border-radius-size);
+    }
+
+    .block_rol::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+
+    .block_rol h5 {
+        font-size: 115%;
+        align-self: center;
+
+    }
+
+    .block_access {
+        gap: 15px;
+        display: grid;
+        /* grid-template-columns: repeat(2, 35.5vw); */
+        /* grid-template-columns: repeat(2, 25.5vw); */
+        grid-template-columns: repeat(2, 47.5%);
+        font-size: 100%;
+        justify-content: center;
+    }
+
+    .tip_block {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .tipo_content {
+        border-left: 1px solid white;
+        padding-inline: 10px;
+        gap: 5px;
+        display: flex;
+        flex-direction: column;
+        /* padding-block: 5px; */
+
+    }
+
+    .rol_block {
+        background-color: var(--color4);
+        border-radius: 5px;
+        padding-inline: 10px;
+        padding-block: 5px;
+        cursor: pointer;
+        color: white;
+
+    }
+
+    .rol_block:hover {
+        scale: 1.05;
+        color: var(--color19);
+    }
+
+    .tip_blocks {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .mod_head,
+    .mod_head>*,
+    .mod_block,
+    .mod_block>*,
+    .pag_block,
+    .pag_block>* {
+        display: flex;
+        padding-inline: 10px;
+        padding-block: 5px;
+        gap: 10px;
+        align-items: center;
+        /* border: 1px solid black; */
+        border-radius: 5px;
+    }
+
+    .mod_head {
+        padding: 0;
+        justify-content: space-between;
+        display: grid;
+        /* flex-direction: column; */
+        align-items: flex-start;
+        justify-items: center;
+        grid-template-areas:
+            " mod_t mod_o "
+            " mod_c mod_c "
+        ;
+    }
+
+    .mod_block {
+        flex-direction: column;
+        align-items: flex-start;
+        /* background-color: var(--color4); */
+        background-color: white;
+        border: 0;
+        padding-block: 10px;
+        position: relative;
+    }
+
+    .mod_block>* {
+        width: 100%;
+    }
+
+    .mod_title {
+        border: 1px solid #8c8c8c29;
+        font-size: 110%;
+        padding-block: 7px;
+        padding-inline: 12px;
+        border-radius: 5px;
+        justify-self: flex-start;
+        grid-area: mod_t;
+    }
+
+    .mod_head .mod_title {
+        cursor: auto;
+    }
+
+    .mod_title p {
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: 100%;
+    }
+
+    .mod_title i {
+        font-size: 150%;
+    }
+
+    .mod_opts {
+        grid-area: mod_o;
+        padding-inline: 10px;
+        justify-self: flex-end;
+        /* gap: 5px; */
+    }
+
+    .mod_opt {
+        /* padding-inline: 5px; */
+        height: 30px;
+        aspect-ratio: 1 / 1;
+        display: flex;
+        justify-content: center;
+        padding: 0;
+        align-items: center;
+        font-size: 140%;
+        border-radius: 50px;
+        color: var(--color4) !important;
+    }
+    
+    .mod_opt:hover {
+        scale: 1.10;
+        color: var(--color-thr) !important;
+    }
+
+    .mod_cant {
+        border-radius: 10px;
+        background-color: #f2f2f2;
+        justify-content: center;
+        justify-items: center;
+        display: flex;
+        gap: 0;
+        padding-inline: 3px;
+        width: 100%;
+        grid-area: mod_c;
+
+    }
+
+    .cant_block:first-of-type {
+        border: 0;
+    }
+
+    .cant_block {
+        border-left: 1px solid grey;
+        width: 100%;
+        padding-inline: 7px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .cant_content {
+        font-weight: bold;
+    }
+
+    .cant_title {
+        font-size: 80%;
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: 3.75vw;
+        text-align: center;
+    }
+
+    .mod_content {
+        flex-direction: column;
+        width: 100%;
+        padding-inline: 0;
+        overflow-y: scroll;
+        height: 200px;
+    }
+
+    .pag_block {
+        width: 100%;
+        display: grid;
+        /* grid-template-columns: 70% auto; */
+        grid-template-columns: 67.5% auto;
+        border: 0;
+        background-color: var(--color4);
+        border-radius: 25px;
+        padding-inline: 5px;
+        padding-block: 5px;
+    }
+
+    .pag_block:hover {
+        background-color: var(--color1);
+    }
+
+    .pag_options {
+        justify-self: center;
+        padding-inline: 0;
+        gap: 7px;
+    }
+
+    .btn_opt {
+        height: 25px;
+        width: 25px;
+        /* background-color: green; */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: transparent;
+        color: white;
+    }
+
+    .pag_options button {
+        display: flex;
+        height: 100;
+        font-size: 120%;
+        filter: brightness(1.4);
+    }
+
+    .pag_options button:hover {
+        scale: 1.15;
+    }
+
+    .pag_title {
+        height: 100%;
+        color: white;
+        padding-left: 5px;
+        padding-right: 0;
+        padding-block: 0px;
+        border: 0;
+        display: grid;
+        grid-template-columns: 30px auto;
+        gap: 5px;
+    }
+
+    .pag_title p {
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: 100%;
+    }
+
+    .pag_title i {
+        font-size: 145%;
+        justify-self: center;
+    }
+
+    .opciones_fila button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 85%;
+        height: 25px;
+        width: 25px;
+        padding: 0;
+    }
+
+    .opciones_fila button:hover {
+        scale: 1.10;
+    }
+
+    .opciones_fila button i {
+        display: flex;
+
+    }
+
+    .opciones_fila button.unable {
+        color: #5f5f5f;
+        background-color: white !important;
+        border: 1px solid #5f5f5f;
+    }
+
+    .pag_content {
+        justify-content: center;
+        gap: 7px;
+        border-radius: 20px;
+        background-color: var(--color9);
+        justify-self: flex-end;
+        padding-inline: 5px;
+        padding-block: 4px;
+    }
+
+    .back_to_page {
+        /* position: absolute; */
+        /* top: 10px; */
+        /* right: 10px; */
+        border-radius: 5px;
+        padding-inline: 15px;
+        padding-block: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: fit-content;
+        gap: 15px;
+    }
+
+    .block_title {
+        display: flex;
+        justify-content: space-between;
+    }
+</style>
+
+
+{% endblock %}
+
+
+{% block contenido %}
+
+<div class="block_crud block_title">
+    {% if rolid %}
+
+    <h3 class="crud_title">
+        <i class="ri-file-lock-fill"></i>
+        Permisos para {{info_rol.get('nombre')}}
+    </h3>
+
+
+    <style>
+    .pag_block {
+        grid-template-columns: auto auto;
+    }
+
+    .block_access {
+        grid-template-columns: 97.5%;
+    }
+
+    .block_admin>* {
+        height: 71.5vh;
+    }
+
+    .cant_title {
+        width: 5.75vw;
+    }
+
+    .mod_content {
+        height: auto;
+    }
+
+        
+    .mod_opt {
+        background-color: var(--color4) !important;
+        border: 1px solid var(--color4);
+        color: white !important;
+    }
+        
+    .mod_opt i {
+        font-size: 70%;
+    }
+
+    .mod_opt:hover {
+        background-color: var(--color-thr) !important;
+        border: 1px solid var(--color-thr);
+        color: white !important;
+    }
+
+    .mod_opt.unable {
+        color: var(--color4) !important;
+        background-color: white !important;
+    }
+
+    .mod_opt.unable:hover {
+        color: var(--color-thr) !important;
+        border: 1px solid var(--color-thr);
+    }
+
+    </style>
+
+    {% else %}
+
+    <h3 class="crud_title">
+        <i class="{{page_icono}}"></i>
+        {{page_titulo}}
+    </h3>
+
+    {% endif %}
+</div>
+
+<div class="block_crud block_admin">
+
+    <div class="block_access">
+        {% for modulo in modulos %}
+        <div class="mod_block" data-moduloid="{{ modulo.get('id') }}"
+            style="border: 1px solid color-mix(in srgb, {{ modulo.get('color') }} 40%, #dadada 80%) ;">
+            <div class="mod_head">
+                <div class="mod_title" style="
+                    background-color: color-mix(in srgb, {{ modulo.get('color') }} 15%, transparent 90%) ; 
+                    color: color-mix(in srgb, {{ modulo.get('color') }} 100%, black 30%)  ;
+                    border: 1px solid color-mix(in srgb, {{ modulo.get('color') }} 40%, #dadada 80%) ;
+                    ">
+                    <i class="{{ modulo.get('icono') }}"></i>
+                    <p> {{ modulo.get('nombre') }} </p>
+                </div>
+
+                <div class="mod_opts">
+                    {% if not rolid %}
+                        <button class="clickable-modal mod_opt text_consult"
+                            id="modal_crud_consult_modulo_{{ modulo.get('id') }}">
+                            <i class="{{ICON_CONSULT}}"></i>
+                        </button>
+
+                        <button class="clickable-modal mod_opt text_update"
+                            id="modal_crud_update_modulo_{{ modulo.get('id') }}">
+                            <i class="{{ICON_UPDATE}}"></i>
+                        </button>
+
+                        {% if modulo.get('activo') == 1 %}
+                        <button class="clickable-modal mod_opt text_active"
+                            id="modal_crud_unactive_modulo_{{ modulo.get('id') }}">
+                            <i class="{{ICON_ACTIVE}}"></i>
+                        </button>
+                        {% else %}
+                        <button class="clickable-modal mod_opt text_unactive"
+                            id="modal_crud_unactive_modulo_{{ modulo.get('id') }}">
+                            <i class="{{ICON_UNACTIVE}}"></i>
+                        </button>
+                        {% endif %}
+
+                    {% else %}
+
+                        <button data-column="acceso" class=" mod_opt unable " id="">
+                            <i class="{{ICON_UNLOCK}}"></i>
+                        </button>
+                        <button data-column="search" class=" mod_opt unable " id="">
+                            <i class="{{ICON_SEARCH}}"></i>
+                        </button>
+                        <button data-column="insert" class=" mod_opt unable " id="">
+                            <i class="{{ICON_INSERT}}"></i>
+                        </button>
+                        <button data-column="consult" class=" mod_opt unable " id="">
+                            <i class="{{ICON_CONSULT}}"></i>
+                        </button>
+                        <button data-column="unactive" class=" mod_opt unable " id="">
+                            <i class="{{ICON_ACTIVE}}"></i>
+                        </button>
+                        <button data-column="update" class=" mod_opt unable " id="">
+                            <i class="{{ICON_UPDATE}}"></i>
+                        </button>
+                        <button data-column="delete" class=" mod_opt unable " id="">
+                            <i class="{{ICON_DELETE}}"></i>
+                        </button>
+
+                    {% endif %}
+                </div>
+
+                <div class="mod_cant">
+                    {% for cant in cants_mod %}
+                    {% if cant.get('id') == modulo.get('id') %}
+                    <div class="cant_block">
+                        <div class="cant_content"> {{ cant.get('cant') }} </div>
+                        <div class="cant_title"> {{ cant.get('tip_nombre') }} </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mod_content">
+
+                {% for tipo_page in cants_mod %}
+                {% if tipo_page.id == modulo.id and tipo_page.cant > 0 %}
+                <p>{{ tipo_page.tip_nombre }}</p>
+
+                {% for page in paginas %}
+
+                {% if page.get('moduloid') == modulo.id and tipo_page.tip_id == page.tipo_paginaid %}
+                <div class="pag_block" data-paginaid="{{page.id}}">
+                    <div class="pag_title">
+                        {% if page.get('tipo_paginaid') == 1 %}
+                        <i class="{{ page.get('icono') or ICON_PAGE_NOICON }}"></i>
+                        <p> {{NOMBRE_CRUD_PAGE}} {{ page.get('titulo') | lower }} </p>
+                        {% else %}
+                        <i class="{{ page.get('icono') or ICON_PAGE_NOICON }}"></i>
+                        <p> {{ page.get('titulo') }} </p>
+                        {% endif %}
+                    </div>
+
+                    {% if rolid %}
+
+                    <div class="pag_content crud_ops">
+
+                        <div class="opciones_fila">
+                            <button data-column="acceso" class="btn_access {% if page.acceso is none or page.acceso == 0 %}unable{% endif %}" id="">
+                                <i class="{{ICON_UNLOCK}}"></i>
+                            </button>
+                        </div>
+
+                        {% if page.get('tipo_paginaid') in [1,3] %}
+                        <div class="opciones_fila">
+                            <button data-column="search" class="btn_search {% if page.search is none or page.search == 0 %}unable{% endif %}" id="">
+                                <i class="{{ICON_SEARCH}}"></i>
+                            </button>
+                        </div>
+
+                        <div class="opciones_fila">
+                            <button data-column="insert" class="btn_insert {% if page.insert is none or page.insert == 0 %}unable{% endif %}" id="">
+                                <i class="{{ICON_INSERT}}"></i>
+                            </button>
+                        </div>
+
+                        <div class="opciones_fila">
+                            <button data-column="consult" class=" btn_consult {% if page.consult is none or page.consult == 0 %}unable{% endif %}" id="">
+                                <i class="{{ICON_CONSULT}}"></i>
+                            </button>
+                        </div>
+
+                        <div class="opciones_fila">
+                            <button data-column="unactive" class=" btn_active {% if page.unactive is none or page.unactive == 0 %}unable{% endif %}" id="">
+                                <i class="{{ICON_ACTIVE}}"></i>
+                            </button>
+                        </div>
+
+                        <div class="opciones_fila">
+                            <button data-column="update" class=" btn_update {% if page['update'] is none or page['update'] == 0 %}unable{% endif %}" id="">
+                                <i class="{{ICON_UPDATE}}"></i>
+                            </button>
+                        </div>
+
+                        <div class="opciones_fila">
+                            <button data-column="delete" class=" btn_delete {% if page.delete is none or page.delete == 0 %}unable{% endif %}" id="">
+                                <i class="{{ICON_DELETE}}"></i>
+                            </button>
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+                    {% else %}
+
+                    <div class="pag_options">
+                        <button class="clickable-modal btn_opt text_consult"
+                            id="modal_crud_consult_pagina_{{ page.get('id') }}">
+                            <i class="{{ICON_CONSULT}}"></i>
+                        </button>
+
+                        <button class="clickable-modal btn_opt text_update"
+                            id="modal_crud_update_pagina_{{ page.get('id') }}">
+                            <i class="{{ICON_UPDATE}}"></i>
+                        </button>
+
+                        {% if page.get('activo') == 1 %}
+                        <button class="clickable-modal btn_opt text_active"
+                            id="modal_crud_unactive_pagina_{{ page.get('id') }}">
+                            <i class="{{ICON_ACTIVE}}"></i>
+                        </button>
+                        {% else %}
+                        <button class="clickable-modal btn_opt text_unactive"
+                            id="modal_crud_unactive_pagina_{{ page.get('id') }}">
+                            <i class="{{ICON_UNACTIVE}}"></i>
+                        </button>
+                        {% endif %}
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+                {% endif %}
+
+                {% endfor %}
+
+                {% endif %}
+                {% endfor %}
+
+
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="block_rol">
+
+        <h5>
+            Permisos de roles
+        </h5>
+
+        <div class="line_separator"></div>
+
+        <div class="tip_blocks">
+            {% for tipo in tipos_rol %}
+            <div class="tip_block">
+                <div class="tipo_title">
+                    {{ tipo.get('nombre') }}
+                </div>
+                <div class="tipo_content">
+
+                    {% for rol in roles %}
+
+                    {% if rol.get('tipo_rolid') == tipo.get('id') %}
+
+                    <a class="rol_block" href="{{url_for('permiso_rol' , rolid = rol.get('id') )}}">
+                        <div class="rol_title">
+                            {{ rol.get('nombre') }}
+                        </div>
+                    </a>
+
+                    {% endif %}
+
+                    {% endfor %}
+
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+{% if rolid %}
+<div class="block_crud">
+    <a class="back_to_page btn_back" href="{{url_for('administrar_paginas')}}">
+        <i class="fa-solid fa-arrow-left"></i>
+        <p>Volver a {{NOMBRE_ADMINPAGES_PAGE}}</p>
+    </a>
+</div>
+{% endif %}
+
+
+
+{% for modulo in modulos %}
+
+{% set fila = modulo %}
+{% set tabla = 'modulo' %}
+{% set primary_key = 'id' %}
+{% set nombre_tabla = 'módulo' %}
+{% set fields_form = fields_form_modulo %}
+
+
+{% set modo_modal = 'unactive' %}
+{% include 'MODAL_FORM_CRUD.html' %}
+
+{% set modo_modal = 'consult' %}
+{% include 'MODAL_FORM_CRUD.html' %}
+
+{% set modo_modal = 'update' %}
+{% include 'MODAL_FORM_CRUD.html' %}
+
+
+{% for pagina in paginas %}
+{% if pagina.get('moduloid') == modulo.get('id') %}
+
+
+{% set fila = pagina %}
+{% set tabla = 'pagina' %}
+{% set primary_key = 'id' %}
+{% set nombre_tabla = 'página' %}
+{% set fields_form = fields_form_page %}
+
+
+{% set modo_modal = 'consult' %}
+{% include 'MODAL_FORM_CRUD.html' %}
+
+{% set modo_modal = 'update' %}
+{% include 'MODAL_FORM_CRUD.html' %}
+
+{% set modo_modal = 'unactive' %}
+{% include 'MODAL_FORM_CRUD.html' %}
+
+
+{% endif %}
+{% endfor %}
+
+
+{% endfor %}
+
+
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<div id="overlayModal" class="overlayModal">
+    <div id="enlargedModal">
+    </div>
+</div>
+
+
+{% if fields_form_page and fields_form_modulo %}
+{% set fields_form_final = fields_form_page + fields_form_modulo %}
+
+<script>
+
+    const SELECT_OPTIONS = {
+    {% for campo in fields_form_final if campo[3] == 'select' %}
+    "{{campo[0]}}": [
+        {% for option in campo[6][0]() %}
+        { value: "{{option[0]}}", label: "{{option[1]}}" } {% if not loop.last %}, {% endif %}
+        {% endfor %}
+    ]{% if not loop.last %},  {% endif %}
+    {% endfor %}
+    
+  };
+
+</script>
+{% endif %}
+
+
+
+{% if rolid %}
+
+<script>
+    // const options = document.querySelectorAll('.opciones_fila ');
+    // options.forEach(opt => {
+        const btns = document.querySelectorAll('.mod_opt');
+        btns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                btn.classList.toggle('unable');
+            });
+        });
+    // });
+</script>
+
+<script>
+    function actualizarBotonesPermisosModulo() {
+        document.querySelectorAll('.mod_block').forEach(block => {
+            const columns = new Set();
+
+            // 1. Obtener todas las columnas únicas dentro del block
+            block.querySelectorAll('.opciones_fila button[data-column]').forEach(btn => {
+                columns.add(btn.dataset.column);
+            });
+
+            // 2. Revisar por cada columna
+            columns.forEach(column => {
+                const allButtons = block.querySelectorAll(`.opciones_fila button[data-column="${column}"]`);
+                const unableButtons = block.querySelectorAll(`.opciones_fila button[data-column="${column}"].unable`);
+
+                const modOpt = block.querySelector(`.mod_opt[data-column="${column}"]`);
+                if (allButtons.length > 0 && allButtons.length === unableButtons.length) {
+                    if (modOpt) {
+                        modOpt.classList.add('unable');
+                    } 
+                } else {
+                    modOpt.classList.remove('unable');
+                }
+            });
+        });
+    }
+    
+    actualizarBotonesPermisosModulo();
+
+    document.querySelectorAll('.mod_opt').forEach(opt => {
+        opt.addEventListener('click', () => {
+            const moduloid = opt.closest('[data-moduloid]').dataset.moduloid;
+            const column = opt.dataset.column;
+            const cantButtons = document.querySelectorAll(`.mod_block[data-moduloid="${moduloid}"] .opciones_fila button[data-column="${column}"]`).length;
+            // const cantButtons_1 = document.querySelectorAll(`.mod_block[data-moduloid="${moduloid}"] .opciones_fila button[data-column="${column}"]:not(.unable)`).length;
+            const cantButtons_0 = document.querySelectorAll(`.mod_block[data-moduloid="${moduloid}"] .opciones_fila button[data-column="${column}"].unable`).length;
+            let value;
+            if (cantButtons == cantButtons_0) {
+                value = 1;
+            } else {
+                value = 0;
+            }
+            const rolid = {{rolid}};
+
+            // console.log(column , moduloid , rolid , value);
+            // console.log(cantButtons , cantButtons_1 , cantButtons_0 );
+
+
+            fetch('/actualizar_permiso_modulo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    moduloid: moduloid,
+                    column: column ,
+                    rolid: rolid ,
+                    value : value ,
+                })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Error al actualizar");
+                return response.json();
+            })
+            .then(data => {
+                // console.log("Actualizado:", data);
+                if (data.rpta) {
+                    const lista = data.rpta;
+                    for (const element of lista) {
+                        for (const column in element) {
+                            // console.log(column , element[column]);
+                            if (column != 'paginaid') {
+                                const pageButton = document.querySelector(`.pag_block[data-paginaid="${element['paginaid']}"] .opciones_fila button[data-column="${column}"]`);
+                                // console.log(pageButton);
+                                if (pageButton) {
+                                    if (element[column] == 1) {
+                                        pageButton.classList.remove('unable');
+                                    } else if (element[column] == 0) {
+                                        pageButton.classList.add('unable');                                
+                                    }
+                                }
+                                
+                            }
+                        }
+                    }
+                }
+                actualizarBotonesPermisosModulo();
+                // if (data.rpta == 1) {
+                //     opt.classList.remove('unable');
+                // } else {
+                //     opt.classList.add('unable');
+                // }
+            })
+            .catch(err => {
+                alert("Error al actualizar respuesta");
+                console.error(err);
+            });
+        });
+    });
+
+
+
+</script>
+
+
+
+
+<script>
+    document.querySelectorAll('.opciones_fila button').forEach(opt => {
+        opt.addEventListener('click', () => {
+            const rolid = {{rolid}};
+            const column = opt.dataset.column;
+            const paginaid = opt.closest('[data-paginaid]').dataset.paginaid;
+            // const valor = opt.checked ? 1 : 0;
+
+            fetch('/actualizar_permiso', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    paginaid: paginaid,
+                    column: column ,
+                    rolid: rolid 
+                })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Error al actualizar");
+                return response.json();
+            })
+            .then(data => {
+                // console.log("Actualizado:", data);
+                if (data.rpta == 1) {
+                    opt.classList.remove('unable');
+                } else {
+                    opt.classList.add('unable');
+                }
+                actualizarBotonesPermisosModulo();
+
+            })
+            .catch(err => {
+                alert("Error al actualizar respuesta");
+                console.error(err);
+            });
+        });
+    });
+
+
+
+</script>
+{% endif %}
+
+
+{% endblock %}

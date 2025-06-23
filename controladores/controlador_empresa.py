@@ -12,64 +12,41 @@ def get_primary_key():
     return show_primary_key(table_name)
 
 
-# def exists_Activo():
-#     return exists_column_Activo(table_name)
+def delete_row( id ):
+    bd.delete_row_table(table_name , id)
 
-
-# def delete_row( id ):
-#     bd.delete_row_table(table_name , id)
-
-
-#####_ CAMBIAR SQL y DICT INTERNO _#####
-
-def table_fetchall():
+    
+def get_rows():
     sql= f'''
         select 
-            id ,
-            nombre
-        from {table_name}
+            * ,
+            CASE 
+                WHEN emp.actual = 1 THEN 'actual'
+                ELSE ''
+            END AS e_actual,
+            DATE_FORMAT(emp.fecha, "%d/%m/%Y") as fecha_txt 
+        from empresa emp
+        order by fecha desc , id desc
     '''
     resultados = sql_select_fetchall(sql)
     
     return resultados
 
 
-# def get_table():
-#     sql= f'''
-#         select 
-#             mar.id ,
-#             mar.nombre ,
-#             mar.activo 
-#         from {table_name} mar
-#     '''
-#     columnas = {
-#         'id': ['ID' , 0.5 ] , 
-#         'nombre' : ['Nombre' , 9.5] , 
-#         'activo' : ['Actividad' , 1] 
-#         }
-#     filas = sql_select_fetchall(sql)
-    
-#     return columnas , filas
+def insert_row(nombre, correo, nro_telefono, logo, color_pri, color_sec, color_ter, porcentaje_recojo, ruc, id_sucursal, igv ):
+    sql = '''
+        INSERT INTO 
+        empresa
+        (nombre, correo, nro_telefono, logo, color_pri, color_sec, color_ter, porcentaje_recojo, ruc, id_sucursal, igv ) VALUES 
+        ( %s , %s , %s , %s , %s , %s , %s , %s , %s , %s , %s )
+    '''
+    emp_id = sql_execute_lastrowid(sql,(nombre, correo, nro_telefono, logo, color_pri, color_sec, color_ter, porcentaje_recojo, ruc, id_sucursal, igv ))
+    return emp_id
 
-
-######_ CAMBIAR PARAMETROS Y SQL INTERNO _###### 
-
-# def unactive_row( id ):
-#     unactive_row_table(table_name , id)
-
-
-# def insert_row( nombre ):
-#     sql = f'''
-#         INSERT INTO 
-#             {table_name} ( nombre )
-#         VALUES 
-#             ( %s )
-#     '''
-#     sql_execute(sql,(nombre))
 
 def update_row( nombre , correo , nro_telefono , logo, porcentaje_recojo , color_pri , color_sec , color_ter ):
     sql = f'''
-        update {table_name} set 
+        update empresa set 
         nombre = %s ,
         correo = %s ,
         nro_telefono = %s ,
@@ -78,9 +55,25 @@ def update_row( nombre , correo , nro_telefono , logo, porcentaje_recojo , color
         color_pri = %s ,
         color_sec = %s ,
         color_ter = %s 
-        where id = 1
+        where actual = 1
     '''
     sql_execute(sql,( nombre , correo , nro_telefono , logo, porcentaje_recojo , color_pri , color_sec , color_ter ))
+
+
+def dar_actual_empresa_id( id ):
+    sql1 = f'''
+        update empresa set 
+        actual = 0
+        where id != %s
+    '''
+    sql_execute(sql1,( id, ))
+
+    sql2 = f'''
+        update empresa set 
+        actual = 1
+        where id = %s
+    '''
+    sql_execute(sql2,( id, ))
 
 
 def get_information():
@@ -93,8 +86,8 @@ def get_information():
             emp.color_pri ,
             emp.color_sec ,
             emp.color_ter 
-        from {table_name} emp
-        where id = 1
+        from empresa emp
+        where actual = 1
     '''
     
     info = sql_select_fetchone(sql)
@@ -113,22 +106,55 @@ def get_data():
             emp.logo,
             emp.color_pri ,
             emp.color_sec ,
-            emp.color_ter 
+            emp.color_ter ,
+
+            emp.ruc,
+            emp.id_sucursal,
+            emp.igv,
+            emp.fecha,
+
+            emp.actual
         from empresa emp
-        where id = 1
+        where actual = 1
     '''
     
     info = sql_select_fetchone(sql)
     
     return info
 
+def get_data_id(id):
+    sql= f'''
+        select 
+            emp.id ,
+            emp.nombre ,
+            emp.correo ,
+            emp.nro_telefono ,
+            emp.porcentaje_recojo , 
+            emp.logo,
+            emp.color_pri ,
+            emp.color_sec ,
+            emp.color_ter ,
+
+            emp.ruc,
+            emp.id_sucursal,
+            emp.igv,
+            emp.fecha,
+
+            emp.actual
+        from empresa emp
+        where id = %s
+    '''
+    
+    info = sql_select_fetchone(sql,(id))
+    
+    return info
 
 def get_logo():
     sql= f'''
         select 
             emp.logo 
         from empresa emp
-        where id = 1
+        where actual = 1
     '''
     
     info = sql_select_fetchone(sql)['logo']
@@ -141,7 +167,7 @@ def get_porcentaje_recojo():
         select 
             emp.porcentaje_recojo 
         from empresa emp
-        where id = 1
+        where actual = 1
     '''
     
     info = sql_select_fetchone(sql)['porcentaje_recojo']
@@ -153,7 +179,7 @@ def get_nombre():
         SELECT 
             emp.nombre
         FROM empresa emp
-        WHERE id = 1
+        WHERE actual = 1
     """
     fila = sql_select_fetchone(sql)
     return fila['nombre']

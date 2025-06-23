@@ -118,7 +118,7 @@ def get_options():
     try:
         sql = f'''
             SELECT 
-                {get_primary_key()},
+                id,
                 direccion
             FROM {table_name}
             WHERE activo = 1
@@ -264,10 +264,6 @@ def get_report_horario():
 
 
 
-
-
-
-
 def get_options_departamento_sucursal():
     sql= f'''
         SELECT DISTINCT 
@@ -350,7 +346,27 @@ def get_data_exit(correo):
     print(fila)
     return fila
     
-
+def get_options_sucursales():
+    sql= f'''
+        SELECT 
+            suc.id ,
+            concat(
+            ubi.departamento,
+            ' - ', 
+            ubi.provincia,
+            ' - ', 
+            ubi.distrito,
+            ' / ', 
+            suc.abreviatura,
+            ' - ', 
+            suc.direccion
+            ) as nom_sucursal
+        FROM sucursal suc
+        inner join ubigeo ubi on ubi.codigo = suc.ubigeocodigo
+        order by 2
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas
 
 def get_coordenadas_actual(id):
     sql = '''

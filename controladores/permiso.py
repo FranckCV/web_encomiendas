@@ -17,6 +17,24 @@ def get_lista_modulos():
     filas = bd.sql_select_fetchall(sql)
     return  filas
 
+def get_lista_modulos_activos():
+    sql= f'''
+        select 
+            mdl.id ,
+            mdl.nombre ,
+            mdl.icono ,
+            mdl.key ,
+            mdl.color ,
+            mdl.activo ,
+            mdl.img
+        from modulo mdl
+        where mdl.activo = 1
+        order by 2 asc 
+    '''
+
+    filas = bd.sql_select_fetchall(sql)
+    return  filas
+
 
 def get_modulo_key(key):
     sql= f'''
@@ -64,6 +82,24 @@ def get_pagina_key(key):
             pag.moduloid 
         from pagina pag
         where pag.key = %s
+    '''
+    filas = bd.sql_select_fetchone(sql,(key))
+    return  filas if key else None
+
+
+def get_pagina_key2(key):
+    sql= f'''
+        select 
+            pag.id ,
+            pag.titulo ,
+            pag.icono ,
+            pag.activo ,
+            pag.key ,
+            pag.tipo_paginaid , 
+            pag.moduloid 
+        from pagina pag
+        inner join modulo mdl on mdl.id = pag.moduloid
+        where pag.key = %s and mdl.activo = 1
     '''
     filas = bd.sql_select_fetchone(sql,(key))
     return  filas if key else None
@@ -271,7 +307,7 @@ def get_modulos_rol(rolid):
         FROM pagina pag
         INNER JOIN modulo mdl ON mdl.id = pag.moduloid
         LEFT JOIN permiso per ON per.paginaid = pag.id AND per.rolid = {rolid}
-        WHERE pag.activo = 1
+        WHERE pag.activo = 1 and mdl.activo = 1
         GROUP BY mdl.id, mdl.nombre, mdl.icono, mdl.key, mdl.color, mdl.activo, mdl.img
         HAVING cantidad_paginas_con_acceso > 0
         ORDER BY mdl.nombre
@@ -342,7 +378,8 @@ def get_paginas_permiso_rol( rolid ):
             per.insert ,
             per.update ,
             per.delete ,
-            per.unactive 
+            per.unactive ,
+            per.otro
         FROM rol
         CROSS JOIN pagina pag 
         inner join modulo mdl on mdl.id = pag.moduloid
@@ -380,13 +417,54 @@ def nuevo_permiso_pagina_rol( paginaid , rolid):
     bd.sql_execute(sql, (paginaid , rolid))
 
 
-def update_permiso_pagina(column , paginaid , rolid , value = None):
-    sql = f'''
-        update permiso set 
-        `{column}` = {value if value is not None else f'NOT `{column}`' }
-        where paginaid = {paginaid} and rolid = {rolid}
-    '''
-    bd.sql_execute(sql)
+# def update_permiso_pagina(column , paginaid , rolid , value = None):
+#     sql = f'''
+#         update permiso set 
+#         `{column}` = {value if value is not None else f'NOT `{column}`' }
+#         where paginaid = {paginaid} and rolid = {rolid}
+#     '''
+#     bd.sql_execute(sql)
+
+
+import json
+
+def update_permiso_pagina(column, paginaid, rolid, value=None):
+    if column in ['insert', 'search', 'update', 'unactive', 'delete', 'consult', 'acceso']:
+        # Campos binarios normales
+        sql = f'''
+            UPDATE permiso
+            SET `{column}` = {value if value is not None else f'NOT `{column}`'}
+            WHERE paginaid = {paginaid} AND rolid = {rolid}
+        '''
+        bd.sql_execute(sql)
+
+    else:
+        # Campos personalizados almacenados en el JSON 'Otro'
+        sql_get = f'''
+            SELECT otro FROM permiso
+            WHERE paginaid = {paginaid} AND rolid = {rolid}
+        '''
+        fila = bd.sql_select_fetchone(sql_get)
+        datos_json = {}
+
+        if fila and fila['otro']:
+            try:
+                datos_json = json.loads(fila['otro'])
+            except json.JSONDecodeError:
+                datos_json = {}
+
+        # Alternar valor entre 1 y 0
+        actual = datos_json.get(column, 0)
+        datos_json[column] = 0 if actual == 1 else 1
+
+        nuevo_json = json.dumps(datos_json)
+
+        sql_update = f'''
+            UPDATE permiso
+            SET otro = '{nuevo_json}'
+            WHERE paginaid = {paginaid} AND rolid = {rolid}
+        '''
+        bd.sql_execute(sql_update)
 
 
 def change_permiso_pagina(column , paginaid , rolid , value = None):
@@ -414,7 +492,7 @@ def validar_acceso(rolid , f_name , f_kwarg ):
             return True
         return None
     elif f_name == 'crud_generico' or f_name == 'reporte' or f_name == 'transaccion' or f_name == 'grafico' or f_name.startswith('crud_') :
-        page = get_pagina_key(f_kwarg)
+        page = get_pagina_key2(f_kwarg)
         if page:
             pag_id = page['id']
             permiso_rol = consult_permiso_rol(pag_id , rolid)
@@ -427,7 +505,7 @@ def validar_acceso(rolid , f_name , f_kwarg ):
                 return acceso if permiso_rol['pag_activo'] and permiso_rol['rol_activo'] else 0
         return None
     else :
-        page = get_pagina_key(f_name)
+        page = get_pagina_key2(f_name)
         if page:
             pag_id = page['id']
             permiso_rol = consult_permiso_rol(pag_id , rolid)
