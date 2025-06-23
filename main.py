@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app , send_file #, after_this_request, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app , send_file, flash #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import permiso as permiso
 from controladores import controlador_pagina as controlador_pagina
@@ -52,6 +52,7 @@ from controladores import controlador_encomienda as controlador_encomienda
 from controladores import controlador_encomiendasss as  controlador_encomiendasss
 from controladores import controlador_seguimiento as  controlador_seguimiento
 from controladores import controlador_programacion_devolucion as controlador_programacion_devolucion
+from controladores import controlador_seguimiento_reclamos as controlador_seguimiento_reclamos
 from controladores import reporte_listar_enco 
 from controladores import reporte_reclamo_causa
 from controladores import reporte_UsoUnidades
@@ -2006,7 +2007,7 @@ PAGINAS_SIMPLES = [
     'mis_envios',
     'NoRecibimos',
     'pagina_reclamo',
-    'seguimiento_reclamo',
+    # 'seguimiento_reclamo',
     'prueba_seguimiento',
     'cajas',
     'cajas_prueba',
@@ -5096,6 +5097,332 @@ def obtener_paquetes_estado_17():
             'success': False,
             'message': f'Error al obtener paquetes: {str(e)}'
         }), 500
+    
+####################SEGUIMIENTO DE RECLAMOS############################3
+
+# Ruta principal de seguimiento de reclamos
+@app.route("/seguimiento_reclamo")
+def seguimiento_reclamo():
+    """
+    Página principal de seguimiento de reclamos
+    """
+    return render_template('seguimiento_reclamo.html')
+
+# Ruta para buscar reclamo
+@app.route("/buscar_reclamo", methods=["POST"])
+def buscar_reclamo():
+    """
+    Busca un reclamo por ID o documento
+    """
+    try:
+        reclamo_id = request.form.get('reclamo_id', '').strip()
+        numero_documento = request.form.get('documento', '').strip()
+        
+        if not reclamo_id and not numero_documento:
+            flash('Debe ingresar al menos un criterio de búsqueda', 'error')
+            return redirect(url_for('seguimiento_reclamo'))
+        
+        # Convertir reclamo_id a entero si está presente
+        if reclamo_id:
+            try:
+                reclamo_id = int(reclamo_id)
+            except ValueError:
+                flash('El ID del reclamo debe ser un número válido', 'error')
+                return redirect(url_for('seguimiento_reclamo'))
+        
+        # Buscar el reclamo
+        reclamo = controlador_seguimiento_reclamos.buscar_reclamo_por_id_o_documento(reclamo_id, numero_documento)
+        
+        if not reclamo:
+            flash('No se encontró ningún reclamo con los criterios proporcionados', 'error')
+            return redirect(url_for('seguimiento_reclamo'))
+        
+        # Obtener datos relacionados
+        estados_reclamo = controlador_seguimiento_reclamos.obtener_estados_reclamo()
+        seguimientos = controlador_seguimiento_reclamos.obtener_seguimientos_reclamo(reclamo['id'])
+        ultimo_seguimiento = controlador_seguimiento_reclamos.obtener_ultimo_seguimiento_reclamo(reclamo['id'])
+        estados_usados = controlador_seguimiento_reclamos.obtener_estados_usados_reclamo(reclamo['id'])
+        
+        # Agrupar seguimientos por estado
+        seguimientos_por_estado = controlador_seguimiento_reclamos.agrupar_seguimientos_por_estado(seguimientos)
+        
+        return render_template('seguimiento_reclamo.html',
+                             reclamo=reclamo,
+                             estados_reclamo=estados_reclamo,
+                             seguimientos_por_estado=seguimientos_por_estado,
+                             ultimo_seguimiento=ultimo_seguimiento,
+                             estados_usados=estados_usados)
+        
+    except Exception as e:
+        flash(f'Error al buscar reclamo: {str(e)}', 'error')
+        return redirect(url_for('seguimiento_reclamo'))
+
+# Ruta directa con ID de reclamo
+@app.route("/seguimiento_reclamo/<int:reclamo_id>")
+def seguimiento_reclamo_directo(reclamo_id):
+    """
+    Acceso directo al seguimiento con ID de reclamo
+    """
+    try:
+        # Buscar el reclamo
+        reclamo = controlador_seguimiento_reclamos.buscar_reclamo_por_id_o_documento(reclamo_id=reclamo_id)
+        
+        if not reclamo:
+            flash('No se encontró el reclamo especificado', 'error')
+            return redirect(url_for('seguimiento_reclamo'))
+        
+        # Obtener datos relacionados
+        estados_reclamo = controlador_seguimiento_reclamos.obtener_estados_reclamo()
+        seguimientos = controlador_seguimiento_reclamos.obtener_seguimientos_reclamo(reclamo['id'])
+        ultimo_seguimiento = controlador_seguimiento_reclamos.obtener_ultimo_seguimiento_reclamo(reclamo['id'])
+        estados_usados = controlador_seguimiento_reclamos.obtener_estados_usados_reclamo(reclamo['id'])
+        
+        # Agrupar seguimientos por estado
+        seguimientos_por_estado = controlador_seguimiento_reclamos.agrupar_seguimientos_por_estado(seguimientos)
+        
+        return render_template('seguimiento_reclamo.html',
+                             reclamo=reclamo,
+                             estados_reclamo=estados_reclamo,
+                             seguimientos_por_estado=seguimientos_por_estado,
+                             ultimo_seguimiento=ultimo_seguimiento,
+                             estados_usados=estados_usados)
+        
+    except Exception as e:
+        flash(f'Error al consultar reclamo: {str(e)}', 'error')
+        return redirect(url_for('seguimiento_reclamo'))
+
+# Endpoint para agregar seguimiento a reclamo (solo empleados)
+@app.route("/agregar_seguimiento_reclamo", methods=["POST"])
+@validar_empleado()
+def agregar_seguimiento_reclamo():
+    """
+    Agrega un nuevo seguimiento a un reclamo existente
+    """
+    try:
+        data = request.get_json()
+        
+        reclamo_id = data.get('reclamo_id')
+        detalle_reclamo_id = data.get('detalle_reclamo_id')
+        
+        if not reclamo_id or not detalle_reclamo_id:
+            return jsonify({
+                'success': False,
+                'message': 'Reclamo ID y Detalle Reclamo ID son requeridos'
+            }), 400
+        
+        resultado = controlador_seguimiento_reclamos.agregar_seguimiento_reclamo(reclamo_id, detalle_reclamo_id)
+        
+        return jsonify(resultado)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al agregar seguimiento: {str(e)}'
+        }), 500
+
+# Endpoint para obtener reclamos por estado (solo empleados)
+@app.route("/reclamos_por_estado/<int:estado_id>", methods=["GET"])
+@validar_empleado()
+def reclamos_por_estado(estado_id):
+    """
+    Obtiene reclamos filtrados por estado
+    """
+    try:
+        limit = request.args.get('limit', 50, type=int)
+        
+        reclamos = controlador_seguimiento_reclamos.obtener_reclamos_por_estado_activo(estado_id, limit)
+        
+        return jsonify({
+            'success': True,
+            'reclamos': reclamos
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener reclamos: {str(e)}'
+        }), 500
+
+# Endpoint para obtener detalles de reclamo por estado (solo empleados)
+@app.route("/detalles_reclamo_por_estado/<int:estado_id>", methods=["GET"])
+@validar_empleado()
+def detalles_reclamo_por_estado(estado_id):
+    """
+    Obtiene los detalles disponibles para un estado de reclamo
+    """
+    try:
+        detalles = controlador_seguimiento_reclamos.obtener_detalles_reclamo_por_estado(estado_id)
+        
+        return jsonify({
+            'success': True,
+            'detalles': detalles
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener detalles: {str(e)}'
+        }), 500
+
+# Endpoint API para obtener información de reclamo (JSON)
+@app.route("/api/reclamo/<int:reclamo_id>", methods=["GET"])
+def api_info_reclamo(reclamo_id):
+    """
+    API endpoint para obtener información de un reclamo en formato JSON
+    """
+    try:
+        reclamo = controlador_seguimiento_reclamos.buscar_reclamo_por_id_o_documento(reclamo_id=reclamo_id)
+        
+        if not reclamo:
+            return jsonify({
+                'success': False,
+                'message': 'Reclamo no encontrado'
+            }), 404
+        
+        ultimo_seguimiento = controlador_seguimiento_reclamos.obtener_ultimo_seguimiento_reclamo(reclamo['id'])
+        seguimientos = controlador_seguimiento_reclamos.obtener_seguimientos_reclamo(reclamo['id'])
+        
+        return jsonify({
+            'success': True,
+            'reclamo': dict(reclamo),
+            'ultimo_seguimiento': dict(ultimo_seguimiento) if ultimo_seguimiento else None,
+            'seguimientos': [dict(s) for s in seguimientos]
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al consultar reclamo: {str(e)}'
+        }), 500
+
+# Endpoint para validar si existe un tracking para reclamo
+@app.route("/validar_tracking_reclamo/<int:tracking>", methods=["GET"])
+def validar_tracking_reclamo(tracking):
+    """
+    Valida si un tracking existe y puede ser asociado a un reclamo
+    """
+    try:
+        paquete = controlador_seguimiento_reclamos.validar_tracking_existe(tracking)
+        
+        if paquete:
+            return jsonify({
+                'success': True,
+                'existe': True,
+                'info_paquete': {
+                    'tracking': paquete.get('tracking'),
+                    'destinatario': paquete.get('destinatario_completo')
+                }
+            })
+        else:
+            return jsonify({
+                'success': True,
+                'existe': False,
+                'message': 'Tracking no encontrado'
+            })
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al validar tracking: {str(e)}'
+        }), 500
+
+# Endpoint para obtener todos los reclamos (vista administrativa)
+@app.route("/admin/reclamos", methods=["GET"])
+@validar_empleado()
+def admin_reclamos():
+    """
+    Vista administrativa de todos los reclamos
+    """
+    try:
+        limit = request.args.get('limit', 50, type=int)
+        reclamos = controlador_seguimiento_reclamos.obtener_todos_los_reclamos(limit)
+        
+        return render_template('admin_reclamos.html', reclamos=reclamos)
+        
+    except Exception as e:
+        flash(f'Error al cargar reclamos: {str(e)}', 'error')
+        return redirect(url_for('dashboard'))
+
+# Endpoint para obtener tipos de reclamo
+@app.route("/api/tipos_reclamo", methods=["GET"])
+def api_tipos_reclamo():
+    """
+    API para obtener tipos de reclamo disponibles
+    """
+    try:
+        tipos = controlador_seguimiento_reclamos.obtener_tipos_reclamo()
+        
+        return jsonify({
+            'success': True,
+            'tipos': tipos
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener tipos de reclamo: {str(e)}'
+        }), 500
+
+# Endpoint para obtener motivos por tipo de reclamo
+@app.route("/api/motivos_reclamo/<int:tipo_id>", methods=["GET"])
+def api_motivos_reclamo(tipo_id):
+    """
+    API para obtener motivos por tipo de reclamo
+    """
+    try:
+        motivos = controlador_seguimiento_reclamos.obtener_motivos_por_tipo_reclamo(tipo_id)
+        
+        return jsonify({
+            'success': True,
+            'motivos': motivos
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener motivos: {str(e)}'
+        }), 500
+
+# Endpoint para obtener causas por motivo de reclamo
+@app.route("/api/causas_reclamo/<int:motivo_id>", methods=["GET"])
+def api_causas_reclamo(motivo_id):
+    """
+    API para obtener causas por motivo de reclamo
+    """
+    try:
+        causas = controlador_seguimiento_reclamos.obtener_causas_por_motivo_reclamo(motivo_id)
+        
+        return jsonify({
+            'success': True,
+            'causas': causas
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener causas: {str(e)}'
+        }), 500
+
+# Endpoint para obtener estados de reclamo
+@app.route("/api/estados_reclamo", methods=["GET"])
+def api_estados_reclamo():
+    """
+    API para obtener estados de reclamo disponibles
+    """
+    try:
+        estados = controlador_seguimiento_reclamos.obtener_estados_reclamo()
+        
+        return jsonify({
+            'success': True,
+            'estados': estados
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener estados: {str(e)}'
+        }), 500
+##############################################3
 ##############################################
 
 if __name__ == "__main__":
