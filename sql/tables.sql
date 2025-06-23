@@ -409,7 +409,7 @@ CREATE TABLE transaccion_encomienda (
  ', 
   descripcion        text, 
   monto_total        numeric(9, 2), 
-  recojo_casa        tinyint(1), 
+  recojo_casa        tinyint(1) DEFAULT 0, 
   id_sucursal_origen int(11) NOT NULL, 
   fecha              date NOT NULL, 
   hora               time NOT NULL, 
@@ -508,3 +508,5 @@ ALTER TABLE empleado_salida ADD CONSTRAINT FKempleado_s895470 FOREIGN KEY (emple
 ALTER TABLE escala ADD CONSTRAINT FKescala650496 FOREIGN KEY (salidaid) REFERENCES salida (id);
 ALTER TABLE escala ADD CONSTRAINT FKescala667165 FOREIGN KEY (sucursalid) REFERENCES sucursal (id);
 ALTER TABLE sucursal ADD CONSTRAINT FKsucursal756715 FOREIGN KEY (ubigeocodigo) REFERENCES ubigeo (codigo);
+
+ALTER TABLE `tipo_comprobante` ADD `tipo_uso` CHAR(1) NULL DEFAULT NULL AFTER `activo`;

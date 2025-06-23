@@ -119,7 +119,7 @@ def get_options():
         sql = f'''
             SELECT 
                 id,
-                direccion
+                concat(abreviatura,'-',direccion) as direccion
             FROM {table_name}
             WHERE activo = 1
             ORDER BY direccion ASC
@@ -336,11 +336,11 @@ def get_data_exit(correo):
         from empleado_salida es
         inner join salida s on s.id = es.salidaid
         inner join empleado e on e.id = es.empleadoid
-        inner join sucursal so on so.id = s.origen_incio
-        inner join sucursal sd on sd.id = s.destino_final
+        inner join sucursal so on so.id = s.origen_inicio_id
+        inner join sucursal sd on sd.id = s.destino_final_id
         where e.correo=%s and s.estado = 'P'
         order by CURRENT_DATE DESC
-        limit 1
+        limit 1;
     '''
     fila = sql_select_fetchone(sql,correo)
     print(fila)
@@ -376,9 +376,9 @@ def get_coordenadas_actual(id):
         sd.latitud as latitud_destino,
         sd.longitud as longitud_destino
         from salida s
-        inner join sucursal so on so.id = s.origen_incio
-        inner join sucursal sd on sd.id = s.destino_final
-        where s.id = %s and s.estado = 'P' or 'T'
+        inner join sucursal so on so.id = s.origen_inicio_id
+        inner join sucursal sd on sd.id = s.destino_final_id
+        where s.id = %s and s.estado IN ('P', 'T')
     '''
     fila = sql_select_fetchone(sql,id)
     return fila

@@ -26,7 +26,7 @@ def sql_select_fetchall(sql , args = None):
 
 def sql_select_fetchone(sql , args = None):
     conexion = obtener_conexion()
-    try:
+    try: 
         with conexion.cursor() as cursor:
             cursor.execute(sql, args)
             resultados = cursor.fetchone()

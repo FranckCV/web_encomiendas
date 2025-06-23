@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app , send_file #, after_this_request, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app , send_file, flash #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import permiso as permiso
 from controladores import controlador_pagina as controlador_pagina
@@ -50,6 +50,9 @@ from controladores import controlador_articulo as controlador_articulo
 from controladores import controlador_modalidad_pago as controlador_modalidad_pago
 from controladores import controlador_encomienda as controlador_encomienda
 from controladores import controlador_encomiendasss as  controlador_encomiendasss
+from controladores import controlador_seguimiento as  controlador_seguimiento
+from controladores import controlador_programacion_devolucion as controlador_programacion_devolucion
+from controladores import controlador_seguimiento_reclamos as controlador_seguimiento_reclamos
 from controladores import reporte_listar_enco 
 from controladores import reporte_reclamo_causa
 from controladores import reporte_UsoUnidades
@@ -83,8 +86,8 @@ from datetime import timedelta
 from flask_socketio import SocketIO, emit
 from time import sleep
 import traceback
-
-# from num2words import num2words
+import socket
+from num2words import num2words
 import pdfkit
 import os
 
@@ -1366,7 +1369,7 @@ REPORTES = {
         "titulo": "Reporte de Usuarios",
         "table": controlador_usuario.get_report_usuarios(),
         "filters": [
-            ['tipo_usuario', 'Tipo de Usuario', lambda: controlador_usuario.get_options()],
+            ['tipo_usuario', 'Tipo de Usuario', lambda: controlador_usuario.get_options_tipo_usuario()],
             ['activo', 'Estado', lambda: [(1, "Activo"), (0, "Inactivo")]],
         ],
     },     
@@ -1479,6 +1482,7 @@ TRANSACCIONES = {
             [False,   f'{ICON_UPDATE}',   'var(--color-update)',  'salida_informacion', {} , '' ,'update'],
             [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa' , 'mapa'], 
             # [True,   f'fa-solid fa-location-dot',   'grey',  'seguimiento_empleado_prueba' , {"placa": "placa"}],
+            # [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa',], 
         ],
         "options": [
         # mostrar_url       icon             color                  text           enlace_function    parametros  modo(insert ,update , consult)
@@ -1562,15 +1566,40 @@ TRANSACCIONES = {
         },
         "buttons": [
         # hay_parametros  icon         color              enlace_function      parametros   clase_html   modo(insert ,update , consult)
-            [True, 'fa-solid fa-map-location-dot', "#9856EE", 'seguimiento_tracking', {"tracking": "tracking"} , '' , 'seguimiento'],
+            # [True, 'fa-solid fa-map-location-dot', "#9856EE", 'seguimiento_tracking', {"tracking": "tracking"} , '' , 'seguimiento'],
+            [True, 'fa-solid fa-route', "#9856EE", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"}],
+            [True, 'fa-solid fa-qrcode', "#B8CBD7", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"}],
         ],
         "options": [
         # mostrar_url       icon             color                  text                 enlace_function       parametros                    modo(insert ,update , consult)
             [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Encomiendas', 'transaccion' , {"tabla": "::transaccion_encomienda" } , 'encomiendas'],
         ],
-
+    },
+    "seguimiento": {
+        "active": True,
+        "titulo": "Seguimiento",
+        "nombre_tabla": "seguimiento",
+        "controlador": controlador_seguimiento,
+        "icon_page": "fa-solid fa-route",
+        "filters": [], 
+        "fields_form": [
+        #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
+            ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_seguimiento.get_options_dict() , 'nombre_det' ] ],
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": False,
+            "crud_consult": False,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": False
+        },
+        "buttons": [],
+        "options": [
+            [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Encomiendas', 'transaccion' , {"tabla": "::paquete" }],
+        ],
     }
-
 }
 
 
@@ -1825,7 +1854,7 @@ PAGINAS_SIMPLES = [
     'mis_envios',
     'NoRecibimos',
     'pagina_reclamo',
-    'seguimiento_reclamo',
+    # 'seguimiento_reclamo',
     'prueba_seguimiento',
     'cajas',
     'cajas_prueba',
@@ -2234,6 +2263,29 @@ def registrar_item_carrito():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/agregar-item-carrito", methods=["POST"])
+def registrar_item_carrito_json():
+    data = request.get_json()
+
+    articuloid = data.get("articuloid")
+    cantidad = data.get("cantidad")
+    clienteid = data.get("clienteid")
+    tipo_comprobanteid = 2  # Provisionalmente fijo
+
+    if not clienteid:
+        return jsonify({"error": "clienteid no proporcionado en el JSON"}), 400
+
+    try:
+        num_serie = controlador_transaccion_venta.registrar_detalle_venta(
+            clienteid=int(clienteid),
+            tipo_comprobanteid=tipo_comprobanteid,
+            articuloid=int(articuloid),
+            cantidad=int(cantidad)
+        )
+        return jsonify({"mensaje": "Item registrado en carrito", "num_serie": num_serie}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route("/eliminar-item-carrito", methods=["POST"])
 def eliminar_item_carrito():
@@ -2580,8 +2632,257 @@ def seguimiento_encomienda():
     estado_encomienda = controlador_estado_encomienda.get_last_state()
     return render_template('seguimiento.html',estado_encomienda=estado_encomienda)
 
+@app.route('/resumen_envio_prueba', methods=['POST'])
+def resumen_envio_prueba():
+    try:
+        raw = request.form.get('payload')
+        if not raw:
+            return "No se recibió payload", 400
 
-@app.route('/resumen_envio', methods=['POST'])
+        # Obtener datos del request
+        data = json.loads(raw)
+        
+        if not data:
+            return jsonify({
+                'error': 'No se recibieron datos',
+                'message': 'El request no contiene datos JSON válidos'
+            }), 400
+        
+        # Extraer información del payload
+        envios = data.get('envios', [])
+        remitente = data.get('remitente', {})
+        modalidad_pago = data.get('modalidad_pago', '')
+        tipo_envio = data.get('tipo_envio', 'individual')
+        
+        # Validaciones básicas
+        if not envios:
+            return render_template('resumen_envio.html', 
+                                 error_message='No se encontraron envíos para procesar',
+                                 envios=[],
+                                 remitente={},
+                                 modalidad_pago='',
+                                 tipo_envio='')
+        
+        # Procesar cada envío para calcular tarifas
+        for i, envio in enumerate(envios):
+            origen_id  = envio['origen']['sucursal_origen']
+            destino_id = envio['destino']['sucursal_destino']
+            valor      = Decimal(str(envio['valorEnvio']))
+            peso       = Decimal(str(envio['peso']))
+
+            tarifa_row  = controlador_tarifa_ruta.get_tarifa_ids(origen_id, destino_id) or {}
+            tarifa_base = Decimal(str(tarifa_row.get('tarifa', 0)))
+
+            regla_p      = controlador_regla_cargo.get_regla_cargo_condicion('P', float(peso)) or {}
+            regla_v      = controlador_regla_cargo.get_regla_cargo_condicion('V', float(valor)) or {}
+            porcentaje_p = Decimal(str(regla_p.get('porcentaje', 0)))
+            porcentaje_v = Decimal(str(regla_v.get('porcentaje', 0)))
+            porcentaje_r = Decimal(str(controlador_empresa.get_porcentaje_recojo()))
+
+            total = controlador_tarifa_ruta.calcularTarifaTotal(
+                tarifa_base, peso, porcentaje_r, porcentaje_v, porcentaje_p
+            )
+            envios[i]['tarifa'] = total
+            
+            # Asegurar que todos los campos necesarios existan
+            envios[i] = normalizar_envio(envio)
+        
+        # ✅ GUARDAR EN SESIÓN PARA EL SIGUIENTE PASO
+        session['resumen_envios'] = envios
+        session['remitente_data'] = remitente
+        session['modalidad_pago'] = modalidad_pago
+        session['tipo_envio'] = tipo_envio
+        
+        # Log para debugging
+        print(f"Procesando {len(envios)} envíos de tipo {tipo_envio}")
+        print(f"Remitente: {remitente.get('nombre_remitente', 'No especificado')}")
+        print(f"Datos guardados en sesión para pago_envio_prueba")
+        
+        # Renderizar la plantilla con los datos
+        return render_template('resumen_envio_prueba.html',
+                             envios=envios,
+                             remitente=remitente,
+                             modalidad_pago=modalidad_pago,
+                             tipo_envio=tipo_envio,
+                             error_message=None)
+        
+    except Exception as e:
+        print(f"Error en resumen_envio_prueba: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'error': 'Error procesando resumen',
+            'message': str(e)
+        }), 500
+
+
+@app.route('/pago_envio_prueba', methods=['POST'])
+def pago_envio_prueba():
+    try:
+        # Obtener datos del formulario o de la sesión
+        envios_data = request.form.get('envios_data')
+        remitente_data = request.form.get('remitente_data')
+        modalidad_pago = request.form.get('modalidad_pago')
+        tipo_envio = request.form.get('tipo_envio')
+        
+        print(f"Datos recibidos del formulario:")
+        print(f"- envios_data_form: {envios_data[:100] if envios_data else 'None'}...")
+        print(f"- remitente_data: {remitente_data[:100] if remitente_data else 'None'}...")
+        print(f"- modalidad_pago: {modalidad_pago}")
+        print(f"- tipo_envio: {tipo_envio}")
+        
+        # Si no vienen del formulario, obtener de la sesión
+        if not envios_data:
+            print("No hay datos en formulario, obteniendo de sesión...")
+            envios = session.get('resumen_envios', [])
+            remitente = session.get('remitente_data', {})
+            modalidad_pago = session.get('modalidad_pago', '')
+            tipo_envio = session.get('tipo_envio', 'individual')
+        else:
+            try:
+                # Convertir de JSON string a objetos Python
+                envios = json.loads(envios_data) if envios_data else []
+                remitente = json.loads(remitente_data) if remitente_data else {}
+                
+                print(f"Datos parseados correctamente:")
+                print(f"- Número de envíos: {len(envios)}")
+                print(f"- Remitente: {remitente.get('nombre_remitente', 'No especificado')}")
+                
+            except json.JSONDecodeError as e:
+                print(f"Error parseando JSON: {e}")
+                print(f"Datos problemáticos - envios_data: {envios_data}")
+                print(f"Datos problemáticos - remitente_data: {remitente_data}")
+                
+                # Intentar obtener de la sesión como fallback
+                envios = session.get('resumen_envios', [])
+                remitente = session.get('remitente_data', {})
+                modalidad_pago = session.get('modalidad_pago', modalidad_pago or '')
+                tipo_envio = session.get('tipo_envio', tipo_envio or 'individual')
+                
+                if not envios:
+                    return jsonify({
+                        'error': 'Error en formato de datos',
+                        'message': 'Los datos enviados no tienen un formato válido'
+                    }), 400
+        
+        if not envios:
+            print("No se encontraron envíos, redirigiendo...")
+            return redirect(url_for('tipos_envio'))
+        
+        # Calcular total a pagar
+        total_pagar = 0
+        for envio in envios:
+            try:
+                tarifa = float(envio.get('tarifa', 0))
+                total_pagar += tarifa
+            except (ValueError, TypeError):
+                print(f"Error calculando tarifa para envío: {envio}")
+                pass
+        
+        print(f"Total a pagar calculado: S/ {total_pagar}")
+        
+        # Guardar datos para el proceso de pago
+        session['datos_pago'] = {
+            'envios': envios,
+            'remitente': remitente,
+            'modalidad_pago': modalidad_pago,
+            'tipo_envio': tipo_envio,
+            'total_pagar': total_pagar
+        }
+        
+        print(f"Datos guardados en sesión, renderizando template...")
+        
+        tipos_comprobante = controlador_tipo_comprobante.get_tipo_comprobante_by_tipo()
+        metodos_pago = controlador_metodo_pago.get_metodo_pago_online()
+        
+        return render_template('pago_envio_prueba.html',
+                             envios=envios,
+                             remitente=remitente,
+                             modalidad_pago=modalidad_pago,
+                             tipo_envio=tipo_envio,
+                             total_pagar=total_pagar,
+                             tipos_comprobante=tipos_comprobante,
+                             metodos_pago=metodos_pago)
+        
+    except Exception as e:
+        print(f"Error general en pago_envio_prueba: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        
+        return jsonify({
+            'error': 'Error procesando pago',
+            'message': str(e)
+        }), 500
+
+# Función auxiliar para debug
+def debug_request_data():
+    """Función para hacer debug de los datos recibidos"""
+    print("=== DEBUG REQUEST DATA ===")
+    print(f"Method: {request.method}")
+    print(f"Content-Type: {request.content_type}")
+    print(f"Form data: {dict(request.form)}")
+    print(f"JSON data: {request.get_json(silent=True)}")
+    print(f"Raw data: {request.data}")
+    print("=" * 30)
+
+
+
+def normalizar_envio(envio):
+    """
+    Normaliza los datos del envío para asegurar que todos los campos existan
+    """
+    campos_default = {
+        'tipoEntrega': '',
+        'tipoEntregaId': '',
+        'valorEnvio': 0,
+        'peso': 0,
+        'largo': 0,
+        'ancho': 0,
+        'alto': 0,
+        'folios': '',
+        'descripcion': '',
+        'clave': '',
+        'tarifa': 0,
+        'tipoEmpaque': '',
+        'tipoArticulo': '',
+        'destino': {
+            'departamento': '',
+            'provincia': '',
+            'distrito': '',
+            'sucursal_destino': '',
+            'direccion': ''
+        },
+        'origen': {
+            'departamento_origen': '',
+            'provincia_origen': '',
+            'distrito_origen': '',
+            'sucursal_origen': ''
+        },
+        'destinatario': {
+            'nombre_destinatario': '',
+            'num_doc_destinatario': '',
+            'num_tel_destinatario': ''
+        }
+    }
+    
+    # Combinar datos default con los datos recibidos
+    envio_normalizado = {**campos_default, **envio}
+    
+    # Normalizar objetos anidados
+    if 'destino' in envio:
+        envio_normalizado['destino'] = {**campos_default['destino'], **envio.get('destino', {})}
+    
+    if 'origen' in envio:
+        envio_normalizado['origen'] = {**campos_default['origen'], **envio.get('origen', {})}
+        
+    if 'destinatario' in envio:
+        envio_normalizado['destinatario'] = {**campos_default['destinatario'], **envio.get('destinatario', {})}
+    
+    return envio_normalizado
+
+
+"""
+@app.route('/resumen_envio_prueba', methods=['POST'])
 def resumen_envio():
     data = request.get_json(force=True)
     envios = data.get('registros')
@@ -2616,7 +2917,7 @@ def resumen_envio():
     session['resumen_envios'] = resultados
 
     return redirect(url_for('resumen'))
-
+"""
 
 @app.route('/resumen')
 def resumen():
@@ -2690,7 +2991,6 @@ def insertar_envio():
             'tipo_documentoid': int(remitente.get('tipo_doc_remitente',1)),
             'tipo_clienteid':   2 if remitente.get('tipo_doc_remitente')==2 else 1
         }
-
         # 1) Creamos transacción y paquetes
         num_serie = controlador_encomienda.crear_transaccion_y_paquetes(
             registros, cliente_data, tipo_comprobante
@@ -2746,17 +3046,125 @@ def insertar_envio():
         traceback.print_exc()
         return jsonify({
             'status': 'error',
-            'message': 'Ocurrió un error al procesar el envío'
+            'message': f'Ocurrió un error al procesar el envío: {repr(e)}'
         }), 500
-        
         
         
 @app.route('/insertar_envio_api', methods=['POST'])
 def insertar_envio_api():
     try:
+        # Obtener datos JSON desde el frontend (tipo_comprobante y modalidad_pago)
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'status': 'error', 'message': 'No se recibieron datos'}), 400
+
+        tipo_comprobante = data.get('tipo_comprobante')
+        modalidad_pago_seleccionada = data.get('metodo_pago')
+
+        # Validaciones básicas
+        if not tipo_comprobante:
+            return jsonify({'status': 'error', 'message': 'Tipo de comprobante es requerido'}), 400
+        # modalidad_pago_seleccionada = 1
+        if modalidad_pago_seleccionada is None:
+            return jsonify({'status': 'error', 'message': 'Modalidad de pago es requerida'}), 400
+
+        # OBTENER DATOS COMPLETOS DE LA SESIÓN
+        datos_pago = session.get('datos_pago')
+        if not datos_pago:
+            return jsonify({'status': 'error', 'message': 'No se encontraron datos del envío en la sesión'}), 400
+
+        envios = datos_pago.get('envios', [])
+        remitente = datos_pago.get('remitente', {})
+        
+        if not envios:
+            return jsonify({'status': 'error', 'message': 'No se encontraron envíos para procesar'}), 400
+
+        # PROCESAR IGUAL QUE TU insertar_envio_api ORIGINAL
+        nombre_empresa = controlador_empresa.get_nombre()
+        
+        # Preparar datos del cliente desde el remitente
+        nombre = remitente.get('nombre_remitente', '')
+        partes = nombre.split() if nombre else []
+
+        cliente_data = {
+            'correo':        remitente.get('correo_remitente', ''),
+            'telefono':      remitente.get('num_tel_remitente', ''),
+            'num_documento': remitente.get('num_doc_remitente', ''),
+            'nombre_siglas': partes[0] if partes else '',
+            'apellidos_razon': ' '.join(partes[1:]) if len(partes) > 1 else '',
+            'tipo_documentoid': int(remitente.get('tipo_doc_remitente', 1)),
+            'tipo_clienteid': 2 if remitente.get('tipo_doc_remitente') == 2 else 1
+        }
+        print(envios)
+
+        # Crear la transacción con los envíos
+        num_serie, trackings = controlador_encomienda.crear_transaccion_y_paquetes(
+            envios, cliente_data, tipo_comprobante
+        )
+
+        # Generar QR para cada paquete
+        if num_serie:
+            try:
+                generar_qr_paquetes(trackings)
+            except Exception as qr_err:
+                current_app.logger.warning(f"Error generando QR: {qr_err}")
+
+            # Enviar correo al remitente
+            destinatario_email = cliente_data['correo']
+            if destinatario_email:
+                msg = Message(
+                    subject=f"{nombre_empresa} Envío registrado: {num_serie}",
+                    sender=app.config['MAIL_USERNAME'],
+                    recipients=[destinatario_email]
+                )
+                msg.body = (
+                    f"Hola {cliente_data['nombre_siglas']},\n\n"
+                    f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
+                    "Adjunto encontrarás los códigos QR para el seguimiento de cada paquete.\n\n"
+                    f"¡Gracias por confiar en {nombre_empresa}!"
+                )
+
+                for tracking in trackings:
+                    qr_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'qr.png')
+                    if os.path.exists(qr_path):
+                        with open(qr_path, 'rb') as f:
+                            qr_data = f.read()
+                        msg.attach(f"qr_{tracking}.png", 'image/png', qr_data)
+                    else:
+                        current_app.logger.warning(f"QR no encontrado para tracking {tracking}")
+
+                mail.send(msg)
+
+        # LIMPIAR SESIÓN DESPUÉS DE PROCESAR
+        session.pop('datos_pago', None)
+        session.pop('resumen_envios', None)
+        session.pop('remitente_data', None)
+
+        current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Envío procesado correctamente',
+            'num_serie': num_serie,
+            'trackings': trackings
+        }), 200
+
+    except Exception as e:
+        current_app.logger.error(f"Error en insertar_envio: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'status': 'error',
+            'message': 'Ocurrió un error al procesar el envío'
+        }), 500
+       
+@app.route('/insertar_envio_api_222222', methods=['POST'])
+def insertar_envio_api_22222():
+    try:
         nombre_empresa = controlador_empresa.get_nombre()
         data = request.get_json()
-
+        # print(data)
         if not data:
             return jsonify({'status': 'error', 'message': 'No se recibió un JSON válido'}), 400
 
@@ -2780,7 +3188,9 @@ def insertar_envio_api():
             'tipo_documentoid': int(remitente.get('tipo_doc_remitente', 1)),
             'tipo_clienteid': 2 if remitente.get('tipo_doc_remitente') == 2 else 1
         }
-
+        # print(f'REGISTROS -> {registros}')
+        # print(f'CLIENTE_DATA -> {cliente_data}')
+        # print(f'tipo_comprobante -> {tipo_comprobante}')
         # 1) Crear transacción y paquetes
         num_serie,trackings = controlador_encomienda.crear_transaccion_y_paquetes(
             registros, cliente_data, tipo_comprobante
@@ -2838,7 +3248,6 @@ def insertar_envio_api():
             'status': 'error',
             'message': 'Ocurrió un error al procesar el envío'
         }), 500
-       
 ##PARA PROBAR EL API E INSERTAR 
 # {
 #   "tipo_comprobante": 2,
@@ -2882,6 +3291,9 @@ def insertar_envio_api():
 # }
 
 def generar_qr_paquetes(trackings):
+    hostname = socket.gethostname()
+    ip_address = socket.gethostbyname(hostname)
+    print(ip_address)
     for tracking in trackings:
         qr_data = f"http://192.168.100.15:8000/insertar_estado?tracking={tracking}"
 
@@ -2979,7 +3391,6 @@ def envio_masivo():
     articulos = controlador_contenido_paquete.get_options()
     empaque = controlador_tipo_empaque.get_options()
     condiciones = controlador_regla_cargo.get_condiciones_tarifa()
-    tarifas = controlador_tarifa_ruta.get_tarifas_ruta_dict()
     modalidad_pago = controlador_modalidad_pago.get_options()
     peso = controlador_tipo_empaque.get_peso()
     valor_max = controlador_regla_cargo.get_max_valor()
@@ -2990,7 +3401,6 @@ def envio_masivo():
                            nombre_doc=nombre_doc,
                            departamento_origen = departamento_origen,
                            modalidad_pago = modalidad_pago,
-                           tarifas = json.dumps(tarifas),
                            empaque=empaque, 
                            articulos=articulos,
                            peso = peso,
@@ -3466,6 +3876,7 @@ def obtener_coordenadas():
         id_salida = data['salida']
 
         coordenadas = controlador_sucursal.get_coordenadas_actual(id_salida)
+        print('coordenas:',coordenadas)
 
         if not coordenadas:
             return jsonify({'error': 'No se encontraron coordenadas'}), 404
@@ -3475,13 +3886,32 @@ def obtener_coordenadas():
             'latitud_origen': coordenadas['latitud_origen'],
             'longitud_origen': coordenadas['longitud_origen'],
             'latitud_destino': coordenadas['latitud_destino'],
-            'longitud_destino': coordenadas['longitud_destino']
+            'longitud_destino': coordenadas['longitud_destino'],
+            "status":1
         }
         return jsonify(res)
 
     except Exception as e:
-        print("❌ ERROR EN BACKEND:", repr(e))
-        return jsonify({'error': str(e)}), 500
+        print("ERROR EN BACKEND:", repr(e))
+        return jsonify({'error': str(e),
+                        "status":-1}), 500
+
+@app.route('/cambiar_estado_salida', methods=['POST'])
+def cambiar_estado_salida():
+    try:
+        data = request.get_json()
+        if not data or 'id' not in data:
+            return jsonify({'success': False, 'message': 'Falta el campo "id" en el cuerpo JSON'}), 400
+
+        id_salida = data.get('id')
+        resultado = controlador_salida.change_state_exit(id_salida)
+        return jsonify(resultado)
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error del servidor: {str(e)}'}), 500
+
+
+
 
 @app.route('/seguimiento_unidad_prueba')
 def seguimiento_unidad_prueba():
@@ -3491,7 +3921,6 @@ def seguimiento_unidad_prueba():
     lon2 = request.args.get('lon2')
     id = request.args.get('id')
     
-    # Podrías formar un "viaje" simple si tu HTML espera eso
     data = [{
         
         'iniciolat_via': lat1,
@@ -3500,8 +3929,9 @@ def seguimiento_unidad_prueba():
         'finlon_via': lon2,
         'id':id
     }]
-
-    return render_template('seguimiento_empleado.html', data=data)
+    info = controlador_salida.get_data_by_id_salida(id)
+    print(info)
+    return render_template('seguimiento_empleado.html', data=data,info=info)
 
 
 
@@ -4404,7 +4834,544 @@ def salida_informacion():
     unidades = controlador_unidad.get_capacidad_unidad()
     return render_template('salida_informacion.html',unidades=unidades)
 
+################PROGRAMACION DEVOLUCIONES############################
 
+@app.route("/buscar_paquete_devolucion", methods=["POST"])
+@validar_empleado()
+def buscar_paquete_devolucion():
+    """
+    Endpoint para buscar paquetes disponibles para devolución
+    """
+    try:
+        data = request.get_json()
+        tracking = data.get('criterio', '').strip()
+        
+        if not tracking:
+            return jsonify({
+                'success': False,
+                'message': 'Código de tracking requerido'
+            }), 400
+        
+        # Validar que sea un número
+        if not tracking.isdigit():
+            return jsonify({
+                'success': False,
+                'message': 'El código de tracking debe ser numérico'
+            }), 400
+        
+        paquete = controlador_programacion_devolucion.buscar_paquete(tracking)
+        
+        if paquete:
+            # Validar que el paquete pueda ser devuelto
+            puede_devolver = controlador_programacion_devolucion.validar_paquete_para_devolucion(paquete['tracking'])
+            
+            if puede_devolver:
+                return jsonify({
+                    'success': True,
+                    'paquete': paquete,
+                    'message': 'Paquete encontrado'
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'message': 'Este paquete no está disponible para devolución'
+                })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Paquete no encontrado'
+            })
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al buscar paquete: {str(e)}'
+        }), 500
+
+
+@app.route("/obtener_unidades_devolucion", methods=["POST"])
+@validar_empleado()
+def obtener_unidades_devolucion():
+    """
+    Endpoint para obtener unidades disponibles para devoluciones
+    """
+    try:
+        data = request.get_json()
+        tracking = data.get('tracking')
+        
+        if not tracking:
+            return jsonify({
+                'success': False,
+                'message': 'Tracking requerido para buscar unidades disponibles'
+            }), 400
+        
+        unidades = controlador_programacion_devolucion.obtener_unidades_disponibles(tracking)
+        
+        return jsonify({
+            'success': True,
+            'unidades': unidades
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener unidades: {str(e)}'
+        }), 500
+
+
+@app.route("/programar_devolucion", methods=["POST"])
+@validar_empleado()
+def programar_devolucion():
+    """
+    Endpoint para programar una devolución
+    """
+    try:
+        data = request.get_json()
+        tracking = data.get('tracking')
+        unidad_id = data.get('unidad_id')
+        
+        if not tracking or not unidad_id:
+            return jsonify({
+                'success': False,
+                'message': 'Tracking y unidad son requeridos'
+            }), 400
+        
+        # Validar que el paquete pueda ser devuelto
+        puede_devolver = controlador_programacion_devolucion.validar_paquete_para_devolucion(tracking)
+        
+        if not puede_devolver:
+            return jsonify({
+                'success': False,
+                'message': 'Este paquete no puede ser programado para devolución'
+            }), 400
+        
+        resultado = controlador_programacion_devolucion.programar_devolucion(tracking, unidad_id)
+        
+        if resultado['success']:
+            return jsonify(resultado)
+        else:
+            return jsonify(resultado), 400
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al programar devolución: {str(e)}'
+        }), 500
+
+
+@app.route("/historial_devoluciones", methods=["GET"])
+@validar_empleado()
+def historial_devoluciones():
+    """
+    Endpoint para obtener el historial de devoluciones
+    """
+    try:
+        limit = request.args.get('limit', 50, type=int)
+        
+        historial = controlador_programacion_devolucion.obtener_historial_devoluciones(limit)
+        
+        return jsonify({
+            'success': True,
+            'historial': historial
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener historial: {str(e)}'
+        }), 500
+
+
+@app.route("/estados_devolucion", methods=["GET"])
+@validar_empleado()
+def estados_devolucion():
+    """
+    Endpoint para obtener estados relacionados con devoluciones
+    """
+    try:
+        estados = controlador_programacion_devolucion.obtener_estados_devolucion()
+        
+        return jsonify({
+            'success': True,
+            'estados': estados
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener estados: {str(e)}'
+        }), 500
+
+
+# Opcional: Endpoint para validar un paquete específico
+@app.route("/validar_paquete_devolucion/<int:tracking>", methods=["GET"])
+@validar_empleado()
+def validar_paquete_devolucion_endpoint(tracking):
+    """
+    Endpoint para validar si un paquete específico puede ser devuelto
+    """
+    try:
+        puede_devolver = controlador_programacion_devolucion.validar_paquete_para_devolucion(tracking)
+        
+        return jsonify({
+            'success': True,
+            'puede_devolver': puede_devolver,
+            'tracking': tracking
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al validar paquete: {str(e)}'
+        }), 500
+
+
+@app.route("/obtener_paquetes_estado_17", methods=["GET"])
+@validar_empleado()
+def obtener_paquetes_estado_17():
+    """
+    Endpoint para obtener paquetes con detalle_estado_id = 17
+    """
+    try:
+        paquetes = controlador_programacion_devolucion.obtener_paquetes_estado_17()
+        
+        return jsonify({
+            'success': True,
+            'paquetes': paquetes
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener paquetes: {str(e)}'
+        }), 500
+    
+####################SEGUIMIENTO DE RECLAMOS############################3
+
+# Ruta principal de seguimiento de reclamos
+@app.route("/seguimiento_reclamo")
+def seguimiento_reclamo():
+    """
+    Página principal de seguimiento de reclamos
+    """
+    return render_template('seguimiento_reclamo.html')
+
+# Ruta para buscar reclamo
+@app.route("/buscar_reclamo", methods=["POST"])
+def buscar_reclamo():
+    """
+    Busca un reclamo por ID o documento
+    """
+    try:
+        reclamo_id = request.form.get('reclamo_id', '').strip()
+        numero_documento = request.form.get('documento', '').strip()
+        
+        if not reclamo_id and not numero_documento:
+            flash('Debe ingresar al menos un criterio de búsqueda', 'error')
+            return redirect(url_for('seguimiento_reclamo'))
+        
+        # Convertir reclamo_id a entero si está presente
+        if reclamo_id:
+            try:
+                reclamo_id = int(reclamo_id)
+            except ValueError:
+                flash('El ID del reclamo debe ser un número válido', 'error')
+                return redirect(url_for('seguimiento_reclamo'))
+        
+        # Buscar el reclamo
+        reclamo = controlador_seguimiento_reclamos.buscar_reclamo_por_id_o_documento(reclamo_id, numero_documento)
+        
+        if not reclamo:
+            flash('No se encontró ningún reclamo con los criterios proporcionados', 'error')
+            return redirect(url_for('seguimiento_reclamo'))
+        
+        # Obtener datos relacionados
+        estados_reclamo = controlador_seguimiento_reclamos.obtener_estados_reclamo()
+        seguimientos = controlador_seguimiento_reclamos.obtener_seguimientos_reclamo(reclamo['id'])
+        ultimo_seguimiento = controlador_seguimiento_reclamos.obtener_ultimo_seguimiento_reclamo(reclamo['id'])
+        estados_usados = controlador_seguimiento_reclamos.obtener_estados_usados_reclamo(reclamo['id'])
+        
+        # Agrupar seguimientos por estado
+        seguimientos_por_estado = controlador_seguimiento_reclamos.agrupar_seguimientos_por_estado(seguimientos)
+        
+        return render_template('seguimiento_reclamo.html',
+                             reclamo=reclamo,
+                             estados_reclamo=estados_reclamo,
+                             seguimientos_por_estado=seguimientos_por_estado,
+                             ultimo_seguimiento=ultimo_seguimiento,
+                             estados_usados=estados_usados)
+        
+    except Exception as e:
+        flash(f'Error al buscar reclamo: {str(e)}', 'error')
+        return redirect(url_for('seguimiento_reclamo'))
+
+# Ruta directa con ID de reclamo
+@app.route("/seguimiento_reclamo/<int:reclamo_id>")
+def seguimiento_reclamo_directo(reclamo_id):
+    """
+    Acceso directo al seguimiento con ID de reclamo
+    """
+    try:
+        # Buscar el reclamo
+        reclamo = controlador_seguimiento_reclamos.buscar_reclamo_por_id_o_documento(reclamo_id=reclamo_id)
+        
+        if not reclamo:
+            flash('No se encontró el reclamo especificado', 'error')
+            return redirect(url_for('seguimiento_reclamo'))
+        
+        # Obtener datos relacionados
+        estados_reclamo = controlador_seguimiento_reclamos.obtener_estados_reclamo()
+        seguimientos = controlador_seguimiento_reclamos.obtener_seguimientos_reclamo(reclamo['id'])
+        ultimo_seguimiento = controlador_seguimiento_reclamos.obtener_ultimo_seguimiento_reclamo(reclamo['id'])
+        estados_usados = controlador_seguimiento_reclamos.obtener_estados_usados_reclamo(reclamo['id'])
+        
+        # Agrupar seguimientos por estado
+        seguimientos_por_estado = controlador_seguimiento_reclamos.agrupar_seguimientos_por_estado(seguimientos)
+        
+        return render_template('seguimiento_reclamo.html',
+                             reclamo=reclamo,
+                             estados_reclamo=estados_reclamo,
+                             seguimientos_por_estado=seguimientos_por_estado,
+                             ultimo_seguimiento=ultimo_seguimiento,
+                             estados_usados=estados_usados)
+        
+    except Exception as e:
+        flash(f'Error al consultar reclamo: {str(e)}', 'error')
+        return redirect(url_for('seguimiento_reclamo'))
+
+# Endpoint para agregar seguimiento a reclamo (solo empleados)
+@app.route("/agregar_seguimiento_reclamo", methods=["POST"])
+@validar_empleado()
+def agregar_seguimiento_reclamo():
+    """
+    Agrega un nuevo seguimiento a un reclamo existente
+    """
+    try:
+        data = request.get_json()
+        
+        reclamo_id = data.get('reclamo_id')
+        detalle_reclamo_id = data.get('detalle_reclamo_id')
+        
+        if not reclamo_id or not detalle_reclamo_id:
+            return jsonify({
+                'success': False,
+                'message': 'Reclamo ID y Detalle Reclamo ID son requeridos'
+            }), 400
+        
+        resultado = controlador_seguimiento_reclamos.agregar_seguimiento_reclamo(reclamo_id, detalle_reclamo_id)
+        
+        return jsonify(resultado)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al agregar seguimiento: {str(e)}'
+        }), 500
+
+# Endpoint para obtener reclamos por estado (solo empleados)
+@app.route("/reclamos_por_estado/<int:estado_id>", methods=["GET"])
+@validar_empleado()
+def reclamos_por_estado(estado_id):
+    """
+    Obtiene reclamos filtrados por estado
+    """
+    try:
+        limit = request.args.get('limit', 50, type=int)
+        
+        reclamos = controlador_seguimiento_reclamos.obtener_reclamos_por_estado_activo(estado_id, limit)
+        
+        return jsonify({
+            'success': True,
+            'reclamos': reclamos
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener reclamos: {str(e)}'
+        }), 500
+
+# Endpoint para obtener detalles de reclamo por estado (solo empleados)
+@app.route("/detalles_reclamo_por_estado/<int:estado_id>", methods=["GET"])
+@validar_empleado()
+def detalles_reclamo_por_estado(estado_id):
+    """
+    Obtiene los detalles disponibles para un estado de reclamo
+    """
+    try:
+        detalles = controlador_seguimiento_reclamos.obtener_detalles_reclamo_por_estado(estado_id)
+        
+        return jsonify({
+            'success': True,
+            'detalles': detalles
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener detalles: {str(e)}'
+        }), 500
+
+# Endpoint API para obtener información de reclamo (JSON)
+@app.route("/api/reclamo/<int:reclamo_id>", methods=["GET"])
+def api_info_reclamo(reclamo_id):
+    """
+    API endpoint para obtener información de un reclamo en formato JSON
+    """
+    try:
+        reclamo = controlador_seguimiento_reclamos.buscar_reclamo_por_id_o_documento(reclamo_id=reclamo_id)
+        
+        if not reclamo:
+            return jsonify({
+                'success': False,
+                'message': 'Reclamo no encontrado'
+            }), 404
+        
+        ultimo_seguimiento = controlador_seguimiento_reclamos.obtener_ultimo_seguimiento_reclamo(reclamo['id'])
+        seguimientos = controlador_seguimiento_reclamos.obtener_seguimientos_reclamo(reclamo['id'])
+        
+        return jsonify({
+            'success': True,
+            'reclamo': dict(reclamo),
+            'ultimo_seguimiento': dict(ultimo_seguimiento) if ultimo_seguimiento else None,
+            'seguimientos': [dict(s) for s in seguimientos]
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al consultar reclamo: {str(e)}'
+        }), 500
+
+# Endpoint para validar si existe un tracking para reclamo
+@app.route("/validar_tracking_reclamo/<int:tracking>", methods=["GET"])
+def validar_tracking_reclamo(tracking):
+    """
+    Valida si un tracking existe y puede ser asociado a un reclamo
+    """
+    try:
+        paquete = controlador_seguimiento_reclamos.validar_tracking_existe(tracking)
+        
+        if paquete:
+            return jsonify({
+                'success': True,
+                'existe': True,
+                'info_paquete': {
+                    'tracking': paquete.get('tracking'),
+                    'destinatario': paquete.get('destinatario_completo')
+                }
+            })
+        else:
+            return jsonify({
+                'success': True,
+                'existe': False,
+                'message': 'Tracking no encontrado'
+            })
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al validar tracking: {str(e)}'
+        }), 500
+
+# Endpoint para obtener todos los reclamos (vista administrativa)
+@app.route("/admin/reclamos", methods=["GET"])
+@validar_empleado()
+def admin_reclamos():
+    """
+    Vista administrativa de todos los reclamos
+    """
+    try:
+        limit = request.args.get('limit', 50, type=int)
+        reclamos = controlador_seguimiento_reclamos.obtener_todos_los_reclamos(limit)
+        
+        return render_template('admin_reclamos.html', reclamos=reclamos)
+        
+    except Exception as e:
+        flash(f'Error al cargar reclamos: {str(e)}', 'error')
+        return redirect(url_for('dashboard'))
+
+# Endpoint para obtener tipos de reclamo
+@app.route("/api/tipos_reclamo", methods=["GET"])
+def api_tipos_reclamo():
+    """
+    API para obtener tipos de reclamo disponibles
+    """
+    try:
+        tipos = controlador_seguimiento_reclamos.obtener_tipos_reclamo()
+        
+        return jsonify({
+            'success': True,
+            'tipos': tipos
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener tipos de reclamo: {str(e)}'
+        }), 500
+
+# Endpoint para obtener motivos por tipo de reclamo
+@app.route("/api/motivos_reclamo/<int:tipo_id>", methods=["GET"])
+def api_motivos_reclamo(tipo_id):
+    """
+    API para obtener motivos por tipo de reclamo
+    """
+    try:
+        motivos = controlador_seguimiento_reclamos.obtener_motivos_por_tipo_reclamo(tipo_id)
+        
+        return jsonify({
+            'success': True,
+            'motivos': motivos
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener motivos: {str(e)}'
+        }), 500
+
+# Endpoint para obtener causas por motivo de reclamo
+@app.route("/api/causas_reclamo/<int:motivo_id>", methods=["GET"])
+def api_causas_reclamo(motivo_id):
+    """
+    API para obtener causas por motivo de reclamo
+    """
+    try:
+        causas = controlador_seguimiento_reclamos.obtener_causas_por_motivo_reclamo(motivo_id)
+        
+        return jsonify({
+            'success': True,
+            'causas': causas
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener causas: {str(e)}'
+        }), 500
+
+# Endpoint para obtener estados de reclamo
+@app.route("/api/estados_reclamo", methods=["GET"])
+def api_estados_reclamo():
+    """
+    API para obtener estados de reclamo disponibles
+    """
+    try:
+        estados = controlador_seguimiento_reclamos.obtener_estados_reclamo()
+        
+        return jsonify({
+            'success': True,
+            'estados': estados
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener estados: {str(e)}'
+        }), 500
+##############################################3
+##############################################
 
 if __name__ == "__main__":
     # app.run(host='192.168.48.178', port=8000, debug=True, use_reloader=True)

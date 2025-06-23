@@ -6356,16 +6356,12 @@ VALUES ('DNI', 'Documento Nacional de Identidad', 1),
   ('CE', 'Carné de Extranjería', 1),
   ('PAS', 'Pasaporte', 1);
 
-INSERT INTO tipo_comprobante (inicial, nombre, descripcion, activo)
-VALUES ('F', 'Factura', 'Factura', 1),
-  ('BV', 'Boleta', 'Boleta de Venta', 1),
-  ('NV', 'Nota de venta', 'Nota de Venta', 1),
-  ('GR', 'Guia de remision', 'Guía de Remisión', 1),
-  ('TI', 'T', 'Ticket', 1),
-  ('NC', 'Nota de crédito', 'Nota de Crédito', 1),
-  ('ND', 'D', 'Nota de Débito', 1),
-  ('OT', 'O', 'Otro', 1);
-
+INSERT INTO tipo_comprobante (inicial, nombre, descripcion, activo,tipo_uso)
+VALUES ('F', 'Factura', 'Factura', 1,'V'),
+  ('BV', 'Boleta', 'Boleta de Venta', 1,'V'),
+  ('GR', 'Guia de remision', 'Guía de Remisión', 1,'T'),
+  ('NC', 'Nota de crédito', 'Nota de Crédito', 1,'R'),
+  ('ND', 'D', 'Nota de Débito', 1,'R');
 INSERT INTO `tipo_recepcion` (`id`, `nombre`, `activo`)
 VALUES (1, 'Recepción en sucursal', 1),
   (2, 'Recepción en domicilio', 1);
@@ -6680,19 +6676,19 @@ VALUES (
   ),
   (
     'Caja S',
-    2.5,
+    3.0,
     100,
     1,
-    'caja S.png',
+    'caja_S.png',
     '20×30×12',
     3
   ),
   (
-    'Caja M',
-    3.2,
+    'Caja_M',
+    3.5,
     100,
     1,
-    'caja M.png',
+    'caja_M.png',
     '24×30×20',
     4
   ),
@@ -6701,7 +6697,7 @@ VALUES (
     4,
     100,
     1,
-    'caja L.png',
+    'caja_L.png',
     '30×42×23',
     5
   );
@@ -7951,16 +7947,16 @@ VALUES (
   );
 
 INSERT INTO DESCUENTO_articulo (DESCUENTOid, articuloid, cantidad_descuento)
-VALUES (1, 1, 1.5),
-  (1, 2, 1.8),
-  (1, 3, 2.0),
-  (1, 4, 2.2),
-  (1, 5, 2.5),
-  (2, 1, 3.5),
-  (2, 2, 3.8),
-  (2, 3, 4.0),
-  (2, 4, 4.3),
-  (2, 5, 4.5);
+VALUES (1, 1, 1.2),
+  (1, 2, 1.7),
+  (1, 3, 2.7),
+  (1, 4, 3.2),
+  (1, 5, 3.7),
+  (2, 1, 1.0),
+  (2, 2, 1.5),
+  (2, 3, 2.5),
+  (2, 4, 3.0),
+  (2, 5, 3.5);
 
 INSERT INTO tarifa_ruta (sucursal_origen_id, sucursal_destino_id, tarifa)
 VALUES (1, 2, 12.50),
@@ -8176,24 +8172,7 @@ INSERT INTO detalle_estado (id, nombre, descripcion, activo, estado_encomiendaid
 (20, 'Firmado en conformidad', 'El destinatario o tercero firmó como constancia de la recepción.', 1, 4),
 (21, 'Entrega validada en sistema', 'La entrega fue confirmada en el sistema con hora y firma.', 1, 4);
 
-INSERT INTO transaccion_encomienda (
-    num_serie, masivo, descripcion, monto_total, recojo_casa,
-    id_sucursal_origen, fecha, hora,
-    direccion_recojo, clienteid, tipo_comprobanteid
-)
-VALUES (
-    'ENCO0001',
-    0,
-    'Envío regular Lima - Trujillo',
-    25.50,
-    0,
-    3,
-    CURRENT_DATE,
-    CURRENT_TIME,
-    'Av. Siempre Viva 742',
-    1,
-    1
-);
+
 
 INSERT INTO empleado (nombre, apellidos, correo, n_documento, rolid) VALUES
 ('Carlos', 'Ramírez León', 'carlos.ramirez@transportes.com', 'D12345678', 1),
@@ -8211,3 +8190,29 @@ INSERT INTO salida (fecha, hora, recojo, entrega, estado, unidadid, destino_fina
 ('2025-06-16', '09:00:00', 0, 1, 'P', 3, 3, 5, 6),
 ('2025-06-16', '10:45:00', 1, 0, 'P', 4, 4, 7, 5),
 ('2025-06-16', '11:30:00', 1, 1, 'P', 5, 4, 7, 7);
+
+
+
+INSERT INTO usuario (correo, contrasenia, tipo_usuario, activo) VALUES
+('carlos.ramirez@transportes.com', SHA2('123456', 256), 'E', 1),
+('lucia.mendoza@transportes.com', SHA2('123456', 256), 'E', 1),
+('pedro.sanchez@transportes.com', SHA2('123456', 256), 'E', 1),
+('ana.torres@transportes.com', SHA2('123456', 256), 'E', 1),
+('luis.castillo@transportes.com', SHA2('123456', 256), 'E', 1),
+('maria.lopez@transportes.com', SHA2('123456', 256), 'E', 1),
+('javier.gomez@transportes.com', SHA2('123456', 256), 'E', 1),
+('sofia.fernandez@transportes.com', SHA2('123456', 256), 'E', 1);
+
+INSERT INTO empleado_salida (salidaid, empleadoid) VALUES 
+(1, 5), -- Pedro Sánchez Huamán (conductor principal de salida 1)
+(1, 3), -- Carlos Ramírez León
+(2, 6), -- Ana Torres Rivas (conductor principal de salida 2)
+(2, 4), -- Lucía Mendoza Ruiz
+(3, 5), -- Pedro Sánchez Huamán (conductor principal de salida 3)
+(3, 8), -- María López Espinoza
+(4, 7), -- Luis Castillo Valverde (conductor principal de salida 4)
+(4, 9), -- Javier Gómez Paredes
+(5, 7), -- Luis Castillo Valverde (conductor principal de salida 5)
+(5, 10); -- Sofía Fernández Quispe
+
+INSERT INTO `detalle_estado` (`id`, `nombre`, `descripcion`, `activo`, `estado_encomiendaid`) VALUES (NULL, 'Regresado a origen', 'No se reclamó así que se devolvió.', '1', '1');
