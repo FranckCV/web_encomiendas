@@ -1440,12 +1440,12 @@ REPORTES = {
     },
 
     "reporte_reclamos_tipo_causa_periodo": {
-        "active": True,
-        "icon_page": "fa-solid fa-clipboard-list",
-        "titulo": "Reporte de reclamos por tipo, causa y periodo",
-        "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),
-        "filters": ['stock_minimo', 'Stock Mínimo', lambda: controlador_articulo.get_stock_minimo_options(), 'select'],
-    },
+    "active": True,
+    "icon_page": "fa-solid fa-clipboard-list",
+    "titulo": "Reporte de reclamos por tipo, causa y periodo",
+    "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),  # ✅ con paréntesis
+    "filters": []
+},
 }
 
 

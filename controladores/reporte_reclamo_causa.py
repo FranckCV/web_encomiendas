@@ -1,29 +1,30 @@
 from controladores.bd import sql_select_fetchall
 
 def get_reporte_reclamos_tipo_causa_periodo():
+    print(">>> ENTRANDO AL REPORTE DE RECLAMOS POR TIPO, CAUSA Y PERIODO <<<")
+
+    columnas = {
+        'tipo_reclamo': ['Tipo de Reclamo', 2],
+        'causa_reclamo': ['Causa de Reclamo', 2],
+        'cantidad_reclamos': ['Cantidad', 1]
+    }
+
     sql = '''
         SELECT 
             tr.nombre AS tipo_reclamo,
-            mr.nombre AS motivo_reclamo,
             cr.nombre AS causa_reclamo,
-            DATE_FORMAT(r.fecha_recepcion, '%Y-%m') AS periodo,
-            COUNT(*) AS cantidad_reclamos
+            COUNT(r.id) AS cantidad_reclamos
         FROM reclamo r
-        INNER JOIN causa_reclamo cr ON r.causa_reclamoid = cr.id
-        INNER JOIN motivo_reclamo mr ON cr.motivo_reclamoid = mr.id
-        INNER JOIN tipo_reclamo tr ON mr.tipo_reclamoid = tr.id
-        GROUP BY tr.nombre, mr.nombre, cr.nombre, DATE_FORMAT(r.fecha_recepcion, '%Y-%m')
-        ORDER BY periodo DESC, cantidad_reclamos DESC;
+        JOIN causa_reclamo cr ON r.causa_reclamoid = cr.id
+        JOIN motivo_reclamo mr ON cr.motivo_reclamoid = mr.id
+        JOIN tipo_reclamo tr ON mr.tipo_reclamoid = tr.id
+        GROUP BY tr.nombre, cr.nombre
+        ORDER BY tr.nombre, cr.nombre;
     '''
 
-    columnas = {
-        'tipo_reclamo'      : ['Tipo de Reclamo', 1.5],
-        'motivo_reclamo'    : ['Motivo', 1.5],
-        'causa_reclamo'     : ['Causa', 2],
-        'periodo'           : ['Periodo', 1],
-        'cantidad_reclamos' : ['Cantidad', 1]
-    }
-
-    filas = sql_select_fetchall(sql)
-    print(">>> ENTRANDO AL REPORTE DE RECLAMOS POR TIPO, CAUSA Y PERIODO <<<")
-    return columnas, filas
+    try:
+        filas = sql_select_fetchall(sql)
+        return columnas, filas
+    except Exception as e:
+        print(f"ERROR en el reporte de reclamos por tipo, causa y periodo: {e}")
+        return columnas, []
