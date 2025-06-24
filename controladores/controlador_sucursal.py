@@ -366,3 +366,94 @@ def get_coordenadas_actual(id):
     '''
     fila = sql_select_fetchone(sql,id)
     return fila
+
+def capitalizar_con_excepciones(texto):
+    if not texto:
+        return ""
+
+    excepciones = {'de', 'del', 'la', 'las', 'el', 'los', 'en', 'y', 'por', 'a', 'con'}
+    
+    palabras = texto.strip().lower().split()
+    resultado = []
+
+    for i, palabra in enumerate(palabras):
+        if i == 0 or palabra not in excepciones:
+            resultado.append(palabra.capitalize())
+        else:
+            resultado.append(palabra)
+    
+    return ' '.join(resultado)
+
+
+
+def sucursales_origen():
+    sql = '''
+        SELECT DISTINCT 
+            tr.sucursal_origen_id, 
+            s.latitud,
+            s.longitud,
+            u.departamento, 
+            u.provincia, 
+            u.distrito, 
+            s.direccion, 
+            s.id
+        FROM tarifa_ruta tr
+        INNER JOIN sucursal s ON s.id = tr.sucursal_origen_id
+        INNER JOIN ubigeo u ON u.codigo = s.ubigeocodigo
+        where s.latitud is not null and s.longitud is not null;
+    '''
+    
+    filas_raw = sql_select_fetchall(sql)
+    resultado = []
+
+    for fila in filas_raw:
+        nombre = f"{capitalizar_con_excepciones(fila['departamento'])} / " \
+                 f"{capitalizar_con_excepciones(fila['provincia'])} / " \
+                 f"{capitalizar_con_excepciones(fila['distrito'])} / " \
+                 f"{capitalizar_con_excepciones(fila['direccion'])} (id: {fila['id']})"
+        
+        resultado.append({
+            "sucursal_origen_id": fila["sucursal_origen_id"],
+            "nombre": nombre,
+            "latitud": fila["latitud"],
+            "longitud":fila["longitud"]
+        })
+    
+    return resultado
+
+
+
+def sucursales_destino(id):
+    sql = '''
+        SELECT DISTINCT 
+            tr.sucursal_destino_id, 
+            s.latitud,
+            s.longitud,
+            u.departamento, 
+            u.provincia, 
+            u.distrito, 
+            s.direccion, 
+            s.id
+        FROM tarifa_ruta tr
+        INNER JOIN sucursal s ON s.id = tr.sucursal_destino_id
+        INNER JOIN ubigeo u ON u.codigo = s.ubigeocodigo
+        WHERE tr.sucursal_origen_id = %s
+    '''
+    
+    filas_raw = sql_select_fetchall(sql, (id,))
+    resultado = []
+
+    for fila in filas_raw:
+        nombre = f"{capitalizar_con_excepciones(fila['departamento'])} / " \
+                 f"{capitalizar_con_excepciones(fila['provincia'])} / " \
+                 f"{capitalizar_con_excepciones(fila['distrito'])} / " \
+                 f"{capitalizar_con_excepciones(fila['direccion'])} (id: {fila['id']})"
+        
+        resultado.append({
+            "sucursal_destino_id": fila["sucursal_destino_id"],
+            "nombre": nombre,
+            "latitud": fila["latitud"],
+            "longitud":fila["longitud"]
+        })
+    
+    return resultado

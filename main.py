@@ -1729,7 +1729,7 @@ TRANSACCIONES = {
         "filters": [], 
         "fields_form": [
         #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
-            ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_seguimiento.get_options_dict() , 'nombre_det' ] ],
+            # ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_options() , 'nombre_det' ] ],
         ],
         "crud_forms": {
             "crud_list": True,
@@ -3288,10 +3288,9 @@ def insertar_envio_api():
             'message': 'Ocurrió un error al procesar el envío'
         }), 500
        
-@app.route('/insertar_envio_api_222222', methods=['POST'])
-def insertar_envio_api_22222():
+@app.route('/registrar_envios_masivos', methods=['POST'])
+def registrar_envios_masivos():
     try:
-        nombre_empresa = controlador_empresa.get_nombre()
         data = request.get_json()
         # print(data)
         if not data:
@@ -3303,8 +3302,10 @@ def insertar_envio_api_22222():
         if not registros or not isinstance(registros, list):
             return jsonify({'status': 'error', 'message': 'No se encontraron registros válidos'}), 400
 
-        # Tomamos los datos del remitente desde el primer registro
-        remitente = registros[0].get('remitente', {})
+        origen = data.get('origen')
+        sucursal_origen = origen.get('sucursal_origen')
+        
+        remitente = data.get('remitente', {})
         nombre = remitente.get('nombre_remitente', '')
         partes = nombre.split() if nombre else []
 
@@ -3317,12 +3318,10 @@ def insertar_envio_api_22222():
             'tipo_documentoid': int(remitente.get('tipo_doc_remitente', 1)),
             'tipo_clienteid': 2 if remitente.get('tipo_doc_remitente') == 2 else 1
         }
-        # print(f'REGISTROS -> {registros}')
-        # print(f'CLIENTE_DATA -> {cliente_data}')
-        # print(f'tipo_comprobante -> {tipo_comprobante}')
-        # 1) Crear transacción y paquetes
+
+
         num_serie,trackings = controlador_encomienda.crear_transaccion_y_paquetes(
-            registros, cliente_data, tipo_comprobante
+            registros, cliente_data, tipo_comprobante,sucursal_origen
         )
 
         # 2) Generar QR para cada paquete
@@ -3333,32 +3332,33 @@ def insertar_envio_api_22222():
                 current_app.logger.warning(f"Error generando QR: {qr_err}")
 
             # 3) Enviar correo al remitente
-            destinatario_email = cliente_data['correo']
-            if destinatario_email:
-                msg = Message(
-                    subject=f"{nombre_empresa} Envío registrado: {num_serie}",
-                    sender=app.config['MAIL_USERNAME'],
-                    recipients=[destinatario_email]
-                )
-                msg.body = (
-                    f"Hola {cliente_data['nombre_siglas']},\n\n"
-                    f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
-                    "Adjunto encontrarás los códigos QR para el seguimiento de cada paquete.\n\n"
-                    f"¡Gracias por confiar en {nombre_empresa}!"
-                )
+            # remitente_email = cliente_data['correo']
+            # if remitente_email:
+            #     msg = Message(
+            #         subject=f"{nombre_empresa} Envío registrado: {num_serie}",
+            #         sender=app.config['MAIL_USERNAME'],
+            #         recipients=[remitente_email]
+            #     )
+            #     msg.body = (
+            #         f"Hola {cliente_data['nombre_siglas']},\n\n"
+            #         f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
+            #         "Adjunto encontrarás los códigos QR para el seguimiento de cada paquete.\n\n"
+            #         f"¡Gracias por confiar en {nombre_empresa}!"
+            #     )
 
-                for r in trackings:
-                    tracking = r
-                    qr_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'qr.png')
-                    if os.path.exists(qr_path):
-                        with open(qr_path, 'rb') as f:
-                            qr_data = f.read()
-                        msg.attach(f"qr_{tracking}.png", 'image/png', qr_data)
-                    else:
-                        current_app.logger.warning(f"QR no encontrado para tracking {tracking}")
+            #     for r in trackings:
+            #         tracking = r
+            #         qr_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'qr.png')
+            #         if os.path.exists(qr_path):
+            #             with open(qr_path, 'rb') as f:
+            #                 qr_data = f.read()
+            #             msg.attach(f"qr_{tracking}.png", 'image/png', qr_data)
+            #         else:
+            #             current_app.logger.warning(f"QR no encontrado para tracking {tracking}")
 
 
-                mail.send(msg)
+            #     mail.send(msg)
+
 
         current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
         return jsonify({
@@ -3380,44 +3380,70 @@ def insertar_envio_api_22222():
 ##PARA PROBAR EL API E INSERTAR 
 # {
 #   "tipo_comprobante": 2,
+#   "origen": {
+#     "sucursal_origen": 2
+#   },
+#   "remitente": {
+#     "nombre_remitente": "Ana Torres",
+#     "correo_remitente": "ana@example.com",
+#     "num_tel_remitente": "987654320",
+#     "num_doc_remitente": "87654321",
+#     "tipo_doc_remitente": 1
+#   },
 #   "registros": [
 #     {
 #       "modo": "individual",
-#       "clave": "4123",
-#       "valorEnvio": 80.0,
-#       "peso": 5.5,
-#       "alto": 40.0,
-#       "largo": 50.0,
-#       "ancho": 30.0,
-#       "tarifa": 25.5,
+#       "clave": "ABC123",
+#       "valorEnvio": 100.5,
+#       "peso": 4.0,
+#       "alto": 35.0,
+#       "largo": 40.0,
+#       "ancho": 25.0,
+#       "tarifa": 20.0,
 #       "tipoEmpaqueId": 1,
-#       "tipoArticuloId": 3,
+#       "tipoArticuloId": 2,
 #       "tipoEntregaId": 1,
-#       "estado_pago":"P",
-#       "modalidad_pago":"1",
-#       "origen": {
-#         "sucursal_origen": 3
-#       },
+#       "estado_pago": "P",
+#       "modalidadPago": "1",
 #       "destino": {
 #         "sucursal_destino": 5
 #       },
 #       "destinatario": {
-#         "nombre_contacto": "Juan",
-#         "apellido_razon": "Pérez",
+#         "nombres": "Carlos",
+#         "apellidos": "Ramírez",
 #         "tipo_doc_destinatario": 1,
-#         "num_doc_destinatario": "12345678",
-#         "num_tel_destinatario": "987654321"
+#         "num_doc_destinatario": "44556677",
+#         "num_tel_destinatario": "912345678"
+#       }
+#     },
+#     {
+#       "modo": "individual",
+#       "clave": "DEF456",
+#       "valorEnvio": 120.0,
+#       "peso": 6.2,
+#       "alto": 38.0,
+#       "largo": 45.0,
+#       "ancho": 28.0,
+#       "tarifa": 30.0,
+#       "tipoEmpaqueId": 2,
+#       "tipoArticuloId": 1,
+#       "tipoEntregaId": 2,
+#       "estado_pago": "P",
+#       "modalidadPago": "2",
+#       "destino": {
+#         "sucursal_destino": 7
 #       },
-#       "remitente": {
-#         "nombre_remitente": "Ana Torres",
-#         "correo_remitente": "ana@example.com",
-#         "num_tel_remitente": "987654320",
-#         "num_doc_remitente": "87654321",
-#         "tipo_doc_remitente": 1
+#       "destinatario": {
+#         "nombres": "María",
+#         "apellidos": "Gómez",
+#         "tipo_doc_destinatario": 1,
+#         "num_doc_destinatario": "88990011",
+#         "num_tel_destinatario": "987112233"
 #       }
 #     }
 #   ]
 # }
+
 
 def generar_qr_paquetes(trackings):
     hostname = socket.gethostname()
@@ -3513,7 +3539,60 @@ def generar_comprobante(tracking):
     return send_file(ruta_pdf, as_attachment=False)
 
 
+@app.route('/rotulo=<int:tracking>')
+def generar_rotulo(tracking):
+    carpeta = os.path.join("static", "comprobantes", str(tracking))
+    ruta_pdf = os.path.join(carpeta, "rotulo.pdf")
 
+    if not os.path.exists(ruta_pdf):
+        try:
+            paquete =controlador_paquete.get_paquete_by_tracking(tracking) 
+            if not paquete:
+                return "Paquete no encontrado", 404
+
+            transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
+            if not transaccion:
+                return "Transacción no encontrada", 404
+
+            empresa = controlador_empresa.getDataComprobante()
+            cliente = {
+                'nombre_siglas': transaccion['nombre_siglas'],
+                'apellidos_razon': transaccion['apellidos_razon']
+            }
+
+            contenido = controlador_paquete.get_contenido(tracking)
+
+            os.makedirs(carpeta, exist_ok=True)
+            qr_path = url_for('static', filename=f"comprobantes/{tracking}/qr.png", _external=True)
+
+            html = render_template("plantilla_rotulo.html",
+                transaccion=transaccion,
+                cliente=cliente,
+                empresa=empresa,
+                paquete=paquete,  # Datos específicos del paquete
+                contenido=contenido,
+                qr_path=qr_path,
+                tracking=tracking
+            )
+
+            ruta_wkhtmltopdf = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
+            config = pdfkit.configuration(wkhtmltopdf=ruta_wkhtmltopdf)
+            options = {
+                'page-size': 'A6',
+                'orientation': 'Landscape',  # Horizontal para rótulo
+                'margin-top': '2mm',
+                'margin-right': '2mm',
+                'margin-bottom': '2mm',
+                'margin-left': '2mm',
+                'encoding': "UTF-8",
+            }
+
+            pdfkit.from_string(html, ruta_pdf, configuration=config, options=options)
+
+        except Exception as e:
+            return f"Error al generar PDF: {e}", 500
+
+    return send_file(ruta_pdf, as_attachment=False)
 
 
 @app.route('/envio_masivo')
@@ -3540,7 +3619,7 @@ def envio_masivo():
                            valores=valores,
                            porcentaje_peso=porcentaje_peso
                            )
-    
+   
 
 @app.route('/api/recepcion', methods=["POST"])
 def recepcion():
@@ -4859,9 +4938,36 @@ def insertar_detalle_estado():
     
 @app.route('/salida_informacion')
 def salida_informacion():
+    sucursal_origen = controlador_sucursal.sucursales_origen()
     unidades = controlador_unidad.get_capacidad_unidad()
-    return render_template('salida_informacion.html',unidades=unidades)
+    empleados = controlador_empleado.get_driver_employee()
+    agencias = controlador_sucursal.get_agencias_data()
+    paquetes = controlador_paquete.listar_paquetes_por_sucursal_escalas()
+    
+    return render_template('salida_informacion.html',
+                           sucursal_origen=sucursal_origen,
+                           unidades=unidades,
+                           empleados=empleados,
+                           agencias=agencias,
+                           paquetes = paquetes)
 
+@app.route('/sucursales_destino_api',  methods=["POST"])
+def sucursales_destino_api():
+    try:
+        datos = request.get_json()
+        id = datos.get('sucursal_origen_id')
+        sucursal_destino = controlador_sucursal.sucursales_destino(id)
+        return {
+            'data': sucursal_destino,
+            'msg': "Se listó con éxito",
+            'status':1
+        }
+    except Exception as e:
+        return {
+            'data': [],
+            'msg': f"Ocurrió un error al listar las distritos: {repr(e)}",
+            'status':-1
+        }
 
 
 if __name__ == "__main__":

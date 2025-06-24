@@ -164,9 +164,25 @@ def get_options_estado():
 
 def get_capacidad_unidad():
     sql = '''
-    select concat(tu.nombre,' ',m.nombre),capacidad from unidad u
-inner join modelo m on m.id = u.modeloid
-inner join tipo_unidad tu on tu.id = m.tipo_unidadid
+        SELECT 
+            s.unidadid, 
+            CONCAT(tu.nombre, ' ', m.nombre) AS nombre_unidad,
+            u.capacidad,
+            SUM(COALESCE(p.peso, 0)) AS capacidad_usada
+        FROM salida s 
+        LEFT JOIN paquete p ON p.salidaid = s.id
+        INNER JOIN unidad u ON u.id = s.unidadid
+        INNER JOIN modelo m ON m.id = u.modeloid
+        INNER JOIN tipo_unidad tu ON tu.id = m.tipo_unidadid
+        WHERE 
+            s.unidadid NOT IN (
+                SELECT unidadid 
+                FROM salida 
+                WHERE 
+                    estado = 'P' AND fecha BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 2 DAY)
+                    OR estado = 'T'
+            )
+        GROUP BY s.unidadid, tu.nombre, m.nombre, u.capacidad;
     '''
     filas = sql_select_fetchall(sql)
     return filas

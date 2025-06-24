@@ -160,8 +160,9 @@ def get_nombre():
 
 def getDataComprobante():
     sql='''
-        select e.nombre,e.ruc,e.nro_telefono,e.correo,e.igv,s.direccion from empresa e 
+        select e.nombre,e.ruc,e.nro_telefono,e.correo,e.igv,s.direccion,u.departamento,u.distrito,u.provincia from empresa e 
         inner join sucursal s on s.id = e.id_sucursal
+        inner join ubigeo u on u.codigo=s.ubigeocodigo
             '''
     fila = sql_select_fetchone(sql)
     return fila
