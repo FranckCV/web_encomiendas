@@ -1399,9 +1399,8 @@ REPORTES = {
         "active": True,
         "icon_page": "fa-solid fa-boxes-stacked",
         "titulo": "Artículos que Necesitan Reposición",
-        "table": controlador_articulo.get_report_reposicion(),  # función sin paréntesis
+        "table": controlador_articulo.get_report_reposicion(), 
         "filters": [
-            ['stock_minimo', 'Sin Stock ', lambda: controlador_articulo.get_stock_minimo_options(), 'select'],
         ],
     },
 
