@@ -10,7 +10,8 @@ INSERT INTO empresa (
     color_sec,
     color_ter,
     porcentaje_recojo,
-    igv
+    igv ,
+    actual 
 )
 VALUES (
     1,
@@ -24,7 +25,8 @@ VALUES (
     '#13e2da',
     '#1b98e0',
     5.00,
-    18.00              
+    18.00  ,
+    1 
 );
 
 
@@ -158,7 +160,11 @@ INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `tipo_paginaid`,
 (46, 'detalle de un estado de reclamo', 'fa-solid fa-file', 1, 'detalle_reclamo', 1, 4),
 (47, 'Programación de devoluciones', 'ri-truck-line', 1, 'programacion_devolucion', 2, 3),
 (48, 'Escaneo de qr', 'fa-solid fa-qrcode', 1, 'interfaz_insertar_estado', 2, 2),
-(49, 'Paquetes', 'fa-solid fa-boxes', 1, 'paquete', 3, 3);
+(49, 'Paquetes', 'fa-solid fa-boxes', 1, 'paquete', 3, 3),
+(50, 'Uso de unidades', 'fa-solid fa-truck', 1, 'reporte_uso_unidades', 4, 1),
+(51, 'Reporte de reclamos segun tipo , causa y periodo', 'fa-solid fa-clipboard-list', 1, 'reporte_reclamos_tipo_causa_periodo', 4, 4),
+(52, 'Reporte de viajes realizados por unidad', 'fa-solid fa-truck-fast', 1, 'viajes_por_unidad', 4, 2),
+(53, 'Listado de encomiendas por tipo empaque', 'fa-solid fa-boxes-packing', 1, 'encomiendas_listar', 4, 3);
 
 
 INSERT INTO `tipo_rol` (`id`, `nombre`, `descripcion`, `activo`)
@@ -6358,11 +6364,8 @@ INSERT INTO tipo_comprobante (inicial, nombre, descripcion, activo,tipo_uso)
 VALUES ('F', 'Factura', 'Factura', 1,'V'),
   ('BV', 'Boleta', 'Boleta de Venta', 1,'V'),
   ('GR', 'Guia de remision', 'Guía de Remisión', 1,'T'),
-  ('TI', 'Ticket', 'Ticket', 1,'V'),
   ('NC', 'Nota de crédito', 'Nota de Crédito', 1,'R'),
-  ('ND', 'D', 'Nota de Débito', 1,'R'),
-  ('OT', 'O', 'Otro', 1,'V');
-
+  ('ND', 'D', 'Nota de Débito', 1,'R');
 INSERT INTO `tipo_recepcion` (`id`, `nombre`, `activo`)
 VALUES (1, 'Recepción en sucursal', 1),
   (2, 'Recepción en domicilio', 1);
@@ -8173,24 +8176,7 @@ INSERT INTO detalle_estado (id, nombre, descripcion, activo, estado_encomiendaid
 (20, 'Firmado en conformidad', 'El destinatario o tercero firmó como constancia de la recepción.', 1, 4),
 (21, 'Entrega validada en sistema', 'La entrega fue confirmada en el sistema con hora y firma.', 1, 4);
 
-INSERT INTO transaccion_encomienda (
-    num_serie, masivo, descripcion, monto_total, recojo_casa,
-    id_sucursal_origen, fecha, hora,
-    direccion_recojo, clienteid, tipo_comprobanteid
-)
-VALUES (
-    'ENCO0001',
-    0,
-    'Envío regular Lima - Trujillo',
-    25.50,
-    0,
-    3,
-    CURRENT_DATE,
-    CURRENT_TIME,
-    'Av. Siempre Viva 742',
-    1,
-    1
-);
+
 
 INSERT INTO empleado (nombre, apellidos, correo, n_documento, rolid) VALUES
 ('Carlos', 'Ramírez León', 'carlos.ramirez@transportes.com', 'D12345678', 1),
@@ -8208,3 +8194,29 @@ INSERT INTO salida (fecha, hora, recojo, entrega, estado, unidadid, destino_fina
 ('2025-06-16', '09:00:00', 0, 1, 'P', 3, 3, 5, 6),
 ('2025-06-16', '10:45:00', 1, 0, 'P', 4, 4, 7, 5),
 ('2025-06-16', '11:30:00', 1, 1, 'P', 5, 4, 7, 7);
+
+
+
+INSERT INTO usuario (correo, contrasenia, tipo_usuario, activo) VALUES
+('carlos.ramirez@transportes.com', SHA2('123456', 256), 'E', 1),
+('lucia.mendoza@transportes.com', SHA2('123456', 256), 'E', 1),
+('pedro.sanchez@transportes.com', SHA2('123456', 256), 'E', 1),
+('ana.torres@transportes.com', SHA2('123456', 256), 'E', 1),
+('luis.castillo@transportes.com', SHA2('123456', 256), 'E', 1),
+('maria.lopez@transportes.com', SHA2('123456', 256), 'E', 1),
+('javier.gomez@transportes.com', SHA2('123456', 256), 'E', 1),
+('sofia.fernandez@transportes.com', SHA2('123456', 256), 'E', 1);
+
+INSERT INTO empleado_salida (salidaid, empleadoid) VALUES 
+(1, 5), -- Pedro Sánchez Huamán (conductor principal de salida 1)
+(1, 3), -- Carlos Ramírez León
+(2, 6), -- Ana Torres Rivas (conductor principal de salida 2)
+(2, 4), -- Lucía Mendoza Ruiz
+(3, 5), -- Pedro Sánchez Huamán (conductor principal de salida 3)
+(3, 8), -- María López Espinoza
+(4, 7), -- Luis Castillo Valverde (conductor principal de salida 4)
+(4, 9), -- Javier Gómez Paredes
+(5, 7), -- Luis Castillo Valverde (conductor principal de salida 5)
+(5, 10); -- Sofía Fernández Quispe
+
+INSERT INTO `detalle_estado` (`id`, `nombre`, `descripcion`, `activo`, `estado_encomiendaid`) VALUES (NULL, 'Regresado a origen', 'No se reclamó así que se devolvió.', '1', '1');

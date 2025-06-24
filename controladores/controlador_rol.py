@@ -29,7 +29,13 @@ def table_fetchall():
     '''
     return sql_select_fetchall(sql)
 
+
+from flask import request
+import controladores.controlador_usuario as controlador_usuario
 def get_table():
+    usuario = controlador_usuario.get_usuario_empleado_user_id(request.cookies.get('user_id'))
+    validar_admin = '' if usuario['rolid'] == 1 else ' where r.id != 1 '
+ 
     sql = f'''
         SELECT 
             r.id,
@@ -40,7 +46,7 @@ def get_table():
             tr.nombre AS nom_tiporol
         FROM {table_name} r
         INNER JOIN tipo_rol tr ON r.tipo_rolid = tr.id
-        where r.id != 1
+        {validar_admin}
 
     '''
     columnas = {
@@ -53,8 +59,10 @@ def get_table():
     filas = sql_select_fetchall(sql)
     return columnas, filas
 
+
 def unactive_row(id):
     unactive_row_table(table_name, id)
+
 
 def insert_row(nombre, descripcion, tipo_rolid):
     sql = f'''
@@ -76,12 +84,15 @@ def update_row(id, nombre, descripcion, tipo_rolid):
 
 
 def get_options():
+    usuario = controlador_usuario.get_usuario_empleado_user_id(request.cookies.get('user_id'))
+    validar_admin = '' if usuario['rolid'] == 1 else ' and r.id != 1 '
+
     sql= f'''
         select 
             id ,
             nombre
-        from rol
-        where activo = 1 and id != 1 
+        from rol r
+        where r.activo = 1 {validar_admin}
         order by nombre asc
     '''
     filas = sql_select_fetchall(sql)

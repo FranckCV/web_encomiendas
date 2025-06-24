@@ -45,9 +45,9 @@ def get_table():
             s.hora,
             u.capacidad,
             CASE s.estado
-                WHEN 'P' THEN 'Pendiente (origen sucursal / domicilio)'
-                WHEN 'E' THEN 'En curso (en ruta)'
-                WHEN 'C' THEN 'Completada (destino sucursal / domicilio)'
+                WHEN 'P' THEN 'Pendiente (sucursal de origen)'
+                WHEN 'T' THEN 'En curso (en ruta)'
+                WHEN 'C' THEN 'Completada (sucursal de destino)'
                 WHEN 'X' THEN 'Cancelada'
                 ELSE 'Estado desconocido'
             END AS estado
@@ -158,3 +158,36 @@ def get_info_salida_pendiente_placa(placa):
     
     return filas
 
+def change_state_exit(id):
+    try:
+        sql_check = "SELECT COUNT(*) as cantidad FROM salida WHERE id = %s"
+        resultado = sql_select_fetchone(sql_check,(id,))
+        if resultado['cantidad'] == 0:
+            return {'success': False, 'message': 'No existe una salida con ese ID'}
+        sql_update = "UPDATE salida SET estado = 'T' WHERE id = %s"
+        sql_execute(sql_update,(id,))
+        return {'success': True, 'message': 'Estado actualizado correctamente'}
+
+    except Exception as e:
+        return {'success': False, 'message': f'Error al actualizar: {str(e)}'}
+
+def get_data_by_id_salida(id):
+    sql = '''
+        select u.placa, concat(e.nombre,' ',e.apellidos) as conductor,s.fecha,
+        concat(uo.departamento,' / ',uo.provincia,' / ',uo.distrito) as origen, concat(ud.departamento,' / ',ud.provincia,' / ',ud.distrito) as destino,
+        CASE
+            WHEN s.estado = 'P' THEN 'Pendiente'
+            WHEN s.estado = 'T' then 'En curso'
+        END as estado
+        from salida s
+        inner join unidad u on u.id=s.unidadid
+        inner join empleado_salida es on es.salidaid = s.id
+        inner join empleado e on e.id = es.empleadoid
+        inner join sucursal so on so.id = s.origen_inicio_id
+        inner join ubigeo uo on uo.codigo = so.ubigeocodigo
+        inner join sucursal sd on sd.id = s.destino_final_id
+        inner join ubigeo ud on ud.codigo = sd.ubigeocodigo
+        where s.id = %s
+    '''
+    fila = sql_select_fetchone(sql,(id,))
+    return fila

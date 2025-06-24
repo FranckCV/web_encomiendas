@@ -118,8 +118,8 @@ def get_options():
     try:
         sql = f'''
             SELECT 
-                {get_primary_key()},
-                direccion
+                id,
+                concat(abreviatura,'-',direccion) as direccion
             FROM {table_name}
             WHERE activo = 1
             ORDER BY direccion ASC
@@ -264,10 +264,6 @@ def get_report_horario():
 
 
 
-
-
-
-
 def get_options_departamento_sucursal():
     sql= f'''
         SELECT DISTINCT 
@@ -340,17 +336,37 @@ def get_data_exit(correo):
         from empleado_salida es
         inner join salida s on s.id = es.salidaid
         inner join empleado e on e.id = es.empleadoid
-        inner join sucursal so on so.id = s.origen_incio
-        inner join sucursal sd on sd.id = s.destino_final
+        inner join sucursal so on so.id = s.origen_inicio_id
+        inner join sucursal sd on sd.id = s.destino_final_id
         where e.correo=%s and s.estado = 'P'
         order by CURRENT_DATE DESC
-        limit 1
+        limit 1;
     '''
     fila = sql_select_fetchone(sql,correo)
     print(fila)
     return fila
     
-
+def get_options_sucursales():
+    sql= f'''
+        SELECT 
+            suc.id ,
+            concat(
+            ubi.departamento,
+            ' - ', 
+            ubi.provincia,
+            ' - ', 
+            ubi.distrito,
+            ' / ', 
+            suc.abreviatura,
+            ' - ', 
+            suc.direccion
+            ) as nom_sucursal
+        FROM sucursal suc
+        inner join ubigeo ubi on ubi.codigo = suc.ubigeocodigo
+        order by 2
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas
 
 def get_coordenadas_actual(id):
     sql = '''
@@ -360,9 +376,9 @@ def get_coordenadas_actual(id):
         sd.latitud as latitud_destino,
         sd.longitud as longitud_destino
         from salida s
-        inner join sucursal so on so.id = s.origen_incio
-        inner join sucursal sd on sd.id = s.destino_final
-        where s.id = %s and s.estado = 'P' or 'T'
+        inner join sucursal so on so.id = s.origen_inicio_id
+        inner join sucursal sd on sd.id = s.destino_final_id
+        where s.id = %s and s.estado IN ('P', 'T')
     '''
     fila = sql_select_fetchone(sql,id)
     return fila

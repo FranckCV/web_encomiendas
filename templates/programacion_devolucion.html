@@ -1,23 +1,22 @@
 {% extends "MAESTRA_ADMIN.html" %}
 
 {% block titulo %}
-{{titulo}}
+Programación de Devoluciones
 {% endblock %}
 
 {% block estilos %}
 <style>
     .devolucion_container {
-    width: 100%;
-    padding: 20px;
-}
-
+        width: 100%;
+        padding: 20px;
+    }
 
     .search_section {
         background: var(--color-bg-light);
         border-radius: 8px;
         padding: 25px;
         margin-bottom: 30px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .search_title {
@@ -85,7 +84,7 @@
         border-radius: 8px;
         padding: 25px;
         margin-bottom: 30px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         border-left: 4px solid var(--color-page);
     }
 
@@ -114,9 +113,14 @@
         text-transform: uppercase;
     }
 
-    .status_en_transito {
+    .status_pendiente {
         background: color-mix(in srgb, orange 20%, white 80%);
         color: orange;
+    }
+
+    .status_en_transito {
+        background: color-mix(in srgb, blue 20%, white 80%);
+        color: blue;
     }
 
     .package_details {
@@ -152,7 +156,7 @@
         background: white;
         border-radius: 8px;
         padding: 25px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .form_title {
@@ -189,7 +193,9 @@
         color: #e74c3c;
     }
 
-    .form_input, .form_select, .form_textarea {
+    .form_input,
+    .form_select,
+    .form_textarea {
         padding: 12px 15px;
         border: 2px solid var(--color-border);
         border-radius: 6px;
@@ -197,7 +203,9 @@
         transition: border-color 0.3s ease;
     }
 
-    .form_input:focus, .form_select:focus, .form_textarea:focus {
+    .form_input:focus,
+    .form_select:focus,
+    .form_textarea:focus {
         outline: none;
         border-color: var(--color-page);
     }
@@ -205,12 +213,6 @@
     .form_textarea {
         resize: vertical;
         min-height: 100px;
-    }
-
-    .datetime_group {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
     }
 
     .unidad_info {
@@ -230,7 +232,8 @@
 
     .unidad_detail {
         display: flex;
-        justify-content: space-between;
+        /* justify-content: space-between; */
+        justify-content: center;
         padding: 5px 0;
         font-size: 0.9em;
     }
@@ -309,7 +312,7 @@
     }
 
     .hidden {
-        display: none;
+        display: none !important;
     }
 
     .alert {
@@ -339,23 +342,164 @@
         border-left: 4px solid #f39c12;
     }
 
+    .btn_ver_paquetes {
+        padding: 10px 20px;
+        background: #17a2b8;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9em;
+    }
+
+    .btn_ver_paquetes:hover {
+        background: #138496;
+        transform: translateY(-1px);
+    }
+
+    .block_crud {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    /* Modal Styles */
+    .modal_overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal_overlay.show {
+        display: flex;
+    }
+
+    .modal_content {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        max-width: 900px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal_header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #eee;
+    }
+
+    .modal_title {
+        color: var(--color-text-primary);
+        font-size: 1.4em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+    }
+
+    .modal_close {
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        cursor: pointer;
+        color: #999;
+        padding: 5px;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+
+    .modal_close:hover {
+        background: #f0f0f0;
+        color: #333;
+    }
+
+    .paquetes_table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+
+    .paquetes_table th,
+    .paquetes_table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+
+    .paquetes_table th {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: var(--color-text-secondary);
+        font-size: 0.9em;
+        text-transform: uppercase;
+    }
+
+    .paquetes_table tr:hover {
+        background: #f8f9fa;
+    }
+
+    .btn_buscar_paquete {
+        padding: 6px 12px;
+        background: var(--color-page);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.8em;
+        transition: all 0.3s ease;
+    }
+
+    .btn_buscar_paquete:hover {
+        background: color-mix(in srgb, var(--color-page) 80%, black 20%);
+        transform: translateY(-1px);
+    }
+
+    .loading_message {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+        font-style: italic;
+    }
+
+    .no_data_message {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+    }
+
     @media (max-width: 768px) {
         .search_form {
             grid-template-columns: 1fr;
         }
-        
+
         .package_header {
             flex-direction: column;
             align-items: flex-start;
             gap: 10px;
         }
-        
+
         .form_actions {
             flex-direction: column;
-        }
-        
-        .datetime_group {
-            grid-template-columns: 1fr;
         }
     }
 </style>
@@ -365,9 +509,13 @@
 <div class="devolucion_container">
     <div class="block_crud">
         <h3 class="crud_title">
-            <i class="{{page_icono}}"></i>
-            {{page_titulo}}
+            <i class="ri-truck-line"></i>
+            Programación de Devoluciones
         </h3>
+        <button type="button" class="btn_ver_paquetes" onclick="mostrarModalPaquetes()">
+            <i class="ri-package-line"></i>
+            Ver Paquetes
+        </button>
     </div>
 
     <!-- Sección de búsqueda -->
@@ -376,12 +524,12 @@
             <i class="ri-search-line"></i>
             Buscar Paquete
         </h4>
-        
+
         <form class="search_form" id="search_form">
             <div class="search_group">
-                <label class="search_label">Código de Seguimiento o Destinatario</label>
-                <input type="text" class="search_input" id="search_input" 
-                       placeholder="Ingrese código de tracking o nombre del destinatario">
+                <label class="search_label">Código de Seguimiento</label>
+                <input type="text" class="search_input" id="search_input"
+                    placeholder="Ingrese código de tracking" pattern="[0-9]*" title="Solo números">
             </div>
             <button type="submit" class="btn_search">
                 <i class="ri-search-line"></i>
@@ -397,121 +545,144 @@
                 <i class="ri-package-line"></i>
                 Información del Paquete
             </h4>
-            <span class="status_badge status_en_transito">En Tránsito</span>
+            <span class="status_badge" id="status_badge">Pendiente</span>
         </div>
-        
+
         <div class="package_details">
             <div class="detail_group">
                 <div class="detail_item">
                     <span class="detail_label">Código de Seguimiento:</span>
-                    <span class="detail_value" id="package_tracking">12345678</span>
+                    <span class="detail_value" id="package_tracking">-</span>
                 </div>
                 <div class="detail_item">
                     <span class="detail_label">Destinatario:</span>
-                    <span class="detail_value" id="package_destinatario">María González Pérez</span>
-                </div>
-                <div class="detail_item">
-                    <span class="detail_label">Dirección de Destino:</span>
-                    <span class="detail_value" id="package_direccion">Av. Los Pinos 123, San Isidro</span>
+                    <span class="detail_value" id="package_destinatario">-</span>
                 </div>
                 <div class="detail_item">
                     <span class="detail_label">Teléfono:</span>
-                    <span class="detail_value" id="package_telefono">987654321</span>
+                    <span class="detail_value" id="package_telefono">-</span>
                 </div>
                 <div class="detail_item">
                     <span class="detail_label">Peso:</span>
-                    <span class="detail_value" id="package_peso">2.5 kg</span>
+                    <span class="detail_value" id="package_peso">-</span>
                 </div>
                 <div class="detail_item">
                     <span class="detail_label">Dimensiones:</span>
-                    <span class="detail_value" id="package_dimensiones">30x20x15 cm</span>
-                </div>
-            </div>
-            
-            <div class="detail_group">
-                <div class="detail_item">
-                    <span class="detail_label">Sucursal de Origen:</span>
-                    <span class="detail_value" id="package_origen">Lima Centro (LIMCE)</span>
-                </div>
-                <div class="detail_item">
-                    <span class="detail_label">Sucursal de Destino:</span>
-                    <span class="detail_value" id="package_destino">San Isidro (SANID)</span>
-                </div>
-                <div class="detail_item">
-                    <span class="detail_label">Estado Actual:</span>
-                    <span class="detail_value" id="package_estado">En ruta de entrega</span>
+                    <span class="detail_value" id="package_dimensiones">-</span>
                 </div>
                 <div class="detail_item">
                     <span class="detail_label">Valor del Paquete:</span>
-                    <span class="detail_value" id="package_valor">S/ 150.00</span>
+                    <span class="detail_value" id="package_valor">-</span>
+                </div>
+            </div>
+
+            <div class="detail_group">
+                <div class="detail_item">
+                    <span class="detail_label">Sucursal de Origen:</span>
+                    <span class="detail_value" id="package_origen">-</span>
+                </div>
+                <div class="detail_item">
+                    <span class="detail_label">Sucursal de Destino:</span>
+                    <span class="detail_value" id="package_destino">-</span>
+                </div>
+                <div class="detail_item">
+                    <span class="detail_label">Estado Actual:</span>
+                    <span class="detail_value" id="package_estado">-</span>
                 </div>
                 <div class="detail_item">
                     <span class="detail_label">Unidad Actual:</span>
-                    <span class="detail_value" id="package_unidad_actual">ABC-123 (Furgoneta)</span>
+                    <span class="detail_value" id="package_unidad_actual">-</span>
+                </div>
+                <div class="detail_item">
+                    <span class="detail_label">N° Serie:</span>
+                    <span class="detail_value" id="package_num_serie">-</span>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="devolucion_form hidden" id="devolucion_form">
-    <h4 class="form_title">
-        <i class="ri-truck-line"></i>
-        Asignar Unidad para Devolución
-    </h4>
+        <h4 class="form_title">
+            <i class="ri-truck-line"></i>
+            Asignar Unidad para Devolución
+        </h4>
 
-    <form id="form_devolucion">
-        <!-- Campo oculto para el tracking -->
-        <input type="hidden" id="tracking_id" name="tracking_id" value="">
+        <form id="form_devolucion">
+            <!-- Campo oculto para el tracking -->
+            <input type="hidden" id="tracking_id" name="tracking_id" value="">
 
-        <!-- Selección de unidad -->
-        <div class="form_group">
-            <label class="form_label">
-                Unidad de Transporte para Devolución <span class="required">*</span>
-                <i class="ri-truck-line" style="color: var(--color-page);"></i>
-            </label>
-            <select class="form_select" name="unidad_id" id="unidad_select" required>
-                <option value="">Seleccione una unidad disponible</option>
-                <!-- OPCIONES DE PRUEBA, reemplazar por backend -->
-                <option value="1" data-placa="ABC-123" data-modelo="Ford Transit" data-capacidad="1000" data-volumen="8.5" data-estado="A" data-ocupacion="65">ABC-123 - Ford Transit (Disponible)</option>
-                <option value="2" data-placa="DEF-456" data-modelo="Mercedes Sprinter" data-capacidad="1500" data-volumen="12.0" data-estado="A" data-ocupacion="80">DEF-456 - Mercedes Sprinter (Disponible)</option>
-                <option value="3" data-placa="GHI-789" data-modelo="Isuzu NPR" data-capacidad="2000" data-volumen="15.0" data-estado="A" data-ocupacion="45">GHI-789 - Isuzu NPR (Disponible)</option>
-                <option value="4" data-placa="JKL-012" data-modelo="Hyundai H100" data-capacidad="800" data-volumen="6.0" data-estado="M" data-ocupacion="0">JKL-012 - Hyundai H100 (En mantenimiento)</option>
-            </select>
+            <!-- Selección de unidad -->
+            <div class="form_group">
+                <label class="form_label">
+                    Unidad de Transporte para Devolución <span class="required">*</span>
+                    <i class="ri-truck-line" style="color: var(--color-page);"></i>
+                </label>
+                <select class="form_select" name="unidad_id" id="unidad_select" required>
+                    <option value="">Seleccione una unidad disponible</option>
+                </select>
 
-            <!-- Información detallada de la unidad seleccionada -->
-            <div class="unidad_info hidden" id="unidad_info">
-                <h5 style="margin: 0 0 10px 0; color: var(--color-text-primary);">
-                    <i class="ri-information-line"></i>
-                    Detalles de la Unidad Seleccionada
-                </h5>
-                <div class="unidad_details">
-                    <div class="unidad_detail"><span class="unidad_label">Placa:</span><span class="unidad_value" id="unidad_placa">-</span></div>
-                    <div class="unidad_detail"><span class="unidad_label">Modelo:</span><span class="unidad_value" id="unidad_modelo">-</span></div>
-                    <div class="unidad_detail"><span class="unidad_label">Capacidad:</span><span class="unidad_value" id="unidad_capacidad">-</span></div>
-                    <div class="unidad_detail"><span class="unidad_label">Volumen:</span><span class="unidad_value" id="unidad_volumen">-</span></div>
-                    <div class="unidad_detail"><span class="unidad_label">Estado:</span><span class="unidad_value" id="unidad_estado">-</span></div>
-                    <div class="unidad_detail"><span class="unidad_label">Ocupación actual:</span><span class="unidad_value" id="unidad_ocupacion">-</span></div>
+                <!-- Información detallada de la unidad seleccionada -->
+                <div class="unidad_info hidden" id="unidad_info">
+                    <h5 style="margin: 0 0 10px 0; color: var(--color-text-primary);">
+                        <i class="ri-information-line"></i>
+                        Detalles de la Unidad Seleccionada
+                    </h5>
+                    <div class="unidad_details">
+                        <div class="unidad_detail"><span class="unidad_label">Placa:&nbsp;</span><span class="unidad_value"
+                                id="unidad_placa">-</span></div>
+                        <div class="unidad_detail"><span class="unidad_label">Modelo:&nbsp;</span><span class="unidad_value"
+                                id="unidad_modelo">-</span></div>
+                        <div class="unidad_detail"><span class="unidad_label">Capacidad:&nbsp;</span><span
+                                class="unidad_value" id="unidad_capacidad">-</span></div>
+                        <div class="unidad_detail"><span class="unidad_label">Volumen:&nbsp;</span><span class="unidad_value"
+                                id="unidad_volumen">-</span></div>
+                        <div class="unidad_detail"><span class="unidad_label">Estado:&nbsp;</span><span class="unidad_value"
+                                id="unidad_estado">-</span></div>
+                        <div class="unidad_detail"><span class="unidad_label">Ocupación actual:&nbsp;</span><span
+                                class="unidad_value" id="unidad_ocupacion">-</span></div>
+                    </div>
+                    <div class="capacity_indicator">
+                        <div class="capacity_bar" id="capacity_bar" style="width: 0%"></div>
+                    </div>
+                    <div class="capacity_text" id="capacity_text">Capacidad disponible: 100%</div>
                 </div>
-                <div class="capacity_indicator">
-                    <div class="capacity_bar" id="capacity_bar" style="width: 0%"></div>
-                </div>
-                <div class="capacity_text" id="capacity_text">Capacidad disponible: 100%</div>
             </div>
-        </div>
 
-        <!-- Botones -->
-        <div class="form_actions">
-            <button type="button" class="btn_cancel" onclick="cancelarDevolucion()">
-                Cancelar
-            </button>
-            <button type="submit" class="btn_submit">
-                <i class="ri-save-line"></i>
-                Confirmar Devolución
-            </button>
-        </div>
-    </form>
+            <!-- Botones -->
+            <div class="form_actions">
+                <button type="button" class="btn_cancel" onclick="cancelarDevolucion()">
+                    Cancelar
+                </button>
+                <button type="submit" class="btn_submit">
+                    <i class="ri-save-line"></i>
+                    Confirmar Devolución
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 
+<!-- Modal para mostrar paquetes -->
+<div class="modal_overlay hidden" id="modal_paquetes">
+    <div class="modal_content">
+        <div class="modal_header">
+            <h4 class="modal_title">
+                <i class="ri-package-line"></i>
+                Paquetes Disponibles para Devolución
+            </h4>
+            <button class="modal_close" onclick="cerrarModalPaquetes()">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        
+        <div id="modal_body">
+            <div class="loading_message">
+                <i class="ri-loader-4-line"></i>
+                Cargando paquetes...
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -524,6 +695,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const unidadSelect = document.getElementById('unidad_select');
     const unidadInfo = document.getElementById('unidad_info');
 
+    // Cargar unidades disponibles al iniciar
+    // cargarUnidadesDisponibles(); // Ya no se carga al inicio, solo cuando se encuentra un paquete
+
     // Mostrar detalles al seleccionar una unidad
     unidadSelect.addEventListener('change', function () {
         const opt = this.options[this.selectedIndex];
@@ -533,7 +707,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('unidad_modelo').textContent = opt.dataset.modelo;
             document.getElementById('unidad_capacidad').textContent = opt.dataset.capacidad + ' kg';
             document.getElementById('unidad_volumen').textContent = opt.dataset.volumen + ' m³';
-            document.getElementById('unidad_estado').textContent = getEstadoText(opt.dataset.estado);
+            document.getElementById('unidad_estado').textContent = opt.dataset.estadoTexto;
             document.getElementById('unidad_ocupacion').textContent = opt.dataset.ocupacion + '%';
 
             const ocupacion = parseInt(opt.dataset.ocupacion);
@@ -555,14 +729,15 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Validación y envío simulado
+    // Validación y envío del formulario
     formDevolucion.addEventListener('submit', function (e) {
         e.preventDefault();
 
-        const data = Object.fromEntries(new FormData(this));
+        const tracking = document.getElementById('tracking_id').value;
+        const unidadId = document.getElementById('unidad_select').value;
         const opt = unidadSelect.options[unidadSelect.selectedIndex];
 
-        if (!data.unidad_id) {
+        if (!unidadId) {
             showAlert('Debe seleccionar una unidad de transporte.', 'error');
             return;
         }
@@ -572,71 +747,168 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        console.log("Devolución programada:", data);
-        showAlert('Devolución programada exitosamente.', 'success');
-
-        formDevolucion.reset();
-        unidadInfo.classList.add('hidden');
-        packageInfo.classList.add('hidden');
-        devolucionForm.classList.add('hidden');
+        // Enviar datos al servidor
+        fetch('/programar_devolucion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                tracking: tracking,
+                unidad_id: unidadId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('Devolución programada exitosamente.', 'success');
+                formDevolucion.reset();
+                unidadInfo.classList.add('hidden');
+                packageInfo.classList.add('hidden');
+                devolucionForm.classList.add('hidden');
+                // cargarUnidadesDisponibles(); // Ya no es necesario recargar
+            } else {
+                showAlert(data.message || 'Error al programar la devolución.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('Error de conexión. Intente nuevamente.', 'error');
+        });
     });
 
-    // Buscar paquete (simulado)
+    // Buscar paquete
     searchForm.addEventListener('submit', function (e) {
         e.preventDefault();
         const value = document.getElementById('search_input').value.trim();
 
         if (!value) {
-            showAlert('Ingrese un código de seguimiento o destinatario.', 'error');
+            showAlert('Ingrese un código de seguimiento.', 'error');
+            return;
+        }
+
+        // Validar que solo sean números
+        if (!/^\d+$/.test(value)) {
+            showAlert('El código de seguimiento debe contener solo números.', 'error');
             return;
         }
 
         buscarPaquete(value);
     });
 
-    function buscarPaquete(valor) {
-        const mock = {
-            tracking: '12345678',
-            destinatario: 'María González Pérez',
-            direccion: 'Av. Los Pinos 123, San Isidro, Lima',
-            telefono: '987654321',
-            peso: '2.5 kg',
-            dimensiones: '30x20x15 cm',
-            sucursal_origen: 'Lima Centro (LIMCE)',
-            sucursal_destino: 'San Isidro (SANID)',
-            estado_actual: 'En ruta de entrega',
-            valor: 'S/ 150.00',
-            unidad_actual: 'ABC-123 (Furgoneta)'
-        };
+    function buscarPaquete(criterio) {
+        fetch('/buscar_paquete_devolucion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                criterio: criterio
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.paquete) {
+                const p = data.paquete;
+                
+                document.getElementById('package_tracking').textContent = p.tracking;
+                document.getElementById('package_destinatario').textContent = p.destinatario_completo;
+                document.getElementById('package_telefono').textContent = p.telefono_destinatario;
+                document.getElementById('package_peso').textContent = p.peso + ' kg';
+                document.getElementById('package_dimensiones').textContent = p.dimensiones || 'No especificado';
+                document.getElementById('package_valor').textContent = 'S/ ' + parseFloat(p.valor).toFixed(2);
+                document.getElementById('package_origen').textContent = p.sucursal_origen;
+                document.getElementById('package_destino').textContent = p.sucursal_destino;
+                document.getElementById('package_estado').textContent = p.estado_actual || 'Sin estado';
+                document.getElementById('package_unidad_actual').textContent = p.unidad_actual || 'Sin asignar';
+                document.getElementById('package_num_serie').textContent = p.num_serie;
+                document.getElementById('tracking_id').value = p.tracking;
 
-        document.getElementById('package_tracking').textContent = mock.tracking;
-        document.getElementById('package_destinatario').textContent = mock.destinatario;
-        document.getElementById('package_direccion').textContent = mock.direccion;
-        document.getElementById('package_telefono').textContent = mock.telefono;
-        document.getElementById('package_peso').textContent = mock.peso;
-        document.getElementById('package_dimensiones').textContent = mock.dimensiones;
-        document.getElementById('package_origen').textContent = mock.sucursal_origen;
-        document.getElementById('package_destino').textContent = mock.sucursal_destino;
-        document.getElementById('package_estado').textContent = mock.estado_actual;
-        document.getElementById('package_valor').textContent = mock.valor;
-        document.getElementById('package_unidad_actual').textContent = mock.unidad_actual;
-        document.getElementById('tracking_id').value = mock.tracking;
+                // Configurar badge de estado
+                const statusBadge = document.getElementById('status_badge');
+                statusBadge.textContent = p.estado_actual || 'Pendiente';
+                statusBadge.className = 'status_badge status_pendiente';
 
-        packageInfo.classList.remove('hidden');
-        devolucionForm.classList.remove('hidden');
+                packageInfo.classList.remove('hidden');
+                devolucionForm.classList.remove('hidden');
 
-        showAlert('Paquete encontrado correctamente.', 'success');
+                // Cargar unidades disponibles para este paquete específico
+                cargarUnidadesDisponibles(p.tracking);
+
+                showAlert('Paquete encontrado correctamente.', 'success');
+            } else {
+                showAlert(data.message || 'Paquete no encontrado o no disponible para devolución.', 'error');
+                packageInfo.classList.add('hidden');
+                devolucionForm.classList.add('hidden');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('Error al buscar el paquete. Intente nuevamente.', 'error');
+        });
     }
 
-    function getEstadoText(e) {
-        return e === 'A' ? 'Activo/Disponible' : e === 'M' ? 'En Mantenimiento' : e === 'I' ? 'Inactivo' : 'Desconocido';
+    function cargarUnidadesDisponibles(tracking) {
+        if (!tracking) {
+            showAlert('Error: No hay tracking para buscar unidades disponibles.', 'error');
+            return;
+        }
+
+        fetch('/obtener_unidades_devolucion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                tracking: tracking
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const select = document.getElementById('unidad_select');
+                
+                // Limpiar opciones existentes excepto la primera
+                while (select.children.length > 1) {
+                    select.removeChild(select.lastChild);
+                }
+
+                data.unidades.forEach(unidad => {
+                    const option = document.createElement('option');
+                    option.value = unidad.id;
+                    option.textContent = `${unidad.placa} - ${unidad.modelo} (Salida: ${unidad.origen_salida} → ${unidad.destino_salida})`;
+                    
+                    // Agregar datos como atributos
+                    option.dataset.placa = unidad.placa;
+                    option.dataset.modelo = unidad.modelo;
+                    option.dataset.capacidad = unidad.capacidad;
+                    option.dataset.volumen = unidad.volumen;
+                    option.dataset.estado = unidad.estado;
+                    option.dataset.estadoTexto = unidad.estado_texto;
+                    option.dataset.ocupacion = unidad.porcentaje_ocupacion;
+
+                    select.appendChild(option);
+                });
+
+                if (data.unidades.length === 0) {
+                    showAlert('No hay unidades disponibles con salidas programadas para la ruta de devolución de este paquete.', 'warning');
+                }
+            } else {
+                showAlert('Error al cargar unidades disponibles.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('Error al cargar unidades disponibles.', 'error');
+        });
     }
 
     window.cancelarDevolucion = function () {
-        if (confirm("¿Deseas cancelar la devolución?")) {
+        if (confirm("¿Deseas cancelar la programación de devolución?")) {
             formDevolucion.reset();
             unidadInfo.classList.add('hidden');
             devolucionForm.classList.add('hidden');
+            packageInfo.classList.add('hidden');
             showAlert('Programación cancelada.', 'warning');
         }
     }
@@ -646,8 +918,131 @@ document.addEventListener('DOMContentLoaded', function () {
         alertDiv.classList.add("alert", `alert_${type}`);
         alertDiv.innerHTML = `<i class="ri-information-line"></i> ${msg}`;
         document.querySelector(".devolucion_container").prepend(alertDiv);
-        setTimeout(() => alertDiv.remove(), 4000);
+        setTimeout(() => alertDiv.remove(), 5000);
     }
+
+    // Función para mostrar modal de paquetes
+    window.mostrarModalPaquetes = function() {
+        const modal = document.getElementById('modal_paquetes');
+        const modalBody = document.getElementById('modal_body');
+        
+        // Mostrar modal
+        modal.classList.remove('hidden');
+        modal.classList.add('show');
+        
+        // Mostrar mensaje de carga
+        modalBody.innerHTML = `
+            <div class="loading_message">
+                <i class="ri-loader-4-line"></i>
+                Cargando paquetes...
+            </div>
+        `;
+        
+        // Cargar paquetes
+        cargarPaquetesParaDevolucion();
+    }
+
+    // Función para cerrar modal
+    window.cerrarModalPaquetes = function() {
+        const modal = document.getElementById('modal_paquetes');
+        modal.classList.add('hidden');
+        modal.classList.remove('show');
+    }
+
+    // Función para cargar paquetes con detalle_estado_id = 17
+    function cargarPaquetesParaDevolucion() {
+        fetch('/obtener_paquetes_estado_17', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const modalBody = document.getElementById('modal_body');
+            
+            if (data.success && data.paquetes && data.paquetes.length > 0) {
+                let tableHTML = `
+                    <table class="paquetes_table">
+                        <thead>
+                            <tr>
+                                <th>Tracking</th>
+                                <th>Destinatario</th>
+                                <th>Teléfono</th>
+                                <th>Origen</th>
+                                <th>Destino</th>
+                                <th>Fecha Estado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                data.paquetes.forEach(paquete => {
+                    tableHTML += `
+                        <tr>
+                            <td><strong>${paquete.tracking}</strong></td>
+                            <td>${paquete.destinatario}</td>
+                            <td>${paquete.telefono}</td>
+                            <td>${paquete.sucursal_origen}</td>
+                            <td>${paquete.sucursal_destino}</td>
+                            <td>${paquete.fecha_estado}</td>
+                            <td>
+                                <button class="btn_buscar_paquete" onclick="buscarPaqueteDesdeModal('${paquete.tracking}')">
+                                    <i class="ri-search-line"></i>
+                                    Buscar
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                tableHTML += `
+                        </tbody>
+                    </table>
+                `;
+                
+                modalBody.innerHTML = tableHTML;
+            } else {
+                modalBody.innerHTML = `
+                    <div class="no_data_message">
+                        <i class="ri-inbox-line"></i>
+                        <p>No hay paquetes disponibles para devolución en este momento.</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const modalBody = document.getElementById('modal_body');
+            modalBody.innerHTML = `
+                <div class="no_data_message">
+                    <i class="ri-error-warning-line"></i>
+                    <p>Error al cargar los paquetes. Intente nuevamente.</p>
+                </div>
+            `;
+        });
+    }
+
+    // Función para buscar paquete desde el modal
+    window.buscarPaqueteDesdeModal = function(tracking) {
+        // Cerrar modal
+        cerrarModalPaquetes();
+        
+        // Colocar tracking en el input de búsqueda
+        document.getElementById('search_input').value = tracking;
+        
+        // Ejecutar búsqueda automáticamente
+        buscarPaquete(tracking);
+    }
+
+    // Cerrar modal al hacer click fuera de él
+    document.addEventListener('click', function(event) {
+        const modal = document.getElementById('modal_paquetes');
+        if (event.target === modal) {
+            cerrarModalPaquetes();
+        }
+    });
 });
 </script>
 {% endblock %}

@@ -3,7 +3,7 @@
 {% block estilos %}
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel= "stylesheet" href="/static/css/seguimiento_empleado.css"
+  <link rel= "stylesheet" href="/static/css/seguimiento_empleado.css">
 {% endblock %}
 
 {% block contenido %}
@@ -17,30 +17,22 @@
 
     <div class="sidebar">
 
-      <div class="vehicle-selector">
-        <div class="selector-label">
-          <i class="fas fa-truck"></i>
-          Seleccionar Vehículo en Tránsito
-        </div>
-        <select class="vehicle-select" id="vehicleSelect">
-          <option value="">-- Selecciona un vehículo --</option>
-        </select>
-      </div>
 
-      <div class="vehicle-info-card" id="vehicleInfoCard" style="display: none;">
+      <div class="vehicle-info-card" id="vehicleInfoCard" >
         <div class="vehicle-header">
-          <div class="vehicle-id" id="selectedVehicleId">VH001</div>
-          <div class="vehicle-status" id="selectedVehicleStatus">ACTIVO</div>
+          
+          <div class="vehicle-id" id="selectedVehicleId">Placa : {{info.placa}}</div>
+          <div class="vehicle-status" id="selectedVehicleStatus">{{info.estado}}</div>
         </div>
 
         <div class="info-grid">
           <div class="info-item">
-            <div class="info-label">Distancia Total</div>
-            <div class="info-value" id="vehicleDistance">450 km</div>
+            <div class="info-label">Distancia total</div>
+            <div class="info-value" id="vehicleDistance">Cargando...</div>
           </div>
           <div class="info-item">
-            <div class="info-label">TIEMPO ESTIMADO</div>
-            <div class="info-value" id="vehicleETA">6h 30m</div>
+            <div class="info-label">Duración de viaje</div>
+            <div class="info-value" id="vehicleETA">Cargando...</div>
           </div>
         </div>
 
@@ -55,29 +47,27 @@
         </div>
       </div>
 
-      <div class="route-details" id="routeDetails" style="display: none;">
+      <div class="route-details" id="routeDetails">
         <div class="route-step">
           <i class="fas fa-circle route-icon step-origin"></i>
-          <span id="routeOrigin">Origen: Chiclayo, Lambayeque</span>
+          <span id="routeOrigin">{{info.origen}}</span>
         </div>
+        <!--
         <div class="route-step">
           <i class="fas fa-truck route-icon step-current"></i>
           <span id="currentLocation">Actual: Trujillo, La Libertad</span>
-        </div>
+        </div>-->
         <div class="route-step">
           <i class="fas fa-map-marker-alt route-icon step-destination"></i>
-          <span id="routeDestination">Destino: Lima, Lima</span>
+          <span id="routeDestination">{{info.destino}}</span>
         </div>
         <div class="route-step">
           <i class="fas fa-user route-icon step-current"></i>
-          <span id="driverName">Conductor: Carlos Mendoza</span>
+          <span id="driverName">{{info.conductor}}</span>
         </div>
-        <div class="route-step">
-          <i class="fas fa-box route-icon step-current"></i>
-          <span id="cargoInfo">Carga: 25 toneladas</span>
-        </div>
-      </div>
 
+      </div>
+<!--
       <div class="controls">
         <button class="control-btn primary" id="locateMeBtn">
           <i class="fas fa-crosshairs"></i>
@@ -96,15 +86,13 @@
           Actualizar
         </button>
       </div>
+    </div>-->
     </div>
-
     <div class="main-content">
       <div id="map"></div>
 
       <div class="map-overlay">
-        <button class="overlay-btn" id="satelliteBtn" title="Vista Satélite"><i class="fas fa-satellite"></i></button>
-        <button class="overlay-btn" id="fullscreenBtn" title="Pantalla Completa"><i class="fas fa-expand"></i></button>
-        <button class="overlay-btn" id="settingsBtn" title="Configuración"><i class="fas fa-cog"></i></button>
+
       </div>
 
       <div class="legend">
@@ -137,7 +125,7 @@
         </div>
       </div>
     </div>
-
+  </div>
 
   </div>
 
@@ -152,6 +140,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMLaqfr73_v_K7PfOhAq39cmjg7lKZT6o"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBMLaqfr73_v_K7PfOhAq39cmjg7lKZT6o&libraries=geometry"></script>
     <script src="/static/js/seguimiento_unidad.js"></script>
 
   <!--

@@ -388,7 +388,7 @@ Permisos para {{info_rol.get('nombre')}}
 
     <h3 class="crud_title">
         <i class="ri-file-lock-fill"></i>
-        Permisos para {{info_rol.get('nombre')}}
+        Permisos para {{info_rol.get('nombre') | lower}}
     </h3>
 
 
@@ -438,6 +438,18 @@ Permisos para {{info_rol.get('nombre')}}
     .mod_opt.unable:hover {
         color: var(--color-thr) !important;
         border: 1px solid var(--color-thr);
+    }
+
+    .mod_title {
+        cursor: pointer !important;
+    }
+
+    .mod_title:hover {
+        scale: 1.05;
+    }
+
+    .collapse_mod_content {
+        display: none;
     }
 
     </style>
@@ -519,6 +531,7 @@ Permisos para {{info_rol.get('nombre')}}
                     {% endif %}
                 </div>
 
+                <!-- <div class="mod_cant collapse_mod_content"> -->
                 <div class="mod_cant">
                     {% for cant in cants_mod %}
                     {% if cant.get('id') == modulo.get('id') %}
@@ -531,7 +544,7 @@ Permisos para {{info_rol.get('nombre')}}
                 </div>
             </div>
 
-            <div class="mod_content">
+            <div class="mod_content collapse_mod_content">
 
                 {% for tipo_page in cants_mod %}
                 {% if tipo_page.id == modulo.id and tipo_page.cant > 0 %}
@@ -561,45 +574,133 @@ Permisos para {{info_rol.get('nombre')}}
                             </button>
                         </div>
 
-                        {% if page.get('tipo_paginaid') in [1,3] %}
-                        <div class="opciones_fila">
-                            <button data-column="search" class="btn_search {% if page.search is none or page.search == 0 %}unable{% endif %}" id="">
-                                <i class="{{ICON_SEARCH}}"></i>
-                                <!-- {{page.search}} -->
-                            </button>
-                        </div>
+                        {% set page_dict = none %}
+                        {% set page_key = page.get('key') %}
 
-                        <div class="opciones_fila">
-                            <button data-column="insert" class="btn_insert {% if page.insert is none or page.insert == 0 %}unable{% endif %}" id="">
-                                <i class="{{ICON_INSERT}}"></i>
-                            </button>
-                        </div>
-
-                        <div class="opciones_fila">
-                            <button data-column="consult" class=" btn_consult {% if page.consult is none or page.consult == 0 %}unable{% endif %}" id="">
-                                <i class="{{ICON_CONSULT}}"></i>
-                            </button>
-                        </div>
-
-                        <div class="opciones_fila">
-                            <button data-column="unactive" class=" btn_active {% if page.unactive is none or page.unactive == 0 %}unable{% endif %}" id="">
-                                <i class="{{ICON_ACTIVE}}"></i>
-                            </button>
-                        </div>
-
-                        <div class="opciones_fila">
-                            <button data-column="update" class=" btn_update {% if page['update'] is none or page['update'] == 0 %}unable{% endif %}" id="">
-                                <i class="{{ICON_UPDATE}}"></i>
-                            </button>
-                        </div>
-
-                        <div class="opciones_fila">
-                            <button data-column="delete" class=" btn_delete {% if page.delete is none or page.delete == 0 %}unable{% endif %}" id="">
-                                <i class="{{ICON_DELETE}}"></i>
-                            </button>
-                        </div>
-
+                        {% if page.get('tipo_paginaid') == 1 %}
+                            {% set page_dict = CONTROLADORES %}
+                        {% elif page.get('tipo_paginaid') == 3 %}
+                            {% set page_dict = TRANSACCIONES %}
+                        {% elif page.get('tipo_paginaid') == 4 %}
+                            {% set page_dict = REPORTES %}
+                        {% else %}
+                            {% set page_dict = none %}
                         {% endif %}
+
+                        {% if page_dict and page_dict.get(page_key)  %}
+                            {% set opts_crud = page_dict.get(page_key).get('crud_forms') %}
+
+                            {% if opts_crud.crud_search %}
+                            <div class="opciones_fila">
+                                <button data-column="search" class="btn_search {% if page.search is none or page.search == 0 %}unable{% endif %}" id="">
+                                    <i class="{{ICON_SEARCH}}"></i>
+                                </button>
+                            </div>
+                            {% endif %}
+                            
+
+                            {% if opts_crud.crud_insert %}
+                            <div class="opciones_fila">
+                                <button data-column="insert" class="btn_insert {% if page.insert is none or page.insert == 0 %}unable{% endif %}" id="">
+                                    <i class="{{ICON_INSERT}}"></i>
+                                </button>
+                            </div>
+                            {% endif %}
+
+
+                            
+                            {% if page.get('tipo_paginaid') == 3 %}
+                            {% set page_otro = page.get('otro')  %}
+
+                            {% set page_options = page_dict.get(page_key).get('options') %}
+                            {% for pbtn in page_options %}
+                            <div class="opciones_fila">
+                                {% set clase_page = '' %}
+                                {% if pbtn[6] in ['insert' , 'update' , 'delete' , 'unactive' , 'acceso' , 'consult' , 'search']  %}
+                                    {% if page.get(pbtn[6]) is none or page.get(pbtn[6]) == 0 %}
+                                    {% set clase_page = 'unable' %}
+                                    {% else %}
+                                    {% set clase_page = '' %}
+                                    {% endif %}
+                                {% elif page_otro  %}
+                                    {% if page_otro.get(pbtn[6]) is none or page_otro.get(pbtn[6]) == 0 %}
+                                    {% set clase_page = 'unable' %}
+                                    {% else %}
+                                    {% set clase_page = '' %}
+                                    {% endif %}
+                                {% else %}
+                                    {% set clase_page = 'unable' %}
+                                {% endif %}
+
+                                <button data-column="{{pbtn[6]}}" class="btn_{{pbtn[6]}} {{clase_page}}" id="" style="background-color: {{pbtn[2]}};">
+                                    <i class="{{pbtn[1]}}"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+
+                            {% set page_buttons = page_dict.get(page_key).get('buttons') %}
+                            {% for pbtn in page_buttons %}
+                            <div class="opciones_fila">
+                                {% set clase_page = '' %}
+                                {% if pbtn[6] in ['insert' , 'update' , 'delete' , 'unactive' , 'acceso' , 'consult' , 'search']  %}
+                                    {% if page.get(pbtn[6]) is none or page.get(pbtn[6]) == 0 %}
+                                    {% set clase_page = 'unable' %}
+                                    {% else %}
+                                    {% set clase_page = '' %}
+                                    {% endif %}
+                                {% elif page_otro  %}
+                                    {% if page_otro.get(pbtn[6]) is none or page_otro.get(pbtn[6]) == 0 %}
+                                    {% set clase_page = 'unable' %}
+                                    {% else %}
+                                    {% set clase_page = '' %}
+                                    {% endif %}
+                                {% else %}
+                                    {% set clase_page = 'unable' %}
+                                {% endif %}
+
+                                <button data-column="{{pbtn[6]}}" class="btn_{{pbtn[6]}} {{clase_page}}" id="" style="background-color: {{pbtn[2]}} ;">
+                                    <i class="{{pbtn[1]}}"></i>
+                                </button>
+                            </div>
+                            {% endfor %}
+
+                            {% endif %}                           
+
+
+
+                            {% if opts_crud.crud_consult %}
+                            <div class="opciones_fila">
+                                <button data-column="consult" class=" btn_consult {% if page.consult is none or page.consult == 0 %}unable{% endif %}" id="">
+                                    <i class="{{ICON_CONSULT}}"></i>
+                                </button>
+                            </div>
+                            {% endif %}
+
+                            {% if page.tiene_crud.crud_unactive and page.existe_activo %}
+                            <div class="opciones_fila">
+                                <button data-column="unactive" class="btn_active {% if page.unactive is none or page.unactive == 0 %}unable{% endif %}" id="">
+                                <i class="{{ICON_ACTIVE}}"></i>
+                                </button>
+                            </div>
+                            {% endif %}
+
+                            {% if opts_crud.crud_update %}
+                            <div class="opciones_fila">
+                                <button data-column="update" class=" btn_update {% if page['update'] is none or page['update'] == 0 %}unable{% endif %}" id="">
+                                    <i class="{{ICON_UPDATE}}"></i>
+                                </button>
+                            </div>
+                            {% endif %}
+
+                            {% if opts_crud.crud_delete %}
+                            <div class="opciones_fila">
+                                <button data-column="delete" class=" btn_delete {% if page.delete is none or page.delete == 0 %}unable{% endif %}" id="">
+                                    <i class="{{ICON_DELETE}}"></i>
+                                </button>
+                            </div>
+                            {% endif %}
+                        {% endif %}
+
 
                     </div>
 
@@ -779,6 +880,17 @@ Permisos para {{info_rol.get('nombre')}}
 {% if rolid %}
 
 <script>
+    const mod_blocks = document.querySelectorAll('.mod_block');
+    mod_blocks.forEach(block => {
+        const title = block.querySelector('.mod_title');
+        title.addEventListener('click', () => {
+            // block.querySelector('.mod_cant').classList.toggle('collapse_mod_content');
+            block.querySelector('.mod_content').classList.toggle('collapse_mod_content');
+        });
+    });
+</script>
+
+<script>
     // const options = document.querySelectorAll('.opciones_fila ');
     // options.forEach(opt => {
         const btns = document.querySelectorAll('.mod_opt');
@@ -802,16 +914,18 @@ Permisos para {{info_rol.get('nombre')}}
 
             // 2. Revisar por cada columna
             columns.forEach(column => {
-                const allButtons = block.querySelectorAll(`.opciones_fila button[data-column="${column}"]`);
-                const unableButtons = block.querySelectorAll(`.opciones_fila button[data-column="${column}"].unable`);
+                if (['acceso' ,"insert", "update", "delete", "search", "unactive", "consult"].includes(column)) {
+                    const allButtons = block.querySelectorAll(`.opciones_fila button[data-column="${column}"]`);
+                    const unableButtons = block.querySelectorAll(`.opciones_fila button[data-column="${column}"].unable`);
 
-                const modOpt = block.querySelector(`.mod_opt[data-column="${column}"]`);
-                if (allButtons.length > 0 && allButtons.length === unableButtons.length) {
-                    if (modOpt) {
-                        modOpt.classList.add('unable');
-                    } 
-                } else {
-                    modOpt.classList.remove('unable');
+                    const modOpt = block.querySelector(`.mod_opt[data-column="${column}"]`);
+                    if (allButtons.length > 0 && allButtons.length === unableButtons.length) {
+                        if (modOpt) {
+                            modOpt.classList.add('unable');
+                        } 
+                    } else {
+                        modOpt.classList.remove('unable');
+                    }
                 }
             });
         });
@@ -824,7 +938,6 @@ Permisos para {{info_rol.get('nombre')}}
             const moduloid = opt.closest('[data-moduloid]').dataset.moduloid;
             const column = opt.dataset.column;
             const cantButtons = document.querySelectorAll(`.mod_block[data-moduloid="${moduloid}"] .opciones_fila button[data-column="${column}"]`).length;
-            // const cantButtons_1 = document.querySelectorAll(`.mod_block[data-moduloid="${moduloid}"] .opciones_fila button[data-column="${column}"]:not(.unable)`).length;
             const cantButtons_0 = document.querySelectorAll(`.mod_block[data-moduloid="${moduloid}"] .opciones_fila button[data-column="${column}"].unable`).length;
             let value;
             if (cantButtons == cantButtons_0) {
@@ -860,8 +973,7 @@ Permisos para {{info_rol.get('nombre')}}
                     const lista = data.rpta;
                     for (const element of lista) {
                         for (const column in element) {
-                            // console.log(column , element[column]);
-                            if (column != 'paginaid') {
+                            if (column != 'paginaid' || column != 'otro' || ['acceso' , "insert", "update", "delete", "search", "unactive", "consult"].includes(column)) {
                                 const pageButton = document.querySelector(`.pag_block[data-paginaid="${element['paginaid']}"] .opciones_fila button[data-column="${column}"]`);
                                 // console.log(pageButton);
                                 if (pageButton) {
@@ -884,7 +996,7 @@ Permisos para {{info_rol.get('nombre')}}
                 // }
             })
             .catch(err => {
-                alert("Error al actualizar respuesta");
+                alert("Error al actualizar respuesta en modulo");
                 console.error(err);
             });
         });

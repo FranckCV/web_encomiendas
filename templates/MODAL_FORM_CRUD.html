@@ -10,8 +10,14 @@
 
 <div class="space_modal modal_crud_{{modo_modal}} modal_crud_base" id="modal_crud_{{modo_modal}}_{{tabla}}_{{ id_pk if modo_modal != 'insert' else ''}}">
   <form class="modal_crud_content"
-        {% if modo_modal in ['insert', 'update', 'delete', 'unactive']  %}
+        {% if modo_modal not in ['consult']  %}
+
+        {% if url_post_modal %}
+        action="{{ url_post_modal }}"
+        {% else %}
         action="{{ url_for('crud_' + modo_modal, tabla=tabla) }}"
+        {% endif %}
+
         method="POST"
         enctype="multipart/form-data"
         {% endif %}>
@@ -36,12 +42,14 @@
           {% elif fila['activo'] == 1 %} {{ ACT_STATE_0 }}
           {% endif %}
         {% elif modo_modal == 'consult' %} {{ NOMBRE_BTN_CONSULT }}
+        {% else %}
+          {{ txt_opt }}
         {% endif %}
         {{ nombre_tabla }}
       </h3>
     </div>
 
-    {% if modo_modal in ['delete', 'unactive'] %}
+    {% if modo_modal not in ['insert', 'update', 'consult'] %}
       <p>
         {% if primary_key is iterable and primary_key is not string %}
           {% set primary_value = primary_key | map(attribute=fila) | join(', ') %}
@@ -51,15 +59,17 @@
 
         ¿Está seguro de que desea 
         {% if modo_modal == 'delete' %}
-          eliminar este {{nombre_tabla}} (ID: {{ primary_value }})?
+          eliminar 
         {% elif modo_modal == 'unactive' %}
           {% if fila['activo'] == 0 %}
             {{ ACT_STATE_1 | lower }}
           {% else %}
             {{ ACT_STATE_0 | lower }}
           {% endif %}
-          este {{nombre_tabla}} (ID: {{ primary_value }})?
+        {% else %}
+          {{txt_desc}}
         {% endif %}
+        este {{nombre_tabla}} (ID: {{ primary_value }})?
       </p>
     {% endif %}
 
@@ -71,7 +81,7 @@
       {# campo[6] != 'map' #}
 
       <div class="form_field form_{{campo[3]}}">
-        <label for="{{campo[0]}}">{{campo[1]}}:</label>
+        <label for="{{campo[0]}}">{{campo[1]}} {% if campo[4] %} <span style="color: red;">*</span> {% endif %} :</label>
 
         {% if campo[3] == 'select' %}
           {% if modo_modal == 'consult' %}
