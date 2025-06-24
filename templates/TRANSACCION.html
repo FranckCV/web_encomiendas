@@ -138,10 +138,6 @@
       </div>
     {% endfor %}
 
-
-
-
-
   </div>
 </div>
 
@@ -163,7 +159,7 @@
           </th>
           {% endfor %}
 
-          {% if crud_consult or crud_unactive or crud_update or crud_delete %}
+          {% if crud_consult or crud_unactive or crud_update or crud_delete or buttons %}
           <th class="opciones_column" style="width: calc( 0.5 * var(--width-column) );">
             <p>
               {{NOMBRE_OPTIONS_COL}}
@@ -197,7 +193,7 @@
           </td>
           {% endfor %}
 
-          {% if crud_consult or crud_unactive or crud_update or crud_delete %}
+          {% if crud_consult or crud_unactive or crud_update or crud_delete or buttons %}
           <td class="opciones_column">
             <div class="acciones">
 
@@ -229,7 +225,7 @@
                     </button>
                   </a>
               </div>
-            {% endfor %}
+              {% endfor %}
 
 
               {% if crud_consult %}                

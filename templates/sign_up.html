@@ -2,8 +2,21 @@
 
 {% block estilos %}
 <style>
+    .mensaje-error {
+        color: #ffbaba;
+        margin-top: 2px;
+        position: absolute;
+        width: 100%;
+    }
+
+    .input-error {
+        border-color: #ff1616c4 !important;
+        box-shadow: 0 0 4px #ff30309c;
+    }
+
     .inputs {
-        grid-template-columns: repeat(6, 1fr);
+        grid-template-columns: repeat(6, 160px);
+        overflow-y: visible;
     }
 
     .input_box {
@@ -43,7 +56,7 @@
         <option value="{{opt[0]}}">{{opt[1]}}</option>
         {% endfor %}
     </select>
-    <!-- <i class="fa-solid fa-id-card"></i> -->
+    
 </div>
 
 <div class="input_box">
@@ -53,7 +66,6 @@
         <option value="{{opt['id']}}" data-siglas="{{opt['siglas']}}">{{opt['nombre']}}</option>
         {% endfor %}
     </select>
-    <!-- <i class="fa-solid fa-id-card"></i> -->
 </div>
 
 <div class="input_box">
@@ -107,80 +119,20 @@
 
 
 {% block scripts %}
-<!-- <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const form = document.querySelector("form");
-        const tipoCliente = document.getElementById("tipo_clienteid");
-        const tipoDocumento = document.getElementById("tipo_documentoid");
-        const numDocumento = document.getElementById("num_documento");
-        const nombreSiglas = document.getElementById("nombre_siglas");
-        const apellidosRazon = document.getElementById("apellidos_razon");
-        const telefono = document.getElementById("telefono");
-        const correo = document.getElementById("correo");
-        const contrasenia = document.getElementById("contrasenia");
-        const confContrasenia = document.getElementById("conf_contrasenia");
-        const verificacion = document.getElementById("verificacion");
-
-        form.addEventListener("submit", (e) => {
-            let errores = [];
-
-            // Validar selects
-            if (tipoCliente.value === "-1") errores.push("Seleccione un tipo de cliente.");
-            if (tipoDocumento.value === "-1") errores.push("Seleccione un tipo de documento.");
-
-            // Validar campos obligatorios
-            if (numDocumento.value.trim().length < 5) errores.push("El número de documento es demasiado corto.");
-            if (nombreSiglas.value.trim().length < 2) errores.push("Ingrese su nombre o siglas.");
-            if (apellidosRazon.value.trim().length < 2) errores.push("Ingrese sus apellidos o razón social.");
-            if (telefono.value.trim().length < 7) errores.push("Ingrese un número de teléfono válido.");
-
-            // Validar correo
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.value.trim())) {
-                errores.push("El correo no tiene un formato válido.");
-            }
-
-            // Validar contraseñas
-            if (contrasenia.value.length < 6) errores.push("La contraseña debe tener al menos 6 caracteres.");
-            if (contrasenia.value !== confContrasenia.value) errores.push("Las contraseñas no coinciden.");
-
-            // Validar verificación
-            if (!verificacion.checked) errores.push("Debe aceptar los términos y condiciones.");
-
-            if (errores.length > 0) {
-                e.preventDefault();
-                alert("Errores en el formulario:\n\n" + errores.join("\n"));
-            }
-        });
-    });
-</script> -->
-
-<!-- <script>
-    document.querySelector('#tipo_clienteid').value = 1 ;
-    document.querySelector('#tipo_documentoid').value = 1 ;
-    document.querySelector('#num_documento').value = '3423' ;
-
-    document.querySelector('#nombre_siglas').value = 'wwqwqdwq' ;
-    document.querySelector('#apellidos_razon').value = '12121' ;
-
-    document.querySelector('#telefono').value = 'wrqwrw' ;
-    document.querySelector('#correo').value = 'qeqw@wwe' ;
-
-    document.querySelector('#contrasenia').value = 'wqqwqw' ;
-    document.querySelector('#conf_contrasenia').value = '123' ;
-</script> -->
-
 <script>
+    configurarFiltroDocumentosPorTipoCliente("tipo_clienteid", "tipo_documentoid");
+
     configurarValidacion({ tipo: "select", selector: "select", id: "tipo_clienteid" });
     configurarValidacion({ tipo: "select", selector: "select", id: "tipo_documentoid" });
-    // configurarValidacion({ tipo: "email", selector: "input", id: "correo" });
-    
+    configurarValidacionDocumento("tipo_documentoid", "num_documento");
+
     configurarValidacion({ tipo: "letras", selector: "input", id: "nombre_siglas" });
     configurarValidacion({ tipo: "letras", selector: "input", id: "apellidos_razon" });
 
-    configurarValidacion({ tipo: "numeros", selector: "input", id: "telefono" });
+    configurarValidacion({ tipo: "telefono", selector: "input", id: "telefono" });
     configurarValidacion({ tipo: "email", selector: "input", id: "correo" });
 
-    configurarValidacion({ tipo: "min8", selector: "input", id: "contrasenia" });
+    configurarValidacion({ tipo: "min:8,max:30", selector: "input", id: "contrasenia" });
     configurarValidacion({ tipo: "match:contrasenia", selector: "input", id: "conf_contrasenia" });
 
     configurarValidacion({ tipo: "checkbox", selector: "input", id: "verificacion" });
@@ -188,7 +140,6 @@
     validarFormularioGlobal("form");
 
 </script>
-
 
 
 {% endblock %}

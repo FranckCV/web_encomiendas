@@ -44,6 +44,9 @@
 
 {% block scripts %}
 <script>
+    configurarValidacion({ tipo: "email", selector: "input", id: "email" });
+    validarFormularioGlobal("form");
+
     localStorage.clear();
 </script>
 {% endblock %}

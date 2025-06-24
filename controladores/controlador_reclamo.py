@@ -15,28 +15,29 @@ def exists_Activo():
     return exists_column_Activo(table_name)
 
 def delete_row(id):
-    sql = f"DELETE FROM {table_name} WHERE id = {id}"
-    sql_execute(sql)
+    sql = f"DELETE FROM {table_name} WHERE id = %s"
+    sql_execute(sql, (id,))
 
 def get_table():
     sql = f'''
         SELECT id, nombres_razon, direccion, correo, telefono, n_documento,
-               monto_indemnizado, titulo_incidencia, bien_contratado, monto_reclamado,
-               relacion, fecha_recojo, sucursal_id, descripcion, pedido,
-               causa_reclamoid, tipo_indemnizacionid,
-               paquetetracking, ubigeocodigo, tipo_documentoid
+               monto_indemnizado, bien_contratado, monto_reclamado,
+               relacion, fecha_recepcion, sucursal_id, descripcion,
+               detalles, pedido, foto,
+               causa_reclamoid, tipo_indemnizacionid, paquetetracking,
+               ubigeocodigo, tipo_documentoid
         FROM {table_name}
     '''
+
     columnas = {
         'id': ['ID', 0.5],
         'nombres_razon': ['Cliente', 1.5],
         'direccion': ['Dirección', 1.5],
         'correo': ['Correo', 1.2],
         'telefono': ['Teléfono', 1.2],
-        'titulo_incidencia': ['Incidencia', 1.5],
         'monto_reclamado': ['Monto Reclamado', 1],
-        'fecha_recojo': ['Fecha', 1],
-        'estado_reclamoid': ['Estado', 1],
+        'fecha_recepcion': ['Fecha', 1],
+        'tipo_documentoid': ['Tipo Documento', 1],
         'sucursal_id': ['Sucursal', 1],
     }
 
@@ -48,66 +49,61 @@ def get_table():
 
     return columnas, filas
 
-def insert_row(nombres_razon, direccion, correo, telefono, n_documento,
-               monto_indemnizado, titulo_incidencia, bien_contratado, monto_reclamado,
-               relacion, fecha_recojo, sucursal_id, descripcion, pedido,
-               causa_reclamoid, tipo_indemnizacionid,
-               paquetetracking, ubigeocodigo, tipo_documentoid):
+def insert_row(form):
+    if not form:
+        raise ValueError("❌ Formulario vacío.")
+
+    form = dict(form)  # Convierte ImmutableMultiDict a dict
+
+    campos = [
+        "nombres_razon", "direccion", "correo", "telefono", "n_documento",
+        "monto_indemnizado", "bien_contratado", "monto_reclamado",
+        "relacion", "fecha_recepcion", "sucursal_id", "descripcion",
+        "detalles", "pedido", "foto", "causa_reclamoid", "tipo_indemnizacionid",
+        "paquetetracking", "ubigeocodigo", "tipo_documentoid"
+    ]
+
+    valores = []
+    for campo in campos:
+        valor = form.get(campo)
+        if valor == '':
+            valor = None
+        valores.append(valor)
+
+    if any(v is None for v in valores):
+        raise ValueError("❌ Algunos campos requeridos están vacíos o mal nombrados")
+
     sql = f'''
         INSERT INTO {table_name} (
-            nombres_razon, direccion, correo, telefono, n_documento,
-            monto_indemnizado, titulo_incidencia, bien_contratado, monto_reclamado,
-            relacion, fecha_recojo, sucursal_id, descripcion, pedido,
-            causa_reclamoid, tipo_indemnizacionid,
-            paquetetracking, ubigeocodigo, tipo_documentoid
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                  %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            {', '.join(campos)}
+        ) VALUES ({', '.join(['%s'] * len(valores))})
     '''
-    sql_execute(sql, (
-        nombres_razon, direccion, correo, telefono, n_documento,
-        monto_indemnizado, titulo_incidencia, bien_contratado, monto_reclamado,
-        relacion, fecha_recojo, sucursal_id, descripcion, pedido,
-        causa_reclamoid, tipo_indemnizacionid,
-        paquetetracking, ubigeocodigo, tipo_documentoid
-    ))
 
-def update_row(id, nombres_razon, direccion, correo, telefono, n_documento,
-               monto_indemnizado, titulo_incidencia, bien_contratado, monto_reclamado,
-               relacion, fecha_recojo, sucursal_id, descripcion, pedido,
-               causa_reclamoid, tipo_indemnizacionid,
-               paquetetracking, ubigeocodigo, tipo_documentoid):
+    sql_execute(sql, valores)
+    return True
+
+def update_row(id, *args):
+    campos = [
+        "nombres_razon", "direccion", "correo", "telefono", "n_documento",
+        "monto_indemnizado", "bien_contratado", "monto_reclamado",
+        "relacion", "fecha_recepcion", "sucursal_id", "descripcion",
+        "detalles", "pedido", "foto", "causa_reclamoid", "tipo_indemnizacionid",
+        "paquetetracking", "ubigeocodigo", "tipo_documentoid"
+    ]
+
+    if len(args) != len(campos):
+        raise ValueError("❌ Número incorrecto de argumentos para update")
+
     sql = f'''
         UPDATE {table_name} SET
-            nombres_razon = %s,
-            direccion = %s,
-            correo = %s,
-            telefono = %s,
-            n_documento = %s,
-            monto_indemnizado = %s,
-            titulo_incidencia = %s,
-            bien_contratado = %s,
-            monto_reclamado = %s,
-            relacion = %s,
-            fecha_recojo = %s,
-            sucursal_id = %s,
-            descripcion = %s,
-            pedido = %s,
-            causa_reclamoid = %s,
-            tipo_indemnizacionid = %s,
-            paquetetracking = %s,
-            ubigeocodigo = %s,
-            tipo_documentoid = %s
+            {', '.join([f"{campo} = %s" for campo in campos])}
         WHERE id = %s
     '''
-    sql_execute(sql, (
-        nombres_razon, direccion, correo, telefono, n_documento,
-        monto_indemnizado, titulo_incidencia, bien_contratado, monto_reclamado,
-        relacion, fecha_recojo, sucursal_id, descripcion, pedido,
-        causa_reclamoid, tipo_indemnizacionid,
-        paquetetracking, ubigeocodigo, tipo_documentoid,
-        id
-    ))
 
+    sql_execute(sql, (*args, id))
+    return True
+
+# Clase usada por main.py
 class ControladorReclamo:
     def get_info_columns(self):
         return get_info_columns()
@@ -124,12 +120,11 @@ class ControladorReclamo:
     def get_table(self):
         return get_table()
 
-    def insert_row(self, *args):
-        return insert_row(*args)
+    def insert_row(self, form):
+        return insert_row(form)
 
-    def update_row(self, *args):
-        return update_row(*args)
-
+    def update_row(self, id, *args):
+        return update_row(id, *args)
 
 
 
@@ -226,3 +221,4 @@ def registrar_reclamo(
     ))
 
     
+

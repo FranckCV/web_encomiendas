@@ -30,7 +30,7 @@ const tiposValidacion = {
         regex: /^[a-zA-Z0-9]{9,12}$/,
         mensaje: "Carnet de extranjería inválido"
     },
-    pasaporte: {
+    pas: {
         regex: /^[a-zA-Z0-9]{6,12}$/,
         mensaje: "Pasaporte inválido"
     },
@@ -55,7 +55,10 @@ const tiposValidacion = {
     match: {
         mensaje: "Los campos no coinciden"
     },
-
+    telefono: {
+        regex: /^\d{9,15}$/,  // entre 9 y 15 dígitos
+        mensaje: "Teléfono inválido (mínimo 9 dígitos)"
+    },
 
 };
 
@@ -87,6 +90,7 @@ function configurarValidacion({ tipo, selector, id }) {
 function validarCampo(el, tipo, matchId = null) {
     const msgError = el.parentElement.querySelector(".mensaje-error");
 
+    // Checkbox
     if (tipo === "checkbox") {
         if (!el.checked) {
             el.classList.add("input-error");
@@ -101,6 +105,7 @@ function validarCampo(el, tipo, matchId = null) {
         }
     }
 
+    // Select
     if (tipo === "select") {
         const val = el.value;
         const isInvalid = val === "" || val === "-1" || el.options[el.selectedIndex]?.disabled;
@@ -117,7 +122,7 @@ function validarCampo(el, tipo, matchId = null) {
         }
     }
 
-    // 💡 match:compara valores
+    // match: campo igual a otro
     if (tipo.startsWith("match:")) {
         const otroCampo = document.querySelector(`#${matchId}`);
         const mismoValor = otroCampo && el.value === otroCampo.value;
@@ -134,9 +139,41 @@ function validarCampo(el, tipo, matchId = null) {
         }
     }
 
-    // ✅ Validación normal con regex
+    // Validaciones min / max dinámicas
+    if (tipo.startsWith("min:")) {
+        const min = parseInt(tipo.split(":")[1]);
+        if (el.value.length < min) {
+            el.classList.add("input-error");
+            msgError.textContent = `Mínimo ${min} caracteres`;
+            msgError.style.display = "block";
+            return false;
+        } else {
+            el.classList.remove("input-error");
+            msgError.textContent = "";
+            msgError.style.display = "none";
+            return true;
+        }
+    }
+
+    if (tipo.startsWith("max:")) {
+        const max = parseInt(tipo.split(":")[1]);
+        if (el.value.length > max) {
+            el.classList.add("input-error");
+            msgError.textContent = `Máximo ${max} caracteres`;
+            msgError.style.display = "block";
+            return false;
+        } else {
+            el.classList.remove("input-error");
+            msgError.textContent = "";
+            msgError.style.display = "none";
+            return true;
+        }
+    }
+
+
+    // Validación normal con regex
     const val = el.value.trim();
-    const tipoBase = tipo.includes(":") ? tipo.split(":")[0] : tipo; // por si es match:algo
+    const tipoBase = tipo.includes(":") ? tipo.split(":")[0] : tipo;
     const { regex, mensaje } = tiposValidacion[tipoBase] || {};
 
     if (!regex || val === "" || !regex.test(val)) {
@@ -179,6 +216,65 @@ function validarFormularioGlobal(formSelector) {
         }
     });
 }
+
+function configurarValidacionDocumento(idSelect, idInput) {
+    const select = document.getElementById(idSelect);
+    const input = document.getElementById(idInput);
+
+    if (!select || !input) return;
+
+    select.addEventListener("change", () => {
+        const siglas = select.options[select.selectedIndex]?.dataset?.siglas?.toLowerCase();
+
+        if (!siglas) return;
+
+        configurarValidacion({ tipo: siglas, selector: "input", id: idInput });
+        input.dispatchEvent(new Event('input'));
+
+    });
+}
+
+
+function configurarFiltroDocumentosPorTipoCliente(idSelectCliente, idSelectDocumento) {
+    const selectCliente = document.getElementById(idSelectCliente);
+    const selectDocumento = document.getElementById(idSelectDocumento);
+
+    if (!selectCliente || !selectDocumento) return;
+
+    // Clonamos las opciones originales
+    const opcionesOriginales = Array.from(selectDocumento.options).filter(opt => opt.value !== "-1");
+
+    function actualizarOpcionesDocumento() {
+        const tipoClienteId = selectCliente.value;
+
+        // Limpiamos todas las opciones excepto la "-1"
+        selectDocumento.innerHTML = '<option value="-1" selected disabled>Tipo de Documento</option>';
+
+        let nuevasOpciones;
+
+        if (tipoClienteId === "2") {
+            // Persona Jurídica: solo RUC
+            nuevasOpciones = opcionesOriginales.filter(opt => opt.dataset.siglas === "RUC");
+        } else {
+            // Persona Natural: DNI, PAS, CE
+            nuevasOpciones = opcionesOriginales.filter(opt => {
+                const siglas = opt.dataset.siglas;
+                return siglas === "DNI" || siglas === "PAS" || siglas === "CE";
+            });
+        }
+
+        nuevasOpciones.forEach(opt => selectDocumento.appendChild(opt));
+        selectDocumento.dispatchEvent(new Event('change'));
+        
+    }
+
+    selectCliente.addEventListener("change", actualizarOpcionesDocumento);
+
+    // Llamada inicial en caso venga precargado
+    actualizarOpcionesDocumento();
+
+}
+
 
 
 

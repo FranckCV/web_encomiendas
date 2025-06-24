@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app , send_file #, after_this_request, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app , send_file, flash #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import permiso as permiso
 from controladores import controlador_pagina as controlador_pagina
@@ -51,7 +51,8 @@ from controladores import controlador_modalidad_pago as controlador_modalidad_pa
 from controladores import controlador_encomienda as controlador_encomienda
 from controladores import controlador_encomiendasss as  controlador_encomiendasss
 from controladores import controlador_seguimiento as  controlador_seguimiento
-
+from controladores import controlador_programacion_devolucion as controlador_programacion_devolucion
+from controladores import controlador_seguimiento_reclamos as controlador_seguimiento_reclamos
 from controladores import reporte_listar_enco 
 from controladores import reporte_reclamo_causa
 from controladores import reporte_UsoUnidades
@@ -84,7 +85,6 @@ from correo import enviar_correo
 from datetime import timedelta
 from flask_socketio import SocketIO, emit
 from time import sleep
-from threading import Thread
 import traceback
 import socket
 from num2words import num2words
@@ -114,36 +114,36 @@ mail = Mail(app)
 
 IGV_RATE = Decimal('0.18')
 
-STATE_0              = configuraciones.STATE_0
-STATE_1              = configuraciones.STATE_1
-TITLE_STATE          = configuraciones.TITLE_STATE
-HABILITAR_ICON_PAGES = configuraciones.HABILITAR_ICON_PAGES
-ACT_STATE_0          = configuraciones.ACT_STATE_0
-ACT_STATE_1          = configuraciones.ACT_STATE_1
-NOMBRE_CRUD_PAGE     = configuraciones.NOMBRE_CRUD_PAGE
+STATE_0                = configuraciones.STATE_0
+STATE_1                = configuraciones.STATE_1
+TITLE_STATE            = configuraciones.TITLE_STATE
+HABILITAR_ICON_PAGES   = configuraciones.HABILITAR_ICON_PAGES
+ACT_STATE_0            = configuraciones.ACT_STATE_0
+ACT_STATE_1            = configuraciones.ACT_STATE_1
+NOMBRE_CRUD_PAGE       = configuraciones.NOMBRE_CRUD_PAGE
 NOMBRE_ADMINPAGES_PAGE = configuraciones.NOMBRE_ADMINPAGES_PAGE 
-NOMBRE_OPTIONS_COL   = configuraciones.NOMBRE_OPTIONS_COL
-NOMBRE_BTN_INSERT    = configuraciones.NOMBRE_BTN_INSERT
-NOMBRE_BTN_UPDATE    = configuraciones.NOMBRE_BTN_UPDATE
-NOMBRE_BTN_DELETE    = configuraciones.NOMBRE_BTN_DELETE
-NOMBRE_BTN_UNACTIVE  = configuraciones.NOMBRE_BTN_UNACTIVE
-NOMBRE_BTN_LIST      = configuraciones.NOMBRE_BTN_LIST
-NOMBRE_BTN_CONSULT   = configuraciones.NOMBRE_BTN_CONSULT
-NOMBRE_BTN_SEARCH    = configuraciones.NOMBRE_BTN_SEARCH
-ICON_PAGE_NOICON     = configuraciones.ICON_PAGE_NOICON 
-ICON_PAGE_CRUD       = configuraciones.ICON_PAGE_CRUD 
-ICON_PAGE_REPORT     = configuraciones.ICON_PAGE_REPORT 
-ICON_PAGE_DASHBOARD  = configuraciones.ICON_PAGE_DASHBOARD 
-ICON_PAGE_PANEL      = configuraciones.ICON_PAGE_PANEL 
-ICON_LIST            = configuraciones.ICON_LIST
-ICON_CONSULT         = configuraciones.ICON_CONSULT
-ICON_SEARCH          = configuraciones.ICON_SEARCH
-ICON_INSERT          = configuraciones.ICON_INSERT
-ICON_UPDATE          = configuraciones.ICON_UPDATE
-ICON_DELETE          = configuraciones.ICON_DELETE
-ICON_ACTIVE          = configuraciones.ICON_ACTIVE
-ICON_UNACTIVE        = configuraciones.ICON_UNACTIVE
-ICON_UNLOCK          = configuraciones.ICON_UNLOCK
+NOMBRE_OPTIONS_COL     = configuraciones.NOMBRE_OPTIONS_COL
+NOMBRE_BTN_INSERT      = configuraciones.NOMBRE_BTN_INSERT
+NOMBRE_BTN_UPDATE      = configuraciones.NOMBRE_BTN_UPDATE
+NOMBRE_BTN_DELETE      = configuraciones.NOMBRE_BTN_DELETE
+NOMBRE_BTN_UNACTIVE    = configuraciones.NOMBRE_BTN_UNACTIVE
+NOMBRE_BTN_LIST        = configuraciones.NOMBRE_BTN_LIST
+NOMBRE_BTN_CONSULT     = configuraciones.NOMBRE_BTN_CONSULT
+NOMBRE_BTN_SEARCH      = configuraciones.NOMBRE_BTN_SEARCH
+ICON_PAGE_NOICON       = configuraciones.ICON_PAGE_NOICON 
+ICON_PAGE_CRUD         = configuraciones.ICON_PAGE_CRUD 
+ICON_PAGE_REPORT       = configuraciones.ICON_PAGE_REPORT 
+ICON_PAGE_DASHBOARD    = configuraciones.ICON_PAGE_DASHBOARD 
+ICON_PAGE_PANEL        = configuraciones.ICON_PAGE_PANEL 
+ICON_LIST              = configuraciones.ICON_LIST
+ICON_CONSULT           = configuraciones.ICON_CONSULT
+ICON_SEARCH            = configuraciones.ICON_SEARCH
+ICON_INSERT            = configuraciones.ICON_INSERT
+ICON_UPDATE            = configuraciones.ICON_UPDATE
+ICON_DELETE            = configuraciones.ICON_DELETE
+ICON_ACTIVE            = configuraciones.ICON_ACTIVE
+ICON_UNACTIVE          = configuraciones.ICON_UNACTIVE
+ICON_UNLOCK            = configuraciones.ICON_UNLOCK
 
 ###########_ TEST FUNCIONES _#############
 
@@ -294,16 +294,25 @@ def guardar_imagen_bd(tabla,ad,archivo):
     return None
 
 
+def texto_a_json(texto):
+    import json
+    try:
+        return json.loads(texto)
+    except json.JSONDecodeError as e:
+        print("Error al convertir a JSON:", e)
+        return None
+
 
 ###########_ DICCIONARIOS _#############
 
 ERRORES = {
-    "'NoneType' object is not subscriptable" : "Inicie sesión con su cuenta correspondiente",
-    "404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again." : "El enlace al que intentó ingresar no existe." ,
     "NO_EXISTE_USERNAME" : "El nombre de usuario ingresado ya fue tomado por otro usuario" ,
     "NO_EXISTE_EMAIL" : "El correo electronico ingresado ya fue tomado por otro usuario" ,
     "LOGIN_INVALIDO" : 'Credenciales inválidas. Intente de nuevo' ,
+    "PAGINA_NO_EXISTE" : 'La página a la que intentó ingresar no existe' ,
+    "'NoneType' object is not subscriptable" : "Inicie sesión con su cuenta correspondiente",
     "foreign key constraint fails" : 'No es posible eliminar dicha fila' ,
+    "404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again." : "El enlace al que intentó ingresar no existe." ,
 }
 
 
@@ -411,7 +420,7 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-    "reclamo": {
+"reclamo": {
     "active": True,
     "id": "reclamo",
     "titulo": "Reclamos",
@@ -426,14 +435,15 @@ CONTROLADORES = {
         ['correo', 'Correo', 'Correo', 'email', True, True, None],
         ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
         ['n_documento', 'N° Documento', '', 'text', True, True, None],
-        ['titulo_incidencia', 'Incidencia', '', 'text', True, True, None],
         ['bien_contratado', 'Bien Contratado', '', 'text', True, True, None],
         ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
         ['monto_indemnizado', 'Monto Indemnizado', '0.00', 'number', True, True, None],
         ['relacion', 'Relación con el bien', '', 'text', True, True, None],
-        ['fecha_recojo', 'Fecha de recojo', '', 'date', True, True, None],
+        ['fecha_recepcion', 'Fecha de recepción', '', 'date', True, True, None],
         ['descripcion', 'Descripción', '', 'textarea', True, True, None],
+        ['detalles', 'Detalles adicionales', '', 'textarea', True, True, None],
         ['pedido', 'Pedido', '', 'text', True, True, None],
+        ['foto', 'Foto del reclamo', '', 'img', False, True, None],
         ['sucursal_id', 'Sucursal', '', 'select', True, True, [lambda: controlador_sucursal.get_options(), 'direccion']],
         ['causa_reclamoid', 'Causa del Reclamo', '', 'select', True, True, [lambda: controlador_causa_reclamo.get_options(), 'nombre']],
         ['tipo_indemnizacionid', 'Tipo de Indemnización', '', 'select', True, True, [lambda: controlador_tipo_indemnizacion.get_options(), 'nombre']],
@@ -1271,41 +1281,41 @@ CONTROLADORES = {
         }
     },
     
-    "paquete": {
-    "active": True,
-    "titulo": "Paquetes",
-    "nombre_tabla": "paquete",
-    "controlador": controlador_paquete,
-    "icon_page": "fa-solid fa-box",
-    "filters": [
-    ],
-    "fields_form": [
-        #   ID/NAME                        LABEL                         PLACEHOLDER                TYPE       REQUIRED  ABLE   DATOS
-        ['tracking',                      'Tracking',                   'Id',            'text',     False,    False, True],
-        ['valor',                         'Valor (S/.)',                'Valor',                   'number',   True,     True,  None],
-        ['peso',                          'Peso (kg)',                  'Peso',                    'number',   True,     True,  None],
-        ['estado_pago',                   'Estado de pago',             '0 = Pagado, 1 = Pendiente','select',  True,     True,  [['0', 'Pagado'], ['1', 'Pendiente']]],
-        ['nombres_contacto_destinatario', 'Nombres contacto',           'Nombres',                 'text',     True,     True,  None],
-        ['apellidos_razon_destinatario',  'Apellidos o Razón Social',   'Apellidos o Razón',       'text',     True,     True,  None],
-        ['num_documento_destinatario',    'N° Documento',               'Documento',               'text',     True,     True,  None],
-        ['tipo_documento_destinatario_id','Tipo de Documento',          'Elegir tipo',             'select',   True,     True,  [lambda: controlador_tipo_documento.get_options(), 'tipo_documento']],
-        ['tipo_empaqueid',                'Tipo de Empaque',            'Elegir tipo',             'select',   True,     True,  [lambda: controlador_tipo_empaque.get_options(), 'tipo_empaque']],
-        ['contenido_paqueteid',           'Contenido del Paquete',      'Elegir contenido',        'select',   False,    True,  [lambda: controlador_contenido_paquete.get_options(), 'contenido_paquete']],
-        ['tipo_recepcionid',              'Tipo de Recepción',          'Elegir recepción',        'select',   True,     True,  [lambda: controlador_tipo_recepcion.get_options(), 'tipo_recepcion']],
-        ['modalidad_pagoid',              'Modalidad de Pago',          'Elegir modalidad',        'select',   True,     True,  [lambda: controlador_modalidad_pago.get_options(), 'modalidad_pago']],
-        ['sucursal_destino_id',           'Sucursal Destino',           'Elegir sucursal',         'select',   True,     True,  [lambda: controlador_sucursal.get_options(), 'direccion_destino']],
-        ['descripcion',                   'Descripción',                'Descripción del paquete', 'textarea', False,    True,  None],
-    ],
-    "crud_forms": {
-        "crud_list": True,
-        "crud_search": True,
-        "crud_consult": True,
-        "crud_insert": True,
-        "crud_update": True,
-        "crud_delete": True,
-        "crud_unactive": True,
-    }
-}
+    # "paquete": {
+    #     "active": True,
+    #     "titulo": "Paquetes",
+    #     "nombre_tabla": "paquete",
+    #     "controlador": controlador_paquete,
+    #     "icon_page": "fa-solid fa-box",
+    #     "filters": [
+    #     ],
+    #     "fields_form": [
+    #         #   ID/NAME                        LABEL                         PLACEHOLDER                TYPE       REQUIRED  ABLE   DATOS
+    #         ['tracking',                      'Tracking',                   'Id',            'text',     False,    False, True],
+    #         ['valor',                         'Valor (S/.)',                'Valor',                   'number',   True,     True,  None],
+    #         ['peso',                          'Peso (kg)',                  'Peso',                    'number',   True,     True,  None],
+    #         ['estado_pago',                   'Estado de pago',             '0 = Pagado, 1 = Pendiente','select',  True,     True,  [['0', 'Pagado'], ['1', 'Pendiente']]],
+    #         ['nombres_contacto_destinatario', 'Nombres contacto',           'Nombres',                 'text',     True,     True,  None],
+    #         ['apellidos_razon_destinatario',  'Apellidos o Razón Social',   'Apellidos o Razón',       'text',     True,     True,  None],
+    #         ['num_documento_destinatario',    'N° Documento',               'Documento',               'text',     True,     True,  None],
+    #         ['tipo_documento_destinatario_id','Tipo de Documento',          'Elegir tipo',             'select',   True,     True,  [lambda: controlador_tipo_documento.get_options(), 'tipo_documento']],
+    #         ['tipo_empaqueid',                'Tipo de Empaque',            'Elegir tipo',             'select',   True,     True,  [lambda: controlador_tipo_empaque.get_options(), 'tipo_empaque']],
+    #         ['contenido_paqueteid',           'Contenido del Paquete',      'Elegir contenido',        'select',   False,    True,  [lambda: controlador_contenido_paquete.get_options(), 'contenido_paquete']],
+    #         ['tipo_recepcionid',              'Tipo de Recepción',          'Elegir recepción',        'select',   True,     True,  [lambda: controlador_tipo_recepcion.get_options(), 'tipo_recepcion']],
+    #         ['modalidad_pagoid',              'Modalidad de Pago',          'Elegir modalidad',        'select',   True,     True,  [lambda: controlador_modalidad_pago.get_options(), 'modalidad_pago']],
+    #         ['sucursal_destino_id',           'Sucursal Destino',           'Elegir sucursal',         'select',   True,     True,  [lambda: controlador_sucursal.get_options(), 'direccion_destino']],
+    #         ['descripcion',                   'Descripción',                'Descripción del paquete', 'textarea', False,    True,  None],
+    #     ],
+    #     "crud_forms": {
+    #         "crud_list": True,
+    #         "crud_search": True,
+    #         "crud_consult": True,
+    #         "crud_insert": True,
+    #         "crud_update": True,
+    #         "crud_delete": True,
+    #         "crud_unactive": True,
+    #     }
+    # }
 
     
 }
@@ -1422,10 +1432,10 @@ REPORTES = {
         "filters": []
     },
 
-    "encomiendas_por_ruta": {
+    "encomiendas_listar": {
         "active": True,
         "icon_page": "fa-solid fa-boxes-packing",
-        "titulo": "Listado de encomiendas asignadas a rutas específicas ",
+        "titulo": "Listado de encomiendas por empaque ",
         "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo(),
         "filters": []
     },
@@ -1436,164 +1446,6 @@ REPORTES = {
         "titulo": "Reporte de reclamos por tipo, causa y periodo",
         "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),
         "filters": []
-    },
-}
-
-
-GRAFICOS = {
-    # LINEA
-    "ingresos_periodo": {
-        "active": False,
-        'icon_page' : 'fa-solid fa-dollar-sign' ,
-        "titulo": "ingresos por mes",
-        "elements": {
-            "graph": True,
-            "table": False,
-            "counter": False,
-        },
-        "graph": {
-            "chart": {
-                "type": 'line',
-                "zoom": {
-                    "enabled": True
-                }
-            },
-            "series": lambda: [{
-                "name": 'Ingresos',
-                "data": extract_col_row(ingresos_periodo())[1]
-            }],
-            "xaxis": lambda: {
-                "categories": extract_col_row(ingresos_periodo())[0]
-            },
-            "colors": [' var(--color1) '],
-            "stroke": {
-                "curve": 'smooth'
-            },
-            "markers": {
-                "size": 5
-            }
-        },
-    },
-    # BARRA VERTICAL
-    "articulos_mas_vendidos": {
-        "active" : False ,
-        'icon_page' : 'fa-solid fa-dollar-sign' ,
-        "titulo": "artículos más vendidos",
-        "elements": {
-            "graph": True,
-            "table": False,
-            "counter": False,
-        },
-        "graph" : {
-            "chart": {
-                "type": 'bar',
-            },
-            "series": lambda: [{
-                "name": 'Ingresos',
-                "data": extract_col_row(articulos_mas_vendidos())[1]
-            }],
-            "xaxis": lambda: {
-                "categories": extract_col_row(articulos_mas_vendidos())[0]
-            },
-            "colors": [' var(--color15) ']
-        }
-    },
-    # BARRA HORIZONTAL
-    "top_envios": {
-        "active" : False ,
-        'icon_page' : 'fa-solid fa-dollar-sign' ,
-        "titulo": "top de envios de encomiendas",
-        "elements": {
-            "graph": True,
-            "table": False,
-            "counter": False,
-        },
-        "graph" : {
-            "chart": {
-                "type": 'bar',
-            },
-            "series": [{
-                "name": 'Envíos',
-                "data": [400, 350, 300, 200] 
-            }],
-            "xaxis": {
-                "categories": ['Sucursal A', 'Sucursal B', 'Sucursal C', 'Sucursal D']
-            },
-            "plotOptions": {
-                "bar": {
-                    "horizontal": True,
-                }
-            },
-            "colors": [' var(--color5) ']
-        }
-    },
-    # PASTEL
-    "envios_tipo": {
-        "active" : False ,
-        'icon_page' : 'fa-solid fa-dollar-sign' ,
-        "titulo": "envios por tipo de articulo",
-        "elements": {
-            "graph": True,
-            "table": False,
-            "counter": False,
-        },
-        "graph" : {
-            "chart": {
-                "type": 'pie',
-                "height": 500,
-                "toolbar": {
-                    "show": True
-                }
-            },
-            "series": [55, 30, 15],
-            "labels": ['Cajas', 'Sobres', 'Otros'],
-            "colors": [' var(--color8) ', ' var(--color11) ', ' var(--color-sec) '],
-            "responsive": [{
-                "breakpoint": 200,
-                "options": {
-                    "chart": {
-                        "width": 100
-                    },
-                    "legend": {
-                        "position": 'bottom'
-                    }
-                }
-            }]
-        }
-    },
-    # DONUT
-    "entregado_pendiente": {
-        "active" : False ,
-        'icon_page' : 'fa-solid fa-dollar-sign' ,
-        "titulo": "encomiendas entregadas vs pendientes",
-        "elements": {
-            "graph": True,
-            "table": False,
-            "counter": False,
-        },
-        "graph" : {
-            "chart": {
-                "type": 'donut',
-                "height": 500,
-                "toolbar": {
-                    "show": True,
-                }
-            },
-            "series": [70, 30] ,
-            "labels": ['Entregadas', 'Pendientes'],
-            "colors": [' var(--color3) ', ' var(--color-sec) '],
-            "responsive": [{
-                "breakpoint": 480,
-                "options": {
-                    "chart": {
-                        "height": 100,
-                    },
-                    "legend": {
-                        "position": 'bottom'
-                    }
-                }
-            }]
-        },
     },
 }
 
@@ -1618,7 +1470,7 @@ TRANSACCIONES = {
        ],
         "crud_forms": {
             "crud_list": True ,
-            "crud_search": False ,
+            "crud_search": True ,
             "crud_consult": False ,
             "crud_insert": False ,
             "crud_update": False ,
@@ -1626,15 +1478,16 @@ TRANSACCIONES = {
             "crud_unactive": False ,
         },
         "buttons": [
-            # parametros - icon - color - enlace_function
-            [False,   f'{ICON_CONSULT}',   '#3165fd',  'salida_informacion', {} , ''],
-            [False,   f'{ICON_UPDATE}',   '#ccac1c',  'salida_informacion', {} , ''],
+           # hay_parametros  icon         color              enlace_function      parametros   clase_html   modo(insert ,update , consult)
+            [False,   f'{ICON_CONSULT}',   'var(--color-consult)',  'salida_informacion', {} , '' , 'consult'],
+            [False,   f'{ICON_UPDATE}',   'var(--color-update)',  'salida_informacion', {} , '' ,'update'],
+            [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa' , 'mapa'], 
             # [True,   f'fa-solid fa-location-dot',   'grey',  'seguimiento_empleado_prueba' , {"placa": "placa"}],
-            [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa',], 
+            # [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa',], 
         ],
         "options": [
-            # icon - color - text - enlace_function
-            [False,   f'{ICON_INSERT}',   'green',  'Programar', 'salida_informacion'],
+        # mostrar_url       icon             color                  text           enlace_function    parametros  modo(insert ,update , consult)
+            [False,   f'{ICON_INSERT}',   'var(--color-insert)',  'Programar', 'salida_informacion', {},         'insert'],
         ],
     },
     "transaccion_encomienda": {
@@ -1661,7 +1514,7 @@ TRANSACCIONES = {
         ],
         "crud_forms": {
             "crud_list": True,
-            "crud_search": False,
+            "crud_search": True,
             "crud_consult": True,
             "crud_insert": True,
             "crud_update": True,
@@ -1669,7 +1522,8 @@ TRANSACCIONES = {
             "crud_unactive": False
         },
         "buttons": [
-            [True, 'fa-solid fa-boxes', "#77D62E", 'transaccion', {"tabla": "::paquete", "pk_foreign": "num_serie"}],
+           # hay_parametros  icon         color      enlace_function              parametros                       clase_html   modo(insert ,update , consult)
+            [True, 'fa-solid fa-boxes', "#77D62E", 'transaccion', {"tabla": "::paquete", "pk_foreign": "num_serie"} , '' ,    'paquete'],
         ],
         "options": [
         ],
@@ -1704,7 +1558,7 @@ TRANSACCIONES = {
         ],
         "crud_forms": {
             "crud_list": True,
-            "crud_search": False,
+            "crud_search": True,
             "crud_consult": True,
             "crud_insert": True,
             "crud_update": True,
@@ -1712,12 +1566,14 @@ TRANSACCIONES = {
             "crud_unactive": False
         },
         "buttons": [
+        # hay_parametros  icon         color              enlace_function      parametros   clase_html   modo(insert ,update , consult)
+            # [True, 'fa-solid fa-map-location-dot', "#9856EE", 'seguimiento_tracking', {"tracking": "tracking"} , '' , 'seguimiento'],
             [True, 'fa-solid fa-route', "#9856EE", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"}],
-             [True, 'fa-solid fa-qrcode', "#B8CBD7", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"}],
+            [True, 'fa-solid fa-qrcode', "#B8CBD7", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"}],
         ],
         "options": [
-            [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Encomiendas', 'transaccion' , {"tabla": "::transaccion_encomienda" }],
-
+        # mostrar_url       icon             color                  text                 enlace_function       parametros                    modo(insert ,update , consult)
+            [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Encomiendas', 'transaccion' , {"tabla": "::transaccion_encomienda" } , 'encomiendas'],
         ],
     },
     "seguimiento": {
@@ -1740,19 +1596,12 @@ TRANSACCIONES = {
             "crud_delete": True,
             "crud_unactive": False
         },
-        "buttons": [
-            
-        ],
+        "buttons": [],
         "options": [
             [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Encomiendas', 'transaccion' , {"tabla": "::paquete" }],
-
         ],
-        "transaccion" : True ,
-
     }
-
 }
-
 
 
 
@@ -1837,11 +1686,11 @@ def validar_empleado():
                             if (usuario['rolid'] == 1 and usuario['tipo_rolid'] == 1) or permiso.validar_acceso(usuario['rolid'] , f_name , f_kwarg ):
                                 return page
                             else:
-                                return rdrct_error( main_empleado_page() , 'Esta pagina no existe') 
+                                return rdrct_error( main_empleado_page() , 'PAGINA_NO_EXISTE') 
                         except Exception as e:
                             return rdrct_error( redirect_url('login') , e) 
                     else:
-                        return rdrct_error( main_empleado_page() , 'Esta pagina no existe') 
+                        return rdrct_error( main_empleado_page() , 'PAGINA_NO_EXISTE') 
                 return rdrct_error( redirect_url('login') , 'LOGIN_INVALIDO') 
             except Exception as e:
                 return rdrct_error( redirect_url('login') , e) 
@@ -1862,7 +1711,7 @@ def validar_cliente():
                     if page:
                         return page
                     else:
-                        return rdrct_error( main_cliente_page() , 'Esta pagina no existe') 
+                        return rdrct_error( main_cliente_page() , 'PAGINA_NO_EXISTE') 
                 return rdrct_error(redirect_url('login') , 'LOGIN_INVALIDO') 
             except Exception as e:
                 return rdrct_error(redirect_url('login') , e) 
@@ -2006,7 +1855,7 @@ PAGINAS_SIMPLES = [
     'mis_envios',
     'NoRecibimos',
     'pagina_reclamo',
-    'seguimiento_reclamo',
+    # 'seguimiento_reclamo',
     'prueba_seguimiento',
     'cajas',
     'cajas_prueba',
@@ -2212,6 +2061,33 @@ def api_Faq():
     preguntas_activas = [f for f in filas if f['activo'] == 1]
     return jsonify(preguntas_activas)
 
+@app.route('/api/marca/update', methods=['POST'])
+def update_marca():
+    try:
+        # Obtener los datos del cuerpo de la solicitud en formato JSON
+        data = request.get_json()
+
+        # Extraer los valores de los parámetros necesarios
+        id = data.get('id')
+        nombre = data.get('nombre')
+
+        # Validar que se reciban los datos correctos
+        if not id or not nombre:
+            return jsonify({'success': False, 'message': 'Faltan parámetros'}), 400
+        
+        # Actualizar la fila de la marca en la base de datos
+        sql = f'''
+            UPDATE marca 
+            SET nombre = %s 
+            WHERE id = %s
+        '''
+        bd.sql_execute(sql, (nombre, id))  
+
+        # Ejecutar el SQL para actualizar la marca
+        
+        return jsonify({'success': True, 'message': 'Marca actualizada correctamente'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/contactanos')
 def contactanos():
@@ -2403,6 +2279,29 @@ def registrar_item_carrito():
     clienteid = cliente.get("id")
     if not clienteid:
         return jsonify({"error": "Cliente sin ID válido"}), 400
+
+    try:
+        num_serie = controlador_transaccion_venta.registrar_detalle_venta(
+            clienteid=int(clienteid),
+            tipo_comprobanteid=tipo_comprobanteid,
+            articuloid=int(articuloid),
+            cantidad=int(cantidad)
+        )
+        return jsonify({"mensaje": "Item registrado en carrito", "num_serie": num_serie}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/agregar-item-carrito", methods=["POST"])
+def registrar_item_carrito_json():
+    data = request.get_json()
+
+    articuloid = data.get("articuloid")
+    cantidad = data.get("cantidad")
+    clienteid = data.get("clienteid")
+    tipo_comprobanteid = 2  # Provisionalmente fijo
+
+    if not clienteid:
+        return jsonify({"error": "clienteid no proporcionado en el JSON"}), 400
 
     try:
         num_serie = controlador_transaccion_venta.registrar_detalle_venta(
@@ -3194,7 +3093,7 @@ def insertar_envio_api():
         # Validaciones básicas
         if not tipo_comprobante:
             return jsonify({'status': 'error', 'message': 'Tipo de comprobante es requerido'}), 400
-        
+        # modalidad_pago_seleccionada = 1
         if modalidad_pago_seleccionada is None:
             return jsonify({'status': 'error', 'message': 'Modalidad de pago es requerida'}), 400
 
@@ -3494,10 +3393,10 @@ def generar_comprobante(tracking):
                 return "Transacción no encontrada", 404
 
             empresa = controlador_empresa.getDataComprobante()
-            tipo_comprobante     = transaccion['tipo_comprobante']
-            comprobante_serie    = transaccion['comprobante_serie']
-            num_serie            = transaccion['num_serie']
-            cliente              = {
+            tipo_comprobante  = transaccion['tipo_comprobante']
+            comprobante_serie = transaccion['comprobante_serie']
+            num_serie         = transaccion['num_serie']
+            cliente           = {
                 'nombre_siglas': transaccion['nombre_siglas'],
                 'apellidos_razon': transaccion['apellidos_razon']
             }
@@ -3539,6 +3438,7 @@ def generar_comprobante(tracking):
     return send_file(ruta_pdf, as_attachment=False)
 
 
+<<<<<<< HEAD
 @app.route('/rotulo=<int:tracking>')
 def generar_rotulo(tracking):
     carpeta = os.path.join("static", "comprobantes", str(tracking))
@@ -3595,6 +3495,8 @@ def generar_rotulo(tracking):
     return send_file(ruta_pdf, as_attachment=False)
 
 
+=======
+>>>>>>> 5a90ab91b9d8f64212a00fcc53783e37cbccab8e
 @app.route('/envio_masivo')
 def envio_masivo():
     nombre_doc = controlador_tipo_documento.get_options()
@@ -4352,14 +4254,18 @@ def panel():
 @validar_empleado()
 def modulo(module_name):
     modulo = permiso.get_modulo_key(module_name)
-    tipos_pag = permiso.get_tipos_pagina_moduloid(modulo['id'])
-    return render_template(
-        'MODULO.html' , 
-        module_name = module_name , 
-        modulo = modulo ,
-        REPORTES = REPORTES ,
-        tipos_pag = tipos_pag ,
-        )
+    usuario = controlador_usuario.get_usuario_empleado_user_id(request.cookies.get('user_id'))
+
+    if modulo['activo'] == 1 or usuario['rolid'] == 1:
+        tipos_pag = permiso.get_tipos_pagina_moduloid(modulo['id'])
+        return render_template(
+            'MODULO.html' , 
+            module_name = module_name , 
+            modulo = modulo ,
+            REPORTES = REPORTES ,
+            tipos_pag = tipos_pag ,
+            )
+    return None
 
 
 @app.route("/crud=<tabla>")
@@ -4371,9 +4277,10 @@ def crud_generico(tabla):
     permisos = permiso.consult_permiso_rol(page['id'] , user_info['rolid'])
 
     if config and page:
-        active = config["active"] and (page['activo'] == 3 or user_info['rolid'] == 1 )
+        active = config["active"] and (page['activo'] == 1 or user_info['rolid'] == 1 )
         tipo_paginaid = page['tipo_paginaid']
         no_crud = config.get('no_crud')
+        # print(active , ' - ',tipo_paginaid ,' - ', no_crud)
 
         if active is True and tipo_paginaid == 1 and (no_crud is None or no_crud is False):
             icon_page_crud = get_icon_page(page.get("icono"))
@@ -4391,11 +4298,11 @@ def crud_generico(tabla):
             
             CRUD_FORMS = config["crud_forms"]
             # crud_list = CRUD_FORMS.get("crud_list")
-            crud_search = CRUD_FORMS.get("crud_search") and   (permisos['search'] or user_info['rolid'] == 1 )
-            crud_consult = CRUD_FORMS.get("crud_consult") and (permisos['consult'] or user_info['rolid'] == 1 )
-            crud_insert = CRUD_FORMS.get("crud_insert") and   (permisos['insert'] or user_info['rolid'] == 1 )
-            crud_update = CRUD_FORMS.get("crud_update") and   (permisos['update'] or user_info['rolid'] == 1 )
-            crud_delete = CRUD_FORMS.get("crud_delete") and   (permisos['delete'] or user_info['rolid'] == 1 )
+            crud_search = CRUD_FORMS.get("crud_search")     and (permisos['search'] or user_info['rolid'] == 1 )
+            crud_consult = CRUD_FORMS.get("crud_consult")   and (permisos['consult'] or user_info['rolid'] == 1 )
+            crud_insert = CRUD_FORMS.get("crud_insert")     and (permisos['insert'] or user_info['rolid'] == 1 )
+            crud_update = CRUD_FORMS.get("crud_update")     and (permisos['update'] or user_info['rolid'] == 1 )
+            crud_delete = CRUD_FORMS.get("crud_delete")     and (permisos['delete'] or user_info['rolid'] == 1 )
             crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo and ( permisos['unactive'] or user_info['rolid'] == 1 )
 
             return render_template(
@@ -4443,8 +4350,8 @@ def transaccion(tabla , pk_foreign):
             filters = config["filters"]
             fields_form = config["fields_form"]
             controlador = config["controlador"]
-            buttons = config['buttons']
-            options = config['options']
+            lst_buttons = config['buttons']
+            lst_options = config['options']
 
             existe_activo = controlador.exists_Activo()
             if pk_foreign is not None:
@@ -4455,13 +4362,30 @@ def transaccion(tabla , pk_foreign):
             table_columns  = list(filas[0].keys()) if filas else []
             
             CRUD_FORMS = config["crud_forms"]
-            # crud_list = CRUD_FORMS.get("crud_list")
             crud_search = CRUD_FORMS.get("crud_search") and (permisos['search'] or user_info['rolid'] == 1 )
             crud_consult = CRUD_FORMS.get("crud_consult") and (permisos['consult'] or user_info['rolid'] == 1 )
             crud_insert = CRUD_FORMS.get("crud_insert") and   (permisos['insert'] or user_info['rolid'] == 1 )
             crud_update = CRUD_FORMS.get("crud_update") and   (permisos['update'] or user_info['rolid'] == 1 )
             crud_delete = CRUD_FORMS.get("crud_delete") and   (permisos['delete'] or user_info['rolid'] == 1 )
             crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo and ( permisos['unactive'] or user_info['rolid'] == 1 )
+            
+            import json
+
+            buttons = []
+            for btn in lst_buttons:
+                permiso_otro = json.loads(permisos.get('otro'))
+                if permiso_otro and permiso_otro.get(btn[6]) and permiso_otro.get(btn[6]) == 1:
+                    buttons.append(btn)
+                elif permisos.get(btn[6]) == 1:
+                    buttons.append(btn)
+
+            options = []
+            for btn in lst_options:
+                permiso_otro = json.loads(permisos.get('otro'))
+                if permiso_otro and permiso_otro.get(btn[6]) and permiso_otro.get(btn[6]) == 1:
+                    options.append(btn)
+                elif permisos.get(btn[6]) == 1:
+                    options.append(btn)
 
             return render_template(
                 "TRANSACCION.html" ,
@@ -4476,7 +4400,6 @@ def transaccion(tabla , pk_foreign):
                 columnas       = columnas ,
                 key_columns    = list(columnas.keys()) ,
                 table_columns  = table_columns ,
-                # crud_list      = crud_list,
                 crud_search    = crud_search,
                 crud_consult   = crud_consult,
                 crud_insert    = crud_insert,
@@ -4519,11 +4442,6 @@ def reporte(report_name):
                 table_columns  = table_columns ,
                 primary_key    = None ,
                 crud_search    = True,
-                # crud_consult   = True,
-                # crud_insert    = True,
-                # crud_update    = True,
-                # crud_delete    = True,
-                # crud_unactive  = True,
                 esReporte      = True ,
             )
 
@@ -4572,6 +4490,7 @@ def administrar_paginas():
 @app.route("/permiso_rol=<int:rolid>")
 @validar_empleado()
 def permiso_rol(rolid):
+
     modulos = permiso.get_lista_modulos()
     paginas = permiso.get_paginas_permiso_rol(rolid)
     roles = permiso.get_lista_roles()
@@ -4580,27 +4499,70 @@ def permiso_rol(rolid):
 
     info_rol = permiso.get_info_rol(rolid)
 
+    # Enriquecer cada página con sus datos de CRUD y existencia de campo activo
+    for pagina in paginas:
+        key = pagina.get("key")
+        tipo = pagina.get("tipo_paginaid")
+        
+        page_dict = None
+        if tipo == 1:
+            page_dict = CONTROLADORES
+        elif tipo == 3:
+            page_dict = TRANSACCIONES
+        elif tipo == 4:
+            page_dict = REPORTES
+
+        config = page_dict.get(key) if page_dict else None
+
+        if config:
+            pagina["tiene_crud"] = config.get("crud_forms", {})
+            pagina["existe_activo"] = False
+
+            controlador = config.get("controlador")
+            if controlador and hasattr(controlador, "exists_Activo"):
+                try:
+                    pagina["existe_activo"] = controlador.exists_Activo()
+                except Exception as e:
+                    print(f"[!] Error en exists_Activo de {key}: {e}")
+
+        if pagina['otro']:
+            import json
+            datos_json = json.loads(pagina['otro'])
+            pagina['otro'] = datos_json
+
     return render_template(
-        'administrar_paginas.html' ,
-        modulos = modulos ,
-        paginas = paginas , 
-        roles = roles ,
-        tipos_rol = tipos_rol ,
-        rolid = rolid ,
-        info_rol = info_rol ,
-        cants_mod = cants_mod ,
-        cur_modulo_id = permiso.get_pagina_key('administrar_paginas')['moduloid'] ,
-        )
+        'administrar_paginas.html',
+        modulos=modulos,
+        paginas=paginas,
+        roles=roles,
+        tipos_rol=tipos_rol,
+        rolid=rolid,
+        info_rol=info_rol,
+        cants_mod=cants_mod,
+        CONTROLADORES=CONTROLADORES,
+        TRANSACCIONES=TRANSACCIONES,
+        REPORTES=REPORTES,
+        cur_modulo_id=permiso.get_pagina_key('administrar_paginas')['moduloid'],
+    )
 
 
 @app.route("/informacion_empresa")
 @validar_empleado()
 def informacion_empresa():
-    information = controlador_empresa.get_data()
+    emp_id = request.args.get("emp_id")
+    sucursales = controlador_sucursal.get_options_sucursales()
+    lst_empresas = controlador_empresa.get_rows()
+
+    if emp_id:
+        information = controlador_empresa.get_data_id(emp_id)
+    else:
+        information = controlador_empresa.get_data()
     
     return render_template(
         'informacion_empresa.html' ,
         information = information ,
+        sucursales = sucursales,
+        lst_empresas = lst_empresas ,
         )
 
 
@@ -4614,8 +4576,10 @@ def crud_insert(tabla):
     # try:
         if tabla in CONTROLADORES.keys():    
             config = CONTROLADORES.get(tabla)
+            url_redirect = 'crud_generico'
         elif tabla in TRANSACCIONES.keys():    
             config = TRANSACCIONES.get(tabla)
+            url_redirect = 'transaccion'
 
         if not config:
             return "Tabla no soportada", 404
@@ -4649,7 +4613,7 @@ def crud_insert(tabla):
         if no_crud :
             return redirect(url_for(no_crud))
         else:
-            return redirect(url_for('crud_generico', tabla = tabla))
+            return redirect(url_redirect , tabla = tabla)
     # except Exception as e:
     #     return f"No se aceptan carácteres especiales", 400
 
@@ -4659,7 +4623,13 @@ def crud_insert(tabla):
 @validar_error_crud()
 def crud_update(tabla):
     # try:
-        config = CONTROLADORES.get(tabla)
+        if tabla in CONTROLADORES.keys():    
+            config = CONTROLADORES.get(tabla)
+            url_redirect = 'crud_generico'
+        elif tabla in TRANSACCIONES.keys():    
+            config = TRANSACCIONES.get(tabla)
+            url_redirect = 'transaccion'
+
         if not config:
             return "Tabla no soportada", 404
 
@@ -4694,7 +4664,7 @@ def crud_update(tabla):
         if no_crud :
             return redirect(url_for(no_crud))
         else:
-            return redirect(url_for('crud_generico', tabla = tabla))
+            return redirect(url_for(url_redirect, tabla = tabla))
     # except Exception as e:
     #     return f"No se aceptan carácteres especiales", 400
 
@@ -4703,7 +4673,13 @@ def crud_update(tabla):
 @validar_empleado()
 @validar_error_crud()
 def crud_delete(tabla):
-    config = CONTROLADORES.get(tabla)
+    if tabla in CONTROLADORES.keys():    
+        config = CONTROLADORES.get(tabla)
+        url_redirect = 'crud_generico'
+    elif tabla in TRANSACCIONES.keys():    
+        config = TRANSACCIONES.get(tabla)
+        url_redirect = 'transaccion'
+
     if not config:
         return "Tabla no soportada", 404
 
@@ -4725,14 +4701,20 @@ def crud_delete(tabla):
     if no_crud :
         return redirect(url_for(no_crud))
     else:
-        return redirect(url_for('crud_generico', tabla = tabla))
+        return redirect(url_for(url_redirect, tabla = tabla))
 
 
 @app.route("/unactive_row=<tabla>", methods=["POST"])
 @validar_empleado()
 @validar_error_crud()
 def crud_unactive(tabla):
-    config = CONTROLADORES.get(tabla)
+    if tabla in CONTROLADORES.keys():    
+        config = CONTROLADORES.get(tabla)
+        url_redirect = 'crud_generico'
+    elif tabla in TRANSACCIONES.keys():    
+        config = TRANSACCIONES.get(tabla)
+        url_redirect = 'transaccion'
+
     if not config:
         return "Tabla no soportada", 404
 
@@ -4756,7 +4738,7 @@ def crud_unactive(tabla):
     if no_crud :
         return redirect(url_for(no_crud))
     else:
-        return redirect(url_for('crud_generico', tabla = tabla))
+        return redirect(url_for(url_redirect, tabla = tabla))
 
 
 @app.route("/update_empresa", methods=["POST"])
@@ -4764,14 +4746,17 @@ def crud_unactive(tabla):
 @validar_error_crud()
 def update_empresa():
     controlador = controlador_empresa
-    firma = inspect.signature(controlador.update_row)
+    funcion = controlador.insert_row
+    firma = inspect.signature(funcion)
 
     valores = []
     for nombre, parametro in firma.parameters.items():
         if nombre in request.files:
             archivo = request.files[nombre]
             if archivo.filename != "":
-                nuevo_nombre = guardar_imagen_bd('empresa' ,'',archivo)
+                ahora = datetime.now()
+                formateado = ahora.strftime("%Y%m%d%H%M%S")
+                nuevo_nombre = guardar_imagen_bd('empresa' ,f'{formateado}_',archivo)
                 valores.append(nuevo_nombre)
             else:
                 valores.append(request.form.get(f"{nombre}_actual"))
@@ -4779,7 +4764,20 @@ def update_empresa():
             valor = request.form.get(nombre)
             valores.append(valor)
 
-    controlador.update_row(*valores)
+    empresa_id = funcion(*valores)
+    controlador_empresa.dar_actual_empresa_id(empresa_id)
+    return redirect(url_for('informacion_empresa'))
+
+
+@app.route("/op_crud_empresa=<op>", methods=["POST"])
+@validar_empleado()
+@validar_error_crud()
+def op_crud_empresa(op):
+    primary_key = 'id'
+    if op == 'delete':
+        controlador_empresa.delete_row(request.form.get(primary_key))
+    elif op == 'actual':
+        controlador_empresa.dar_actual_empresa_id(request.form.get(primary_key))
     return redirect(url_for('informacion_empresa'))
 
 
@@ -4795,7 +4793,15 @@ def actualizar_permiso():
 
     try:
         permiso.change_permiso_pagina(column , paginaid , rolid)
-        rpta_column = permiso.consult_permiso_rol(paginaid , rolid)[column]
+        if column in ['insert' , 'update' , 'delete' , 'unactive' , 'search' , 'acceso' , 'consult']:
+            rpta_column = permiso.consult_permiso_rol(paginaid , rolid)[column]
+        else:
+            import json
+            permiso_otro = permiso.consult_permiso_rol(paginaid , rolid)['otro']
+            dict_otro = json.loads(permiso_otro)
+            rpta_column = dict_otro.get(column)
+
+
         return jsonify({'success': True , 'rpta' : rpta_column})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
@@ -4951,6 +4957,7 @@ def salida_informacion():
                            agencias=agencias,
                            paquetes = paquetes)
 
+<<<<<<< HEAD
 @app.route('/sucursales_destino_api',  methods=["POST"])
 def sucursales_destino_api():
     try:
@@ -4968,12 +4975,552 @@ def sucursales_destino_api():
             'msg': f"Ocurrió un error al listar las distritos: {repr(e)}",
             'status':-1
         }
+=======
+################PROGRAMACION DEVOLUCIONES############################
+>>>>>>> 5a90ab91b9d8f64212a00fcc53783e37cbccab8e
 
+@app.route("/buscar_paquete_devolucion", methods=["POST"])
+@validar_empleado()
+def buscar_paquete_devolucion():
+    """
+    Endpoint para buscar paquetes disponibles para devolución
+    """
+    try:
+        data = request.get_json()
+        tracking = data.get('criterio', '').strip()
+        
+        if not tracking:
+            return jsonify({
+                'success': False,
+                'message': 'Código de tracking requerido'
+            }), 400
+        
+        # Validar que sea un número
+        if not tracking.isdigit():
+            return jsonify({
+                'success': False,
+                'message': 'El código de tracking debe ser numérico'
+            }), 400
+        
+        paquete = controlador_programacion_devolucion.buscar_paquete(tracking)
+        
+        if paquete:
+            # Validar que el paquete pueda ser devuelto
+            puede_devolver = controlador_programacion_devolucion.validar_paquete_para_devolucion(paquete['tracking'])
+            
+            if puede_devolver:
+                return jsonify({
+                    'success': True,
+                    'paquete': paquete,
+                    'message': 'Paquete encontrado'
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'message': 'Este paquete no está disponible para devolución'
+                })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Paquete no encontrado'
+            })
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al buscar paquete: {str(e)}'
+        }), 500
+
+
+@app.route("/obtener_unidades_devolucion", methods=["POST"])
+@validar_empleado()
+def obtener_unidades_devolucion():
+    """
+    Endpoint para obtener unidades disponibles para devoluciones
+    """
+    try:
+        data = request.get_json()
+        tracking = data.get('tracking')
+        
+        if not tracking:
+            return jsonify({
+                'success': False,
+                'message': 'Tracking requerido para buscar unidades disponibles'
+            }), 400
+        
+        unidades = controlador_programacion_devolucion.obtener_unidades_disponibles(tracking)
+        
+        return jsonify({
+            'success': True,
+            'unidades': unidades
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener unidades: {str(e)}'
+        }), 500
+
+
+@app.route("/programar_devolucion", methods=["POST"])
+@validar_empleado()
+def programar_devolucion():
+    """
+    Endpoint para programar una devolución
+    """
+    try:
+        data = request.get_json()
+        tracking = data.get('tracking')
+        unidad_id = data.get('unidad_id')
+        
+        if not tracking or not unidad_id:
+            return jsonify({
+                'success': False,
+                'message': 'Tracking y unidad son requeridos'
+            }), 400
+        
+        # Validar que el paquete pueda ser devuelto
+        puede_devolver = controlador_programacion_devolucion.validar_paquete_para_devolucion(tracking)
+        
+        if not puede_devolver:
+            return jsonify({
+                'success': False,
+                'message': 'Este paquete no puede ser programado para devolución'
+            }), 400
+        
+        resultado = controlador_programacion_devolucion.programar_devolucion(tracking, unidad_id)
+        
+        if resultado['success']:
+            return jsonify(resultado)
+        else:
+            return jsonify(resultado), 400
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al programar devolución: {str(e)}'
+        }), 500
+
+
+@app.route("/historial_devoluciones", methods=["GET"])
+@validar_empleado()
+def historial_devoluciones():
+    """
+    Endpoint para obtener el historial de devoluciones
+    """
+    try:
+        limit = request.args.get('limit', 50, type=int)
+        
+        historial = controlador_programacion_devolucion.obtener_historial_devoluciones(limit)
+        
+        return jsonify({
+            'success': True,
+            'historial': historial
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener historial: {str(e)}'
+        }), 500
+
+
+@app.route("/estados_devolucion", methods=["GET"])
+@validar_empleado()
+def estados_devolucion():
+    """
+    Endpoint para obtener estados relacionados con devoluciones
+    """
+    try:
+        estados = controlador_programacion_devolucion.obtener_estados_devolucion()
+        
+        return jsonify({
+            'success': True,
+            'estados': estados
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener estados: {str(e)}'
+        }), 500
+
+
+# Opcional: Endpoint para validar un paquete específico
+@app.route("/validar_paquete_devolucion/<int:tracking>", methods=["GET"])
+@validar_empleado()
+def validar_paquete_devolucion_endpoint(tracking):
+    """
+    Endpoint para validar si un paquete específico puede ser devuelto
+    """
+    try:
+        puede_devolver = controlador_programacion_devolucion.validar_paquete_para_devolucion(tracking)
+        
+        return jsonify({
+            'success': True,
+            'puede_devolver': puede_devolver,
+            'tracking': tracking
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al validar paquete: {str(e)}'
+        }), 500
+
+
+@app.route("/obtener_paquetes_estado_17", methods=["GET"])
+@validar_empleado()
+def obtener_paquetes_estado_17():
+    """
+    Endpoint para obtener paquetes con detalle_estado_id = 17
+    """
+    try:
+        paquetes = controlador_programacion_devolucion.obtener_paquetes_estado_17()
+        
+        return jsonify({
+            'success': True,
+            'paquetes': paquetes
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener paquetes: {str(e)}'
+        }), 500
+    
+####################SEGUIMIENTO DE RECLAMOS############################3
+
+# Ruta principal de seguimiento de reclamos
+@app.route("/seguimiento_reclamo")
+def seguimiento_reclamo():
+    """
+    Página principal de seguimiento de reclamos
+    """
+    return render_template('seguimiento_reclamo.html')
+
+# Ruta para buscar reclamo
+@app.route("/buscar_reclamo", methods=["POST"])
+def buscar_reclamo():
+    """
+    Busca un reclamo por ID o documento
+    """
+    try:
+        reclamo_id = request.form.get('reclamo_id', '').strip()
+        numero_documento = request.form.get('documento', '').strip()
+        
+        if not reclamo_id and not numero_documento:
+            flash('Debe ingresar al menos un criterio de búsqueda', 'error')
+            return redirect(url_for('seguimiento_reclamo'))
+        
+        # Convertir reclamo_id a entero si está presente
+        if reclamo_id:
+            try:
+                reclamo_id = int(reclamo_id)
+            except ValueError:
+                flash('El ID del reclamo debe ser un número válido', 'error')
+                return redirect(url_for('seguimiento_reclamo'))
+        
+        # Buscar el reclamo
+        reclamo = controlador_seguimiento_reclamos.buscar_reclamo_por_id_o_documento(reclamo_id, numero_documento)
+        
+        if not reclamo:
+            flash('No se encontró ningún reclamo con los criterios proporcionados', 'error')
+            return redirect(url_for('seguimiento_reclamo'))
+        
+        # Obtener datos relacionados
+        estados_reclamo = controlador_seguimiento_reclamos.obtener_estados_reclamo()
+        seguimientos = controlador_seguimiento_reclamos.obtener_seguimientos_reclamo(reclamo['id'])
+        ultimo_seguimiento = controlador_seguimiento_reclamos.obtener_ultimo_seguimiento_reclamo(reclamo['id'])
+        estados_usados = controlador_seguimiento_reclamos.obtener_estados_usados_reclamo(reclamo['id'])
+        
+        # Agrupar seguimientos por estado
+        seguimientos_por_estado = controlador_seguimiento_reclamos.agrupar_seguimientos_por_estado(seguimientos)
+        
+        return render_template('seguimiento_reclamo.html',
+                             reclamo=reclamo,
+                             estados_reclamo=estados_reclamo,
+                             seguimientos_por_estado=seguimientos_por_estado,
+                             ultimo_seguimiento=ultimo_seguimiento,
+                             estados_usados=estados_usados)
+        
+    except Exception as e:
+        flash(f'Error al buscar reclamo: {str(e)}', 'error')
+        return redirect(url_for('seguimiento_reclamo'))
+
+# Ruta directa con ID de reclamo
+@app.route("/seguimiento_reclamo/<int:reclamo_id>")
+def seguimiento_reclamo_directo(reclamo_id):
+    """
+    Acceso directo al seguimiento con ID de reclamo
+    """
+    try:
+        # Buscar el reclamo
+        reclamo = controlador_seguimiento_reclamos.buscar_reclamo_por_id_o_documento(reclamo_id=reclamo_id)
+        
+        if not reclamo:
+            flash('No se encontró el reclamo especificado', 'error')
+            return redirect(url_for('seguimiento_reclamo'))
+        
+        # Obtener datos relacionados
+        estados_reclamo = controlador_seguimiento_reclamos.obtener_estados_reclamo()
+        seguimientos = controlador_seguimiento_reclamos.obtener_seguimientos_reclamo(reclamo['id'])
+        ultimo_seguimiento = controlador_seguimiento_reclamos.obtener_ultimo_seguimiento_reclamo(reclamo['id'])
+        estados_usados = controlador_seguimiento_reclamos.obtener_estados_usados_reclamo(reclamo['id'])
+        
+        # Agrupar seguimientos por estado
+        seguimientos_por_estado = controlador_seguimiento_reclamos.agrupar_seguimientos_por_estado(seguimientos)
+        
+        return render_template('seguimiento_reclamo.html',
+                             reclamo=reclamo,
+                             estados_reclamo=estados_reclamo,
+                             seguimientos_por_estado=seguimientos_por_estado,
+                             ultimo_seguimiento=ultimo_seguimiento,
+                             estados_usados=estados_usados)
+        
+    except Exception as e:
+        flash(f'Error al consultar reclamo: {str(e)}', 'error')
+        return redirect(url_for('seguimiento_reclamo'))
+
+# Endpoint para agregar seguimiento a reclamo (solo empleados)
+@app.route("/agregar_seguimiento_reclamo", methods=["POST"])
+@validar_empleado()
+def agregar_seguimiento_reclamo():
+    """
+    Agrega un nuevo seguimiento a un reclamo existente
+    """
+    try:
+        data = request.get_json()
+        
+        reclamo_id = data.get('reclamo_id')
+        detalle_reclamo_id = data.get('detalle_reclamo_id')
+        
+        if not reclamo_id or not detalle_reclamo_id:
+            return jsonify({
+                'success': False,
+                'message': 'Reclamo ID y Detalle Reclamo ID son requeridos'
+            }), 400
+        
+        resultado = controlador_seguimiento_reclamos.agregar_seguimiento_reclamo(reclamo_id, detalle_reclamo_id)
+        
+        return jsonify(resultado)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al agregar seguimiento: {str(e)}'
+        }), 500
+
+# Endpoint para obtener reclamos por estado (solo empleados)
+@app.route("/reclamos_por_estado/<int:estado_id>", methods=["GET"])
+@validar_empleado()
+def reclamos_por_estado(estado_id):
+    """
+    Obtiene reclamos filtrados por estado
+    """
+    try:
+        limit = request.args.get('limit', 50, type=int)
+        
+        reclamos = controlador_seguimiento_reclamos.obtener_reclamos_por_estado_activo(estado_id, limit)
+        
+        return jsonify({
+            'success': True,
+            'reclamos': reclamos
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener reclamos: {str(e)}'
+        }), 500
+
+# Endpoint para obtener detalles de reclamo por estado (solo empleados)
+@app.route("/detalles_reclamo_por_estado/<int:estado_id>", methods=["GET"])
+@validar_empleado()
+def detalles_reclamo_por_estado(estado_id):
+    """
+    Obtiene los detalles disponibles para un estado de reclamo
+    """
+    try:
+        detalles = controlador_seguimiento_reclamos.obtener_detalles_reclamo_por_estado(estado_id)
+        
+        return jsonify({
+            'success': True,
+            'detalles': detalles
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener detalles: {str(e)}'
+        }), 500
+
+# Endpoint API para obtener información de reclamo (JSON)
+@app.route("/api/reclamo/<int:reclamo_id>", methods=["GET"])
+def api_info_reclamo(reclamo_id):
+    """
+    API endpoint para obtener información de un reclamo en formato JSON
+    """
+    try:
+        reclamo = controlador_seguimiento_reclamos.buscar_reclamo_por_id_o_documento(reclamo_id=reclamo_id)
+        
+        if not reclamo:
+            return jsonify({
+                'success': False,
+                'message': 'Reclamo no encontrado'
+            }), 404
+        
+        ultimo_seguimiento = controlador_seguimiento_reclamos.obtener_ultimo_seguimiento_reclamo(reclamo['id'])
+        seguimientos = controlador_seguimiento_reclamos.obtener_seguimientos_reclamo(reclamo['id'])
+        
+        return jsonify({
+            'success': True,
+            'reclamo': dict(reclamo),
+            'ultimo_seguimiento': dict(ultimo_seguimiento) if ultimo_seguimiento else None,
+            'seguimientos': [dict(s) for s in seguimientos]
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al consultar reclamo: {str(e)}'
+        }), 500
+
+# Endpoint para validar si existe un tracking para reclamo
+@app.route("/validar_tracking_reclamo/<int:tracking>", methods=["GET"])
+def validar_tracking_reclamo(tracking):
+    """
+    Valida si un tracking existe y puede ser asociado a un reclamo
+    """
+    try:
+        paquete = controlador_seguimiento_reclamos.validar_tracking_existe(tracking)
+        
+        if paquete:
+            return jsonify({
+                'success': True,
+                'existe': True,
+                'info_paquete': {
+                    'tracking': paquete.get('tracking'),
+                    'destinatario': paquete.get('destinatario_completo')
+                }
+            })
+        else:
+            return jsonify({
+                'success': True,
+                'existe': False,
+                'message': 'Tracking no encontrado'
+            })
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al validar tracking: {str(e)}'
+        }), 500
+
+# Endpoint para obtener todos los reclamos (vista administrativa)
+@app.route("/admin/reclamos", methods=["GET"])
+@validar_empleado()
+def admin_reclamos():
+    """
+    Vista administrativa de todos los reclamos
+    """
+    try:
+        limit = request.args.get('limit', 50, type=int)
+        reclamos = controlador_seguimiento_reclamos.obtener_todos_los_reclamos(limit)
+        
+        return render_template('admin_reclamos.html', reclamos=reclamos)
+        
+    except Exception as e:
+        flash(f'Error al cargar reclamos: {str(e)}', 'error')
+        return redirect(url_for('dashboard'))
+
+# Endpoint para obtener tipos de reclamo
+@app.route("/api/tipos_reclamo", methods=["GET"])
+def api_tipos_reclamo():
+    """
+    API para obtener tipos de reclamo disponibles
+    """
+    try:
+        tipos = controlador_seguimiento_reclamos.obtener_tipos_reclamo()
+        
+        return jsonify({
+            'success': True,
+            'tipos': tipos
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener tipos de reclamo: {str(e)}'
+        }), 500
+
+# Endpoint para obtener motivos por tipo de reclamo
+@app.route("/api/motivos_reclamo/<int:tipo_id>", methods=["GET"])
+def api_motivos_reclamo(tipo_id):
+    """
+    API para obtener motivos por tipo de reclamo
+    """
+    try:
+        motivos = controlador_seguimiento_reclamos.obtener_motivos_por_tipo_reclamo(tipo_id)
+        
+        return jsonify({
+            'success': True,
+            'motivos': motivos
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener motivos: {str(e)}'
+        }), 500
+
+# Endpoint para obtener causas por motivo de reclamo
+@app.route("/api/causas_reclamo/<int:motivo_id>", methods=["GET"])
+def api_causas_reclamo(motivo_id):
+    """
+    API para obtener causas por motivo de reclamo
+    """
+    try:
+        causas = controlador_seguimiento_reclamos.obtener_causas_por_motivo_reclamo(motivo_id)
+        
+        return jsonify({
+            'success': True,
+            'causas': causas
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener causas: {str(e)}'
+        }), 500
+
+# Endpoint para obtener estados de reclamo
+@app.route("/api/estados_reclamo", methods=["GET"])
+def api_estados_reclamo():
+    """
+    API para obtener estados de reclamo disponibles
+    """
+    try:
+        estados = controlador_seguimiento_reclamos.obtener_estados_reclamo()
+        
+        return jsonify({
+            'success': True,
+            'estados': estados
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener estados: {str(e)}'
+        }), 500
+##############################################3
+##############################################
 
 if __name__ == "__main__":
     # app.run(host='192.168.48.178', port=8000, debug=True, use_reloader=True)
     # Thread(target=enviar_posiciones).start()
-    socketio.run(app, host='0.0.0.0', port=8000, debug=True)
+    # app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=True)
+    socketio.run(app, host='0.0.0.0', port=8000, debug=True , use_reloader=True)
 
 
 
@@ -4982,7 +5529,6 @@ if __name__ == "__main__":
 
 
 # @app.route("/grafico=<report_name>")
-# # @validar_admin()
 # def grafico(report_name):
 #     config = REPORTES.get(report_name)
 #     if not config:
@@ -5030,4 +5576,163 @@ if __name__ == "__main__":
 #         icon_page = icon_page,
 #     )
 
+
+
+
+# GRAFICOS = {
+#     # LINEA
+#     "ingresos_periodo": {
+#         "active": False,
+#         'icon_page' : 'fa-solid fa-dollar-sign' ,
+#         "titulo": "ingresos por mes",
+#         "elements": {
+#             "graph": True,
+#             "table": False,
+#             "counter": False,
+#         },
+#         "graph": {
+#             "chart": {
+#                 "type": 'line',
+#                 "zoom": {
+#                     "enabled": True
+#                 }
+#             },
+#             "series": lambda: [{
+#                 "name": 'Ingresos',
+#                 "data": extract_col_row(ingresos_periodo())[1]
+#             }],
+#             "xaxis": lambda: {
+#                 "categories": extract_col_row(ingresos_periodo())[0]
+#             },
+#             "colors": [' var(--color1) '],
+#             "stroke": {
+#                 "curve": 'smooth'
+#             },
+#             "markers": {
+#                 "size": 5
+#             }
+#         },
+#     },
+#     # BARRA VERTICAL
+#     "articulos_mas_vendidos": {
+#         "active" : False ,
+#         'icon_page' : 'fa-solid fa-dollar-sign' ,
+#         "titulo": "artículos más vendidos",
+#         "elements": {
+#             "graph": True,
+#             "table": False,
+#             "counter": False,
+#         },
+#         "graph" : {
+#             "chart": {
+#                 "type": 'bar',
+#             },
+#             "series": lambda: [{
+#                 "name": 'Ingresos',
+#                 "data": extract_col_row(articulos_mas_vendidos())[1]
+#             }],
+#             "xaxis": lambda: {
+#                 "categories": extract_col_row(articulos_mas_vendidos())[0]
+#             },
+#             "colors": [' var(--color15) ']
+#         }
+#     },
+#     # BARRA HORIZONTAL
+#     "top_envios": {
+#         "active" : False ,
+#         'icon_page' : 'fa-solid fa-dollar-sign' ,
+#         "titulo": "top de envios de encomiendas",
+#         "elements": {
+#             "graph": True,
+#             "table": False,
+#             "counter": False,
+#         },
+#         "graph" : {
+#             "chart": {
+#                 "type": 'bar',
+#             },
+#             "series": [{
+#                 "name": 'Envíos',
+#                 "data": [400, 350, 300, 200] 
+#             }],
+#             "xaxis": {
+#                 "categories": ['Sucursal A', 'Sucursal B', 'Sucursal C', 'Sucursal D']
+#             },
+#             "plotOptions": {
+#                 "bar": {
+#                     "horizontal": True,
+#                 }
+#             },
+#             "colors": [' var(--color5) ']
+#         }
+#     },
+#     # PASTEL
+#     "envios_tipo": {
+#         "active" : False ,
+#         'icon_page' : 'fa-solid fa-dollar-sign' ,
+#         "titulo": "envios por tipo de articulo",
+#         "elements": {
+#             "graph": True,
+#             "table": False,
+#             "counter": False,
+#         },
+#         "graph" : {
+#             "chart": {
+#                 "type": 'pie',
+#                 "height": 500,
+#                 "toolbar": {
+#                     "show": True
+#                 }
+#             },
+#             "series": [55, 30, 15],
+#             "labels": ['Cajas', 'Sobres', 'Otros'],
+#             "colors": [' var(--color8) ', ' var(--color11) ', ' var(--color-sec) '],
+#             "responsive": [{
+#                 "breakpoint": 200,
+#                 "options": {
+#                     "chart": {
+#                         "width": 100
+#                     },
+#                     "legend": {
+#                         "position": 'bottom'
+#                     }
+#                 }
+#             }]
+#         }
+#     },
+#     # DONUT
+#     "entregado_pendiente": {
+#         "active" : False ,
+#         'icon_page' : 'fa-solid fa-dollar-sign' ,
+#         "titulo": "encomiendas entregadas vs pendientes",
+#         "elements": {
+#             "graph": True,
+#             "table": False,
+#             "counter": False,
+#         },
+#         "graph" : {
+#             "chart": {
+#                 "type": 'donut',
+#                 "height": 500,
+#                 "toolbar": {
+#                     "show": True,
+#                 }
+#             },
+#             "series": [70, 30] ,
+#             "labels": ['Entregadas', 'Pendientes'],
+#             "colors": [' var(--color3) ', ' var(--color-sec) '],
+#             "responsive": [{
+#                 "breakpoint": 480,
+#                 "options": {
+#                     "chart": {
+#                         "height": 100,
+#                     },
+#                     "legend": {
+#                         "position": 'bottom'
+#                     }
+#                 }
+#             }]
+#         },
+#     },
+# }
 

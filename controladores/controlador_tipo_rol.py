@@ -36,8 +36,12 @@ def table_fetchall():
     
     return resultados
 
-
+from flask import request
+import controladores.controlador_usuario as controlador_usuario
 def get_table():
+    usuario = controlador_usuario.get_usuario_empleado_user_id(request.cookies.get('user_id'))
+    validar_admin = '' if usuario['rolid'] == 1 else ' where tip.id != 1 '
+
     sql= f'''
         select 
             tip.id ,
@@ -45,8 +49,7 @@ def get_table():
             tip.descripcion ,
             tip.activo 
         from {table_name} tip
-        where tip.id != 1
-
+        {validar_admin}
     '''
     columnas = {
         'id': ['ID' , 0.5] , 
@@ -89,17 +92,20 @@ def update_row( id , nombre , descripcion ):
 #####_ ADICIONALES _#####
 
 def get_options():
+    usuario = controlador_usuario.get_usuario_empleado_user_id(request.cookies.get('user_id'))
+    validar_admin = '' if usuario['rolid'] == 1 else ' and tip.id != 1 '
+
     sql= f'''
         select 
-            {get_primary_key()} ,
+            id ,
             nombre
-        from {table_name}
-        where activo = 1
+        from {table_name} tip
+        where activo = 1 {validar_admin}
         order by nombre asc
     '''
     filas = sql_select_fetchall(sql)
     
-    lista = [(fila[get_primary_key()], fila["nombre"]) for fila in filas]
+    lista = [(fila['id'], fila["nombre"]) for fila in filas]
 
     return lista
 

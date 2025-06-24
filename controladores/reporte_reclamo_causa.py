@@ -6,13 +6,13 @@ def get_reporte_reclamos_tipo_causa_periodo():
             tr.nombre AS tipo_reclamo,
             mr.nombre AS motivo_reclamo,
             cr.nombre AS causa_reclamo,
-            DATE_FORMAT(r.fecha_recojo, '%Y-%m') AS periodo,
+            DATE_FORMAT(r.fecha_recepcion, '%Y-%m') AS periodo,
             COUNT(*) AS cantidad_reclamos
         FROM reclamo r
         INNER JOIN causa_reclamo cr ON r.causa_reclamoid = cr.id
         INNER JOIN motivo_reclamo mr ON cr.motivo_reclamoid = mr.id
         INNER JOIN tipo_reclamo tr ON mr.tipo_reclamoid = tr.id
-        GROUP BY tr.nombre, mr.nombre, cr.nombre, DATE_FORMAT(r.fecha_recojo, '%Y-%m')
+        GROUP BY tr.nombre, mr.nombre, cr.nombre, DATE_FORMAT(r.fecha_recepcion, '%Y-%m')
         ORDER BY periodo DESC, cantidad_reclamos DESC;
     '''
 

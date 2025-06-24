@@ -11,165 +11,98 @@
 {% block contenido %}
   <div class="contenedor">
     <div class="header">
-      <div class="order-search">
-        <input type="text" placeholder="Nº de Reclamo" class="order-input" />
-        <input type="text" placeholder="Nº de Documento" class="order-input" />
+      <form class="order-search" action="{{ url_for('buscar_reclamo') }}" method="post">
+        <input type="text" placeholder="ID del Reclamo" class="order-input" name="reclamo_id" />
+        <input type="text" placeholder="Nº de Documento" class="order-input" name="documento" />
         <button class="search-btn">Buscar <i class="ri-arrow-right-line"></i></button>
-      </div>
+      </form>
     </div>
 
+    {% if reclamo %}
     <div class="container_estado">
       <div class="card status-card">
         <div class="order-number">
-          <p class="number">N° DE RECLAMO: RC-2025-001245</p>
+          <p class="number">RECLAMO ID: {{ reclamo.id }}</p>
         </div>
         <div class="status-detail">
-          <img class="img_estado" src="{{ url_for('static', filename='img/reclamo_en_proceso.png') }}" alt="Reclamo en proceso" />
+          <img class="img_estado" 
+               src="{{ url_for('static', filename='img/reclamo_en_proceso.png') }}" 
+               alt="Estado del reclamo" />
 
           <div class="status-content">
             <div class="status-header">
               <div class="status-title">
                 <div class="documents">
-                  <h3>Descargar documentos disponibles</h3>
-                  <button class="grt-btn"><i class="fa-solid fa-download"></i></button>
-                </div>
-                <span id="selection-document">Seleccione los documentos que desea descargar</span>
-                <div>
-                  <input type="checkbox"> <label>Constancia de recepción del reclamo</label>
-                  <br>
-                  <input type="checkbox"> <label>Comunicación de respuesta</label>
-                  <br>
-                  <input type="checkbox"> <label>Resolución del reclamo</label>
+                  <h5 class="text-muted">Documentos disponibles próximamente.</h5>
                 </div>
               </div>
             </div>
-            <div>
-              <h3 style="margin-bottom: 10px;">Estado actual: En evaluación</h3>
-              <p><strong>Tipo de reclamo:</strong> Producto defectuoso</p>
-              <p><strong>Motivo:</strong> Daños en el paquete durante el transporte</p>
-              <p><strong>Monto reclamado:</strong> S/. 450.00</p>
-              <p>Fecha de última actualización: 24/05/25 a las 16:30</p>
+            <div class="ultimo_estado">
+              <h3 style="margin-bottom: 10px;">Último estado:</h3>
+
+              {% if ultimo_seguimiento %}
+                <p>{{ ultimo_seguimiento.detalle_nombre }}</p>
+                <p>el día {{ ultimo_seguimiento.fecha }}, a las {{ ultimo_seguimiento.hora }}</p>
+              {% else %}
+                <p>Reclamo registrado</p>
+                <p>el día {{ reclamo.fecha_recepcion }}</p>
+              {% endif %}
+
+              <div style="margin-top: 15px;">
+                <p><strong>Bien contratado:</strong> {{ 'Producto' if reclamo.bien_contratado == 'P' else 'Servicio' }}</p>
+                <p><strong>Monto reclamado:</strong> S/. {{ "%.2f"|format(reclamo.monto_reclamado) }}</p>
+                {% if reclamo.monto_indemnizado %}
+                  <p><strong>Monto indemnizado:</strong> S/. {{ "%.2f"|format(reclamo.monto_indemnizado) }}</p>
+                {% endif %}
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Tracker de progreso del reclamo -->
+        <!-- Tracker de progreso -->
         <div class="progress-tracker">
           <div class="progress-line"></div>
+          <div class="progress-line-fill" style="width: 0%;"></div>
+          
+          {% for estado in estados_reclamo %}
+            <div class="progress-step {% if estado.id in estados_usados %}active{% endif %}">
+              <div class="step-icon {% if estado.id in estados_usados %}completed{% endif %}">
+                <span class="check-icon">✓</span>
+              </div>
+              <div class="step-label">{{ estado.nombre }}</div>
 
-          <!-- Paso 1: Recibido -->
-          <div class="progress-step">
-            <div class="step-icon">
-              <span class="check-icon">✓</span>
-            </div>
-            <div class="step-label">Recibido</div>
-
-            <div class="timeline">
-              <div class="timeline-item active">
-                <div class="timeline-dot"></div>
-                <div class="timeline-line"></div>
-                <div class="timeline-content">
-                  <div class="timeline-title">Reclamo recibido</div>
-                  <div class="timeline-date">20/05/25 - 14:25</div>
-                  <div class="timeline-location">Sucursal Lima Centro - Se registró su reclamo</div>
-                </div>
+              <div class="timeline">
+                {% if estado.id in seguimientos_por_estado %}
+                  {% for seg in seguimientos_por_estado[estado.id] %}
+                    <div class="timeline-item active">
+                      <div class="timeline-dot"></div>
+                      <div class="timeline-line"></div>
+                      <div class="timeline-content">
+                        <div class="timeline-title">{{ seg.detalle_nombre }}</div>
+                        <div class="timeline-date">{{ seg.fecha }} - {{ seg.hora }}</div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                {% endif %}
               </div>
             </div>
-          </div>
-
-          <!-- Paso 2: En evaluación -->
-          <div class="progress-step">
-            <div class="step-icon">
-              <span class="check-icon">⏳</span>
-            </div>
-            <div class="step-label">En evaluación</div>
-
-            <div class="timeline">
-              <div class="timeline-item active">
-                <div class="timeline-dot"></div>
-                <div class="timeline-line"></div>
-                <div class="timeline-content">
-                  <div class="timeline-title">Asignado a especialista</div>
-                  <div class="timeline-date">21/05/25 - 09:15</div>
-                  <div class="timeline-location">Área de Atención al Cliente</div>
-                </div>
-              </div>
-
-              <div class="timeline-item active">
-                <div class="timeline-dot"></div>
-                <div class="timeline-line"></div>
-                <div class="timeline-content">
-                  <div class="timeline-title">Revisión de documentación</div>
-                  <div class="timeline-date">22/05/25 - 11:40</div>
-                  <div class="timeline-location">Verificación de evidencias presentadas</div>
-                </div>
-              </div>
-
-              <div class="timeline-item active">
-                <div class="timeline-dot"></div>
-                <div class="timeline-line"></div>
-                <div class="timeline-content">
-                  <div class="timeline-title">Investigación en curso</div>
-                  <div class="timeline-date">24/05/25 - 16:30</div>
-                  <div class="timeline-location">Análisis del incidente reportado</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Paso 3: En resolución -->
-          <div class="progress-step">
-            <div class="step-icon">
-              <span class="pending-icon">○</span>
-            </div>
-            <div class="step-label">En resolución</div>
-
-            <div class="timeline">
-              <div class="timeline-item pending">
-                <div class="timeline-dot pending"></div>
-                <div class="timeline-line"></div>
-                <div class="timeline-content">
-                  <div class="timeline-title">Pendiente de evaluación final</div>
-                  <div class="timeline-date">Estimado: 27/05/25</div>
-                  <div class="timeline-location">Determinación de procedencia del reclamo</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Paso 4: Resuelto -->
-          <div class="progress-step">
-            <div class="step-icon">
-              <span class="pending-icon">○</span>
-            </div>
-            <div class="step-label">Resuelto</div>
-
-            <div class="timeline">
-              <div class="timeline-item pending">
-                <div class="timeline-dot pending"></div>
-                <div class="timeline-line"></div>
-                <div class="timeline-content">
-                  <div class="timeline-title">Resolución pendiente</div>
-                  <div class="timeline-date">Estimado: 30/05/25</div>
-                  <div class="timeline-location">Comunicación de respuesta final</div>
-                </div>
-              </div>
-            </div>
-          </div>
+          {% endfor %}
         </div>
       </div>
 
       <!-- Tarjeta de información del reclamo -->
       <div class="card info-card">
         <div class="info-section">
-          <h3>Fecha de presentación: <span style="font-weight: normal; color: #666;">20/05/2025</span></h3>
+          <h3>Fecha de recepción: <span style="font-weight: normal; color: #666;">{{ reclamo.fecha_recepcion }}</span></h3>
         </div>
         <div class="info-section">
-          <h3>Tiempo de respuesta: <span style="font-weight: normal; color: #666;">15 días hábiles</span></h3>
+          <h3>Sucursal: <span style="font-weight: normal; color: #666;">{{ reclamo.sucursal_direccion }}</span></h3>
         </div>
-        <div class="info-section">
-          <h3>Sucursal de atención: <span style="font-weight: normal; color: #666;">Lima Centro</span></h3>
-        </div>
+        {% if reclamo.tracking_paquete %}
+          <div class="info-section">
+            <h3>Paquete relacionado: <span style="font-weight: normal; color: #666;">{{ reclamo.tracking_paquete }}</span></h3>
+          </div>
+        {% endif %}
       </div>
 
       <!-- Tarjeta de detalles del reclamo -->
@@ -177,40 +110,65 @@
         <div class="detail-section">
           <i class="fa-solid fa-user icono"></i>
           <div class="detail-title">Reclamante</div>
-          <div class="detail-value">María José González Pérez</div>
-          <div class="detail-value">DNI: 45632871</div>
+          <div class="detail-value">{{ reclamo.nombres_razon }}</div>
+          <div class="detail-value">{{ reclamo.tipo_documento_siglas }}: {{ reclamo.n_documento }}</div>
+        </div>
+
+        <div class="detail-section">
+          <i class="fa-solid fa-map-marker-alt icono"></i>
+          <div class="detail-title">Dirección</div>
+          <div class="detail-value">{{ reclamo.direccion }}</div>
+        </div>
+
+        <div class="detail-section">
+          <i class="fa-solid fa-phone icono"></i>
+          <div class="detail-title">Contacto</div>
+          <div class="detail-value">Teléfono: {{ reclamo.telefono }}</div>
+          <div class="detail-value">Email: {{ reclamo.correo }}</div>
         </div>
 
         <div class="detail-section">
           <i class="fa-solid fa-exclamation-triangle icono"></i>
           <div class="detail-title">Tipo de reclamo</div>
-          <div class="detail-value">Producto defectuoso</div>
-          <div class="detail-value">Daños durante el transporte</div>
+          <div class="detail-value">{{ reclamo.tipo_reclamo_nombre }}</div>
+          <div class="detail-value">{{ reclamo.motivo_nombre }}</div>
+          <div class="detail-value">{{ reclamo.causa_nombre }}</div>
         </div>
 
-        <div class="detail-section">
-          <i class="fa-solid fa-box icono"></i>
-          <div class="detail-title">Paquete relacionado</div>
-          <div class="detail-value">Tracking: 45106974</div>
-          <div class="detail-value">Contenido: Electrodoméstico</div>
-        </div>
+        {% if reclamo.descripcion %}
+          <div class="detail-section">
+            <i class="fa-solid fa-file-text icono"></i>
+            <div class="detail-title">Descripción</div>
+            <div class="detail-value">{{ reclamo.descripcion }}</div>
+          </div>
+        {% endif %}
+
+        {% if reclamo.detalles %}
+          <div class="detail-section">
+            <i class="fa-solid fa-info-circle icono"></i>
+            <div class="detail-title">Detalles adicionales</div>
+            <div class="detail-value">{{ reclamo.detalles }}</div>
+          </div>
+        {% endif %}
+
+        {% if reclamo.pedido %}
+          <div class="detail-section">
+            <i class="fa-solid fa-clipboard-list icono"></i>
+            <div class="detail-title">Pedido del reclamante</div>
+            <div class="detail-value">{{ reclamo.pedido }}</div>
+          </div>
+        {% endif %}
 
         <div class="detail-section">
           <i class="fa-solid fa-money-bill icono"></i>
-          <div class="detail-title">Monto reclamado</div>
-          <div class="detail-value">S/. 450.00</div>
-        </div>
-
-        <div class="detail-section">
-          <i class="fa-solid fa-file-text icono"></i>
-          <div class="detail-title">Descripción</div>
-          <div class="detail-value">El paquete llegó con daños evidentes en el empaque exterior y el producto presenta abolladuras que afectan su funcionamiento normal.</div>
-        </div>
-
-        <div class="detail-section">
-          <i class="fa-solid fa-clipboard-list icono"></i>
-          <div class="detail-title">Solicitud</div>
-          <div class="detail-value">Reembolso completo del valor del producto más gastos de envío por daños ocasionados durante el transporte.</div>
+          <div class="detail-title">Información económica</div>
+          <div class="detail-value">Monto reclamado: S/. {{ "%.2f"|format(reclamo.monto_reclamado) }}</div>
+          {% if reclamo.monto_indemnizado %}
+            <div class="detail-value">Monto indemnizado: S/. {{ "%.2f"|format(reclamo.monto_indemnizado) }}</div>
+          {% endif %}
+          {% if reclamo.tipo_indemnizacion_nombre %}
+            <div class="detail-value">Tipo de indemnización: {{ reclamo.tipo_indemnizacion_nombre }}</div>
+          {% endif %}
         </div>
       </div>
 
@@ -220,53 +178,63 @@
           <h3>¿Necesita más información?</h3>
           <p style="color: #666; margin-top: 5px;">
             Puede contactarnos al teléfono <strong>(01) 123-4567</strong> o escribir a 
-            <strong>reclamos@empresa.com</strong> mencionando su número de reclamo.
+            <strong>reclamos@empresa.com</strong> mencionando su ID de reclamo.
           </p>
         </div>
       </div>
     </div>
+    {% else %}
+      <!-- Mensaje cuando no hay reclamo encontrado -->
+      <div class="container_estado">
+        <div class="card info-card">
+          <div class="info-section">
+            <h3>Seguimiento de Reclamos</h3>
+            <p style="color: #666; margin-top: 5px;">
+              Ingrese el ID del reclamo y su número de documento para consultar el estado de su reclamo.
+            </p>
+          </div>
+        </div>
+      </div>
+    {% endif %}
   </div>
 {% endblock %}
 
 {% block scripts %}
   <script>
-    // Función para mostrar/ocultar detalles del timeline
     document.addEventListener('DOMContentLoaded', function() {
-      const timelineItems = document.querySelectorAll('.timeline-item');
+      // Calcular progreso
+      const totalSteps = document.querySelectorAll('.progress-step').length;
+      const completedSteps = document.querySelectorAll('.step-icon.completed').length;
       
-      timelineItems.forEach(item => {
-        item.addEventListener('click', function() {
-          const content = this.querySelector('.timeline-content');
-          if (content) {
-            content.classList.toggle('expanded');
+      if (totalSteps > 0) {
+        const fillLine = document.querySelector('.progress-line-fill');
+        let porcentaje;
+        
+        if (completedSteps === 0) {
+          porcentaje = 22; // Progreso inicial
+        } else {
+          porcentaje = ((completedSteps - 1) / (totalSteps - 1)) * 100;
+          porcentaje = Math.max(porcentaje, 22); // Mínimo 22%
+        }
+        
+        if (fillLine) {
+          fillLine.style.width = `${porcentaje}%`;
+        }
+      }
+
+      // Validación del formulario de búsqueda
+      const searchForm = document.querySelector('.order-search');
+      if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+          const reclamoId = document.querySelector('input[name="reclamo_id"]').value.trim();
+          const documento = document.querySelector('input[name="documento"]').value.trim();
+          
+          if (!reclamoId && !documento) {
+            e.preventDefault();
+            alert('Por favor ingrese al menos un criterio de búsqueda');
           }
         });
-      });
-
-      // Funcionalidad para los checkboxes de documentos
-      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-      const downloadBtn = document.querySelector('.grt-btn');
-      
-      checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-          const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
-          downloadBtn.style.opacity = checkedBoxes.length > 0 ? '1' : '0.5';
-        });
-      });
-
-      // Función de búsqueda
-      const searchBtn = document.querySelector('.search-btn');
-      searchBtn.addEventListener('click', function() {
-        const reclamoNum = document.querySelector('input[placeholder="Nº de Reclamo"]').value;
-        const documento = document.querySelector('input[placeholder="Nº de Documento"]').value;
-        
-        if (reclamoNum || documento) {
-          // Aquí iría la lógica de búsqueda
-          console.log('Buscando reclamo:', reclamoNum, 'Documento:', documento);
-        } else {
-          alert('Por favor ingrese al menos un criterio de búsqueda');
-        }
-      });
+      }
     });
   </script>
 {% endblock %}
