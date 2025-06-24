@@ -3190,20 +3190,40 @@ def insertar_envio_api():
 @app.route('/insertar_envio_api_222222', methods=['POST'])
 def insertar_envio_api_22222():
     try:
-        nombre_empresa = controlador_empresa.get_nombre()
         data = request.get_json()
-        # print(data)
+
         if not data:
-            return jsonify({'status': 'error', 'message': 'No se recibió un JSON válido'}), 400
+            return jsonify({'status': 'error', 'message': 'No se recibieron datos'}), 400
 
         tipo_comprobante = data.get('tipo_comprobante')
-        registros = data.get('registros') 
+        # modalidad_pago_seleccionada = data.get('modalidad_pago')
 
-        if not registros or not isinstance(registros, list):
-            return jsonify({'status': 'error', 'message': 'No se encontraron registros válidos'}), 400
+        if not tipo_comprobante:
+            return jsonify({'status': 'error', 'message': 'Tipo de comprobante es requerido'}), 400
+        # if modalidad_pago_seleccionada is None:
+        #     return jsonify({'status': 'error', 'message': 'Modalidad de pago es requerida'}), 400
 
-        # Tomamos los datos del remitente desde el primer registro
-        remitente = registros[0].get('remitente', {})
+        # Compatibilidad con API antigua (estructura con 'registros')
+        if 'registros' in data:
+            registros = data['registros']
+            if registros:
+                primer_registro = registros[0]
+                data['envios'] = registros
+                data['remitente'] = primer_registro.get('remitente')
+
+        # Prioridad: si no hay sesión, usar lo que viene del JSON
+        datos_pago = session.get('datos_pago') or {
+            'envios': data.get('envios', []),
+            'remitente': data.get('remitente', {})
+        }
+
+        envios = datos_pago.get('envios', [])
+        remitente = datos_pago.get('remitente', {})
+
+        if not envios:
+            return jsonify({'status': 'error', 'message': 'No se encontraron envíos para procesar'}), 400
+
+        nombre_empresa = controlador_empresa.get_nombre()
         nombre = remitente.get('nombre_remitente', '')
         partes = nombre.split() if nombre else []
 
@@ -3216,22 +3236,17 @@ def insertar_envio_api_22222():
             'tipo_documentoid': int(remitente.get('tipo_doc_remitente', 1)),
             'tipo_clienteid': 2 if remitente.get('tipo_doc_remitente') == 2 else 1
         }
-        # print(f'REGISTROS -> {registros}')
-        # print(f'CLIENTE_DATA -> {cliente_data}')
-        # print(f'tipo_comprobante -> {tipo_comprobante}')
-        # 1) Crear transacción y paquetes
-        num_serie,trackings = controlador_encomienda.crear_transaccion_y_paquetes(
-            registros, cliente_data, tipo_comprobante
+
+        num_serie, trackings = controlador_encomienda.crear_transaccion_y_paquetes(
+            envios, cliente_data, tipo_comprobante
         )
 
-        # 2) Generar QR para cada paquete
         if num_serie:
             try:
                 generar_qr_paquetes(trackings)
             except Exception as qr_err:
                 current_app.logger.warning(f"Error generando QR: {qr_err}")
 
-            # 3) Enviar correo al remitente
             destinatario_email = cliente_data['correo']
             if destinatario_email:
                 msg = Message(
@@ -3246,36 +3261,35 @@ def insertar_envio_api_22222():
                     f"¡Gracias por confiar en {nombre_empresa}!"
                 )
 
-                for r in trackings:
-                    tracking = r
+                for tracking in trackings:
                     qr_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'qr.png')
                     if os.path.exists(qr_path):
                         with open(qr_path, 'rb') as f:
                             qr_data = f.read()
                         msg.attach(f"qr_{tracking}.png", 'image/png', qr_data)
-                    else:
-                        current_app.logger.warning(f"QR no encontrado para tracking {tracking}")
-
 
                 mail.send(msg)
 
-        current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
+        session.pop('datos_pago', None)
+        session.pop('resumen_envios', None)
+        session.pop('remitente_data', None)
+
         return jsonify({
             'status': 'success',
-            'message': 'Transacción creada correctamente',
-            'comprobante_serie': num_serie
-        }), 201
-
-    except ValueError as ve:
-        current_app.logger.warning(f"Bad request: {ve}")
-        return jsonify({'status': 'error', 'message': str(ve)}), 400
+            'message': 'Envío procesado correctamente',
+            'num_serie': num_serie,
+            'trackings': trackings
+        }), 200
 
     except Exception as e:
+        current_app.logger.error(f"Error en insertar_envio: {str(e)}")
+        import traceback
         traceback.print_exc()
         return jsonify({
             'status': 'error',
             'message': 'Ocurrió un error al procesar el envío'
         }), 500
+        
 ##PARA PROBAR EL API E INSERTAR 
 # {
 #   "tipo_comprobante": 2,
