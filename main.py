@@ -420,12 +420,12 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-    "reclamo": {
+"reclamo": {
     "active": True,
     "id": "reclamo",
     "titulo": "Reclamos",
     "nombre_tabla": "reclamo",
-    "controlador": controlador_reclamo,
+   "controlador": controlador_reclamo,
     "icon_page": "fa-solid fa-file",
     "filters": [],
     "fields_form": [
@@ -1431,10 +1431,10 @@ REPORTES = {
         "filters": []
     },
 
-    "encomiendas_por_ruta": {
+    "encomiendas_listar": {
         "active": True,
         "icon_page": "fa-solid fa-boxes-packing",
-        "titulo": "Listado de encomiendas asignadas a rutas específicas ",
+        "titulo": "Listado de encomiendas por empaque ",
         "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo(),
         "filters": []
     },
@@ -5376,7 +5376,7 @@ def api_estados_reclamo():
 if __name__ == "__main__":
     # app.run(host='192.168.48.178', port=8000, debug=True, use_reloader=True)
     # Thread(target=enviar_posiciones).start()
-    socketio.run(app, host='0.0.0.0', port=8000, debug=True)
+    socketio.run(app, host='0.0.0.0', port=8001, debug=True)
 
 
 
