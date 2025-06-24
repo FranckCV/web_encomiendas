@@ -231,7 +231,7 @@ def get_report_reposicion(stock_minimo=10):
     """
     Obtiene un reporte de artículos que necesitan reposición
     basado en un stock mínimo definido
-    """
+    """     
     try:
         sql = '''
             SELECT 
