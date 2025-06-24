@@ -7,6 +7,7 @@ from decimal import Decimal
 from controladores.bd import obtener_conexion
 from flask import current_app
 logger = logging.getLogger(__name__)
+from num2words import num2words
 
 
 table_name = 'transaccion_encomienda'
@@ -162,24 +163,24 @@ def insert_cliente(correo, telefono, num_doc, nombre, tipo_doc):
 #     id = sql_execute_lastrowid(sql,(num_serie, masivo, descripcion, recojo_casa, id_sucursal_origen, estado_pago, fecha, hora, direccion_recojo, clienteid, tipo_comprobanteid) )
 #     return id
 
-def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
+# Firma de la función
+
+def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante, sucursal_origen):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            # 1) Cliente: obtener o crear
             row = sql_select_fetchone(
                 "SELECT id FROM cliente WHERE num_documento = %s",
                 (cliente_data['num_documento'],)
             )
             if row:
                 cliente_id = row['id']
-                # print(f"este es el cliente EXISTENTE miau {cliente_id}")
             else:
                 cliente_id = sql_execute_lastrowid(
                     """
                     INSERT INTO cliente
                     (correo, telefono, num_documento, nombre_siglas,
-                    apellidos_razon, tipo_documentoid, tipo_clienteid)
+                     apellidos_razon, tipo_documentoid, tipo_clienteid)
                     VALUES (%s,%s,%s,%s,%s,%s,%s)
                     """,
                     (
@@ -192,65 +193,52 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
                         cliente_data['tipo_clienteid']
                     )
                 )
-            
-            print(cliente_id)
+
             result = sql_select_fetchone("SELECT inicial FROM tipo_comprobante WHERE id = %s", tipo_comprobante)
             if not result:
                 raise ValueError("Tipo de comprobante no válido")
             inicial = result['inicial'].strip().upper()
-            comprobante_serie = f"{inicial}001"
+            comprobante_serie_prefix = f"{inicial}001"
 
-            row = sql_select_fetchone(
-                """
-                SELECT MAX(CAST(num_serie AS UNSIGNED)) as numero
-                FROM transaccion_encomienda;
-                """
-            )
-
-            nuevo_correlativo = (row['numero'] if row and row['numero'] else 0) + 1
-            correlativo_str = str(nuevo_correlativo).zfill(6)
-            num_serie = correlativo_str
-            comprobante_serie_final = f"{comprobante_serie}-{correlativo_str}"
-
-            # 4) Insertar transacción
-            print(num_serie)
-            print(comprobante_serie_final)
             masivo = 1 if registros and registros[0].get('modo') == 'masivo' else 0
-            print(masivo)
             monto_total = sum(Decimal(r.get('tarifa', 0)) for r in registros).quantize(Decimal('0.01'))
-            print(monto_total)
-            descripcion = f"Envío {'masivo' if masivo else 'individual'} #{comprobante_serie_final}"
-            print(descripcion)
+            descripcion = f"Envío {'masivo' if masivo else 'individual'}"
             direccion_recojo = ''
 
             cursor.execute(
                 """
                 INSERT INTO transaccion_encomienda
-                (num_serie, masivo, descripcion, monto_total, 
-                id_sucursal_origen, fecha, hora,
-                direccion_recojo, clienteid, tipo_comprobanteid, comprobante_serie)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                (masivo, descripcion, monto_total, 
+                 id_sucursal_origen, fecha, hora,
+                 direccion_recojo, clienteid, tipo_comprobanteid)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
-                    num_serie,
                     masivo,
                     descripcion,
                     float(monto_total),
-                    int(registros[0]['origen']['sucursal_origen']),
+                    sucursal_origen,
                     date.today(),
                     datetime.now().strftime('%H:%M:%S'),
                     direccion_recojo,
                     cliente_id,
-                    tipo_comprobante,
-                    comprobante_serie_final
+                    tipo_comprobante
                 )
             )
-            
-            print(cursor.lastrowid)
+
+            num_serie = cursor.lastrowid 
+            correlativo_str = str(num_serie).zfill(6)
+            comprobante_serie_final = f"{comprobante_serie_prefix}-{correlativo_str}"
+
+            # Actualizar con comprobante_serie
+            cursor.execute(
+                "UPDATE transaccion_encomienda SET comprobante_serie = %s WHERE num_serie = %s",
+                (comprobante_serie_final, num_serie)
+            )
 
             trackings = []
-            for idx, r in enumerate(registros):
-                # print('ACA ES XDXD',idx , r)
+
+            for r in registros:
                 clave = r['clave']
                 valor = float(r.get('valorEnvio') or 0)
                 peso = float(r.get('peso') or 0)
@@ -263,102 +251,60 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante):
                 tipo_doc_dest = int(dest.get('tipo_doc_destinatario', 1))
                 num_doc_dest = dest.get('num_doc_destinatario', '')
                 tel_dest = dest.get('num_tel_destinatario', '')
-                if (tipo_doc_dest == 2):
+                if tipo_doc_dest == 2:
                     nombre_contacto_destinatario = dest.get('contacto')
                     apellido_razon_destinatario = dest.get('razon_social')
                 else:
                     nombre_contacto_destinatario = dest.get('nombres')
                     apellido_razon_destinatario = dest.get('apellidos')
+
                 suc_dest_id = int(r['destino']['sucursal_destino'])
                 estado_pago = r.get('estado_pago', 'P')
                 modalidad_pago = r.get('modalidadPago')
-                print('modalidad : ',modalidad_pago)
-
                 contenido_paqueteid = int(r.get('tipoArticuloId')) if r.get('tipoArticuloId') not in (None, '') else None
-
                 cantidad_folios = r.get('cantidad_folios')
 
                 cursor.execute(
                     """
                     INSERT INTO paquete
-                    (clave, valor, peso, 
-                    alto, largo, precio_ruta, 
-                    ancho, descripcion, direccion_destinatario, 
-                    telefono_destinatario, num_documento_destinatario, sucursal_destino_id,
-                    tipo_documento_destinatario_id, tipo_empaqueid, contenido_paqueteid, 
-                    tipo_recepcionid, salidaid, transaccion_encomienda_num_serie,
-                    qr_url, estado_pago, modalidad_pagoid,
-                    nombres_contacto_destinatario, apellidos_razon_destinatario, cantidad_folios
-                    )
-                    VALUES
-                    (%s, %s, %s, 
-                    %s, %s, %s, 
-                    %s,%s, %s, 
-                    %s, %s, %s, 
-                    %s, %s,%s, 
-                    %s, %s, %s, 
-                    %s, %s, %s,
-                    %s, %s, %s)
+                    (clave, valor, peso, alto, largo, precio_ruta, ancho, descripcion,
+                     direccion_destinatario, telefono_destinatario, num_documento_destinatario,
+                     sucursal_destino_id, tipo_documento_destinatario_id, tipo_empaqueid,
+                     contenido_paqueteid, tipo_recepcionid, salidaid, transaccion_encomienda_num_serie,
+                     qr_url, estado_pago, modalidad_pagoid, nombres_contacto_destinatario,
+                     apellidos_razon_destinatario, cantidad_folios)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     """,
                     (
-                        clave,
-                        valor,
-                        peso,
-                        alto,
-                        largo,
-                        tarifa,
-                        ancho,
-                        '',  # descripcion
-                        '',  # direccion_destinatario
-                        tel_dest,
-                        num_doc_dest,
-                        suc_dest_id,
-                        tipo_doc_dest,
-                        int(r.get('tipoEmpaqueId', 1)),
-                        contenido_paqueteid,
-                        int(r.get('tipoEntregaId', 1)),
-                        None,  # salidaid
-                        num_serie,
-                        None,  # qr_url
-                        estado_pago,
-                        modalidad_pago,
-                        nombre_contacto_destinatario,
-                        apellido_razon_destinatario,
-                        cantidad_folios  
+                        clave, valor, peso, alto, largo, tarifa, ancho, '', '', tel_dest, num_doc_dest,
+                        suc_dest_id, tipo_doc_dest, int(r.get('tipoEmpaqueId', 1)),
+                        contenido_paqueteid, int(r.get('tipoEntregaId', 1)), None, num_serie,
+                        None, estado_pago, modalidad_pago, nombre_contacto_destinatario,
+                        apellido_razon_destinatario, cantidad_folios
                     )
                 )
-                                
+
                 paquete_id = cursor.lastrowid
-                print(paquete_id)
                 cursor.execute(
                     """
                     INSERT INTO seguimiento
                     (paquetetracking, detalle_estadoid, fecha, hora)
                     VALUES (%s, %s, %s, %s)
                     """,
-                    (
-                        paquete_id,
-                        1,
-                        date.today(),
-                        datetime.now().strftime('%H:%M:%S'),
-                    )
+                    (paquete_id, 1, date.today(), datetime.now().strftime('%H:%M:%S'))
                 )
                 trackings.append(paquete_id)
 
-            # Commit de los cambios si todo fue exitoso
             conexion.commit()
-
         return comprobante_serie_final, trackings
 
     except Exception as e:
-        # Rollback si ocurrió un error
         conexion.rollback()
         print(str(e))
         return str(e)
 
     finally:
         conexion.close()
-
 
 
 def get_transaction_by_tracking(tracking):
@@ -455,6 +401,7 @@ def obtener_items_por_num_serie(num_serie):
 
 
 
+
 def calcular_resumen_venta(monto_total, igv):
     monto_total = Decimal(monto_total)
     igv = Decimal(igv)
@@ -463,12 +410,16 @@ def calcular_resumen_venta(monto_total, igv):
     base_imponible = (monto_total / factor).quantize(Decimal('0.01'))
     igv_valor = (monto_total - base_imponible).quantize(Decimal('0.01'))
 
+    entero = int(monto_total)
+    centimos = int(round((monto_total - entero) * 100))
+    importe_letras = f"{num2words(entero, lang='es').upper()} CON {centimos:02d}/100 SOLES"
+
     return {
         'base_imponible': base_imponible,
         'igv': igv_valor,
-        'total': monto_total
+        'total': monto_total,
+        'importe_letras': importe_letras
     }
-
 
 
 

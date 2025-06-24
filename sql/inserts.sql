@@ -8179,14 +8179,14 @@ INSERT INTO detalle_estado (id, nombre, descripcion, activo, estado_encomiendaid
 
 
 INSERT INTO empleado (nombre, apellidos, correo, n_documento, rolid) VALUES
-('Carlos', 'Ramírez León', 'carlos.ramirez@transportes.com', 'D12345678', 1),
-('Lucía', 'Mendoza Ruiz', 'lucia.mendoza@transportes.com', 'B98765432', 1),
-('Pedro', 'Sánchez Huamán', 'pedro.sanchez@transportes.com', 'C76543210', 1),
-('Ana', 'Torres Rivas', 'ana.torres@transportes.com', 'A11223344', 1),
-('Luis', 'Castillo Valverde', 'luis.castillo@transportes.com', 'E55667788', 1),
-('María', 'López Espinoza', 'maria.lopez@transportes.com', 'F99887766', 1),
-('Javier', 'Gómez Paredes', 'javier.gomez@transportes.com', 'G33445566', 1),
-('Sofía', 'Fernández Quispe', 'sofia.fernandez@transportes.com', 'H77889900', 1);
+('Carlos', 'Ramírez León', 'carlos.ramirez@transportes.com', 'D12345678', 3),
+('Lucía', 'Mendoza Ruiz', 'lucia.mendoza@transportes.com', 'B98765432', 3),
+('Pedro', 'Sánchez Huamán', 'pedro.sanchez@transportes.com', 'C76543210',3),
+('Ana', 'Torres Rivas', 'ana.torres@transportes.com', 'A11223344', 3),
+('Luis', 'Castillo Valverde', 'luis.castillo@transportes.com', 'E55667788',3),
+('María', 'López Espinoza', 'maria.lopez@transportes.com', 'F99887766', 3),
+('Javier', 'Gómez Paredes', 'javier.gomez@transportes.com', 'G33445566', 3),
+('Sofía', 'Fernández Quispe', 'sofia.fernandez@transportes.com', 'H77889900',3);
 
 INSERT INTO salida (fecha, hora, recojo, entrega, estado, unidadid, destino_final_id, conductor_principal, origen_inicio_id) VALUES
 ('2025-06-16', '07:30:00', 1, 0, 'P', 1, 2, 5, 3),

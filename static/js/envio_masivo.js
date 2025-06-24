@@ -902,7 +902,6 @@ class LocationManager {
 // ===========================
 class ShippingManager {
   static collectFormData() {
-    // Función auxiliar para obtener valores seguros
     const getValue = (id) => {
       const element = document.getElementById(id);
       return element ? element.value.trim() : '';
@@ -917,12 +916,11 @@ class ShippingManager {
       const radio = document.querySelector(`input[name="${name}"]:checked`);
       return radio ? radio.value : '';
     };
-      let valorDireccion=''; // Agregar dirección si es domicilio
+      let valorDireccion=''; 
       if(getValue('m-tipoEntrega')=='2'){
            valorDireccion= document.getElementById('m-direccion').value
         }
 
-    // Recolectar datos con validación
     const formData = {
       modo: typeof mode !== 'undefined' ? mode : null,
       remitente: {
