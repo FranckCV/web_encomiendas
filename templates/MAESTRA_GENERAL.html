@@ -15,17 +15,13 @@
 {% block body_html %}
 <header class="general_element top-header">
   <a class="logo-container" href="{{ url_for('main_page') }}">
-    <img class="logo" src="{{ URL_IMG_LOGO }}" alt="" />
+    <img class="logo img_logo_empresa" src="{{ URL_IMG_LOGO }}" alt="" />
     <div class="logo-text">{{ SYSTEM_NAME }}</div>
   </a>
 
   <nav class="main-nav">
-    <!--  <a href="{{ url_for('main_page') }}" class="nav-link">
-        <i class="fas fa-home"></i>
-        <span>Inicio</span>
-      </a>  -->
     <a href="{{ url_for('tracking') }}" class="nav-link">
-<i class="fa-solid fa-map-location-dot"></i>
+      <i class="fa-solid fa-map-location-dot"></i>
       <span>Seguimiento</span>
     </a>
     <a href="{{ url_for('cotizador') }}" class="nav-link">
