@@ -708,7 +708,6 @@ CONTROLADORES = {
         "icon_page" : "ri-store-3-line",
         "filters":[
         ],
-
         "fields_form": [
     #         ID/NAME         LABEL              PLACEHOLDER        TYPE       REQUIRED   ABLE/DISABLE   DATOS
             ['id',            'ID',              'ID',              'text',      True ,    False,      True ],
@@ -1402,7 +1401,7 @@ REPORTES = {
         "titulo": "Artículos que Necesitan Reposición",
         "table": controlador_articulo.get_report_reposicion(),  # función sin paréntesis
         "filters": [
-            ['stock_minimo', 'Stock Mínimo', lambda: controlador_articulo.get_stock_minimo_options(), 'select'],
+            ['stock_minimo', 'Sin Stock ', lambda: controlador_articulo.get_stock_minimo_options(), 'select'],
         ],
     },
 
@@ -1436,7 +1435,7 @@ REPORTES = {
         "active": True,
         "icon_page": "fa-solid fa-boxes-packing",
         "titulo": "Listado de encomiendas por empaque ",
-        "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo(),
+        "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo,
         "filters": []
     },
 
@@ -1445,7 +1444,7 @@ REPORTES = {
         "icon_page": "fa-solid fa-clipboard-list",
         "titulo": "Reporte de reclamos por tipo, causa y periodo",
         "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),
-        "filters": []
+        "filters": ['stock_minimo', 'Stock Mínimo', lambda: controlador_articulo.get_stock_minimo_options(), 'select'],
     },
 }
 
@@ -4501,7 +4500,7 @@ def crud_insert(tabla):
 
         active = config["active"]
         no_crud = config.get('no_crud')
-        transaccion = config.get('transaccion')
+        # transaccion = config.get('transaccion')
 
         if active is False:
             return "Tabla no soportada", 404
@@ -4525,10 +4524,11 @@ def crud_insert(tabla):
 
         controlador.insert_row( *valores )
 
+
         if no_crud :
             return redirect(url_for(no_crud))
         else:
-            return redirect(url_redirect , tabla = tabla)
+            return redirect(url_for(url_redirect , tabla = tabla))
     # except Exception as e:
     #     return f"No se aceptan carácteres especiales", 400
 
