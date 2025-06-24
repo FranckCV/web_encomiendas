@@ -196,7 +196,6 @@ def get_report_mas_vendidos(fecha_inicio=None, fecha_fin=None):
                 ON a.id = dv.articuloid
             LEFT JOIN transaccion_venta tv 
                 ON dv.ventanum_serie = tv.num_serie 
-                AND dv.ventatipo_comprobanteid = tv.tipo_comprobanteid
             WHERE 1=1
         '''
         params = []

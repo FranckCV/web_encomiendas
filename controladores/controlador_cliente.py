@@ -140,7 +140,7 @@ def get_reporte_ventas():
             tv.monto_total
         FROM transaccion_venta tv
         INNER JOIN cliente cl ON tv.clienteid = cl.id
-        INNER JOIN detalle_venta dv ON tv.num_serie = dv.ventanum_serie AND tv.tipo_comprobanteid = dv.ventatipo_comprobanteid
+        INNER JOIN detalle_venta dv ON tv.num_serie = dv.ventanum_serie
         INNER JOIN articulo art ON dv.articuloid = art.id
         GROUP BY tv.num_serie, tv.fecha, tv.hora, cliente, tv.monto_total
         ORDER BY tv.fecha DESC, tv.hora DESC 

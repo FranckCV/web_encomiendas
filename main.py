@@ -2212,6 +2212,33 @@ def api_Faq():
     preguntas_activas = [f for f in filas if f['activo'] == 1]
     return jsonify(preguntas_activas)
 
+@app.route('/api/marca/update', methods=['POST'])
+def update_marca():
+    try:
+        # Obtener los datos del cuerpo de la solicitud en formato JSON
+        data = request.get_json()
+
+        # Extraer los valores de los parámetros necesarios
+        id = data.get('id')
+        nombre = data.get('nombre')
+
+        # Validar que se reciban los datos correctos
+        if not id or not nombre:
+            return jsonify({'success': False, 'message': 'Faltan parámetros'}), 400
+        
+        # Actualizar la fila de la marca en la base de datos
+        sql = f'''
+            UPDATE marca 
+            SET nombre = %s 
+            WHERE id = %s
+        '''
+        bd.sql_execute(sql, (nombre, id))  
+
+        # Ejecutar el SQL para actualizar la marca
+        
+        return jsonify({'success': True, 'message': 'Marca actualizada correctamente'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/contactanos')
 def contactanos():
