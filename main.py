@@ -420,7 +420,7 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-    "reclamo": {
+"reclamo": {
     "active": True,
     "id": "reclamo",
     "titulo": "Reclamos",
@@ -435,14 +435,15 @@ CONTROLADORES = {
         ['correo', 'Correo', 'Correo', 'email', True, True, None],
         ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
         ['n_documento', 'N° Documento', '', 'text', True, True, None],
-        ['titulo_incidencia', 'Incidencia', '', 'text', True, True, None],
         ['bien_contratado', 'Bien Contratado', '', 'text', True, True, None],
         ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
         ['monto_indemnizado', 'Monto Indemnizado', '0.00', 'number', True, True, None],
         ['relacion', 'Relación con el bien', '', 'text', True, True, None],
-        ['fecha_recojo', 'Fecha de recojo', '', 'date', True, True, None],
+        ['fecha_recepcion', 'Fecha de recepción', '', 'date', True, True, None],
         ['descripcion', 'Descripción', '', 'textarea', True, True, None],
+        ['detalles', 'Detalles adicionales', '', 'textarea', True, True, None],
         ['pedido', 'Pedido', '', 'text', True, True, None],
+        ['foto', 'Foto del reclamo', '', 'img', False, True, None],
         ['sucursal_id', 'Sucursal', '', 'select', True, True, [lambda: controlador_sucursal.get_options(), 'direccion']],
         ['causa_reclamoid', 'Causa del Reclamo', '', 'select', True, True, [lambda: controlador_causa_reclamo.get_options(), 'nombre']],
         ['tipo_indemnizacionid', 'Tipo de Indemnización', '', 'select', True, True, [lambda: controlador_tipo_indemnizacion.get_options(), 'nombre']],
@@ -1431,10 +1432,10 @@ REPORTES = {
         "filters": []
     },
 
-    "encomiendas_por_ruta": {
+    "encomiendas_listar": {
         "active": True,
         "icon_page": "fa-solid fa-boxes-packing",
-        "titulo": "Listado de encomiendas asignadas a rutas específicas ",
+        "titulo": "Listado de encomiendas por empaque ",
         "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo(),
         "filters": []
     },
@@ -2060,6 +2061,33 @@ def api_Faq():
     preguntas_activas = [f for f in filas if f['activo'] == 1]
     return jsonify(preguntas_activas)
 
+@app.route('/api/marca/update', methods=['POST'])
+def update_marca():
+    try:
+        # Obtener los datos del cuerpo de la solicitud en formato JSON
+        data = request.get_json()
+
+        # Extraer los valores de los parámetros necesarios
+        id = data.get('id')
+        nombre = data.get('nombre')
+
+        # Validar que se reciban los datos correctos
+        if not id or not nombre:
+            return jsonify({'success': False, 'message': 'Faltan parámetros'}), 400
+        
+        # Actualizar la fila de la marca en la base de datos
+        sql = f'''
+            UPDATE marca 
+            SET nombre = %s 
+            WHERE id = %s
+        '''
+        bd.sql_execute(sql, (nombre, id))  
+
+        # Ejecutar el SQL para actualizar la marca
+        
+        return jsonify({'success': True, 'message': 'Marca actualizada correctamente'}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/contactanos')
 def contactanos():

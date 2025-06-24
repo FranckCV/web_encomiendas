@@ -1,106 +1,124 @@
-from controladores.bd import obtener_conexion , sql_select_fetchall , sql_select_fetchone , sql_execute , sql_execute_lastrowid , show_columns , show_primary_key , exists_column_Activo , unactive_row_table
-import controladores.bd as bd
-#####_ MANTENER IGUAL - SOLO CAMBIAR table_name _#####
+from controladores.bd import (
+    sql_select_fetchall, sql_select_fetchone, sql_execute,
+    show_columns, show_primary_key, exists_column_Activo, unactive_row_table
+)
 
-table_name = 'tipo_reclamo'
+table_name = 'reclamo'
 
 def get_info_columns():
     return show_columns(table_name)
 
-
 def get_primary_key():
     return show_primary_key(table_name)
-
 
 def exists_Activo():
     return exists_column_Activo(table_name)
 
-
-def delete_row( id ):
-    sql = f'''
-        delete from {table_name}
-        where id = {id}
-    '''
-    sql_execute(sql)
-
-
-#####_ CAMBIAR SQL y DICT INTERNO _#####
-
-def table_fetchall():
-    sql= f'''
-        select 
-            *
-        from {table_name}
-    '''
-    resultados = sql_select_fetchall(sql)
-    
-    return resultados
-
+def delete_row(id):
+    sql = f"DELETE FROM {table_name} WHERE id = %s"
+    sql_execute(sql, (id,))
 
 def get_table():
-    sql= f'''
-        select 
-            *
-        from {table_name} 
-
+    sql = f'''
+        SELECT id, nombres_razon, direccion, correo, telefono, n_documento,
+               monto_indemnizado, titulo_incidencia, bien_contratado, monto_reclamado,
+               relacion, fecha_recojo, sucursal_id, descripcion, pedido,
+               causa_reclamoid, tipo_indemnizacionid, paquetetracking, ubigeocodigo, tipo_documentoid
+        FROM {table_name}
     '''
+
     columnas = {
-        'id': ['ID' , 0.5] , 
-        'nombre' : ['Nombre' , 4.5] , 
-        'descripcion' : ['Descripción' , 4.5] , 
-        'activo' : ['Actividad' , 1] 
-        }
-    filas = sql_select_fetchall(sql)
-    
-    return columnas , filas
+        'id': ['ID', 0.5],
+        'nombres_razon': ['Cliente', 1.5],
+        'direccion': ['Dirección', 1.5],
+        'correo': ['Correo', 1.2],
+        'telefono': ['Teléfono', 1.2],
+        'titulo_incidencia': ['Incidencia', 1.5],
+        'monto_reclamado': ['Monto Reclamado', 1],
+        'fecha_recojo': ['Fecha', 1],
+        'tipo_documentoid': ['Tipo Documento', 1],
+        'sucursal_id': ['Sucursal', 1],
+    }
 
+    try:
+        filas = sql_select_fetchall(sql)
+    except Exception as e:
+        print("❌ Error en get_table reclamo:", e)
+        filas = []
 
-######_ CRUD ESPECIFICAS _###### 
+    return columnas, filas
 
-def unactive_row( id ):
-    unactive_row_table(table_name , id)
+def insert_row(form):
+    if not form:
+        raise ValueError("❌ Formulario vacío.")
 
+    form = dict(form)  # Convierte ImmutableMultiDict a dict
 
-def insert_row( nombre ,descripcion=None ):
+    campos = [
+        "nombres_razon", "direccion", "correo", "telefono", "n_documento",
+        "monto_indemnizado", "titulo_incidencia", "bien_contratado", "monto_reclamado",
+        "relacion", "fecha_recojo", "sucursal_id", "descripcion", "pedido",
+        "causa_reclamoid", "tipo_indemnizacionid", "paquetetracking", "ubigeocodigo", "tipo_documentoid"
+    ]
+
+    valores = []
+    for campo in campos:
+        valor = form.get(campo)
+        if valor == '':
+            valor = None
+        valores.append(valor)
+
+    if any(v is None for v in valores):
+        raise ValueError("❌ Algunos campos requeridos están vacíos o mal nombrados")
+
     sql = f'''
-        INSERT INTO 
-            {table_name} 
-            ( nombre ,descripcion ,activo)
-        VALUES 
-            ( %s , %s,1 )
+        INSERT INTO {table_name} (
+            {', '.join(campos)}
+        ) VALUES ({', '.join(['%s'] * len(valores))})
     '''
-    sql_execute(sql,( nombre, descripcion ))
 
+    sql_execute(sql, valores)
+    return True
 
-def update_row( id , nombre , inicial ,descripcion ):
+def update_row(id, *args):
+    campos = [
+        "nombres_razon", "direccion", "correo", "telefono", "n_documento",
+        "monto_indemnizado", "titulo_incidencia", "bien_contratado", "monto_reclamado",
+        "relacion", "fecha_recojo", "sucursal_id", "descripcion", "pedido",
+        "causa_reclamoid", "tipo_indemnizacionid", "paquetetracking", "ubigeocodigo", "tipo_documentoid"
+    ]
+
+    if len(args) != len(campos):
+        raise ValueError("❌ Número incorrecto de argumentos para update")
+
     sql = f'''
-        update {table_name} set 
-        nombre = %s ,
-        descripcion = %s
-        where {get_primary_key()} = {id}
+        UPDATE {table_name} SET
+            {', '.join([f"{campo} = %s" for campo in campos])}
+        WHERE id = %s
     '''
-    sql_execute(sql, (nombre, descripcion ))
 
+    sql_execute(sql, (*args, id))
+    return True
 
-#####_ ADICIONALES _#####
+# Clase usada por main.py
+class ControladorReclamo:
+    def get_info_columns(self):
+        return get_info_columns()
 
-def get_options():
-    sql= f'''
-        select 
-            {get_primary_key()} ,
-            nombre
-        from {table_name}
-        where activo = 1
-        order by nombre asc
-    '''
-    filas = sql_select_fetchall(sql)
-    
-    lista = [(fila[get_primary_key()], fila["nombre"]) for fila in filas]
+    def get_primary_key(self):
+        return get_primary_key()
 
-    return lista
+    def exists_Activo(self):
+        return exists_Activo()
 
+    def delete_row(self, id):
+        return delete_row(id)
 
+    def get_table(self):
+        return get_table()
 
+    def insert_row(self, form):
+        return insert_row(form)
 
-
-
+    def update_row(self, id, *args):
+        return update_row(id, *args)
