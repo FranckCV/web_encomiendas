@@ -1439,12 +1439,12 @@ REPORTES = {
     },
 
     "reporte_reclamos_tipo_causa_periodo": {
-        "active": True,
-        "icon_page": "fa-solid fa-clipboard-list",
-        "titulo": "Reporte de reclamos por tipo, causa y periodo",
-        "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),
-        "filters": ['stock_minimo', 'Stock Mínimo', lambda: controlador_articulo.get_stock_minimo_options(), 'select'],
-    },
+    "active": True,
+    "icon_page": "fa-solid fa-clipboard-list",
+    "titulo": "Reporte de reclamos por tipo, causa y periodo",
+    "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),  # ✅ con paréntesis
+    "filters": []
+},
 }
 
 
@@ -3189,15 +3189,17 @@ def insertar_envio_api():
 def registrar_envios_masivos():
     try:
         data = request.get_json()
-        # print(data)
+
         if not data:
-            return jsonify({'status': 'error', 'message': 'No se recibió un JSON válido'}), 400
+            return jsonify({'status': 'error', 'message': 'No se recibieron datos'}), 400
 
         tipo_comprobante = data.get('tipo_comprobante')
-        registros = data.get('registros') 
+        # modalidad_pago_seleccionada = data.get('modalidad_pago')
 
-        if not registros or not isinstance(registros, list):
-            return jsonify({'status': 'error', 'message': 'No se encontraron registros válidos'}), 400
+        if not tipo_comprobante:
+            return jsonify({'status': 'error', 'message': 'Tipo de comprobante es requerido'}), 400
+        # if modalidad_pago_seleccionada is None:
+        #     return jsonify({'status': 'error', 'message': 'Modalidad de pago es requerida'}), 400
 
         origen = data.get('origen')
         sucursal_origen = origen.get('sucursal_origen')
@@ -3221,7 +3223,6 @@ def registrar_envios_masivos():
             registros, cliente_data, tipo_comprobante,sucursal_origen
         )
 
-        # 2) Generar QR para cada paquete
         if num_serie:
             try:
                 generar_qr_paquetes(trackings)
@@ -3257,23 +3258,26 @@ def registrar_envios_masivos():
             #     mail.send(msg)
 
 
-        current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
+        session.pop('datos_pago', None)
+        session.pop('resumen_envios', None)
+        session.pop('remitente_data', None)
+
         return jsonify({
             'status': 'success',
-            'message': 'Transacción creada correctamente',
-            'comprobante_serie': num_serie
-        }), 201
-
-    except ValueError as ve:
-        current_app.logger.warning(f"Bad request: {ve}")
-        return jsonify({'status': 'error', 'message': str(ve)}), 400
+            'message': 'Envío procesado correctamente',
+            'num_serie': num_serie,
+            'trackings': trackings
+        }), 200
 
     except Exception as e:
+        current_app.logger.error(f"Error en insertar_envio: {str(e)}")
+        import traceback
         traceback.print_exc()
         return jsonify({
             'status': 'error',
             'message': 'Ocurrió un error al procesar el envío'
         }), 500
+        
 ##PARA PROBAR EL API E INSERTAR 
 # {
 #   "tipo_comprobante": 2,
