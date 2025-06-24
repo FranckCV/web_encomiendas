@@ -4972,10 +4972,7 @@ def sucursales_destino_api():
             'msg': f"Ocurrió un error al listar las distritos: {repr(e)}",
             'status':-1
         }
-<<<<<<< HEAD
 
-=======
->>>>>>> edaad2ca2c4a5c65179b4106de5d9fe44b544983
 
 @app.route("/buscar_paquete_devolucion", methods=["POST"])
 @validar_empleado()
