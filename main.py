@@ -3438,7 +3438,6 @@ def generar_comprobante(tracking):
     return send_file(ruta_pdf, as_attachment=False)
 
 
-<<<<<<< HEAD
 @app.route('/rotulo=<int:tracking>')
 def generar_rotulo(tracking):
     carpeta = os.path.join("static", "comprobantes", str(tracking))
@@ -3495,8 +3494,7 @@ def generar_rotulo(tracking):
     return send_file(ruta_pdf, as_attachment=False)
 
 
-=======
->>>>>>> 5a90ab91b9d8f64212a00fcc53783e37cbccab8e
+
 @app.route('/envio_masivo')
 def envio_masivo():
     nombre_doc = controlador_tipo_documento.get_options()
@@ -4957,7 +4955,6 @@ def salida_informacion():
                            agencias=agencias,
                            paquetes = paquetes)
 
-<<<<<<< HEAD
 @app.route('/sucursales_destino_api',  methods=["POST"])
 def sucursales_destino_api():
     try:
@@ -4975,9 +4972,7 @@ def sucursales_destino_api():
             'msg': f"Ocurrió un error al listar las distritos: {repr(e)}",
             'status':-1
         }
-=======
-################PROGRAMACION DEVOLUCIONES############################
->>>>>>> 5a90ab91b9d8f64212a00fcc53783e37cbccab8e
+
 
 @app.route("/buscar_paquete_devolucion", methods=["POST"])
 @validar_empleado()
