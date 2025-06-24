@@ -541,6 +541,7 @@ Información de la empresa
                 prevIframe.contentDocument.documentElement.style.setProperty('--color-base', colorPri.value);
                 prevIframe.contentDocument.documentElement.style.setProperty('--color-sec', colorSec.value);
                 prevIframe.contentDocument.documentElement.style.setProperty('--color-thr', colorTer.value);
+                // prevIframe.contentDocument.querySelector('.img_logo_empresa').src = '';
             });
         }
 
@@ -550,16 +551,40 @@ Información de la empresa
         colorTer.addEventListener('input', updateColorPreviews);
 
         // Preview del logo al seleccionar un archivo
+        // logoInput.addEventListener('change', function (e) {
+        //     if (e.target.files && e.target.files[0]) {
+        //         const reader = new FileReader();
+        //         reader.onload = function (event) {
+        //             logoPreview.src = event.target.result;
+        //             logoPreview.classList.add('clickable-image');
+        //         }
+        //         reader.readAsDataURL(e.target.files[0]);
+        //     }
+        // });
+
         logoInput.addEventListener('change', function (e) {
-            if (e.target.files && e.target.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function (event) {
-                    logoPreview.src = event.target.result;
-                    logoPreview.classList.add('clickable-image');
-                }
-                reader.readAsDataURL(e.target.files[0]);
-            }
-        });
+    if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            const imageUrl = event.target.result;
+
+            // Mostrar en vista previa principal
+            logoPreview.src = imageUrl;
+            logoPreview.classList.add('clickable-image');
+
+            // Mostrar en el iframe
+            const prevIframe = document.getElementById('preview_iframe');
+            const iframeDoc = prevIframe.contentDocument || prevIframe.contentWindow.document;
+
+            const logosEnIframe = iframeDoc.querySelectorAll('.img_logo_empresa');
+            logosEnIframe.forEach(img => {
+                img.src = imageUrl;
+            });
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    }
+});
+
 
         function cargarDatosEmpresa() {
             const empresa = {{ information  | tojson}} ;
