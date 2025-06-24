@@ -99,6 +99,7 @@
                 id="{{campo[0]}}" 
                 name="{{campo[0]}}"
                 data-select="{{campo[0]}}"
+                {% if campo[4] %}required{% endif %} 
                 {% if modo_modal != 'insert' and fila[campo[0]] is not none %} data-select-value="{{fila[campo[0]]}}" {% endif %}
                 {% if modo_modal == 'consult' or campo[5] == False %} disabled {% endif %}
                 >

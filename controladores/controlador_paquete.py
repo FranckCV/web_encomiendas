@@ -251,3 +251,72 @@ def get_table_pk_foreign(pk_foreign):
     filas = sql_select_fetchall(sql,(pk_foreign,))
 
     return columnas, filas
+
+def get_contenido(tracking):
+    sql = '''
+        SELECT 
+    tp.nombre,
+    CASE 
+        WHEN tp.nombre = 'Caja' THEN c.nombre
+        WHEN tp.nombre = 'Sobre' THEN p.cantidad_folios
+        ELSE NULL
+    END AS detalle_empaque
+FROM paquete p
+INNER JOIN tipo_empaque tp ON tp.id = p.tipo_empaqueid
+INNER JOIN contenido_paquete c ON c.id = p.contenido_paqueteid
+where p.tracking = %s
+    '''
+    fila = sql_select_fetchone(sql,(tracking,))
+    return fila
+
+
+def get_paquete_by_tracking(tracking):
+    sql = '''
+        SELECT 
+            p.clave,
+            p.tracking,
+            p.estado_pago,
+            -- Origen
+            so.direccion AS sucursal_origen,
+            uo.distrito AS distrito_origen,
+            uo.provincia AS provincia_origen,
+            uo.departamento AS departamento_origen,
+            -- Destino
+            sd.abreviatura,
+            sd.direccion AS sucursal_destino,
+            ud.distrito AS distrito_destino,
+            ud.provincia AS provincia_destino,
+            ud.departamento AS departamento_destino,
+            -- Empaque
+            te.nombre AS tipo_empaque,
+            cp.nombre AS contenido_paquete
+        FROM paquete p
+        inner join transaccion_encomienda tre on tre.num_serie = p.transaccion_encomienda_num_serie
+        INNER JOIN sucursal so ON so.id = tre.id_sucursal_origen
+        INNER JOIN ubigeo uo ON uo.codigo = so.ubigeocodigo
+        INNER JOIN sucursal sd ON sd.id = p.sucursal_destino_id
+        INNER JOIN ubigeo ud ON ud.codigo = sd.ubigeocodigo
+        LEFT JOIN tipo_empaque te ON te.id = p.tipo_empaqueid
+        LEFT JOIN contenido_paquete cp ON cp.id = p.contenido_paqueteid
+        WHERE p.tracking = %s
+    '''
+    return sql_select_fetchone(sql, (tracking,))
+
+
+def listar_paquetes_por_sucursal_escalas():
+    sql = '''
+        
+        SELECT 
+            p.tracking,                  
+            p.peso,                     
+            te.id_sucursal_origen,       
+            p.sucursal_destino_id         
+        FROM paquete p 
+        INNER JOIN transaccion_encomienda te 
+            ON te.num_serie = p.transaccion_encomienda_num_serie
+        WHERE p.salidaid is null   
+        ORDER BY p.tracking;
+
+    '''
+    filas = sql_select_fetchall(sql)
+    return filas
