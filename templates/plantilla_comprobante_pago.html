@@ -1,102 +1,322 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>{{ tipo_comprobante }} {{ comprobante_serie }}</title>
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      font-size: 11px;
-      width: 280px;
-      margin: 0 auto;
-      color: #000;
-    }
-    .center {
-      text-align: center;
-    }
-    .bold {
-      font-weight: bold;
-    }
-    .line {
-      border-top: 1px dashed #000;
-      margin: 6px 0;
-    }
-    .section {
-      margin-bottom: 10px;
-    }
-    .totales td {
-      padding: 2px 0;
-    }
-    .qr {
-      text-align: center;
-      margin-top: 10px;
-    }
-    .small {
-      font-size: 9px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boleta de Venta Electrónica</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            line-height: 1.2;
+            color: #000;
+            background: white;
+            width: 105mm;
+            margin: 0 auto;
+        }
+        
+        .boleta {
+            padding: 5mm;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #000;
+            padding-bottom: 5px;
+        }
+        
+        .empresa-nombre {
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+        
+        .empresa-info {
+            font-size: 9px;
+            margin-bottom: 1px;
+        }
+        
+        .titulo-documento {
+            font-weight: bold;
+            font-size: 11px;
+            margin: 5px 0;
+            border: 1px solid #000;
+            padding: 3px;
+        }
+        
+        .numero-documento {
+            font-weight: bold;
+            font-size: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .cliente-info {
+            margin-bottom: 8px;
+            font-size: 9px;
+        }
+        
+        .cliente-info div {
+            margin-bottom: 1px;
+        }
+        
+        .fecha-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 9px;
+        }
+        
+        .moneda-igv {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 9px;
+        }
+        
+        .tabla-items {
+            width: 100%;
+            margin-bottom: 8px;
+            border-collapse: collapse;
+        }
+        
+        .tabla-items th {
+            background: #f0f0f0;
+            padding: 2px;
+            border: 1px solid #000;
+            font-size: 8px;
+            text-align: center;
+        }
+        
+        .tabla-items td {
+            padding: 2px;
+            border: 1px solid #000;
+            font-size: 8px;
+            text-align: center;
+        }
+        
+        .item-descripcion {
+            text-align: left !important;
+            font-size: 7px;
+            line-height: 1.1;
+        }
+        
+        .resumen {
+            margin-bottom: 8px;
+            font-size: 9px;
+        }
+        
+        .resumen-linea {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1px;
+        }
+        
+        .total-linea {
+            font-weight: bold;
+            border-top: 1px solid #000;
+            padding-top: 2px;
+        }
+        
+        .importe-letras {
+            margin-bottom: 8px;
+            font-size: 8px;
+            font-weight: bold;
+        }
+        
+        .observaciones {
+            margin-bottom: 8px;
+            font-size: 7px;
+            text-align: justify;
+        }
+        
+        .forma-pago {
+            margin-bottom: 8px;
+            font-size: 9px;
+            font-weight: bold;
+        }
+        
+        .footer {
+            text-align: center;
+            font-size: 7px;
+            margin-bottom: 8px;
+        }
+        
+        .qr-section {
+            text-align: center;
+            margin-top: 8px;
+        }
+        
+        .qr-code {
+            width: 60px;
+            height: 60px;
+            border: 1px solid #000;
+        }
+        
+        .autorizacion {
+            font-size: 7px;
+            text-align: center;
+            margin-top: 3px;
+        }
+        
+        .emitido-desde {
+            font-size: 7px;
+            text-align: center;
+            margin-top: 3px;
+        }
+    </style>
 </head>
 <body>
+    <div class="boleta">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="empresa-nombre">{{ empresa.nombre or 'EMPRESA S.A.C.' }}</div>
+            <div class="empresa-info">{{ empresa.direccion or 'AV. PRINCIPAL NRO. 123' }}</div>
+            <div class="empresa-info">{{ empresa.distrito or 'DISTRITO' }} - {{ empresa.provincia or 'PROVINCIA' }} - {{ empresa.departamento or 'DEPARTAMENTO' }}</div>
+            <div class="empresa-info">RUC {{ empresa.ruc or '20123456789' }}</div>
+            <div class="empresa-info">CENTRAL TELEFÓNICA {{ empresa.nro_telefono or '01-1234567' }}</div>
+            {% if empresa.whatsapp %}
+            <div class="empresa-info">CENTRAL DE WHATSAPP {{ empresa.whatsapp }}</div>
+            {% endif %}
+            {% if empresa.website %}
+            <div class="empresa-info">{{ empresa.website }}</div>
+            {% endif %}
+        </div>
+        
+        <!-- TIPO DE DOCUMENTO -->
+        <div class="titulo-documento">
+            {% if tipo_comprobante == '2' %}
+                BOLETA DE VENTA ELECTRÓNICA
+            {% elif tipo_comprobante == '1' %}
+                FACTURA ELECTRÓNICA
+            {% else %}
+                COMPROBANTE DE PAGO ELECTRÓNICO
+            {% endif %}
+        </div>
+        
+        <!-- NUMERO DE DOCUMENTO -->
+        <div class="numero-documento">
+            {{ comprobante_serie }}
+        </div>
+        
+        <!-- INFORMACIÓN DEL CLIENTE -->
+        <div class="cliente-info">
+            <div><strong>ADQUIRIENTE</strong></div>
+            <div>{{ transaccion.tipo_documento or 'DNI' }}: {{ transaccion.numero_documento or '12345678' }}</div>
+            <div>{{ cliente.nombre_siglas }} {{ cliente.apellidos_razon }}</div>
+        </div>
+        
+        <!-- FECHAS -->
+        <div class="fecha-info">
+            <span>FECHA EMISIÓN: {{ transaccion.fecha.strftime('%d/%m/%Y') if transaccion.fecha else '01/01/2025' }}</span>
+        </div>
+        <div class="fecha-info">
+            <span>FECHA DE VENC: {{ transaccion.fecha.strftime('%d/%m/%Y') if transaccion.fecha else '01/01/2025' }}</span>
+        </div>
+        
+        <!-- MONEDA E IGV -->
+        <div class="moneda-igv">
+            <span>MONEDA: SOLES</span>
+        </div>
+        <div class="moneda-igv">
+            <span>IGV: {{ "%.2f"|format(empresa.igv) }}%</span>
+        </div>
+        
+        <!-- TABLA DE ITEMS -->
+        <table class="tabla-items">
+            <thead>
+                <tr>
+                    <th style="width: 12%;">CANT.</th>
+                    <th style="width: 60%;">DESCRIPCIÓN</th>
+                    <th style="width: 14%;">P/U</th>
+                    <th style="width: 14%;">TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>1</td>
+                    <td class="item-descripcion">
+                        Clave: {{ item.clave }}<br>
+                        Servicio de transporte<br>
+                        {% if masivo %}
+                        ENVÍO MASIVO<br>
+                        {% endif %}
+                        <strong>ORIGEN:</strong><br>
+                        {{ item.origen.sucursal }}<br>
+                        {{ item.origen.distrito }} - {{ item.origen.provincia }}<br>
+                        {{ item.origen.departamento }}<br>
+                        <strong>DESTINO:</strong><br>
+                        {{ item.destino.sucursal }}<br>
+                        {{ item.destino.distrito }} - {{ item.destino.provincia }}<br>
+                        {{ item.destino.departamento }}<br>
+                        <strong>Paga:</strong> {{ item.quien_paga }}
+                    </td>
+                    <td>{{ "%.3f"|format(item.tarifa) }}</td>
+                    <td>{{ "%.2f"|format(item.tarifa) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- RESUMEN -->
+        <div class="resumen">
+            <div class="resumen-linea">
+                <span>GRAVADA</span>
+                <span>S/ {{ "%.2f"|format(resumen.base_imponible) }}</span>
+            </div>
+            <div class="resumen-linea">
+                <span>IGV</span>
+                <span>S/ {{ "%.2f"|format(resumen.igv) }}</span>
+            </div>
+            <div class="resumen-linea total-linea">
+                <span>TOTAL</span>
+                <span>S/ {{ "%.2f"|format(resumen.total) }}</span>
+            </div>
+        </div>
+        
+        <!-- IMPORTE EN LETRAS -->
+        <div class="importe-letras">
+            IMPORTE EN LETRAS: {{ resumen.importe_letras or 'CERO CON 00/100 SOLES' }}
+        </div>
+        
+        <!-- OBSERVACIONES -->
+        <div class="observaciones">
+            <strong>OBSERVACIONES:</strong> {{ transaccion.observaciones or 'INCORPORADO AL RÉGIMEN DE AGENTES DE RETENCIÓN DEL IGV A PARTIR DEL 01/10/2023' }}
+        </div>
+        
+        <!-- FORMA DE PAGO -->
+        <div class="forma-pago">
+            FORMA DE PAGO: {{ transaccion.forma_pago or 'BILLETERA ELECTRÓNICA' }}
+        </div>
+        
+        <!-- FOOTER -->
 
-  <div class="center bold">
-    {{ empresa.nombre.upper() }}<br>
-    {{ empresa.direccion }}<br>
-    RUC {{ empresa.ruc }}<br>
-    CENTRAL: {{ empresa.nro_telefono }}<br>
-    {{ empresa.correo }}<br>
-    <div class="line"></div>
-    {{ tipo_comprobante }} ELECTRÓNICA<br>
-    {{ comprobante_serie }}
-  </div>
-
-  <div class="section">
-    <strong>ADQUIRIENTE</strong><br>
-    DNI: {{ cliente.num_documento }}<br>
-    {{ cliente.nombre_siglas }} {{ cliente.apellidos_razon }}<br>
-    <strong>FECHA EMISIÓN:</strong> {{ transaccion.fecha }}<br>
-    <strong>FECHA VENC.:</strong> {{ transaccion.fecha }}<br>
-    <strong>MONEDA:</strong> SOLES<br>
-    <strong>IGV:</strong> {{ empresa.igv }}%
-  </div>
-
-  {% if transaccion.masivo %}
-  <div class="section">
-    <strong>Tipo de Envío:</strong> Masivo<br>
-    <strong>Total Paquetes:</strong> {{ items | length }}
-  </div>
-  {% else %}
-  <div class="section">
-    <strong>Tipo de Envío:</strong> Individual
-  </div>
-  {% endif %}
-
-  <div class="line"></div>
-  <strong>[ CANT. ] DESCRIPCIÓN</strong><br>
-  {% for item in items %}
-    [1] Servicio de transporte<br>
-    Clave: {{ item.clave }}<br>
-    Origen: {{ item.origen.departamento }} - {{ item.origen.provincia }} - {{ item.origen.distrito }}<br>
-    Destino: {{ item.destino.departamento }} - {{ item.destino.provincia }} - {{ item.destino.distrito }}<br>
-    Tarifa: S/ {{ item.tarifa }}<br>
-    Pagado por: {{ item.quien_paga }}<br>
-    <br>
-  {% endfor %}
-  <div class="line"></div>
-
-  <table class="totales" width="100%">
-    <tr><td>GRAVADA</td><td style="text-align:right">S/ {{ resumen.base_imponible }}</td></tr>
-    <tr><td>IGV</td><td style="text-align:right">S/ {{ resumen.igv }}</td></tr>
-    <tr><td><strong>TOTAL</strong></td><td style="text-align:right"><strong>S/ {{ resumen.total }}</strong></td></tr>
-  </table>
-
-  <!-- <div class="section">
-    <strong>IMPORTE EN LETRAS:</strong><br>
-    {{ monto_en_letras }}
-  </div> -->
-
-  <div class="qr">
-    <img src="{{ qr_path }}" alt="QR" width="120">
-  </div>
-
+        
+        <!-- QR CODE -->
+        {% if qr_path %}
+        <div class="qr-section">
+            <img src="{{ qr_path }}" alt="Código QR" class="qr-code">
+        </div>
+        {% endif %}
+        
+        <!-- AUTORIZACIÓN -->
+        <div class="autorizacion">
+            Autorizado mediante Resolución de Intendencia<br>
+            No.{{ empresa.resolucion or '034-005-0005315' }}
+        </div>
+        
+        <!-- EMITIDO DESDE -->
+        <div class="emitido-desde">
+            Emitido desde {{ empresa.plataforma or 'www.losmalditosdeLucia' }}
+        </div>
+    </div>
 </body>
 </html>

@@ -120,3 +120,23 @@ def get_report_test():
     
     return columnas, filas
 
+def get_driver_employee():
+    sql = '''
+        SELECT 
+                e.id,
+                CONCAT(e.nombre, ' ', e.apellidos) AS nombre
+            FROM empleado e 
+            INNER JOIN rol r ON r.id = e.rolid
+            WHERE r.id = 3
+            AND e.id NOT IN (
+                SELECT es.empleadoid
+                FROM salida s 
+                inner join empleado_salida es on es.salidaid = s.id
+                WHERE 
+                    estado = 'T'
+                    OR (estado = 'P' AND fecha BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 2 DAY))
+            );
+
+    '''
+    fila = sql_select_fetchall(sql)
+    return fila
