@@ -25,7 +25,7 @@ def get_table():
                relacion, fecha_recojo, sucursal_id, descripcion, pedido,
                causa_reclamoid, tipo_indemnizacionid,
                paquetetracking, ubigeocodigo, tipo_documentoid
-        FROM {table_name}
+        FROM reclamo
     '''
     columnas = {
         'id': ['ID', 0.5],
