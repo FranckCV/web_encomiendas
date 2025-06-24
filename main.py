@@ -425,7 +425,7 @@ CONTROLADORES = {
     "id": "reclamo",
     "titulo": "Reclamos",
     "nombre_tabla": "reclamo",
-   "controlador": controlador_reclamo,
+    "controlador": controlador_reclamo,
     "icon_page": "fa-solid fa-file",
     "filters": [],
     "fields_form": [
@@ -435,14 +435,15 @@ CONTROLADORES = {
         ['correo', 'Correo', 'Correo', 'email', True, True, None],
         ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
         ['n_documento', 'N° Documento', '', 'text', True, True, None],
-        ['titulo_incidencia', 'Incidencia', '', 'text', True, True, None],
         ['bien_contratado', 'Bien Contratado', '', 'text', True, True, None],
         ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
         ['monto_indemnizado', 'Monto Indemnizado', '0.00', 'number', True, True, None],
         ['relacion', 'Relación con el bien', '', 'text', True, True, None],
-        ['fecha_recojo', 'Fecha de recojo', '', 'date', True, True, None],
+        ['fecha_recepcion', 'Fecha de recepción', '', 'date', True, True, None],
         ['descripcion', 'Descripción', '', 'textarea', True, True, None],
+        ['detalles', 'Detalles adicionales', '', 'textarea', True, True, None],
         ['pedido', 'Pedido', '', 'text', True, True, None],
+        ['foto', 'Foto del reclamo', '', 'img', False, True, None],
         ['sucursal_id', 'Sucursal', '', 'select', True, True, [lambda: controlador_sucursal.get_options(), 'direccion']],
         ['causa_reclamoid', 'Causa del Reclamo', '', 'select', True, True, [lambda: controlador_causa_reclamo.get_options(), 'nombre']],
         ['tipo_indemnizacionid', 'Tipo de Indemnización', '', 'select', True, True, [lambda: controlador_tipo_indemnizacion.get_options(), 'nombre']],
@@ -5376,7 +5377,7 @@ def api_estados_reclamo():
 if __name__ == "__main__":
     # app.run(host='192.168.48.178', port=8000, debug=True, use_reloader=True)
     # Thread(target=enviar_posiciones).start()
-    socketio.run(app, host='0.0.0.0', port=8001, debug=True)
+    socketio.run(app, host='0.0.0.0', port=8000, debug=True)
 
 
 
