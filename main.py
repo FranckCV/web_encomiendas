@@ -436,7 +436,7 @@ CONTROLADORES = {
         ['correo', 'Correo', 'Correo', 'email', True, True, None],
         ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
         ['n_documento', 'N° Documento', '', 'text', True, True, None],
-        ['bien_contratado', 'Bien Contratado', '', 'text', True, True, None],
+        ['bien_contratado', 'Bien Contratado', '', 'select', True, True, [lambda:controlador_reclamo.get_list_bien_contratado(), '']],
         ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
         ['monto_indemnizado', 'Monto Indemnizado', '0.00', 'number', True, True, None],
         ['relacion', 'Relación con el bien', '', 'text', True, True, None],
