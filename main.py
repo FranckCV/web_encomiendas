@@ -57,6 +57,7 @@ from controladores import reporte_listar_enco
 from controladores import reporte_reclamo_causa
 from controladores import reporte_UsoUnidades
 from controladores import reporte_Viajes_por_Unidad
+from controladores import reporte_encomiendas_rutas as reporte_encomiendas_rutas
 # import BytesIO
 from itsdangerous import URLSafeSerializer
 from controladores.bd import sql_execute
@@ -448,7 +449,7 @@ CONTROLADORES = {
         ['causa_reclamoid', 'Causa del Reclamo', '', 'select', True, True, [lambda: controlador_causa_reclamo.get_options(), 'nombre']],
         ['tipo_indemnizacionid', 'Tipo de Indemnización', '', 'select', True, True, [lambda: controlador_tipo_indemnizacion.get_options(), 'nombre']],
         ['paquetetracking', 'Tracking', '', 'text', True, True, None],
-        ['ubigeocodigo', 'Ubigeo', '', 'text', True, True, None],
+        ['ubigeocodigo', 'Ubigeo', '', 'select', True, True, [lambda: controlador_ubigeo.get_options(), 'codigo']],
         ['tipo_documentoid', 'Tipo Documento', '', 'select', True, True, [lambda: controlador_tipo_documento.get_options(), 'nombre']]
     ],
     "crud_forms": {
@@ -1433,8 +1434,8 @@ REPORTES = {
     "encomiendas_listar": {
         "active": True,
         "icon_page": "fa-solid fa-boxes-packing",
-        "titulo": "Listado de encomiendas por empaque ",
-        "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo,
+        "titulo": "Listado de encomiendas segun tipo de empaque ",
+        "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo(),
         "filters": []
     },
 
@@ -1443,6 +1444,13 @@ REPORTES = {
     "icon_page": "fa-solid fa-clipboard-list",
     "titulo": "Reporte de reclamos por tipo, causa y periodo",
     "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),  # ✅ con paréntesis
+    "filters": []
+},
+"encomiendas_rutas_estado": {
+    "active": True,
+    "icon_page": "fa-solid fa-route",
+    "titulo": "Listado de encomiendas asignadas a rutas específicas y su estado",
+    "table": reporte_encomiendas_rutas.get_reporte_encomiendas_rutas_estado(),  # 👈 con paréntesis
     "filters": []
 },
 }
