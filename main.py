@@ -813,6 +813,24 @@ CONTROLADORES = {
             "crud_unactive": False
         }
     },
+    "seguimiento_reclamos": {
+    "active": True,
+    "titulo": "gestión de reclamos",
+    "nombre_tabla": "reclamo",
+    "controlador": controlador_seguimiento_reclamos,
+    "icon_page": "fa-solid fa-headset",
+    "filters": [],
+    "fields_form": [],
+    "crud_forms": {
+        "crud_list": True,
+        "crud_search": True,
+        "crud_consult": True,
+        "crud_insert": False,
+        "crud_update": False,
+        "crud_delete": False,
+        "crud_unactive": False
+    }
+},
     "tipo_cliente": {
         "active" : True ,
         "titulo": "tipos de clientes",
@@ -1571,7 +1589,8 @@ TRANSACCIONES = {
         # hay_parametros  icon         color              enlace_function      parametros   clase_html   modo(insert ,update , consult)
             # [True, 'fa-solid fa-map-location-dot', "#9856EE", 'seguimiento_tracking', {"tracking": "tracking"} , '' , 'seguimiento'],
             [True, 'fa-solid fa-route', "#9856EE", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"} , '' , 'seguimiento' , False],
-            [True, 'fa-solid fa-qrcode', "#B8CBD7", 'ver_img_qr',  {"tracking": "tracking"} , '' , 'qr_code' , True],
+            [True, 'fa-solid fa-qrcode', "#2195DC", 'ver_img_qr',  {"tracking": "tracking"} , '' , 'qr_code' , True],
+            [True, 'fa-solid fa-dollar', "#6FDC21", 'pagar_paquete',  {"tracking": "tracking"} , '' , 'pago' , False],
         ],
         "options": [
         # mostrar_url       icon             color                  text                 enlace_function       parametros                    modo(insert ,update , consult)
@@ -1587,8 +1606,13 @@ TRANSACCIONES = {
         "filters": [], 
         "fields_form": [
         #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
+<<<<<<< HEAD
             ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_detalle() , 'nombre_det' ] ],
              ['tip_comp',  'Tipo de comprobante', 'Tipo de comprobante', 'select', True ,True, [lambda: controlador_tipo_comprobante.get_options() , 'tip_comp' ] ],
+=======
+            ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_options() , 'nombre_det' ] ],
+            ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_options() , 'nombre_det' ] ],
+>>>>>>> e04d37279d7410b8bba1e475f21d8fd7c58aa484
             
         ],
         "crud_forms": {
@@ -1602,7 +1626,12 @@ TRANSACCIONES = {
         },
         "buttons": [],
         "options": [
+<<<<<<< HEAD
             # [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Encomiendas', 'transaccion' , {"tabla": "::paquete" }],
+=======
+            # mostrar_url       icon             color                  text                 enlace_function       parametros                    modo(insert ,update , consult)
+            [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Paquetes', 'transaccion' , {"tabla": "::paquete" } , 'paquetes'],
+>>>>>>> e04d37279d7410b8bba1e475f21d8fd7c58aa484
         ],
     }
 }
@@ -1740,17 +1769,42 @@ def inject_cur_modulo_id():
         usuario = controlador_usuario.get_usuario_empleado_user_id(user_id)
         if  usuario :
             if usuario['correo'] == correo and usuario['tipo_usuario'] == 'E' :
-                path = request.path
-                parts = path.strip('/').split('=')
-                key = parts[-1] 
-                page = obtener_funcion_desde_url(app , path)
+                path = request.path.strip('/')
+                key = None
+                pk_foreign = None
+
+                if '=' in path:
+                    # Caso: /transaccion=seguimiento/161
+                    parts = path.split('=')
+                    if len(parts) > 1:
+                        ruta_final = parts[-1]  # seguimiento/161
+                        partes_ruta = ruta_final.split('/')
+                        key = partes_ruta[0]
+                        if len(partes_ruta) > 1:
+                            pk_foreign = partes_ruta[1]
+                else:
+                    # Caso: /pagar_paquete/161 o /crud_delete/usuario/123
+                    partes_ruta = path.split('/')
+                    if len(partes_ruta) >= 2:
+                        key = partes_ruta[0]     # pagar_paquete
+                        pk_foreign = partes_ruta[1]  # 161
+                    elif len(partes_ruta) == 1:
+                        key = partes_ruta[0]
+                page = obtener_funcion_desde_url(app, path)
+
                 if page == 'modulo':
                     dataPage = permiso.get_modulo_key(key)
                     if dataPage:
                         return dict(cur_modulo_id=dataPage['id'])
+                elif page in ['crud_generico' , 'transaccion' , 'reporte']:
+                    dataPage = permiso.get_pagina_key(key) if key is not None else permiso.get_pagina_key(page)
+                    if dataPage:                        
+                        return dict(
+                            cur_modulo_id = dataPage['moduloid'] ,
+                        )
                 else:
-                    dataPage = permiso.get_pagina_key(key)
-                    if dataPage:
+                    dataPage = permiso.get_pagina_key(page)
+                    if dataPage:                        
                         if dataPage['tipo_paginaid'] == 2:
                             page_titulo = dataPage['titulo']
                             page_icono  = dataPage['icono']
@@ -4284,13 +4338,10 @@ def procesar_cambio_contrasenia():
 
 ##################_ PAGINAS EMPLEADO _################## 
 
-
-PAGINAS_SIMPLES_ADMIN = [ 
-    # 'panel' , 
-    'programacion_devolucion',
-]
-
-registrar_paginas_con_decorador(app, PAGINAS_SIMPLES_ADMIN, validar_empleado)
+@app.route("/programacion_devolucion")
+@validar_empleado()
+def programacion_devolucion():
+    return render_template('programacion_devolucion.html')
 
 
 @app.route("/panel")
@@ -5280,20 +5331,19 @@ def obtener_paquetes_estado_17():
         }), 500
     
 ####################SEGUIMIENTO DE RECLAMOS############################3
+# ========== ENDPOINTS PARA SEGUIMIENTO PÚBLICO DE RECLAMOS ==========
 
-# Ruta principal de seguimiento de reclamos
 @app.route("/seguimiento_reclamo")
 def seguimiento_reclamo():
     """
-    Página principal de seguimiento de reclamos
+    Página principal de seguimiento de reclamos (pública)
     """
     return render_template('seguimiento_reclamo.html')
 
-# Ruta para buscar reclamo
 @app.route("/buscar_reclamo", methods=["POST"])
 def buscar_reclamo():
     """
-    Busca un reclamo por ID o documento
+    Busca un reclamo por ID o documento (público)
     """
     try:
         reclamo_id = request.form.get('reclamo_id', '').strip()
@@ -5338,11 +5388,10 @@ def buscar_reclamo():
         flash(f'Error al buscar reclamo: {str(e)}', 'error')
         return redirect(url_for('seguimiento_reclamo'))
 
-# Ruta directa con ID de reclamo
 @app.route("/seguimiento_reclamo/<int:reclamo_id>")
 def seguimiento_reclamo_directo(reclamo_id):
     """
-    Acceso directo al seguimiento con ID de reclamo
+    Acceso directo al seguimiento con ID de reclamo (público)
     """
     try:
         # Buscar el reclamo
@@ -5372,80 +5421,147 @@ def seguimiento_reclamo_directo(reclamo_id):
         flash(f'Error al consultar reclamo: {str(e)}', 'error')
         return redirect(url_for('seguimiento_reclamo'))
 
-# Endpoint para agregar seguimiento a reclamo (solo empleados)
-@app.route("/agregar_seguimiento_reclamo", methods=["POST"])
+# ========== ENDPOINTS PARA GESTIÓN ADMINISTRATIVA DE RECLAMOS ==========
+
+@app.route("/responder_reclamos", methods=["GET"])
 @validar_empleado()
-def agregar_seguimiento_reclamo():
+def vista_responder_reclamos():
     """
-    Agrega un nuevo seguimiento a un reclamo existente
+    Vista principal para que los administradores respondan reclamos
     """
     try:
-        data = request.get_json()
+        # Obtener parámetros de paginación y filtros
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 20, type=int)
+        offset = (page - 1) * per_page
         
-        reclamo_id = data.get('reclamo_id')
-        detalle_reclamo_id = data.get('detalle_reclamo_id')
+        texto_busqueda = request.args.get('search', '')
+        estado_filtro = request.args.get('estado', '')
         
-        if not reclamo_id or not detalle_reclamo_id:
-            return jsonify({
-                'success': False,
-                'message': 'Reclamo ID y Detalle Reclamo ID son requeridos'
-            }), 400
+        # Obtener reclamos
+        if texto_busqueda or estado_filtro:
+            reclamos = controlador_seguimiento_reclamos.buscar_reclamos_con_filtros(
+                texto_busqueda=texto_busqueda,
+                estado_filtro=estado_filtro,
+                limit=per_page,
+                offset=offset
+            )
+        else:
+            reclamos = controlador_seguimiento_reclamos.obtener_reclamos_admin(
+                limit=per_page,
+                offset=offset
+            )
         
-        resultado = controlador_seguimiento_reclamos.agregar_seguimiento_reclamo(reclamo_id, detalle_reclamo_id)
+        # Obtener datos adicionales para el formulario
+        estados_disponibles = controlador_seguimiento_reclamos.obtener_estados_reclamo()
+        detalles_reclamo = controlador_seguimiento_reclamos.obtener_detalles_reclamo()
         
-        return jsonify(resultado)
+        # Configuración de paginación
+        options_pagination_crud = [5, 10, 20, 50, 100]
+        selected_option_crud = per_page
+        
+        return render_template('responder_reclamo.html',
+                             titulo="Gestión de Reclamos",
+                             icon_page_crud="fa-solid fa-headset",
+                             reclamos=reclamos,
+                             estados_disponibles=estados_disponibles,
+                             detalles_reclamo=detalles_reclamo,
+                             options_pagination_crud=options_pagination_crud,
+                             selected_option_crud=selected_option_crud)
         
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error al agregar seguimiento: {str(e)}'
-        }), 500
+        flash(f'Error al cargar reclamos: {str(e)}', 'error')
+        return render_template('responder_reclamo.html',
+                             titulo="Gestión de Reclamos",
+                             icon_page_crud="fa-solid fa-headset",
+                             reclamos=[],
+                             estados_disponibles=[],
+                             detalles_reclamo=[],
+                             options_pagination_crud=[5, 10, 20, 50],
+                             selected_option_crud=20)
 
-# Endpoint para obtener reclamos por estado (solo empleados)
-@app.route("/reclamos_por_estado/<int:estado_id>", methods=["GET"])
+@app.route("/procesar_respuesta_reclamo", methods=["POST"])
 @validar_empleado()
-def reclamos_por_estado(estado_id):
+def procesar_respuesta_reclamo_admin():
     """
-    Obtiene reclamos filtrados por estado
+    Procesa la respuesta enviada por el administrador a un reclamo
     """
     try:
-        limit = request.args.get('limit', 50, type=int)
+        # Obtener datos del formulario
+        reclamo_id = request.form.get('reclamo_id')
+        detalle_reclamo_id = request.form.get('detalle_reclamo_id')
+        observaciones = request.form.get('observaciones', '').strip()
         
-        reclamos = controlador_seguimiento_reclamos.obtener_reclamos_por_estado_activo(estado_id, limit)
+        # Validaciones
+        if not reclamo_id:
+            flash('ID de reclamo no válido', 'error')
+            return redirect(url_for('vista_responder_reclamos'))
         
-        return jsonify({
-            'success': True,
-            'reclamos': reclamos
-        })
+        if not detalle_reclamo_id:
+            flash('Debe seleccionar un tipo de respuesta', 'error')
+            return redirect(url_for('vista_responder_reclamos'))
         
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error al obtener reclamos: {str(e)}'
-        }), 500
-
-# Endpoint para obtener detalles de reclamo por estado (solo empleados)
-@app.route("/detalles_reclamo_por_estado/<int:estado_id>", methods=["GET"])
-@validar_empleado()
-def detalles_reclamo_por_estado(estado_id):
-    """
-    Obtiene los detalles disponibles para un estado de reclamo
-    """
-    try:
-        detalles = controlador_seguimiento_reclamos.obtener_detalles_reclamo_por_estado(estado_id)
+        # Procesar la respuesta
+        resultado = controlador_seguimiento_reclamos.procesar_respuesta_reclamo(
+            reclamo_id=reclamo_id,
+            detalle_reclamo_id=detalle_reclamo_id,
+            observaciones=observaciones if observaciones else None
+        )
         
-        return jsonify({
-            'success': True,
-            'detalles': detalles
-        })
+        if resultado['success']:
+            flash(f'Respuesta enviada exitosamente al reclamo #{reclamo_id}', 'success')
+        else:
+            flash(f'Error: {resultado["message"]}', 'error')
+        
+        return redirect(url_for('vista_responder_reclamos'))
         
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error al obtener detalles: {str(e)}'
-        }), 500
+        flash(f'Error al procesar respuesta: {str(e)}', 'error')
+        return redirect(url_for('vista_responder_reclamos'))
 
-# Endpoint API para obtener información de reclamo (JSON)
+# ========== ENDPOINTS API PARA RECLAMOS ==========
+
+# Solución rápida: Reemplaza solo el endpoint problemático
+
+def procesar_para_json(item):
+    """
+    Procesa un item (dict o similar) para hacerlo compatible con JSON
+    """
+    if not item:
+        return None
+    
+    # Convertir a diccionario si es necesario
+    if hasattr(item, 'keys'):
+        item_dict = dict(item)
+    else:
+        item_dict = item
+    
+    # Procesar cada campo
+    for key, value in item_dict.items():
+        if value is None:
+            continue
+            
+        # Convertir timedelta a string
+        if hasattr(value, 'total_seconds'):  # Es un timedelta
+            total_seconds = int(value.total_seconds())
+            hours = total_seconds // 3600
+            minutes = (total_seconds % 3600) // 60
+            seconds = total_seconds % 60
+            item_dict[key] = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+        
+        # Limpiar fechas inválidas
+        elif key == 'fecha' and value in ['0000-00-00', '', '00-00-0000']:
+            item_dict[key] = None
+        
+        # Convertir datetime a string si es necesario
+        elif hasattr(value, 'strftime'):
+            if hasattr(value, 'hour'):  # Es datetime
+                item_dict[key] = value.strftime('%Y-%m-%d %H:%M:%S')
+            else:  # Es date
+                item_dict[key] = value.strftime('%Y-%m-%d')
+    
+    return item_dict
+
 @app.route("/api/reclamo/<int:reclamo_id>", methods=["GET"])
 def api_info_reclamo(reclamo_id):
     """
@@ -5463,11 +5579,20 @@ def api_info_reclamo(reclamo_id):
         ultimo_seguimiento = controlador_seguimiento_reclamos.obtener_ultimo_seguimiento_reclamo(reclamo['id'])
         seguimientos = controlador_seguimiento_reclamos.obtener_seguimientos_reclamo(reclamo['id'])
         
+        # Procesar todos los datos
+        reclamo_procesado = procesar_para_json(reclamo)
+        ultimo_seguimiento_procesado = procesar_para_json(ultimo_seguimiento)
+        
+        seguimientos_procesados = []
+        for seguimiento in seguimientos:
+            seguimiento_procesado = procesar_para_json(seguimiento)
+            seguimientos_procesados.append(seguimiento_procesado)
+        
         return jsonify({
             'success': True,
-            'reclamo': dict(reclamo),
-            'ultimo_seguimiento': dict(ultimo_seguimiento) if ultimo_seguimiento else None,
-            'seguimientos': [dict(s) for s in seguimientos]
+            'reclamo': reclamo_procesado,
+            'ultimo_seguimiento': ultimo_seguimiento_procesado,
+            'seguimientos': seguimientos_procesados
         })
         
     except Exception as e:
@@ -5475,9 +5600,206 @@ def api_info_reclamo(reclamo_id):
             'success': False,
             'message': f'Error al consultar reclamo: {str(e)}'
         }), 500
+    
+@app.route("/api/obtener_historial_reclamo/<int:reclamo_id>", methods=["GET"])
+@validar_empleado()
+def api_obtener_historial_reclamo(reclamo_id):
+    """
+    Obtiene el historial de seguimiento de un reclamo (para modal administrativo)
+    """
+    try:
+        historial = controlador_seguimiento_reclamos.obtener_historial_reclamo(reclamo_id)
+        
+        # Procesar cada item del historial
+        historial_procesado = []
+        for item in historial:
+            item_procesado = procesar_para_json(item)
+            historial_procesado.append(item_procesado)
+        
+        return jsonify({
+            'success': True,
+            'historial': historial_procesado
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
 
-# Endpoint para validar si existe un tracking para reclamo
-@app.route("/validar_tracking_reclamo/<int:tracking>", methods=["GET"])
+@app.route("/api/agregar_seguimiento_reclamo", methods=["POST"])
+@validar_empleado()
+def api_agregar_seguimiento_reclamo():
+    """
+    Agrega un nuevo seguimiento a un reclamo existente (empleados)
+    """
+    try:
+        data = request.get_json()
+        
+        reclamo_id = data.get('reclamo_id')
+        detalle_reclamo_id = data.get('detalle_reclamo_id')
+        comentario = data.get('comentario', '').strip()
+        
+        if not reclamo_id or not detalle_reclamo_id:
+            return jsonify({
+                'success': False,
+                'message': 'Reclamo ID y Detalle Reclamo ID son requeridos'
+            }), 400
+        
+        resultado = controlador_seguimiento_reclamos.agregar_seguimiento_reclamo(
+            reclamo_id=reclamo_id,
+            detalle_reclamo_id=detalle_reclamo_id,
+            comentario=comentario if comentario else None
+        )
+        
+        return jsonify(resultado)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al agregar seguimiento: {str(e)}'
+        }), 500
+
+@app.route("/api/buscar_reclamos_ajax", methods=["POST"])
+@validar_empleado()
+def api_buscar_reclamos_ajax():
+    """
+    Búsqueda de reclamos vía AJAX para filtrado dinámico (administrativo)
+    """
+    try:
+        data = request.get_json()
+        texto_busqueda = data.get('search', '')
+        estado_filtro = data.get('estado', '')
+        page = data.get('page', 1)
+        per_page = data.get('per_page', 20)
+        offset = (page - 1) * per_page
+        
+        # Buscar reclamos
+        reclamos = controlador_seguimiento_reclamos.buscar_reclamos_con_filtros(
+            texto_busqueda=texto_busqueda,
+            estado_filtro=estado_filtro,
+            limit=per_page,
+            offset=offset
+        )
+        
+        # Procesar cada reclamo
+        reclamos_procesados = []
+        for reclamo in reclamos:
+            reclamo_procesado = procesar_para_json(reclamo)
+            reclamos_procesados.append(reclamo_procesado)
+        
+        return jsonify({
+            'success': True,
+            'reclamos': reclamos_procesados,
+            'total': len(reclamos_procesados)
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+
+# ========== ENDPOINTS DE CONFIGURACIÓN Y UTILIDADES ==========
+
+# @app.route("/api/estados_reclamo", methods=["GET"])
+# def api_estados_reclamo():
+#     """
+#     API para obtener estados de reclamo disponibles
+#     """
+#     try:
+#         estados = controlador_seguimiento_reclamos.obtener_estados_reclamo()
+        
+#         return jsonify({
+#             'success': True,
+#             'estados': estados
+#         })
+        
+#     except Exception as e:
+#         return jsonify({
+#             'success': False,
+#             'message': f'Error al obtener estados: {str(e)}'
+#         }), 500
+
+@app.route("/api/detalles_reclamo_por_estado/<int:estado_id>", methods=["GET"])
+@validar_empleado()
+def api_obtener_detalles_por_estado(estado_id):
+    """
+    Obtiene los detalles de reclamo disponibles para un estado específico
+    """
+    try:
+        detalles = controlador_seguimiento_reclamos.obtener_detalles_reclamo_por_estado(estado_id)
+        
+        return jsonify({
+            'success': True,
+            'detalles': detalles
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+@app.route("/api/tipos_reclamo", methods=["GET"])
+def api_tipos_reclamo():
+    """
+    API para obtener tipos de reclamo disponibles
+    """
+    try:
+        tipos = controlador_seguimiento_reclamos.obtener_tipos_reclamo()
+        
+        return jsonify({
+            'success': True,
+            'tipos': tipos
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener tipos de reclamo: {str(e)}'
+        }), 500
+
+@app.route("/api/motivos_reclamo/<int:tipo_id>", methods=["GET"])
+def api_motivos_reclamo(tipo_id):
+    """
+    API para obtener motivos por tipo de reclamo
+    """
+    try:
+        motivos = controlador_seguimiento_reclamos.obtener_motivos_por_tipo_reclamo(tipo_id)
+        
+        return jsonify({
+            'success': True,
+            'motivos': motivos
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener motivos: {str(e)}'
+        }), 500
+
+@app.route("/api/causas_reclamo/<int:motivo_id>", methods=["GET"])
+def api_causas_reclamo(motivo_id):
+    """
+    API para obtener causas por motivo de reclamo
+    """
+    try:
+        causas = controlador_seguimiento_reclamos.obtener_causas_por_motivo_reclamo(motivo_id)
+        
+        return jsonify({
+            'success': True,
+            'causas': causas
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener causas: {str(e)}'
+        }), 500
+
+@app.route("/api/validar_tracking_reclamo/<int:tracking>", methods=["GET"])
 def validar_tracking_reclamo(tracking):
     """
     Valida si un tracking existe y puede ser asociado a un reclamo
@@ -5507,88 +5829,116 @@ def validar_tracking_reclamo(tracking):
             'message': f'Error al validar tracking: {str(e)}'
         }), 500
 
-# Endpoint para obtener todos los reclamos (vista administrativa)
+# ========== ENDPOINTS DE REPORTES Y ESTADÍSTICAS ==========
+
+@app.route("/api/reclamos_por_estado/<int:estado_id>", methods=["GET"])
+@validar_empleado()
+def api_reclamos_por_estado(estado_id):
+    """
+    Obtiene reclamos filtrados por estado
+    """
+    try:
+        limit = request.args.get('limit', 50, type=int)
+        
+        reclamos = controlador_seguimiento_reclamos.obtener_reclamos_por_estado_activo(estado_id, limit)
+        
+        return jsonify({
+            'success': True,
+            'reclamos': reclamos
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener reclamos: {str(e)}'
+        }), 500
+
+@app.route("/api/estadisticas_reclamos", methods=["GET"])
+@validar_empleado()
+def api_obtener_estadisticas_reclamos():
+    """
+    Obtiene estadísticas generales de los reclamos
+    """
+    try:
+        estadisticas = controlador_seguimiento_reclamos.obtener_estadisticas_reclamos()
+        
+        return jsonify({
+            'success': True,
+            'estadisticas': estadisticas
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+# ========== ENDPOINTS ADMINISTRATIVOS ADICIONALES ==========
+
 @app.route("/admin/reclamos", methods=["GET"])
 @validar_empleado()
 def admin_reclamos():
     """
-    Vista administrativa de todos los reclamos
+    Vista administrativa completa de todos los reclamos
     """
     try:
         limit = request.args.get('limit', 50, type=int)
-        reclamos = controlador_seguimiento_reclamos.obtener_todos_los_reclamos(limit)
+        reclamos = controlador_seguimiento_reclamos.obtener_reclamos_admin(limit=limit, offset=0)
         
         return render_template('admin_reclamos.html', reclamos=reclamos)
         
     except Exception as e:
         flash(f'Error al cargar reclamos: {str(e)}', 'error')
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('panel'))
 
-# Endpoint para obtener tipos de reclamo
-@app.route("/api/tipos_reclamo", methods=["GET"])
-def api_tipos_reclamo():
-    """
-    API para obtener tipos de reclamo disponibles
-    """
-    try:
-        tipos = controlador_seguimiento_reclamos.obtener_tipos_reclamo()
-        
-        return jsonify({
-            'success': True,
-            'tipos': tipos
-        })
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error al obtener tipos de reclamo: {str(e)}'
-        }), 500
+# ========== FUNCIONES DE UTILIDAD ==========
 
-# Endpoint para obtener motivos por tipo de reclamo
-@app.route("/api/motivos_reclamo/<int:tipo_id>", methods=["GET"])
-def api_motivos_reclamo(tipo_id):
+def formatear_fecha_reclamo(fecha):
     """
-    API para obtener motivos por tipo de reclamo
+    Formatea una fecha para mostrar en el sistema de reclamos
     """
-    try:
-        motivos = controlador_seguimiento_reclamos.obtener_motivos_por_tipo_reclamo(tipo_id)
-        
-        return jsonify({
-            'success': True,
-            'motivos': motivos
-        })
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error al obtener motivos: {str(e)}'
-        }), 500
+    if isinstance(fecha, str):
+        from datetime import datetime
+        try:
+            fecha_obj = datetime.strptime(fecha, '%Y-%m-%d')
+            return fecha_obj.strftime('%d/%m/%Y')
+        except:
+            return fecha
+    elif hasattr(fecha, 'strftime'):
+        return fecha.strftime('%d/%m/%Y')
+    else:
+        return str(fecha)
 
-# Endpoint para obtener causas por motivo de reclamo
-@app.route("/api/causas_reclamo/<int:motivo_id>", methods=["GET"])
-def api_causas_reclamo(motivo_id):
+def obtener_color_estado_reclamo(estado_nombre):
     """
-    API para obtener causas por motivo de reclamo
+    Devuelve una clase CSS según el estado del reclamo
     """
-    try:
-        causas = controlador_seguimiento_reclamos.obtener_causas_por_motivo_reclamo(motivo_id)
-        
-        return jsonify({
-            'success': True,
-            'causas': causas
-        })
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error al obtener causas: {str(e)}'
-        }), 500
+    estado_lower = estado_nombre.lower() if estado_nombre else ''
+    
+    if 'pendiente' in estado_lower or 'nuevo' in estado_lower:
+        return 'estado-pendiente'
+    elif 'proceso' in estado_lower or 'revisión' in estado_lower:
+        return 'estado-proceso'
+    elif 'resuelto' in estado_lower or 'finalizado' in estado_lower:
+        return 'estado-resuelto'
+    else:
+        return 'estado-pendiente'
+    
+from controladores import controlador_seguimiento_reclamos
 
-@app.route('/pagar_paquete')
-def pagar_paquete():
+@app.route('/api/eliminar_ultimo_seguimiento/<int:reclamoid>', methods=['DELETE'])
+def eliminar_ultimo_seguimiento(reclamoid):
+    return controlador_seguimiento_reclamos.eliminar_ultimo_seguimiento(reclamoid)
+
+
+
+@app.route("/pagar_paquete",defaults={'tracking': None})
+@app.route("/pagar_paquete/<tracking>")
+def pagar_paquete(tracking):
     tipo_comprobante = controlador_tipo_comprobante.get_tipo_comprobante_by_tipo()
     metodo_pago = controlador_metodo_pago.get_options()
-    return render_template('pagar_paquete.html',metodo_pago=metodo_pago,tipo_comprobante=tipo_comprobante)
+    return render_template('pagar_paquete.html',tracking = tracking ,metodo_pago=metodo_pago,tipo_comprobante=tipo_comprobante)
+
 
 @app.route('/insertar_pago_paquete', methods=['POST'])
 def insertar_pago_paquete():

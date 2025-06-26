@@ -1,240 +1,326 @@
 {% extends 'MAESTRA_GENERAL.html' %}
 
 {% block titulo %}
-  Seguimiento de Reclamo
+Seguimiento de Reclamo
 {% endblock %}
 
 {% block estilos %}
-  <link rel="stylesheet" href="/static/css/seguimiento.css" />
+<link rel="stylesheet" href="/static/css/seguimiento.css" />
 {% endblock %}
 
 {% block contenido %}
-  <div class="contenedor">
-    <div class="header">
-      <form class="order-search" action="{{ url_for('buscar_reclamo') }}" method="post">
-        <input type="text" placeholder="ID del Reclamo" class="order-input" name="reclamo_id" />
-        <input type="text" placeholder="Nº de Documento" class="order-input" name="documento" />
-        <button class="search-btn">Buscar <i class="ri-arrow-right-line"></i></button>
-      </form>
-    </div>
-
-    {% if reclamo %}
-    <div class="container_estado">
-      <div class="card status-card">
-        <div class="order-number">
-          <p class="number">RECLAMO ID: {{ reclamo.id }}</p>
-        </div>
-        <div class="status-detail">
-          <img class="img_estado" 
-               src="{{ url_for('static', filename='img/reclamo_en_proceso.png') }}" 
-               alt="Estado del reclamo" />
-
-          <div class="status-content">
-            <div class="status-header">
-              <div class="status-title">
-                <div class="documents">
-                  <h5 class="text-muted">Documentos disponibles próximamente.</h5>
-                </div>
-              </div>
-            </div>
-            <div class="ultimo_estado">
-              <h3 style="margin-bottom: 10px;">Último estado:</h3>
-
-              {% if ultimo_seguimiento %}
-                <p>{{ ultimo_seguimiento.detalle_nombre }}</p>
-                <p>el día {{ ultimo_seguimiento.fecha }}, a las {{ ultimo_seguimiento.hora }}</p>
-              {% else %}
-                <p>Reclamo registrado</p>
-                <p>el día {{ reclamo.fecha_recepcion }}</p>
-              {% endif %}
-
-              <div style="margin-top: 15px;">
-                <p><strong>Bien contratado:</strong> {{ 'Producto' if reclamo.bien_contratado == 'P' else 'Servicio' }}</p>
-                <p><strong>Monto reclamado:</strong> S/. {{ "%.2f"|format(reclamo.monto_reclamado) }}</p>
-                {% if reclamo.monto_indemnizado %}
-                  <p><strong>Monto indemnizado:</strong> S/. {{ "%.2f"|format(reclamo.monto_indemnizado) }}</p>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tracker de progreso -->
-        <div class="progress-tracker">
-          <div class="progress-line"></div>
-          <div class="progress-line-fill" style="width: 0%;"></div>
-          
-          {% for estado in estados_reclamo %}
-            <div class="progress-step {% if estado.id in estados_usados %}active{% endif %}">
-              <div class="step-icon {% if estado.id in estados_usados %}completed{% endif %}">
-                <span class="check-icon">✓</span>
-              </div>
-              <div class="step-label">{{ estado.nombre }}</div>
-
-              <div class="timeline">
-                {% if estado.id in seguimientos_por_estado %}
-                  {% for seg in seguimientos_por_estado[estado.id] %}
-                    <div class="timeline-item active">
-                      <div class="timeline-dot"></div>
-                      <div class="timeline-line"></div>
-                      <div class="timeline-content">
-                        <div class="timeline-title">{{ seg.detalle_nombre }}</div>
-                        <div class="timeline-date">{{ seg.fecha }} - {{ seg.hora }}</div>
-                      </div>
-                    </div>
-                  {% endfor %}
-                {% endif %}
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- Tarjeta de información del reclamo -->
-      <div class="card info-card">
-        <div class="info-section">
-          <h3>Fecha de recepción: <span style="font-weight: normal; color: #666;">{{ reclamo.fecha_recepcion }}</span></h3>
-        </div>
-        <div class="info-section">
-          <h3>Sucursal: <span style="font-weight: normal; color: #666;">{{ reclamo.sucursal_direccion }}</span></h3>
-        </div>
-        {% if reclamo.tracking_paquete %}
-          <div class="info-section">
-            <h3>Paquete relacionado: <span style="font-weight: normal; color: #666;">{{ reclamo.tracking_paquete }}</span></h3>
-          </div>
-        {% endif %}
-      </div>
-
-      <!-- Tarjeta de detalles del reclamo -->
-      <div class="card details-card">
-        <div class="detail-section">
-          <i class="fa-solid fa-user icono"></i>
-          <div class="detail-title">Reclamante</div>
-          <div class="detail-value">{{ reclamo.nombres_razon }}</div>
-          <div class="detail-value">{{ reclamo.tipo_documento_siglas }}: {{ reclamo.n_documento }}</div>
-        </div>
-
-        <div class="detail-section">
-          <i class="fa-solid fa-map-marker-alt icono"></i>
-          <div class="detail-title">Dirección</div>
-          <div class="detail-value">{{ reclamo.direccion }}</div>
-        </div>
-
-        <div class="detail-section">
-          <i class="fa-solid fa-phone icono"></i>
-          <div class="detail-title">Contacto</div>
-          <div class="detail-value">Teléfono: {{ reclamo.telefono }}</div>
-          <div class="detail-value">Email: {{ reclamo.correo }}</div>
-        </div>
-
-        <div class="detail-section">
-          <i class="fa-solid fa-exclamation-triangle icono"></i>
-          <div class="detail-title">Tipo de reclamo</div>
-          <div class="detail-value">{{ reclamo.tipo_reclamo_nombre }}</div>
-          <div class="detail-value">{{ reclamo.motivo_nombre }}</div>
-          <div class="detail-value">{{ reclamo.causa_nombre }}</div>
-        </div>
-
-        {% if reclamo.descripcion %}
-          <div class="detail-section">
-            <i class="fa-solid fa-file-text icono"></i>
-            <div class="detail-title">Descripción</div>
-            <div class="detail-value">{{ reclamo.descripcion }}</div>
-          </div>
-        {% endif %}
-
-        {% if reclamo.detalles %}
-          <div class="detail-section">
-            <i class="fa-solid fa-info-circle icono"></i>
-            <div class="detail-title">Detalles adicionales</div>
-            <div class="detail-value">{{ reclamo.detalles }}</div>
-          </div>
-        {% endif %}
-
-        {% if reclamo.pedido %}
-          <div class="detail-section">
-            <i class="fa-solid fa-clipboard-list icono"></i>
-            <div class="detail-title">Pedido del reclamante</div>
-            <div class="detail-value">{{ reclamo.pedido }}</div>
-          </div>
-        {% endif %}
-
-        <div class="detail-section">
-          <i class="fa-solid fa-money-bill icono"></i>
-          <div class="detail-title">Información económica</div>
-          <div class="detail-value">Monto reclamado: S/. {{ "%.2f"|format(reclamo.monto_reclamado) }}</div>
-          {% if reclamo.monto_indemnizado %}
-            <div class="detail-value">Monto indemnizado: S/. {{ "%.2f"|format(reclamo.monto_indemnizado) }}</div>
-          {% endif %}
-          {% if reclamo.tipo_indemnizacion_nombre %}
-            <div class="detail-value">Tipo de indemnización: {{ reclamo.tipo_indemnizacion_nombre }}</div>
-          {% endif %}
-        </div>
-      </div>
-
-      <!-- Tarjeta de contacto -->
-      <div class="card info-card">
-        <div class="info-section">
-          <h3>¿Necesita más información?</h3>
-          <p style="color: #666; margin-top: 5px;">
-            Puede contactarnos al teléfono <strong>(01) 123-4567</strong> o escribir a 
-            <strong>reclamos@empresa.com</strong> mencionando su ID de reclamo.
-          </p>
-        </div>
-      </div>
-    </div>
-    {% else %}
-      <!-- Mensaje cuando no hay reclamo encontrado -->
-      <div class="container_estado">
-        <div class="card info-card">
-          <div class="info-section">
-            <h3>Seguimiento de Reclamos</h3>
-            <p style="color: #666; margin-top: 5px;">
-              Ingrese el ID del reclamo y su número de documento para consultar el estado de su reclamo.
-            </p>
-          </div>
-        </div>
-      </div>
-    {% endif %}
+<div class="contenedor">
+  <div class="header">
+    <form class="order-search" action="{{ url_for('buscar_reclamo') }}" method="post">
+      <input type="text" placeholder="ID del Reclamo" class="order-input" name="reclamo_id" />
+      <input type="text" placeholder="Nº de Documento" class="order-input" name="documento" />
+      <button class="search-btn">Buscar <i class="ri-arrow-right-line"></i></button>
+    </form>
   </div>
+
+  {% if reclamo %}
+  <div class="container_estado">
+    <div class="card status-card">
+      <div class="order-number">
+        <p class="number">RECLAMO ID: {{ reclamo.id }}</p>
+      </div>
+      <div class="status-detail">
+        <img class="img_estado" src="{{ url_for('static', filename='img/reclamo_en_proceso.png') }}"
+          alt="Estado del reclamo" />
+
+        <div class="status-content">
+          <div class="status-header">
+            <div class="status-title">
+              <div class="documents">
+                {% if reclamo.foto %}
+                <h5>
+                  <i class="fa-solid fa-camera"></i>
+                  Foto asociada - 
+                  <a href="{{ url_for('static', filename='img/img_reclamo/' ~ reclamo.foto) }}" 
+                     download target="_blank" class="foto-link">
+                    Descargar
+                  </a>
+                </h5>
+                {% else %}
+                <h5 class="text-muted">
+                  <i class="fa-solid fa-image"></i>
+                  Sin foto asociada
+                </h5>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          
+          <div class="ultimo_estado">
+            <h3 style="margin-bottom: 10px;">Último estado:</h3>
+
+            {% if ultimo_seguimiento %}
+            <p>{{ ultimo_seguimiento.detalle_nombre }}</p>
+            <p>el día {{ ultimo_seguimiento.fecha }}, a las {{ ultimo_seguimiento.hora }}</p>
+            {% else %}
+            <p>Reclamo registrado</p>
+            <p>el día {{ reclamo.fecha_recepcion }}</p>
+            {% endif %}
+
+            <div style="margin-top: 15px;">
+              <p><strong>Bien contratado:</strong> {{ 'Producto' if reclamo.bien_contratado == 'P' else 'Servicio' }}
+              </p>
+              <p><strong>Monto reclamado:</strong> S/. {{ "%.2f"|format(reclamo.monto_reclamado) }}</p>
+              {% if reclamo.monto_indemnizado %}
+              <p><strong>Monto indemnizado:</strong> S/. {{ "%.2f"|format(reclamo.monto_indemnizado) }}</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tracker de progreso -->
+      <div class="progress-tracker">
+        <div class="progress-line"></div>
+        <div class="progress-line-fill" style="width: 0%;"></div>
+
+        {% for estado in estados_reclamo %}
+        <div class="progress-step {% if estado.id in estados_usados %}active{% endif %}" data-id="{{ estado.id }}">
+          <div class="step-icon {% if estado.id in estados_usados %}completed{% endif %}">
+            <span class="check-icon">✓</span>
+          </div>
+          <div class="step-label">{{ estado.nombre }}</div>
+
+          <div class="timeline">
+            {% if estado.id in seguimientos_por_estado %}
+            {% for seg in seguimientos_por_estado[estado.id] %}
+            <div class="timeline-item active">
+              <div class="timeline-dot"></div>
+              <div class="timeline-line"></div>
+              <div class="timeline-content">
+                <div class="timeline-title">{{ seg.detalle_nombre }}</div>
+                <div class="timeline-date">{{ seg.fecha }} - {{ seg.hora }}</div>
+                <div class="timeline-title">{{ seg.comentario | default('', true) }}</div>
+
+              </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Tarjeta de información del reclamo -->
+    <div class="card info-card">
+      <div class="info-section">
+        <h3>Fecha de recepción: <span style="font-weight: normal; color: #666;">{{ reclamo.fecha_recepcion }}</span>
+        </h3>
+      </div>
+      <div class="info-section">
+        <h3>Sucursal: <span style="font-weight: normal; color: #666;">{{ reclamo.sucursal_direccion }}</span></h3>
+      </div>
+      {% if reclamo.tracking_paquete %}
+      <div class="info-section">
+        <h3>Paquete relacionado: <span style="font-weight: normal; color: #666;">{{ reclamo.tracking_paquete }}</span>
+        </h3>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Tarjeta de detalles del reclamo -->
+    <div class="card details-card">
+      <div class="detail-section">
+        <i class="fa-solid fa-user icono"></i>
+        <div class="detail-title">Reclamante</div>
+        <div class="detail-value">{{ reclamo.nombres_razon }}</div>
+        <div class="detail-value">{{ reclamo.tipo_documento_siglas }}: {{ reclamo.n_documento }}</div>
+      </div>
+
+      <div class="detail-section">
+        <i class="fa-solid fa-map-marker-alt icono"></i>
+        <div class="detail-title">Dirección</div>
+        <div class="detail-value">{{ reclamo.direccion }}</div>
+      </div>
+
+      <div class="detail-section">
+        <i class="fa-solid fa-phone icono"></i>
+        <div class="detail-title">Contacto</div>
+        <div class="detail-value">Teléfono: {{ reclamo.telefono }}</div>
+        <div class="detail-value">Email: {{ reclamo.correo }}</div>
+      </div>
+
+      <div class="detail-section">
+        <i class="fa-solid fa-exclamation-triangle icono"></i>
+        <div class="detail-title">Tipo de reclamo</div>
+        <div class="detail-value">{{ reclamo.tipo_reclamo_nombre }}</div>
+        <div class="detail-value">{{ reclamo.motivo_nombre }}</div>
+        <div class="detail-value">{{ reclamo.causa_nombre }}</div>
+      </div>
+
+      {% if reclamo.descripcion %}
+      <div class="detail-section">
+        <i class="fa-solid fa-file-text icono"></i>
+        <div class="detail-title">Descripción</div>
+        <div class="detail-value">{{ reclamo.descripcion }}</div>
+      </div>
+      {% endif %}
+
+      {% if reclamo.detalles %}
+      <div class="detail-section">
+        <i class="fa-solid fa-info-circle icono"></i>
+        <div class="detail-title">Detalles adicionales</div>
+        <div class="detail-value">{{ reclamo.detalles }}</div>
+      </div>
+      {% endif %}
+
+      {% if reclamo.pedido %}
+      <div class="detail-section">
+        <i class="fa-solid fa-clipboard-list icono"></i>
+        <div class="detail-title">Pedido del reclamante</div>
+        <div class="detail-value">{{ reclamo.pedido }}</div>
+      </div>
+      {% endif %}
+
+      <div class="detail-section">
+        <i class="fa-solid fa-money-bill icono"></i>
+        <div class="detail-title">Información económica</div>
+        <div class="detail-value">Monto reclamado: S/. {{ "%.2f"|format(reclamo.monto_reclamado) }}</div>
+        {% if reclamo.monto_indemnizado %}
+        <div class="detail-value">Monto indemnizado: S/. {{ "%.2f"|format(reclamo.monto_indemnizado) }}</div>
+        {% endif %}
+        {% if reclamo.tipo_indemnizacion_nombre %}
+        <div class="detail-value">Tipo de indemnización: {{ reclamo.tipo_indemnizacion_nombre }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Tarjeta de contacto -->
+    <div class="card info-card">
+      <div class="info-section">
+        <h3>¿Necesita más información?</h3>
+        <p style="color: #666; margin-top: 5px;">
+          Puede contactarnos al teléfono <strong>(01) 123-4567</strong> o escribir a
+          <strong>reclamos@empresa.com</strong> mencionando su ID de reclamo.
+        </p>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <!-- Mensaje cuando no hay reclamo encontrado -->
+  <div class="container_estado">
+    <div class="card info-card">
+      <div class="info-section">
+        <h3>Seguimiento de Reclamos</h3>
+        <p style="color: #666; margin-top: 5px;">
+          Ingrese el ID del reclamo y su número de documento para consultar el estado de su reclamo.
+        </p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+
 {% endblock %}
 
 {% block scripts %}
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Calcular progreso
-      const totalSteps = document.querySelectorAll('.progress-step').length;
-      const completedSteps = document.querySelectorAll('.step-icon.completed').length;
-      
-      if (totalSteps > 0) {
-        const fillLine = document.querySelector('.progress-line-fill');
-        let porcentaje;
-        
-        if (completedSteps === 0) {
-          porcentaje = 22; // Progreso inicial
-        } else {
-          porcentaje = ((completedSteps - 1) / (totalSteps - 1)) * 100;
-          porcentaje = Math.max(porcentaje, 22); // Mínimo 22%
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Calcular progreso
+    const totalSteps = document.querySelectorAll('.progress-step').length;
+    const completedSteps = document.querySelectorAll('.step-icon.completed').length;
+
+    if (totalSteps > 0) {
+      const fillLine = document.querySelector('.progress-line-fill');
+      let porcentaje;
+
+      if (fillLine) {
+        let porcentaje = 0;
+        switch (completedSteps) {
+          case 0:
+            porcentaje = 0;
+            break;
+          case 1:
+            porcentaje = 5;
+            break;
+          case 2:
+            porcentaje = 40;
+            break;
+          case 3:
+            porcentaje = 70;
+            break;
+          case 4:
+            porcentaje = 100;
+            break;
+          case 5:
+            porcentaje = 100;
+            break;
+          default:
+            porcentaje = 5;
         }
-        
-        if (fillLine) {
-          fillLine.style.width = `${porcentaje}%`;
-        }
+
+        fillLine.style.width = `${porcentaje}%`;
       }
 
-      // Validación del formulario de búsqueda
-      const searchForm = document.querySelector('.order-search');
-      if (searchForm) {
-        searchForm.addEventListener('submit', function(e) {
-          const reclamoId = document.querySelector('input[name="reclamo_id"]').value.trim();
-          const documento = document.querySelector('input[name="documento"]').value.trim();
-          
-          if (!reclamoId && !documento) {
-            e.preventDefault();
-            alert('Por favor ingrese al menos un criterio de búsqueda');
+    }
+
+    // Validación del formulario de búsqueda
+    const searchForm = document.querySelector('.order-search');
+    if (searchForm) {
+      searchForm.addEventListener('submit', function (e) {
+        const reclamoId = document.querySelector('input[name="reclamo_id"]').value.trim();
+        const documento = document.querySelector('input[name="documento"]').value.trim();
+
+        if (!reclamoId && !documento) {
+          e.preventDefault();
+          alert('Por favor ingrese al menos un criterio de búsqueda');
+        }
+      });
+    }
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const pasos = document.querySelectorAll('.progress-step');
+
+    let estadoAprobado = null;
+    let estadoRechazado = null;
+    let haySeguimientoRechazado = false;
+
+    pasos.forEach(paso => {
+      const label = paso.querySelector('.step-label');
+      if (label) {
+        const texto = label.textContent.trim();
+        if (texto === 'Aprobado') {
+          estadoAprobado = paso;
+        } else if (texto === 'Rechazado') {
+          estadoRechazado = paso;
+          if (paso.querySelectorAll('.timeline-item').length > 0) {
+            haySeguimientoRechazado = true;
           }
-        });
+        }
       }
     });
-  </script>
+
+    if (estadoAprobado) {
+      estadoAprobado.style.display = haySeguimientoRechazado ? 'none' : 'block';
+    }
+
+    if (estadoRechazado) {
+      estadoRechazado.style.display = haySeguimientoRechazado ? 'block' : 'none';
+    }
+
+    pasos.forEach(paso => {
+      const label = paso.querySelector('.step-label');
+      const icono = paso.querySelector('.check-icon');
+      const timelineItems = paso.querySelectorAll('.timeline-item');
+
+      if (label && icono) {
+        const idPaso = parseInt(paso.dataset.id);
+
+        if ((idPaso === 4 || idPaso === 5) && haySeguimientoRechazado) {
+          icono.textContent = '✗';
+        }
+      }
+    });
+  });
+</script>
+
 {% endblock %}
