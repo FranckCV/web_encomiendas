@@ -3585,37 +3585,73 @@ def generar_comprobante(tracking):
         }), 500
 
 
-@app.route('/api/rotulo/<int:tracking>')
+@app.route('/rotulo=<tracking>', methods=['GET'])
 def generar_rotulo(tracking):
-    from controladores import reporte_rotulo  # Suponiendo que aquí está tu lógica de generación
+    from controladores import reporte_rotulo as reporte_rotulo
+    try:
+        transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
+        if not transaccion:
+            return jsonify({'success': False, 'message': 'Transacción no encontrada'}), 404
 
-    paquete = controlador_paquete.get_paquete_by_tracking(tracking)
-    if not paquete:
-        return jsonify({'success': False, 'message': 'Paquete no encontrado'}), 404
+        num_serie = transaccion.get('num_serie')
+        if not num_serie:
+            return jsonify({'success': False, 'message': 'Número de serie no disponible'}), 400
 
-    transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
-    if not transaccion:
-        return jsonify({'success': False, 'message': 'Transacción no encontrada'}), 404
+        items, masivo = controlador_encomienda.obtener_items_por_num_serie(num_serie)
+        if not items:
+            return jsonify({'success': False, 'message': 'No hay paquetes asociados'}), 404
 
-    empresa = controlador_empresa.getDataComprobante()
-    cliente = {
-        'nombre_siglas': transaccion['nombre_siglas'],
-        'apellidos_razon': transaccion['apellidos_razon']
-    }
-    contenido = controlador_paquete.get_contenido(tracking)
+        origen = items[0]['origen']
+        destino = items[0]['destino']
 
-    carpeta = os.path.join("static", "comprobantes", str(tracking))
-    os.makedirs(carpeta, exist_ok=True)
-    ruta_pdf = os.path.join(carpeta, "rotulo.pdf")
+        datos_rotulo = {
+            'tracking': tracking,
+            'sucursal_origen': f"{origen['sucursal']} - {origen['distrito']}, {origen['provincia']}, {origen['departamento']}",
+            'sucursal_destino': f"{destino['sucursal']} - {destino['distrito']}, {destino['provincia']}, {destino['departamento']}",
+            'remitente': f"{transaccion.get('nombre_remitente', '')}\nDNI: {transaccion.get('dni_remitente', '')}\nCel: {transaccion.get('cel_remitente', '')}",
+            'destinatario': f"{transaccion.get('nombre_destinatario', '')}\nDNI: {transaccion.get('dni_destinatario', '')}\nCel: {transaccion.get('cel_destinatario', '')}",
+            'contenido': transaccion.get('descripcion_contenido', '---'),
+            'pago': 'Pagado' if transaccion.get('estado_pago') == 'C' else 'Por cobrar'
+        }
 
-    if not os.path.exists(ruta_pdf):
-        try:
-            qr_path = url_for('static', filename=f"comprobantes/{tracking}/qr.png", _external=True)
-            reporte_rotulo.generar_rotulo_pdf(transaccion, cliente, empresa, paquete, contenido, qr_path, ruta_pdf)
-        except Exception as e:
-            return jsonify({'success': False, 'message': f'Error al generar PDF: {e}'}), 500
+        # Crear carpeta dentro de 'static/comprobantes/{tracking}/'
+        carpeta = os.path.join("static", "comprobantes", str(tracking))
+        os.makedirs(carpeta, exist_ok=True)
+        ruta_rotulo = os.path.join(carpeta, "rotulo.pdf")
 
-    return send_file(ruta_pdf, as_attachment=True)
+        # Generar PDF
+        reporte_rotulo.generar_rotulo_pdf(datos_rotulo, ruta_pdf=ruta_rotulo)
+
+        return send_file(ruta_rotulo, as_attachment=True, download_name=f"rotulo_{tracking}.pdf")
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error al generar rótulo: {str(e)}'}), 500
+
+
+
+@app.route('/descargar_comprobante/<tracking>', methods=['GET'])
+def descargar_comprobante(tracking):
+    try:
+        ruta_pdf = os.path.join("static", "comprobantes", str(tracking), "comprobante.pdf")
+
+        if not os.path.exists(ruta_pdf):
+            return jsonify({
+                'success': False,
+                'message': 'Comprobante no encontrado'
+            }), 404
+
+        return send_file(
+            ruta_pdf,
+            as_attachment=True,
+            download_name=f"comprobante_{tracking}.pdf"
+        )
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f"Error al descargar comprobante: {str(e)}"
+        }), 500
+
 
 
 @app.route('/envio_masivo')
