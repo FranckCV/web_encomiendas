@@ -1606,13 +1606,8 @@ TRANSACCIONES = {
         "filters": [], 
         "fields_form": [
         #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
-<<<<<<< HEAD
             ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_detalle() , 'nombre_det' ] ],
              ['tip_comp',  'Tipo de comprobante', 'Tipo de comprobante', 'select', True ,True, [lambda: controlador_tipo_comprobante.get_options() , 'tip_comp' ] ],
-=======
-            ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_options() , 'nombre_det' ] ],
-            ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_options() , 'nombre_det' ] ],
->>>>>>> e04d37279d7410b8bba1e475f21d8fd7c58aa484
             
         ],
         "crud_forms": {
@@ -1626,12 +1621,9 @@ TRANSACCIONES = {
         },
         "buttons": [],
         "options": [
-<<<<<<< HEAD
             # [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Encomiendas', 'transaccion' , {"tabla": "::paquete" }],
-=======
             # mostrar_url       icon             color                  text                 enlace_function       parametros                    modo(insert ,update , consult)
             [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Paquetes', 'transaccion' , {"tabla": "::paquete" } , 'paquetes'],
->>>>>>> e04d37279d7410b8bba1e475f21d8fd7c58aa484
         ],
     }
 }
