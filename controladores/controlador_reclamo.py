@@ -1,7 +1,62 @@
 from controladores.bd import (
-    sql_select_fetchall, sql_select_fetchone, sql_execute,
+    sql_select_fetchall, sql_select_fetchone, sql_execute, sql_execute_lastrowid,
     show_columns, show_primary_key, exists_column_Activo, unactive_row_table
 )
+
+from datetime import datetime
+def registrar_reclamo(
+    nombres_razon, 
+    direccion, 
+    correo, 
+    telefono, 
+    n_documento, 
+    bien_contratado, 
+    monto_reclamado, 
+    fecha_recepcion, 
+    sucursal_id, 
+    descripcion, 
+    detalles, 
+    pedido, 
+    foto, 
+    causa_reclamoid, 
+    tipo_documentoid, 
+    paquetetracking, 
+    tipo_indemnizacionid=None, 
+    relacion=None, 
+    monto_indemnizado=None, 
+    ubigeocodigo=None
+):
+    # Insertar reclamo
+    sql = '''
+        INSERT INTO reclamo (
+            nombres_razon, direccion, correo, telefono, n_documento,
+            monto_indemnizado, bien_contratado, monto_reclamado, relacion,
+            fecha_recepcion, sucursal_id, descripcion, detalles, pedido, foto,
+            causa_reclamoid, tipo_indemnizacionid, paquetetracking, ubigeocodigo,
+            tipo_documentoid
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    '''
+    args = (
+        nombres_razon, direccion, correo, telefono, n_documento,
+        monto_indemnizado, bien_contratado, monto_reclamado, relacion,
+        fecha_recepcion, sucursal_id, descripcion, detalles, pedido, foto,
+        causa_reclamoid, tipo_indemnizacionid, paquetetracking, ubigeocodigo,
+        tipo_documentoid
+    )
+
+    reclamoid = sql_execute_lastrowid(sql, args)
+
+    # Insertar seguimiento del reclamo con detalle_reclamoid = 1
+    now = datetime.now()
+    fecha = now.date()
+    hora = now.time()
+
+    sql_seguimiento = '''
+        INSERT INTO seguimiento_reclamo (
+            reclamoid, detalle_reclamoid, fecha, hora
+        ) VALUES (%s, %s, %s, %s)
+    '''
+    sql_execute(sql_seguimiento, (reclamoid, 1, fecha, hora))
 
 table_name = 'reclamo'
 
@@ -208,35 +263,58 @@ def get_dict_causa_reclamo():
 
 
 def registrar_reclamo(
-        nombres_razon, 
-        direccion, 
-        correo, telefono, 
-        n_documento, 
-        bien_contratado, 
-        monto_reclamado, 
-        fecha_recepcion, 
-        sucursal_id, 
-        descripcion, detalles, 
-        pedido, 
-        foto, 
-        causa_reclamoid, 
-        tipo_documentoid, 
-        paquetetracking, 
-
-        tipo_indemnizacionid = None, 
-        relacion = None, 
-        monto_indemnizado = None, 
-        ubigeocodigo = None
-    ):
-    sql = f'''
+    nombres_razon, 
+    direccion, 
+    correo, 
+    telefono, 
+    n_documento, 
+    bien_contratado, 
+    monto_reclamado, 
+    fecha_recepcion, 
+    sucursal_id, 
+    descripcion, 
+    detalles, 
+    pedido, 
+    foto, 
+    causa_reclamoid, 
+    tipo_documentoid, 
+    paquetetracking, 
+    tipo_indemnizacionid=None, 
+    relacion=None, 
+    monto_indemnizado=None, 
+    ubigeocodigo=None
+):
+    # Insertar reclamo
+    sql = '''
         INSERT INTO reclamo (
-            nombres_razon, direccion, correo, telefono, n_documento, monto_indemnizado, bien_contratado, monto_reclamado, relacion, fecha_recepcion, sucursal_id, descripcion, detalles, pedido, foto, causa_reclamoid, tipo_indemnizacionid, paquetetracking, ubigeocodigo, tipo_documentoid
+            nombres_razon, direccion, correo, telefono, n_documento,
+            monto_indemnizado, bien_contratado, monto_reclamado, relacion,
+            fecha_recepcion, sucursal_id, descripcion, detalles, pedido, foto,
+            causa_reclamoid, tipo_indemnizacionid, paquetetracking, ubigeocodigo,
+            tipo_documentoid
         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     '''
-    sql_execute(sql, (
-        nombres_razon, direccion, correo, telefono, n_documento, monto_indemnizado, bien_contratado, monto_reclamado, relacion, fecha_recepcion, sucursal_id, descripcion, detalles, pedido, foto, causa_reclamoid, tipo_indemnizacionid, paquetetracking, ubigeocodigo, tipo_documentoid
-    ))
+    args = (
+        nombres_razon, direccion, correo, telefono, n_documento,
+        monto_indemnizado, bien_contratado, monto_reclamado, relacion,
+        fecha_recepcion, sucursal_id, descripcion, detalles, pedido, foto,
+        causa_reclamoid, tipo_indemnizacionid, paquetetracking, ubigeocodigo,
+        tipo_documentoid
+    )
 
+    reclamoid = sql_execute_lastrowid(sql, args)
+
+    # Insertar seguimiento del reclamo con detalle_reclamoid = 1
+    now = datetime.now()
+    fecha = now.date()
+    hora = now.time()
+
+    sql_seguimiento = '''
+        INSERT INTO seguimiento_reclamo (
+            reclamoid, detalle_reclamoid, fecha, hora
+        ) VALUES (%s, %s, %s, %s)
+    '''
+    sql_execute(sql_seguimiento, (reclamoid, 1, fecha, hora))
     
 
 def get_reporte_listado_reclamos():

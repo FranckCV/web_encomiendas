@@ -20,17 +20,18 @@ Mi perfil
                 <div class="shape"></div>
             </div>
             <div class="profile-info">
-                <div class="profile-avatar">FP</div>
+                <div class="profile-avatar">
+                    {{ datosUsuario.nombre_siglas[:1] }}{{ datosUsuario.apellidos_razon[:1] if datosUsuario.apellidos_razon else '' }}
+                </div>
                 <div class="profile-details">
-                    <h1> {{ datosUsuario.nombre_siglas }} {{ datosUsuario.apellidos_razon }} </h1>
+                    <h1>{{ datosUsuario.nombre_siglas }} {{ datosUsuario.apellidos_razon }}</h1>
                     <div class="profile-meta">
-                        {{datosUsuario.correo}} <br />
-                        <!-- Cliente desde: Enero 2023 -->
+                        {{ datosUsuario.correo }}<br />
                     </div>
                     <div class="action-buttons">
                         <button class="btn btn-primary" onclick="toggleEditMode()">✏️ Editar datos</button>
                         <a href="{{url_for('cambiar_contrasenia')}}" class="btn btn-primary">🔒 Cambiar contraseña</a>
-                        <a href="#" class="btn btn-primary">🏠 Registrar recojo en casa</a>
+                        <a href="{{url_for('envio_masivo')}}" class="btn btn-primary">📦 Nuevo envío</a>
                     </div>
                 </div>
             </div>
@@ -39,23 +40,23 @@ Mi perfil
         <!-- Estadísticas -->
         <div class="stats-container">
             <div class="stat-card">
-                <div class="stat-number">24</div>
+                <div class="stat-number">{{ estadisticas.total_envios }}</div>
                 <div class="stat-label">Envíos Totales</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">21</div>
+                <div class="stat-number">{{ estadisticas.entregados }}</div>
                 <div class="stat-label">Entregados</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">2</div>
+                <div class="stat-number">{{ estadisticas.en_transito }}</div>
                 <div class="stat-label">En Tránsito</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">1</div>
+                <div class="stat-number">{{ estadisticas.pendientes }}</div>
                 <div class="stat-label">Pendientes</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">3</div>
+                <div class="stat-number">{{ estadisticas.reclamos }}</div>
                 <div class="stat-label">Reclamos</div>
             </div>
         </div>
@@ -67,42 +68,43 @@ Mi perfil
                 <div id="user-info-display">
                     <div class="info-item">
                         <span class="info-label">Nombre:</span>
-                        <span class="info-value" id="display-nombre">{{datosUsuario.nombre_siglas}}</span>
+                        <span class="info-value" id="display-nombre">{{ datosUsuario.nombre_siglas }}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Apellidos:</span>
-                        <span class="info-value" id="display-apellidos">{{datosUsuario.apellidos_razon}}</span>
+                        <span class="info-value" id="display-apellidos">{{ datosUsuario.apellidos_razon }}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Tipo Documento:</span>
-                        <span class="info-value" id="display-tipo-doc"> {{datosUsuario.tdc_nombre}} ({{datosUsuario.tdc_siglas}})</span>
+                        <span class="info-value" id="display-tipo-doc">{{ datosUsuario.tdc_nombre }} ({{ datosUsuario.tdc_siglas }})</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">N° Documento:</span>
-                        <span class="info-value" id="display-num-doc">{{datosUsuario.num_documento}}</span>
+                        <span class="info-value" id="display-num-doc">{{ datosUsuario.num_documento }}</span>
                     </div>
                 </div>
                 <div class="edit-form" id="personal-edit-form">
                     <div class="form-group">
                         <label>Nombre / Siglas:</label>
-                        <input type="text" id="edit-nombre" value="{{datosUsuario.nombre_siglas}}" />
+                        <input type="text" id="edit-nombre" value="{{ datosUsuario.nombre_siglas }}" />
                     </div>
                     <div class="form-group">
                         <label>Apellidos / Razón Social:</label>
-                        <input type="text" id="edit-apellidos" value="{{datosUsuario.apellidos_razon}}" />
+                        <input type="text" id="edit-apellidos" value="{{ datosUsuario.apellidos_razon }}" />
                     </div>
                     <div class="form-group">
                         <label>Tipo de Documento:</label>
                         <select id="edit-tipo-doc">
-                            <option value="1">DNI</option>
-                            <option value="2">RUC</option>
-                            <option value="3">Pasaporte</option>
-                            <option value="4">Carnet de Extranjería</option>
+                            {% for tipo in tipos_documento %}
+                            <option value="{{ tipo.id }}" {% if tipo.id == datosUsuario.tipo_documentoid %}selected{% endif %}>
+                                {{ tipo.nombre }}
+                            </option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="form-group">
                         <label>N° Documento:</label>
-                        <input type="text" id="edit-num-doc" value="{{datosUsuario.num_documento}}" />
+                        <input type="text" id="edit-num-doc" value="{{ datosUsuario.num_documento }}" />
                     </div>
                 </div>
             </div>
@@ -112,31 +114,34 @@ Mi perfil
                 <div id="contact-info-display">
                     <div class="info-item">
                         <span class="info-label">Correo:</span>
-                        <span class="info-value" id="display-correo">{{datosUsuario.correo}}</span>
+                        <span class="info-value" id="display-correo">{{ datosUsuario.correo }}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Teléfono:</span>
-                        <span class="info-value" id="display-telefono">{{datosUsuario.telefono}}</span>
+                        <span class="info-value" id="display-telefono">{{ datosUsuario.telefono or 'No registrado' }}</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Tipo Cliente:</span>
-                        <span class="info-value" id="display-tipo-cliente">{{datosUsuario.tcl_nombre}}</span>
+                        <span class="info-value" id="display-tipo-cliente">{{ datosUsuario.tcl_nombre }}</span>
                     </div>
                 </div>
                 <div class="edit-form" id="contact-edit-form">
                     <div class="form-group">
                         <label>Correo Electrónico:</label>
-                        <input type="email" id="edit-correo" value="{{datosUsuario.correo}}" />
+                        <input type="email" id="edit-correo" value="{{ datosUsuario.correo }}" />
                     </div>
                     <div class="form-group">
                         <label>Teléfono:</label>
-                        <input type="tel" id="edit-telefono" value="{{datosUsuario.telefono}}" />
+                        <input type="tel" id="edit-telefono" value="{{ datosUsuario.telefono or '' }}" />
                     </div>
                     <div class="form-group">
                         <label>Tipo de Cliente:</label>
                         <select id="edit-tipo-cliente">
-                            <option value="1">Persona Natural</option>
-                            <option value="2">Persona Juridica</option>
+                            {% for tipo in tipos_cliente %}
+                            <option value="{{ tipo.id }}" {% if tipo.id == datosUsuario.tipo_clienteid %}selected{% endif %}>
+                                {{ tipo.nombre }}
+                            </option>
+                            {% endfor %}
                         </select>
                     </div>
                 </div>
@@ -159,6 +164,7 @@ Mi perfil
 
             <!-- Tab: Mis Envíos -->
             <div id="envios-tab" class="tab-content active">
+                {% if paquetes %}
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -172,72 +178,30 @@ Mi perfil
                         </tr>
                     </thead>
                     <tbody>
+                        {% for paquete in paquetes %}
                         <tr>
-                            <td rowspan="2"><strong>COM-20250501</strong></td>
-                            <td><strong>ENV-20250501-3782</strong></td>
-                            <td>Santiago</td>
-                            <td>Valparaíso</td>
-                            <td>01/05/2025</td>
-                            <td><span class="status-badge status-transit">En tránsito</span></td>
-                            <td><a href="{{url_for('seguimiento')}}" class="btn-action">Ver detalles</a></td>
+                            <td><strong>{{ paquete.num_comprobante }}</strong></td>
+                            <td><strong>{{ paquete.num_seguimiento }}</strong></td>
+                            <td>{{ paquete.origen or 'No especificado' }}</td>
+                            <td>{{ paquete.destino or 'No especificado' }}</td>
+                            <td>{{ paquete.fecha_envio.strftime('%d/%m/%Y') if paquete.fecha_envio else 'No registrada' }}</td>
+                            <td><span class="status-badge status-{{ paquete.estado_clase }}">{{ paquete.estado_nombre }}</span></td>
+                            <td><a href="{{ url_for('seguimiento_tracking', tracking=paquete.num_seguimiento) }}" class="btn-action">Ver detalles</a></td>
                         </tr>
-                        <tr>
-                            <td><strong>ENV-20250501-4890</strong></td>
-                            <td>Valparaíso</td>
-                            <td>La Serena</td>
-                            <td>01/05/2025</td>
-                            <td><span class="status-badge status-transit">En tránsito</span></td>
-                            <td><a href="{{url_for('seguimiento')}}"  class="btn-action">Ver detalles</a></td>
-                        </tr>
-                        <tr>
-                            <td rowspan="3"><strong>COM-20250418</strong></td>
-                            <td><strong>ENV-20250418-2945</strong></td>
-                            <td>Santiago</td>
-                            <td>Concepción</td>
-                            <td>18/04/2025</td>
-                            <td><span class="status-badge status-delivered">Entregado</span></td>
-                            <td><a href="{{url_for('seguimiento')}}"  class="btn-action">Ver detalles</a></td>
-                        </tr>
-                        <tr>
-                            <td><strong>ENV-20250418-3067</strong></td>
-                            <td>Concepción</td>
-                            <td>Temuco</td>
-                            <td>18/04/2025</td>
-                            <td><span class="status-badge status-delivered">Entregado</span></td>
-                            <td><a href="{{url_for('seguimiento')}}"  class="btn-action">Ver detalles</a></td>
-                        </tr>
-                        <tr>
-                            <td><strong>ENV-20250418-3189</strong></td>
-                            <td>Temuco</td>
-                            <td>Santiago</td>
-                            <td>18/04/2025</td>
-                            <td><span class="status-badge status-delivered">Entregado</span></td>
-                            <td><a href="{{url_for('seguimiento')}}"  class="btn-action">Ver detalles</a></td>
-                        </tr>
-                        <tr>
-                            <td><strong>COM-20250410</strong></td>
-                            <td><strong>ENV-20250410-1876</strong></td>
-                            <td>Valparaíso</td>
-                            <td>Santiago</td>
-                            <td>10/04/2025</td>
-                            <td><span class="status-badge status-delivered">Entregado</span></td>
-                            <td><a href="{{url_for('seguimiento')}}"  class="btn-action">Ver detalles</a></td>
-                        </tr>
-                        <tr>
-                            <td><strong>COM-20250405</strong></td>
-                            <td><strong>ENV-20250405-5621</strong></td>
-                            <td>Santiago</td>
-                            <td>La Serena</td>
-                            <td>05/04/2025</td>
-                            <td><span class="status-badge status-pending">Pendiente</span></td>
-                            <td><a href="{{url_for('seguimiento')}}"  class="btn-action">Ver detalles</a></td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
+                {% else %}
+                <div class="no-data">
+                    <p>No tienes paquetes registrados aún.</p>
+                    <a href="{{ url_for('envio_masivo') }}" class="btn btn-primary">Enviar tu primer paquete</a>
+                </div>
+                {% endif %}
             </div>
 
             <!-- Tab: Mis Compras -->
             <div id="compras-tab" class="tab-content">
+                {% if compras %}
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -246,66 +210,35 @@ Mi perfil
                             <th>Monto Total</th>
                             <th>Método de Pago</th>
                             <th>Estado Pago</th>
-                            <th>Acciones</th>
+                            <!-- <th>Acciones</th> -->
                         </tr>
                     </thead>
                     <tbody>
+                        {% for compra in compras %}
                         <tr>
-                            <td><strong>COM-20250501</strong></td>
-                            <td>01/05/2025</td>
-                            <td>S/ 125.50</td>
-                            <td>Tarjeta de Crédito</td>
-                            <td><span class="status-badge status-delivered">Pagado</span></td>
-                            <td>
-                                <a href="#" class="btn-action btn-download" onclick="downloadReceipt('COM-20250501')">📄 Descargar</a>
-                            </td>
+                            <td><strong>{{ compra.num_comprobante }}</strong></td>
+                            <td>{{ compra.fecha_compra.strftime('%d/%m/%Y') if compra.fecha_compra else 'No registrada' }}</td>
+                            <td>S/ {{ "%.2f"|format(compra.monto_total) if compra.monto_total else '0.00' }}</td>
+                            <td>{{ compra.metodo_pago or 'No especificado' }}</td>
+                            <td><span class="status-badge status-{{ compra.estado_clase }}">{{ compra.estado_pago }}</span></td>
+                            <!-- <td>
+                                <a href="{{ url_for('descargar_comprobante_venta', num_serie=compra.num_comprobante) }}" class="btn-action btn-download">📄 Descargar</a>
+                            </td> -->
                         </tr>
-                        <tr>
-                            <td><strong>COM-20250418</strong></td>
-                            <td>18/04/2025</td>
-                            <td>S/ 89.75</td>
-                            <td>Transferencia Bancaria</td>
-                            <td><span class="status-badge status-delivered">Pagado</span></td>
-                            <td>
-                                <a href="#" class="btn-action btn-download" onclick="downloadReceipt('COM-20250418')">📄 Descargar</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>COM-20250410</strong></td>
-                            <td>10/04/2025</td>
-                            <td>S/ 45.20</td>
-                            <td>PayPal</td>
-                            <td><span class="status-badge status-delivered">Pagado</span></td>
-                            <td>
-                                <a href="#" class="btn-action btn-download" onclick="downloadReceipt('COM-20250410')">📄 Descargar</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>COM-20250405</strong></td>
-                            <td>05/04/2025</td>
-                            <td>S/ 67.30</td>
-                            <td>Tarjeta de Débito</td>
-                            <td><span class="status-badge status-pending">Pendiente</span></td>
-                            <td>
-                                <a href="#" class="btn-action btn-download" onclick="downloadReceipt('COM-20250405')">📄 Descargar</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>COM-20250325</strong></td>
-                            <td>25/03/2025</td>
-                            <td>S/ 156.80</td>
-                            <td>Tarjeta de Crédito</td>
-                            <td><span class="status-badge status-delivered">Pagado</span></td>
-                            <td>
-                                <a href="#" class="btn-action btn-download" onclick="downloadReceipt('COM-20250325')">📄 Descargar</a>
-                            </td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
+                {% else %}
+                <div class="no-data">
+                    <p>No tienes compras registradas aún.</p>
+                    <a href="{{ url_for('articulos') }}" class="btn btn-primary">Ver productos disponibles</a>
+                </div>
+                {% endif %}
             </div>
 
             <!-- Tab: Mis Órdenes -->
             <div id="ordenes-tab" class="tab-content">
+                {% if ordenes %}
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -314,94 +247,43 @@ Mi perfil
                             <th>Paquetes Registrados</th>
                             <th>Estado General</th>
                             <th>Total Paquetes</th>
-                            <th>Acciones</th>
+                            <th>Monto Total</th>
+                            <!-- <th>Acciones</th> -->
                         </tr>
                     </thead>
                     <tbody>
+                        {% for orden in ordenes %}
                         <tr>
-                            <td><strong>COM-20250501</strong></td>
-                            <td>01/05/2025</td>
+                            <td><strong>{{ orden.num_comprobante }}</strong></td>
+                            <td>{{ orden.fecha_orden.strftime('%d/%m/%Y') if orden.fecha_orden else 'No registrada' }}</td>
                             <td>
                                 <div class="package-list">
-                                    <span class="package-item">ENV-20250501-3782: Documentos</span>
-                                    <span class="package-item">ENV-20250501-4890: Electrónicos</span>
+                                    {% for paquete in orden.paquetes_lista %}
+                                    <span class="package-item">{{ paquete.tracking }}: {{ paquete.contenido }}</span>
+                                    {% endfor %}
                                 </div>
                             </td>
-                            <td><span class="status-badge status-transit">En Proceso</span></td>
-                            <td>2</td>
-                            <td>
-                                <a href="#" class="btn-action btn-edit" onclick="editOrder('COM-20250501')">✏️ Editar</a>
-                                <a href="#" class="btn-action btn-cancel" onclick="cancelOrder('COM-20250501')">❌ Cancelar</a>
-                                <a href="#" class="btn-action btn-download" onclick="downloadReceipt('COM-20250501')">📄 Comprobante</a>
-                            </td>
+                            <td><span class="status-badge status-{{ orden.estado_clase }}">{{ orden.estado_general }}</span></td>
+                            <td>{{ orden.total_paquetes or 0 }}</td>
+                            <td>S/ {{ "%.2f"|format(orden.monto_total) if orden.monto_total else '0.00' }}</td>
+                            <!-- <td>
+                                <a href="{{ url_for('transaccion', tabla='transaccion_encomienda') }}" class="btn-action">Ver detalles</a>
+                            </td> -->
                         </tr>
-                        <tr>
-                            <td><strong>COM-20250418</strong></td>
-                            <td>18/04/2025</td>
-                            <td>
-                                <div class="package-list">
-                                    <span class="package-item">ENV-20250418-2945: Ropa</span>
-                                    <span class="package-item">ENV-20250418-3067: Libros</span>
-                                    <span class="package-item">ENV-20250418-3189: Medicamentos</span>
-                                </div>
-                            </td>
-                            <td><span class="status-badge status-delivered">Completado</span></td>
-                            <td>3</td>
-                            <td>
-                                <a href="#" class="btn-action btn-download" onclick="downloadReceipt('COM-20250418')">📄 Comprobante</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>COM-20250410</strong></td>
-                            <td>10/04/2025</td>
-                            <td>
-                                <div class="package-list">
-                                    <span class="package-item">ENV-20250410-1876: Herramientas</span>
-                                </div>
-                            </td>
-                            <td><span class="status-badge status-delivered">Completado</span></td>
-                            <td>1</td>
-                            <td>
-                                <a href="#" class="btn-action btn-download" onclick="downloadReceipt('COM-20250410')">📄 Comprobante</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>COM-20250405</strong></td>
-                            <td>05/04/2025</td>
-                            <td>
-                                <div class="package-list">
-                                    <span class="package-item">ENV-20250405-5621: Juguetes</span>
-                                </div>
-                            </td>
-                            <td><span class="status-badge status-pending">Pendiente</span></td>
-                            <td>1</td>
-                            <td>
-                                <a href="#" class="btn-action btn-edit" onclick="editOrder('COM-20250405')">✏️ Editar</a>
-                                <a href="#" class="btn-action btn-cancel" onclick="cancelOrder('COM-20250405')">❌ Cancelar</a>
-                                <a href="#" class="btn-action btn-download" onclick="downloadReceipt('COM-20250405')">📄 Comprobante</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>COM-20250325</strong></td>
-                            <td>25/03/2025</td>
-                            <td>
-                                <div class="package-list">
-                                    <span class="package-item">ENV-20250325-1234: Perfumes</span>
-                                    <span class="package-item">ENV-20250325-5678: Cosméticos</span>
-                                </div>
-                            </td>
-                            <td><span class="status-badge status-delivered">Completado</span></td>
-                            <td>2</td>
-                            <td>
-                                <a href="#" class="btn-action btn-download" onclick="downloadReceipt('COM-20250325')">📄 Comprobante</a>
-                            </td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
+                {% else %}
+                <div class="no-data">
+                    <p>No tienes órdenes registradas aún.</p>
+                    <a href="{{ url_for('envio_masivo') }}" class="btn btn-primary">Crear tu primera orden</a>
+                </div>
+                {% endif %}
             </div>
 
             <!-- Tab: Mis Reclamos -->
             <div id="reclamos-tab" class="tab-content">
+                {% if reclamos %}
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -409,163 +291,294 @@ Mi perfil
                             <th>N° Envío</th>
                             <th>Motivo</th>
                             <th>Fecha Reclamo</th>
+                            <th>Monto Reclamado</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {% for reclamo in reclamos %}
                         <tr>
-                            <td><strong>REC-2025-001</strong></td>
-                            <td>ENV-20250418-2945</td>
-                            <td>Retraso en la entrega</td>
-                            <td>20/04/2025</td>
-                            <td><span class="status-badge status-delivered">Resuelto</span></td>
-                            <td><a href="#" class="btn-action">Ver detalles</a></td>
+                            <td><strong>REC-{{ reclamo.num_reclamo }}</strong></td>
+                            <td>{{ reclamo.num_envio }}</td>
+                            <td>{{ reclamo.motivo or 'No especificado' }}</td>
+                            <td>{{ reclamo.fecha_reclamo.strftime('%d/%m/%Y') if reclamo.fecha_reclamo else 'No registrada' }}</td>
+                            <td>S/ {{ "%.2f"|format(reclamo.monto_reclamado) if reclamo.monto_reclamado else '0.00' }}</td>
+                            <td><span class="status-badge status-{{ reclamo.estado_clase }}">{{ reclamo.estado }}</span></td>
+                            <td><a href="{{ url_for('seguimiento_reclamo_directo', reclamo_id=reclamo.num_reclamo) }}" class="btn-action">Ver detalles</a></td>
                         </tr>
-                        <tr>
-                            <td><strong>REC-2025-002</strong></td>
-                            <td>ENV-20250410-1876</td>
-                            <td>Daño en el paquete</td>
-                            <td>12/04/2025</td>
-                            <td><span class="status-badge status-transit">En proceso</span></td>
-                            <td><a href="#" class="btn-action">Ver detalles</a></td>
-                        </tr>
-                        <tr>
-                            <td><strong>REC-2025-003</strong></td>
-                            <td>ENV-20250405-5621</td>
-                            <td>Información incorrecta</td>
-                            <td>08/04/2025</td>
-                            <td><span class="status-badge status-pending">Pendiente</span></td>
-                            <td><a href="#" class="btn-action">Ver detalles</a></td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
+                {% else %}
+                <div class="no-data">
+                    <p>No tienes reclamos registrados.</p>
+                    <a href="{{ url_for('libro_reclamaciones') }}" class="btn btn-primary">Presentar un reclamo</a>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
 
-
 {% endblock %}
 
 {% block scripts %}
-  <script>
-        let isEditMode = false;
+<script>
+    let isEditMode = false;
 
-        function switchTab(tabName) {
-            // Ocultar todos los tabs
-            document.querySelectorAll('.tab-content').forEach((tab) => {
-                tab.classList.remove('active');
-            });
-
-            // Remover clase activa de todos los botones
-            document.querySelectorAll('.tab-button').forEach((btn) => {
-                btn.classList.remove('active');
-            });
-
-            // Mostrar tab seleccionado
-            document.getElementById(tabName + '-tab').classList.add('active');
-
-            // Activar botón correspondiente
-            event.target.classList.add('active');
-        }
-
-        function toggleEditMode() {
-            isEditMode = !isEditMode;
-
-            const displaySections = document.querySelectorAll('#user-info-display, #contact-info-display');
-            const editForms = document.querySelectorAll('.edit-form');
-            const editActions = document.getElementById('edit-actions');
-
-            if (isEditMode) {
-                displaySections.forEach((section) => (section.style.display = 'none'));
-                editForms.forEach((form) => (form.style.display = 'grid'));
-                editActions.style.display = 'flex';
-            } else {
-                displaySections.forEach((section) => (section.style.display = 'block'));
-                editForms.forEach((form) => (form.style.display = 'none'));
-                editActions.style.display = 'none';
-            }
-        }
-
-        function saveChanges() {
-            // Actualizar valores mostrados
-            document.getElementById('display-nombre').textContent = document.getElementById('edit-nombre').value;
-            document.getElementById('display-apellidos').textContent = document.getElementById('edit-apellidos').value;
-            document.getElementById('display-num-doc').textContent = document.getElementById('edit-num-doc').value;
-            document.getElementById('display-correo').textContent = document.getElementById('edit-correo').value;
-            document.getElementById('display-telefono').textContent = document.getElementById('edit-telefono').value;
-
-            // Actualizar tipo de documento
-            const tipoDocSelect = document.getElementById('edit-tipo-doc');
-            document.getElementById('display-tipo-doc').textContent = tipoDocSelect.options[tipoDocSelect.selectedIndex].text;
-
-            // Actualizar tipo de cliente
-            const tipoClienteSelect = document.getElementById('edit-tipo-cliente');
-            document.getElementById('display-tipo-cliente').textContent = tipoClienteSelect.options[tipoClienteSelect.selectedIndex].text;
-
-            // Salir del modo edición
-            toggleEditMode();
-
-            // Mostrar mensaje de confirmación
-            alert('Datos actualizados correctamente');
-        }
-
-        function cancelEdit() {
-            // Restaurar valores originales
-            document.getElementById('edit-nombre').value = document.getElementById('display-nombre').textContent;
-            document.getElementById('edit-apellidos').value = document.getElementById('display-apellidos').textContent;
-            document.getElementById('edit-num-doc').value = document.getElementById('display-num-doc').textContent;
-            document.getElementById('edit-correo').value = document.getElementById('display-correo').textContent;
-            document.getElementById('edit-telefono').value = document.getElementById('display-telefono').textContent;
-
-            // Salir del modo edición
-            toggleEditMode();
-        }
-
-        // Funciones para Mis Compras
-        function downloadReceipt(receiptNumber) {
-            alert(`Descargando comprobante: ${receiptNumber}`);
-            // Aquí iría la lógica para descargar el comprobante
-            // Por ejemplo: window.open(`/download-receipt/${receiptNumber}`, '_blank');
-        }
-
-        // Funciones para Mis Órdenes
-        function editOrder(orderNumber) {
-            alert(`Editando orden: ${orderNumber}`);
-            // Aquí iría la lógica para editar la orden
-            // Por ejemplo: window.location.href = `/edit-order/${orderNumber}`;
-        }
-
-        function cancelOrder(orderNumber) {
-            if (confirm(`¿Está seguro de que desea cancelar la orden ${orderNumber}?`)) {
-                alert(`Orden ${orderNumber} cancelada`);
-                // Aquí iría la lógica para cancelar la orden
-                // Por ejemplo: fetch(`/cancel-order/${orderNumber}`, {method: 'POST'});
-                
-                // Actualizar visualmente el estado (simulación)
-                const rows = document.querySelectorAll('#ordenes-tab tbody tr');
-                rows.forEach(row => {
-                    const orderCell = row.querySelector('td strong').textContent;
-                    if (orderCell === orderNumber) {
-                        const statusCell = row.querySelector('.status-badge');
-                        statusCell.className = 'status-badge status-cancelled';
-                        statusCell.textContent = 'Cancelado';
-                        
-                        // Deshabilitar botones de editar y cancelar
-                        const editBtn = row.querySelector('.btn-edit');
-                        const cancelBtn = row.querySelector('.btn-cancel');
-                        if (editBtn) editBtn.style.display = 'none';
-                        if (cancelBtn) cancelBtn.style.display = 'none';
-                    }
-                });
-            }
-        }
-
-        // Inicializar valores de los selects
-        document.addEventListener('DOMContentLoaded', function () {
-            // Configurar valores por defecto de los selects
-            document.getElementById('edit-tipo-doc').value = '1'; // DNI
-            document.getElementById('edit-tipo-cliente').value = '1'; // Personal
+    function switchTab(tabName) {
+        // Ocultar todos los tabs
+        document.querySelectorAll('.tab-content').forEach((tab) => {
+            tab.classList.remove('active');
         });
-    </script>
+
+        // Remover clase activa de todos los botones
+        document.querySelectorAll('.tab-button').forEach((btn) => {
+            btn.classList.remove('active');
+        });
+
+        // Mostrar tab seleccionado
+        document.getElementById(tabName + '-tab').classList.add('active');
+
+        // Activar botón correspondiente
+        event.target.classList.add('active');
+    }
+
+    function toggleEditMode() {
+        isEditMode = !isEditMode;
+
+        const displaySections = document.querySelectorAll('#user-info-display, #contact-info-display');
+        const editForms = document.querySelectorAll('.edit-form');
+        const editActions = document.getElementById('edit-actions');
+
+        if (isEditMode) {
+            displaySections.forEach((section) => (section.style.display = 'none'));
+            editForms.forEach((form) => (form.style.display = 'grid'));
+            editActions.style.display = 'flex';
+        } else {
+            displaySections.forEach((section) => (section.style.display = 'block'));
+            editForms.forEach((form) => (form.style.display = 'none'));
+            editActions.style.display = 'none';
+        }
+    }
+
+    async function saveChanges() {
+        try {
+            const datos = {
+                nombre: document.getElementById('edit-nombre').value.trim(),
+                apellidos: document.getElementById('edit-apellidos').value.trim(),
+                correo: document.getElementById('edit-correo').value.trim(),
+                telefono: document.getElementById('edit-telefono').value.trim(),
+                num_documento: document.getElementById('edit-num-doc').value.trim(),
+                tipo_documentoid: parseInt(document.getElementById('edit-tipo-doc').value),
+                tipo_clienteid: parseInt(document.getElementById('edit-tipo-cliente').value)
+            };
+
+            // Validaciones básicas
+            if (!datos.nombre || !datos.apellidos || !datos.correo || !datos.num_documento) {
+                alert('Por favor, complete todos los campos obligatorios');
+                return;
+            }
+
+            if (!datos.tipo_documentoid || !datos.tipo_clienteid) {
+                alert('Por favor, seleccione un tipo de documento y tipo de cliente válidos');
+                return;
+            }
+
+            const response = await fetch('/actualizar_perfil', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(datos)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // Actualizar valores mostrados
+                document.getElementById('display-nombre').textContent = datos.nombre;
+                document.getElementById('display-apellidos').textContent = datos.apellidos;
+                document.getElementById('display-num-doc').textContent = datos.num_documento;
+                document.getElementById('display-correo').textContent = datos.correo;
+                document.getElementById('display-telefono').textContent = datos.telefono || 'No registrado';
+
+                // Actualizar tipo de documento
+                const tipoDocSelect = document.getElementById('edit-tipo-doc');
+                const selectedTipoDoc = tipoDocSelect.options[tipoDocSelect.selectedIndex];
+                document.getElementById('display-tipo-doc').textContent = selectedTipoDoc.text;
+
+                // Actualizar tipo de cliente
+                const tipoClienteSelect = document.getElementById('edit-tipo-cliente');
+                const selectedTipoCliente = tipoClienteSelect.options[tipoClienteSelect.selectedIndex];
+                document.getElementById('display-tipo-cliente').textContent = selectedTipoCliente.text;
+
+                // Salir del modo edición
+                toggleEditMode();
+
+                // Mostrar mensaje de confirmación
+                alert('Datos actualizados correctamente');
+                
+                // Opcional: recargar la página para actualizar toda la información
+                // window.location.reload();
+            } else {
+                alert('Error al actualizar: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al actualizar los datos');
+        }
+    }
+
+    function cancelEdit() {
+        // Restaurar valores originales desde los campos de visualización
+        document.getElementById('edit-nombre').value = document.getElementById('display-nombre').textContent;
+        document.getElementById('edit-apellidos').value = document.getElementById('display-apellidos').textContent;
+        document.getElementById('edit-num-doc').value = document.getElementById('display-num-doc').textContent;
+        document.getElementById('edit-correo').value = document.getElementById('display-correo').textContent;
+        const telefonoText = document.getElementById('display-telefono').textContent;
+        document.getElementById('edit-telefono').value = telefonoText === 'No registrado' ? '' : telefonoText;
+
+        // Restaurar selects a sus valores originales
+        document.getElementById('edit-tipo-doc').value = '{{ datosUsuario.tipo_documentoid }}';
+        document.getElementById('edit-tipo-cliente').value = '{{ datosUsuario.tipo_clienteid }}';
+
+        // Salir del modo edición
+        toggleEditMode();
+    }
+
+    // Función para actualizar estadísticas en tiempo real (opcional)
+    async function actualizarEstadisticas() {
+        try {
+            const response = await fetch('/api/estadisticas_perfil');
+            const result = await response.json();
+            
+            if (result.success) {
+                const stats = result.estadisticas;
+                document.querySelector('.stat-card:nth-child(1) .stat-number').textContent = stats.total_envios;
+                document.querySelector('.stat-card:nth-child(2) .stat-number').textContent = stats.entregados;
+                document.querySelector('.stat-card:nth-child(3) .stat-number').textContent = stats.en_transito;
+                document.querySelector('.stat-card:nth-child(4) .stat-number').textContent = stats.pendientes;
+                document.querySelector('.stat-card:nth-child(5) .stat-number').textContent = stats.reclamos;
+            }
+        } catch (error) {
+            console.error('Error al actualizar estadísticas:', error);
+        }
+    }
+
+    // Inicializar valores de los selects cuando carga la página
+    document.addEventListener('DOMContentLoaded', function () {
+        // Configurar valores actuales de los selects desde los datos del usuario
+        const tipoDocSelect = document.getElementById('edit-tipo-doc');
+        const tipoClienteSelect = document.getElementById('edit-tipo-cliente');
+        
+        if (tipoDocSelect) {
+            tipoDocSelect.value = '{{ datosUsuario.tipo_documentoid }}';
+        }
+        
+        if (tipoClienteSelect) {
+            tipoClienteSelect.value = '{{ datosUsuario.tipo_clienteid }}';
+        }
+        
+        console.log('Tipo documento inicial:', '{{ datosUsuario.tipo_documentoid }}');
+        console.log('Tipo cliente inicial:', '{{ datosUsuario.tipo_clienteid }}');
+    });
+
+    // Actualizar estadísticas cada 30 segundos (opcional)
+    setInterval(actualizarEstadisticas, 30000);
+</script>
+
+<style>
+    .no-data {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+    }
+
+    .no-data p {
+        margin-bottom: 20px;
+        font-size: 16px;
+    }
+
+    .package-list {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .package-item {
+        background: #f8f9fa;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        border-left: 3px solid #007bff;
+    }
+
+    .btn-download {
+        color: #28a745 !important;
+    }
+
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+
+    .status-delivered {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-transit {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .data-table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .data-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .btn-action {
+        display: inline-block;
+        padding: 6px 12px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 12px;
+        transition: background-color 0.2s;
+    }
+
+    .btn-action:hover {
+        background-color: #0056b3;
+        text-decoration: none;
+        color: white;
+    }
+</style>
 {% endblock %}

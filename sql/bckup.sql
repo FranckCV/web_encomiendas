@@ -4653,3 +4653,5 @@ ALTER TABLE `transaccion_venta`
 ALTER TABLE `unidad`
   ADD CONSTRAINT `FKunidad608127` FOREIGN KEY (`modeloid`) REFERENCES `modelo` (`id`);
 COMMIT;
+
+Alter table seguimiento_reclamo add column comentario text;
