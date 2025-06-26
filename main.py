@@ -5992,6 +5992,23 @@ def api_estados_reclamo():
             'success': False,
             'message': f'Error al obtener estados: {str(e)}'
         }), 500
+        
+@app.route('/insertar_salida', methods=['POST'])
+def insertar_salida():
+    data = request.get_json()
+    vehiculo = data.get('vehiculo')
+    empleados = data.get('empleados')
+    escalas = data.get('escalas')            
+    paquetes = data.get('paquetes')    
+    
+    salida_id = controlador_salida.crear_transaccion_salida(vehiculo, empleados, escalas, paquetes)
+    
+    return jsonify({
+        "mensaje": "Salida registrada",
+        "salida_id": salida_id
+    })
+
+    
     
 
 @app.route('/api/guia_remision/<int:transaccion_id>')
