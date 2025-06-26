@@ -161,11 +161,11 @@ INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `tipo_paginaid`,
 (47, 'Programación de devoluciones', 'ri-truck-line', 1, 'programacion_devolucion', 2, 3),
 (48, 'Escaneo de qr', 'fa-solid fa-qrcode', 1, 'interfaz_insertar_estado', 2, 2),
 (49, 'Paquetes', 'fa-solid fa-boxes', 1, 'paquete', 3, 3),
-(50, 'Uso de unidades', 'fa-solid fa-truck', 1, 'reporte_uso_unidades', 4, 1),
-(51, 'Reporte de reclamos segun tipo , causa y periodo', 'fa-solid fa-clipboard-list', 1, 'reporte_reclamos_tipo_causa_periodo', 4, 4),
+(50, 'Reporte Uso de unidades', 'fa-solid fa-truck', 1, 'reporte_uso_unidades', 4, 1),
+(51, 'Reporte de reclamos según tipo , causa y periodo', 'fa-solid fa-clipboard-list', 1, 'reporte_reclamos_tipo_causa_periodo', 4, 4),
 (52, 'Reporte de viajes realizados por unidad', 'fa-solid fa-truck-fast', 1, 'viajes_por_unidad', 4, 2),
-(53, 'Listado de encomiendas por tipo empaque', 'fa-solid fa-boxes-packing', 1, 'encomiendas_listar', 4, 3);
-
+(53, 'Listado de encomiendas por tipo empaque', 'fa-solid fa-boxes-packing', 1, 'encomiendas_listar', 4, 3),
+(54, 'Listado de encomiendas asignadas a rutas específicas y su estado ', 'fa-solid fa-route', 1, 'encomiendas_rutas_estado', 4, 3);
 
 INSERT INTO `tipo_rol` (`id`, `nombre`, `descripcion`, `activo`)
 VALUES (1, 'SuperAdministador', 'Dios', 1),

@@ -57,6 +57,7 @@ from controladores import reporte_listar_enco
 from controladores import reporte_reclamo_causa
 from controladores import reporte_UsoUnidades
 from controladores import reporte_Viajes_por_Unidad
+from controladores import reporte_encomiendas_rutas as reporte_encomiendas_rutas
 # import BytesIO
 from itsdangerous import URLSafeSerializer
 from controladores.bd import sql_execute
@@ -435,7 +436,7 @@ CONTROLADORES = {
         ['correo', 'Correo', 'Correo', 'email', True, True, None],
         ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
         ['n_documento', 'N° Documento', '', 'text', True, True, None],
-        ['bien_contratado', 'Bien Contratado', '', 'text', True, True, None],
+        ['bien_contratado', 'Bien Contratado', '', 'select', True, True, [lambda:controlador_reclamo.get_list_bien_contratado(), '']],
         ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
         ['monto_indemnizado', 'Monto Indemnizado', '0.00', 'number', True, True, None],
         ['relacion', 'Relación con el bien', '', 'text', True, True, None],
@@ -448,7 +449,7 @@ CONTROLADORES = {
         ['causa_reclamoid', 'Causa del Reclamo', '', 'select', True, True, [lambda: controlador_causa_reclamo.get_options(), 'nombre']],
         ['tipo_indemnizacionid', 'Tipo de Indemnización', '', 'select', True, True, [lambda: controlador_tipo_indemnizacion.get_options(), 'nombre']],
         ['paquetetracking', 'Tracking', '', 'text', True, True, None],
-        ['ubigeocodigo', 'Ubigeo', '', 'text', True, True, None],
+        ['ubigeocodigo', 'Ubigeo', '', 'select', True, True, [lambda: controlador_ubigeo.get_options(), 'codigo']],
         ['tipo_documentoid', 'Tipo Documento', '', 'select', True, True, [lambda: controlador_tipo_documento.get_options(), 'nombre']]
     ],
     "crud_forms": {
@@ -1399,9 +1400,8 @@ REPORTES = {
         "active": True,
         "icon_page": "fa-solid fa-boxes-stacked",
         "titulo": "Artículos que Necesitan Reposición",
-        "table": controlador_articulo.get_report_reposicion(),  # función sin paréntesis
+        "table": controlador_articulo.get_report_reposicion(), 
         "filters": [
-            ['stock_minimo', 'Sin Stock ', lambda: controlador_articulo.get_stock_minimo_options(), 'select'],
         ],
     },
 
@@ -1434,18 +1434,25 @@ REPORTES = {
     "encomiendas_listar": {
         "active": True,
         "icon_page": "fa-solid fa-boxes-packing",
-        "titulo": "Listado de encomiendas por empaque ",
-        "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo,
+        "titulo": "Listado de encomiendas segun tipo de empaque ",
+        "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo(),
         "filters": []
     },
 
     "reporte_reclamos_tipo_causa_periodo": {
-        "active": True,
-        "icon_page": "fa-solid fa-clipboard-list",
-        "titulo": "Reporte de reclamos por tipo, causa y periodo",
-        "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),
-        "filters": ['stock_minimo', 'Stock Mínimo', lambda: controlador_articulo.get_stock_minimo_options(), 'select'],
-    },
+    "active": True,
+    "icon_page": "fa-solid fa-clipboard-list",
+    "titulo": "Reporte de reclamos por tipo, causa y periodo",
+    "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),  # ✅ con paréntesis
+    "filters": []
+},
+"encomiendas_rutas_estado": {
+    "active": True,
+    "icon_page": "fa-solid fa-route",
+    "titulo": "Listado de encomiendas asignadas a rutas específicas y su estado",
+    "table": reporte_encomiendas_rutas.get_reporte_encomiendas_rutas_estado(),  # 👈 con paréntesis
+    "filters": []
+},
 }
 
 
@@ -3183,15 +3190,18 @@ def insertar_envio_api():
 def registrar_envios_masivos():
     try:
         data = request.get_json()
-        # print(data)
+
         if not data:
-            return jsonify({'status': 'error', 'message': 'No se recibió un JSON válido'}), 400
+            return jsonify({'status': 'error', 'message': 'No se recibieron datos'}), 400
 
         tipo_comprobante = data.get('tipo_comprobante')
-        registros = data.get('registros') 
+        registros = data.get('registros')
+        # modalidad_pago_seleccionada = data.get('modalidad_pago')
 
-        if not registros or not isinstance(registros, list):
-            return jsonify({'status': 'error', 'message': 'No se encontraron registros válidos'}), 400
+        if not tipo_comprobante:
+            return jsonify({'status': 'error', 'message': 'Tipo de comprobante es requerido'}), 400
+        # if modalidad_pago_seleccionada is None:
+        #     return jsonify({'status': 'error', 'message': 'Modalidad de pago es requerida'}), 400
 
         origen = data.get('origen')
         sucursal_origen = origen.get('sucursal_origen')
@@ -3215,7 +3225,6 @@ def registrar_envios_masivos():
             registros, cliente_data, tipo_comprobante,sucursal_origen
         )
 
-        # 2) Generar QR para cada paquete
         if num_serie:
             try:
                 generar_qr_paquetes(trackings)
@@ -3251,23 +3260,26 @@ def registrar_envios_masivos():
             #     mail.send(msg)
 
 
-        current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
+        session.pop('datos_pago', None)
+        session.pop('resumen_envios', None)
+        session.pop('remitente_data', None)
+
         return jsonify({
             'status': 'success',
-            'message': 'Transacción creada correctamente',
-            'comprobante_serie': num_serie
-        }), 201
-
-    except ValueError as ve:
-        current_app.logger.warning(f"Bad request: {ve}")
-        return jsonify({'status': 'error', 'message': str(ve)}), 400
+            'message': 'Envío procesado correctamente',
+            'num_serie': num_serie,
+            'trackings': trackings
+        }), 200
 
     except Exception as e:
+        current_app.logger.error(f"Error en insertar_envio: {str(e)}")
+        import traceback
         traceback.print_exc()
         return jsonify({
             'status': 'error',
             'message': 'Ocurrió un error al procesar el envío'
         }), 500
+        
 ##PARA PROBAR EL API E INSERTAR 
 # {
 #   "tipo_comprobante": 2,
@@ -4965,6 +4977,10 @@ def sucursales_destino_api():
             'msg': f"Ocurrió un error al listar las distritos: {repr(e)}",
             'status':-1
         }
+<<<<<<< HEAD
+
+=======
+>>>>>>> edaad2ca2c4a5c65179b4106de5d9fe44b544983
 
 @app.route("/buscar_paquete_devolucion", methods=["POST"])
 @validar_empleado()

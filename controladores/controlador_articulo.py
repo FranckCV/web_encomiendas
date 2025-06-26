@@ -243,7 +243,8 @@ def get_report_reposicion(stock_minimo=10):
                 tam.nombre as tam_nombre,
                 CASE 
                     WHEN a.stock = 0 THEN 'Sin Stock'
-                    WHEN a.stock <= %s THEN 'Stock Bajo'
+                    WHEN a.stock < %s THEN 'Stock Bajo'
+                    WHEN a.stock  > %s THEN 'Stock Normal'
                     ELSE 'Stock Normal'
                 END as estado_stock,
                 COALESCE(SUM(dv.cantidad), 0) AS total_vendido
@@ -253,38 +254,24 @@ def get_report_reposicion(stock_minimo=10):
             WHERE a.activo = 1 
                 AND a.stock <= %s
             GROUP BY a.id, a.nombre, a.precio, a.stock, a.dimensiones, tam.nombre
-            ORDER BY a.stock ASC, total_vendido DESC
+
         '''
         
         columnas = {
             'id': ['ID', 0.5],
-            'nombre': ['Artículo', 3],
-            'precio': ['Precio', 1],
-            'stock': ['Stock Actual', 1],
-            'dimensiones': ['Dimensiones', 2],
-            'tam_nombre': ['Tamaño Caja', 2],
-            'estado_stock': ['Estado', 1.5],
-            'total_vendido': ['Total Vendido', 1.5],
+            'nombre': ['Artículo', 0.5],
+            'precio': ['Precio', 0.5],
+            'estado_stock': ['Estado', 0.5],
+            'stock': ['Stock Actual', 0.5]
         }
         
-        filas = sql_select_fetchall(sql, (stock_minimo, stock_minimo))
+        filas = sql_select_fetchall(sql, (stock_minimo, stock_minimo, stock_minimo))
         
         return columnas, filas
         
     except Exception as e:
         print(f"Error en get_report_reposicion: {e}")
         return {}, []
-
-def get_stock_minimo_options():
-    """Retorna opciones predefinidas para el stock mínimo"""
-    return [
-        (5, "5 unidades"),
-        (10, "10 unidades"), 
-        (15, "15 unidades"),
-        (20, "20 unidades"),
-        (25, "25 unidades"),
-        (50, "50 unidades")
-    ]
 
 
 ################## TRANSACCION VENTA ############
