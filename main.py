@@ -6029,7 +6029,6 @@ def descargar_guia_remision(tracking):
     return send_file(path, as_attachment=True)
 
 
->>>>>>> ac612087b9cd33c9d314f887280f2c07956b2a7a
 ##############################################3
 ##############################################
 
