@@ -1,181 +1,190 @@
 {% extends 'MAESTRA_GENERAL.html' %}
 
 {% block titulo %}
-  Seguimiento
+Seguimiento
 {% endblock %}
 
 {% block estilos %}
-  <link rel="stylesheet" href="/static/css/seguimiento.css" />
+<link rel="stylesheet" href="/static/css/seguimiento.css" />
 {% endblock %}
 
 {% block contenido %}
-  <div class="contenedor">
-    <!--  -->
-    <div class="header">
-      <form class="order-search" action="{{ url_for('buscar_paquete') }}" method="post">
-        <input type="text" placeholder="Tracking" class="order-input" name="tracking" />
-        <input type="text" placeholder="Año de emisión" class="order-input" name="anio" />
-        <button class="search-btn">Buscar <i class="ri-arrow-right-line"></i></button>
-      </form>
-    </div>
+<div class="contenedor">
+  <!--  -->
+  <div class="header">
+    <form class="order-search" action="{{ url_for('buscar_paquete') }}" method="post">
+      <input type="text" placeholder="Tracking" class="order-input" name="tracking" />
+      <input type="text" placeholder="Año de emisión" class="order-input" name="anio" />
+      <button class="search-btn">Buscar <i class="ri-arrow-right-line"></i></button>
+    </form>
+  </div>
 
-    <div class="container_estado">
-      <div class="card status-card">
-        <!-- <div class="order-number">
+  <div class="container_estado">
+    <div class="card status-card">
+      <!-- <div class="order-number">
           <p class="number">N° DE ORDEN: 45106974</p>
         </div> -->
-        <div class="status-detail">
-          <img class="img_estado" src="{{ url_for('static', filename='img/entregado.png') }}" alt="Persona con paquete entregado" />
+      <div class="status-detail">
+        <img class="img_estado" src="{{ url_for('static', filename='img/entregado.png') }}"
+          alt="Persona con paquete entregado" />
 
-          <div class="status-content">
-            <div class="status-header">
-              <div class="status-title">
-                {% if comprobantes and comprobantes|length > 0 %}
-                  <div class="documents">
-                    <h3>Descargar documentos disponibles</h3>
+        <div class="status-content">
+          <div class="status-header">
+            <div class="status-title">
+              {% if comprobantes and comprobantes|length > 0 %}
+              <div class="documents">
+                <h3>Descargar documentos disponibles</h3>
 
-                    <ul class="lista_document">
-                      {% for comp in comprobantes %}
-                        <li>
-                          <a href="{{ url_for('generar_comprobante', tracking=tracking) }}" target="_blank"><i class="fa-solid fa-file-pdf"></i> {{ comp.tipo_comprobante|capitalize }}</a>
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  </div>
-                {% else %}
-                  <div class="documents">
-                    <h5 class="text-muted">No hay documentos disponibles por ahora.</h5>
-                  </div>
-                {% endif %}
+                <ul class="lista_document">
+                  {% for comp in comprobantes %}
+                  <li>
+                    <a href="{{ url_for('generar_comprobante', tracking=tracking) }}" target="_blank"><i
+                        class="fa-solid fa-file-pdf"></i> {{ comp.tipo_comprobante|capitalize }}</a>
+                  </li>
+                  {% endfor %}
+                  
+
+                </ul>
               </div>
-            </div>
-            <div class="ultimo_estado">
-              <h3 style="margin-bottom: 10px;">Último estado:</h3>
-
-              {% if ultimo_estado %}
-                <p>{{ ultimo_estado.nombre }}</p>
-                <p>el día {{ ultimo_estado.fecha }}, a las {{ ultimo_estado.hora }}</p>
               {% else %}
-                <p>No hay información de estado disponible.</p>
+              <div class="documents">
+                <h5 class="text-muted">No hay documentos disponibles por ahora.</h5>
+                <li>
+                    <a href="{{ url_for('descargar_guia_remision', tracking=tracking) }}" target="_blank">
+                      <i class="fa-solid fa-truck"></i> Guía de Remisión Transportista
+                    </a>
+                  </li>
+              </div>
               {% endif %}
             </div>
-            <!--                     
+          </div>
+          <div class="ultimo_estado">
+            <h3 style="margin-bottom: 10px;">Último estado:</h3>
+
+            {% if ultimo_estado %}
+            <p>{{ ultimo_estado.nombre }}</p>
+            <p>el día {{ ultimo_estado.fecha }}, a las {{ ultimo_estado.hora }}</p>
+            {% else %}
+            <p>No hay información de estado disponible.</p>
+            {% endif %}
+          </div>
+          <!--                     
             <div class="delivery-time">
               <p>Desde el 25/04/25 a las 09:27</p>
             </div>                  -->
-            <!-- Tracker de progreso -->
+          <!-- Tracker de progreso -->
+        </div>
+      </div>
+      <div class="progress-tracker">
+        <div class="progress-line"></div>
+        <div class="progress-line-fill" style="width: 0%;"></div>
+        {% for state in estados %}
+        <div class="progress-step {% if state.id in estados_usados %}active{% endif %}">
+          <div class="step-icon {% if state.id in estados_usados %}completed{% endif %}">
+            <span class="check-icon">✓</span>
           </div>
-        </div>
-        <div class="progress-tracker">
-          <div class="progress-line"></div>
-          <div class="progress-line-fill" style="width: 0%;"></div>
-          {% for state in estados %}
-            <div class="progress-step {% if state.id in estados_usados %}active{% endif %}">
-              <div class="step-icon {% if state.id in estados_usados %}completed{% endif %}">
-                <span class="check-icon">✓</span>
+          <div class="step-label">{{ state.nombre }}</div>
+          <input type="hidden" value="{{ state.id }}" />
+
+
+          <div class="timeline">
+            {% if state.id in detalles_por_estado %}
+            {% for det in detalles_por_estado[state.id] %}
+            <div class="timeline-item active">
+              <div class="timeline-dot"></div>
+              <div class="timeline-line"></div>
+              <div class="timeline-content">
+                <div class="timeline-title">{{ det.nombre }}</div>
+                <div class="timeline-date">{{ det.fecha }} - {{ det.hora }}</div>
+
               </div>
-              <div class="step-label">{{ state.nombre }}</div>
-              <input type="hidden" value="{{ state.id }}" />
-
-        
-                <div class="timeline">
-  {% if state.id in detalles_por_estado %}
-    {% for det in detalles_por_estado[state.id] %}
-      <div class="timeline-item active">
-        <div class="timeline-dot"></div>
-        <div class="timeline-line"></div>
-        <div class="timeline-content">
-          <div class="timeline-title">{{ det.nombre }}</div>
-          <div class="timeline-date">{{ det.fecha }} - {{ det.hora }}</div>
-
-        </div>
-      </div>
-    {% endfor %}
-  {% endif %}
-</div>
-
-
-
-              
             </div>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- Tarjeta de información origen/destino -->
-      <div class="card info-card">
-        <div class="info-section">
-          <h3>Origen : <span style="font-weight: normal; color: #666;">{{ datos.direccion_origen }}</span></h3>
-        </div>
-        <div class="info-section">
-          <h3>Destino : <span style="font-weight: normal; color: #666;">{{ datos.direccion_destino }}</span></h3>
-        </div>
-      </div>
-
-      <div class="card details-card">
-        <div class="detail-section">
-          <i class="fa-solid fa-user icono"></i>
-          <div class="detail-title">Remitente</div>
-          <div class="detail-value">{{ datos.remitente }}</div>
-        </div>
-
-        <div class="detail-section">
-          <i class="fa-solid fa-box-open icono"></i>
-          <div class="detail-title">Contenido</div>
-          <div class="detail-value">
-            {{ datos.tipo_empaque }}{% if datos.contenido_paquete %}
-              - {{ datos.contenido_paquete }}
+            {% endfor %}
             {% endif %}
           </div>
-        </div>
 
-        <div class="detail-section">
-          <i class="fa-solid fa-user icono"></i>
-          <div class="detail-title">Destinatario</div>
-          <div class="detail-value">{{ datos.num_documento_destinatario }}</div>
-        </div>
 
-        <div class="detail-section">
-          <i class="fa-solid fa-dollar-sign icono"></i>
-          <div class="detail-title">Pago {{ datos.estado_pago|lower }}</div>
-          <p>Monto : S/. {{ datos.monto_total }}</p>
+
+
         </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Tarjeta de información origen/destino -->
+    <div class="card info-card">
+      <div class="info-section">
+        <h3>Origen : <span style="font-weight: normal; color: #666;">{{ datos.direccion_origen }}</span></h3>
+      </div>
+      <div class="info-section">
+        <h3>Destino : <span style="font-weight: normal; color: #666;">{{ datos.direccion_destino }}</span></h3>
+      </div>
+    </div>
+
+    <div class="card details-card">
+      <div class="detail-section">
+        <i class="fa-solid fa-user icono"></i>
+        <div class="detail-title">Remitente</div>
+        <div class="detail-value">{{ datos.remitente }}</div>
+      </div>
+
+      <div class="detail-section">
+        <i class="fa-solid fa-box-open icono"></i>
+        <div class="detail-title">Contenido</div>
+        <div class="detail-value">
+          {{ datos.tipo_empaque }}{% if datos.contenido_paquete %}
+          - {{ datos.contenido_paquete }}
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <i class="fa-solid fa-user icono"></i>
+        <div class="detail-title">Destinatario</div>
+        <div class="detail-value">{{ datos.num_documento_destinatario }}</div>
+      </div>
+
+      <div class="detail-section">
+        <i class="fa-solid fa-dollar-sign icono"></i>
+        <div class="detail-title">Pago {{ datos.estado_pago|lower }}</div>
+        <p>Monto : S/. {{ datos.monto_total }}</p>
       </div>
     </div>
   </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
-  <script>
-    document.querySelector('.details-toggle').addEventListener('click', function () {
-      const timeline = document.querySelector('.timeline')
-      if (timeline.style.display === 'none') {
-        timeline.style.display = 'block'
-        this.textContent = 'Ver menos'
-      } else {
-        timeline.style.display = 'none'
-        this.textContent = 'Ver más'
-      }
-    })
-  </script>
-
-  <script>
-    const totalSteps = document.querySelectorAll('.progress-step').length
-    const completedSteps = document.querySelectorAll('.step-icon.completed').length
-    
-    const fillLine = document.querySelector('.progress-line-fill')
-    console.log(completedSteps)
-    console.log(totalSteps)
-
-    const coso = ((completedSteps - 1) / (totalSteps - 1)) * 145;
-    //const coso = 0;
-    let porcentaje;
-    if (coso == 0) {
-      porcentaje = 22
+<script>
+  document.querySelector('.details-toggle').addEventListener('click', function () {
+    const timeline = document.querySelector('.timeline')
+    if (timeline.style.display === 'none') {
+      timeline.style.display = 'block'
+      this.textContent = 'Ver menos'
     } else {
-      porcentaje = coso
+      timeline.style.display = 'none'
+      this.textContent = 'Ver más'
     }
-    
-    fillLine.style.width = `${porcentaje}%`
-  </script>
+  })
+</script>
+
+<script>
+  const totalSteps = document.querySelectorAll('.progress-step').length
+  const completedSteps = document.querySelectorAll('.step-icon.completed').length
+
+  const fillLine = document.querySelector('.progress-line-fill')
+  console.log(completedSteps)
+  console.log(totalSteps)
+
+  const coso = ((completedSteps - 1) / (totalSteps - 1)) * 145;
+  //const coso = 0;
+  let porcentaje;
+  if (coso == 0) {
+    porcentaje = 22
+  } else {
+    porcentaje = coso
+  }
+
+  fillLine.style.width = `${porcentaje}%`
+</script>
 {% endblock %}

@@ -5416,7 +5416,7 @@ def seguimiento_reclamo_directo(reclamo_id):
 # ========== ENDPOINTS PARA GESTIÓN ADMINISTRATIVA DE RECLAMOS ==========
 
 @app.route("/responder_reclamos", methods=["GET"])
-@validar_empleado()
+# @validar_empleado()
 def vista_responder_reclamos():
     """
     Vista principal para que los administradores respondan reclamos
@@ -5594,7 +5594,7 @@ def api_info_reclamo(reclamo_id):
         }), 500
     
 @app.route("/api/obtener_historial_reclamo/<int:reclamo_id>", methods=["GET"])
-@validar_empleado()
+# @validar_empleado()
 def api_obtener_historial_reclamo(reclamo_id):
     """
     Obtiene el historial de seguimiento de un reclamo (para modal administrativo)
@@ -5992,6 +5992,44 @@ def insertar_salida():
     })
 
     
+    
+
+@app.route('/api/guia_remision/<int:transaccion_id>')
+def generar_guia_remision(transaccion_id):
+    from controladores import reporte_pepo as reporte_pepo  # Suponiendo que ya tienes esta función
+
+    data = controlador_paquete.obtener_datos_guia_remision(transaccion_id)
+
+    if not data:
+        return jsonify({'success': False, 'message': 'Datos no encontrados para la transacción'})
+
+    filename = f'guia_{transaccion_id}.pdf'
+    path = f'img/guias/{filename}'
+    reporte_pepo.generar_guia_pdf(data, filename="guia_remision.pdf")
+
+    return send_file(path, as_attachment=True)
+
+@app.route("/descargar_guia/<string:tracking>")
+def descargar_guia_remision(tracking):
+    from controladores import reporte_pepo as reporte_pepo
+
+    num_serie = controlador_paquete.get_num_serie_por_tracking(tracking)
+    if not num_serie:
+        return "No se encontró la transacción para este paquete", 404
+
+    data = controlador_paquete.obtener_datos_guia_remision(num_serie)
+    if not data:
+        return "Datos insuficientes para generar la guía", 400
+
+    filename = f"guia_{num_serie}.pdf"
+    path = f"static/img/guias/{filename}"
+
+    reporte_pepo.generar_guia_pdf(data, filename=path)
+
+    return send_file(path, as_attachment=True)
+
+
+>>>>>>> ac612087b9cd33c9d314f887280f2c07956b2a7a
 ##############################################3
 ##############################################
 

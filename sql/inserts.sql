@@ -106,6 +106,7 @@ VALUES (1, 'Mantenimientos'),
   (3, 'Transacciones'),
   (4, 'Reportes');
 
+
 INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `mostrar`, `padrepaginaid`, `tipo_paginaid`, `moduloid`) VALUES
 (1, 'tipos de unidades', 'fa-solid fa-truck-plane', 1, 'tipo_unidad', 1, NULL, 1, 1),
 (2, 'marcas de unidades', 'fa-solid fa-car-side', 1, 'marca', 1, NULL, 1, 1),
@@ -158,8 +159,11 @@ INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `mostrar`, `padr
 (51, 'Reporte de reclamos segun tipo , causa y periodo', 'fa-solid fa-clipboard-list', 1, 'reporte_reclamos_tipo_causa_periodo', 1, NULL, 4, 4),
 (52, 'Reporte de viajes realizados por unidad', 'fa-solid fa-truck-fast', 1, 'viajes_por_unidad', 1, NULL, 4, 2),
 (53, 'Listado de encomiendas por tipo empaque', 'fa-solid fa-boxes-packing', 1, 'encomiendas_listar', 1, NULL, 4, 3),
-(54, 'Seguimiento de paquete', NULL, 1, 'seguimiento', 1, NULL, 3, 3),
-(55, 'Permisos de acceso', 'ri-file-lock-fill', 1, 'permiso_rol', 0, NULL, 2, 6);
+(54, 'Seguimiento de paquete', NULL, 1, 'seguimiento', 0, NULL, 3, 3),
+(55, 'Permisos de acceso', 'ri-file-lock-fill', 1, 'permiso_rol', 0, NULL, 2, 6),
+(56, 'Procesar Pago de Paquete', 'fas fa-credit-card', 1, 'pagar_paquete', 0, NULL, 2, 3),
+(57, 'Responder reclamos', 'fa-solid fa-headset', 1, 'vista_responder_reclamos', 1, NULL, 2, 4);
+
 
 INSERT INTO `tipo_rol` (`id`, `nombre`, `descripcion`, `activo`)
 VALUES (1, 'SuperAdministador', 'Dios', 1),
@@ -6800,9 +6804,48 @@ VALUES (
     'C',
     1
   );
-INSERT INTO empleado (id, nombre, apellidos, correo, rolid)
-VALUES (1, 'Ana', 'Ramírez', 'ana@gmail.com', 1),
-  (2, 'Juan', 'Perez', 'perez@gmail.com', 1);
+
+
+
+INSERT INTO `empleado` (`id`, `nombre`, `apellidos`, `correo`, `n_documento`, `rolid`) VALUES
+(1, 'Ana', 'Ramírez', 'ana@gmail.com', '', 1),
+(2, 'Juan', 'Perez', 'perez@gmail.com', '', 1),
+(3, 'Carlos', 'Ramírez León', 'carlos.ramirez@transportes.com', 'D12345678', 3),
+(4, 'Lucía', 'Mendoza Ruiz', 'lucia.mendoza@transportes.com', 'B98765432', 3),
+(5, 'Pedro', 'Sánchez Huamán', 'pedro.sanchez@transportes.com', 'C76543210', 3),
+(6, 'Ana', 'Torres Rivas', 'ana.torres@transportes.com', 'A11223344', 3),
+(7, 'Luis', 'Castillo Valverde', 'luis.castillo@transportes.com', 'E55667788', 3),
+(8, 'María', 'López Espinoza', 'maria.lopez@transportes.com', 'F99887766', 3),
+(9, 'Javier', 'Gómez Paredes', 'javier.gomez@transportes.com', 'G33445566', 3),
+(10, 'Sofía', 'Fernández Quispe', 'sofia.fernandez@transportes.com', 'H77889900', 3),
+(11, 'Renzo', 'Morales Vega', 'renzo.morales@transportes.com', 'L10101010', 2),
+(12, 'Karen', 'Vera Castro', 'karen.vera@transportes.com', 'L20202020', 2),
+(13, 'Miguel', 'Torres Díaz', 'miguel.torres@transportes.com', 'M30303030', 4),
+(14, 'Fiorella', 'Salas Gutiérrez', 'fiorella.salas@transportes.com', 'M40404040', 4),
+(15, 'Valeria', 'Reyes Sánchez', 'valeria.reyes@transportes.com', 'V50505050', 5),
+(16, 'Andrés', 'Cruz Ponce', 'andres.cruz@transportes.com', 'V60606060', 5),
+(17, 'Lucero', 'Medina Cáceres', 'lucero.medina@transportes.com', 'D70707070', 6),
+(18, 'Pablo', 'Vargas Luján', 'pablo.vargas@transportes.com', 'D80808080', 6),
+(19, 'Esteban', 'Guerrero Ramírez', 'esteban.guerrero@transportes.com', 'R90909090', 7),
+(20, 'Nathaly', 'Silva Aquino', 'nathaly.silva@transportes.com', 'R01010101', 7),
+(21, 'Oscar', 'Huamán Ortega', 'oscar.huaman@transportes.com', 'S11111111', 8),
+(22, 'Brenda', 'Campos Aguirre', 'brenda.campos@transportes.com', 'S12121212', 8),
+(23, 'Ismael', 'Palacios Ruiz', 'ismael.palacios@transportes.com', 'I13131313', 9),
+(24, 'Juliana', 'Ortega Paredes', 'juliana.ortega@transportes.com', 'I14141414', 9),
+(25, 'Ricardo', 'Delgado Soto', 'ricardo.delgado@transportes.com', 'F15151515', 10),
+(26, 'Milagros', 'León Chávez', 'milagros.leon@transportes.com', 'F16161616', 10),
+(27, 'Sebastián', 'Calle Zapata', 'sebastian.calle@transportes.com', 'A17171717', 11),
+(28, 'Adriana', 'García Rojas', 'adriana.garcia@transportes.com', 'A18181818', 11),
+(29, 'Mario', 'Vásquez Pinto', 'mario.vasquez@transportes.com', 'V19191919', 12),
+(30, 'Diana', 'Rosales Inga', 'diana.rosales@transportes.com', 'V20202020', 12),
+(31, 'Alberto', 'Reyna Ríos', 'alberto.reyna@transportes.com', 'P21212121', 13),
+(32, 'Valentina', 'Pérez Torres', 'valentina.perez@transportes.com', 'P22222222', 13),
+(33, 'Rosa', 'Núñez Carranza', 'rosa.nunez@transportes.com', 'U23232323', 14),
+(34, 'Enrique', 'Salazar Guzmán', 'enrique.salazar@transportes.com', 'U24242424', 14),
+(35, 'Jimena', 'Flores Córdova', 'jimena.flores@transportes.com', 'G25252525', 15),
+(36, 'Diego', 'Zamora Cornejo', 'diego.zamora@transportes.com', 'G26262626', 15);
+
+
 INSERT INTO `sucursal`(
     `abreviatura`,
     `codigo_postal`,
@@ -8286,63 +8329,7 @@ VALUES (
     1,
     4
   );
-INSERT INTO empleado (nombre, apellidos, correo, n_documento, rolid)
-VALUES (
-    'Carlos',
-    'Ramírez León',
-    'carlos.ramirez@transportes.com',
-    'D12345678',
-    3
-  ),
-  (
-    'Lucía',
-    'Mendoza Ruiz',
-    'lucia.mendoza@transportes.com',
-    'B98765432',
-    3
-  ),
-  (
-    'Pedro',
-    'Sánchez Huamán',
-    'pedro.sanchez@transportes.com',
-    'C76543210',
-    3
-  ),
-  (
-    'Ana',
-    'Torres Rivas',
-    'ana.torres@transportes.com',
-    'A11223344',
-    3
-  ),
-  (
-    'Luis',
-    'Castillo Valverde',
-    'luis.castillo@transportes.com',
-    'E55667788',
-    3
-  ),
-  (
-    'María',
-    'López Espinoza',
-    'maria.lopez@transportes.com',
-    'F99887766',
-    3
-  ),
-  (
-    'Javier',
-    'Gómez Paredes',
-    'javier.gomez@transportes.com',
-    'G33445566',
-    3
-  ),
-  (
-    'Sofía',
-    'Fernández Quispe',
-    'sofia.fernandez@transportes.com',
-    'H77889900',
-    3
-  );
+
 INSERT INTO salida (
     fecha,
     hora,
@@ -8445,75 +8432,222 @@ VALUES (
   );
 
 
-
-
 INSERT INTO `permiso` (`paginaid`, `rolid`, `acceso`, `search`, `consult`, `insert`, `update`, `delete`, `unactive`, `otro`) VALUES
 (1, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(1, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(1, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(1, 15, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (2, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(2, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(2, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(2, 15, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (3, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(3, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(3, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(3, 15, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (4, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(4, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(4, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(4, 15, 1, 1, 1, 1, 1, 1, 0, '{}'),
 (5, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(5, 8, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(5, 11, 1, 1, 1, 1, 0, 0, 0, '{}'),
 (5, 12, 1, 0, 0, 0, 0, 0, 0, '{}'),
 (6, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(6, 8, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(6, 11, 1, 1, 1, 1, 0, 0, 0, '{}'),
 (6, 12, 1, 0, 0, 0, 0, 0, 0, '{}'),
 (7, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(7, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(7, 13, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (8, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(8, 10, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(8, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(8, 12, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (9, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(9, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(9, 13, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (10, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(10, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(10, 14, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (11, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(11, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(11, 14, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (12, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(12, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(12, 14, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (13, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(13, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(13, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(13, 15, 0, 0, 0, 0, 0, 0, 0, '{}'),
 (14, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(14, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(14, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (15, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(15, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(15, 9, 1, 1, 1, 0, 0, 0, 0, '{}'),
 (16, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(16, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(16, 9, 1, 1, 1, 0, 0, 0, 0, '{}'),
 (17, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(17, 4, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(17, 10, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(17, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(17, 12, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (18, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(18, 8, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(18, 11, 1, 1, 1, 1, 0, 0, 0, '{}'),
 (18, 12, 1, 0, 0, 0, 0, 0, 0, '{}'),
 (19, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(19, 4, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(19, 10, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(19, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(19, 12, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (20, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(20, 8, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(20, 11, 1, 1, 1, 1, 0, 0, 0, '{}'),
 (20, 12, 1, 0, 0, 0, 0, 0, 0, '{}'),
 (21, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(21, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(21, 13, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (22, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(22, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(22, 9, 1, 1, 1, 0, 0, 0, 0, '{}'),
 (23, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(23, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(23, 9, 1, 1, 1, 0, 0, 0, 0, '{}'),
 (24, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(24, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(24, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(24, 13, 1, 0, 0, 0, 0, 0, 0, '{}'),
 (25, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(25, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(25, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(25, 13, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(25, 15, 0, 0, 0, 0, 0, 0, 0, '{}'),
 (26, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(26, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(26, 9, 1, 1, 1, 0, 0, 0, 0, '{}'),
 (28, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(28, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(28, 14, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (29, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(29, 8, 0, 0, 1, 0, 0, 0, 0, '{}'),
+(29, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (30, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(30, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(30, 9, 1, 1, 1, 1, 1, 1, 0, '{}'),
 (31, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(31, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(31, 9, 1, 1, 1, 0, 0, 0, 0, '{}'),
 (32, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(32, 6, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(32, 7, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(32, 8, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(32, 11, 1, 1, 1, 1, 0, 0, 0, '{}'),
 (32, 12, 1, 0, 0, 0, 0, 0, 0, '{}'),
 (33, 1, 1, 1, 1, 1, 1, 1, 1, '{\"mapa\": 1}'),
+(33, 2, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(33, 4, 1, 1, 1, 1, 0, 0, 0, '{\"mapa\": 1}'),
+(33, 10, 1, 1, 0, 1, 0, 0, 1, '{}'),
+(33, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
 (33, 12, 1, 0, 0, 1, 0, 0, 0, '{\"mapa\": 1}'),
 (34, 1, 1, 1, 1, 1, 1, 1, 1, '{\"paquete\": 1}'),
+(34, 6, 1, 1, 1, 1, 1, 0, 0, '{\"paquete\": 1}'),
+(34, 8, 1, 1, 1, 1, 1, 1, 0, '{\"paquete\": 1}'),
+(34, 11, 1, 1, 1, 1, 0, 0, 0, '{\"paquete\": 1}'),
 (34, 12, 1, 0, 0, 1, 0, 0, 0, '{}'),
 (35, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(35, 2, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(35, 10, 1, 1, 0, 1, 0, 0, 1, '{}'),
+(35, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
 (36, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(36, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(36, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (37, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(37, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(37, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (39, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(39, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(39, 13, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (40, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(40, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(40, 14, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (41, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(41, 4, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(41, 10, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(41, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(41, 12, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (42, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(42, 4, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(42, 10, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(42, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(42, 12, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (43, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(43, 4, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(43, 10, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(43, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(43, 12, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (44, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(44, 10, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(44, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(44, 12, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (45, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(45, 10, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(45, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(45, 12, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (46, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(46, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(46, 9, 1, 1, 1, 0, 0, 0, 0, '{}'),
 (47, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(47, 6, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(47, 8, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(47, 11, 1, 1, 1, 1, 0, 0, 0, '{}'),
 (47, 12, 1, 0, 0, 0, 0, 0, 0, '{}'),
 (48, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
-(49, 1, 1, 1, 1, 1, 1, 1, 1, '{\"qr_code\": 1, \"seguimiento\": 1, \"encomiendas\": 1}'),
+(48, 2, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(48, 10, 1, 1, 0, 1, 0, 0, 1, '{}'),
+(48, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(49, 1, 1, 1, 1, 1, 1, 1, 1, '{\"qr_code\": 1, \"seguimiento\": 1, \"encomiendas\": 1, \"pago\": 1}'),
+(49, 6, 1, 1, 1, 1, 1, 0, 0, '{\"encomiendas\": 1, \"seguimiento\": 1, \"qr_code\": 1, \"pago\": 1}'),
+(49, 7, 1, 1, 1, 1, 1, 1, 0, '{\"encomiendas\": 1, \"seguimiento\": 1, \"qr_code\": 1, \"pago\": 1}'),
+(49, 8, 1, 1, 1, 1, 1, 1, 0, '{\"seguimiento\": 1, \"encomiendas\": 1, \"qr_code\": 1, \"pago\": 1}'),
+(49, 11, 1, 1, 1, 1, 0, 0, 0, '{\"encomiendas\": 1, \"qr_code\": 1, \"seguimiento\": 1}'),
 (49, 12, 1, 0, 0, 1, 0, 0, 0, '{\"encomiendas\": 1, \"qr_code\": 1}'),
 (50, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(50, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(50, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(50, 15, 1, 0, 0, 0, 0, 0, 0, '{}'),
 (51, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(51, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(51, 9, 1, 1, 1, 0, 0, 0, 0, '{}'),
 (52, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(52, 2, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(52, 4, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(52, 10, 1, 1, 0, 1, 0, 0, 1, '{}'),
+(52, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(52, 15, 1, 0, 0, 0, 0, 0, 0, '{}'),
 (53, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(53, 6, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(53, 7, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(53, 8, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(53, 11, 1, 1, 1, 1, 0, 0, 0, '{}'),
 (53, 12, 1, 0, 0, 0, 0, 0, 0, '{}'),
-(54, 1, 1, 1, 1, 1, 1, 1, 1, '{\"\": 1}'),
+(54, 1, 1, 1, 1, 1, 1, 1, 1, '{\"\": 1, \"paquetes\": 1}'),
+(54, 6, 1, 0, 0, 1, 1, 1, 0, '{}'),
+(54, 8, 1, 0, 0, 1, 1, 1, 0, '{\"paquetes\": 1}'),
+(54, 11, 1, 1, 1, 1, 0, 0, 0, '{\"paquetes\": 1}'),
 (54, 12, 1, 0, 0, 0, 0, 0, 0, '{}'),
-(55, 1, 1, 1, 1, 1, 1, 1, 1, '{}');
-
-
+(55, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(55, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(55, 14, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(56, 1, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(56, 6, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(56, 8, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(56, 11, 1, 1, 1, 1, 0, 0, 0, '{}'),
+(57, 1, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(57, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(57, 9, 1, 1, 1, 0, 0, 0, 0, '{}');
 
 
 INSERT INTO transaccion_encomienda (num_serie, masivo, descripcion, monto_total, recojo_casa, id_sucursal_origen, fecha, hora, direccion_recojo, clienteid) VALUES
@@ -8536,3 +8670,200 @@ INSERT INTO paquete (tracking, clave, valor, peso, qr_url, alto, cantidad_folios
 
 
 
+INSERT INTO transaccion_venta (num_serie, tipo_comprobanteid, estado, monto_total, fecha, hora, clienteid) VALUES
+-- Ventas de Enero 2024
+(1001, 1, 1, 45.50, '2024-01-15', '10:30:00', 1),
+(1002, 2, 1, 128.90, '2024-01-16', '14:20:00', 3),
+(1003, 1, 1, 67.30, '2024-01-18', '16:45:00', 2),
+(1004, 1, 0, 34.70, '2024-01-20', '11:15:00', 4),
+(1005, 1, 1, 89.20, '2024-01-25', '15:30:00', 5),
+
+-- Ventas de Febrero 2024
+(1006, 1, 1, 156.80, '2024-02-05', '09:30:00', 1),
+(1007, 1, 1, 78.40, '2024-02-10', '15:20:00', 2),
+(1008, 2, 1, 198.60, '2024-02-12', '13:45:00', 3),
+(1009, 1, 1, 92.30, '2024-02-15', '17:30:00', 5),
+(1010, 1, 1, 54.70, '2024-02-28', '12:15:00', 4),
+
+-- Ventas de Marzo 2024
+(1011, 1, 1, 234.50, '2024-03-02', '10:15:00', 4),
+(1012, 1, 1, 167.80, '2024-03-08', '12:30:00', 1),
+(1013, 2, 1, 345.20, '2024-03-10', '14:45:00', 3),
+(1014, 1, 0, 76.40, '2024-03-15', '16:20:00', 2),
+(1015, 1, 1, 123.90, '2024-03-22', '11:40:00', 5),
+
+-- Ventas de Abril 2024
+(1016, 1, 1, 189.60, '2024-04-05', '11:30:00', 5),
+(1017, 1, 1, 98.70, '2024-04-12', '15:45:00', 1),
+(1018, 2, 1, 278.50, '2024-04-18', '13:20:00', 3),
+(1019, 1, 1, 134.20, '2024-04-25', '17:10:00', 2),
+(1020, 1, 0, 45.80, '2024-04-30', '10:50:00', 4),
+
+-- Ventas de Mayo 2024
+(1021, 1, 1, 267.40, '2024-05-08', '14:25:00', 2),
+(1022, 1, 1, 87.30, '2024-05-15', '16:30:00', 4),
+(1023, 2, 1, 456.80, '2024-05-20', '12:15:00', 3),
+(1024, 1, 1, 178.90, '2024-05-28', '18:45:00', 1),
+(1025, 1, 1, 213.50, '2024-05-30', '09:20:00', 5),
+
+-- Ventas RECIENTES (Junio 2024)
+(1026, 1, 1, 324.70, '2024-06-20', '10:45:00', 2),
+(1027, 1, 1, 94.60, '2024-06-21', '14:30:00', 4),
+(1028, 2, 1, 567.80, '2024-06-22', '16:15:00', 3),
+(1029, 1, 0, 76.20, '2024-06-23', '12:30:00', 1),
+(1030, 1, 1, 145.30, '2024-06-24', '17:45:00', 5);
+
+-- 3. DETALLES DE VENTA (productos vendidos en cada transacción)
+INSERT INTO detalle_venta (articuloid, ventanum_serie, cantidad) VALUES
+-- Detalles de Enero 2024
+(1, 1001, 10), -- Caja XXS
+(6, 1001, 5),  -- Plumón
+(7, 1001, 8),  -- Sobre A4
+
+(2, 1002, 15), -- Caja XS
+(3, 1002, 20), -- Caja S
+(8, 1002, 3),  -- Cinta Embalaje
+
+(4, 1003, 8),  -- Caja M
+(10, 1003, 12), -- Burbupack
+
+(1, 1004, 5),  -- Caja XXS
+(6, 1004, 2),  -- Plumón
+
+(3, 1005, 12), -- Caja S
+(5, 1005, 6),  -- Caja L
+
+-- Detalles de Febrero 2024
+(1, 1006, 25), -- Caja XXS
+(2, 1006, 20), -- Caja XS
+(8, 1006, 5),  -- Cinta Embalaje
+
+(4, 1007, 10), -- Caja M
+(6, 1007, 8),  -- Plumón
+
+(5, 1008, 30), -- Caja L
+(9, 1008, 4),  -- Stretch Film
+(10, 1008, 15), -- Burbupack
+
+(1, 1009, 18), -- Caja XXS
+(7, 1009, 25), -- Sobre A4
+
+(3, 1010, 8),  -- Caja S
+(6, 1010, 3),  -- Plumón
+
+-- Detalles de Marzo 2024
+(2, 1011, 35), -- Caja XS
+(4, 1011, 25), -- Caja M
+(8, 1011, 8),  -- Cinta Embalaje
+
+(1, 1012, 40), -- Caja XXS
+(5, 1012, 15), -- Caja L
+
+(3, 1013, 50), -- Caja S
+(9, 1013, 10), -- Stretch Film
+(10, 1013, 20), -- Burbupack
+
+(1, 1014, 12), -- Caja XXS
+(7, 1014, 15), -- Sobre A4
+
+(4, 1015, 18), -- Caja M
+(6, 1015, 4),  -- Plumón
+
+-- Detalles de Abril 2024
+(2, 1016, 28), -- Caja XS
+(3, 1016, 22), -- Caja S
+(8, 1016, 6),  -- Cinta Embalaje
+
+(1, 1017, 20), -- Caja XXS
+(10, 1017, 8), -- Burbupack
+
+(4, 1018, 35), -- Caja M
+(5, 1018, 25), -- Caja L
+(9, 1018, 8),  -- Stretch Film
+
+(2, 1019, 24), -- Caja XS
+(7, 1019, 30), -- Sobre A4
+
+(1, 1020, 8),  -- Caja XXS
+(6, 1020, 2),  -- Plumón
+
+-- Detalles de Mayo 2024
+(3, 1021, 45), -- Caja S
+(4, 1021, 30), -- Caja M
+(8, 1021, 10), -- Cinta Embalaje
+
+(1, 1022, 15), -- Caja XXS
+(6, 1022, 5),  -- Plumón
+
+(5, 1023, 60), -- Caja L
+(9, 1023, 15), -- Stretch Film
+(10, 1023, 25), -- Burbupack
+
+(2, 1024, 38), -- Caja XS
+(7, 1024, 40), -- Sobre A4
+
+(1, 1025, 35), -- Caja XXS
+(4, 1025, 28), -- Caja M
+
+-- Detalles de Junio 2024
+(3, 1026, 55), -- Caja S
+(5, 1026, 40), -- Caja L
+(8, 1026, 12), -- Cinta Embalaje
+
+(1, 1027, 18), -- Caja XXS
+(6, 1027, 6),  -- Plumón
+
+(4, 1028, 65), -- Caja M
+(9, 1028, 18), -- Stretch Film
+(10, 1028, 30), -- Burbupack
+
+(2, 1029, 16), -- Caja XS
+(7, 1029, 20), -- Sobre A4
+
+(1, 1030, 25), -- Caja XXS
+(3, 1030, 18), -- Caja S
+(6, 1030, 4);  -- Plumón
+
+-- 4. MÉTODOS DE PAGO PARA LAS VENTAS
+INSERT INTO metodo_pago_venta (num_serie, tipo_comprobante, metodo_pagoid) VALUES
+-- Pagos de Enero
+(1001, 1, 1), -- Efectivo
+(1002, 2, 2), -- Tarjeta Crédito
+(1003, 1, 3), -- Tarjeta Débito
+(1004, 1, 4), -- Yape
+(1005, 1, 1), -- Efectivo
+
+-- Pagos de Febrero
+(1006, 1, 2), -- Tarjeta Crédito
+(1007, 1, 1), -- Efectivo
+(1008, 2, 3), -- Tarjeta Débito
+(1009, 1, 4), -- Yape
+(1010, 1, 1), -- Efectivo
+
+-- Pagos de Marzo
+(1011, 1, 1), -- Efectivo
+(1012, 1, 2), -- Tarjeta Crédito
+(1013, 2, 3), -- Tarjeta Débito
+(1014, 1, 4), -- Yape
+(1015, 1, 1), -- Efectivo
+
+-- Pagos de Abril
+(1016, 1, 2), -- Tarjeta Crédito
+(1017, 1, 1), -- Efectivo
+(1018, 2, 3), -- Tarjeta Débito
+(1019, 1, 4), -- Yape
+(1020, 1, 1), -- Efectivo
+
+-- Pagos de Mayo
+(1021, 1, 1), -- Efectivo
+(1022, 1, 2), -- Tarjeta Crédito
+(1023, 2, 3), -- Tarjeta Débito
+(1024, 1, 4), -- Yape
+(1025, 1, 1), -- Efectivo
+
+-- Pagos de Junio
+(1026, 1, 2), -- Tarjeta Crédito
+(1027, 1, 1), -- Efectivo
+(1028, 2, 3), -- Tarjeta Débito
+(1029, 1, 4), -- Yape
+(1030, 1, 1); -- Efectivo
