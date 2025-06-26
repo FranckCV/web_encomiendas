@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app , send_file, flash , send_from_directory #, after_this_request, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app , send_file, flash #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import permiso as permiso
 from controladores import controlador_pagina as controlador_pagina
@@ -57,7 +57,6 @@ from controladores import reporte_listar_enco
 from controladores import reporte_reclamo_causa
 from controladores import reporte_UsoUnidades
 from controladores import reporte_Viajes_por_Unidad
-from controladores import reporte_encomiendas_rutas as reporte_encomiendas_rutas
 # import BytesIO
 from itsdangerous import URLSafeSerializer
 from controladores.bd import sql_execute
@@ -436,7 +435,7 @@ CONTROLADORES = {
         ['correo', 'Correo', 'Correo', 'email', True, True, None],
         ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
         ['n_documento', 'N° Documento', '', 'text', True, True, None],
-        ['bien_contratado', 'Bien Contratado', '', 'select', True, True, [lambda:controlador_reclamo.get_list_bien_contratado(), '']],
+        ['bien_contratado', 'Bien Contratado', '', 'text', True, True, None],
         ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
         ['monto_indemnizado', 'Monto Indemnizado', '0.00', 'number', True, True, None],
         ['relacion', 'Relación con el bien', '', 'text', True, True, None],
@@ -449,7 +448,7 @@ CONTROLADORES = {
         ['causa_reclamoid', 'Causa del Reclamo', '', 'select', True, True, [lambda: controlador_causa_reclamo.get_options(), 'nombre']],
         ['tipo_indemnizacionid', 'Tipo de Indemnización', '', 'select', True, True, [lambda: controlador_tipo_indemnizacion.get_options(), 'nombre']],
         ['paquetetracking', 'Tracking', '', 'text', True, True, None],
-        ['ubigeocodigo', 'Ubigeo', '', 'select', True, True, [lambda: controlador_ubigeo.get_options(), 'codigo']],
+        ['ubigeocodigo', 'Ubigeo', '', 'text', True, True, None],
         ['tipo_documentoid', 'Tipo Documento', '', 'select', True, True, [lambda: controlador_tipo_documento.get_options(), 'nombre']]
     ],
     "crud_forms": {
@@ -813,24 +812,6 @@ CONTROLADORES = {
             "crud_unactive": False
         }
     },
-    "seguimiento_reclamos": {
-    "active": True,
-    "titulo": "gestión de reclamos",
-    "nombre_tabla": "reclamo",
-    "controlador": controlador_seguimiento_reclamos,
-    "icon_page": "fa-solid fa-headset",
-    "filters": [],
-    "fields_form": [],
-    "crud_forms": {
-        "crud_list": True,
-        "crud_search": True,
-        "crud_consult": True,
-        "crud_insert": False,
-        "crud_update": False,
-        "crud_delete": False,
-        "crud_unactive": False
-    }
-},
     "tipo_cliente": {
         "active" : True ,
         "titulo": "tipos de clientes",
@@ -1396,18 +1377,20 @@ REPORTES = {
     # Ventas
     "ventas_periodo": {
         "active" : True ,
-        'icon_page' : 'fa-solid fa-sack-dollar' ,   
+        'icon_page' : 'fa-solid fa-sack-dollar' ,
         "titulo": "Ventas",
-        "table" : controlador_articulo.get_reporte_ventas(),
+        "table" : controlador_cliente.get_reporte_ventas(),
         "filters": [
+            # ['rol_id', 'Rol', lambda: controlador_rol.get_options() , 'select' ],
             ['fecha', 'Fecha', None, 'interval_date' ], 
+            # ['fecha', 'Fecha', None, 'date' ],
         ] ,
     },
     "articulos_mas_vendidos": {
         "active": True,
         "icon_page": "fa-solid fa-boxes-stacked",
         "titulo": "Artículos Más Vendidos",
-        "table": controlador_articulo.get_report_mas_vendidos(),  
+        "table": controlador_articulo.get_report_mas_vendidos(),  # referencia a función sin paréntesis
         "filters": [
             ['fecha', 'Fecha', None, 'interval_date'],  # filtro rango de fechas
         ],
@@ -1416,8 +1399,9 @@ REPORTES = {
         "active": True,
         "icon_page": "fa-solid fa-boxes-stacked",
         "titulo": "Artículos que Necesitan Reposición",
-        "table": controlador_articulo.get_report_reposicion(), 
+        "table": controlador_articulo.get_report_reposicion(),  # función sin paréntesis
         "filters": [
+            ['stock_minimo', 'Sin Stock ', lambda: controlador_articulo.get_stock_minimo_options(), 'select'],
         ],
     },
 
@@ -1450,25 +1434,18 @@ REPORTES = {
     "encomiendas_listar": {
         "active": True,
         "icon_page": "fa-solid fa-boxes-packing",
-        "titulo": "Listado de encomiendas segun tipo de empaque ",
-        "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo(),
+        "titulo": "Listado de encomiendas por empaque ",
+        "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo,
         "filters": []
     },
 
     "reporte_reclamos_tipo_causa_periodo": {
-    "active": True,
-    "icon_page": "fa-solid fa-clipboard-list",
-    "titulo": "Reporte de reclamos por tipo, causa y periodo",
-    "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),  # ✅ con paréntesis
-    "filters": []
-},
-"encomiendas_rutas_estado": {
-    "active": True,
-    "icon_page": "fa-solid fa-route",
-    "titulo": "Listado de encomiendas asignadas a rutas específicas y su estado",
-    "table": reporte_encomiendas_rutas.get_reporte_encomiendas_rutas_estado(),  # 👈 con paréntesis
-    "filters": []
-},
+        "active": True,
+        "icon_page": "fa-solid fa-clipboard-list",
+        "titulo": "Reporte de reclamos por tipo, causa y periodo",
+        "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),
+        "filters": ['stock_minimo', 'Stock Mínimo', lambda: controlador_articulo.get_stock_minimo_options(), 'select'],
+    },
 }
 
 
@@ -1527,7 +1504,9 @@ TRANSACCIONES = {
             ['hora',                'Hora',               'Hora',                      'time',      True,  True,   None],
             ['id_sucursal_origen',  'Sucursal de origen', 'Sucursales de origen',                          'select',    True,  True,   [lambda: controlador_tarifa_ruta.get_options_select_sucursal_origen(), 'nombre']],
             ['clienteid',           'Cliente',            'Clientes',                          'select',    True,  True,   [lambda: controlador_cliente.get_select_cliente(), 'nombre']],
+            ['tipo_comprobanteid', 'Tipo Comprobante',    'Tipos de comprobante',                          'select',    True,  True,   [lambda: controlador_tipo_comprobante.get_options(), 'nombre']],
 
+            ['comprobante_serie',   'Serie de Comprobante',    'Serie de Comprobante',            'text',    True,  True,   None],
             ['monto_total',         'Monto Total',        'Monto total',             'decimal_2', True,  True,   None],
             ['direccion_recojo',    'Direccion de recojo',    'Direccion de recojo',            'text',    True,  True,   None],
             ['descripcion',         'Descripcion',            'Descripcion',        'textarea',    True,  True,   None],
@@ -1588,8 +1567,8 @@ TRANSACCIONES = {
         "buttons": [
         # hay_parametros  icon         color              enlace_function      parametros   clase_html   modo(insert ,update , consult)
             # [True, 'fa-solid fa-map-location-dot', "#9856EE", 'seguimiento_tracking', {"tracking": "tracking"} , '' , 'seguimiento'],
-            [True, 'fa-solid fa-route', "#9856EE", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"} , '' , 'seguimiento' , False],
-            [True, 'fa-solid fa-qrcode', "#2195DC", 'ver_img_qr',  {"tracking": "tracking"} , '' , 'qr_code' , True],
+            [True, 'fa-solid fa-route', "#9856EE", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"} , '' , 'seguimiento'],
+            [True, 'fa-solid fa-qrcode', "#B8CBD7", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"} , '' , 'qr_code'],
         ],
         "options": [
         # mostrar_url       icon             color                  text                 enlace_function       parametros                    modo(insert ,update , consult)
@@ -1605,9 +1584,7 @@ TRANSACCIONES = {
         "filters": [], 
         "fields_form": [
         #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
-            ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_options() , 'nombre_det' ] ],
-            ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_options() , 'nombre_det' ] ],
-            
+            # ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_options() , 'nombre_det' ] ],
         ],
         "crud_forms": {
             "crud_list": True,
@@ -1620,8 +1597,7 @@ TRANSACCIONES = {
         },
         "buttons": [],
         "options": [
-            # mostrar_url       icon             color                  text                 enlace_function       parametros                    modo(insert ,update , consult)
-            [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Paquetes', 'transaccion' , {"tabla": "::paquete" } , 'paquetes'],
+            [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Encomiendas', 'transaccion' , {"tabla": "::paquete" }],
         ],
     }
 }
@@ -1703,30 +1679,23 @@ def validar_empleado():
                         f_name = f.__name__
                         l_kwarg = list(kwargs.values())
                         f_kwarg = l_kwarg[0] if l_kwarg else None
-                        # print(f_name,' - ',f_kwarg) 
-                        # try:
-                        if request.method == 'GET':
-                        # if (usuario['rolid'] == 1 and usuario['tipo_rolid'] == 1) or permiso.validar_acceso(usuario['rolid'] , f_name , f_kwarg ):
-                            if permiso.validar_acceso(usuario['rolid'] , f_name , f_kwarg ):
+
+                        try:
+                            # if (usuario['rolid'] == 1 and usuario['tipo_rolid'] == 1) or permiso.validar_acceso(usuario['rolid'] , p_key):
+                            if (usuario['rolid'] == 1 and usuario['tipo_rolid'] == 1) or permiso.validar_acceso(usuario['rolid'] , f_name , f_kwarg ):
                                 return page
                             else:
-                                return rdrct_error( main_empleado_page() , 'PAGINA_NO_EXISTE')
-                        else: 
-                            return page
-                        # except Exception as e:
-                        #     return rdrct_error( redirect_url('login') , e) 
-                    # else:
-                    return rdrct_error( main_empleado_page() , 'PAGINA_NO_EXISTE') 
+                                return rdrct_error( main_empleado_page() , 'PAGINA_NO_EXISTE') 
+                        except Exception as e:
+                            return rdrct_error( redirect_url('login') , e) 
+                    else:
+                        return rdrct_error( main_empleado_page() , 'PAGINA_NO_EXISTE') 
                 return rdrct_error( redirect_url('login') , 'LOGIN_INVALIDO') 
             except Exception as e:
                 return rdrct_error( redirect_url('login') , e) 
         return wrapper
     return decorator
 
-@app.route("/test_redirect")
-def test_redirect():
-    page = CONTROLADORES.get('modulo').get('no_crud')
-    return redirect(url_for(page))
 
 def validar_cliente():
     def decorator(f):
@@ -1761,19 +1730,15 @@ def inject_cur_modulo_id():
             if usuario['correo'] == correo and usuario['tipo_usuario'] == 'E' :
                 path = request.path
                 parts = path.strip('/').split('=')
-                key = None
-                if len(parts) > 1:
-                    ruta_final = parts[-1]
-                    key = ruta_final.split('/')[0]
-                page = obtener_funcion_desde_url(app, path)
-
+                key = parts[-1] 
+                page = obtener_funcion_desde_url(app , path)
                 if page == 'modulo':
                     dataPage = permiso.get_modulo_key(key)
                     if dataPage:
                         return dict(cur_modulo_id=dataPage['id'])
                 else:
-                    dataPage = permiso.get_pagina_key(key) if key is not None else permiso.get_pagina_key(page)
-                    if dataPage:                        
+                    dataPage = permiso.get_pagina_key(key)
+                    if dataPage:
                         if dataPage['tipo_paginaid'] == 2:
                             page_titulo = dataPage['titulo']
                             page_icono  = dataPage['icono']
@@ -1809,11 +1774,11 @@ def inject_globals():
             datosUsuario = controlador_usuario.get_usuario_empleado_user_id(user_id)
             menu_rolid = datosUsuario['rolid']
             if menu_rolid:
-                # if menu_rolid == 1 :
-                #     menu_modulos = permiso.get_lista_modulos()
-                #     menu_tipos_paginas = permiso.get_lista_tipo_paginas()
-                #     menu_paginas = permiso.get_paginas()
-                # else:
+                if menu_rolid == 1 :
+                    menu_modulos = permiso.get_lista_modulos()
+                    menu_tipos_paginas = permiso.get_lista_tipo_paginas()
+                    menu_paginas = permiso.get_paginas()
+                else:
                     menu_modulos = permiso.get_modulos_rol(menu_rolid)
                     menu_tipos_paginas = permiso.get_tipo_paginas_rol(menu_rolid)
                     menu_paginas = permiso.get_paginas_permiso_rol(menu_rolid)
@@ -2692,207 +2657,80 @@ def seguimiento_encomienda():
     estado_encomienda = controlador_estado_encomienda.get_last_state()
     return render_template('seguimiento.html',estado_encomienda=estado_encomienda)
 
-
-# @app.route('/resumen_envio_prueba', methods=['POST'])
-# def resumen_envio_prueba():
-#     try:
-#         raw = request.form.get('payload')
-#         print("Payload recibido:", raw)
-        
-#         if not raw:
-#             return "No se recibió payload", 400
-
-#         # Obtener datos del request
-#         data = json.loads(raw)
-#         print("Datos parseados:", data)
-        
-#         if not data:
-#             return jsonify({
-#                 'error': 'No se recibieron datos',
-#                 'message': 'El request no contiene datos JSON válidos'
-#             }), 400
-
-#         # Extraer información del payload
-#         envios = data.get('registros', [])
-#         remitente = data.get('remitente', {})
-#         origen = data.get('origen', {})
-#         modo_envio = data.get('modo', 'individual')
-
-#         # Validaciones básicas
-#         if not envios:
-#             return render_template('resumen_envio_prueba.html',
-#                                  error_message='No se encontraron envíos para procesar',
-#                                  envios=[],
-#                                  remitente={},
-#                                  origen={},
-#                                  tipo_envio='')
-
-#         # Procesar cada envío para calcular tarifas
-#         for i, envio in enumerate(envios):
-#             try:
-#                 # Mejor manejo de origen/destino
-#                 origen_id = envio.get('origen', {}).get('sucursal_origen') or origen.get('sucursal_origen')
-#                 destino_id = envio.get('destino', {}).get('sucursal_destino')
-                
-#                 if not origen_id or not destino_id:
-#                     print(f"Error: origen_id={origen_id}, destino_id={destino_id} para envío {i}")
-#                     continue
-                
-#                 valor = Decimal(str(envio.get('valorEnvio', 0)))
-#                 peso = Decimal(str(envio.get('peso', 0)))
-
-#                 # Obtener tarifas
-#                 tarifa_row = controlador_tarifa_ruta.get_tarifa_ids(origen_id, destino_id) or {}
-#                 tarifa_base = Decimal(str(tarifa_row.get('tarifa', 0)))
-
-#                 # Obtener reglas de cargo
-#                 regla_p = controlador_regla_cargo.get_regla_cargo_condicion('P', float(peso)) or {}
-#                 regla_v = controlador_regla_cargo.get_regla_cargo_condicion('V', float(valor)) or {}
-#                 porcentaje_p = Decimal(str(regla_p.get('porcentaje', 0)))
-#                 porcentaje_v = Decimal(str(regla_v.get('porcentaje', 0)))
-#                 porcentaje_r = Decimal(str(controlador_empresa.get_porcentaje_recojo()))
-
-#                 # Calcular tarifa total
-#                 total = controlador_tarifa_ruta.calcularTarifaTotal(
-#                     tarifa_base, peso, porcentaje_r, porcentaje_v, porcentaje_p
-#                 )
-#                 envios[i]['tarifa'] = float(total)  # Convertir a float para JSON
-                
-#                 print(f"Envío {i}: tarifa calculada = {total}")
-                
-#             except Exception as e:
-#                 print(f"Error calculando tarifa para envío {i}: {str(e)}")
-#                 envios[i]['tarifa'] = 0
-
-#         # GUARDAR EN SESIÓN PARA EL SIGUIENTE PASO
-#         session['resumen_envios'] = envios
-#         session['remitente_data'] = remitente
-#         session['origen_data'] = origen
-#         session['tipo_envio'] = modo_envio
-
-#         # Log para debugging
-#         print(f"Procesando {len(envios)} envíos de tipo {modo_envio}")
-#         print(f"Remitente: {remitente.get('nombre_remitente', 'No especificado')}")
-#         print(f"Datos guardados en sesión para pago_envio_prueba")
-
-#         # Renderizar la plantilla con los datos
-#         return render_template('resumen_envio_prueba.html',
-#                              envios=envios,
-#                              remitente=remitente,
-#                              origen=origen,
-#                              tipo_envio=modo_envio,
-#                              error_message=None)
-
-        
-#     except Exception as e:
-#         print(f"Error en resumen_envio_prueba: {str(e)}")
-#         import traceback
-#         traceback.print_exc()
-#         return jsonify({
-#             'error': 'Error procesando resumen',
-#             'message': str(e)
-#         }), 500
-
-
-#     except Exception as e:
-#         print(f"Error en resumen_envio_prueba: {str(e)}")
-#         import traceback
-#         traceback.print_exc()
-#         return jsonify({
-#             'error': 'Error procesando resumen',
-#             'message': str(e)
-#         }), 500
-
 @app.route('/resumen_envio_prueba', methods=['POST'])
 def resumen_envio_prueba():
     try:
         raw = request.form.get('payload')
-        print("Payload recibido:", raw)
-        
         if not raw:
             return "No se recibió payload", 400
 
         # Obtener datos del request
         data = json.loads(raw)
-        print("Datos parseados:", data)
         
         if not data:
             return jsonify({
                 'error': 'No se recibieron datos',
                 'message': 'El request no contiene datos JSON válidos'
             }), 400
-
+        
         # Extraer información del payload
-        envios = data.get('registros', [])
+        envios = data.get('envios', [])
         remitente = data.get('remitente', {})
-        origen = data.get('origen', {})
-        modo_envio = data.get('modo', 'individual')
-
+        modalidad_pago = data.get('modalidad_pago', '')
+        tipo_envio = data.get('tipo_envio', 'individual')
+        
         # Validaciones básicas
         if not envios:
-            return render_template('resumen_envio_prueba.html',
+            return render_template('resumen_envio.html', 
                                  error_message='No se encontraron envíos para procesar',
                                  envios=[],
                                  remitente={},
-                                 origen={},
+                                 modalidad_pago='',
                                  tipo_envio='')
-
+        
         # Procesar cada envío para calcular tarifas
         for i, envio in enumerate(envios):
-            try:
-                # Mejor manejo de origen/destino
-                origen_id = envio.get('origen', {}).get('sucursal_origen') or origen.get('sucursal_origen')
-                destino_id = envio.get('destino', {}).get('sucursal_destino')
-                
-                if not origen_id or not destino_id:
-                    print(f"Error: origen_id={origen_id}, destino_id={destino_id} para envío {i}")
-                    continue
-                
-                valor = Decimal(str(envio.get('valorEnvio', 0)))
-                peso = Decimal(str(envio.get('peso', 0)))
+            origen_id  = envio['origen']['sucursal_origen']
+            destino_id = envio['destino']['sucursal_destino']
+            valor      = Decimal(str(envio['valorEnvio']))
+            peso       = Decimal(str(envio['peso']))
 
-                # Obtener tarifas
-                tarifa_row = controlador_tarifa_ruta.get_tarifa_ids(origen_id, destino_id) or {}
-                tarifa_base = Decimal(str(tarifa_row.get('tarifa', 0)))
+            tarifa_row  = controlador_tarifa_ruta.get_tarifa_ids(origen_id, destino_id) or {}
+            tarifa_base = Decimal(str(tarifa_row.get('tarifa', 0)))
 
-                # Obtener reglas de cargo
-                regla_p = controlador_regla_cargo.get_regla_cargo_condicion('P', float(peso)) or {}
-                regla_v = controlador_regla_cargo.get_regla_cargo_condicion('V', float(valor)) or {}
-                porcentaje_p = Decimal(str(regla_p.get('porcentaje', 0)))
-                porcentaje_v = Decimal(str(regla_v.get('porcentaje', 0)))
-                porcentaje_r = Decimal(str(controlador_empresa.get_porcentaje_recojo()))
+            regla_p      = controlador_regla_cargo.get_regla_cargo_condicion('P', float(peso)) or {}
+            regla_v      = controlador_regla_cargo.get_regla_cargo_condicion('V', float(valor)) or {}
+            porcentaje_p = Decimal(str(regla_p.get('porcentaje', 0)))
+            porcentaje_v = Decimal(str(regla_v.get('porcentaje', 0)))
+            porcentaje_r = Decimal(str(controlador_empresa.get_porcentaje_recojo()))
 
-                # Calcular tarifa total
-                total = controlador_tarifa_ruta.calcularTarifaTotal(
-                    tarifa_base, peso, porcentaje_r, porcentaje_v, porcentaje_p
-                )
-                envios[i]['tarifa'] = float(total)  # Convertir a float para JSON
-                
-                print(f"Envío {i}: tarifa calculada = {total}")
-                
-            except Exception as e:
-                print(f"Error calculando tarifa para envío {i}: {str(e)}")
-                envios[i]['tarifa'] = 0
-
-        # GUARDAR EN SESIÓN PARA EL SIGUIENTE PASO
+            total = controlador_tarifa_ruta.calcularTarifaTotal(
+                tarifa_base, peso, porcentaje_r, porcentaje_v, porcentaje_p
+            )
+            envios[i]['tarifa'] = total
+            
+            # Asegurar que todos los campos necesarios existan
+            envios[i] = normalizar_envio(envio)
+        
+        # ✅ GUARDAR EN SESIÓN PARA EL SIGUIENTE PASO
         session['resumen_envios'] = envios
         session['remitente_data'] = remitente
-        session['origen_data'] = origen
-        session['tipo_envio'] = modo_envio
-
+        session['modalidad_pago'] = modalidad_pago
+        session['tipo_envio'] = tipo_envio
+        
         # Log para debugging
-        print(f"Procesando {len(envios)} envíos de tipo {modo_envio}")
+        print(f"Procesando {len(envios)} envíos de tipo {tipo_envio}")
         print(f"Remitente: {remitente.get('nombre_remitente', 'No especificado')}")
         print(f"Datos guardados en sesión para pago_envio_prueba")
-
+        
         # Renderizar la plantilla con los datos
         return render_template('resumen_envio_prueba.html',
                              envios=envios,
                              remitente=remitente,
-                             origen=origen,
-                             tipo_envio=modo_envio,
+                             modalidad_pago=modalidad_pago,
+                             tipo_envio=tipo_envio,
                              error_message=None)
-
+        
     except Exception as e:
         print(f"Error en resumen_envio_prueba: {str(e)}")
         import traceback
@@ -2906,92 +2744,205 @@ def resumen_envio_prueba():
 @app.route('/pago_envio_prueba', methods=['POST'])
 def pago_envio_prueba():
     try:
-        # Obtener datos del formulario
+        # Obtener datos del formulario o de la sesión
         envios_data = request.form.get('envios_data')
         remitente_data = request.form.get('remitente_data')
-        origen_data = request.form.get('origen_data')
+        modalidad_pago = request.form.get('modalidad_pago')
         tipo_envio = request.form.get('tipo_envio')
         
         print(f"Datos recibidos del formulario:")
-        print(f"- Número de envíos: {len(json.loads(envios_data)) if envios_data else 0}")
-        print(f"- Tipo envío: {tipo_envio}")
+        print(f"- envios_data_form: {envios_data[:100] if envios_data else 'None'}...")
+        print(f"- remitente_data: {remitente_data[:100] if remitente_data else 'None'}...")
+        print(f"- modalidad_pago: {modalidad_pago}")
+        print(f"- tipo_envio: {tipo_envio}")
         
-        # Convertir de JSON string a objetos Python
+        # Si no vienen del formulario, obtener de la sesión
         if not envios_data:
-            return redirect(url_for('tipos_envio'))
-            
-        envios = json.loads(envios_data)
-        remitente = json.loads(remitente_data) if remitente_data else {}
-        origen = json.loads(origen_data) if origen_data else {}
+            print("No hay datos en formulario, obteniendo de sesión...")
+            envios = session.get('resumen_envios', [])
+            remitente = session.get('remitente_data', {})
+            modalidad_pago = session.get('modalidad_pago', '')
+            tipo_envio = session.get('tipo_envio', 'individual')
+        else:
+            try:
+                # Convertir de JSON string a objetos Python
+                envios = json.loads(envios_data) if envios_data else []
+                remitente = json.loads(remitente_data) if remitente_data else {}
+                
+                print(f"Datos parseados correctamente:")
+                print(f"- Número de envíos: {len(envios)}")
+                print(f"- Remitente: {remitente.get('nombre_remitente', 'No especificado')}")
+                
+            except json.JSONDecodeError as e:
+                print(f"Error parseando JSON: {e}")
+                print(f"Datos problemáticos - envios_data: {envios_data}")
+                print(f"Datos problemáticos - remitente_data: {remitente_data}")
+                
+                # Intentar obtener de la sesión como fallback
+                envios = session.get('resumen_envios', [])
+                remitente = session.get('remitente_data', {})
+                modalidad_pago = session.get('modalidad_pago', modalidad_pago or '')
+                tipo_envio = session.get('tipo_envio', tipo_envio or 'individual')
+                
+                if not envios:
+                    return jsonify({
+                        'error': 'Error en formato de datos',
+                        'message': 'Los datos enviados no tienen un formato válido'
+                    }), 400
         
         if not envios:
+            print("No se encontraron envíos, redirigiendo...")
             return redirect(url_for('tipos_envio'))
         
-        # Separar envíos por modalidad de pago
-        envios_pago_online = [envio for envio in envios if envio.get('modalidadPago') == '1']
-        envios_otras_modalidades = [envio for envio in envios if envio.get('modalidadPago') != '1']
+        # Calcular total a pagar
+        total_pagar = 0
+        for envio in envios:
+            try:
+                tarifa = float(envio.get('tarifa', 0))
+                total_pagar += tarifa
+            except (ValueError, TypeError):
+                print(f"Error calculando tarifa para envío: {envio}")
+                pass
         
-        # Calcular totales
-        total_general = sum(float(envio.get('tarifa', 0)) for envio in envios)
-        total_pago_online = sum(float(envio.get('tarifa', 0)) for envio in envios_pago_online)
-        total_otras_modalidades = sum(float(envio.get('tarifa', 0)) for envio in envios_otras_modalidades)
-        
-        # Detectar si hay envíos con modalidad de pago 1 (pago en línea)
-        tiene_pago_online = len(envios_pago_online) > 0
-        
-        print(f"Total general: S/ {total_general}")
-        print(f"Total pago online: S/ {total_pago_online}")
-        print(f"Total otras modalidades: S/ {total_otras_modalidades}")
-        print(f"¿Tiene pago online?: {tiene_pago_online}")
-        print(f"Envíos pago online: {len(envios_pago_online)}")
-        print(f"Envíos otras modalidades: {len(envios_otras_modalidades)}")
+        print(f"Total a pagar calculado: S/ {total_pagar}")
         
         # Guardar datos para el proceso de pago
         session['datos_pago'] = {
             'envios': envios,
-            'envios_pago_online': envios_pago_online,
-            'envios_otras_modalidades': envios_otras_modalidades,
             'remitente': remitente,
-            'origen': origen,
+            'modalidad_pago': modalidad_pago,
             'tipo_envio': tipo_envio,
-            'total_general': total_general,
-            'total_pago_online': total_pago_online,
-            'total_otras_modalidades': total_otras_modalidades,
-            'tiene_pago_online': tiene_pago_online
+            'total_pagar': total_pagar
         }
         
-        # Obtener opciones de pago solo si hay modalidad 1
-        tipos_comprobante = []
-        metodos_pago = []
+        print(f"Datos guardados en sesión, renderizando template...")
         
-        if tiene_pago_online:
-            tipos_comprobante = controlador_tipo_comprobante.get_tipo_comprobante_by_tipo()
-            metodos_pago = controlador_metodo_pago.get_metodo_pago_online()
+        tipos_comprobante = controlador_tipo_comprobante.get_tipo_comprobante_by_tipo()
+        metodos_pago = controlador_metodo_pago.get_metodo_pago_online()
         
         return render_template('pago_envio_prueba.html',
                              envios=envios,
-                             envios_pago_online=envios_pago_online,
-                             envios_otras_modalidades=envios_otras_modalidades,
                              remitente=remitente,
-                             origen=origen,
+                             modalidad_pago=modalidad_pago,
                              tipo_envio=tipo_envio,
-                             total_general=total_general,
-                             total_pago_online=total_pago_online,
-                             total_otras_modalidades=total_otras_modalidades,
-                             tiene_pago_online=tiene_pago_online,
+                             total_pagar=total_pagar,
                              tipos_comprobante=tipos_comprobante,
                              metodos_pago=metodos_pago)
         
-        
     except Exception as e:
-        print(f"Error en pago_envio_prueba: {str(e)}")
+        print(f"Error general en pago_envio_prueba: {str(e)}")
         import traceback
         traceback.print_exc()
+        
         return jsonify({
             'error': 'Error procesando pago',
             'message': str(e)
         }), 500
 
+# Función auxiliar para debug
+def debug_request_data():
+    """Función para hacer debug de los datos recibidos"""
+    print("=== DEBUG REQUEST DATA ===")
+    print(f"Method: {request.method}")
+    print(f"Content-Type: {request.content_type}")
+    print(f"Form data: {dict(request.form)}")
+    print(f"JSON data: {request.get_json(silent=True)}")
+    print(f"Raw data: {request.data}")
+    print("=" * 30)
+
+
+
+def normalizar_envio(envio):
+    """
+    Normaliza los datos del envío para asegurar que todos los campos existan
+    """
+    campos_default = {
+        'tipoEntrega': '',
+        'tipoEntregaId': '',
+        'valorEnvio': 0,
+        'peso': 0,
+        'largo': 0,
+        'ancho': 0,
+        'alto': 0,
+        'folios': '',
+        'descripcion': '',
+        'clave': '',
+        'tarifa': 0,
+        'tipoEmpaque': '',
+        'tipoArticulo': '',
+        'destino': {
+            'departamento': '',
+            'provincia': '',
+            'distrito': '',
+            'sucursal_destino': '',
+            'direccion': ''
+        },
+        'origen': {
+            'departamento_origen': '',
+            'provincia_origen': '',
+            'distrito_origen': '',
+            'sucursal_origen': ''
+        },
+        'destinatario': {
+            'nombre_destinatario': '',
+            'num_doc_destinatario': '',
+            'num_tel_destinatario': ''
+        }
+    }
+    
+    # Combinar datos default con los datos recibidos
+    envio_normalizado = {**campos_default, **envio}
+    
+    # Normalizar objetos anidados
+    if 'destino' in envio:
+        envio_normalizado['destino'] = {**campos_default['destino'], **envio.get('destino', {})}
+    
+    if 'origen' in envio:
+        envio_normalizado['origen'] = {**campos_default['origen'], **envio.get('origen', {})}
+        
+    if 'destinatario' in envio:
+        envio_normalizado['destinatario'] = {**campos_default['destinatario'], **envio.get('destinatario', {})}
+    
+    return envio_normalizado
+
+
+"""
+@app.route('/resumen_envio_prueba', methods=['POST'])
+def resumen_envio():
+    data = request.get_json(force=True)
+    envios = data.get('registros')
+    print(envios)
+    if not envios:
+        abort(400, "No vinieron registros")
+
+    resultados = []
+    for envio in envios:
+        origen_id  = envio['origen']['sucursal_origen']
+        destino_id = envio['destino']['sucursal_destino']
+        valor      = Decimal(str(envio['valorEnvio']))
+        peso       = Decimal(str(envio['peso']))
+
+        tarifa_row  = controlador_tarifa_ruta.get_tarifa_ids(origen_id, destino_id) or {}
+        tarifa_base = Decimal(str(tarifa_row.get('tarifa', 0)))
+
+        regla_p      = controlador_regla_cargo.get_regla_cargo_condicion('P', float(peso)) or {}
+        regla_v      = controlador_regla_cargo.get_regla_cargo_condicion('V', float(valor)) or {}
+        porcentaje_p = Decimal(str(regla_p.get('porcentaje', 0)))
+        porcentaje_v = Decimal(str(regla_v.get('porcentaje', 0)))
+        porcentaje_r = Decimal(str(controlador_empresa.get_porcentaje_recojo()))
+
+        total = controlador_tarifa_ruta.calcularTarifaTotal(
+            tarifa_base, peso, porcentaje_r, porcentaje_v, porcentaje_p
+        )
+
+        envio_con_tarifa = envio.copy()
+        envio_con_tarifa['tarifa'] = total.quantize(Decimal('0.01'))
+        resultados.append(envio_con_tarifa)
+        print(resultados)
+    session['resumen_envios'] = resultados
+
+    return redirect(url_for('resumen'))
+"""
 
 @app.route('/resumen')
 def resumen():
@@ -3127,98 +3078,96 @@ def insertar_envio():
 @app.route('/insertar_envio_api', methods=['POST'])
 def insertar_envio_api():
     try:
+        # Obtener datos JSON desde el frontend (tipo_comprobante y modalidad_pago)
         data = request.get_json()
+        
         if not data:
             return jsonify({'status': 'error', 'message': 'No se recibieron datos'}), 400
 
-        # Obtener datos de la sesión
-        registros = session.get('resumen_envios', [])
-        modo = session.get('tipo_envio')
-        origen_data = session.get('origen_data')
-        sucursal_origen = origen_data.get('sucursal_origen') if isinstance(origen_data, dict) else origen_data
-        remitente = session.get('remitente_data', {})
+        tipo_comprobante = data.get('tipo_comprobante')
+        modalidad_pago_seleccionada = data.get('metodo_pago')
+
+        # Validaciones básicas
+        if not tipo_comprobante:
+            return jsonify({'status': 'error', 'message': 'Tipo de comprobante es requerido'}), 400
+        # modalidad_pago_seleccionada = 1
+        if modalidad_pago_seleccionada is None:
+            return jsonify({'status': 'error', 'message': 'Modalidad de pago es requerida'}), 400
+
+        # OBTENER DATOS COMPLETOS DE LA SESIÓN
+        datos_pago = session.get('datos_pago')
+        if not datos_pago:
+            return jsonify({'status': 'error', 'message': 'No se encontraron datos del envío en la sesión'}), 400
+
+        envios = datos_pago.get('envios', [])
+        remitente = datos_pago.get('remitente', {})
         
-        # Validaciones
-        if not registros:
-            return jsonify({'status': 'error', 'message': 'No hay registros de paquetes'}), 400
-            
-        if not sucursal_origen:
-            return jsonify({'status': 'error', 'message': 'Sucursal de origen no proporcionada'}), 400
+        if not envios:
+            return jsonify({'status': 'error', 'message': 'No se encontraron envíos para procesar'}), 400
 
-        # Verificar si requiere datos de pago
-        requiere_datos_pago = any(r.get('modalidadPago') == '1' for r in registros)
-        tipo_comprobante = data.get('tipo_comprobante') if requiere_datos_pago else None
-        metodo_pago = data.get('metodo_pago') if requiere_datos_pago else None
-
-        if requiere_datos_pago and (tipo_comprobante is None or metodo_pago is None):
-            return jsonify({
-                "status": "error",
-                "message": "Debe proporcionar tipo_comprobante y metodo_pago porque al menos un registro tiene modalidadPago = 1"
-            }), 400
-
-        # Preparar datos del cliente
+        # PROCESAR IGUAL QUE TU insertar_envio_api ORIGINAL
+        nombre_empresa = controlador_empresa.get_nombre()
+        
+        # Preparar datos del cliente desde el remitente
         nombre = remitente.get('nombre_remitente', '')
         partes = nombre.split() if nombre else []
 
         cliente_data = {
-            'correo': remitente.get('correo_remitente', ''),
-            'telefono': remitente.get('num_tel_remitente', ''),
+            'correo':        remitente.get('correo_remitente', ''),
+            'telefono':      remitente.get('num_tel_remitente', ''),
             'num_documento': remitente.get('num_doc_remitente', ''),
             'nombre_siglas': partes[0] if partes else '',
             'apellidos_razon': ' '.join(partes[1:]) if len(partes) > 1 else '',
             'tipo_documentoid': int(remitente.get('tipo_doc_remitente', 1)),
             'tipo_clienteid': 2 if remitente.get('tipo_doc_remitente') == 2 else 1
         }
+        print(envios)
 
-        # Procesar la transacción
-        nombre_empresa = controlador_empresa.get_nombre()
+        # Crear la transacción con los envíos
         num_serie, trackings = controlador_encomienda.crear_transaccion_y_paquetes(
-            registros, cliente_data, tipo_comprobante, metodo_pago, sucursal_origen, modo
+            envios, cliente_data, tipo_comprobante
         )
 
-        # Generar QR y enviar email si es exitoso
+        # Generar QR para cada paquete
         if num_serie:
             try:
                 generar_qr_paquetes(trackings)
             except Exception as qr_err:
                 current_app.logger.warning(f"Error generando QR: {qr_err}")
 
+            # Enviar correo al remitente
             destinatario_email = cliente_data['correo']
             if destinatario_email:
-                try:
-                    msg = Message(
-                        subject=f"{nombre_empresa} Envío registrado: {num_serie}",
-                        sender=app.config['MAIL_USERNAME'],
-                        recipients=[destinatario_email]
-                    )
-                    msg.body = (
-                        f"Hola {cliente_data['nombre_siglas']},\n\n"
-                        f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
-                        "Adjunto encontrarás los códigos QR para el seguimiento de cada paquete.\n\n"
-                        f"¡Gracias por confiar en {nombre_empresa}!"
-                    )
+                msg = Message(
+                    subject=f"{nombre_empresa} Envío registrado: {num_serie}",
+                    sender=app.config['MAIL_USERNAME'],
+                    recipients=[destinatario_email]
+                )
+                msg.body = (
+                    f"Hola {cliente_data['nombre_siglas']},\n\n"
+                    f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
+                    "Adjunto encontrarás los códigos QR para el seguimiento de cada paquete.\n\n"
+                    f"¡Gracias por confiar en {nombre_empresa}!"
+                )
 
-                    for tracking in trackings:
-                        qr_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'qr.png')
-                        if os.path.exists(qr_path):
-                            with open(qr_path, 'rb') as f:
-                                qr_data = f.read()
-                            msg.attach(f"qr_{tracking}.png", 'image/png', qr_data)
-                        else:
-                            current_app.logger.warning(f"QR no encontrado para tracking {tracking}")
+                for tracking in trackings:
+                    qr_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'qr.png')
+                    if os.path.exists(qr_path):
+                        with open(qr_path, 'rb') as f:
+                            qr_data = f.read()
+                        msg.attach(f"qr_{tracking}.png", 'image/png', qr_data)
+                    else:
+                        current_app.logger.warning(f"QR no encontrado para tracking {tracking}")
 
-                    mail.send(msg)
-                except Exception as email_err:
-                    current_app.logger.warning(f"Error enviando email: {email_err}")
+                mail.send(msg)
 
+        # LIMPIAR SESIÓN DESPUÉS DE PROCESAR
         session.pop('datos_pago', None)
         session.pop('resumen_envios', None)
         session.pop('remitente_data', None)
-        session.pop('origen_data', None)     
-        session.pop('tipo_envio', None)      
 
         current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
-
+        
         return jsonify({
             'status': 'success',
             'message': 'Envío procesado correctamente',
@@ -3239,18 +3188,15 @@ def insertar_envio_api():
 def registrar_envios_masivos():
     try:
         data = request.get_json()
-
+        # print(data)
         if not data:
-            return jsonify({'status': 'error', 'message': 'No se recibieron datos'}), 400
+            return jsonify({'status': 'error', 'message': 'No se recibió un JSON válido'}), 400
 
         tipo_comprobante = data.get('tipo_comprobante')
-        registros = data.get('registros')
-        # modalidad_pago_seleccionada = data.get('modalidad_pago')
+        registros = data.get('registros') 
 
-        if not tipo_comprobante:
-            return jsonify({'status': 'error', 'message': 'Tipo de comprobante es requerido'}), 400
-        # if modalidad_pago_seleccionada is None:
-        #     return jsonify({'status': 'error', 'message': 'Modalidad de pago es requerida'}), 400
+        if not registros or not isinstance(registros, list):
+            return jsonify({'status': 'error', 'message': 'No se encontraron registros válidos'}), 400
 
         origen = data.get('origen')
         sucursal_origen = origen.get('sucursal_origen')
@@ -3274,6 +3220,7 @@ def registrar_envios_masivos():
             registros, cliente_data, tipo_comprobante,sucursal_origen
         )
 
+        # 2) Generar QR para cada paquete
         if num_serie:
             try:
                 generar_qr_paquetes(trackings)
@@ -3309,26 +3256,23 @@ def registrar_envios_masivos():
             #     mail.send(msg)
 
 
-        session.pop('datos_pago', None)
-        session.pop('resumen_envios', None)
-        session.pop('remitente_data', None)
-
+        current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
         return jsonify({
             'status': 'success',
-            'message': 'Envío procesado correctamente',
-            'num_serie': num_serie,
-            'trackings': trackings
-        }), 200
+            'message': 'Transacción creada correctamente',
+            'comprobante_serie': num_serie
+        }), 201
+
+    except ValueError as ve:
+        current_app.logger.warning(f"Bad request: {ve}")
+        return jsonify({'status': 'error', 'message': str(ve)}), 400
 
     except Exception as e:
-        current_app.logger.error(f"Error en insertar_envio: {str(e)}")
-        import traceback
         traceback.print_exc()
         return jsonify({
             'status': 'error',
             'message': 'Ocurrió un error al procesar el envío'
         }), 500
-        
 ##PARA PROBAR EL API E INSERTAR 
 # {
 #   "tipo_comprobante": 2,
@@ -3344,7 +3288,7 @@ def registrar_envios_masivos():
 #   },
 #   "registros": [
 #     {
-#      "modo": "individual",
+#       "modo": "individual",
 #       "clave": "ABC123",
 #       "valorEnvio": 100.5,
 #       "peso": 4.0,
@@ -3369,7 +3313,7 @@ def registrar_envios_masivos():
 #       }
 #     },
 #     {
-#       "modo": "masivo",
+#       "modo": "individual",
 #       "clave": "DEF456",
 #       "valorEnvio": 120.0,
 #       "peso": 6.2,
@@ -3554,6 +3498,7 @@ def envio_masivo():
     departamento_origen = controlador_tarifa_ruta.get_departamentos_origen()
     articulos = controlador_contenido_paquete.get_options()
     empaque = controlador_tipo_empaque.get_options()
+    condiciones = controlador_regla_cargo.get_condiciones_tarifa()
     modalidad_pago = controlador_modalidad_pago.get_options()
     peso = controlador_tipo_empaque.get_peso()
     valor_max = controlador_regla_cargo.get_max_valor()
@@ -4304,9 +4249,9 @@ def panel():
 @validar_empleado()
 def modulo(module_name):
     modulo = permiso.get_modulo_key(module_name)
-    # usuario = controlador_usuario.get_usuario_empleado_user_id(request.cookies.get('user_id'))
+    usuario = controlador_usuario.get_usuario_empleado_user_id(request.cookies.get('user_id'))
 
-    if modulo['activo'] == 1 :
+    if modulo['activo'] == 1 or usuario['rolid'] == 1:
         tipos_pag = permiso.get_tipos_pagina_moduloid(modulo['id'])
         return render_template(
             'MODULO.html' , 
@@ -4327,7 +4272,7 @@ def crud_generico(tabla):
     permisos = permiso.consult_permiso_rol(page['id'] , user_info['rolid'])
 
     if config and page:
-        active = config["active"] and (page['activo'] == 1 )
+        active = config["active"] and (page['activo'] == 1 or user_info['rolid'] == 1 )
         tipo_paginaid = page['tipo_paginaid']
         no_crud = config.get('no_crud')
         # print(active , ' - ',tipo_paginaid ,' - ', no_crud)
@@ -4347,12 +4292,13 @@ def crud_generico(tabla):
             table_columns  = list(filas[0].keys()) if filas else []
             
             CRUD_FORMS = config["crud_forms"]
-            crud_search = CRUD_FORMS.get("crud_search")     and permisos['search']                       
-            crud_consult = CRUD_FORMS.get("crud_consult")   and permisos['consult']                      
-            crud_insert = CRUD_FORMS.get("crud_insert")     and permisos['insert']                       
-            crud_update = CRUD_FORMS.get("crud_update")     and permisos['update']                       
-            crud_delete = CRUD_FORMS.get("crud_delete")     and permisos['delete']                       
-            crud_unactive = CRUD_FORMS.get("crud_unactive") and permisos['unactive'] and existe_activo 
+            # crud_list = CRUD_FORMS.get("crud_list")
+            crud_search = CRUD_FORMS.get("crud_search")     and (permisos['search'] or user_info['rolid'] == 1 )
+            crud_consult = CRUD_FORMS.get("crud_consult")   and (permisos['consult'] or user_info['rolid'] == 1 )
+            crud_insert = CRUD_FORMS.get("crud_insert")     and (permisos['insert'] or user_info['rolid'] == 1 )
+            crud_update = CRUD_FORMS.get("crud_update")     and (permisos['update'] or user_info['rolid'] == 1 )
+            crud_delete = CRUD_FORMS.get("crud_delete")     and (permisos['delete'] or user_info['rolid'] == 1 )
+            crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo and ( permisos['unactive'] or user_info['rolid'] == 1 )
 
             return render_template(
                 "CRUD.html" ,
@@ -4377,7 +4323,6 @@ def crud_generico(tabla):
             )
 
 
-
 @app.route("/transaccion=<tabla>",defaults={'pk_foreign': None})
 @app.route("/transaccion=<tabla>/<pk_foreign>")
 # @validar_empleado()
@@ -4388,7 +4333,7 @@ def transaccion(tabla , pk_foreign):
     permisos = permiso.consult_permiso_rol(page['id'] , user_info['rolid'])
 
     if config and page:
-        active = config["active"] and (page['activo'] == 1 )
+        active = config["active"] and (page['activo'] == 1 or user_info['rolid'] == 1 )
         tipo_paginaid = page['tipo_paginaid']
         no_crud = config.get('no_crud')
 
@@ -4412,32 +4357,35 @@ def transaccion(tabla , pk_foreign):
             table_columns  = list(filas[0].keys()) if filas else []
             
             CRUD_FORMS = config["crud_forms"]
-            crud_search = CRUD_FORMS.get("crud_search") and (permisos['search']                          )
-            crud_consult = CRUD_FORMS.get("crud_consult") and (permisos['consult']                       )
-            crud_insert = CRUD_FORMS.get("crud_insert") and   (permisos['insert']                        )
-            crud_update = CRUD_FORMS.get("crud_update") and   (permisos['update']                        )
-            crud_delete = CRUD_FORMS.get("crud_delete") and   (permisos['delete']                        )
-            crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo and ( permisos['unactive'] )
+            crud_search = CRUD_FORMS.get("crud_search") and (permisos['search'] or user_info['rolid'] == 1 )
+            crud_consult = CRUD_FORMS.get("crud_consult") and (permisos['consult'] or user_info['rolid'] == 1 )
+            crud_insert = CRUD_FORMS.get("crud_insert") and   (permisos['insert'] or user_info['rolid'] == 1 )
+            crud_update = CRUD_FORMS.get("crud_update") and   (permisos['update'] or user_info['rolid'] == 1 )
+            crud_delete = CRUD_FORMS.get("crud_delete") and   (permisos['delete'] or user_info['rolid'] == 1 )
+            crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo and ( permisos['unactive'] or user_info['rolid'] == 1 )
             
             buttons = []
             options = []
 
             import json
 
-            
-            for btn in lst_buttons:
-                permiso_otro_button = json.loads(permisos.get('otro')) if permisos.get('otro') is not None else {}
-                if permiso_otro_button and permiso_otro_button.get(btn[6]) and permiso_otro_button.get(btn[6]) == 1:
-                    buttons.append(btn)
-                elif permisos.get(btn[6]) == 1:
-                    buttons.append(btn)
+            if user_info['rolid'] == 1 :
+                buttons = lst_buttons
+                options = lst_options
+            else:
+                for btn in lst_buttons:
+                    permiso_otro_button = json.loads(permisos.get('otro')) if permisos.get('otro') is not None else {}
+                    if permiso_otro_button and permiso_otro_button.get(btn[6]) and permiso_otro_button.get(btn[6]) == 1:
+                        buttons.append(btn)
+                    elif permisos.get(btn[6]) == 1:
+                        buttons.append(btn)
 
-            for btn in lst_options:
-                permiso_otro_option = json.loads(permisos.get('otro')) if permisos.get('otro') is not None else {}
-                if permiso_otro_option and permiso_otro_option.get(btn[6]) and permiso_otro_option.get(btn[6]) == 1:
-                    options.append(btn)
-                elif permisos.get(btn[6]) == 1:
-                    options.append(btn)
+                for btn in lst_options:
+                    permiso_otro_option = json.loads(permisos.get('otro')) if permisos.get('otro') is not None else {}
+                    if permiso_otro_option and permiso_otro_option.get(btn[6]) and permiso_otro_option.get(btn[6]) == 1:
+                        options.append(btn)
+                    elif permisos.get(btn[6]) == 1:
+                        options.append(btn)
 
             return render_template(
                 "TRANSACCION.html" ,
@@ -4673,7 +4621,7 @@ def crud_insert(tabla):
 
 @app.route("/update_row=<tabla>", methods=["POST"])
 @validar_empleado()
-# @validar_error_crud()
+@validar_error_crud()
 def crud_update(tabla):
     # try:
         if tabla in CONTROLADORES.keys():    
@@ -4714,9 +4662,8 @@ def crud_update(tabla):
                 valores.append(valor)
 
         controlador.update_row( *valores )
-
         if no_crud :
-            return redirect(url_for(str(no_crud)))
+            return redirect(url_for(no_crud))
         else:
             return redirect(url_for(url_redirect, tabla = tabla))
     # except Exception as e:
@@ -4823,39 +4770,6 @@ def update_empresa():
     return redirect(url_for('informacion_empresa'))
 
 
-
-@app.route("/update_admin_pag=<tabla>", methods=["POST"])
-@validar_empleado()
-def update_admin_pag(tabla):
-        if tabla == 'modulo':
-            controlador = controlador_modulo
-        elif tabla == 'pagina':
-            controlador = controlador_pagina
-
-        firma = inspect.signature(controlador.update_row)
-
-        valores = []
-        for nombre, parametro in firma.parameters.items():
-            if nombre in request.files:
-                archivo = request.files[nombre]
-                if archivo.filename != "":
-                    nuevo_nombre = guardar_imagen_bd(tabla,'' ,archivo)
-                    valores.append(nuevo_nombre)
-                else:
-                    # Si no se selecciona una nueva imagen, mantener la actual
-                    valores.append(request.form.get(f"{nombre}_actual"))
-            else:
-                valor = request.form.get(nombre)
-                if valor == '':
-                    valor = None
-                valores.append(valor)
-
-        controlador.update_row( *valores )
-
-        return redirect(url_for('administrar_paginas'))
-
-
-
 @app.route("/op_crud_empresa=<op>", methods=["POST"])
 @validar_empleado()
 @validar_error_crud()
@@ -4954,12 +4868,11 @@ def buscar_paquete():
     tracking = request.form.get('tracking')
     anio = request.form.get('anio')
     paquete = controlador_paquete.buscar_paquete(tracking, anio)
-    
-    if paquete and anio:
+    print(paquete)
+    if paquete is not None:
         return redirect(url_for('seguimiento_tracking', tracking=paquete))
     else:
-        return render_template('index.html', paquete_no_encontrado=True)
-
+        return redirect(url_for('seguimiento_tracking', tracking=0))
 
 
    
@@ -5011,12 +4924,6 @@ def interfaz_insertar_estado():
                            detalles_estado=detalles_estado)
 
 
-
-@app.route("/ver_img_qr=<int:tracking>")
-def ver_img_qr(tracking):
-    return send_from_directory(f"static/comprobantes/{tracking}","qr.png")
-
-
 @app.route('/api_insertar_estado', methods=['POST'])
 def insertar_detalle_estado():
     try:
@@ -5043,14 +4950,13 @@ def salida_informacion():
     empleados = controlador_empleado.get_driver_employee()
     agencias = controlador_sucursal.get_agencias_data()
     paquetes = controlador_paquete.listar_paquetes_por_sucursal_escalas()
-    recojo_casa = controlador_encomienda.get_recojo_casa()
+    
     return render_template('salida_informacion.html',
                            sucursal_origen=sucursal_origen,
                            unidades=unidades,
                            empleados=empleados,
                            agencias=agencias,
-                           paquetes = paquetes,
-                           recojo_casa = recojo_casa)
+                           paquetes = paquetes)
 
 @app.route('/sucursales_destino_api',  methods=["POST"])
 def sucursales_destino_api():
@@ -5281,19 +5187,20 @@ def obtener_paquetes_estado_17():
         }), 500
     
 ####################SEGUIMIENTO DE RECLAMOS############################3
-# ========== ENDPOINTS PARA SEGUIMIENTO PÚBLICO DE RECLAMOS ==========
 
+# Ruta principal de seguimiento de reclamos
 @app.route("/seguimiento_reclamo")
 def seguimiento_reclamo():
     """
-    Página principal de seguimiento de reclamos (pública)
+    Página principal de seguimiento de reclamos
     """
     return render_template('seguimiento_reclamo.html')
 
+# Ruta para buscar reclamo
 @app.route("/buscar_reclamo", methods=["POST"])
 def buscar_reclamo():
     """
-    Busca un reclamo por ID o documento (público)
+    Busca un reclamo por ID o documento
     """
     try:
         reclamo_id = request.form.get('reclamo_id', '').strip()
@@ -5338,10 +5245,11 @@ def buscar_reclamo():
         flash(f'Error al buscar reclamo: {str(e)}', 'error')
         return redirect(url_for('seguimiento_reclamo'))
 
+# Ruta directa con ID de reclamo
 @app.route("/seguimiento_reclamo/<int:reclamo_id>")
 def seguimiento_reclamo_directo(reclamo_id):
     """
-    Acceso directo al seguimiento con ID de reclamo (público)
+    Acceso directo al seguimiento con ID de reclamo
     """
     try:
         # Buscar el reclamo
@@ -5371,147 +5279,80 @@ def seguimiento_reclamo_directo(reclamo_id):
         flash(f'Error al consultar reclamo: {str(e)}', 'error')
         return redirect(url_for('seguimiento_reclamo'))
 
-# ========== ENDPOINTS PARA GESTIÓN ADMINISTRATIVA DE RECLAMOS ==========
-
-@app.route("/responder_reclamos", methods=["GET"])
+# Endpoint para agregar seguimiento a reclamo (solo empleados)
+@app.route("/agregar_seguimiento_reclamo", methods=["POST"])
 @validar_empleado()
-def vista_responder_reclamos():
+def agregar_seguimiento_reclamo():
     """
-    Vista principal para que los administradores respondan reclamos
+    Agrega un nuevo seguimiento a un reclamo existente
     """
     try:
-        # Obtener parámetros de paginación y filtros
-        page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 20, type=int)
-        offset = (page - 1) * per_page
+        data = request.get_json()
         
-        texto_busqueda = request.args.get('search', '')
-        estado_filtro = request.args.get('estado', '')
+        reclamo_id = data.get('reclamo_id')
+        detalle_reclamo_id = data.get('detalle_reclamo_id')
         
-        # Obtener reclamos
-        if texto_busqueda or estado_filtro:
-            reclamos = controlador_seguimiento_reclamos.buscar_reclamos_con_filtros(
-                texto_busqueda=texto_busqueda,
-                estado_filtro=estado_filtro,
-                limit=per_page,
-                offset=offset
-            )
-        else:
-            reclamos = controlador_seguimiento_reclamos.obtener_reclamos_admin(
-                limit=per_page,
-                offset=offset
-            )
+        if not reclamo_id or not detalle_reclamo_id:
+            return jsonify({
+                'success': False,
+                'message': 'Reclamo ID y Detalle Reclamo ID son requeridos'
+            }), 400
         
-        # Obtener datos adicionales para el formulario
-        estados_disponibles = controlador_seguimiento_reclamos.obtener_estados_reclamo()
-        detalles_reclamo = controlador_seguimiento_reclamos.obtener_detalles_reclamo()
+        resultado = controlador_seguimiento_reclamos.agregar_seguimiento_reclamo(reclamo_id, detalle_reclamo_id)
         
-        # Configuración de paginación
-        options_pagination_crud = [5, 10, 20, 50, 100]
-        selected_option_crud = per_page
-        
-        return render_template('responder_reclamo.html',
-                             titulo="Gestión de Reclamos",
-                             icon_page_crud="fa-solid fa-headset",
-                             reclamos=reclamos,
-                             estados_disponibles=estados_disponibles,
-                             detalles_reclamo=detalles_reclamo,
-                             options_pagination_crud=options_pagination_crud,
-                             selected_option_crud=selected_option_crud)
+        return jsonify(resultado)
         
     except Exception as e:
-        flash(f'Error al cargar reclamos: {str(e)}', 'error')
-        return render_template('responder_reclamo.html',
-                             titulo="Gestión de Reclamos",
-                             icon_page_crud="fa-solid fa-headset",
-                             reclamos=[],
-                             estados_disponibles=[],
-                             detalles_reclamo=[],
-                             options_pagination_crud=[5, 10, 20, 50],
-                             selected_option_crud=20)
+        return jsonify({
+            'success': False,
+            'message': f'Error al agregar seguimiento: {str(e)}'
+        }), 500
 
-@app.route("/procesar_respuesta_reclamo", methods=["POST"])
+# Endpoint para obtener reclamos por estado (solo empleados)
+@app.route("/reclamos_por_estado/<int:estado_id>", methods=["GET"])
 @validar_empleado()
-def procesar_respuesta_reclamo_admin():
+def reclamos_por_estado(estado_id):
     """
-    Procesa la respuesta enviada por el administrador a un reclamo
+    Obtiene reclamos filtrados por estado
     """
     try:
-        # Obtener datos del formulario
-        reclamo_id = request.form.get('reclamo_id')
-        detalle_reclamo_id = request.form.get('detalle_reclamo_id')
-        observaciones = request.form.get('observaciones', '').strip()
+        limit = request.args.get('limit', 50, type=int)
         
-        # Validaciones
-        if not reclamo_id:
-            flash('ID de reclamo no válido', 'error')
-            return redirect(url_for('vista_responder_reclamos'))
+        reclamos = controlador_seguimiento_reclamos.obtener_reclamos_por_estado_activo(estado_id, limit)
         
-        if not detalle_reclamo_id:
-            flash('Debe seleccionar un tipo de respuesta', 'error')
-            return redirect(url_for('vista_responder_reclamos'))
-        
-        # Procesar la respuesta
-        resultado = controlador_seguimiento_reclamos.procesar_respuesta_reclamo(
-            reclamo_id=reclamo_id,
-            detalle_reclamo_id=detalle_reclamo_id,
-            observaciones=observaciones if observaciones else None
-        )
-        
-        if resultado['success']:
-            flash(f'Respuesta enviada exitosamente al reclamo #{reclamo_id}', 'success')
-        else:
-            flash(f'Error: {resultado["message"]}', 'error')
-        
-        return redirect(url_for('vista_responder_reclamos'))
+        return jsonify({
+            'success': True,
+            'reclamos': reclamos
+        })
         
     except Exception as e:
-        flash(f'Error al procesar respuesta: {str(e)}', 'error')
-        return redirect(url_for('vista_responder_reclamos'))
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener reclamos: {str(e)}'
+        }), 500
 
-# ========== ENDPOINTS API PARA RECLAMOS ==========
-
-# Solución rápida: Reemplaza solo el endpoint problemático
-
-def procesar_para_json(item):
+# Endpoint para obtener detalles de reclamo por estado (solo empleados)
+@app.route("/detalles_reclamo_por_estado/<int:estado_id>", methods=["GET"])
+@validar_empleado()
+def detalles_reclamo_por_estado(estado_id):
     """
-    Procesa un item (dict o similar) para hacerlo compatible con JSON
+    Obtiene los detalles disponibles para un estado de reclamo
     """
-    if not item:
-        return None
-    
-    # Convertir a diccionario si es necesario
-    if hasattr(item, 'keys'):
-        item_dict = dict(item)
-    else:
-        item_dict = item
-    
-    # Procesar cada campo
-    for key, value in item_dict.items():
-        if value is None:
-            continue
-            
-        # Convertir timedelta a string
-        if hasattr(value, 'total_seconds'):  # Es un timedelta
-            total_seconds = int(value.total_seconds())
-            hours = total_seconds // 3600
-            minutes = (total_seconds % 3600) // 60
-            seconds = total_seconds % 60
-            item_dict[key] = f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+    try:
+        detalles = controlador_seguimiento_reclamos.obtener_detalles_reclamo_por_estado(estado_id)
         
-        # Limpiar fechas inválidas
-        elif key == 'fecha' and value in ['0000-00-00', '', '00-00-0000']:
-            item_dict[key] = None
+        return jsonify({
+            'success': True,
+            'detalles': detalles
+        })
         
-        # Convertir datetime a string si es necesario
-        elif hasattr(value, 'strftime'):
-            if hasattr(value, 'hour'):  # Es datetime
-                item_dict[key] = value.strftime('%Y-%m-%d %H:%M:%S')
-            else:  # Es date
-                item_dict[key] = value.strftime('%Y-%m-%d')
-    
-    return item_dict
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener detalles: {str(e)}'
+        }), 500
 
+# Endpoint API para obtener información de reclamo (JSON)
 @app.route("/api/reclamo/<int:reclamo_id>", methods=["GET"])
 def api_info_reclamo(reclamo_id):
     """
@@ -5529,20 +5370,11 @@ def api_info_reclamo(reclamo_id):
         ultimo_seguimiento = controlador_seguimiento_reclamos.obtener_ultimo_seguimiento_reclamo(reclamo['id'])
         seguimientos = controlador_seguimiento_reclamos.obtener_seguimientos_reclamo(reclamo['id'])
         
-        # Procesar todos los datos
-        reclamo_procesado = procesar_para_json(reclamo)
-        ultimo_seguimiento_procesado = procesar_para_json(ultimo_seguimiento)
-        
-        seguimientos_procesados = []
-        for seguimiento in seguimientos:
-            seguimiento_procesado = procesar_para_json(seguimiento)
-            seguimientos_procesados.append(seguimiento_procesado)
-        
         return jsonify({
             'success': True,
-            'reclamo': reclamo_procesado,
-            'ultimo_seguimiento': ultimo_seguimiento_procesado,
-            'seguimientos': seguimientos_procesados
+            'reclamo': dict(reclamo),
+            'ultimo_seguimiento': dict(ultimo_seguimiento) if ultimo_seguimiento else None,
+            'seguimientos': [dict(s) for s in seguimientos]
         })
         
     except Exception as e:
@@ -5550,206 +5382,9 @@ def api_info_reclamo(reclamo_id):
             'success': False,
             'message': f'Error al consultar reclamo: {str(e)}'
         }), 500
-    
-@app.route("/api/obtener_historial_reclamo/<int:reclamo_id>", methods=["GET"])
-@validar_empleado()
-def api_obtener_historial_reclamo(reclamo_id):
-    """
-    Obtiene el historial de seguimiento de un reclamo (para modal administrativo)
-    """
-    try:
-        historial = controlador_seguimiento_reclamos.obtener_historial_reclamo(reclamo_id)
-        
-        # Procesar cada item del historial
-        historial_procesado = []
-        for item in historial:
-            item_procesado = procesar_para_json(item)
-            historial_procesado.append(item_procesado)
-        
-        return jsonify({
-            'success': True,
-            'historial': historial_procesado
-        })
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': str(e)
-        }), 500
 
-@app.route("/api/agregar_seguimiento_reclamo", methods=["POST"])
-@validar_empleado()
-def api_agregar_seguimiento_reclamo():
-    """
-    Agrega un nuevo seguimiento a un reclamo existente (empleados)
-    """
-    try:
-        data = request.get_json()
-        
-        reclamo_id = data.get('reclamo_id')
-        detalle_reclamo_id = data.get('detalle_reclamo_id')
-        comentario = data.get('comentario', '').strip()
-        
-        if not reclamo_id or not detalle_reclamo_id:
-            return jsonify({
-                'success': False,
-                'message': 'Reclamo ID y Detalle Reclamo ID son requeridos'
-            }), 400
-        
-        resultado = controlador_seguimiento_reclamos.agregar_seguimiento_reclamo(
-            reclamo_id=reclamo_id,
-            detalle_reclamo_id=detalle_reclamo_id,
-            comentario=comentario if comentario else None
-        )
-        
-        return jsonify(resultado)
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error al agregar seguimiento: {str(e)}'
-        }), 500
-
-@app.route("/api/buscar_reclamos_ajax", methods=["POST"])
-@validar_empleado()
-def api_buscar_reclamos_ajax():
-    """
-    Búsqueda de reclamos vía AJAX para filtrado dinámico (administrativo)
-    """
-    try:
-        data = request.get_json()
-        texto_busqueda = data.get('search', '')
-        estado_filtro = data.get('estado', '')
-        page = data.get('page', 1)
-        per_page = data.get('per_page', 20)
-        offset = (page - 1) * per_page
-        
-        # Buscar reclamos
-        reclamos = controlador_seguimiento_reclamos.buscar_reclamos_con_filtros(
-            texto_busqueda=texto_busqueda,
-            estado_filtro=estado_filtro,
-            limit=per_page,
-            offset=offset
-        )
-        
-        # Procesar cada reclamo
-        reclamos_procesados = []
-        for reclamo in reclamos:
-            reclamo_procesado = procesar_para_json(reclamo)
-            reclamos_procesados.append(reclamo_procesado)
-        
-        return jsonify({
-            'success': True,
-            'reclamos': reclamos_procesados,
-            'total': len(reclamos_procesados)
-        })
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': str(e)
-        }), 500
-
-
-# ========== ENDPOINTS DE CONFIGURACIÓN Y UTILIDADES ==========
-
-@app.route("/api/estados_reclamo", methods=["GET"])
-def api_estados_reclamo():
-    """
-    API para obtener estados de reclamo disponibles
-    """
-    try:
-        estados = controlador_seguimiento_reclamos.obtener_estados_reclamo()
-        
-        return jsonify({
-            'success': True,
-            'estados': estados
-        })
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error al obtener estados: {str(e)}'
-        }), 500
-
-@app.route("/api/detalles_reclamo_por_estado/<int:estado_id>", methods=["GET"])
-@validar_empleado()
-def api_obtener_detalles_por_estado(estado_id):
-    """
-    Obtiene los detalles de reclamo disponibles para un estado específico
-    """
-    try:
-        detalles = controlador_seguimiento_reclamos.obtener_detalles_reclamo_por_estado(estado_id)
-        
-        return jsonify({
-            'success': True,
-            'detalles': detalles
-        })
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': str(e)
-        }), 500
-
-@app.route("/api/tipos_reclamo", methods=["GET"])
-def api_tipos_reclamo():
-    """
-    API para obtener tipos de reclamo disponibles
-    """
-    try:
-        tipos = controlador_seguimiento_reclamos.obtener_tipos_reclamo()
-        
-        return jsonify({
-            'success': True,
-            'tipos': tipos
-        })
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error al obtener tipos de reclamo: {str(e)}'
-        }), 500
-
-@app.route("/api/motivos_reclamo/<int:tipo_id>", methods=["GET"])
-def api_motivos_reclamo(tipo_id):
-    """
-    API para obtener motivos por tipo de reclamo
-    """
-    try:
-        motivos = controlador_seguimiento_reclamos.obtener_motivos_por_tipo_reclamo(tipo_id)
-        
-        return jsonify({
-            'success': True,
-            'motivos': motivos
-        })
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error al obtener motivos: {str(e)}'
-        }), 500
-
-@app.route("/api/causas_reclamo/<int:motivo_id>", methods=["GET"])
-def api_causas_reclamo(motivo_id):
-    """
-    API para obtener causas por motivo de reclamo
-    """
-    try:
-        causas = controlador_seguimiento_reclamos.obtener_causas_por_motivo_reclamo(motivo_id)
-        
-        return jsonify({
-            'success': True,
-            'causas': causas
-        })
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error al obtener causas: {str(e)}'
-        }), 500
-
-@app.route("/api/validar_tracking_reclamo/<int:tracking>", methods=["GET"])
+# Endpoint para validar si existe un tracking para reclamo
+@app.route("/validar_tracking_reclamo/<int:tracking>", methods=["GET"])
 def validar_tracking_reclamo(tracking):
     """
     Valida si un tracking existe y puede ser asociado a un reclamo
@@ -5779,137 +5414,82 @@ def validar_tracking_reclamo(tracking):
             'message': f'Error al validar tracking: {str(e)}'
         }), 500
 
-# ========== ENDPOINTS DE REPORTES Y ESTADÍSTICAS ==========
-
-@app.route("/api/reclamos_por_estado/<int:estado_id>", methods=["GET"])
-@validar_empleado()
-def api_reclamos_por_estado(estado_id):
-    """
-    Obtiene reclamos filtrados por estado
-    """
-    try:
-        limit = request.args.get('limit', 50, type=int)
-        
-        reclamos = controlador_seguimiento_reclamos.obtener_reclamos_por_estado_activo(estado_id, limit)
-        
-        return jsonify({
-            'success': True,
-            'reclamos': reclamos
-        })
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error al obtener reclamos: {str(e)}'
-        }), 500
-
-@app.route("/api/estadisticas_reclamos", methods=["GET"])
-@validar_empleado()
-def api_obtener_estadisticas_reclamos():
-    """
-    Obtiene estadísticas generales de los reclamos
-    """
-    try:
-        estadisticas = controlador_seguimiento_reclamos.obtener_estadisticas_reclamos()
-        
-        return jsonify({
-            'success': True,
-            'estadisticas': estadisticas
-        })
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': str(e)
-        }), 500
-
-# ========== ENDPOINTS ADMINISTRATIVOS ADICIONALES ==========
-
+# Endpoint para obtener todos los reclamos (vista administrativa)
 @app.route("/admin/reclamos", methods=["GET"])
 @validar_empleado()
 def admin_reclamos():
     """
-    Vista administrativa completa de todos los reclamos
+    Vista administrativa de todos los reclamos
     """
     try:
         limit = request.args.get('limit', 50, type=int)
-        reclamos = controlador_seguimiento_reclamos.obtener_reclamos_admin(limit=limit, offset=0)
+        reclamos = controlador_seguimiento_reclamos.obtener_todos_los_reclamos(limit)
         
         return render_template('admin_reclamos.html', reclamos=reclamos)
         
     except Exception as e:
         flash(f'Error al cargar reclamos: {str(e)}', 'error')
-        return redirect(url_for('panel'))
+        return redirect(url_for('dashboard'))
 
-# ========== FUNCIONES DE UTILIDAD ==========
-
-def formatear_fecha_reclamo(fecha):
+# Endpoint para obtener tipos de reclamo
+@app.route("/api/tipos_reclamo", methods=["GET"])
+def api_tipos_reclamo():
     """
-    Formatea una fecha para mostrar en el sistema de reclamos
+    API para obtener tipos de reclamo disponibles
     """
-    if isinstance(fecha, str):
-        from datetime import datetime
-        try:
-            fecha_obj = datetime.strptime(fecha, '%Y-%m-%d')
-            return fecha_obj.strftime('%d/%m/%Y')
-        except:
-            return fecha
-    elif hasattr(fecha, 'strftime'):
-        return fecha.strftime('%d/%m/%Y')
-    else:
-        return str(fecha)
-
-def obtener_color_estado_reclamo(estado_nombre):
-    """
-    Devuelve una clase CSS según el estado del reclamo
-    """
-    estado_lower = estado_nombre.lower() if estado_nombre else ''
-    
-    if 'pendiente' in estado_lower or 'nuevo' in estado_lower:
-        return 'estado-pendiente'
-    elif 'proceso' in estado_lower or 'revisión' in estado_lower:
-        return 'estado-proceso'
-    elif 'resuelto' in estado_lower or 'finalizado' in estado_lower:
-        return 'estado-resuelto'
-    else:
-        return 'estado-pendiente'
-    
-from controladores import controlador_seguimiento_reclamos
-
-@app.route('/api/eliminar_ultimo_seguimiento/<int:reclamoid>', methods=['DELETE'])
-def eliminar_ultimo_seguimiento(reclamoid):
-    return controlador_seguimiento_reclamos.eliminar_ultimo_seguimiento(reclamoid)
-
-
-@app.route('/pagar_paquete')
-def pagar_paquete():
-    tipo_comprobante = controlador_tipo_comprobante.get_tipo_comprobante_by_tipo()
-    metodo_pago = controlador_metodo_pago.get_options()
-    return render_template('pagar_paquete.html',metodo_pago=metodo_pago,tipo_comprobante=tipo_comprobante)
-
-@app.route('/insertar_pago_paquete', methods=['POST'])
-def insertar_pago_paquete():
-    data = request.get_json()
-    tracking = data.get('tracking')
-    num_serie_data = controlador_encomienda.get_num_serie_by_tracking(tracking)
-    num_serie = num_serie_data['transaccion_encomienda_num_serie']
-    tipo_comprobante = data.get('tipo_comprobante')
-    metodo_pago = data.get('metodo_pago')
-    
     try:
-        pago = controlador_metodo_pago_venta.pagar_encomienda(num_serie, tipo_comprobante, metodo_pago, tracking)
+        tipos = controlador_seguimiento_reclamos.obtener_tipos_reclamo()
+        
         return jsonify({
             'success': True,
-            'message': 'Pago procesado exitosamente',
-            'tracking': tracking
-        }), 200
+            'tipos': tipos
+        })
+        
     except Exception as e:
         return jsonify({
             'success': False,
-            'message': 'Error al procesar el pago',
-            'error': str(e)
+            'message': f'Error al obtener tipos de reclamo: {str(e)}'
         }), 500
 
+# Endpoint para obtener motivos por tipo de reclamo
+@app.route("/api/motivos_reclamo/<int:tipo_id>", methods=["GET"])
+def api_motivos_reclamo(tipo_id):
+    """
+    API para obtener motivos por tipo de reclamo
+    """
+    try:
+        motivos = controlador_seguimiento_reclamos.obtener_motivos_por_tipo_reclamo(tipo_id)
+        
+        return jsonify({
+            'success': True,
+            'motivos': motivos
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener motivos: {str(e)}'
+        }), 500
+
+# Endpoint para obtener causas por motivo de reclamo
+@app.route("/api/causas_reclamo/<int:motivo_id>", methods=["GET"])
+def api_causas_reclamo(motivo_id):
+    """
+    API para obtener causas por motivo de reclamo
+    """
+    try:
+        causas = controlador_seguimiento_reclamos.obtener_causas_por_motivo_reclamo(motivo_id)
+        
+        return jsonify({
+            'success': True,
+            'causas': causas
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al obtener causas: {str(e)}'
+        }), 500
 
 # Endpoint para obtener estados de reclamo
 @app.route("/api/estados_reclamo", methods=["GET"])
@@ -5939,4 +5519,217 @@ if __name__ == "__main__":
     # app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=True)
     socketio.run(app, host='0.0.0.0', port=8000, debug=True , use_reloader=True)
 
+
+
+##################_ _ARCHIVADO_ _################## 
+
+
+
+# @app.route("/grafico=<report_name>")
+# def grafico(report_name):
+#     config = REPORTES.get(report_name)
+#     if not config:
+#         return "Reporte no encontrado", 404
+
+#     active = config["active"]
+
+#     if active is False:
+#         return "Reporte no encontrado", 404
+        
+#     titulo = 'Reporte de ' + config.get("titulo")
+#     elements = config.get("elements")
+#     e_graph = elements.get('graph')
+#     e_table = elements.get('table')
+#     e_counter = elements.get('counter')
+#     icon_page = get_icon_page(config.get("icon_page"))
+
+#     graph = config.get("graph")
+#     if graph:
+#         if callable(graph.get("series")):
+#             graph["series"] = graph["series"]()
+#         if callable(graph.get("xaxis")):
+#             graph["xaxis"] = graph["xaxis"]()
+
+#     table = config.get("table")
+#     columnas = None
+#     filas = None
+#     if table is not None and e_table is True:
+#         columnas , filas = table
+
+#     counter = config.get("counter")
+
+#     return render_template(
+#         "REPORTE.html" ,
+#         titulo = titulo ,
+#         elements = elements ,
+#         e_graph = e_graph,
+#         e_table = e_table,
+#         e_counter = e_counter,
+#         graph = graph ,
+#         table = table ,
+#         columnas = columnas,
+#         filas = filas,
+#         counter = counter ,
+#         icon_page = icon_page,
+#     )
+
+
+
+
+# GRAFICOS = {
+#     # LINEA
+#     "ingresos_periodo": {
+#         "active": False,
+#         'icon_page' : 'fa-solid fa-dollar-sign' ,
+#         "titulo": "ingresos por mes",
+#         "elements": {
+#             "graph": True,
+#             "table": False,
+#             "counter": False,
+#         },
+#         "graph": {
+#             "chart": {
+#                 "type": 'line',
+#                 "zoom": {
+#                     "enabled": True
+#                 }
+#             },
+#             "series": lambda: [{
+#                 "name": 'Ingresos',
+#                 "data": extract_col_row(ingresos_periodo())[1]
+#             }],
+#             "xaxis": lambda: {
+#                 "categories": extract_col_row(ingresos_periodo())[0]
+#             },
+#             "colors": [' var(--color1) '],
+#             "stroke": {
+#                 "curve": 'smooth'
+#             },
+#             "markers": {
+#                 "size": 5
+#             }
+#         },
+#     },
+#     # BARRA VERTICAL
+#     "articulos_mas_vendidos": {
+#         "active" : False ,
+#         'icon_page' : 'fa-solid fa-dollar-sign' ,
+#         "titulo": "artículos más vendidos",
+#         "elements": {
+#             "graph": True,
+#             "table": False,
+#             "counter": False,
+#         },
+#         "graph" : {
+#             "chart": {
+#                 "type": 'bar',
+#             },
+#             "series": lambda: [{
+#                 "name": 'Ingresos',
+#                 "data": extract_col_row(articulos_mas_vendidos())[1]
+#             }],
+#             "xaxis": lambda: {
+#                 "categories": extract_col_row(articulos_mas_vendidos())[0]
+#             },
+#             "colors": [' var(--color15) ']
+#         }
+#     },
+#     # BARRA HORIZONTAL
+#     "top_envios": {
+#         "active" : False ,
+#         'icon_page' : 'fa-solid fa-dollar-sign' ,
+#         "titulo": "top de envios de encomiendas",
+#         "elements": {
+#             "graph": True,
+#             "table": False,
+#             "counter": False,
+#         },
+#         "graph" : {
+#             "chart": {
+#                 "type": 'bar',
+#             },
+#             "series": [{
+#                 "name": 'Envíos',
+#                 "data": [400, 350, 300, 200] 
+#             }],
+#             "xaxis": {
+#                 "categories": ['Sucursal A', 'Sucursal B', 'Sucursal C', 'Sucursal D']
+#             },
+#             "plotOptions": {
+#                 "bar": {
+#                     "horizontal": True,
+#                 }
+#             },
+#             "colors": [' var(--color5) ']
+#         }
+#     },
+#     # PASTEL
+#     "envios_tipo": {
+#         "active" : False ,
+#         'icon_page' : 'fa-solid fa-dollar-sign' ,
+#         "titulo": "envios por tipo de articulo",
+#         "elements": {
+#             "graph": True,
+#             "table": False,
+#             "counter": False,
+#         },
+#         "graph" : {
+#             "chart": {
+#                 "type": 'pie',
+#                 "height": 500,
+#                 "toolbar": {
+#                     "show": True
+#                 }
+#             },
+#             "series": [55, 30, 15],
+#             "labels": ['Cajas', 'Sobres', 'Otros'],
+#             "colors": [' var(--color8) ', ' var(--color11) ', ' var(--color-sec) '],
+#             "responsive": [{
+#                 "breakpoint": 200,
+#                 "options": {
+#                     "chart": {
+#                         "width": 100
+#                     },
+#                     "legend": {
+#                         "position": 'bottom'
+#                     }
+#                 }
+#             }]
+#         }
+#     },
+#     # DONUT
+#     "entregado_pendiente": {
+#         "active" : False ,
+#         'icon_page' : 'fa-solid fa-dollar-sign' ,
+#         "titulo": "encomiendas entregadas vs pendientes",
+#         "elements": {
+#             "graph": True,
+#             "table": False,
+#             "counter": False,
+#         },
+#         "graph" : {
+#             "chart": {
+#                 "type": 'donut',
+#                 "height": 500,
+#                 "toolbar": {
+#                     "show": True,
+#                 }
+#             },
+#             "series": [70, 30] ,
+#             "labels": ['Entregadas', 'Pendientes'],
+#             "colors": [' var(--color3) ', ' var(--color-sec) '],
+#             "responsive": [{
+#                 "breakpoint": 480,
+#                 "options": {
+#                     "chart": {
+#                         "height": 100,
+#                     },
+#                     "legend": {
+#                         "position": 'bottom'
+#                     }
+#                 }
+#             }]
+#         },
+#     },
+# }
 

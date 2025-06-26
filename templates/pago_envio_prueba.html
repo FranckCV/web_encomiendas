@@ -1,13 +1,10 @@
 {% extends 'MAESTRA_GENERAL.html' %}
 
-{% block titulo %}
-  Medios de Pago
-{% endblock %}
+{% block titulo %}Medios de Pago{% endblock %}
 
 {% block estilos %}
   <link rel="stylesheet" href="/static/css/pago_envio.css" />
   <style>
-    /* MODAL ESTILOS */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -20,7 +17,9 @@
       align-items: center;
       z-index: 999999;
     }
-    
+    #text-mixto{
+      margin:10px 0px;
+    }
     .modal-content {
       background-color: #ffffff;
       border-radius: 15px;
@@ -32,34 +31,6 @@
       position: relative;
     }
     
-    .modal-content h3 {
-      color: #0e1d63;
-      margin-top: 10px;
-      margin-bottom: 15px;
-    }
-    
-    .btn-continuar-modal {
-      background-color: #fbbd0a;
-      color: white;
-      font-weight: 700;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 25px;
-      width: 100%;
-      font-size: 16px;
-      cursor: pointer;
-      margin-top: 15px;
-    }
-    
-    .modal-close {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 20px;
-      color: #0e1d63;
-      cursor: pointer;
-    }
-
     .form-group {
       margin-bottom: 15px;
       text-align: left;
@@ -90,15 +61,29 @@
       flex: 1;
     }
 
-    .seccion-pago {
-      margin-bottom: 2rem;
-      padding: 1.5rem;
-      background: #f8f9fa;
+    .btn-continuar-modal {
+      background-color: #fbbd0a;
+      color: white;
+      font-weight: 700;
+      border: none;
       border-radius: 8px;
-      border-left: 4px solid #007bff;
+      padding: 12px 25px;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      color: #0e1d63;
+      cursor: pointer;
     }
 
-    .info-modalidad {
+    .info-pago {
       background: #e3f2fd;
       padding: 1rem;
       border-radius: 6px;
@@ -108,14 +93,33 @@
       text-align: center;
     }
 
-    .info-modalidad.sucursal {
-      background: #f3e5f5;
-      color: #7b1fa2;
+    .info-mixto {
+      background: #93e0ef;
+      border: 1px solidrgb(10, 37, 168);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      color:rgb(17, 2, 68);
     }
 
-    .info-modalidad.contraentrega {
-      background: #e8f5e8;
-      color: #2e7d32;
+    .detalles-envios {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .detalles-envios h4 {
+      margin: 0 0 0.5rem 0;
+      color: #495057;
+      font-size: 0.9rem;
+    }
+
+    .detalles-envios ul {
+      margin: 0;
+      padding-left: 1.2rem;
+      font-size: 0.85rem;
+      color: #6c757d;
     }
 
     .mensaje-simple {
@@ -126,228 +130,42 @@
       margin: 2rem 0;
     }
 
-    .mensaje-simple h3 {
-      color: #495057;
-      margin-bottom: 1rem;
-    }
-
-    .mensaje-simple p {
-      color: #6c757d;
-      margin-bottom: 1.5rem;
-    }
-
-    /* ANIMACIONES DE ÉXITO */
-    .success-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, rgba(76, 175, 80, 0.95), rgba(67, 160, 71, 0.95));
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      animation: fadeIn 0.5s ease-in-out;
-    }
-
-    .success-content {
-      text-align: center;
-      color: white;
-      max-width: 500px;
-      padding: 40px;
-    }
-
-    .success-check {
-      width: 120px;
-      height: 120px;
-      border: 4px solid white;
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #007bff;
       border-radius: 50%;
-      margin: 0 auto 30px;
-      position: relative;
-      animation: checkScale 0.6s ease-in-out;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
     }
 
-    .success-check::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 30px;
-      height: 60px;
-      border: solid white;
-      border-width: 0 6px 6px 0;
-      transform: translate(-50%, -60%) rotate(45deg);
-      animation: checkDraw 0.8s ease-in-out 0.3s both;
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
-    .confetti-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      overflow: hidden;
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      background: #28a745;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: scaleIn 0.5s ease-out;
     }
 
-    .confetti {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background: #ffeb3b;
-      animation: confettiFall 3s linear infinite;
-    }
-
-    .confetti:nth-child(1) { left: 10%; animation-delay: 0s; background: #f44336; }
-    .confetti:nth-child(2) { left: 20%; animation-delay: 0.2s; background: #2196f3; }
-    .confetti:nth-child(3) { left: 30%; animation-delay: 0.4s; background: #ff9800; }
-    .confetti:nth-child(4) { left: 40%; animation-delay: 0.6s; background: #9c27b0; }
-    .confetti:nth-child(5) { left: 50%; animation-delay: 0.8s; background: #4caf50; }
-    .confetti:nth-child(6) { left: 60%; animation-delay: 1s; background: #ff5722; }
-    .confetti:nth-child(7) { left: 70%; animation-delay: 1.2s; background: #795548; }
-    .confetti:nth-child(8) { left: 80%; animation-delay: 1.4s; background: #607d8b; }
-    .confetti:nth-child(9) { left: 90%; animation-delay: 1.6s; background: #e91e63; }
-
-    .success-title {
-      font-size: 3rem;
-      font-weight: bold;
-      margin: 20px 0;
-      animation: titleBounce 0.8s ease-out 0.5s both;
-    }
-
-    .success-message {
-      font-size: 1.3rem;
-      margin: 20px 0;
-      animation: messageSlide 1s ease-out 0.8s both;
-      opacity: 0;
-    }
-
-    .success-details {
-      background: rgba(255, 255, 255, 0.2);
-      padding: 20px;
-      border-radius: 15px;
-      margin: 30px 0;
-      animation: detailsFade 1s ease-out 1.2s both;
-      opacity: 0;
-    }
-
-    .success-button {
-      background: white;
-      color: #4CAF50;
-      border: none;
-      padding: 15px 40px;
-      border-radius: 50px;
-      font-size: 18px;
-      font-weight: 600;
-      cursor: pointer;
-      animation: buttonPulse 2s infinite 1.5s;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      transition: transform 0.2s;
-    }
-
-    .success-button:hover {
-      transform: scale(1.05);
-    }
-
-    /* ANIMACIONES PARA RÓTULO */
-    .rotulo-overlay {
-      background: linear-gradient(135deg, rgba(33, 150, 243, 0.95), rgba(63, 81, 181, 0.95));
-    }
-
-    .rotulo-overlay .success-button {
-      color: #2196F3;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes checkScale {
+    @keyframes scaleIn {
       0% { transform: scale(0); }
-      50% { transform: scale(1.1); }
       100% { transform: scale(1); }
     }
 
-    @keyframes checkDraw {
-      0% { width: 0; height: 0; }
-      50% { width: 0; height: 60px; }
-      100% { width: 30px; height: 60px; }
-    }
-
-    @keyframes confettiFall {
-      0% {
-        top: -10px;
-        transform: rotateZ(0deg);
-      }
-      100% {
-        top: 100vh;
-        transform: rotateZ(360deg);
-      }
-    }
-
-    @keyframes titleBounce {
-      0% {
-        transform: translateY(-50px);
-        opacity: 0;
-      }
-      60% {
-        transform: translateY(10px);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    @keyframes messageSlide {
-      from {
-        transform: translateX(-30px);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-
-    @keyframes detailsFade {
-      from {
-        transform: translateY(20px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    @keyframes buttonPulse {
-      0%, 100% {
-        transform: scale(1);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-      }
-      50% {
-        transform: scale(1.05);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-      }
-    }
-
-    /* RESPONSIVO */
-    @media (max-width: 768px) {
-      .success-title {
-        font-size: 2rem;
-      }
-      
-      .success-message {
-        font-size: 1.1rem;
-      }
-      
-      .success-content {
-        padding: 20px;
-      }
+    .checkmark {
+      width: 40px;
+      height: 40px;
+      fill: white;
     }
   </style>
 {% endblock %}
@@ -379,897 +197,404 @@
       </div>
     </div>
 
-    <!-- Información de modalidad de pago -->
-    <div class="info-modalidad {% if modalidad_pago == '2' %}sucursal{% elif modalidad_pago == '3' %}contraentrega{% endif %}">
-      {% if modalidad_pago == '1' %}
-        💳 Modalidad: Pago en Línea - Completa el pago para generar tu comprobante
-      {% elif modalidad_pago == '2' %}
-        🏢 Modalidad: Pago en Sucursal - Se generará rótulo para el pago en sucursal
-      {% elif modalidad_pago == '3' %}
-        📦 Modalidad: Pago Contraentrega - Se generará rótulo para pago contraentrega
-      {% else %}
-        📄 Modalidad: Generar Documento
-      {% endif %}
-    </div>
-
-    <div class="contenido">
-      <div>
-        {% if modalidad_pago == '1' %}
-
-          <div class="seccion-pago">
-  <h2 class="subtitulo">Elige el tipo de comprobante</h2>
-  <div class="pago-content">
-    <div class="opciones-pago">
-      {% for nom_comprobante in tipos_comprobante %}
-      <label class="opcion" onclick="toggleSelection(this, 'comprobante')">
-        <div class="cabecera-opcion">
-          <!-- ✅ CORREGIDO: ID único, value dinámico, atributos data -->
-          <input 
-            type="radio" 
-            name="comprobante" 
-            id="comprobante_{{nom_comprobante.id}}" 
-            value="{{nom_comprobante.id}}" 
-            data-nombre="{{nom_comprobante.nombre}}"
-            onchange="validarSelecciones()" 
-          />
-          <span class="texto">{{nom_comprobante.nombre}}</span>
-        </div>
-      </label>
-      {% endfor %}
-    </div>
-  </div>
-</div>
-
-          <!-- Sección de método de pago -->
-          <div class="seccion-pago">
-  <h2 class="subtitulo">Elige tu medio de pago</h2>
-  <div class="pago-content">
-    <div class="opciones-pago">
-      {% for metodo in metodos_pago %}
-      <label class="opcion" onclick="toggleSelection(this, 'metodo')">
-        <div class="cabecera-opcion">
-          <!-- ✅ CORREGIDO: ID único, value dinámico, atributos data -->
-          <input 
-            type="radio" 
-            name="metodo" 
-            id="metodo_{{metodo.id}}" 
-            value="{{metodo.id}}" 
-            data-nombre="{{metodo.nombre}}"
-            data-codigo="{{metodo.codigo|default('')}}"
-            onchange="validarSelecciones()" 
-          />
-          <span class="texto">{{metodo.nombre}}</span>
-        </div>
-      </label>
-      {% endfor %}
-    </div>
-  </div>
-</div>
-          
-        {% else %}
-          <!-- Para modalidades 2 y 3: Solo mensaje informativo -->
-          <div class="mensaje-simple">
-            {% if modalidad_pago == '2' %}
-              <h3> Generar Rótulo de Envío</h3>
-              <p>Se generará tu rótulo de envío. El pago se realizará en la sucursal al momento del registro.</p>
-            {% elif modalidad_pago == '3' %}
-              <h3>Generar Rótulo de Envío</h3>
-              <p>Se generará tu rótulo de envío. El destinatario realizará el pago al momento de recibir el paquete.</p>
-            {% else %}
-              <h3>Generar Rótulo de Envío</h3>
-              <p>Se generará tu rótulo de envío.</p>
-            {% endif %}
+    {% if tiene_pago_online %}
+      <!-- PASARELA DE PAGO -->
+      {% if envios_otras_modalidades|length > 0 %}
+        <div class="info-mixto">
+          <h4>Envíos mixtos</h4>
+          <p id="text-mixto"  ><strong>Tu pedido incluye envíos con diferentes modalidades de pago</strong></p>
+          <!---
+          <div class="detalles-envios">
+            <h4>🌐 Envíos con Pago en Línea ({{ envios_pago_online|length }})</h4>
+            <ul>
+              {% for envio in envios_pago_online %}
+                <li>Clave: {{ envio.clave }} - S/ {{ "%.2f"|format(envio.tarifa) }}</li>
+              {% endfor %}
+            </ul>
           </div>
-        {% endif %}
-      </div>
 
-      <div>
-        <div class="resumen-box">
-          <h3>Resumen de tu registro</h3>
-          <table>
-            <tr>
-              <td>Cantidad De Envíos:</td>
-              <td class="value-td">{{ envios|length if envios else 0 }}</td>
-            </tr>
-            {% if modalidad_pago == '1' %}
+          <div class="detalles-envios">
+            <h4>🏢 Envíos con Otras Modalidades ({{ envios_otras_modalidades|length }})</h4>
+            <ul>
+              {% for envio in envios_otras_modalidades %}
+                <li>Clave: {{ envio.clave }} - S/ {{ "%.2f"|format(envio.tarifa) }} (pago en sucursal/destino)</li>
+              {% endfor %}
+            </ul>
+          </div>-->
+        </div>
+      {% else %}
+        <div class="info-pago">
+          Pago en línea - Completa el pago para generar tu comprobante
+        </div>
+      {% endif %}
+
+      <div class="contenido">
+        <div>
+          <!-- Tipo de comprobante -->
+          <div class="seccion-pago">
+            <h2 class="subtitulo">Elige el tipo de comprobante</h2>
+            <div class="pago-content">
+              <div class="opciones-pago">
+                {% for comprobante in tipos_comprobante %}
+                <label class="opcion" onclick="toggleSelection(this, 'comprobante')">
+                  <div class="cabecera-opcion">
+                    <input 
+                      type="radio" 
+                      name="comprobante" 
+                      id="comprobante_{{comprobante.id}}" 
+                      value="{{comprobante.id}}" 
+                      onchange="validarSelecciones()" 
+                    />
+                    <span class="texto">{{comprobante.nombre}}</span>
+                  </div>
+                </label>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Método de pago -->
+          <div class="seccion-pago">
+            <h2 class="subtitulo">Elige tu medio de pago</h2>
+            <div class="pago-content">
+              <div class="opciones-pago">
+                {% for metodo in metodos_pago %}
+                <label class="opcion" onclick="toggleSelection(this, 'metodo')">
+                  <div class="cabecera-opcion">
+                    <input 
+                      type="radio" 
+                      name="metodo" 
+                      id="metodo_{{metodo.id}}" 
+                      value="{{metodo.id}}" 
+                      data-nombre="{{metodo.nombre}}"
+                      onchange="validarSelecciones()" 
+                    />
+                    <span class="texto">{{metodo.nombre}}</span>
+                  </div>
+                </label>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="resumen-box">
+            <h3>Resumen del pago</h3>
+            <table>
               <tr>
-                <td>Sub Total:</td>
-                <td class="value-td">S/ {{ "%.2f"|format((total_pagar / 1.18)|round(2)) if total_pagar else '0.00' }}</td>
+                <td>Total de envíos:</td>
+                <td class="value-td">{{ envios|length }}</td>
+              </tr>
+              {% if envios_otras_modalidades|length > 0 %}
+              <tr>
+                <td>Envíos con pago en línea:</td>
+                <td class="value-td">{{ envios_pago_online|length }}</td>
+              </tr>
+              <tr>
+                <td>Envíos con otras modalidades:</td>
+                <td class="value-td">{{ envios_otras_modalidades|length }}</td>
+              </tr>
+              <tr style="border-top: 1px solid #ddd;">
+                <td>Monto total general:</td>
+                <td class="value-td">S/ {{ "%.2f"|format(total_general) }}</td>
+              </tr>
+              {% endif %}
+              <tr>
+                <td>Sub Total (Pago en línea):</td>
+                <td class="value-td">S/ {{ "%.2f"|format((total_pago_online / 1.18)|round(2)) }}</td>
               </tr>
               <tr>
                 <td>I.G.V. (18%):</td>
-                <td class="value-td">S/ {{ "%.2f"|format((total_pagar * 0.18 / 1.18)|round(2)) if total_pagar else '0.00' }}</td>
+                <td class="value-td">S/ {{ "%.2f"|format((total_pago_online * 0.18 / 1.18)|round(2)) }}</td>
               </tr>
               <tr class="total">
-                <td><strong>Total a Pagar:</strong></td>
-                <td class="value-td"><strong>S/ {{ "%.2f"|format(total_pagar) if total_pagar else '0.00' }}</strong></td>
+                <td><strong>Total a Pagar en línea:</strong></td>
+                <td class="value-td"><strong>S/ {{ "%.2f"|format(total_pago_online) }}</strong></td>
               </tr>
-            {% else %}
-              <tr class="total">
-                <td><strong>Costo del Envío:</strong></td>
-                <td class="value-td"><strong>S/ {{ "%.2f"|format(total_pagar) if total_pagar else '0.00' }}</strong></td>
-              </tr>
-              <tr>
-                <td colspan="2" style="text-align: center; color: #6c757d; font-style: italic; padding-top: 10px;">
-                  {% if modalidad_pago == '2' %}
-                    Pago a realizar en sucursal
-                  {% elif modalidad_pago == '3' %}
-                    Pago contraentrega
-                  {% endif %}
-                </td>
-              </tr>
-            {% endif %}
+            </table>
+          </div>
+
+          <div class="boton-pagar-container">
+            <button id="btn-pagar" class="btn-pagar oculto" disabled onclick="mostrarModal()">
+              PAGAR S/ {{ "%.2f"|format(total_pago_online) }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal de pago -->
+      <div id="modalPago" class="modal-overlay">
+        <div class="modal-content">
+          <span class="modal-close" onclick="cerrarModal()">&times;</span>
+          <h3 id="tituloModal">Completar Pago</h3>
+          <div id="contenidoModal"></div>
+          <button class="btn-continuar-modal" onclick="procesarPago()">CONTINUAR</button>
+        </div>
+      </div>
+
+    {% else %}
+      <!-- SOLO GENERAR RÓTULO -->
+      <div class="mensaje-simple">
+        <h3>
+          
+          Generar Rótulo de Envío</h3>
+        <p>Tus envíos han sido registrados. Se generará el rótulo correspondiente.</p>
+        
+        <div class="resumen-box" style="margin: 2rem auto; max-width: 400px;">
+          <h3>Resumen</h3>
+          <table>
+            <tr>
+              <td>Cantidad de envíos:</td>
+              <td class="value-td">{{ envios|length }}</td>
+            </tr>
+            <tr class="total">
+              <td><strong>Costo total:</strong></td>
+              <td class="value-td"><strong>S/ {{ "%.2f"|format(total_general) }}</strong></td>
+            </tr>
           </table>
         </div>
 
-        <div class="boton-pagar-container">
-          <button id="btn-accion" class="btn-pagar {% if modalidad_pago != '1' %}{% else %}oculto{% endif %}" 
-                  {% if modalidad_pago != '1' %}{% else %}disabled{% endif %} onclick="accionPrincipal()">
-            {% if modalidad_pago == '1' %}
-              PAGAR S/ {{ "%.2f"|format(total_pagar) if total_pagar else '0.00' }}
-            {% else %}
-              GENERAR RÓTULO
-            {% endif %}
-          </button>
-        </div>
+        <button class="btn-pagar" onclick="generarRotulo()">
+          GENERAR RÓTULO
+        </button>
       </div>
-    </div>
+    {% endif %}
   </div>
 
-  <!-- Modal de pago (solo para modalidad 1) -->
-  {% if modalidad_pago == '1' %}
-  <div id="modalPago" class="modal-overlay">
-    <div class="modal-content">
-      <span class="modal-close" onclick="cerrarModal()">&times;</span>
-      <h3 id="tituloModal">Completar Pago</h3>
-
-      <div id="contenidoModal"></div>
-
-      <button class="btn-continuar-modal" >CONTINUAR</button>
-    </div>
-  </div>
-  {% endif %}
-
-  <!-- ANIMACIÓN DE ÉXITO PARA PAGO (Modalidad 1) -->
-  <div id="successPaymentOverlay" class="success-overlay">
-    <div class="confetti-container">
-      <div class="confetti"></div>
-      <div class="confetti"></div>
-      <div class="confetti"></div>
-      <div class="confetti"></div>
-      <div class="confetti"></div>
-      <div class="confetti"></div>
-      <div class="confetti"></div>
-      <div class="confetti"></div>
-      <div class="confetti"></div>
-    </div>
-
-    <div class="success-content">
-      <div class="success-check"></div>
-      <h1 class="success-title">¡Pago Exitoso!</h1>
-      <p class="success-message">Tu pago se ha procesado correctamente</p>
-      
-      <div class="success-details" id="successPaymentDetails">
-        <h3>Detalles del Pago</h3>
-        <p><strong>Número de Operación:</strong> <span id="numeroOperacionPago">#PAY-123456</span></p>
-        <p><strong>Monto:</strong> <span id="montoOperacionPago">S/ 0.00</span></p>
-        <p><strong>Método:</strong> <span id="metodoOperacionPago">-</span></p>
-        <p><strong>Fecha:</strong> <span id="fechaOperacionPago">-</span></p>
-      </div>
-      
-      <button class="success-button" onclick="continuarDespuesPago()">
-        Descarga Comprobante
-      </button>
-    </div>
-  </div>
-
-  <!-- ANIMACIÓN DE ÉXITO PARA RÓTULO (Modalidades 2 y 3) -->
-  <div id="successRotuloOverlay" class="success-overlay rotulo-overlay">
-    <div class="confetti-container">
-      <div class="confetti"></div>
-      <div class="confetti"></div>
-      <div class="confetti"></div>
-      <div class="confetti"></div>
-      <div class="confetti"></div>
-      <div class="confetti"></div>
-      <div class="confetti"></div>
-      <div class="confetti"></div>
-      <div class="confetti"></div>
-    </div>
-
-    <div class="success-content">
-      <div class="success-check"></div>
-      <h1 class="success-title">¡Rótulo Generado!</h1>
-      <p class="success-message">Tu envío ha sido registrado exitosamente</p>
-      
-      <div class="success-details" id="successRotuloDetails">
-        <h3>Detalles del Envío</h3>
-        <p><strong>Número de Rótulo:</strong> <span id="numeroRotulo">#ROT-123456</span></p>
-        <p><strong>Costo:</strong> <span id="costoEnvio">S/ 0.00</span></p>
-        <p><strong>Modalidad:</strong> <span id="modalidadEnvio">-</span></p>
-        <p><strong>Fecha:</strong> <span id="fechaEnvio">-</span></p>
-      </div>
-      
-      <button class="success-button" onclick="continuarDespuesRotulo()">
-        Ver Rótulo
-      </button>
-    </div>
-  </div>
 {% endblock %}
 
 {% block scripts %}
-
 <script>
-
-// ==============================================
-// VARIABLES GLOBALES
-// ==============================================
-let modalidadPago = {{ modalidad_pago|default(0) }};
 let tipoComprobanteSeleccionado = null;
 let metodoPagoSeleccionado = null;
 let nombreMetodoPago = null;
-let totalPagar = {{ total_pagar|default(0) }}; // ✅ AGREGADO: Variable para el total
+let totalPagarOnline = {{ total_pago_online if tiene_pago_online else 0 }};
 
-// ==============================================
-// FUNCIONES DE INTERFAZ - SELECCIÓN (YA LAS TENÍAS)
-// ==============================================
 function toggleSelection(label, tipo) {
-  // Remover selección visual anterior
   document.querySelectorAll(`input[name="${tipo}"]`).forEach(input => {
     input.closest('.opcion').style.borderColor = '#e1e8f5';
     input.closest('.opcion').style.background = 'white';
   });
   
-  // Aplicar selección visual actual
   label.style.borderColor = '#fbbd0a';
   label.style.background = '#fefdf8';
 }
 
-function toggleIcons(label) {
-  document.querySelectorAll('.iconos-pago').forEach(group => group.classList.add('oculto'));
-  const iconos = label.querySelector('.iconos-pago');
-  if (iconos) iconos.classList.remove('oculto');
-}
-
-function hideAllIcons() {
-  document.querySelectorAll('.iconos-pago').forEach(group => group.classList.add('oculto'));
-}
-
-// ==============================================
-// FUNCIONES DE VALIDACIÓN Y BOTONES (YA LAS TENÍAS)
-// ==============================================
 function validarSelecciones() {
-  console.log('🔍 Validando selecciones...');
-  
-  // Capturar comprobante seleccionado
   const comprobanteSeleccionado = document.querySelector('input[name="comprobante"]:checked');
+  const metodoSeleccionado = document.querySelector('input[name="metodo"]:checked');
+  
   tipoComprobanteSeleccionado = comprobanteSeleccionado ? comprobanteSeleccionado.value : null;
+  metodoPagoSeleccionado = metodoSeleccionado ? metodoSeleccionado.value : null;
+  nombreMetodoPago = metodoSeleccionado ? metodoSeleccionado.dataset.nombre : null;
   
-  console.log('📄 Comprobante seleccionado:', {
-    id: tipoComprobanteSeleccionado,
-    nombre: comprobanteSeleccionado ? comprobanteSeleccionado.dataset.nombre : null
-  });
-  
-  if (modalidadPago === 1) {
-    // Para modalidad de pago en línea: necesitamos comprobante Y método
-    const metodoSeleccionado = document.querySelector('input[name="metodo"]:checked');
-    metodoPagoSeleccionado = metodoSeleccionado ? metodoSeleccionado.value : null;
-    nombreMetodoPago = metodoSeleccionado ? metodoSeleccionado.dataset.nombre : null;
-    
-    console.log('💳 Método de pago seleccionado:', {
-      id: metodoPagoSeleccionado,
-      nombre: nombreMetodoPago,
-      codigo: metodoSeleccionado ? metodoSeleccionado.dataset.codigo : null
-    });
-    
-    // Ambos deben estar seleccionados
-    if (tipoComprobanteSeleccionado && metodoPagoSeleccionado) {
-      console.log('✅ Ambas selecciones válidas - habilitando botón');
-      habilitarBoton();
-    } else {
-      console.log('❌ Selecciones incompletas - deshabilitando botón');
-      deshabilitarBoton();
-    }
+  const boton = document.getElementById('btn-pagar');
+  if (tipoComprobanteSeleccionado && metodoPagoSeleccionado) {
+    boton.classList.remove('oculto');
+    boton.disabled = false;
   } else {
-    // Para otras modalidades: solo necesitamos comprobante
-    if (tipoComprobanteSeleccionado) {
-      console.log('✅ Comprobante seleccionado - habilitando botón');
-      habilitarBoton();
-    } else {
-      console.log('❌ Sin comprobante - deshabilitando botón');
-      deshabilitarBoton();
-    }
+    boton.disabled = true;
   }
 }
 
-function habilitarBoton() {
-  const boton = document.getElementById('btn-accion');
-  boton.classList.remove('oculto');
-  boton.disabled = false;
-}
-
-function deshabilitarBoton() {
-  const boton = document.getElementById('btn-accion');
-  boton.disabled = true;
-}
-
-// ==============================================
-// FUNCIÓN PRINCIPAL DE ACCIÓN
-// ==============================================
-function accionPrincipal() {
-  if (modalidadPago === 1) {
-    mostrarModal();
-  } else {
-    enviarDatos(false); // false = solo guardar datos
-  }
-}
-
-// ==============================================
-// FUNCIONES DE ENVÍO AL BACKEND - CORREGIDAS
-// ==============================================
-function enviarDatos(esPago = false) {
-  console.log('📤 Enviando datos al servidor...');
-  
-  const datos = {
-    tipo_comprobante: tipoComprobanteSeleccionado,
-    modalidad_pago: modalidadPago // ✅ CORREGIDO: Enviar modalidad_pago como está
-  };
-  
-  // ✅ CORREGIDO: Si es modalidad 1, agregar método de pago seleccionado
-  if (modalidadPago === 1) {
-    datos.metodo_pago = metodoPagoSeleccionado; // El método seleccionado por el usuario
-  }
-  
-  console.log('📦 Datos a enviar:', datos);
-
-  // Mostrar animación de procesamiento
-  if (esPago) {
-    mostrarProcesando();
-  } else {
-    mostrarGenerandoRotulo();
-  }
-
-  fetch('/insertar_envio_api', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(datos)
-  })
-  .then(res => {
-    console.log('📡 Respuesta del servidor:', res.status);
-    if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
-    return res.json();
-  })
-  .then(response => {
-    console.log('✅ Respuesta exitosa:', response);
-    if (response.status === 'success') {
-      const mensaje = esPago ? 'Pago procesado exitosamente' : 'Rótulo generado exitosamente';
-      mostrarExito(mensaje, () => {
-        window.location.href = '/index';
-      });
-    } else {
-      console.error('❌ Error en respuesta:', response.message);
-      alert(response.message || 'No se pudo completar la operación');
-      if (esPago) cerrarModal();
-    }
-  })
-  .catch(err => {
-    console.error('🚨 Error en la petición:', err);
-    alert('Ocurrió un error al comunicar con el servidor.');
-    if (esPago) cerrarModal();
-  });
-}
-
-// ==============================================
-// FUNCIONES DE MODAL - CORREGIDAS
-// ==============================================
 function mostrarModal() {
   const modal = document.getElementById('modalPago');
   const titulo = document.getElementById('tituloModal');
   const contenido = document.getElementById('contenidoModal');
   
-  // Configurar contenido según el método de pago
   if (nombreMetodoPago && nombreMetodoPago.toLowerCase().includes('yape')) {
-    configurarModalYape(titulo, contenido);
+    titulo.textContent = 'Pago con Yape';
+    contenido.innerHTML = `
+      <div class="form-group">
+        <label for="numeroConfirmacion">Número de Confirmación Yape:</label>
+        <input type="text" id="numeroConfirmacion" placeholder="Ej: 972345678" maxlength="9" required>
+      </div>
+      <p style="font-size: 0.9em; color: #666;">
+        Realiza el pago de <strong>S/ ${totalPagarOnline.toFixed(2)}</strong> e ingresa el número de confirmación.
+      </p>
+    `;
   } else {
-    configurarModalTarjeta(titulo, contenido);
+    titulo.textContent = 'Pago con Tarjeta';
+    contenido.innerHTML = `
+      <div class="form-group">
+        <label for="numeroTarjeta">Número de Tarjeta:</label>
+        <input type="text" id="numeroTarjeta" placeholder="1234 5678 9012 3456" maxlength="19" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fechaVencimiento">Vencimiento:</label>
+          <input type="text" id="fechaVencimiento" placeholder="MM/AA" maxlength="5" required>
+        </div>
+        <div class="form-group">
+          <label for="cvv">CVV:</label>
+          <input type="text" id="cvv" placeholder="123" maxlength="3" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="nombreTitular">Nombre del Titular:</label>
+        <input type="text" id="nombreTitular" placeholder="Como aparece en la tarjeta" required>
+      </div>
+    `;
   }
   
   modal.style.display = 'flex';
 }
 
-function configurarModalYape(titulo, contenido) {
-  titulo.textContent = 'Confirmar pago con Yape';
-  contenido.innerHTML = `
-    <div style="text-align: center; margin-bottom: 20px;">
-      <!-- ✅ CORREGIDO: Ícono SVG de Yape -->
-      <div style="
-        width: 80px; 
-        height: 80px; 
-        background: linear-gradient(135deg, #722F87 0%, #A855F7 100%);
-        border-radius: 20px;
-        margin: 0 auto 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 25px rgba(114, 47, 135, 0.3);
-      ">
-        <svg width="45" height="45" viewBox="0 0 24 24" fill="white">
-          <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
-          <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
-        </svg>
-      </div>
-      
-      <p style="color: #0e1d63; font-size: 1.2em; margin-bottom: 10px; font-weight: 600;">
-        Realiza el pago de <strong style="color: #722F87;">S/ ${totalPagar.toFixed(2)}</strong>
-      </p>
-      <p style="color: #666; font-size: 0.95em;">
-        e ingresa tu número de confirmación
-      </p>
-    </div>
-    <div class="form-group">
-      <label for="numeroConfirmacion">Número de Confirmación Yape:</label>
-      <input type="text" id="numeroConfirmacion" placeholder="Ej: 972345678" maxlength="9" required>
-    </div>
-    <div style="font-size: 0.9em; color: #666; text-align: left; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 15px;">
-      <p style="margin: 0 0 8px 0; font-weight: 600; color: #495057;">📱 Instrucciones:</p>
-      <p style="margin: 3px 0;">1. Abre tu app Yape</p>
-      <p style="margin: 3px 0;">2. Realiza el pago por <strong>S/ ${totalPagar.toFixed(2)}</strong></p>
-      <p style="margin: 3px 0;">3. Ingresa el número de confirmación aquí</p>
-    </div>
-  `;
-}
-
-function configurarModalTarjeta(titulo, contenido) {
-  titulo.textContent = 'Pago con Tarjeta';
-  contenido.innerHTML = `
-    <div style="text-align: center; margin-bottom: 20px;">
-      <div style="
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        margin-bottom: 15px;
-      ">
-        <div style="
-          width: 50px;
-          height: 32px;
-          background: linear-gradient(135deg, #1565C0 0%, #42A5F5 100%);
-          border-radius: 6px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        ">
-          <svg width="24" height="18" viewBox="0 0 24 18" fill="white">
-            <rect x="2" y="3" width="20" height="12" rx="2" fill="none" stroke="white" stroke-width="1.5"/>
-            <rect x="2" y="7" width="20" height="2" fill="white"/>
-          </svg>
-        </div>
-        <div style="
-          display: flex;
-          gap: 5px;
-        ">
-          <div style="width: 30px; height: 20px; background: #1A1F71; border-radius: 3px; font-size: 8px; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">VISA</div>
-          <div style="width: 30px; height: 20px; background: #EB001B; border-radius: 3px; font-size: 6px; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">MC</div>
-        </div>
-      </div>
-      
-      <p style="color: #0e1d63; font-size: 1.2em; margin-bottom: 15px; font-weight: 600;">
-        Monto a pagar: <strong style="color: #1565C0;">S/ ${totalPagar.toFixed(2)}</strong>
-      </p>
-    </div>
-    <div class="form-group">
-      <label for="numeroTarjeta">Número de Tarjeta:</label>
-      <input type="text" id="numeroTarjeta" placeholder="1234 5678 9012 3456" maxlength="19" required>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label for="fechaVencimiento">Fecha de Vencimiento:</label>
-        <input type="text" id="fechaVencimiento" placeholder="MM/AA" maxlength="5" required>
-      </div>
-      <div class="form-group">
-        <label for="cvv">CVV:</label>
-        <input type="text" id="cvv" placeholder="123" maxlength="3" required>
-      </div>
-    </div>
-    <div class="form-group">
-      <label for="nombreTitular">Nombre del Titular:</label>
-      <input type="text" id="nombreTitular" placeholder="Como aparece en la tarjeta" required>
-    </div>
-  `;
-  
-  // Agregar formato automático a los campos
-  setTimeout(() => formatearCamposTarjeta(), 100);
-}
-
-function mostrarProcesando() {
-  const contenido = document.getElementById('contenidoModal');
-  const boton = document.querySelector('.btn-continuar-modal');
-  
-  contenido.innerHTML = `
-    <div style="text-align: center; padding: 40px 20px;">
-      <div style="border: 4px solid #f3f3f3; border-top: 4px solid rgb(1, 31, 97); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-      <p style="color: #0e1d63; font-size: 1.1em;">Procesando pago...</p>
-      <p style="color: #666; font-size: 0.9em;">Por favor espera</p>
-    </div>
-    <style>
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-    </style>
-  `;
-  
-  if (boton) boton.style.display = 'none';
-}
-
-function mostrarGenerandoRotulo() {
-  // Crear overlay para toda la pantalla
-  const overlay = document.createElement('div');
-  overlay.id = 'overlayGenerando';
-  
-  overlay.innerHTML = `
-    <div style="
-      background: white;
-      padding: 40px;
-      border-radius: 15px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      max-width: 400px;
-      width: 90%;
-    ">
-      <div style="
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #007bff;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 20px;
-      "></div>
-      <h3 style="color: #0e1d63; margin-bottom: 10px;">Generando rótulo...</h3>
-      <p style="color: #666; margin: 0;">Por favor espera un momento</p>
-    </div>
-    <style>
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-    </style>
-  `;
-  
-  document.body.appendChild(overlay);
-}
-
-function mostrarExito(mensaje, callback) {
-  // Remover overlay de generando si existe
-  const overlayGenerando = document.getElementById('overlayGenerando');
-  if (overlayGenerando) {
-    overlayGenerando.remove();
-  }
-  
-  // Si estamos en modal de pago, actualizar el contenido
-  const contenidoModal = document.getElementById('contenidoModal');
-  if (contenidoModal && document.getElementById('modalPago').style.display === 'flex') {
-    mostrarExitoEnModal(mensaje, callback);
+function procesarPago() {
+  // Validar campos del modal
+  if (!validarCamposModal()) {
     return;
   }
   
-  // Crear overlay de éxito para pantalla completa
+  cerrarModal();
+  mostrarProcesando('Procesando pago...');
+  
+  setTimeout(() => {
+    enviarDatos();
+  }, 3000); // Simular tiempo de procesamiento de pago
+}
+
+function generarRotulo() {
+  mostrarProcesando('Generando rótulo...');
+  
+  setTimeout(() => {
+    enviarDatos();
+  }, 2000);
+}
+
+function validarCamposModal() {
+  const inputs = document.querySelectorAll('#contenidoModal input[required]');
+  let esValido = true;
+  
+  inputs.forEach(input => {
+    if (!input.value.trim()) {
+      input.style.borderColor = '#dc3545';
+      esValido = false;
+    } else {
+      input.style.borderColor = '#dce3f5';
+    }
+  });
+  
+  if (!esValido) {
+    alert('Por favor, completa todos los campos requeridos.');
+  }
+  
+  return esValido;
+}
+
+function enviarDatos() {
+  const datos = {
+    tipo_comprobante: tipoComprobanteSeleccionado,
+    metodo_pago: metodoPagoSeleccionado
+  };
+  
+  fetch('/insertar_envio_api', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(datos)
+  })
+  .then(res => res.json())
+  .then(response => {
+    if (response.status === 'success') {
+      mostrarExito('¡Procesado exitosamente!', () => {
+        window.location.href = '/index';
+      });
+    } else {
+      ocultarProcesando();
+      alert(response.message || 'Error en la operación');
+    }
+  })
+  .catch(err => {
+    console.error('Error:', err);
+    ocultarProcesando();
+    alert('Error al comunicar con el servidor');
+  });
+}
+
+function mostrarProcesando(mensaje = 'Procesando...') {
   const overlay = document.createElement('div');
-  overlay.id = 'overlayExito';
+  overlay.id = 'procesandoOverlay';
   overlay.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.9);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10001;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8); display: flex; justify-content: center;
+    align-items: center; z-index: 10000;
   `;
   
   overlay.innerHTML = `
-    <div style="
-      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-      padding: 50px 40px;
-      border-radius: 20px;
-      text-align: center;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-      max-width: 450px;
-      width: 90%;
-      position: relative;
-      overflow: hidden;
-    ">
-      <div style="
-        position: absolute;
-        top: -50px;
-        left: -50px;
-        width: 100px;
-        height: 100px;
-        background: linear-gradient(45deg, #28a745, #20c997);
-        border-radius: 50%;
-        opacity: 0.1;
-      "></div>
-      
-      <div id="checkContainer" style="
-        width: 80px;
-        height: 80px;
-        margin: 0 auto 25px;
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
-        animation: bounceIn 0.8s ease-out;
-        position: relative;
-      ">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-          <path id="checkPath" d="M9 12l2 2 4-4" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" 
-                style="stroke-dasharray: 20; stroke-dashoffset: 20; animation: drawCheck 0.5s ease-out 0.5s forwards;"/>
-        </svg>
-        
-        <div style="
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          border-radius: 50%;
-          background: rgba(255,255,255,0.2);
-          animation: ripple 1.5s ease-out 0.3s;
-        "></div>
-      </div>
-      
-      <h2 style="
-        color: #28a745;
-        margin-bottom: 15px;
-        font-size: 1.8em;
-        font-weight: 600;
-        animation: slideUp 0.6s ease-out 0.7s both;
-      ">¡Éxito!</h2>
-      
-      <p style="
-        color: #6c757d;
-        font-size: 1.1em;
-        margin-bottom: 30px;
-        line-height: 1.5;
-        animation: slideUp 0.6s ease-out 0.9s both;
-      ">${mensaje}</p>
-      
-      <div style="
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        animation: slideUp 0.6s ease-out 1.1s both;
-      ">
-        <div style="width: 8px; height: 8px; background: #28a745; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite;"></div>
-        <div style="width: 8px; height: 8px; background: #28a745; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite 0.2s;"></div>
-        <div style="width: 8px; height: 8px; background: #28a745; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite 0.4s;"></div>
-      </div>
+    <div style="background: white; padding: 40px; border-radius: 15px; text-align: center; min-width: 300px;">
+      <div class="spinner"></div>
+      <p style="margin: 0; font-size: 1.1em; font-weight: 600; color: #333;">${mensaje}</p>
+      <p style="margin: 0.5rem 0 0 0; font-size: 0.9em; color: #666;">Por favor espera...</p>
     </div>
-    
-    <style>
-      @keyframes bounceIn {
-        0% { transform: scale(0.3); opacity: 0; }
-        50% { transform: scale(1.1); }
-        70% { transform: scale(0.9); }
-        100% { transform: scale(1); opacity: 1; }
-      }
-      
-      @keyframes drawCheck {
-        to { stroke-dashoffset: 0; }
-      }
-      
-      @keyframes ripple {
-        0% { transform: scale(1); opacity: 0.6; }
-        100% { transform: scale(1.4); opacity: 0; }
-      }
-      
-      @keyframes slideUp {
-        from { transform: translateY(30px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-      }
-      
-      @keyframes pulse {
-        0%, 100% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.2); opacity: 0.7; }
-      }
-    </style>
   `;
   
   document.body.appendChild(overlay);
-  
-  // Auto cerrar y ejecutar callback después de 3 segundos
-  setTimeout(() => {
-    overlay.style.animation = 'fadeOut 0.5s ease-out forwards';
-    setTimeout(() => {
-      overlay.remove();
-      if (callback) callback();
-    }, 500);
-  }, 3000);
 }
 
-function mostrarExitoEnModal(mensaje, callback) {
-  const contenido = document.getElementById('contenidoModal');
-  const boton = document.querySelector('.btn-continuar-modal');
+function ocultarProcesando() {
+  const overlay = document.getElementById('procesandoOverlay');
+  if (overlay) {
+    overlay.remove();
+  }
+}
+
+function mostrarExito(mensaje, callback) {
+  ocultarProcesando();
   
-  contenido.innerHTML = `
-    <div style="text-align: center; padding: 40px 20px;">
-      <div style="
-        width: 70px;
-        height: 70px;
-        margin: 0 auto 20px;
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
-        animation: bounceIn 0.8s ease-out;
-      ">
-        <svg width="35" height="35" viewBox="0 0 24 24" fill="none">
-          <path d="M9 12l2 2 4-4" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" 
-                style="stroke-dasharray: 20; stroke-dashoffset: 20; animation: drawCheck 0.5s ease-out 0.5s forwards;"/>
-        </svg>
-      </div>
-      
-      <h3 style="color: #28a745; margin-bottom: 15px; animation: slideUp 0.6s ease-out 0.7s both;">¡Éxito!</h3>
-      <p style="color: #666; font-size: 1.1em; animation: slideUp 0.6s ease-out 0.9s both;">${mensaje}</p>
-    </div>
-    
-    <style>
-      @keyframes bounceIn {
-        0% { transform: scale(0.3); opacity: 0; }
-        50% { transform: scale(1.1); }
-        70% { transform: scale(0.9); }
-        100% { transform: scale(1); opacity: 1; }
-      }
-      
-      @keyframes drawCheck {
-        to { stroke-dashoffset: 0; }
-      }
-      
-      @keyframes slideUp {
-        from { transform: translateY(20px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-      }
-    </style>
+  const exitoOverlay = document.createElement('div');
+  exitoOverlay.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9); display: flex; justify-content: center;
+    align-items: center; z-index: 10001;
   `;
   
-  if (boton) boton.style.display = 'none';
+  exitoOverlay.innerHTML = `
+    <div style="background: white; padding: 50px; border-radius: 20px; text-align: center; max-width: 400px;">
+      <div class="success-icon">
+        <svg class="checkmark" viewBox="0 0 24 24">
+          <path d="M9 12l2 2 4-4" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 style="color: #28a745; margin-bottom: 15px;">¡Éxito!</h2>
+      <p style="color: #666; margin-bottom: 30px;">${mensaje}</p>
+      <p style="color: #999; font-size: 0.9em;">Redirigiendo...</p>
+    </div>
+  `;
   
-  // Auto cerrar modal y ejecutar callback
+  document.body.appendChild(exitoOverlay);
+  
   setTimeout(() => {
-    cerrarModal();
+    exitoOverlay.remove();
     if (callback) callback();
-  }, 2500);
+  }, 3000);
 }
 
 function cerrarModal() {
   document.getElementById('modalPago').style.display = 'none';
 }
 
-// ==============================================
-// FUNCIONES DE VALIDACIÓN Y FORMATO (YA LAS TENÍAS)
-// ==============================================
-function validarPagoYape() {
-  const numeroConfirmacion = document.getElementById('numeroConfirmacion').value;
-  
-  if (!numeroConfirmacion || numeroConfirmacion.length < 6) {
-    alert('Por favor ingresa un número de confirmación válido');
-    return false;
-  }
-  return true;
-}
-
-function validarPagoTarjeta() {
-  const numeroTarjeta = document.getElementById('numeroTarjeta').value;
-  const fechaVencimiento = document.getElementById('fechaVencimiento').value;
-  const cvv = document.getElementById('cvv').value;
-  const nombreTitular = document.getElementById('nombreTitular').value;
-  
-  if (!numeroTarjeta || numeroTarjeta.replace(/\s/g, '').length < 16) {
-    alert('Por favor ingresa un número de tarjeta válido');
-    return false;
-  }
-  
-  if (!fechaVencimiento || fechaVencimiento.length < 5) {
-    alert('Por favor ingresa una fecha de vencimiento válida');
-    return false;
-  }
-  
-  if (!cvv || cvv.length < 3) {
-    alert('Por favor ingresa un CVV válido');
-    return false;
-  }
-  
-  if (!nombreTitular.trim()) {
-    alert('Por favor ingresa el nombre del titular');
-    return false;
-  }
-  
-  return true;
-}
-
-function formatearCamposTarjeta() {
-  const numeroTarjeta = document.getElementById('numeroTarjeta');
-  const fechaVencimiento = document.getElementById('fechaVencimiento');
-  
-  if (numeroTarjeta) {
-    numeroTarjeta.addEventListener('input', function(e) {
-      let valor = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
-      let formateado = valor.match(/.{1,4}/g)?.join(' ') || valor;
-      e.target.value = formateado;
-    });
-  }
-  
-  if (fechaVencimiento) {
-    fechaVencimiento.addEventListener('input', function(e) {
-      let valor = e.target.value.replace(/\D/g, '');
-      if (valor.length >= 2) {
-        valor = valor.substring(0,2) + '/' + valor.substring(2,4);
-      }
-      e.target.value = valor;
-    });
-  }
-}
-
-// ==============================================
-// FUNCIÓN PRINCIPAL DE PROCESAMIENTO (YA LA TENÍAS)
-// ==============================================
-function iniciarProcesamiento() {
-  let esValido = false;
-  
-  if (nombreMetodoPago && nombreMetodoPago.toLowerCase().includes('yape')) {
-    esValido = validarPagoYape();
-  } else {
-    esValido = validarPagoTarjeta();
-  }
-  
-  if (esValido) {
-    enviarDatos(true); // true = procesar pago
-  }
-}
-
-// ==============================================
-// EVENT LISTENERS - CORREGIDOS
-// ==============================================
-document.addEventListener('DOMContentLoaded', function() {
-  // ✅ CORREGIDO: Agregar event listener al botón CONTINUAR del modal
-  const btnContinuarModal = document.querySelector('.btn-continuar-modal');
-  if (btnContinuarModal) {
-    btnContinuarModal.addEventListener('click', function() {
-      console.log('🔄 Botón continuar presionado');
-      iniciarProcesamiento();
-    });
-  }
-
-  // Agregar estilos CSS globales para las animaciones
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
+// Formateo automático de campos en el modal
+document.addEventListener('input', function(e) {
+  if (e.target.id === 'numeroTarjeta') {
+    // Formatear número de tarjeta
+    let value = e.target.value.replace(/\D/g, '');
+    value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+    e.target.value = value;
+  } else if (e.target.id === 'fechaVencimiento') {
+    // Formatear fecha MM/AA
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length >= 2) {
+      value = value.substring(0, 2) + '/' + value.substring(2, 4);
     }
-  `;
-  document.head.appendChild(style);
-
-  // Cerrar modal al hacer clic fuera de él
-  document.addEventListener('click', function(e) {
-    const modal = document.getElementById('modalPago');
-    if (e.target === modal) {
-      cerrarModal();
-    }
-  });
-
-  // Cerrar modal con tecla Escape
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      cerrarModal();
-    }
-  });
+    e.target.value = value;
+  } else if (e.target.id === 'cvv') {
+    // Solo números para CVV
+    e.target.value = e.target.value.replace(/\D/g, '');
+  } else if (e.target.id === 'numeroConfirmacion') {
+    // Solo números para confirmación Yape
+    e.target.value = e.target.value.replace(/\D/g, '');
+  }
 });
-
 </script>
 {% endblock %}

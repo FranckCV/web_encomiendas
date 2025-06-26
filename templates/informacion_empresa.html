@@ -340,7 +340,7 @@ Información de la empresa
             
             <div class="form-group" style="grid-column: span 3 ;">
                 <label for="correo">Sucursal principal</label>
-                <select name="id_sucursal" id="" style="width: 100%;">
+                <select name="id_sucursal" id="id_sucursal" style="width: 100%;">
                     {% for suc in sucursales %}
                     <option value="{{suc['id']}}"
                     {% if suc['id'] == information['id_sucursal']  %}
@@ -501,6 +501,7 @@ Información de la empresa
     document.addEventListener('DOMContentLoaded', function () {
         // Elementos del DOM
         const form = document.getElementById('empresaForm');
+
         const colorPri = document.getElementById('color_pri');
         const colorSec = document.getElementById('color_sec');
         const colorTer = document.getElementById('color_ter');
@@ -509,7 +510,6 @@ Información de la empresa
         const previewTer = document.getElementById('previewTertiary');
         const logoInput = document.getElementById('logo');
         const logoPreview = document.getElementById('logoImage');
-
 
         const alertSuccess = document.getElementById('alertSuccess');
         const alertError = document.getElementById('alertError');
@@ -591,10 +591,16 @@ Información de la empresa
 
             // Llenar formulario
             document.getElementById('id').value = empresa.id;
+
             document.getElementById('nombre').value = empresa.nombre;
             document.getElementById('correo').value = empresa.correo;
             document.getElementById('nro_telefono').value = empresa.nro_telefono;
+            
+            document.getElementById('ruc').value = empresa.ruc;
+            document.getElementById('igv').value = empresa.igv;
             document.getElementById('porcentaje_recojo').value = empresa.porcentaje_recojo;
+            
+            document.getElementById('id_sucursal').value = empresa.id_sucursal;
 
             // Colores
             colorPri.value = empresa.color_pri;

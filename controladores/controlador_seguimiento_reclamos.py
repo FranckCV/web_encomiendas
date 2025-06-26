@@ -506,3 +506,5 @@ def eliminar_ultimo_seguimiento(reclamoid):
     except Exception as e:
         print("Error al eliminar seguimiento:", e)
         return {'success': False, 'message': "Error interno al eliminar seguimiento."}
+
+

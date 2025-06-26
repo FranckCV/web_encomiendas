@@ -104,7 +104,7 @@
                 {% if modo_modal == 'consult' or campo[5] == False %} disabled {% endif %}
                 >
                   {% if modo_modal == 'insert' %}
-                  <option value="-1" disabled selected>{{campo[2]}}</option>
+                  <option value="" disabled selected>{{campo[2]}}</option>
                   {% elif modo_modal == 'update' and campo[4] == False %}
                   <option value="" >Sin {{campo[2] | lower}}</option>
                   {% endif %}

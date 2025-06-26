@@ -1,0 +1,811 @@
+{% extends "MAESTRA_ADMIN.html" %}
+
+{% block estilos %}
+<style>
+:root {
+    --primary-blue: #2563eb;
+    --primary-blue-hover: #1d4ed8;
+    --light-blue: #dbeafe;
+    --lighter-blue: #eff6ff;
+    --dark-blue: #1e40af;
+    --border-blue: #93c5fd;
+    --text-blue: #1e40af;
+    --success-green: #059669;
+    --error-red: #dc2626;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-300: #cbd5e1;
+    --gray-500: #64748b;
+    --gray-700: #334155;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--gray-50);
+    color: var(--gray-700);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Contenedor principal centrado */
+.main-container {
+    min-height: 100vh;
+    display: flex;
+        width: 100%;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 500px;
+}
+
+.card {
+    background: white;
+    border: 1px solid var(--gray-100);
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--lighter-blue) 0%, var(--light-blue) 100%);
+    border-bottom: 1px solid var(--border-blue);
+    padding: 2rem;
+    text-align: center;
+}
+
+.card-header-icon {
+    font-size: 2.5rem;
+    color: var(--primary-blue);
+    margin-bottom: 1rem;
+}
+
+.card-header h1 {
+    color: var(--text-blue);
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+}
+
+.card-header p {
+    color: var(--gray-500);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    color: var(--gray-700);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    display: block;
+}
+
+.form-label i {
+    color: var(--primary-blue);
+    margin-right: 0.5rem;
+}
+
+.form-control,
+.form-select {
+    width: 100%;
+    border: 2px solid var(--gray-300);
+    border-radius: 8px;
+    padding: 0.875rem 1rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    background-color: white;
+    font-family: inherit;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    outline: none;
+}
+
+.form-control:hover:not(:focus),
+.form-select:hover:not(:focus) {
+    border-color: var(--border-blue);
+}
+
+.form-select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+    appearance: none;
+}
+
+.btn {
+    border-radius: 8px;
+    padding: 0.875rem 1.5rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: inherit;
+    text-decoration: none;
+    min-width: 140px;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+    color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--primary-blue-hover) 0%, var(--primary-blue) 100%);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    background-color: var(--gray-100);
+    color: var(--gray-700);
+    border: 2px solid var(--gray-300);
+}
+
+.btn-secondary:hover {
+    background-color: var(--gray-300);
+    color: var(--gray-700);
+}
+
+.btn-success {
+    background-color: var(--success-green);
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #047857;
+    color: white;
+}
+
+.btn-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn-group .btn {
+    flex: 1;
+}
+
+/* Validación */
+.is-valid {
+    border-color: var(--success-green) !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23059669' d='m2.3 6.73.94-.94 1.44 1.44 2.75-2.75.94.94L3.64 8.84z'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1rem 1rem;
+}
+
+.is-invalid {
+    border-color: var(--error-red) !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc2626'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.5 5.5 1 1m0 -1-1 1'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1rem 1rem;
+}
+
+.form-select.is-valid {
+    background-position: right 2.5rem center, right 0.5rem center;
+}
+
+.form-select.is-invalid {
+    background-position: right 2.5rem center, right 0.5rem center;
+}
+
+.invalid-feedback {
+    color: var(--error-red);
+    font-size: 0.8125rem;
+    margin-top: 0.25rem;
+    display: none;
+}
+
+.is-invalid + .invalid-feedback {
+    display: block;
+}
+
+/* Modales */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-dialog {
+    width: 100%;
+    max-width: 500px;
+    margin: 1rem;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+}
+
+.modal.show .modal-dialog {
+    transform: translateY(0);
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--lighter-blue) 0%, var(--light-blue) 100%);
+    border-bottom: 1px solid var(--border-blue);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title {
+    color: var(--text-blue);
+    font-weight: 600;
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--gray-500);
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.btn-close:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: var(--gray-700);
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--gray-100);
+    padding: 1.5rem;
+    background-color: var(--gray-50);
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+/* Alertas */
+.alert {
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.alert-success {
+    background-color: #dcfce7;
+    color: #166534;
+    border-left: 4px solid var(--success-green);
+}
+
+.alert-danger {
+    background-color: #fef2f2;
+    color: #991b1b;
+    border-left: 4px solid var(--error-red);
+}
+
+.alert-info {
+    background-color: var(--lighter-blue);
+    color: var(--text-blue);
+    border-left: 4px solid var(--primary-blue);
+}
+
+.alert h6 {
+    margin: 0 0 0.5rem 0;
+    font-weight: 600;
+}
+
+.alert p {
+    margin: 0;
+}
+
+/* Información del paquete */
+.package-info {
+    background: var(--lighter-blue);
+    border: 1px solid var(--border-blue);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.package-info h6 {
+    color: var(--text-blue);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-blue);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+    font-weight: 600;
+    color: var(--text-blue);
+}
+
+.info-label {
+    color: var(--gray-700);
+    font-weight: 500;
+}
+
+.info-value {
+    color: var(--text-blue);
+    font-weight: 600;
+}
+
+/* Spinner */
+.spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .main-container {
+        padding: 1rem;
+    }
+    
+    .card-header,
+    .card-body,
+    .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+    }
+    
+    .btn-group .btn {
+        width: 100%;
+    }
+    
+    .modal-footer {
+        flex-direction: column-reverse;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+    }
+    
+    .form-container {
+        max-width: 100%;
+    }
+}
+</style>
+{% endblock estilos %}
+
+{% block contenido %}
+<div class="main-container">
+    <div class="form-container">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <h1>Procesar Pago de Paquete</h1>
+            </div>
+            <div class="card-body">
+                <form id="formPagarPaquete">
+                    <!-- Campo Tracking -->
+                    <div class="form-group">
+                        <label for="tracking" class="form-label">
+                            <i class="fas fa-barcode"></i>
+                            Código de Tracking *
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="tracking" 
+                               placeholder="Ingrese su número de tracking"
+                               name="tracking" 
+                               required>
+                        <div class="invalid-feedback">
+                            <i class="fas fa-exclamation-circle"></i>
+                            Por favor ingrese el código de tracking.
+                        </div>
+                    </div>
+
+                    <!-- Tipo de Comprobante -->
+                    <div class="form-group">
+                        <label for="tipo_comprobante" class="form-label">
+                            <i class="fas fa-file-invoice"></i>
+                            Tipo de Comprobante *
+                        </label>
+                        <select class="form-select" 
+                                id="tipo_comprobante" 
+                                name="tipo_comprobante" 
+                                required>
+                            <option value="">Seleccione tipo de comprobante</option>
+                            {% for fila in tipo_comprobante %}
+                                <option value="{{ fila.id }}">{{ fila.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">
+                            <i class="fas fa-exclamation-circle"></i>
+                            Por favor seleccione un tipo de comprobante.
+                        </div>
+                    </div>
+
+                    <!-- Método de Pago -->
+                    <div class="form-group">
+                        <label for="metodo_pago" class="form-label">
+                            <i class="fas fa-wallet"></i>
+                            Método de Pago *
+                        </label>
+                        <select class="form-select" 
+                                id="metodo_pago" 
+                                name="metodo_pago" 
+                                required>
+                            <option value="">Seleccione método de pago</option>
+                            {% for fila in metodo_pago %}
+                                <option value="{{ fila.id }}">{{ fila.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">
+                            <i class="fas fa-exclamation-circle"></i>
+                            Por favor seleccione un método de pago.
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="btn-group">
+                                                <button type="button" class="btn btn-secondary" onclick="limpiarFormulario()">
+                            <i class="fas fa-broom"></i>
+                            Limpiar
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="btnPagar">
+                            <i class="fas fa-credit-card"></i>
+                            Procesar Pago
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<div class="modal" id="modalConfirmacion">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle"></i>
+                    Confirmar Pago
+                </h5>
+                <button type="button" class="btn-close" onclick="cerrarModal('modalConfirmacion')">
+                    &times;
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>Revise los datos antes de confirmar</strong><br>
+                        Esta acción no se puede deshacer una vez confirmada.
+                    </div>
+                </div>
+                
+                <div class="package-info">
+                    <h6>
+                        <i class="fas fa-box"></i>
+                        Información del Pago
+                    </h6>
+                    <div class="info-row">
+                        <span class="info-label">Código de Tracking:</span>
+                        <span class="info-value" id="trackingConfirm">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Tipo de Comprobante:</span>
+                        <span class="info-value" id="tipoComprobanteConfirm">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Método de Pago:</span>
+                        <span class="info-value" id="metodoPagoConfirm">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="cerrarModal('modalConfirmacion')">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-success" id="btnConfirmarPago">
+                    <i class="fas fa-check"></i>
+                    Confirmar Pago
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Resultado -->
+<div class="modal" id="modalResultado">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalResultadoLabel">Resultado</h5>
+                <button type="button" class="btn-close" onclick="cerrarModal('modalResultado')">
+                    &times;
+                </button>
+            </div>
+            <div class="modal-body" id="modalResultadoBody">
+                <!-- El contenido se genera dinámicamente -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="cerrarModal('modalResultado')">
+                    <i class="fas fa-check"></i>
+                    Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock contenido %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('formPagarPaquete');
+    const btnPagar = document.getElementById('btnPagar');
+    const btnConfirmarPago = document.getElementById('btnConfirmarPago');
+    
+    let datosFormulario = {};
+
+    // Validación en tiempo real
+    form.addEventListener('input', function(e) {
+        validateField(e.target);
+    });
+
+    // Envío del formulario
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (validateForm()) {
+            // Recopilar datos
+            const tipoComprobanteSelect = document.getElementById('tipo_comprobante');
+            const metodoPagoSelect = document.getElementById('metodo_pago');
+            
+            datosFormulario = {
+                tracking: document.getElementById('tracking').value.trim(),
+                tipo_comprobante: tipoComprobanteSelect.value,
+                metodo_pago: metodoPagoSelect.value,
+                tipo_comprobante_nombre: tipoComprobanteSelect.options[tipoComprobanteSelect.selectedIndex].text,
+                metodo_pago_nombre: metodoPagoSelect.options[metodoPagoSelect.selectedIndex].text
+            };
+            
+            // Mostrar datos en el modal de confirmación
+            document.getElementById('trackingConfirm').textContent = datosFormulario.tracking;
+            document.getElementById('tipoComprobanteConfirm').textContent = datosFormulario.tipo_comprobante_nombre;
+            document.getElementById('metodoPagoConfirm').textContent = datosFormulario.metodo_pago_nombre;
+            
+            mostrarModal('modalConfirmacion');
+        }
+    });
+
+    // Confirmar pago
+    btnConfirmarPago.addEventListener('click', function() {
+        cerrarModal('modalConfirmacion');
+        procesarPago(datosFormulario);
+    });
+
+    function validateField(field) {
+        const isValid = field.checkValidity() && field.value.trim() !== '';
+        field.classList.toggle('is-invalid', !isValid);
+        field.classList.toggle('is-valid', isValid);
+        return isValid;
+    }
+
+    function validateForm() {
+        const fields = form.querySelectorAll('input[required], select[required]');
+        let isValid = true;
+        
+        fields.forEach(field => {
+            if (!validateField(field)) {
+                isValid = false;
+            }
+        });
+        
+        return isValid;
+    }
+
+    function procesarPago(datos) {
+        // Mostrar loading
+        btnPagar.disabled = true;
+        btnPagar.innerHTML = '<span class="spinner"></span>Procesando...';
+        
+        fetch('/insertar_pago_paquete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                tracking: datos.tracking,
+                tipo_comprobante: datos.tipo_comprobante,
+                metodo_pago: datos.metodo_pago
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            mostrarResultado('success', 'Pago Procesado Exitosamente', 
+                `El pago para el paquete <strong>${datos.tracking}</strong> ha sido registrado correctamente en el sistema.`);
+            limpiarFormulario();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarResultado('error', 'Error al Procesar el Pago', 
+                'No se pudo procesar el pago en este momento. Por favor, verifique los datos e intente nuevamente.');
+        })
+        .finally(() => {
+            // Restaurar botón
+            btnPagar.disabled = false;
+            btnPagar.innerHTML = '<i class="fas fa-credit-card"></i>Procesar Pago';
+        });
+    }
+
+    function mostrarResultado(tipo, titulo, mensaje) {
+        const modalBody = document.getElementById('modalResultadoBody');
+        const alertClass = tipo === 'success' ? 'alert-success' : 'alert-danger';
+        const icon = tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+        
+        modalBody.innerHTML = `
+            <div class="alert ${alertClass}">
+                <i class="fas ${icon}" style="font-size: 1.5rem;"></i>
+                <div>
+                    <h6>${titulo}</h6>
+                    <p>${mensaje}</p>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('modalResultadoLabel').textContent = titulo;
+        mostrarModal('modalResultado');
+    }
+
+    // Función global para limpiar formulario
+    window.limpiarFormulario = function() {
+        form.reset();
+        form.querySelectorAll('.is-valid, .is-invalid').forEach(field => {
+            field.classList.remove('is-valid', 'is-invalid');
+        });
+        datosFormulario = {};
+    };
+
+    // Validación del tracking al escribir
+    document.getElementById('tracking').addEventListener('input', function() {
+        this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    });
+
+    // Mejorar la experiencia al cambiar selects
+    document.querySelectorAll('select').forEach(select => {
+        select.addEventListener('change', function() {
+            validateField(this);
+        });
+    });
+});
+
+// Funciones para manejar modales
+function mostrarModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
+}
+
+// Cerrar modal al hacer clic fuera de él
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal')) {
+        cerrarModal(e.target.id);
+    }
+});
+
+// Cerrar modal con tecla Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const modals = document.querySelectorAll('.modal.show');
+        modals.forEach(modal => {
+            cerrarModal(modal.id);
+        });
+    }
+});
+</script>
+{% endblock scripts %}
