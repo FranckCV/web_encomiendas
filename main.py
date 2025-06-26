@@ -1409,7 +1409,6 @@ REPORTES = {
         "titulo": "Artículos Más Vendidos",
         "table": controlador_articulo.get_report_mas_vendidos(),  
         "filters": [
-            ['fecha', 'Fecha', None, 'interval_date'],  # filtro rango de fechas
         ],
     },
     "articulos_reposicion": {
@@ -1501,8 +1500,8 @@ TRANSACCIONES = {
         },
         "buttons": [
            # hay_parametros  icon         color              enlace_function      parametros   clase_html   modo(insert ,update , consult)
-            [False,   f'{ICON_CONSULT}',   'var(--color-consult)',  'salida_informacion', {} , '' , 'consult'],
-            [False,   f'{ICON_UPDATE}',   'var(--color-update)',  'salida_informacion', {} , '' ,'update'],
+            # [False,   f'{ICON_CONSULT}',   'var(--color-consult)',  'salida_informacion', {} , '' , 'consult'],
+            # [False,   f'{ICON_UPDATE}',   'var(--color-update)',  'salida_informacion', {} , '' ,'update'],
             [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa' , 'mapa'], 
             # [True,   f'fa-solid fa-location-dot',   'grey',  'seguimiento_empleado_prueba' , {"placa": "placa"}],
             # [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa',], 
@@ -3478,117 +3477,180 @@ def generar_boleta_post():
     return redirect(url_for('generar_comprobante', tracking=tracking))
 
 
-@app.route('/comprobante=<int:tracking>')
+@app.route('/comprobante=<tracking>', methods=['POST'])
 def generar_comprobante(tracking):
-    carpeta = os.path.join("static", "comprobantes", str(tracking))
-    ruta_pdf = os.path.join(carpeta, "comprobante.pdf")
+    from controladores import reporte_comprobante as reporte_comprobante  
+    try:
+        data = request.get_json()
+        tipo_comprobante = data.get('comprobante', 'BOLETA')
+        print(tipo_comprobante)
+        
+        if not tipo_comprobante:
+            return jsonify({
+                'success': False, 
+                'message': 'Tipo de comprobante requerido'
+            }), 400
+        
+        transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
+        if not transaccion or not isinstance(transaccion, dict):
+            return jsonify({
+                'success': False, 
+                'message': 'Transacción no encontrada'
+            }), 404
+        
+        # Generar serie del comprobante
+        num_serie = transaccion.get('num_serie')
+        if tipo_comprobante.upper() == 'BOLETA':
+            comprobante_serie = f"B361-{num_serie}"
+        else:
+            comprobante_serie = f"F361-{num_serie}"
+        
+        # Crear directorio
+        carpeta = os.path.join("static", "comprobantes", str(tracking))
+        os.makedirs(carpeta, exist_ok=True)
+        ruta_pdf = os.path.join(carpeta, "comprobante.pdf")
+        
+        # Si existe, devolverlo
+        if os.path.exists(ruta_pdf):
+            return send_file(ruta_pdf, as_attachment=True,
+                           download_name=f"comprobante_{tracking}.pdf")
+        
+        # Obtener datos necesarios
+        empresa = controlador_empresa.getDataComprobante()
+        if not empresa:
+            return jsonify({
+                'success': False, 
+                'message': 'Datos de empresa no disponibles'
+            }), 500
+        
+        # Datos del cliente
+        cliente = {
+            'nombre_siglas': transaccion.get('nombre_siglas', ''),
+            'apellidos_razon': transaccion.get('apellidos_razon', ''),
+            'documento_identidad': transaccion.get('documento_identidad', ''),
+            'direccion': transaccion.get('direccion_destino', '')
+        }
+        
+        # Obtener items
+        items, masivo = controlador_encomienda.obtener_items_por_num_serie(num_serie)
+        print(items)
+        # Calcular resumen
+        monto_total = float(transaccion.get('monto_total', 0))
+        igv_rate = float(empresa.get('igv', 18)) / 100
+        
+        # Calcular valores
+        if igv_rate > 0:
+            op_gravada = monto_total / (1 + igv_rate)
+            igv = monto_total - op_gravada
+        else:
+            op_gravada = monto_total
+            igv = 0
+        
+        resumen = {
+            'op_gravada': op_gravada,
+            'op_exonerada': 0,
+            'op_inafecta': 0,
+            'isc': 0,
+            'igv': igv,
+            'icbper': 0,
+            'otros_cargos': 0,
+            'otros_tributos': 0,
+            'importe_total': monto_total
+        }
+        
+        # Generar código QR
+        qr_path = os.path.join(carpeta, "qr.png")
+        
+        # Generar PDF
+        reporte_comprobante.generar_comprobante_pdf(
+            transaccion=transaccion,
+            cliente=cliente,
+            empresa=empresa,
+            tipo_comprobante=tipo_comprobante,
+            comprobante_serie=comprobante_serie,
+            items=items,
+            resumen=resumen,
+            qr_path=qr_path,
+            masivo=masivo,
+            ruta_pdf=ruta_pdf
+        )
+        
+        return send_file(ruta_pdf, as_attachment=True,
+                        download_name=f"comprobante_{tracking}.pdf")
+        
+    except Exception as e:
+        return jsonify({
+            'success': False, 
+            'message': f'Error al generar comprobante: {str(e)}'
+        }), 500
 
-    if not os.path.exists(ruta_pdf):
-        try:
-            transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
-            if not transaccion or not isinstance(transaccion, dict):
-                return "Transacción no encontrada", 404
 
-            empresa = controlador_empresa.getDataComprobante()
-            tipo_comprobante  = transaccion['tipo_comprobante']
-            comprobante_serie = transaccion['comprobante_serie']
-            num_serie         = transaccion['num_serie']
-            cliente           = {
-                'nombre_siglas': transaccion['nombre_siglas'],
-                'apellidos_razon': transaccion['apellidos_razon']
-            }
-
-            items, masivo = controlador_encomienda.obtener_items_por_num_serie(num_serie)
-            resumen = controlador_encomienda.calcular_resumen_venta(transaccion['monto_total'], empresa['igv'])
-
-            os.makedirs(carpeta, exist_ok=True)
-            qr_path = url_for('static', filename=f"comprobantes/{tracking}/qr.png", _external=True)
-
-            html = render_template("plantilla_comprobante_pago.html",
-                transaccion=transaccion,
-                cliente=cliente,
-                empresa=empresa,
-                tipo_comprobante=tipo_comprobante,
-                comprobante_serie=comprobante_serie,
-                items=items,
-                resumen=resumen,
-                qr_path=qr_path,
-                masivo=masivo
-            )
-
-            ruta_wkhtmltopdf = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
-            config = pdfkit.configuration(wkhtmltopdf=ruta_wkhtmltopdf)
-            options = {
-                'page-size': 'A6',
-                'margin-top': '5mm',
-                'margin-right': '5mm',
-                'margin-bottom': '5mm',
-                'margin-left': '5mm',
-                'encoding': "UTF-8",
-            }
-
-            pdfkit.from_string(html, ruta_pdf, configuration=config, options=options)
-
-        except Exception as e:
-            return f"Error al generar PDF: {e}", 500
-
-    return send_file(ruta_pdf, as_attachment=False)
-
-
-@app.route('/rotulo=<int:tracking>')
+@app.route('/rotulo=<tracking>', methods=['GET'])
 def generar_rotulo(tracking):
-    carpeta = os.path.join("static", "comprobantes", str(tracking))
-    ruta_pdf = os.path.join(carpeta, "rotulo.pdf")
+    from controladores import reporte_rotulo as reporte_rotulo
+    try:
+        transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
+        if not transaccion:
+            return jsonify({'success': False, 'message': 'Transacción no encontrada'}), 404
 
-    if not os.path.exists(ruta_pdf):
-        try:
-            paquete =controlador_paquete.get_paquete_by_tracking(tracking) 
-            if not paquete:
-                return "Paquete no encontrado", 404
+        num_serie = transaccion.get('num_serie')
+        if not num_serie:
+            return jsonify({'success': False, 'message': 'Número de serie no disponible'}), 400
 
-            transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
-            if not transaccion:
-                return "Transacción no encontrada", 404
+        items, masivo = controlador_encomienda.obtener_items_por_num_serie(num_serie)
+        if not items:
+            return jsonify({'success': False, 'message': 'No hay paquetes asociados'}), 404
 
-            empresa = controlador_empresa.getDataComprobante()
-            cliente = {
-                'nombre_siglas': transaccion['nombre_siglas'],
-                'apellidos_razon': transaccion['apellidos_razon']
-            }
+        origen = items[0]['origen']
+        destino = items[0]['destino']
 
-            contenido = controlador_paquete.get_contenido(tracking)
+        datos_rotulo = {
+            'tracking': tracking,
+            'sucursal_origen': f"{origen['sucursal']} - {origen['distrito']}, {origen['provincia']}, {origen['departamento']}",
+            'sucursal_destino': f"{destino['sucursal']} - {destino['distrito']}, {destino['provincia']}, {destino['departamento']}",
+            'remitente': f"{transaccion.get('nombre_remitente', '')}\nDNI: {transaccion.get('dni_remitente', '')}\nCel: {transaccion.get('cel_remitente', '')}",
+            'destinatario': f"{transaccion.get('nombre_destinatario', '')}\nDNI: {transaccion.get('dni_destinatario', '')}\nCel: {transaccion.get('cel_destinatario', '')}",
+            'contenido': transaccion.get('descripcion_contenido', '---'),
+            'pago': 'Pagado' if transaccion.get('estado_pago') == 'C' else 'Por cobrar'
+        }
 
-            os.makedirs(carpeta, exist_ok=True)
-            qr_path = url_for('static', filename=f"comprobantes/{tracking}/qr.png", _external=True)
+        # Crear carpeta dentro de 'static/comprobantes/{tracking}/'
+        carpeta = os.path.join("static", "comprobantes", str(tracking))
+        os.makedirs(carpeta, exist_ok=True)
+        ruta_rotulo = os.path.join(carpeta, "rotulo.pdf")
 
-            html = render_template("plantilla_rotulo.html",
-                transaccion=transaccion,
-                cliente=cliente,
-                empresa=empresa,
-                paquete=paquete,  # Datos específicos del paquete
-                contenido=contenido,
-                qr_path=qr_path,
-                tracking=tracking
-            )
+        # Generar PDF
+        reporte_rotulo.generar_rotulo_pdf(datos_rotulo, ruta_pdf=ruta_rotulo)
 
-            ruta_wkhtmltopdf = r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe"
-            config = pdfkit.configuration(wkhtmltopdf=ruta_wkhtmltopdf)
-            options = {
-                'page-size': 'A6',
-                'orientation': 'Landscape',  # Horizontal para rótulo
-                'margin-top': '2mm',
-                'margin-right': '2mm',
-                'margin-bottom': '2mm',
-                'margin-left': '2mm',
-                'encoding': "UTF-8",
-            }
+        return send_file(ruta_rotulo, as_attachment=True, download_name=f"rotulo_{tracking}.pdf")
 
-            pdfkit.from_string(html, ruta_pdf, configuration=config, options=options)
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error al generar rótulo: {str(e)}'}), 500
 
-        except Exception as e:
-            return f"Error al generar PDF: {e}", 500
 
-    return send_file(ruta_pdf, as_attachment=False)
+
+@app.route('/descargar_comprobante/<tracking>', methods=['GET'])
+def descargar_comprobante(tracking):
+    try:
+        ruta_pdf = os.path.join("static", "comprobantes", str(tracking), "comprobante.pdf")
+
+        if not os.path.exists(ruta_pdf):
+            return jsonify({
+                'success': False,
+                'message': 'Comprobante no encontrado'
+            }), 404
+
+        return send_file(
+            ruta_pdf,
+            as_attachment=True,
+            download_name=f"comprobante_{tracking}.pdf"
+        )
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f"Error al descargar comprobante: {str(e)}"
+        }), 500
 
 
 
@@ -6285,7 +6347,7 @@ def insertar_salida():
     })
 
     
-    
+
 
 @app.route('/api/guia_remision/<int:transaccion_id>')
 def generar_guia_remision(transaccion_id):

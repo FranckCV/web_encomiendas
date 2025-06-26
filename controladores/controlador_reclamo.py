@@ -81,7 +81,47 @@ def get_by_id(id):
     return sql_select_fetchone(sql, (id,))
 
 def get_table():
-    sql = f"SELECT * FROM {table_name}"
+    sql = '''
+        SELECT 
+            r.id,
+            r.nombres_razon,
+            r.direccion,
+            r.correo,
+            r.telefono,
+            r.n_documento,
+            r.monto_indemnizado,
+            CASE r.bien_contratado
+                WHEN 'P' THEN 'Producto'
+                WHEN 'S' THEN 'Servicio'
+                WHEN 'A' THEN 'Producto y servicio'
+                ELSE 'No especificado'
+            END AS bien_contratado,
+            r.monto_reclamado,
+            CASE r.relacion
+                WHEN 'E' THEN 'Quien envía'
+                WHEN 'R' THEN 'Quien recibe'
+                ELSE 'No definido'
+            END AS relacion,
+            r.fecha_recepcion,
+            s.direccion AS sucursal,
+            r.descripcion,
+            r.detalles,
+            r.pedido,
+            r.foto,
+            c.nombre AS causa_reclamo,
+            ti.nombre AS tipo_indemnizacion,
+            r.paquetetracking,
+            u.departamento || ' / ' || u.provincia || ' / ' || u.distrito AS ubigeo,
+            td.nombre AS tipo_documento
+        FROM reclamo r
+        LEFT JOIN sucursal s ON s.id = r.sucursal_id
+        LEFT JOIN causa_reclamo c ON c.id = r.causa_reclamoid
+        LEFT JOIN tipo_indemnizacion ti ON ti.id = r.tipo_indemnizacionid
+        LEFT JOIN ubigeo u ON u.codigo = r.ubigeocodigo
+        LEFT JOIN tipo_documento td ON td.id = r.tipo_documentoid
+        ORDER BY r.id DESC;
+    '''
+
     columnas = {
         "id": ["ID", 0.3],
         "nombres_razon": ["Nombres/Razón social", 2.5],
@@ -94,18 +134,18 @@ def get_table():
         "monto_reclamado": ["Monto reclamado", 1.5],
         "relacion": ["Relación", 1],
         "fecha_recepcion": ["Recepción", 1.5],
-        "fecha_recojo": ["Recojo", 1.5],
+        "sucursal": ["Sucursal", 2],
         "descripcion": ["Descripción", 2.5],
         "detalles": ["Detalles", 2.5],
         "pedido": ["Pedido", 2],
         "foto": ["Foto", 1],
-        "sucursal_id": ["Sucursal", 1],
-        "causa_reclamoid": ["Causa", 1],
-        "tipo_indemnizacionid": ["Tipo indemnización", 1.5],
+        "causa_reclamo": ["Causa", 2],
+        "tipo_indemnizacion": ["Tipo indemnización", 2],
         "paquetetracking": ["N° Tracking", 1.5],
-        "ubigeocodigo": ["Ubigeo", 1],
-        "tipo_documentoid": ["Tipo Documento", 1]
+        "ubigeo": ["Ubigeo", 2],
+        "tipo_documento": ["Tipo Documento", 1.5]
     }
+
     filas = sql_select_fetchall(sql)
     return columnas, filas
 

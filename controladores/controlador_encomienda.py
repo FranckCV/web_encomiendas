@@ -307,16 +307,13 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante, meto
 
 def get_transaction_by_tracking(tracking):
     sql = '''
-        SELECT 
-            tc.nombre AS tipo_comprobante,
-            te.comprobante_serie,
+SELECT 
             te.num_serie,
             te.masivo,
             te.descripcion,
             te.monto_total,
             te.fecha,
             te.hora,
-            te.tipo_comprobanteid,
             te.clienteid,
             c.nombre_siglas,
             c.apellidos_razon
@@ -325,8 +322,6 @@ def get_transaction_by_tracking(tracking):
             ON te.num_serie = p.transaccion_encomienda_num_serie
         INNER JOIN cliente c 
             ON c.id = te.clienteid
-        INNER JOIN tipo_comprobante tc 
-            ON tc.id = te.tipo_comprobanteid
         WHERE p.tracking = %s
     '''
     fila = sql_select_fetchone(sql, (tracking,))
