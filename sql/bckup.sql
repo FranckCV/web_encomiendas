@@ -609,7 +609,7 @@ CREATE TABLE `modulo` (
 --
 
 INSERT INTO `modulo` (`id`, `nombre`, `icono`, `key`, `color`, `activo`, `img`) VALUES
-(1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF', 0, 'administracion.jpg'),
+(1, 'Administración', 'fa-solid fa-user-tie', 'administracion', '#1A53FF', 1, 'administracion.jpg'),
 (2, 'Logística', 'fa-solid fa-truck-front', 'logistica', '#00F068', 1, 'logistica.jpg'),
 (3, 'Encomiendas', 'fa-solid fa-box', 'encomienda', '#FF5E1A', 1, 'encomienda.jpg'),
 (4, 'Atención al cliente', 'fa-solid fa-circle-question', 'atencion', '#8232D2', 1, 'atencion.jpg'),

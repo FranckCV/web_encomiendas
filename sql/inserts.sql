@@ -43,7 +43,7 @@ VALUES (
     'fa-solid fa-user-tie',
     'administracion',
     '#1A53FF',
-    0,
+    1,
     'administracion.jpg'
   ),
   (
