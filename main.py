@@ -4307,13 +4307,10 @@ def procesar_cambio_contrasenia():
 
 ##################_ PAGINAS EMPLEADO _################## 
 
-
-PAGINAS_SIMPLES_ADMIN = [ 
-    # 'panel' , 
-    'programacion_devolucion',
-]
-
-registrar_paginas_con_decorador(app, PAGINAS_SIMPLES_ADMIN, validar_empleado)
+@app.route("/programacion_devolucion")
+@validar_empleado()
+def programacion_devolucion():
+    return render_template('programacion_devolucion.html')
 
 
 @app.route("/panel")
@@ -5675,24 +5672,24 @@ def api_buscar_reclamos_ajax():
 
 # ========== ENDPOINTS DE CONFIGURACIÓN Y UTILIDADES ==========
 
-@app.route("/api/estados_reclamo", methods=["GET"])
-def api_estados_reclamo():
-    """
-    API para obtener estados de reclamo disponibles
-    """
-    try:
-        estados = controlador_seguimiento_reclamos.obtener_estados_reclamo()
+# @app.route("/api/estados_reclamo", methods=["GET"])
+# def api_estados_reclamo():
+#     """
+#     API para obtener estados de reclamo disponibles
+#     """
+#     try:
+#         estados = controlador_seguimiento_reclamos.obtener_estados_reclamo()
         
-        return jsonify({
-            'success': True,
-            'estados': estados
-        })
+#         return jsonify({
+#             'success': True,
+#             'estados': estados
+#         })
         
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Error al obtener estados: {str(e)}'
-        }), 500
+#     except Exception as e:
+#         return jsonify({
+#             'success': False,
+#             'message': f'Error al obtener estados: {str(e)}'
+#         }), 500
 
 @app.route("/api/detalles_reclamo_por_estado/<int:estado_id>", methods=["GET"])
 @validar_empleado()
