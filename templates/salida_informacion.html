@@ -1326,7 +1326,7 @@ function renderizarPaquetes() {
         }
         
         return `
-            <tr class="package-row ${yaAsignado ? 'selected' : ''}" onclick="togglePaquete('${paquete.tracking}')">
+            <tr class="package-row ${yaAsignado ? 'selected' : ''}" onclick="togglePaquete(${paquete.tracking})">
                 <td>
                     <strong style="color: #2c3e50;">${paquete.tracking}</strong>
                 </td>
@@ -1920,15 +1920,15 @@ function toggleRecojoItem(transaccionId) {
     const checkbox = document.getElementById(`recojo_${transaccionId}`);
     const item = document.querySelector(`#recojo_${transaccionId}`).closest('.recojo-item');
     
-    if (index === -1) {
-        recojosAsignados.push(transaccion);
-        checkbox.checked = true;
-        item.classList.add('selected');
-    } else {
-        recojosAsignados.splice(index, 1);
-        checkbox.checked = false;
-        item.classList.remove('selected');
-    }
+    // if (index === -1) {
+    //     recojosAsignados.push(transaccion);
+    //     checkbox.checked = true;
+    //     item.classList.add('selected');
+    // } else {
+    //     recojosAsignados.splice(index, 1);
+    //     checkbox.checked = false;
+    //     item.classList.remove('selected');
+    // }
     
     actualizarRecojosAsignados();
 }
@@ -2946,8 +2946,8 @@ function obtenerDatosSalida() {
         paquetes_ids: paquetesAsignados.map(paq => paq.id),
         
         // Opcionales
-        incluye_recojos: document.getElementById('recojoCheckbox').checked,
-        recojos_ids: recojosAsignados.map(rec => rec.id),
+        // incluye_recojos: document.getElementById('recojoCheckbox').checked,
+        // recojos_ids: recojosAsignados.map(rec => rec.id),
         
         // Peso total
         peso_total: pesoTotal,
@@ -2967,25 +2967,33 @@ function guardarSalida() {
     console.log('Datos completos de la salida:', datosSalida);
     
     // TODO: Aquí harías la llamada real al backend para guardar
-    /*
-    fetch('/guardar_salida_api', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datosSalida)
+    fetch('/insertar_salida', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        vehiculo: {
+            id: vehiculoSeleccionado,
+            origen_inicio_id: parseInt(origenSeleccionado.id),
+            destino_final_id: parseInt(destinoSeleccionado.id)
+        },
+        empleados: empleadosAsignados.map(e => e.id),
+        escalas: escalas.map(e => e.id),
+        paquetes: paquetesAsignados.map(p => ({ tracking: p.tracking }))
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 1) {
-            showAlert('mensajeGuardado', 'Salida guardada exitosamente', 'success');
-        } else {
-            showAlert('mensajeGuardado', 'Error al guardar: ' + data.msg, 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showAlert('mensajeGuardado', 'Error de conexión', 'error');
-    });
-    */
+})
+.then(response => response.json())
+.then(data => {
+    if (data.salida_id) {
+        showAlert('mensajeGuardado', `✅ Salida registrada correctamente. ID: ${data.salida_id}`, 'success');
+    } else {
+        showAlert('mensajeGuardado', `❌ Error: ${data.mensaje || 'Error desconocido'}`, 'error');
+    }
+})
+.catch(error => {
+    console.error('❌ Error en la API:', error);
+    showAlert('mensajeGuardado', 'Error de conexión al guardar salida', 'error');
+});
+
     
     // Por ahora mostrar mensaje de éxito con resumen
     const vehiculo = vehiculos.find(v => v.unidadid === vehiculoSeleccionado);
@@ -3008,5 +3016,6 @@ function guardarSalida() {
         Peso total: ${pesoTotal}kg${mensajeEscalas}${mensajeRecojos}`, 
         'success');
 }
+
 </script>
 {% endblock  %}
