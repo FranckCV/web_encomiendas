@@ -4928,11 +4928,12 @@ def buscar_paquete():
     tracking = request.form.get('tracking')
     anio = request.form.get('anio')
     paquete = controlador_paquete.buscar_paquete(tracking, anio)
-    print(paquete)
-    if paquete is not None:
+    
+    if paquete and anio:
         return redirect(url_for('seguimiento_tracking', tracking=paquete))
     else:
-        return redirect(url_for('seguimiento_tracking', tracking=0))
+        return render_template('index.html', paquete_no_encontrado=True)
+
 
 
    
