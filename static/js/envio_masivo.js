@@ -1430,7 +1430,7 @@ static renderTabla() {
       `<td>${clave}</td>` +
       `<td>` +
       ` <div class="btn-actions">` +
-      `<button class="btn-small btn-edit" data-index="${i}" title="Editar"><i class="fa fa-edit"></i></button>` +
+     // `<button class="btn-small btn-edit" data-index="${i}" title="Editar"><i class="fa fa-edit"></i></button>` +
       `<button class="btn-small btn-delete" data-index="${i}" title="Eliminar"><i class="fa fa-trash"></i></button>` +
       `</div>` +
       `</td></tr>`;
