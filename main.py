@@ -1571,7 +1571,7 @@ TRANSACCIONES = {
         # hay_parametros  icon         color              enlace_function      parametros   clase_html   modo(insert ,update , consult)
             # [True, 'fa-solid fa-map-location-dot', "#9856EE", 'seguimiento_tracking', {"tracking": "tracking"} , '' , 'seguimiento'],
             [True, 'fa-solid fa-route', "#9856EE", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"} , '' , 'seguimiento' , False],
-            [True, 'fa-solid fa-qrcode', "#B8CBD7", 'ver_img_qr',  {"tracking": "tracking"} , '' , 'qr_code' , True],
+            [True, 'fa-solid fa-qrcode', "#2195DC", 'ver_img_qr',  {"tracking": "tracking"} , '' , 'qr_code' , True],
         ],
         "options": [
         # mostrar_url       icon             color                  text                 enlace_function       parametros                    modo(insert ,update , consult)
@@ -1588,7 +1588,7 @@ TRANSACCIONES = {
         "fields_form": [
         #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
             ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_options() , 'nombre_det' ] ],
-             ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_options() , 'nombre_det' ] ],
+            ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_options() , 'nombre_det' ] ],
             
         ],
         "crud_forms": {
@@ -1602,7 +1602,8 @@ TRANSACCIONES = {
         },
         "buttons": [],
         "options": [
-            [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Encomiendas', 'transaccion' , {"tabla": "::paquete" }],
+            # mostrar_url       icon             color                  text                 enlace_function       parametros                    modo(insert ,update , consult)
+            [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Paquetes', 'transaccion' , {"tabla": "::paquete" } , 'paquetes'],
         ],
     }
 }
@@ -1742,15 +1743,19 @@ def inject_cur_modulo_id():
             if usuario['correo'] == correo and usuario['tipo_usuario'] == 'E' :
                 path = request.path
                 parts = path.strip('/').split('=')
-                key = parts[-1] 
-                page = obtener_funcion_desde_url(app , path)
+                key = None
+                if len(parts) > 1:
+                    ruta_final = parts[-1]
+                    key = ruta_final.split('/')[0]
+                page = obtener_funcion_desde_url(app, path)
+
                 if page == 'modulo':
                     dataPage = permiso.get_modulo_key(key)
                     if dataPage:
                         return dict(cur_modulo_id=dataPage['id'])
                 else:
-                    dataPage = permiso.get_pagina_key(key)
-                    if dataPage:
+                    dataPage = permiso.get_pagina_key(key) if key is not None else permiso.get_pagina_key(page)
+                    if dataPage:                        
                         if dataPage['tipo_paginaid'] == 2:
                             page_titulo = dataPage['titulo']
                             page_icono  = dataPage['icono']

@@ -545,7 +545,6 @@ def change_permiso_modulo(column , moduloid , rolid , value = None):
     
 
 def validar_acceso(rolid , f_name , f_kwarg ):
-    print(rolid,' - ',f_name,' - ',f_kwarg) 
     if f_name == 'panel' :
         return True
     elif f_name == 'modulo' :
@@ -571,12 +570,10 @@ def validar_acceso(rolid , f_name , f_kwarg ):
         return None
     else :
         page = get_pagina_key2(f_name)
-        print(page)
         if page:
             pag_id = page['id']
             permiso_rol = consult_permiso_rol(pag_id , rolid)
             acceso = permiso_rol['acceso']
-            print('acceso -> ',acceso,' - ',permiso_rol['pag_activo'],' - ',permiso_rol['rol_activo']) 
             return acceso if permiso_rol['pag_activo'] and permiso_rol['rol_activo'] else 0
         return None
     
