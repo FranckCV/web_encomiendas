@@ -1409,7 +1409,6 @@ REPORTES = {
         "titulo": "Artículos Más Vendidos",
         "table": controlador_articulo.get_report_mas_vendidos(),  
         "filters": [
-            ['fecha', 'Fecha', None, 'interval_date'],  # filtro rango de fechas
         ],
     },
     "articulos_reposicion": {
