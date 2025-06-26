@@ -470,3 +470,17 @@ def get_select_recojo_casa():
     return filas
 
 
+
+def get_recojo_casa():
+    sql = '''
+        select
+    num_serie,
+    direccion_recojo,
+    concat(c.nombre_siglas,' ',c.apellidos_razon),
+    c.telefono
+    from transaccion_encomienda te 
+    inner join cliente c on c.id = te.clienteid
+    where te.recojo_casa != 0
+    '''
+    fila = sql_select_fetchall(sql)
+    return fila

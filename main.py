@@ -5010,13 +5010,14 @@ def salida_informacion():
     empleados = controlador_empleado.get_driver_employee()
     agencias = controlador_sucursal.get_agencias_data()
     paquetes = controlador_paquete.listar_paquetes_por_sucursal_escalas()
-    
+    recojo_casa = controlador_encomienda.get_recojo_casa()
     return render_template('salida_informacion.html',
                            sucursal_origen=sucursal_origen,
                            unidades=unidades,
                            empleados=empleados,
                            agencias=agencias,
-                           paquetes = paquetes)
+                           paquetes = paquetes,
+                           recojo_casa = recojo_casa)
 
 @app.route('/sucursales_destino_api',  methods=["POST"])
 def sucursales_destino_api():
