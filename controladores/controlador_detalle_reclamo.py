@@ -73,6 +73,17 @@ def update_row(id, nombre, descripcion, tipo_rolid):
     sql_execute(sql, (nombre, descripcion, tipo_rolid))
 
 
+def get_options():
+    sql = '''
+        SELECT id, nombre
+        FROM detalle_reclamo
+        WHERE activo = 1
+        ORDER BY nombre ASC
+    '''
+    filas = sql_select_fetchall(sql)
+    return [(fila['id'], fila['nombre']) for fila in filas]
+
+
 # def get_options():
 #     sql= f'''
 #         select 

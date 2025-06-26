@@ -1,0 +1,335 @@
+{# templates/MODAL_RESPONDER_RECLAMO.html #}
+<div class="modal fade" id="modal_responder_{{fila['id']}}" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content modal-responder-reclamo">
+      <form method="POST" action="/guardar_comentario_reclamo">
+        <div class="modal-header bg-primary text-white">
+          <div class="d-flex align-items-center">
+            <i class="fa-solid fa-comment-dots me-2"></i>
+            <h5 class="modal-title mb-0">Responder Reclamo #{{fila['id']}}</h5>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        
+        <div class="modal-body p-4">
+          <input type="hidden" name="reclamoid" value="{{fila['id']}}">
+
+          <!-- Información del Cliente -->
+          <div class="card mb-4">
+            <div class="card-header bg-light">
+              <h6 class="mb-0">
+                <i class="fa-solid fa-user me-2"></i>
+                Información del Cliente
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-8">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label text-muted small">CLIENTE</label>
+                      <p class="fw-bold mb-0">{{fila['nombres_razon']}}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label text-muted small">CORREO ELECTRÓNICO</label>
+                      <p class="mb-0">
+                        <i class="fa-solid fa-envelope me-1 text-primary"></i>
+                        <a href="mailto:{{fila['correo']}}" class="text-decoration-none">{{fila['correo']}}</a>
+                      </p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label text-muted small">TELÉFONO</label>
+                      <p class="mb-0">
+                        <i class="fa-solid fa-phone me-1 text-success"></i>
+                        <a href="tel:{{fila['telefono']}}" class="text-decoration-none">{{fila['telefono']}}</a>
+                      </p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label text-muted small">TRACKING</label>
+                      <p class="mb-0">
+                        <span class="badge bg-secondary">{{fila['paquetetracking']}}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4 text-center">
+                  <label class="form-label text-muted small">EVIDENCIA</label>
+                  <div class="imagen-container">
+                    {% if fila['foto'] %}
+                    <img src="{{ url_for('static', filename='img/img_reclamo/' ~ fila['foto']) }}" 
+                         alt="Foto del reclamo" 
+                         class="img-fluid rounded shadow-sm imagen-reclamo"
+                         data-bs-toggle="modal" 
+                         data-bs-target="#modal_imagen_{{fila['id']}}"
+                         style="max-height: 150px; cursor: pointer;">
+                    <small class="text-muted d-block mt-1">Click para ampliar</small>
+                    {% else %}
+                    <div class="sin-imagen">
+                      <i class="fa-solid fa-image text-muted" style="font-size: 3rem;"></i>
+                      <p class="text-muted mt-2">Sin imagen adjunta</p>
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detalle del Reclamo -->
+          {% if fila['detalle'] %}
+          <div class="card mb-4">
+            <div class="card-header bg-light">
+              <h6 class="mb-0">
+                <i class="fa-solid fa-file-text me-2"></i>
+                Detalle del Reclamo
+              </h6>
+            </div>
+            <div class="card-body">
+              <p class="mb-0">{{fila['detalle']}}</p>
+            </div>
+          </div>
+          {% endif %}
+
+          <!-- Formulario de Respuesta -->
+          <div class="card">
+            <div class="card-header bg-success text-white">
+              <h6 class="mb-0">
+                <i class="fa-solid fa-reply me-2"></i>
+                Respuesta al Reclamo
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="detalle_reclamoid_{{fila['id']}}" class="form-label">
+                    <i class="fa-solid fa-list me-1"></i>
+                    Estado del Reclamo <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-select" name="detalle_reclamoid" id="detalle_reclamoid_{{fila['id']}}" required>
+                    <option value="" selected disabled>Seleccione un estado</option>
+                    {% for d in opciones_detalle %}
+                    <option value="{{d.id}}">{{d.nombre}}</option>
+                    {% endfor %}
+                  </select>
+                  <div class="invalid-feedback">
+                    Por favor seleccione un estado.
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">
+                    <i class="fa-solid fa-clock me-1"></i>
+                    Fecha de Respuesta
+                  </label>
+                  <input type="text" class="form-control" id="fecha_respuesta_{{fila['id']}}" readonly>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <label for="comentario_{{fila['id']}}" class="form-label">
+                  <i class="fa-solid fa-comment me-1"></i>
+                  Comentario de Respuesta
+                </label>
+                <textarea class="form-control" 
+                          name="comentario" 
+                          id="comentario_{{fila['id']}}" 
+                          rows="4" 
+                          placeholder="Escriba aquí su respuesta al reclamo..."></textarea>
+                <div class="form-text">
+                  <i class="fa-solid fa-info-circle me-1"></i>
+                  Proporcione detalles sobre la resolución o las acciones tomadas.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-footer bg-light">
+          <button type="submit" class="btn btn-success">
+            <i class="fa-solid fa-save me-2"></i>
+            Guardar Respuesta
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fa-solid fa-times me-2"></i>
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para ampliar imagen -->
+{% if fila['foto'] %}
+<div class="modal fade" id="modal_imagen_{{fila['id']}}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Evidencia - Reclamo #{{fila['id']}}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img src="{{ url_for('static', filename='img/img_reclamo/' ~ fila['foto']) }}" 
+             alt="Foto del reclamo" 
+             class="img-fluid rounded">
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<style>
+.modal-responder-reclamo {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-responder-reclamo .card {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.modal-responder-reclamo .card-header {
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+  font-weight: 600;
+}
+
+.modal-responder-reclamo .form-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.modal-responder-reclamo .form-label.text-muted {
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.imagen-reclamo {
+  transition: transform 0.2s ease;
+  border: 2px solid #e9ecef;
+}
+
+.imagen-reclamo:hover {
+  transform: scale(1.05);
+  border-color: #007bff;
+}
+
+.sin-imagen {
+  padding: 2rem;
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+}
+
+.badge {
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+}
+
+.modal-responder-reclamo .btn {
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.5rem 1.5rem;
+}
+
+.modal-responder-reclamo .btn-success {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  border: none;
+}
+
+.modal-responder-reclamo .btn-success:hover {
+  background: linear-gradient(135deg, #218838, #1ea085);
+  transform: translateY(-1px);
+}
+
+.form-select:focus,
+.form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+@media (max-width: 768px) {
+  .modal-dialog.modal-xl {
+    margin: 0.5rem;
+  }
+  
+  .modal-responder-reclamo .modal-body {
+    padding: 1rem;
+  }
+}
+</style>
+
+<script>
+// Validación del formulario y configuración de fecha
+document.addEventListener('DOMContentLoaded', function() {
+  // Configurar fecha actual
+  const fechaInputs = document.querySelectorAll('input[id^="fecha_respuesta_"]');
+  const now = new Date();
+  const fechaActual = now.toLocaleDateString('es-PE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+  
+  fechaInputs.forEach(input => {
+    input.value = fechaActual;
+  });
+  
+  // Validación del formulario
+  const forms = document.querySelectorAll('form[action="/guardar_comentario_reclamo"]');
+  
+  forms.forEach(form => {
+    form.addEventListener('submit', function(e) {
+      const select = form.querySelector('select[name="detalle_reclamoid"]');
+      
+      if (!select.value) {
+        e.preventDefault();
+        select.classList.add('is-invalid');
+        select.focus();
+        
+        // Mostrar mensaje de error
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'alert alert-danger mt-2';
+        errorMsg.innerHTML = '<i class="fa-solid fa-exclamation-triangle me-2"></i>Por favor seleccione un estado para el reclamo.';
+        
+        // Remover mensaje anterior si existe
+        const existingError = form.querySelector('.alert-danger');
+        if (existingError) {
+          existingError.remove();
+        }
+        
+        select.parentNode.insertAdjacentElement('afterend', errorMsg);
+        
+        setTimeout(() => {
+          errorMsg.remove();
+        }, 5000);
+        
+        return false;
+      }
+      
+      // Confirmar envío
+      if (!confirm('¿Está seguro de enviar esta respuesta al reclamo?')) {
+        e.preventDefault();
+        return false;
+      }
+    });
+    
+    // Remover clase de error al seleccionar
+    const select = form.querySelector('select[name="detalle_reclamoid"]');
+    select.addEventListener('change', function() {
+      this.classList.remove('is-invalid');
+      
+      // Remover mensaje de error si existe
+      const errorMsg = form.querySelector('.alert-danger');
+      if (errorMsg) {
+        errorMsg.remove();
+      }
+    });
+  });
+});
+</script>
