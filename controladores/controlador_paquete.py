@@ -128,7 +128,12 @@ def get_table():
           p.tracking,
           p.valor,
           p.peso,
-          p.estado_pago,
+          CASE 
+        WHEN p.estado_pago = 'P' THEN 'Pendiente'
+        WHEN p.estado_pago = 'C' THEN 'Pagado'
+        ELSE 'Desconocido'
+    END AS estado_pago,
+          
           p.qr_url,
           p.nombres_contacto_destinatario,
           p.apellidos_razon_destinatario,
@@ -194,7 +199,11 @@ def get_table_pk_foreign(pk_foreign):
           p.tracking,
           p.valor,
           p.peso,
-          p.estado_pago,
+         CASE 
+        WHEN p.estado_pago = 'P' THEN 'Pendiente'
+        WHEN p.estado_pago = 'C' THEN 'Pagado'
+        ELSE 'Desconocido'
+    END AS estado_pago,
           p.qr_url,
           p.nombres_contacto_destinatario,
           p.apellidos_razon_destinatario,
