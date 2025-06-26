@@ -313,3 +313,6 @@ def obtener_causas_por_motivo_reclamo(motivo_reclamo_id):
     """
     
     return sql_select_fetchall(sql, (motivo_reclamo_id,))
+
+
+
