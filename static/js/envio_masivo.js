@@ -1120,27 +1120,26 @@ class ShippingManager {
       tipoArticuloId: parseInt(getValue('m-tipoArticulo')) || null,
       tipoEntregaId: parseInt(getValue('m-tipoEntrega')) || null,
       modalidadPago: modalidadPagoValue,
-      modalidadPagoTexto: modalidadPagoTexto, // CORREGIDO: Espaciado
+      modalidadPagoTexto: modalidadPagoTexto, 
       
       folios: getValue('m-folios') ? parseInt(getValue('m-folios')) : null,
       
-      // Datos para mostrar en la tabla (mantener compatibilidad)
       tipoEntrega: this.getSelectText('m-tipoEntrega'),
       tipoEmpaque: this.getSelectText('m-tipoEmpaque'),
       tipoArticulo: this.getSelectText('m-tipoArticulo'),
       
       origen: {
         sucursal_origen: parseInt(getValue('origen-sucursal')) || null,
-        departamento_origen: this.getSelectText('origen-departamento'), // CORREGIDO: Usar texto
-        provincia_origen: this.getSelectText('origen-provincia'),       // CORREGIDO: Usar texto
-        distrito_origen: this.getSelectText('origen-distrito')          // CORREGIDO: Usar texto
+        departamento_origen: this.getSelectText('origen-departamento'), 
+        provincia_origen: this.getSelectText('origen-provincia'),       
+        distrito_origen: this.getSelectText('origen-distrito')         
       },
       
       destino: {
         sucursal_destino: parseInt(getValue('select-sucursal')) || null,
-        departamento: this.getSelectText('select-departamento'),        // CORREGIDO: Usar texto
-        provincia: this.getSelectText('select-provincia'),              // CORREGIDO: Usar texto
-        distrito: this.getSelectText('select-distrito'),                // CORREGIDO: Usar texto
+        departamento: this.getSelectText('select-departamento'),        
+        provincia: this.getSelectText('select-provincia'),              
+        distrito: this.getSelectText('select-distrito'),               
         direccion: getValue('m-direccion') || null
       },
       
@@ -1300,13 +1299,13 @@ class ShippingManager {
   }
 
   // Métodos auxiliares para compatibilidad
-  static startEdit(idx) {
-    editingIndex = idx;
-    this.fillFormData(window.registros[idx]);
-    document.querySelectorAll('#seccion-origen select').forEach(el => el.disabled = true);
-    const btnCancelEdit = document.querySelector('.btn-cancel-edit');
-    if (btnCancelEdit) btnCancelEdit.style.display = 'inline-block';
-  }
+  // static startEdit(idx) {
+  //   editingIndex = idx;
+  //   this.fillFormData(window.registros[idx]);
+  //   document.querySelectorAll('#seccion-origen select').forEach(el => el.disabled = true);
+  //   const btnCancelEdit = document.querySelector('.btn-cancel-edit');
+  //   if (btnCancelEdit) btnCancelEdit.style.display = 'inline-block';
+  // }
 
   static cancelEdit() {
     editingIndex = null;
@@ -1431,7 +1430,7 @@ static renderTabla() {
       `<td>${clave}</td>` +
       `<td>` +
       ` <div class="btn-actions">` +
-      `<button class="btn-small btn-edit" data-index="${i}" title="Editar"><i class="fa fa-edit"></i></button>` +
+     // `<button class="btn-small btn-edit" data-index="${i}" title="Editar"><i class="fa fa-edit"></i></button>` +
       `<button class="btn-small btn-delete" data-index="${i}" title="Eliminar"><i class="fa fa-trash"></i></button>` +
       `</div>` +
       `</td></tr>`;

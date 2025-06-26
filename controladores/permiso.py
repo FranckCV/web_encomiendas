@@ -1,4 +1,6 @@
 import controladores.bd as bd
+from flask import request
+import controladores.controlador_usuario as controlador_usuario
 
 def get_lista_modulos():
     sql= f'''
@@ -132,7 +134,7 @@ def get_lista_tipo_paginas():
         FROM tipo_pagina tp
         CROSS JOIN modulo m
         LEFT JOIN pagina p ON p.tipo_paginaid = tp.id AND p.moduloid = m.id
-        GROUP BY m.id, tp.id
+        GROUP BY m.id, tp.id 
     '''
 
     filas = bd.sql_select_fetchall(sql)
@@ -140,6 +142,28 @@ def get_lista_tipo_paginas():
 
 
 def get_paginas():
+    sql= f'''
+        SELECT 
+            pag.id , 
+            pag.titulo , 
+            pag.icono , 
+            pag.activo, 
+            pag.key , 
+            pag.tipo_paginaid , 
+            pag.moduloid ,
+            mdl.nombre as nom_modulo , 
+            tip.nombre as nom_tipo
+        from pagina pag
+        inner join modulo mdl on mdl.id = pag.moduloid
+        inner join tipo_pagina tip on tip.id = pag.tipo_paginaid
+        where pag.mostrar = 1 
+        order by pag.titulo
+    '''
+    filas = bd.sql_select_fetchall(sql)
+    return  filas
+
+
+def get_todos_paginas():
     sql= f'''
         SELECT 
             pag.id , 
@@ -215,8 +239,10 @@ def get_lista_roles():
     filas = bd.sql_select_fetchall(sql)
     return  filas
 
-
 def get_lista_tipo_roles():
+    usuario = controlador_usuario.get_usuario_empleado_user_id(request.cookies.get('user_id'))
+    validar_admin = '' if usuario['rolid'] == 1 else ' AND tip.id != 1 '
+ 
     sql= f'''
         SELECT
             tip.id,
@@ -225,7 +251,7 @@ def get_lista_tipo_roles():
             COUNT(rol.id) AS cant
         FROM tipo_rol tip
         LEFT JOIN rol ON rol.tipo_rolid = tip.id
-        WHERE tip.activo = 1 AND tip.id != 1
+        WHERE tip.activo = 1  {validar_admin}
         GROUP BY tip.id
         HAVING COUNT(rol.id) != 0;
     '''
@@ -234,6 +260,9 @@ def get_lista_tipo_roles():
 
 
 def get_info_rol(rolid):
+    usuario = controlador_usuario.get_usuario_empleado_user_id(request.cookies.get('user_id'))
+    validar_admin = '' if usuario['rolid'] == 1 else ' and tip.id != 1 '
+ 
     sql= f'''
         select 
             rol.id ,
@@ -245,7 +274,7 @@ def get_info_rol(rolid):
             tip.activo as act_tip
         from rol 
         left join tipo_rol tip on tip.id = rol.tipo_rolid
-        where tip.activo = 1 and rol.activo = 1 and tip.id != 1 and rol.id = {rolid}
+        where tip.activo = 1 and rol.activo = 1 and rol.id = {rolid} {validar_admin}
     '''
     a = bd.sql_select_fetchone(sql)
     return  a
@@ -328,9 +357,9 @@ def get_tipo_paginas_rol(rolid):
         CROSS JOIN modulo m
         LEFT JOIN pagina p ON p.tipo_paginaid = tp.id AND p.moduloid = m.id AND p.activo = 1
         LEFT JOIN permiso per ON per.paginaid = p.id AND per.rolid = {rolid}
+        where p.mostrar = 1
         GROUP BY tp.id, tp.nombre, m.id, m.nombre
         HAVING cant > 0
-        ORDER BY m.nombre, tp.nombre;
 
     '''
     data = bd.sql_select_fetchall(sql)
@@ -385,6 +414,38 @@ def get_paginas_permiso_rol( rolid ):
         inner join modulo mdl on mdl.id = pag.moduloid
         inner join tipo_pagina tip on tip.id = pag.tipo_paginaid
         LEFT JOIN permiso per ON per.rolid = rol.id AND per.paginaid = pag.id
+        WHERE rol.id = {rolid} and rol.activo = 1 and pag.activo = 1 and pag.mostrar = 1
+        order by pag.titulo
+    '''
+    data = bd.sql_select_fetchall(sql)
+    return  data
+
+
+def get_paginas_todos_permiso_rol( rolid ):
+    sql= f'''
+        SELECT 
+            pag.id , 
+            pag.titulo , 
+            pag.icono , 
+            pag.activo, 
+            pag.key , 
+            pag.tipo_paginaid , 
+            pag.moduloid ,
+            mdl.nombre as nom_modulo , 
+            tip.nombre as nom_tipo ,
+            per.acceso ,
+            per.search ,
+            per.consult ,
+            per.insert ,
+            per.update ,
+            per.delete ,
+            per.unactive ,
+            per.otro
+        FROM rol
+        CROSS JOIN pagina pag 
+        inner join modulo mdl on mdl.id = pag.moduloid
+        inner join tipo_pagina tip on tip.id = pag.tipo_paginaid
+        LEFT JOIN permiso per ON per.rolid = rol.id AND per.paginaid = pag.id
         WHERE rol.id = {rolid} and rol.activo = 1 and pag.activo = 1 
         order by pag.titulo
     '''
@@ -398,6 +459,7 @@ def consult_permiso_rol( paginaid, rolid):
             rol.* ,
             rol.activo as rol_activo ,
             per.* ,
+            per.paginaid as per_paginaid ,
             pag.* ,
             pag.activo as pag_activo 
         FROM rol
@@ -469,7 +531,7 @@ def update_permiso_pagina(column, paginaid, rolid, value=None):
 
 def change_permiso_pagina(column , paginaid , rolid , value = None):
     data = consult_permiso_rol( paginaid , rolid)
-    if data['paginaid'] is not None and data['rolid'] is not None: 
+    if data['per_paginaid'] is not None and data['rolid'] is not None: 
         update_permiso_pagina(column , paginaid , rolid , value)
     else:
         nuevo_permiso_pagina_rol( paginaid , rolid)
@@ -496,10 +558,12 @@ def validar_acceso(rolid , f_name , f_kwarg ):
         if page:
             pag_id = page['id']
             permiso_rol = consult_permiso_rol(pag_id , rolid)
+            # if f_name.startswith('crud_') and f_name != 'crud_generico':
+            #     for op in ['insert' , 'update' , 'delete' , 'unactive']:
+            #         if f_name == f'crud_{op}' and permiso_rol[op] == 1:
+            #             return True
             if f_name.startswith('crud_') and f_name != 'crud_generico':
-                for op in ['insert' , 'update' , 'delete' , 'unactive']:
-                    if f_name == f'crud_{op}' and permiso_rol[op] == 1:
-                        return True
+                return True
             else:
                 acceso = permiso_rol['acceso']
                 return acceso if permiso_rol['pag_activo'] and permiso_rol['rol_activo'] else 0

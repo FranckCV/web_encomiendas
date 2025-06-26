@@ -297,7 +297,7 @@
         </table>
       </div>
 
-      <!-- CORREGIDO: Totales calculados dinámicamente -->
+      <!--
       <div class="totales-container">
         <h4 style="margin-top: 0; color: #007bff;">Resumen de Totales</h4>
         <div class="totales-grid">
@@ -327,11 +327,9 @@
             <div class="total-label">Total a Pagar</div>
           </div>
         </div>
-      </div>
+      </div>-->
 
-      <!-- CORREGIDO: Botones de acción sin modalidad_pago -->
       <div class="botones-acciones" style="margin-top: 2rem;">
-        <a href="javascript:history.back();" class="btn-volver">VOLVER</a>
         <form id="formPago" action="{{ url_for('pago_envio_prueba') }}" method="post" style="display: inline;">
           <input type="hidden" name="envios_data" id="envios_data" value="">
           <input type="hidden" name="remitente_data" id="remitente_data" value="">

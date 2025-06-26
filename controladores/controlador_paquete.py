@@ -20,13 +20,12 @@ def get_report_test():
         FROM paquete paq 
         LEFT JOIN transaccion_encomienda tra 
         ON tra.num_serie = paq.transaccion_encomienda_num_serie 
-        INNER JOIN contenido_paquete con ON con.id = paq.contenido_paqueteid 
-        INNER JOIN ( 
+        LEFT JOIN contenido_paquete con ON con.id = paq.contenido_paqueteid 
+        LEFT JOIN ( 
         SELECT paquetetracking, MAX(detalle_estadoid) AS max_detalle_estadoid 
         FROM seguimiento GROUP BY paquetetracking ) ult_seg ON ult_seg.paquetetracking = paq.tracking 
         INNER JOIN detalle_estado det ON det.id = ult_seg.max_detalle_estadoid 
-        INNER JOIN estado_encomienda est ON est.id = det.estado_encomiendaid
-        
+        LEFT JOIN estado_encomienda est ON est.id = det.estado_encomiendaid      
 
     '''
     
@@ -128,7 +127,12 @@ def get_table():
           p.tracking,
           p.valor,
           p.peso,
-          p.estado_pago,
+          CASE 
+        WHEN p.estado_pago = 'P' THEN 'Pendiente'
+        WHEN p.estado_pago = 'C' THEN 'Pagado'
+        ELSE 'Desconocido'
+    END AS estado_pago,
+          
           p.qr_url,
           p.nombres_contacto_destinatario,
           p.apellidos_razon_destinatario,
@@ -194,7 +198,11 @@ def get_table_pk_foreign(pk_foreign):
           p.tracking,
           p.valor,
           p.peso,
-          p.estado_pago,
+         CASE 
+        WHEN p.estado_pago = 'P' THEN 'Pendiente'
+        WHEN p.estado_pago = 'C' THEN 'Pagado'
+        ELSE 'Desconocido'
+    END AS estado_pago,
           p.qr_url,
           p.nombres_contacto_destinatario,
           p.apellidos_razon_destinatario,
@@ -320,3 +328,86 @@ def listar_paquetes_por_sucursal_escalas():
     '''
     filas = sql_select_fetchall(sql)
     return filas
+
+def obtener_datos_guia_remision(transaccion_id):
+    sql = """
+        SELECT 
+            -- Emisor
+            e.ruc AS emisor_ruc,
+            e.nombre AS emisor_razon_social,
+            s_origen.direccion AS emisor_direccion,
+
+            -- Destinatario
+            p.num_documento_destinatario AS destinatario_doc,
+            p.nombres_contacto_destinatario AS destinatario_nombres,
+            p.apellidos_razon_destinatario AS destinatario_apellidos,
+            p.direccion_destinatario AS destinatario_direccion,
+
+            -- Transporte
+            sa.fecha AS fecha_inicio_traslado,
+            suc_origen.direccion AS punto_partida,
+            suc_destino.direccion AS punto_llegada,
+            u.placa AS vehiculo_placa,
+            emp.nombre AS conductor_nombre,
+            emp.n_documento AS conductor_dni,
+
+            -- Bienes
+            p.descripcion AS descripcion_item,
+            te.unidad_medida AS unidad_medida,
+            p.peso AS peso,
+            1 AS cantidad
+
+        FROM transaccion_encomienda tec
+        JOIN paquete p ON p.transaccion_encomienda_num_serie = tec.num_serie
+        JOIN salida sa ON sa.id = p.salidaid
+        JOIN unidad u ON u.id = sa.unidadid
+        JOIN empleado emp ON emp.id = sa.conductor_principal
+        JOIN sucursal s_origen ON s_origen.id = tec.id_sucursal_origen
+        JOIN sucursal suc_origen ON suc_origen.id = sa.origen_inicio_id
+        JOIN sucursal suc_destino ON suc_destino.id = sa.destino_final_id
+        JOIN empresa e ON e.actual = 1
+        JOIN tipo_empaque te ON te.id = p.tipo_empaqueid
+        WHERE tec.num_serie = %s
+        LIMIT 1
+    """
+    fila = sql_select_fetchone(sql, (transaccion_id,))
+    if not fila:
+        return None
+
+    return {
+        "emisor": {
+            "ruc": fila["emisor_ruc"],
+            "razon_social": fila["emisor_razon_social"],
+            "direccion": fila["emisor_direccion"],
+        },
+        "destinatario": {
+            "ruc_dni": fila["destinatario_doc"],
+            "nombre": f"{fila['destinatario_nombres']} {fila['destinatario_apellidos']}",
+            "direccion": fila["destinatario_direccion"],
+        },
+        "transporte": {
+            "fecha_inicio": fila["fecha_inicio_traslado"].strftime("%Y-%m-%d"),
+            "punto_partida": fila["punto_partida"],
+            "punto_llegada": fila["punto_llegada"],
+            "placa": fila["vehiculo_placa"],
+            "conductor": fila["conductor_nombre"],
+            "dni_conductor": fila["conductor_dni"],
+        },
+        "bienes": [{
+            "descripcion": fila["descripcion_item"],
+            "unidad": fila["unidad_medida"],
+            "cantidad": fila["cantidad"],
+            "peso": fila["peso"]
+        }]
+    }
+
+
+def get_num_serie_por_tracking(tracking):
+    sql = """
+        SELECT transaccion_encomienda_num_serie 
+        FROM paquete 
+        WHERE tracking = %s
+        LIMIT 1
+    """
+    fila = sql_select_fetchone(sql, (tracking,))
+    return fila['transaccion_encomienda_num_serie'] if fila else None

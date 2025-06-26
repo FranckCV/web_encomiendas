@@ -41,23 +41,46 @@ def get_table_pk_foreign(pk_foreign):
     sql = '''
         SELECT 
 	e.nombre as estado,
-	de.nombre as nombre_det
+	de.nombre as nombre_det,
+    tc.nombre as tip_comp
         FROM 
             seguimiento s
         INNER JOIN detalle_estado de ON de.id = s.detalle_estadoid
         inner join estado_encomienda e on e.id = de.estado_encomiendaid
-        where s.paquetetracking = %s
+        LEFT join tipo_comprobante tc on tc.id = s.tipo_comprobanteid
+        where s.paquetetracking = %s;
     '''
 
     columnas = {
         'estado':['Estado',2],
         'nombre_det': ['Detalle estado', 3],
+        'tip_comp':['Comprobante',2]
     }
 
     filas = sql_select_fetchall(sql,pk_foreign)
     return columnas, filas
 
+def get_table():
+    sql = '''
+        SELECT 
+	e.nombre as estado,
+	de.nombre as nombre_det,
+    tc.nombre as tip_comp
+        FROM 
+            seguimiento s
+        INNER JOIN detalle_estado de ON de.id = s.detalle_estadoid
+        inner join estado_encomienda e on e.id = de.estado_encomiendaid
+        LEFT join tipo_comprobante tc on tc.id = s.tipo_comprobanteid
+    '''
 
+    columnas = {
+        'estado':['Estado',2],
+        'nombre_det': ['Detalle estado', 3],
+        'tip_comp':['Comprobante',2]
+    }
+
+    filas = sql_select_fetchall(sql)
+    return columnas, filas
 
 ######_ CRUD ESPECIFICAS _###### 
 
@@ -65,12 +88,12 @@ def get_table_pk_foreign(pk_foreign):
 #     unactive_row_table("sucursal", id)
 
 
-def insert_row(paquetetracking, detalle_estadoid):
+def insert_row(pk_foreign, detalle_estadoid,tipo_comprobante):
     sql = '''
-        INSERT INTO seguimiento (paquetetracking, detalle_estadoid)
-        VALUES (%s, %s)
+        INSERT INTO seguimiento (paquetetracking, detalle_estadoid,tipo_comprobanteid)
+        VALUES (%s, %s,%s)
     '''
-    sql_execute(sql, (paquetetracking, detalle_estadoid))
+    sql_execute(sql, (pk_foreign, detalle_estadoid,tipo_comprobante))
 
 
 def update_row(paquetetracking, detalle_estadoid):

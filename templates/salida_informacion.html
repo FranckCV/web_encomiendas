@@ -6,6 +6,364 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <style>
+
+    /* ========================================
+   ESTILOS PARA CONTROL DE CAPACIDAD POR TRAMOS
+   ======================================== */
+
+.control-capacidad-tramos {
+    margin-top: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.vehiculo-control-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.vehiculo-resumen {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 1px solid #dee2e6;
+}
+
+.vehiculo-icon {
+    font-size: 2.5rem;
+    margin-right: 15px;
+    background: #fff;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.vehiculo-info {
+    flex: 1;
+}
+
+.vehiculo-info h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.vehiculo-tag {
+    background: #28a745;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.capacidad-general {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    text-align: right;
+    min-width: 200px;
+}
+
+.barra-capacidad-general {
+    padding: 0 20px 20px 20px;
+}
+
+.barra-fondo {
+    width: 100%;
+    height: 20px;
+    margin-top: 18px;
+    background-color: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.barra-relleno {
+    height: 100%;
+    transition: width 0.3s ease;
+    border-radius: 10px;
+    position: relative;
+}
+
+.barra-relleno.dentro-limite {
+    background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+}
+
+.barra-relleno.cerca-limite {
+    background: linear-gradient(90deg, #ffc107 0%, #fd7e14 100%);
+}
+
+.barra-relleno.excede-limite {
+    background: linear-gradient(90deg, #dc3545 0%, #e91e63 100%);
+}
+
+.vehiculo-seleccionado-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.vehiculo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.vehiculo-nombre {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #2c3e50;
+}
+
+.vehiculo-capacidad {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.btn-cambiar-vehiculo {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-cambiar-vehiculo:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+.detalle-tramos {
+    background: #fff;
+    border-top: 1px solid #dee2e6;
+}
+
+.detalle-header {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.detalle-icon {
+    font-size: 1.5rem;
+    margin-right: 10px;
+}
+
+.detalle-header h4 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.tabla-tramos {
+    display: flex;
+    flex-direction: column;
+}
+
+.tabla-header {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1.5fr;
+    gap: 15px;
+    padding: 15px 20px;
+    background: #e9ecef;
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.fila-tramo {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1.5fr;
+    gap: 15px;
+    padding: 15px 20px;
+    border-bottom: 1px solid #f1f3f4;
+    transition: background-color 0.2s ease;
+}
+
+.fila-tramo:hover {
+    background-color: #f8f9fa;
+}
+
+.fila-tramo:last-child {
+    border-bottom: none;
+}
+
+.columna-tramo strong {
+    color: #2c3e50;
+    font-size: 0.95rem;
+}
+
+.columna-peso {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.peso-valor {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.95rem;
+}
+
+.barra-mini {
+    width: 100%;
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.barra-mini-relleno {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.barra-mini-relleno.dentro-limite {
+    background: #28a745;
+}
+
+.barra-mini-relleno.cerca-limite {
+    background: #ffc107;
+}
+
+.barra-mini-relleno.excede-limite {
+    background: #dc3545;
+}
+
+.porcentaje {
+    color: #6c757d;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.estado-badge {
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.estado-badge.dentro-limite {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.estado-badge.cerca-limite {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.estado-badge.excede-limite {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .vehiculo-resumen {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .vehiculo-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .tabla-header,
+    .fila-tramo {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .tabla-header {
+        display: none; /* Ocultar headers en móvil */
+    }
+    
+    .fila-tramo {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .columna-tramo::before {
+        content: "Tramo: ";
+        font-weight: 600;
+        color: #6c757d;
+    }
+    
+    .columna-peso::before {
+        content: "Peso: ";
+        font-weight: 600;
+        color: #6c757d;
+    }
+    
+    .columna-estado::before {
+        content: "Estado: ";
+        font-weight: 600;
+        color: #6c757d;
+    }
+}
+
+/* Animaciones */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.control-capacidad-tramos {
+    animation: slideIn 0.3s ease;
+}
+
+.barra-relleno::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
 #map {
   height: 400px;
   width: 100%;
@@ -256,39 +614,52 @@ Programar nueva salida
                     <i class="fa-solid fa-boxes-stacked"></i>
                     Paquetes
                 </button>
+                <!---
                 <button class="tab-btn" onclick="openTab(event, 'tab-recojos')">
                     <i class="fa-solid fa-house"></i>
                     Recojos
-                </button>
+                </button>-->
+
             </div>
 
             <!-- Contenido Pestaña: Vehículo -->
-            <div id="tab-vehiculo" class="tab-content active">
-                <div class="section">
-                    <h2 class="section-title">🚚 Selección de unidad</h2>
-                    <div class="alert alert-error" id="errorVehiculo"></div>
-                    
-                    <table id="vehiculosTabla">
-                        <thead>
-                            <tr>
-                                <th>Vehículo</th>
-                                <th>Capacidad Máxima (kg)</th>
-                                <th>Capacidad Usada (kg)</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+            <!-- Contenido Pestaña: Vehículo MODIFICADO -->
+<div id="tab-vehiculo" class="tab-content active">
+    <div class="section">
+        <h2 class="section-title">🚚 Selección de unidad</h2>
+        <div class="alert alert-error" id="errorVehiculo"></div>
+        
+        <!-- Tabla de vehículos (se oculta al seleccionar) -->
+        <table id="vehiculosTabla">
+            <thead>
+                <tr>
+                    <th>Vehículo</th>
+                    <th>Capacidad Máxima (kg)</th>
+                    <th>Capacidad Usada (kg)</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
 
-                    <div class="assigned-items" id="vehiculoSeleccionado" style="display: none;">
-                        <h4>🚚 Vehículo seleccionado:</h4>
-                        <div id="vehiculoInfo"></div>
-                        <div class="capacity-bar" style="margin-top: 10px;">
-                            <div id="capacityFill" class="capacity-fill" style="width: 0%"></div>
-                        </div>
-                        <div id="capacityText" style="margin-top: 5px; font-size: 0.9rem; color: #666;">0 kg / 0 kg (0%)</div>
-                    </div>
-                </div>
+        <!-- Vehículo seleccionado (se muestra al seleccionar) -->
+        <div class="assigned-items" id="vehiculoSeleccionado" style="display: none;">
+            <div id="vehiculoInfo">
+                <!-- El contenido se genera dinámicamente -->
             </div>
+            
+            <!-- Barra de capacidad básica (se mantiene para compatibilidad) -->
+            <div class="capacity-bar" style="margin-top: 10px; display: none;">
+                <div id="capacityFill" class="capacity-fill" style="width: 0%"></div>
+            </div>
+            <div id="capacityText" style="margin-top: 5px; font-size: 0.9rem; color: #666; display: none;">0 kg / 0 kg (0%)</div>
+        </div>
+        
+        <!-- Control de capacidad por tramos (se genera dinámicamente) -->
+        <div id="controlCapacidadTramos" class="control-capacidad-tramos" style="display: none;">
+            <!-- El contenido se genera dinámicamente con JavaScript -->
+        </div>
+    </div>
+</div>
 
             <!-- Contenido Pestaña: Empleados -->
             <div id="tab-empleados" class="tab-content">
@@ -365,7 +736,7 @@ Programar nueva salida
                 </div>
             </div>
 
-            <!-- Contenido Pestaña: Recojos -->
+            <!-- Contenido Pestaña: Recojos 
             <div id="tab-recojos" class="tab-content">
                 <div class="section">
                     <h2 class="section-title">🏠 Recojos en casa</h2>
@@ -377,7 +748,6 @@ Programar nueva salida
                     <div class="recojo-section" id="recojoSection">
                         <h4 style="color: #f39c12; margin-bottom: 15px;">📋 Transacciones disponibles para recojo:</h4>
                         <div id="transaccionesRecojo">
-                            <!-- Las transacciones se cargan aquí dinámicamente -->
                         </div>
                         
                         <div class="assigned-items" style="margin-top: 20px;">
@@ -388,7 +758,8 @@ Programar nueva salida
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>-->
+
         </div>
 
         <!-- Botón Guardar -->
@@ -408,8 +779,8 @@ Programar nueva salida
  const sucursalesOrigen = {{ sucursal_origen | tojson }};
  const empleados = {{ empleados | tojson }};
  const agencias = {{ agencias | tojson }};
- const paquetes = {{ paquetes | tojson }}
-
+ const paquetes = {{ paquetes | tojson }};
+ const transaccionesRecojo = {{ recojo_casa | tojson }};
 // Variables globales
 let escalas = [];
 let map;
@@ -438,73 +809,6 @@ function inicializarMapa() {
 
 
 
-// Datos de transacciones de recojo en casa
-const transaccionesRecojo = [
-    { 
-        id: 1, 
-        numeroTransaccion: "RC-2024-001", 
-        direccion: "Av. Los Jardines 245, Urb. San Martín", 
-        cliente: "María González Ruiz",
-        telefono: "987654321",
-        estado: "Pendiente"
-    },
-    { 
-        id: 2, 
-        numeroTransaccion: "RC-2024-002", 
-        direccion: "Jr. Las Flores 678, Pueblo Libre", 
-        cliente: "Carlos Mendoza Silva",
-        telefono: "976543210",
-        estado: "Pendiente"
-    },
-    { 
-        id: 3, 
-        numeroTransaccion: "RC-2024-003", 
-        direccion: "Calle Los Pinos 123, San Isidro", 
-        cliente: "Ana Torres Vega",
-        telefono: "965432109",
-        estado: "Pendiente"
-    },
-    { 
-        id: 4, 
-        numeroTransaccion: "RC-2024-004", 
-        direccion: "Av. Industrial 987, Callao", 
-        cliente: "Roberto Silva Morales",
-        telefono: "954321098",
-        estado: "Pendiente"
-    },
-    { 
-        id: 5, 
-        numeroTransaccion: "RC-2024-005", 
-        direccion: "Jr. Comercio 456, Miraflores", 
-        cliente: "Lucía Vargas Castro",
-        telefono: "943210987",
-        estado: "Pendiente"
-    },
-    { 
-        id: 6, 
-        numeroTransaccion: "RC-2024-006", 
-        direccion: "Av. Universitaria 741, Los Olivos", 
-        cliente: "Pedro Ramírez López",
-        telefono: "932109876",
-        estado: "Pendiente"
-    },
-    { 
-        id: 7, 
-        numeroTransaccion: "RC-2024-007", 
-        direccion: "Jr. Ayacucho 852, Breña", 
-        cliente: "Carmen Delgado Ramos",
-        telefono: "921098765",
-        estado: "Pendiente"
-    },
-    { 
-        id: 8, 
-        numeroTransaccion: "RC-2024-008", 
-        direccion: "Av. El Sol 963, San Juan de Miraflores", 
-        cliente: "José Hernández Paz",
-        telefono: "910987654",
-        estado: "Pendiente"
-    }
-];
 
 // Variables de estado
 let vehiculoSeleccionado = null;
@@ -664,114 +968,6 @@ function validarDatosGenerales() {
     }
 }
 
-// Función para cargar paquetes según la ruta seleccionada
-function obtenerPaquetesParaRuta() {
-    // Verificar que tenemos origen y destino
-    if (!origenSeleccionado || !destinoSeleccionado) {
-        console.log('⚠️ No hay origen o destino seleccionado');
-        return [];
-    }
-    
-    // Crear ruta completa: [origen, escalas..., destino]
-    const rutaCompleta = [
-        { id: parseInt(origenSeleccionado.id), nombre: origenSeleccionado.nombre },
-        ...escalas.map(escala => ({ id: escala.id, nombre: escala.nombre })),
-        { id: parseInt(destinoSeleccionado.id), nombre: destinoSeleccionado.nombre }
-    ];
-    
-    console.log('🗺️ Ruta completa:', rutaCompleta.map(r => r.nombre).join(' → '));
-    
-    // Extraer solo los IDs para facilitar búsquedas
-    const idsRuta = rutaCompleta.map(punto => punto.id);
-    
-    console.log('📍 IDs en la ruta:', idsRuta);
-    
-    // Filtrar paquetes que pueden viajar en esta ruta
-    const paquetesValidos = paquetes.filter(paquete => {
-        const origenPaquete = parseInt(paquete.id_sucursal_origen);
-        const destinoPaquete = parseInt(paquete.sucursal_destino_id);
-        
-        // El origen del paquete debe estar en nuestra ruta
-        const origenEnRuta = idsRuta.includes(origenPaquete);
-        
-        // El destino del paquete debe estar en nuestra ruta
-        const destinoEnRuta = idsRuta.includes(destinoPaquete);
-        
-        // El origen debe ser diferente al destino
-        const origenDistintoDestino = origenPaquete !== destinoPaquete;
-        
-        // Verificar que el orden sea correcto (origen antes que destino en la ruta)
-        const indiceOrigen = idsRuta.indexOf(origenPaquete);
-        const indiceDestino = idsRuta.indexOf(destinoPaquete);
-        const ordenCorrecto = indiceOrigen !== -1 && indiceDestino !== -1 && indiceOrigen < indiceDestino;
-        
-        return origenEnRuta && destinoEnRuta && origenDistintoDestino && ordenCorrecto;
-    });
-    
-    console.log(`📦 Paquetes válidos encontrados: ${paquetesValidos.length}`);
-    
-    // Categorizar y enriquecer cada paquete
-    const paquetesCategorizados = paquetesValidos.map(paquete => {
-        const origenPaquete = parseInt(paquete.id_sucursal_origen);
-        const destinoPaquete = parseInt(paquete.sucursal_destino_id);
-        
-        const indiceCarga = idsRuta.indexOf(origenPaquete);
-        const indiceDescarga = idsRuta.indexOf(destinoPaquete);
-        
-        // Determinar tipo de paquete
-        let tipo = 'entre_escalas';
-        let descripcionRuta = '';
-        let iconoTipo = '📦';
-        
-        const puntoOrigen = rutaCompleta[indiceCarga]?.nombre.split(' / ')[0] || 'Origen';
-        const puntoDestino = rutaCompleta[indiceDescarga]?.nombre.split(' / ')[0] || 'Destino';
-        
-        if (indiceCarga === 0 && indiceDescarga === rutaCompleta.length - 1) {
-            // Viaje completo: del primer punto al último
-            tipo = 'largo_recorrido';
-            iconoTipo = '🚀';
-            descripcionRuta = `${puntoOrigen} → ${puntoDestino} (Viaje completo)`;
-        } else if (indiceCarga === 0) {
-            // Se carga en origen, se entrega en una escala
-            tipo = 'entrega_intermedia';
-            iconoTipo = '📤';
-            descripcionRuta = `${puntoOrigen} → ${puntoDestino} (Entrega en escala)`;
-        } else if (indiceDescarga === rutaCompleta.length - 1) {
-            // Se recoge en una escala, se entrega en destino final
-            tipo = 'recojo_intermedio';
-            iconoTipo = '📥';
-            descripcionRuta = `${puntoOrigen} → ${puntoDestino} (Recojo en escala)`;
-        } else {
-            // Entre escalas intermedias
-            tipo = 'entre_escalas';
-            iconoTipo = '🔄';
-            descripcionRuta = `${puntoOrigen} → ${puntoDestino} (Entre escalas)`;
-        }
-        
-        return {
-            id: paquete.tracking,              // ✅ Usar tracking como ID único
-            tracking: paquete.tracking,        // ✅ Campo tracking
-            descripcion: descripcionRuta,      // ✅ Descripción generada
-            peso: parseFloat(paquete.peso),    // ✅ Peso como número
-            punto_carga: indiceCarga,          // ✅ Índice donde se carga
-            punto_descarga: indiceDescarga,    // ✅ Índice donde se descarga
-            tipo: tipo,                        // ✅ Tipo de envío
-            origen_id: origenPaquete,          // ✅ ID de sucursal origen
-            destino_id: destinoPaquete,        // ✅ ID de sucursal destino
-            icono: iconoTipo                   // ✅ Icono para la UI
-        };
-    });
-    
-    // Estadísticas para debug
-    const estadisticas = paquetesCategorizados.reduce((acc, paquete) => {
-        acc[paquete.tipo] = (acc[paquete.tipo] || 0) + 1;
-        return acc;
-    }, {});
-    
-    console.log('📊 Estadísticas de paquetes:', estadisticas);
-    
-    return paquetesCategorizados;
-}
 
 
 function crearIndicePaquetes() {
@@ -892,7 +1088,6 @@ document.addEventListener('DOMContentLoaded', function() {
     renderizarVehiculos();
     renderizarEmpleados();
     renderizarPaquetes();
-    cargarTransaccionesRecojo();
     actualizarContadorEscalas();
     
     // Inicializar variable global para paquetes
@@ -980,21 +1175,6 @@ function validarFechaHora() {
     validarDatosGenerales();
 }
 
-function cargarTransaccionesRecojo() {
-    const contenedor = document.getElementById('transaccionesRecojo');
-    contenedor.innerHTML = transaccionesRecojo.map(transaccion => `
-        <div class="recojo-item" onclick="toggleRecojoItem(${transaccion.id})">
-            <input type="checkbox" class="recojo-checkbox" id="recojo_${transaccion.id}" onchange="toggleRecojoItem(${transaccion.id})">
-            <div class="recojo-info">
-                <div class="recojo-numero">${transaccion.numeroTransaccion}</div>
-                <div class="recojo-direccion">
-                    <strong>📍 ${transaccion.direccion}</strong><br>
-                    👤 Cliente: ${transaccion.cliente} | 📞 ${transaccion.telefono}
-                </div>
-            </div>
-        </div>
-    `).join('');
-}
 
 function renderizarVehiculos() {
     const tbody = document.querySelector('#vehiculosTabla tbody');
@@ -1090,12 +1270,12 @@ function renderizarPaquetes() {
         }
         
         return `
-            <tr class="package-row ${yaAsignado ? 'selected' : ''}" onclick="togglePaquete('${paquete.id}')">
+            <tr class="package-row ${yaAsignado ? 'selected' : ''}" onclick="togglePaquete('${paquete.tracking}')">
                 <td>
                     <strong style="color: #2c3e50;">${paquete.tracking}</strong>
                 </td>
                 <td>
-                    <div style="background: ${colorTipo}; padding: 4px 8px; border-radius: 5px; margin-bottom: 4px; border-left: 3px solid #007bff;">
+                    <div style="background: ${colorTipo}; padding: 4px 8px; border-radius: 5px; margin-bottom: 4px;">
                         ${iconoTipo} ${paquete.descripcion}
                     </div>
                     <small style="color: #666;">Tipo: ${paquete.tipo.replace(/_/g, ' ')}</small>
@@ -1151,63 +1331,6 @@ async function cargarPaquetesParaRuta() {
     }
 }
 
-// Función auxiliar para actualizar info de paquetes
-function actualizarInfoPaquetes(paquetesParaRuta = []) {
-    const infoElement = document.getElementById('infoPaquetes');
-    if (!infoElement) return;
-    
-    if (paquetesParaRuta.length === 0) {
-        infoElement.innerHTML = `
-            <i class="fa-solid fa-info-circle"></i>
-            No hay paquetes disponibles para la ruta seleccionada.
-        `;
-        infoElement.className = 'alert alert-warning';
-    } else {
-        // Crear resumen por tipo
-        const resumenTipos = paquetesParaRuta.reduce((acc, paquete) => {
-            const tipoLegible = paquete.tipo.replace(/_/g, ' ');
-            acc[tipoLegible] = (acc[tipoLegible] || 0) + 1;
-            return acc;
-        }, {});
-        
-        const pesoTotal = paquetesParaRuta.reduce((sum, p) => sum + p.peso, 0);
-        
-        const resumenTexto = Object.entries(resumenTipos)
-            .map(([tipo, cantidad]) => `${tipo}: ${cantidad}`)
-            .join(', ');
-        
-        infoElement.innerHTML = `
-            <i class="fa-solid fa-check-circle"></i>
-            <strong>${paquetesParaRuta.length} paquetes disponibles</strong> 
-            (${pesoTotal.toFixed(1)}kg total)<br>
-            <small style="color: #666;">${resumenTexto}</small>
-        `;
-        infoElement.className = 'alert alert-info';
-    }
-}
-
-// ========================================
-// FUNCIÓN AUXILIAR: Limpiar paquetes
-// ========================================
-
-function limpiarPaquetes() {
-    window.paquetesDisponibles = [];
-    paquetesAsignados = [];
-    pesoTotal = 0;
-    
-    renderizarPaquetes();
-    actualizarPaquetesAsignados();
-    
-    if (vehiculoSeleccionado) {
-        actualizarCapacidadVehiculo();
-    }
-    
-    console.log('🧹 Paquetes limpiados');
-}
-
-// ========================================
-// INTEGRACIÓN CON EL FLUJO PRINCIPAL
-// ========================================
 
 // Actualizar la función validarDatosGenerales() para incluir la carga de paquetes
 function validarDatosGenerales() {
@@ -1269,8 +1392,6 @@ function validarDatosGenerales() {
         alertaDatos.style.display = 'block';
         btnGuardar.disabled = true;
         
-        // ✅ CORREGIDO: Limpiar paquetes si no hay ruta completa
-        limpiarPaquetes();
         
         // Mensaje dinámico
         let mensaje = `Complete todos los datos generales para continuar (${camposCompletos}/${totalCampos}): `;
@@ -1336,85 +1457,76 @@ function verificarDatosPaquetes() {
     }
 }
 
-function obtenerPaquetesParaRuta() {
-    if (!origenSeleccionado || !destinoSeleccionado) return [];
-    
-    // Crear ruta completa: [origen, escalas..., destino]
-    const rutaCompleta = [
-        { id: parseInt(origenSeleccionado.id), nombre: origenSeleccionado.nombre },
-        ...escalas.map(escala => ({ id: escala.id, nombre: escala.nombre })),
-        { id: parseInt(destinoSeleccionado.id), nombre: destinoSeleccionado.nombre }
-    ];
-    
-    console.log('🗺️ Ruta completa:', rutaCompleta);
-    
-    // Filtrar paquetes que tengan origen y destino en esta ruta
-    const paquetesValidos = paquetes.filter(paquete => {
-        const origenEnRuta = rutaCompleta.some(punto => punto.id == paquete.id_sucursal_origen);
-        const destinoEnRuta = rutaCompleta.some(punto => punto.id == paquete.sucursal_destino_id);
-        
-        return origenEnRuta && destinoEnRuta && 
-               paquete.id_sucursal_origen != paquete.sucursal_destino_id;
-    });
-    
-    console.log(`📦 Paquetes válidos: ${paquetesValidos.length}`);
-    
-    // Categorizar cada paquete
-    const paquetesCategorizados = paquetesValidos.map(paquete => {
-        const indiceCarga = rutaCompleta.findIndex(punto => punto.id == paquete.id_sucursal_origen);
-        const indiceDescarga = rutaCompleta.findIndex(punto => punto.id == paquete.sucursal_destino_id);
-        
-        let tipo = 'invalido';
-        let descripcionRuta = '';
-        
-        if (indiceCarga !== -1 && indiceDescarga !== -1 && indiceCarga < indiceDescarga) {
-            const puntoOrigen = rutaCompleta[indiceCarga].nombre.split(' / ')[0];
-            const puntoDestino = rutaCompleta[indiceDescarga].nombre.split(' / ')[0];
-            
-            if (indiceCarga === 0 && indiceDescarga === rutaCompleta.length - 1) {
-                tipo = 'largo_recorrido';
-                descripcionRuta = `${puntoOrigen} → ${puntoDestino} (Viaje completo)`;
-            } else if (indiceCarga === 0) {
-                tipo = 'entrega_intermedia';
-                descripcionRuta = `${puntoOrigen} → ${puntoDestino} (Entrega en ruta)`;
-            } else if (indiceDescarga === rutaCompleta.length - 1) {
-                tipo = 'recojo_intermedio';
-                descripcionRuta = `${puntoOrigen} → ${puntoDestino} (Recojo en ruta)`;
-            } else {
-                tipo = 'entre_escalas';
-                descripcionRuta = `${puntoOrigen} → ${puntoDestino} (Entre escalas)`;
-            }
-        }
-        
-        return {
-            id: paquete.tracking,              // ✅ Usar tracking como ID único
-            tracking: paquete.tracking,        // ✅ Del campo p.tracking
-            descripcion: descripcionRuta,      // ✅ Generada automáticamente
-            peso: parseFloat(paquete.peso),    // ✅ Del campo p.peso
-            punto_carga: indiceCarga,
-            punto_descarga: indiceDescarga,
-            tipo: tipo,
-            origen_id: paquete.id_sucursal_origen,    // ✅ Del campo te.id_sucursal_origen
-            destino_id: paquete.sucursal_destino_id   // ✅ Del campo p.sucursal_destino_id
-        };
-    });
-    
-    return paquetesCategorizados.filter(p => p.tipo !== 'invalido');
-}
+
 
 function seleccionarVehiculo(vehiculoId) {
     vehiculoSeleccionado = vehiculoId;
     const vehiculo = vehiculos.find(v => v.unidadid === vehiculoId);
     
-    document.getElementById('vehiculoSeleccionado').style.display = 'block';
-    document.getElementById('vehiculoInfo').innerHTML = `
-        <span class="item-tag">${vehiculo.nombre_unidad} - Capacidad: ${vehiculo.capacidad}kg</span>
-    `;
+    // Mostrar solo el vehículo seleccionado
+    mostrarVehiculoSeleccionado(vehiculo);
     
+    // Actualizar capacidad inicial
     actualizarCapacidadVehiculo();
-    renderizarVehiculos();
+    
+    // Ocultar errores
     hideAlert('errorVehiculo');
+    
+    // Actualizar control de capacidad por tramos
+    actualizarControlCapacidadTramos();
 }
+
+function mostrarVehiculoSeleccionado(vehiculo) {
+    // Ocultar la tabla de vehículos
+    const tabla = document.getElementById('vehiculosTabla');
+    tabla.style.display = 'none';
+    
+    // Mostrar el vehículo seleccionado
+    const contenedorSeleccionado = document.getElementById('vehiculoSeleccionado');
+    contenedorSeleccionado.style.display = 'block';
+    
+    // Actualizar información del vehículo
+    document.getElementById('vehiculoInfo').innerHTML = `
+        <div class="vehiculo-seleccionado-card">
+            <div class="vehiculo-header">
+                <span class="vehiculo-nombre">${vehiculo.nombre_unidad}</span>
+                <span class="vehiculo-capacidad">Capacidad: ${vehiculo.capacidad} kg</span>
+                <button class="btn-cambiar-vehiculo" onclick="cambiarVehiculo()">
+                    <i class="fa-solid fa-exchange-alt"></i> Cambiar vehículo
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function cambiarVehiculo() {
+    // Mostrar la tabla de vehículos nuevamente
+    const tabla = document.getElementById('vehiculosTabla');
+    tabla.style.display = 'table';
+    
+    // Ocultar el vehículo seleccionado
+    const contenedorSeleccionado = document.getElementById('vehiculoSeleccionado');
+    contenedorSeleccionado.style.display = 'none';
+    
+    // Limpiar selección
+    vehiculoSeleccionado = null;
+    
+    // Limpiar paquetes asignados
+    paquetesAsignados = [];
+    pesoTotal = 0;
+    actualizarPaquetesAsignados();
+    
+    // Ocultar control de tramos
+    const controlTramos = document.getElementById('controlCapacidadTramos');
+    if (controlTramos) {
+        controlTramos.style.display = 'none';
+    }
+    
+    // Re-renderizar tabla
+    renderizarVehiculos();
+}
+
+
 
 function toggleEmpleado(empleadoId) {
     const empleado = empleados.find(e => e.id === empleadoId);
@@ -1430,123 +1542,8 @@ function toggleEmpleado(empleadoId) {
     renderizarEmpleados();
 }
 
-function validarCapacidadPorTramos(paquetesAsignados, rutaCompleta, capacidadMaxima = 1000) {
-    const capacidadPorTramo = {};
-    const alertas = [];
-    
-    // 🔧 PASO 1: Inicializar capacidad para cada tramo
-    for (let i = 0; i < rutaCompleta.length - 1; i++) {
-        const claveTramo = `${i}-${i + 1}`;
-        capacidadPorTramo[claveTramo] = {
-            origen: rutaCompleta[i].nombre.split(' / ')[0],
-            destino: rutaCompleta[i + 1].nombre.split(' / ')[0],
-            peso: 0,
-            paquetes: []
-        };
-    }
-    
-    // 🔧 PASO 2: Calcular peso por tramo para cada paquete
-    paquetesAsignados.forEach(paquete => {
-        // Encontrar donde se carga y descarga este paquete
-        const origenPaquete = parseInt(paquete.origen_id || paquete.id_sucursal_origen);
-        const destinoPaquete = parseInt(paquete.destino_id || paquete.sucursal_destino_id);
-        
-        const indiceCarga = rutaCompleta.findIndex(punto => punto.id === origenPaquete);
-        const indiceDescarga = rutaCompleta.findIndex(punto => punto.id === destinoPaquete);
-        
-        // Calcular tramos ocupados
-        const tramosOcupados = calcularTramosOcupados(indiceCarga, indiceDescarga);
-        
-        // Agregar peso a cada tramo ocupado
-        tramosOcupados.forEach(tramo => {
-            if (capacidadPorTramo[tramo]) {
-                capacidadPorTramo[tramo].peso += parseFloat(paquete.peso);
-                capacidadPorTramo[tramo].paquetes.push({
-                    tracking: paquete.tracking,
-                    peso: parseFloat(paquete.peso)
-                });
-            }
-        });
-    });
-    
-    // 🔧 PASO 3: Validar cada tramo y generar alertas
-    let capacidadMaximaUsada = 0;
-    let tramoProblematico = null;
-    
-    Object.entries(capacidadPorTramo).forEach(([tramo, datos]) => {
-        const porcentaje = (datos.peso / capacidadMaxima) * 100;
-        
-        // ❌ ERROR: Sobrepeso
-        if (datos.peso > capacidadMaxima) {
-            alertas.push({
-                tipo: 'error',
-                tramo: tramo,
-                mensaje: `Tramo ${datos.origen} → ${datos.destino}: Sobrepeso (${datos.peso.toFixed(1)}kg > ${capacidadMaxima}kg)`,
-                peso: datos.peso,
-                porcentaje: porcentaje,
-                exceso: datos.peso - capacidadMaxima
-            });
-        } 
-        // ⚠️ WARNING: Capacidad alta
-        else if (porcentaje > 90) {
-            alertas.push({
-                tipo: 'warning',
-                tramo: tramo,
-                mensaje: `Tramo ${datos.origen} → ${datos.destino}: Capacidad casi llena (${porcentaje.toFixed(1)}%)`,
-                peso: datos.peso,
-                porcentaje: porcentaje
-            });
-        }
-        
-        // Rastrear la capacidad máxima usada
-        if (datos.peso > capacidadMaximaUsada) {
-            capacidadMaximaUsada = datos.peso;
-            tramoProblematico = tramo;
-        }
-    });
-    
-    return {
-        capacidadPorTramo: capacidadPorTramo,
-        capacidadMaximaUsada: capacidadMaximaUsada,
-        tramoProblematico: tramoProblematico,
-        alertas: alertas,
-        esValido: alertas.filter(a => a.tipo === 'error').length === 0
-    };
-}
 
-function mostrarResumenCapacidad() {
-    if (!vehiculoSeleccionado || paquetesAsignados.length === 0) return;
-    
-    const vehiculo = vehiculos.find(v => v.unidadid === vehiculoSeleccionado);
-    
-    if (!origenSeleccionado || !destinoSeleccionado) {
-        console.log('📊 No se puede calcular capacidad por tramos: falta ruta completa');
-        return;
-    }
-    
-    try {
-        const rutaCompleta = crearRutaCompleta(origenSeleccionado, destinoSeleccionado, escalas);
-        const validacion = validarCapacidadPorTramos(paquetesAsignados, rutaCompleta, vehiculo.capacidad);
-        
-        console.log('📊 Resumen de capacidad por tramos:');
-        console.table(validacion.capacidadPorTramo);
-        
-        if (validacion.alertas.length > 0) {
-            console.warn('⚠️ Alertas de capacidad:');
-            validacion.alertas.forEach(alerta => {
-                const emoji = alerta.tipo === 'error' ? '❌' : '⚠️';
-                console.warn(`${emoji} ${alerta.mensaje}`);
-            });
-        } else {
-            console.log('✅ Capacidad OK en todos los tramos');
-        }
-        
-        console.log(`📈 Capacidad máxima usada: ${validacion.capacidadMaximaUsada.toFixed(1)}kg de ${vehiculo.capacidad}kg`);
-        
-    } catch (error) {
-        console.error('❌ Error calculando capacidad por tramos:', error);
-    }
-}
+
 
 // ✅ 3. MEJORAR obtenerPaquetesParaRuta() CON VALIDACIÓN CORRECTA
 function obtenerPaquetesParaRuta() {
@@ -1655,44 +1652,7 @@ function obtenerPaquetesParaRuta() {
     return paquetesCategorizados;
 }
 
-// ✅ 4. AGREGAR FUNCIÓN PARA DEPURAR CAPACIDAD
-function depurarCapacidadDetallada() {
-    if (!vehiculoSeleccionado || paquetesAsignados.length === 0) {
-        console.log('🔍 No hay vehículo seleccionado o paquetes asignados');
-        return;
-    }
-    
-    const vehiculo = vehiculos.find(v => v.unidadid === vehiculoSeleccionado);
-    
-    console.log('🚛 Análisis detallado de capacidad:');
-    console.log(`📋 Vehículo: ${vehiculo.nombre_unidad} (${vehiculo.capacidad}kg)`);
-    console.log(`📦 Paquetes asignados: ${paquetesAsignados.length}`);
-    
-    // Mostrar cada paquete
-    paquetesAsignados.forEach((paquete, index) => {
-        console.log(`${index + 1}. ${paquete.tracking} - ${paquete.peso}kg - ${paquete.descripcion}`);
-        if (paquete.tramos_ocupados) {
-            console.log(`   Tramos ocupados: ${paquete.tramos_ocupados.join(', ')}`);
-        }
-    });
-    
-    // Mostrar capacidad por tramos si es posible
-    if (origenSeleccionado && destinoSeleccionado) {
-        const rutaCompleta = crearRutaCompleta(origenSeleccionado, destinoSeleccionado, escalas);
-        const validacion = validarCapacidadPorTramos(paquetesAsignados, rutaCompleta, vehiculo.capacidad);
-        
-        console.log('\n📊 Capacidad por tramo:');
-        Object.entries(validacion.capacidadPorTramo).forEach(([tramo, datos]) => {
-            const porcentaje = ((datos.peso / vehiculo.capacidad) * 100).toFixed(1);
-            const estado = datos.peso > vehiculo.capacidad ? '❌ SOBREPESO' : 
-                          porcentaje > 90 ? '⚠️ CASI LLENO' : '✅ OK';
-            
-            console.log(`${tramo}: ${datos.origen} → ${datos.destino}`);
-            console.log(`  Peso: ${datos.peso.toFixed(1)}kg (${porcentaje}%) ${estado}`);
-            console.log(`  Paquetes: ${datos.paquetes.length}`);
-        });
-    }
-}
+
 
 // ✅ 5. FUNCIÓN PARA VALIDAR TODO EL SISTEMA
 function validarSistemaCompleto() {
@@ -1731,95 +1691,85 @@ function validarSistemaCompleto() {
 }
 
 
-function puedeAgregarPaquete(paqueteNuevo, paquetesActuales, capacidadVehiculo, origenSeleccionado, destinoSeleccionado, escalas) {
-    
-    // 🔍 PASO 1: Verificaciones básicas
-    if (!paqueteNuevo) {
+
+function dibujarRutaDesdeEscalas() {
+    //ShowSpinner();
+
+    if (escalas.length < 2) {
+        toastr.warning("Debe haber al menos dos sucursales para dibujar la ruta.", 'MENSAJE DE SISTEMA');
+        HideSpinner();
+        return;
+    }
+
+    borrarRutasPrevias();
+
+    const coordenadas = escalas.map(escala => {
         return {
-            puedeAgregar: false,
-            razon: 'Paquete no válido',
-            alertas: [],
-            tipo: 'error'
+            lat: escala.latitud,
+            lng: escala.longitud
         };
+    });
+
+    let totalDistancia = 0;
+    let totalDuracion = 0;
+    let promesas = [];
+
+    for (let i = 0; i < coordenadas.length - 1; i++) {
+        const origen = coordenadas[i];
+        const destino = coordenadas[i + 1];
+
+        let promesa = axios.get('/API_ENRUTAR', {
+            params: {
+                start: `${origen.lat},${origen.lng}`,
+                end: `${destino.lat},${destino.lng}`
+            }
+        }).then(response => {
+            const datos = response.data;
+            const ruta = datos.route;
+            const resumen = datos;
+
+            totalDistancia += resumen.distance;
+            totalDuracion += resumen.duration;
+
+            if (ruta && ruta.length > 0) {
+                const latlngs = ruta.map(coord => [coord[1], coord[0]]);
+                const lineaRuta = L.polyline(latlngs, { color: 'blue' }).addTo(capaRutas);
+
+                const distanciaKm = (resumen.distance / 1000).toFixed(2);
+                const duracionMin = (resumen.duration / 60).toFixed(2);
+
+                escalas[i + 1]['distancia'] = (resumen.distance / 1000);
+                escalas[i + 1]['tiempo'] = (resumen.duration / 60);
+
+                lineaRuta.bindTooltip(`📍 ${distanciaKm} km - ⏱ ${duracionMin} min`, {
+                    permanent: false,
+                    direction: 'center',
+                    offset: [0, -10],
+                    opacity: 0.8,
+                    className: 'tooltip-ruta'
+                }).openTooltip();
+            }
+        }).catch(error => {
+            toastr.error("Ocurrió un error inesperado al obtener la ruta");
+            console.error('Error al obtener la ruta:', error);
+            HideSpinner();
+        });
+
+        promesas.push(promesa);
     }
-    
-    if (!origenSeleccionado || !destinoSeleccionado) {
-        return {
-            puedeAgregar: false,
-            razon: 'No hay ruta definida (falta origen o destino)',
-            alertas: [],
-            tipo: 'error'
-        };
-    }
-    
-    if (!capacidadVehiculo || capacidadVehiculo <= 0) {
-        return {
-            puedeAgregar: false,
-            razon: 'Capacidad del vehículo no válida',
-            alertas: [],
-            tipo: 'error'
-        };
-    }
-    
-    // 🔍 PASO 2: Verificar que el paquete no esté ya asignado
-    const yaAsignado = paquetesActuales.some(p => p.id === paqueteNuevo.id || p.tracking === paqueteNuevo.tracking);
-    if (yaAsignado) {
-        return {
-            puedeAgregar: false,
-            razon: 'Este paquete ya está asignado',
-            alertas: [],
-            tipo: 'warning'
-        };
-    }
-    
-    // 🔍 PASO 3: Crear la lista completa de paquetes (actuales + nuevo)
-    const todosLosPaquetes = [...paquetesActuales, paqueteNuevo];
-    
-    // 🔍 PASO 4: Crear ruta completa para validación
-    const rutaCompleta = crearRutaCompleta(origenSeleccionado, destinoSeleccionado, escalas);
-    
-    // 🔍 PASO 5: Validar capacidad por todos los tramos
-    const validacionCapacidad = validarCapacidadPorTramos(todosLosPaquetes, rutaCompleta, capacidadVehiculo);
-    
-    // 🔍 PASO 6: Verificar el resultado
-    if (!validacionCapacidad.esValido) {
-        // Buscar el primer error crítico
-        const errorPrincipal = validacionCapacidad.alertas.find(alerta => alerta.tipo === 'error');
-        
-        if (errorPrincipal) {
-            return {
-                puedeAgregar: false,
-                razon: errorPrincipal.mensaje,
-                alertas: validacionCapacidad.alertas,
-                tipo: 'error',
-                detalles: {
-                    capacidadPorTramo: validacionCapacidad.capacidadPorTramo,
-                    tramoProblematico: validacionCapacidad.tramoProblematico,
-                    capacidadMaximaUsada: validacionCapacidad.capacidadMaximaUsada
-                }
-            };
-        }
-    }
-    
-    // 🔍 PASO 7: Verificar warnings (capacidad alta pero no crítica)
-    const warnings = validacionCapacidad.alertas.filter(alerta => alerta.tipo === 'warning');
-    
-    // ✅ PASO 8: El paquete se puede agregar
-    return {
-        puedeAgregar: true,
-        razon: 'El paquete se puede agregar sin problemas',
-        alertas: warnings, // Incluir warnings si los hay
-        tipo: warnings.length > 0 ? 'warning' : 'success',
-        detalles: {
-            pesoNuevoPaquete: paqueteNuevo.peso,
-            pesoTotalActual: paquetesActuales.reduce((sum, p) => sum + p.peso, 0),
-            pesoTotalNuevo: todosLosPaquetes.reduce((sum, p) => sum + p.peso, 0),
-            capacidadPorTramo: validacionCapacidad.capacidadPorTramo,
-            capacidadMaximaUsada: validacionCapacidad.capacidadMaximaUsada,
-            porcentajeUsoMaximo: ((validacionCapacidad.capacidadMaximaUsada / capacidadVehiculo) * 100).toFixed(1)
-        }
-    };
+
+    Promise.all(promesas).then(() => {
+        const km = formatearNumero((totalDistancia / 1000));
+        const min = formatearNumero((totalDuracion / 60));
+        document.getElementById('distanciaRuta').innerText = km;
+        document.getElementById('tiempoRuta').innerText = min;
+
+        reordenarTabla();
+    }).finally(() => {
+        HideSpinner();
+    });
 }
+
 
 function togglePaquete(paqueteId) {
     if (!vehiculoSeleccionado) {
@@ -1827,19 +1777,19 @@ function togglePaquete(paqueteId) {
         return;
     }
 
-    const paquete = window.paquetesDisponibles.find(p => p.id === paqueteId);
+    const paquete = window.paquetesDisponibles.find(p => p.tracking === paqueteId);
+    console.log(paquete)
     const vehiculo = vehiculos.find(v => v.unidadid === vehiculoSeleccionado);
     const index = paquetesAsignados.findIndex(p => p.id === paqueteId);
     
     if (index === -1) {
-        // ✅ CORRECCIÓN: Pasar TODOS los parámetros requeridos
         const validacion = puedeAgregarPaquete(
             paquete, 
             paquetesAsignados, 
             vehiculo.capacidad,
-            origenSeleccionado,      // ✅ Agregado
-            destinoSeleccionado,     // ✅ Agregado
-            escalas                  // ✅ Agregado
+            origenSeleccionado,
+            destinoSeleccionado,
+            escalas
         );
         
         if (!validacion.puedeAgregar) {
@@ -1848,21 +1798,9 @@ function togglePaquete(paqueteId) {
             return;
         }
         
-        // ✅ Mostrar warnings si los hay
-        if (validacion.alertas && validacion.alertas.length > 0) {
-            const warnings = validacion.alertas.filter(a => a.tipo === 'warning');
-            if (warnings.length > 0) {
-                console.warn('⚠️ Advertencias al agregar paquete:');
-                warnings.forEach(warning => {
-                    console.warn(warning.mensaje);
-                });
-            }
-        }
-        
         paquetesAsignados.push(paquete);
         pesoTotal += paquete.peso;
     } else {
-        // Remover paquete
         pesoTotal -= paquete.peso;
         paquetesAsignados.splice(index, 1);
     }
@@ -1872,9 +1810,10 @@ function togglePaquete(paqueteId) {
     renderizarPaquetes();
     hideAlert('errorPaquetes');
     
-    // ✅ CORRECCIÓN: Llamar función que SÍ existe
-    mostrarResumenCapacidad();
+    // Actualizar control de tramos
+    actualizarControlCapacidadTramos();
 }
+
 
 function toggleRecojoItem(transaccionId) {
     const transaccion = transaccionesRecojo.find(t => t.id === transaccionId);
@@ -1917,7 +1856,7 @@ function actualizarPaquetesAsignados() {
         contenedor.innerHTML = paquetesAsignados.map(paquete => 
             `<span class="item-tag">
                 ${paquete.tracking} - ${paquete.peso}kg
-                <button class="remove-btn" onclick="togglePaquete(${paquete.id})">×</button>
+                <button class="remove-btn" onclick="togglePaquete(${paquete.tracking})">×</button>
             </span>`
         ).join('');
     }
@@ -2077,13 +2016,6 @@ function crearRutaCompleta(origen, destino, escalas) {
     return ruta;
 }
 
-function calcularTramosOcupados(indiceCarga, indiceDescarga) {
-    const tramos = [];
-    for (let i = indiceCarga; i < indiceDescarga; i++) {
-        tramos.push(`${i}-${i + 1}`);
-    }
-    return tramos;
-}
 
 
 function agregarEscalaDesdeMapa(idAgencia) {
@@ -2135,6 +2067,7 @@ function eliminarEscalaDesdeMapa(idAgencia) {
     cargarPaquetesParaRuta();
 }
 
+
 function actualizarEscalas() {
     const contenedor = document.getElementById('escalasLista');
     
@@ -2166,10 +2099,17 @@ function actualizarEscalas() {
     
     actualizarContadorEscalas();
     actualizarRutaEnMapa();
+    
     if (origenSeleccionado && destinoSeleccionado) {
-    cargarPaquetesParaRuta();
+        cargarPaquetesParaRuta();
+    }
+    
+    // Actualizar control de tramos si hay vehículo seleccionado
+    if (vehiculoSeleccionado) {
+        actualizarControlCapacidadTramos();
+    }
 }
-}
+
 
 function eliminarEscala(agenciaId) {
     escalas = escalas.filter(e => e.id !== agenciaId);

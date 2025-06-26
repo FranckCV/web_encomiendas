@@ -12,18 +12,15 @@
   <div class="container">
     <h2 class="titulo-seguimiento">Seguimiento de envíos</h2>
     <div class="form-container">
-      <form action="#" method="post">
+      <form action="{{ url_for('buscar_paquete') }}" method="post">
         <div class="input-container">
           <label for="tracking">Número de tracking</label>
           <input type="text" id="tracking" name="tracking" placeholder="Escriba el número de tracking" />
         </div>
         <div class="input-container">
           <label for="ano-emision">Año de emisión</label>
-          <select id="ano-emision" name="ano-emision">
-            <option value="25">2025</option>
-            <option value="24">2024</option>
-            <option value="23">2023</option>
-          </select>
+          <input type="text" class="tracking-input" placeholder="Ingresa el año de registro" name="anio" maxlength="4">
+
         </div>
         <button type="submit" class="buscar-btn">Buscar <i class="ri-arrow-right-line"></i></button>
       </form>

@@ -54,15 +54,11 @@ def get_table():
             te.monto_total,
             te.fecha,
             te.hora,
-            te.comprobante_serie,
             te.clienteid,
-            te.tipo_comprobanteid,
             te.monto_total,
             te.recojo_casa,
             te.direccion_recojo,
             te.descripcion,
-
-            tc.nombre AS nom_tip_comprobante,
             CASE 
                 WHEN te.masivo = 1 THEN 'Masivo'
                 ELSE 'Individual'
@@ -80,10 +76,9 @@ def get_table():
 
         FROM transaccion_encomienda te
         INNER JOIN cliente c ON c.id = te.clienteid
-        INNER JOIN tipo_comprobante tc ON tc.id = te.tipo_comprobanteid
         INNER JOIN sucursal s ON s.id = te.id_sucursal_origen
         INNER JOIN ubigeo u ON u.codigo = s.ubigeocodigo
-        ORDER BY te.fecha DESC, te.hora DESC
+        ORDER BY te.fecha DESC, te.hora DESC;
     '''
 
     columnas = {
@@ -94,7 +89,6 @@ def get_table():
         'recojo_casa_txt': ['¿Recojo en casa?', 1],
         'fecha': ['Fecha', 1],
         'hora': ['Hora', 1],
-        'nom_tip_comprobante': ['Comprobante', 1.5],
         'nombre_cliente': ['Cliente', 2],
     }
 
@@ -261,7 +255,7 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante, meto
 
                 suc_dest_id = int(r['destino']['sucursal_destino'])
                 modalidad_pago = r.get('modalidadPago')
-                estado_pago = 'P' if modalidad_pago == '1' else r.get('estado_pago', 'P')
+                estado_pago = 'C' if modalidad_pago == '1' else 'P'
                 contenido_paqueteid = int(r.get('tipoArticuloId')) if tipo_empaque == 1 else None
                 cantidad_folios = r.get('cantidad_folios') if tipo_empaque == 2 else None
                 direccion_destinatario = r.get('direccion_destinatario') if tipo_entrega == 2 else ''
@@ -476,3 +470,26 @@ def get_select_recojo_casa():
     return filas
 
 
+
+def get_recojo_casa():
+    sql = '''
+        select
+    num_serie,
+    direccion_recojo,
+    concat(c.nombre_siglas,' ',c.apellidos_razon),
+    c.telefono
+    from transaccion_encomienda te 
+    inner join cliente c on c.id = te.clienteid
+    where te.recojo_casa != 0
+    '''
+    fila = sql_select_fetchall(sql)
+    return fila
+
+
+def get_num_serie_by_tracking(tracking):
+    sql = '''
+        select transaccion_encomienda_num_serie from paquete where tracking = %s
+    '''
+    fila = sql_select_fetchone(sql,(tracking,))
+    
+    return fila

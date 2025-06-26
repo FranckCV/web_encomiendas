@@ -203,6 +203,7 @@
                 {% set icono = btn[1] %}
                 {% set color = btn[2] %}
                 {% set funcion = btn[3] %}
+                {% set target = 'target="_blank"' if btn[7] else '' %}
                 {% set parametros = {} %}
 
                 {% if mostrar_url and btn|length > 4 %}
@@ -214,11 +215,11 @@
                       {% set _ = parametros.update({key: fila[val]}) %}
                     {% endif %}
                   {% endfor %}
-                  <a href="{{ url_for(funcion, **parametros) }}">
+                  <a href="{{ url_for(funcion, **parametros) }}"  {{ target }}>
                 {% elif funcion is none or funcion == '' %}
-                  <a href="#">
+                  <a href="#"  {{ target }}>
                 {% else %}
-                  <a href="{{ url_for(funcion) }}">
+                  <a href="{{ url_for(funcion) }}"  {{ target }}>
                 {% endif %}
                     <button class="{{ btn[5] if btn|length > 5 else '' }}" style="background-color: {{ color }};" id="{{fila[primary_key]}}">
                       <i class="{{ icono }}"></i>

@@ -10,14 +10,14 @@ INSERT INTO empresa (
     color_sec,
     color_ter,
     porcentaje_recojo,
-    igv ,
-    actual 
-)
+    igv,
+    actual
+  )
 VALUES (
     1,
     20512528458,
     'New Olva',
-    54,                 
+    54,
     'info@newolva.com',
     '+123 456 789',
     'logo.png',
@@ -25,11 +25,9 @@ VALUES (
     '#13e2da',
     '#1b98e0',
     5.00,
-    18.00  ,
-    1 
-);
-
-
+    18.00,
+    1
+  );
 INSERT INTO `modulo` (
     `id`,
     `nombre`,
@@ -45,7 +43,7 @@ VALUES (
     'fa-solid fa-user-tie',
     'administracion',
     '#1A53FF',
-    0,
+    1,
     'administracion.jpg'
   ),
   (
@@ -102,70 +100,70 @@ VALUES (
     1,
     'personal.jpg'
   );
-
 INSERT INTO `tipo_pagina` (`id`, `nombre`)
 VALUES (1, 'Mantenimientos'),
   (2, 'Funcionalidades'),
   (3, 'Transacciones'),
-  (4, 'Reportes'),
-  (5, 'Gráficos');
+  (4, 'Reportes');
 
 
+INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `mostrar`, `padrepaginaid`, `tipo_paginaid`, `moduloid`) VALUES
+(1, 'tipos de unidades', 'fa-solid fa-truck-plane', 1, 'tipo_unidad', 1, NULL, 1, 1),
+(2, 'marcas de unidades', 'fa-solid fa-car-side', 1, 'marca', 1, NULL, 1, 1),
+(3, 'modelos de unidades', 'fa-solid fa-cogs', 1, 'modelo', 1, NULL, 1, 1),
+(4, 'unidades', 'fa-solid fa-truck-fast', 1, 'unidad', 1, NULL, 1, 1),
+(5, 'tipos de empaques para paquetes', 'fa-solid fa-truck-plane', 1, 'tipo_empaque', 1, NULL, 1, 3),
+(6, 'tipos de recepción de paquetes', 'fa-solid fa-truck-plane', 1, 'tipo_recepcion', 1, NULL, 1, 3),
+(7, 'roles', 'fa-solid fa-user-shield', 1, 'rol', 1, NULL, 1, 7),
+(8, 'métodos de pago', 'fa-solid fa-money-bill-wave', 1, 'metodo_pago', 1, NULL, 1, 5),
+(9, 'empleados', 'fa-solid fa-address-card', 1, 'empleado', 1, NULL, 1, 7),
+(10, 'tipos de clientes', 'fa-solid fa-layer-group', 1, 'tipo_cliente', 1, NULL, 1, 6),
+(11, 'usuarios', 'fa-solid fa-user', 1, 'usuario', 1, NULL, 1, 6),
+(12, 'clientes', 'fa-solid fa-user', 1, 'cliente', 1, NULL, 1, 6),
+(13, 'tipos de documentos', 'fa-solid fa-id-card', 1, 'tipo_documento', 1, NULL, 1, 1),
+(14, 'tipos de comprobantes', 'fa-solid fa-file-lines', 1, 'tipo_comprobante', 1, NULL, 1, 1),
+(15, 'tipos de indemnización', 'fa-solid fa-hand-holding-dollar', 1, 'tipo_indemnizacion', 1, NULL, 1, 4),
+(16, 'estados de reclamos', 'fa-solid fa-circle-exclamation', 1, 'estado_reclamo', 1, NULL, 1, 4),
+(17, 'tamaños de cajas', 'fa-solid fa-box-open', 1, 'tamanio_caja', 1, NULL, 1, 5),
+(18, 'contenido de paquetes', 'fa-solid fa-box-open', 1, 'contenido_paquete', 1, NULL, 1, 3),
+(19, 'articulos para encomiendas', 'fa-solid fa-box-open', 1, 'articulo', 1, NULL, 1, 5),
+(20, 'estados de encomiendas', 'fa-solid fa-boxes-packing', 1, 'estado_encomienda', 1, NULL, 1, 3),
+(21, 'tipos de roles', 'ri-file-user-fill', 1, 'tipo_rol', 1, NULL, 1, 7),
+(22, 'Motivos de reclamo', '', 1, 'motivo_reclamo', 1, NULL, 1, 4),
+(23, 'Causas de reclamo', '', 1, 'causa_reclamo', 1, NULL, 1, 4),
+(24, 'Tarifas de ruta', 'fa-solid fa-dollar', 1, 'tarifa_ruta', 1, NULL, 1, 1),
+(25, 'Sucursales', 'ri-store-3-line', 1, 'sucursal', 1, NULL, 1, 1),
+(26, 'tipos de reclamos', 'fa-solid fa-book-open-reader', 1, 'tipo_reclamo', 1, NULL, 1, 4),
+(28, 'Administración de páginas', 'ri-file-settings-fill', 1, 'administrar_paginas', 1, NULL, 2, 6),
+(29, 'Información de la empresa', 'ri-file-lock-fill', 1, 'informacion_empresa', 1, NULL, 2, 1),
+(30, 'Reclamo', 'fa fa-bullhorn', 1, 'reclamo', 1, NULL, 1, 4),
+(31, 'Preguntas frecuentes', 'fa-solid fa-circle-question', 1, 'pregunta_frecuente', 1, NULL, 1, 4),
+(32, 'Listado de paquetes por estado actual y fecha', 'fa-solid fa-boxes', 1, 'paquete_estado_fecha', 1, NULL, 4, 3),
+(33, 'Salidas', 'fa-solid fa-van-shuttle', 1, 'salida', 1, NULL, 3, 2),
+(34, 'Programación de encomiendas', 'fa-solid fa-boxes-packing', 1, 'transaccion_encomienda', 1, NULL, 3, 3),
+(35, 'Programar nueva salida', 'fas fa-shipping-fast', 1, 'salida_informacion', 1, NULL, 2, 2),
+(36, 'Reporte de horarios de sucursales', 'fa-solid fa-clock', 1, 'horarios_sucursal', 1, NULL, 4, 1),
+(37, 'Reporte de ingresos por periodo', 'fa-solid fa-coins', 1, 'ingresos_periodo', 1, NULL, 4, 1),
+(39, 'Listado de empleados por rol', 'fa-solid fa-user-tie', 1, 'listado_general_empleados_rol', 1, NULL, 4, 7),
+(40, 'Reporte de Usuarios', 'fa-solid fa-users', 1, 'reporte_usuarios', 1, NULL, 4, 6),
+(41, 'Lista de Artículos Más Vendidos', 'fa-solid fa-boxes-stacked', 1, 'articulos_mas_vendidos', 1, NULL, 4, 5),
+(42, 'Reporte de Artículos que Necesitan Reposición', 'fa-solid fa-boxes-stacked', 1, 'articulos_reposicion', 1, NULL, 4, 5),
+(43, 'Reporte de ventas por periodo', 'fa-solid fa-sack-dollar', 1, 'ventas_periodo', 1, NULL, 4, 5),
+(44, 'Descuentos', 'fa-solid fa-percent', 1, 'descuento', 1, NULL, 1, 5),
+(45, 'Descuentos de artículos', 'fa-solid fa-percent', 1, 'descuento_articulo', 1, NULL, 1, 5),
+(46, 'detalle de un estado de reclamo', 'fa-solid fa-file', 1, 'detalle_reclamo', 1, NULL, 1, 4),
+(47, 'Programación de devoluciones', 'ri-truck-line', 1, 'programacion_devolucion', 1, NULL, 2, 3),
+(48, 'Escaneo de qr', 'fa-solid fa-qrcode', 1, 'interfaz_insertar_estado', 0, NULL, 2, 2),
+(49, 'Paquetes', 'fa-solid fa-boxes', 1, 'paquete', 1, NULL, 3, 3),
+(50, 'Uso de unidades', 'fa-solid fa-truck', 1, 'reporte_uso_unidades', 1, NULL, 4, 1),
+(51, 'Reporte de reclamos segun tipo , causa y periodo', 'fa-solid fa-clipboard-list', 1, 'reporte_reclamos_tipo_causa_periodo', 1, NULL, 4, 4),
+(52, 'Reporte de viajes realizados por unidad', 'fa-solid fa-truck-fast', 1, 'viajes_por_unidad', 1, NULL, 4, 2),
+(53, 'Listado de encomiendas por tipo empaque', 'fa-solid fa-boxes-packing', 1, 'encomiendas_listar', 1, NULL, 4, 3),
+(54, 'Seguimiento de paquete', NULL, 1, 'seguimiento', 0, NULL, 3, 3),
+(55, 'Permisos de acceso', 'ri-file-lock-fill', 1, 'permiso_rol', 0, NULL, 2, 6),
+(56, 'Procesar Pago de Paquete', 'fas fa-credit-card', 1, 'pagar_paquete', 0, NULL, 2, 3),
+(57, 'Responder reclamos', 'fa-solid fa-headset', 1, 'vista_responder_reclamos', 1, NULL, 2, 4);
 
-INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `tipo_paginaid`, `moduloid`) VALUES
-(1, 'tipos de unidades', 'fa-solid fa-truck-plane', 1, 'tipo_unidad', 1, 1),
-(2, 'marcas de unidades', 'fa-solid fa-car-side', 1, 'marca', 1, 1),
-(3, 'modelos de unidades', 'fa-solid fa-cogs', 1, 'modelo', 1, 1),
-(4, 'unidades', 'fa-solid fa-truck-fast', 1, 'unidad', 1, 1),
-(5, 'tipos de empaques para paquetes', 'fa-solid fa-truck-plane', 1, 'tipo_empaque', 1, 3),
-(6, 'tipos de recepción de paquetes', 'fa-solid fa-truck-plane', 1, 'tipo_recepcion', 1, 3),
-(7, 'roles', 'fa-solid fa-user-shield', 1, 'rol', 1, 7),
-(8, 'métodos de pago', 'fa-solid fa-money-bill-wave', 1, 'metodo_pago', 1, 5),
-(9, 'empleados', 'fa-solid fa-address-card', 1, 'empleado', 1, 7),
-(10, 'tipos de clientes', 'fa-solid fa-layer-group', 1, 'tipo_cliente', 1, 6),
-(11, 'usuarios', 'fa-solid fa-user', 1, 'usuario', 1, 6),
-(12, 'clientes', 'fa-solid fa-user', 1, 'cliente', 1, 6),
-(13, 'tipos de documentos', 'fa-solid fa-id-card', 1, 'tipo_documento', 1, 1),
-(14, 'tipos de comprobantes', 'fa-solid fa-file-lines', 1, 'tipo_comprobante', 1, 1),
-(15, 'tipos de indemnización', 'fa-solid fa-hand-holding-dollar', 1, 'tipo_indemnizacion', 1, 4),
-(16, 'estados de reclamos', 'fa-solid fa-circle-exclamation', 1, 'estado_reclamo', 1, 4),
-(17, 'tamaños de cajas', 'fa-solid fa-box-open', 1, 'tamanio_caja', 1, 5),
-(18, 'contenido de paquetes', 'fa-solid fa-box-open', 1, 'contenido_paquete', 1, 3),
-(19, 'articulos para encomiendas', 'fa-solid fa-box-open', 1, 'articulo', 1, 5),
-(20, 'estados de encomiendas', 'fa-solid fa-boxes-packing', 1, 'estado_encomienda', 1, 3),
-(21, 'tipos de roles', 'ri-file-user-fill', 1, 'tipo_rol', 1, 7),
-(22, 'Motivos de reclamo', '', 1, 'motivo_reclamo', 1, 4),
-(23, 'Causas de reclamo', '', 1, 'causa_reclamo', 1, 4),
-(24, 'Tarifas de ruta', 'fa-solid fa-dollar', 1, 'tarifa_ruta', 1, 1),
-(25, 'Sucursales', 'ri-store-3-line', 1, 'sucursal', 1, 1),
-(26, 'tipos de reclamos', 'fa-solid fa-book-open-reader', 1, 'tipo_reclamo', 1, 4),
-(28, 'Administración de páginas', 'ri-file-settings-fill', 1, 'administrar_paginas', 2, 6),
-(29, 'Información de la empresa', 'ri-file-lock-fill', 1, 'informacion_empresa', 2, 1),
-(30, 'Reclamo', 'fa fa-bullhorn', 1, 'reclamo', 1, 4),
-(31, 'Preguntas frecuentes', 'fa-solid fa-circle-question', 1, 'pregunta_frecuente', 1, 4),
-(32, 'Listado de paquetes por estado actual y fecha', 'fa-solid fa-boxes', 1, 'paquete_estado_fecha', 4, 3),
-(33, 'Salidas', 'fa-solid fa-van-shuttle', 1, 'salida', 3, 2),
-(34, 'Programación de encomiendas', 'fa-solid fa-boxes-packing', 1, 'transaccion_encomienda', 3, 3),
-(35, 'Programar nueva salida', 'fas fa-shipping-fast', 1, 'salida_informacion', 2, 2),
-(36, 'Reporte de horarios de sucursales', 'fa-solid fa-clock', 1, 'horarios_sucursal', 4, 1),
-(37, 'Reporte de ingresos por periodo', 'fa-solid fa-coins', 1, 'ingresos_periodo', 4, 1),
-(38, 'Reporte de uso de unidades', '', 1, '', 4, 1),
-(39, 'Listado de empleados por rol', 'fa-solid fa-user-tie', 1, 'listado_general_empleados_rol', 4, 7),
-(40, 'Reporte de Usuarios', 'fa-solid fa-users', 1, 'reporte_usuarios', 4, 6),
-(41, 'Lista de Artículos Más Vendidos', 'fa-solid fa-boxes-stacked', 1, 'articulos_mas_vendidos', 4, 5),
-(42, 'Reporte de Artículos que Necesitan Reposición', 'fa-solid fa-boxes-stacked', 1, 'articulos_reposicion', 4, 5),
-(43, 'Reporte de ventas por periodo', 'fa-solid fa-sack-dollar', 1, 'ventas_periodo', 4, 5),
-(44, 'Descuentos', 'fa-solid fa-percent', 1, 'descuento', 1, 5),
-(45, 'Descuentos de artículos', 'fa-solid fa-percent', 1, 'descuento_articulo', 1, 5),
-(46, 'detalle de un estado de reclamo', 'fa-solid fa-file', 1, 'detalle_reclamo', 1, 4),
-(47, 'Programación de devoluciones', 'ri-truck-line', 1, 'programacion_devolucion', 2, 3),
-(48, 'Escaneo de qr', 'fa-solid fa-qrcode', 1, 'interfaz_insertar_estado', 2, 2),
-(49, 'Paquetes', 'fa-solid fa-boxes', 1, 'paquete', 3, 3),
-(50, 'Reporte Uso de unidades', 'fa-solid fa-truck', 1, 'reporte_uso_unidades', 4, 1),
-(51, 'Reporte de reclamos según tipo , causa y periodo', 'fa-solid fa-clipboard-list', 1, 'reporte_reclamos_tipo_causa_periodo', 4, 4),
-(52, 'Reporte de viajes realizados por unidad', 'fa-solid fa-truck-fast', 1, 'viajes_por_unidad', 4, 2),
-(53, 'Listado de encomiendas por tipo empaque', 'fa-solid fa-boxes-packing', 1, 'encomiendas_listar', 4, 3),
-(54, 'Listado de encomiendas asignadas a rutas específicas y su estado ', 'fa-solid fa-route', 1, 'encomiendas_rutas_estado', 4, 3);
 
 INSERT INTO `tipo_rol` (`id`, `nombre`, `descripcion`, `activo`)
 VALUES (1, 'SuperAdministador', 'Dios', 1),
@@ -212,7 +210,6 @@ VALUES (1, 'SuperAdministador', 'Dios', 1),
     'Roles encargados de la atención al cliente y la gestión de reclamos e incidencias.',
     1
   );
-
 INSERT INTO `rol` (
     `id`,
     `nombre`,
@@ -313,7 +310,6 @@ VALUES (1, 'Superadmin', 'El patrón', 1, 1),
     2
   ),
   (15, 'Gestor de unidades', NULL, 1, 3);
-
 INSERT INTO `ubigeo` (
     `codigo`,
     `departamento`,
@@ -3251,7 +3247,6 @@ VALUES ('100101', 'ICA', 'ICA', 'ICA', 1),
   ('21404', 'ANCASH', 'SIHUAS', 'HUAYLLABAMBA', 1),
   ('21405', 'ANCASH', 'SIHUAS', 'QUICHES', 1),
   ('21406', 'ANCASH', 'SIHUAS', 'SICSIBAMBA', 1);
-
 INSERT INTO `ubigeo` (
     `codigo`,
     `departamento`,
@@ -6145,7 +6140,6 @@ VALUES ('21407', 'ANCASH', 'SIHUAS', 'ACOBAMBA', 1),
   ('91106', 'HUANUCO', 'YAROWILCA', 'OBAS', 1),
   ('91107', 'HUANUCO', 'YAROWILCA', 'PAMPAMARCA', 1),
   ('91108', 'HUANUCO', 'YAROWILCA', 'CHORAS', 1);
-
 INSERT INTO `marca` (`id`, `nombre`)
 VALUES (1, 'Volvo'),
   (2, 'Iveco'),
@@ -6159,7 +6153,6 @@ VALUES (1, 'Volvo'),
   (10, 'Hyundai'),
   (11, 'International'),
   (12, 'Kenworth');
-
 INSERT INTO `tipo_unidad` (`id`, `nombre`, `descripcion`, `activo`)
 VALUES (1, 'Camión', 'Vehículo de carga pesada', 1),
   (2, 'Furgoneta', 'Vehículo de carga medianaa', 0),
@@ -6181,7 +6174,6 @@ VALUES (1, 'Camión', 'Vehículo de carga pesada', 1),
     'Vehículo mixto de carga y pasajeros',
     1
   );
-
 INSERT INTO `modelo` (`id`, `nombre`, `marcaid`, `tipo_unidadid`)
 VALUES (1, 'FH16', 1, 1),
   (2, 'Daily', 2, 2),
@@ -6195,7 +6187,6 @@ VALUES (1, 'FH16', 1, 1),
   (10, 'HD65', 10, 5),
   (11, 'ProStar', 11, 1),
   (12, 'T680', 12, 3);
-
 INSERT INTO unidad (
     placa,
     MTC,
@@ -6326,7 +6317,6 @@ VALUES (
     'A',
     12
   );
-
 INSERT INTO tipo_indemnizacion (nombre, descripcion, activo)
 VALUES (
     'Pérdida total',
@@ -6353,23 +6343,32 @@ VALUES (
     'Compensación por errores en la dirección o destinatario incorrecto.',
     1
   );
-
 INSERT INTO tipo_documento (siglas, nombre, activo)
 VALUES ('DNI', 'Documento Nacional de Identidad', 1),
   ('RUC', 'Registro Único de Contribuyente', 1),
   ('CE', 'Carné de Extranjería', 1),
   ('PAS', 'Pasaporte', 1);
-
-INSERT INTO tipo_comprobante (inicial, nombre, descripcion, activo,tipo_uso)
-VALUES ('F', 'Factura', 'Factura', 1,'V'),
-  ('BV', 'Boleta', 'Boleta de Venta', 1,'V'),
-  ('GR', 'Guia de remision', 'Guía de Remisión', 1,'T'),
-  ('NC', 'Nota de crédito', 'Nota de Crédito', 1,'R'),
-  ('ND', 'D', 'Nota de Débito', 1,'R');
+INSERT INTO tipo_comprobante (inicial, nombre, descripcion, activo, tipo_uso)
+VALUES ('F', 'Factura', 'Factura', 1, 'V'),
+  ('BV', 'Boleta', 'Boleta de Venta', 1, 'V'),
+  (
+    'GR',
+    'Guia de remision',
+    'Guía de Remisión',
+    1,
+    'T'
+  ),
+  (
+    'NC',
+    'Nota de crédito',
+    'Nota de Crédito',
+    1,
+    'R'
+  ),
+  ('ND', 'Nota de débito', 'Nota de Débito', 1, 'R');
 INSERT INTO `tipo_recepcion` (`id`, `nombre`, `activo`)
 VALUES (1, 'Recepción en sucursal', 1),
   (2, 'Recepción en domicilio', 1);
-
 INSERT INTO `tipo_empaque` (
     `id`,
     `nombre`,
@@ -6379,7 +6378,6 @@ INSERT INTO `tipo_empaque` (
   )
 VALUES (1, 'Caja', 30, 'kg', 1),
   (2, 'Sobre', 5, 'gr', 1);
-
 INSERT INTO tipo_reclamo (nombre, descripcion)
 VALUES (
     'Queja',
@@ -6389,7 +6387,6 @@ VALUES (
     'Reclamo',
     'Es la disconformidad con los servicios prestados o bienes adquiridos. Por ejemplo: demora en el envío, entregas no realizadas, etc.'
   );
-
 INSERT INTO motivo_reclamo (nombre, descripcion, tipo_reclamoid)
 VALUES (
     'Demora en Servicio',
@@ -6416,7 +6413,6 @@ VALUES (
     'Es la falta de calidad en el servicio proporcionado al cliente, ya sea por parte del personal o del proceso de atención.',
     1
   );
-
 INSERT INTO `causa_reclamo` (
     `id`,
     `nombre`,
@@ -6621,14 +6617,12 @@ VALUES (
     'El comportamiento inapropiado o deficiente por parte del personal de la unidad encargada del servicio afecta la calidad del mismo.',
     5
   );
-
 INSERT INTO `tamanio_caja` (`id`, `nombre`, `activo`)
 VALUES (1, 'XXS', 1),
   (2, 'XS', 1),
   (3, 'S', 1),
   (4, 'M', 1),
   (5, 'L', 1);
-
 INSERT INTO contenido_paquete (nombre, activo)
 VALUES ('ACCESORIOS PARA FIESTAS', 1),
   ('ACCESORIOS ELECTRÓNICOS', 1),
@@ -6650,7 +6644,6 @@ VALUES ('ACCESORIOS PARA FIESTAS', 1),
   ('VALIJA-DOCUMENTOS', 1),
   ('UTILES DE ESCRITORIO', 1),
   ('UTILES DE OFICINA', 1);
-
 INSERT INTO articulo (
     nombre,
     precio,
@@ -6705,7 +6698,6 @@ VALUES (
     '30×42×23',
     5
   );
-
 INSERT INTO articulo (
     nombre,
     precio,
@@ -6760,45 +6752,99 @@ VALUES (
     '1 m × 1 m',
     NULL
   );
-
 insert INTO `tipo_cliente` (nombre, activo)
 VALUES ('Persona Natural', 1);
-
 insert INTO `tipo_cliente` (nombre, activo)
 VALUES ('Persona Jurídica', 1);
-
 insert INTO `metodo_pago` (nombre, activo)
 VALUES ('Efectivo', 1);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-INSERT INTO `metodo_pago` (nombre, activo) VALUES 
-  ('Tarjeta de Crédito', 1),
+INSERT INTO `metodo_pago` (nombre, activo)
+VALUES ('Tarjeta de Crédito', 1),
   ('Tarjeta de Débito', 1),
-  ('Yape',1);
+  ('Yape', 1);
+INSERT INTO `usuario` (
+    `id`,
+    `correo`,
+    `contrasenia`,
+    `tipo_usuario`,
+    `activo`
+  )
+VALUES (
+    1,
+    'ana@gmail.com',
+    '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92',
+    'E',
+    1
+  ),
+  (
+    2,
+    'perez@gmail.com',
+    '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92',
+    'E',
+    1
+  ),
+  (
+    3,
+    'fabs@correo.com',
+    '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92',
+    'C',
+    1
+  ),
+  (
+    4,
+    'abc@gmail.com',
+    '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92',
+    'C',
+    1
+  ),
+  (
+    5,
+    'abcdef@gmail.com',
+    '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92',
+    'C',
+    1
+  );
 
-INSERT INTO `usuario` (`id`, `correo`, `contrasenia`, `tipo_usuario`, `activo`) VALUES
-(1, 'ana@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
-(2, 'perez@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
-(3, 'fabs@correo.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'C', 1),
-(4, 'abc@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'C', 1),
-(5, 'abcdef@gmail.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'C', 1);
 
-INSERT INTO empleado (id, nombre, apellidos, correo, rolid) VALUES 
-  (1, 'Ana', 'Ramírez', 'ana@gmail.com', 1),
-  (2, 'Juan', 'Perez', 'perez@gmail.com', 1);
+
+INSERT INTO `empleado` (`id`, `nombre`, `apellidos`, `correo`, `n_documento`, `rolid`) VALUES
+(1, 'Ana', 'Ramírez', 'ana@gmail.com', '', 1),
+(2, 'Juan', 'Perez', 'perez@gmail.com', '', 1),
+(3, 'Carlos', 'Ramírez León', 'carlos.ramirez@transportes.com', 'D12345678', 3),
+(4, 'Lucía', 'Mendoza Ruiz', 'lucia.mendoza@transportes.com', 'B98765432', 3),
+(5, 'Pedro', 'Sánchez Huamán', 'pedro.sanchez@transportes.com', 'C76543210', 3),
+(6, 'Ana', 'Torres Rivas', 'ana.torres@transportes.com', 'A11223344', 3),
+(7, 'Luis', 'Castillo Valverde', 'luis.castillo@transportes.com', 'E55667788', 3),
+(8, 'María', 'López Espinoza', 'maria.lopez@transportes.com', 'F99887766', 3),
+(9, 'Javier', 'Gómez Paredes', 'javier.gomez@transportes.com', 'G33445566', 3),
+(10, 'Sofía', 'Fernández Quispe', 'sofia.fernandez@transportes.com', 'H77889900', 3),
+(11, 'Renzo', 'Morales Vega', 'renzo.morales@transportes.com', 'L10101010', 2),
+(12, 'Karen', 'Vera Castro', 'karen.vera@transportes.com', 'L20202020', 2),
+(13, 'Miguel', 'Torres Díaz', 'miguel.torres@transportes.com', 'M30303030', 4),
+(14, 'Fiorella', 'Salas Gutiérrez', 'fiorella.salas@transportes.com', 'M40404040', 4),
+(15, 'Valeria', 'Reyes Sánchez', 'valeria.reyes@transportes.com', 'V50505050', 5),
+(16, 'Andrés', 'Cruz Ponce', 'andres.cruz@transportes.com', 'V60606060', 5),
+(17, 'Lucero', 'Medina Cáceres', 'lucero.medina@transportes.com', 'D70707070', 6),
+(18, 'Pablo', 'Vargas Luján', 'pablo.vargas@transportes.com', 'D80808080', 6),
+(19, 'Esteban', 'Guerrero Ramírez', 'esteban.guerrero@transportes.com', 'R90909090', 7),
+(20, 'Nathaly', 'Silva Aquino', 'nathaly.silva@transportes.com', 'R01010101', 7),
+(21, 'Oscar', 'Huamán Ortega', 'oscar.huaman@transportes.com', 'S11111111', 8),
+(22, 'Brenda', 'Campos Aguirre', 'brenda.campos@transportes.com', 'S12121212', 8),
+(23, 'Ismael', 'Palacios Ruiz', 'ismael.palacios@transportes.com', 'I13131313', 9),
+(24, 'Juliana', 'Ortega Paredes', 'juliana.ortega@transportes.com', 'I14141414', 9),
+(25, 'Ricardo', 'Delgado Soto', 'ricardo.delgado@transportes.com', 'F15151515', 10),
+(26, 'Milagros', 'León Chávez', 'milagros.leon@transportes.com', 'F16161616', 10),
+(27, 'Sebastián', 'Calle Zapata', 'sebastian.calle@transportes.com', 'A17171717', 11),
+(28, 'Adriana', 'García Rojas', 'adriana.garcia@transportes.com', 'A18181818', 11),
+(29, 'Mario', 'Vásquez Pinto', 'mario.vasquez@transportes.com', 'V19191919', 12),
+(30, 'Diana', 'Rosales Inga', 'diana.rosales@transportes.com', 'V20202020', 12),
+(31, 'Alberto', 'Reyna Ríos', 'alberto.reyna@transportes.com', 'P21212121', 13),
+(32, 'Valentina', 'Pérez Torres', 'valentina.perez@transportes.com', 'P22222222', 13),
+(33, 'Rosa', 'Núñez Carranza', 'rosa.nunez@transportes.com', 'U23232323', 14),
+(34, 'Enrique', 'Salazar Guzmán', 'enrique.salazar@transportes.com', 'U24242424', 14),
+(35, 'Jimena', 'Flores Córdova', 'jimena.flores@transportes.com', 'G25252525', 15),
+(36, 'Diego', 'Zamora Cornejo', 'diego.zamora@transportes.com', 'G26262626', 15);
+
 
 INSERT INTO `sucursal`(
     `abreviatura`,
@@ -6826,7 +6872,6 @@ VALUES (
     1,
     '10101'
   );
-
 INSERT INTO `sucursal`(
     `abreviatura`,
     `codigo_postal`,
@@ -7152,7 +7197,6 @@ VALUES (
     1,
     '40106'
   );
-
 INSERT INTO `sucursal`(
     `abreviatura`,
     `ubigeocodigo`,
@@ -7856,66 +7900,17 @@ VALUES (
     ''
   );
 
-INSERT INTO `cliente` (
-    `id`,
-    `correo`,
-    `telefono`,
-    `num_documento`,
-    `nombre_siglas`,
-    `apellidos_razon`,
-    `tipo_documentoid`,
-    `tipo_clienteid`
-  )
-VALUES (
-    1,
-    'fabs@correo.com',
-    '+51 987654321',
-    '12345678',
-    'Fabiola',
-    'Mejía',
-    1,
-    1
-  ),
-  (
-    2,
-    'abc@gmail.com',
-    '9726158362',
-    '72435653',
-    'Ermenegildo',
-    'Quispe Mamani',
-    1,
-    1
-  ),
-  (
-    3,
-    'abcdef@gmail.com',
-    '917363282',
-    '97264262',
-    'Pedro',
-    'Suarez Vertiz',
-    1,
-    1
-  ),
-  (
-    4,
-    'fran@gmail.com',
-    '83636232',
-    '1028273672647',
-    'FN',
-    'CV',
-    2,
-    2
-  ),
-  (
-    5,
-    'aaa@gmail.com',
-    '76767434324',
-    '75645375',
-    'Juan José',
-    'Paredes',
-    3,
-    2
-  );
+
+INSERT INTO cliente (id, correo, telefono, num_documento, nombre_siglas, apellidos_razon, tipo_documentoid, tipo_clienteid) VALUES
+(1, 'fabs@correo.com', '+51 987654321', '12345678', 'Fabiola', 'Mejía', 1, 1),
+(2, 'abc@gmail.com', '9726158362', '72435653', 'Ermenegildo', 'Quispe Mamani', 1, 1),
+(3, 'abcdef@gmail.com', '917363282', '97264262', 'Pedro', 'Suarez Vertiz', 1, 1),
+(4, 'fran@gmail.com', '83636232', '1028273672647', 'FN', 'CV', 2, 2),
+(5, 'aaa@gmail.com', '76767434324', '75645375', 'Juan José', 'Paredes', 3, 2),
+(6, 'ana@example.com', '987654320', '87654321', 'Ana', 'Torres', 1, 1),
+(7, 'fabianapm060126@gmail.com', '987654345', '72428857', 'Liliana', 'Mejia', 1, 1),
+(8, 'edgaralarconhd@gmail.com', '948811527', '71309189', 'Edgar', 'Ivan Alarcon Chapoñan', 1, 1);
+
 
 INSERT INTO descuento (
     id,
@@ -7949,7 +7944,6 @@ VALUES (
     '2024-08-31',
     1
   );
-
 INSERT INTO DESCUENTO_articulo (DESCUENTOid, articuloid, cantidad_descuento)
 VALUES (1, 1, 1.2),
   (1, 2, 1.7),
@@ -7961,7 +7955,6 @@ VALUES (1, 1, 1.2),
   (2, 3, 2.5),
   (2, 4, 3.0),
   (2, 5, 3.5);
-
 INSERT INTO tarifa_ruta (sucursal_origen_id, sucursal_destino_id, tarifa)
 VALUES (1, 2, 12.50),
   (1, 3, 9.75),
@@ -7994,18 +7987,12 @@ VALUES (1, 2, 12.50),
   (25, 28, 17.90),
   (26, 29, 13.60),
   (27, 30, 14.95);
-
 INSERT INTO estado_reclamo (id, nombre, activo)
 VALUES (1, 'Recibido', 1),
   (2, 'Aprobado', 1),
   (3, 'Rechazado', 1),
   (4, 'En revisión', 1),
   (5, 'Resuelto', 1);
-
-
-
-
-
 INSERT INTO detalle_reclamo (nombre, descripcion, estado_reclamoid)
 VALUES (
     'Reclamo registrado',
@@ -8057,7 +8044,6 @@ VALUES (
     'El caso fue cerrado y archivado tras resolución.',
     5
   );
-
 INSERT INTO regla_cargo (
     id,
     tipo_condicion,
@@ -8066,7 +8052,6 @@ INSERT INTO regla_cargo (
     porcentaje
   )
 VALUES (1, 'V', 100, 3000, 0.6);
-
 INSERT INTO regla_cargo (
     id,
     tipo_condicion,
@@ -8075,8 +8060,6 @@ INSERT INTO regla_cargo (
     porcentaje
   )
 VALUES (2, 'V', 3000, 10000, 2.0);
-
-
 INSERT INTO regla_cargo (
     id,
     tipo_condicion,
@@ -8085,8 +8068,6 @@ INSERT INTO regla_cargo (
     porcentaje
   )
 VALUES (3, 'P', 1, NULL, 0.1);
-
-
 INSERT INTO pregunta_frecuente (titulo, descripcion, activo)
 VALUES (
     '¿Qué tipos de servicios ofrecemos?',
@@ -8108,8 +8089,6 @@ VALUES (
     '<ul><li>Solicitarla en cualquiera de nuestras agencias al momento de realizar tu envío</li><li>Descargarla directamente desde nuestra plataforma web en la sección "Mis envíos"</li><li>Recibirla por correo electrónico cuando registres tu envío</li></ul><p>Recuerda que este documento es importante para el seguimiento y control de tu envío.</p>',
     1
   );
-
-
 INSERT INTO tarifa_ruta
 values (28, 29, 80.00),
   (28, 30, 100.00),
@@ -8124,99 +8103,767 @@ values (28, 29, 80.00),
   (1, 28, 200.00),
   (2, 28, 180.00),
   (28, 59, 120.00),
-  (3,  5,  40.00),  
-  (5,  1,  70.00),  
+  (3, 5, 40.00),
+  (5, 1, 70.00),
   (60, 28, 120.00);
-
-
-
-
-INSERT INTO `modalidad_pago` (`id`, `nombre`, `descripcion`, `activo`) VALUES
-(1, 'Remitente paga en línea',
+INSERT INTO `modalidad_pago` (`id`, `nombre`, `descripcion`, `activo`)
+VALUES (
+    1,
+    'Remitente paga en línea',
     'El remitente realiza el pago a través de medios electrónicos como tarjeta de crédito/débito, Yape u otras plataformas de pago en línea.',
-    1),
-(2, 'Remitente paga en sucursal',
+    1
+  ),
+  (
+    2,
+    'Remitente paga en sucursal',
     'El remitente efectúa el pago directamente en la sucursal al momento de registrar el envío.',
-    1),
-(3, 'Destinatario paga contraentrega',
+    1
+  ),
+  (
+    3,
+    'Destinatario paga contraentrega',
     'El destinatario realiza el pago en el momento de recibir el paquete en su domicilio o sucursal.',
-    1);
+    1
+  );
+INSERT INTO estado_encomienda (id, nombre, descripcion, activo, tipoEstado)
+VALUES (
+    1,
+    'En origen',
+    'La encomienda aún no ha salido de la sucursal de origen.',
+    1,
+    'N'
+  ),
+  (
+    2,
+    'En tránsito',
+    'La encomienda se encuentra viajando hacia su destino.',
+    1,
+    'N'
+  ),
+  (
+    3,
+    'En destino',
+    'La encomienda está en la sucursal de destino o en reparto.',
+    1,
+    'N'
+  ),
+  (
+    4,
+    'Entregado',
+    'La encomienda fue entregada satisfactoriamente al destinatario',
+    1,
+    'N'
+  );
+INSERT INTO detalle_estado (
+    id,
+    nombre,
+    descripcion,
+    activo,
+    estado_encomiendaid
+  )
+VALUES (
+    1,
+    'Esperando recepción en agencia de origen',
+    'Aún no se ha recibido el paquete en la sucursal de origen. Esperando que el remitente lo entregue.',
+    1,
+    1
+  ),
+  (
+    2,
+    'Paquete recepcionado en agencia de origen',
+    'El paquete ha sido entregado por el remitente y registrado en el sistema.',
+    1,
+    1
+  ),
+  (
+    3,
+    'Validación de contenido y embalaje',
+    'El personal de agencia verifica el embalaje y las restricciones del contenido.',
+    1,
+    1
+  ),
+  (
+    4,
+    'Etiqueta de tracking generada',
+    'Se ha generado la etiqueta con código de seguimiento y se ha adherido al paquete.',
+    1,
+    1
+  ),
+  (
+    5,
+    'Clasificación interna',
+    'El paquete ha sido clasificado internamente según su destino final.',
+    1,
+    1
+  ),
+  (
+    6,
+    'Almacenado para despacho',
+    'El paquete está en la zona de salida esperando ser cargado en el vehículo de transporte.',
+    1,
+    1
+  );
+INSERT INTO detalle_estado (
+    id,
+    nombre,
+    descripcion,
+    activo,
+    estado_encomiendaid
+  )
+VALUES (
+    7,
+    'Cargado en unidad de transporte',
+    'El paquete ha sido cargado en la unidad de transporte interprovincial o interurbana.',
+    1,
+    2
+  ),
+  (
+    8,
+    'Salida de agencia de origen',
+    'El vehículo con el paquete ha salido de la agencia de origen.',
+    1,
+    2
+  ),
+  (
+    9,
+    'En tránsito intermedio',
+    'El paquete se encuentra en ruta, desplazándose hacia la ciudad de destino.',
+    1,
+    2
+  ),
+  (
+    10,
+    'Paso por centro logístico intermedio',
+    'El paquete ha pasado por un centro de distribución o nodo intermedio.',
+    1,
+    2
+  ),
+  (
+    11,
+    'Revisión en control de ruta',
+    'El paquete fue revisado por control en tránsito (ej. control de aduanas, pesaje, etc.).',
+    1,
+    2
+  ),
+  (
+    12,
+    'Próximo a llegar a destino',
+    'El transporte está llegando a la agencia de destino con el paquete a bordo.',
+    1,
+    2
+  );
+INSERT INTO detalle_estado (
+    id,
+    nombre,
+    descripcion,
+    activo,
+    estado_encomiendaid
+  )
+VALUES (
+    13,
+    'Recepcionado en agencia de destino',
+    'El paquete ha sido descargado y registrado en la sucursal de destino.',
+    1,
+    3
+  ),
+  (
+    14,
+    'Clasificación para reparto',
+    'El paquete ha sido clasificado y programado para reparto domiciliario.',
+    1,
+    3
+  ),
+  (
+    15,
+    'En espera de salida para reparto',
+    'El paquete está esperando ser cargado en la unidad de reparto local.',
+    1,
+    3
+  ),
+  (
+    16,
+    'En ruta de entrega',
+    'El paquete ha salido de la agencia y se encuentra en proceso de entrega al destinatario.',
+    1,
+    3
+  ),
+  (
+    17,
+    'Intento de entrega fallido',
+    'Se intentó la entrega pero no hubo respuesta o no se encontró al destinatario.',
+    1,
+    3
+  );
+INSERT INTO detalle_estado (
+    id,
+    nombre,
+    descripcion,
+    activo,
+    estado_encomiendaid
+  )
+VALUES (
+    18,
+    'Entregado al destinatario',
+    'El paquete fue entregado correctamente al destinatario registrado.',
+    1,
+    4
+  ),
+  (
+    19,
+    'Recibido por tercero autorizado',
+    'El paquete fue recibido por una persona autorizada diferente al destinatario.',
+    1,
+    4
+  ),
+  (
+    20,
+    'Firmado en conformidad',
+    'El destinatario o tercero firmó como constancia de la recepción.',
+    1,
+    4
+  ),
+  (
+    21,
+    'Entrega validada en sistema',
+    'La entrega fue confirmada en el sistema con hora y firma.',
+    1,
+    4
+  );
+
+INSERT INTO salida (
+    fecha,
+    hora,
+    recojo,
+    entrega,
+    estado,
+    unidadid,
+    destino_final_id,
+    conductor_principal,
+    origen_inicio_id
+  )
+VALUES ('2025-06-16', '07:30:00', 1, 0, 'P', 1, 2, 5, 3),
+  ('2025-06-16', '08:15:00', 1, 1, 'P', 2, 2, 6, 5),
+  ('2025-06-16', '09:00:00', 0, 1, 'P', 3, 3, 5, 6),
+  ('2025-06-16', '10:45:00', 1, 0, 'P', 4, 4, 7, 5),
+  ('2025-06-16', '11:30:00', 1, 1, 'P', 5, 4, 7, 7);
+INSERT INTO usuario (correo, contrasenia, tipo_usuario, activo)
+VALUES (
+    'carlos.ramirez@transportes.com',
+    SHA2('123456', 256),
+    'E',
+    1
+  ),
+  (
+    'lucia.mendoza@transportes.com',
+    SHA2('123456', 256),
+    'E',
+    1
+  ),
+  (
+    'pedro.sanchez@transportes.com',
+    SHA2('123456', 256),
+    'E',
+    1
+  ),
+  (
+    'ana.torres@transportes.com',
+    SHA2('123456', 256),
+    'E',
+    1
+  ),
+  (
+    'luis.castillo@transportes.com',
+    SHA2('123456', 256),
+    'E',
+    1
+  ),
+  (
+    'maria.lopez@transportes.com',
+    SHA2('123456', 256),
+    'E',
+    1
+  ),
+  (
+    'javier.gomez@transportes.com',
+    SHA2('123456', 256),
+    'E',
+    1
+  ),
+  (
+    'sofia.fernandez@transportes.com',
+    SHA2('123456', 256),
+    'E',
+    1
+  );
+INSERT INTO empleado_salida (salidaid, empleadoid)
+VALUES (1, 5),
+  -- Pedro Sánchez Huamán (conductor principal de salida 1)
+  (1, 3),
+  -- Carlos Ramírez León
+  (2, 6),
+  -- Ana Torres Rivas (conductor principal de salida 2)
+  (2, 4),
+  -- Lucía Mendoza Ruiz
+  (3, 5),
+  -- Pedro Sánchez Huamán (conductor principal de salida 3)
+  (3, 8),
+  -- María López Espinoza
+  (4, 7),
+  -- Luis Castillo Valverde (conductor principal de salida 4)
+  (4, 9),
+  -- Javier Gómez Paredes
+  (5, 7),
+  -- Luis Castillo Valverde (conductor principal de salida 5)
+  (5, 10);
+-- Sofía Fernández Quispe
+INSERT INTO `detalle_estado` (
+    `id`,
+    `nombre`,
+    `descripcion`,
+    `activo`,
+    `estado_encomiendaid`
+  )
+VALUES (
+    NULL,
+    'Regresado a origen',
+    'No se reclamó así que se devolvió.',
+    '1',
+    '1'
+  );
 
 
-INSERT INTO estado_encomienda (id, nombre, descripcion, activo, tipoEstado) VALUES
-(1, 'En origen',   'La encomienda aún no ha salido de la sucursal de origen.',       1, 'N'),
-(2, 'En tránsito', 'La encomienda se encuentra viajando hacia su destino.',          1, 'N'),
-(3, 'En destino',  'La encomienda está en la sucursal de destino o en reparto.',     1, 'N'),
-(4, 'Entregado',   'La encomienda fue entregada satisfactoriamente al destinatario', 1, 'N');
+INSERT INTO `permiso` (`paginaid`, `rolid`, `acceso`, `search`, `consult`, `insert`, `update`, `delete`, `unactive`, `otro`) VALUES
+(1, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(1, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(1, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(1, 15, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(2, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(2, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(2, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(2, 15, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(3, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(3, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(3, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(3, 15, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(4, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(4, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(4, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(4, 15, 1, 1, 1, 1, 1, 1, 0, '{}'),
+(5, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(5, 8, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(5, 11, 1, 1, 1, 1, 0, 0, 0, '{}'),
+(5, 12, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(6, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(6, 8, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(6, 11, 1, 1, 1, 1, 0, 0, 0, '{}'),
+(6, 12, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(7, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(7, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(7, 13, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(8, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(8, 10, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(8, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(8, 12, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(9, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(9, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(9, 13, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(10, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(10, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(10, 14, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(11, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(11, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(11, 14, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(12, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(12, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(12, 14, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(13, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(13, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(13, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(13, 15, 0, 0, 0, 0, 0, 0, 0, '{}'),
+(14, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(14, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(14, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(15, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(15, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(15, 9, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(16, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(16, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(16, 9, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(17, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(17, 4, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(17, 10, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(17, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(17, 12, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(18, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(18, 8, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(18, 11, 1, 1, 1, 1, 0, 0, 0, '{}'),
+(18, 12, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(19, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(19, 4, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(19, 10, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(19, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(19, 12, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(20, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(20, 8, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(20, 11, 1, 1, 1, 1, 0, 0, 0, '{}'),
+(20, 12, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(21, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(21, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(21, 13, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(22, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(22, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(22, 9, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(23, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(23, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(23, 9, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(24, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(24, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(24, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(24, 13, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(25, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(25, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(25, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(25, 13, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(25, 15, 0, 0, 0, 0, 0, 0, 0, '{}'),
+(26, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(26, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(26, 9, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(28, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(28, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(28, 14, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(29, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(29, 8, 0, 0, 1, 0, 0, 0, 0, '{}'),
+(29, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(30, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(30, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(30, 9, 1, 1, 1, 1, 1, 1, 0, '{}'),
+(31, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(31, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(31, 9, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(32, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(32, 6, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(32, 7, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(32, 8, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(32, 11, 1, 1, 1, 1, 0, 0, 0, '{}'),
+(32, 12, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(33, 1, 1, 1, 1, 1, 1, 1, 1, '{\"mapa\": 1}'),
+(33, 2, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(33, 4, 1, 1, 1, 1, 0, 0, 0, '{\"mapa\": 1}'),
+(33, 10, 1, 1, 0, 1, 0, 0, 1, '{}'),
+(33, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(33, 12, 1, 0, 0, 1, 0, 0, 0, '{\"mapa\": 1}'),
+(34, 1, 1, 1, 1, 1, 1, 1, 1, '{\"paquete\": 1}'),
+(34, 6, 1, 1, 1, 1, 1, 0, 0, '{\"paquete\": 1}'),
+(34, 8, 1, 1, 1, 1, 1, 1, 0, '{\"paquete\": 1}'),
+(34, 11, 1, 1, 1, 1, 0, 0, 0, '{\"paquete\": 1}'),
+(34, 12, 1, 0, 0, 1, 0, 0, 0, '{}'),
+(35, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(35, 2, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(35, 10, 1, 1, 0, 1, 0, 0, 1, '{}'),
+(35, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(36, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(36, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(36, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(37, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(37, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(37, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(39, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(39, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(39, 13, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(40, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(40, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(40, 14, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(41, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(41, 4, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(41, 10, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(41, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(41, 12, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(42, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(42, 4, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(42, 10, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(42, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(42, 12, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(43, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(43, 4, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(43, 10, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(43, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(43, 12, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(44, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(44, 10, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(44, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(44, 12, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(45, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(45, 10, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(45, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(45, 12, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(46, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(46, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(46, 9, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(47, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(47, 6, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(47, 8, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(47, 11, 1, 1, 1, 1, 0, 0, 0, '{}'),
+(47, 12, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(48, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(48, 2, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(48, 10, 1, 1, 0, 1, 0, 0, 1, '{}'),
+(48, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(49, 1, 1, 1, 1, 1, 1, 1, 1, '{\"qr_code\": 1, \"seguimiento\": 1, \"encomiendas\": 1, \"pago\": 1}'),
+(49, 6, 1, 1, 1, 1, 1, 0, 0, '{\"encomiendas\": 1, \"seguimiento\": 1, \"qr_code\": 1, \"pago\": 1}'),
+(49, 7, 1, 1, 1, 1, 1, 1, 0, '{\"encomiendas\": 1, \"seguimiento\": 1, \"qr_code\": 1, \"pago\": 1}'),
+(49, 8, 1, 1, 1, 1, 1, 1, 0, '{\"seguimiento\": 1, \"encomiendas\": 1, \"qr_code\": 1, \"pago\": 1}'),
+(49, 11, 1, 1, 1, 1, 0, 0, 0, '{\"encomiendas\": 1, \"qr_code\": 1, \"seguimiento\": 1}'),
+(49, 12, 1, 0, 0, 1, 0, 0, 0, '{\"encomiendas\": 1, \"qr_code\": 1}'),
+(50, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(50, 8, 1, 0, 1, 0, 0, 0, 0, '{}'),
+(50, 11, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(50, 15, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(51, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(51, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(51, 9, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(52, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(52, 2, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(52, 4, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(52, 10, 1, 1, 0, 1, 0, 0, 1, '{}'),
+(52, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(52, 15, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(53, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(53, 6, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(53, 7, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(53, 8, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(53, 11, 1, 1, 1, 1, 0, 0, 0, '{}'),
+(53, 12, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(54, 1, 1, 1, 1, 1, 1, 1, 1, '{\"\": 1, \"paquetes\": 1}'),
+(54, 6, 1, 0, 0, 1, 1, 1, 0, '{}'),
+(54, 8, 1, 0, 0, 1, 1, 1, 0, '{\"paquetes\": 1}'),
+(54, 11, 1, 1, 1, 1, 0, 0, 0, '{\"paquetes\": 1}'),
+(54, 12, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(55, 1, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(55, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(55, 14, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(56, 1, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(56, 6, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(56, 8, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(56, 11, 1, 1, 1, 1, 0, 0, 0, '{}'),
+(57, 1, 1, 0, 0, 0, 0, 0, 0, '{}'),
+(57, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
+(57, 9, 1, 1, 1, 0, 0, 0, 0, '{}');
 
 
-INSERT INTO detalle_estado (id, nombre, descripcion, activo, estado_encomiendaid) VALUES
-(1, 'Esperando recepción en agencia de origen', 'Aún no se ha recibido el paquete en la sucursal de origen. Esperando que el remitente lo entregue.', 1, 1),
-(2, 'Paquete recepcionado en agencia de origen', 'El paquete ha sido entregado por el remitente y registrado en el sistema.', 1, 1),
-(3, 'Validación de contenido y embalaje', 'El personal de agencia verifica el embalaje y las restricciones del contenido.', 1, 1),
-(4, 'Etiqueta de tracking generada', 'Se ha generado la etiqueta con código de seguimiento y se ha adherido al paquete.', 1, 1),
-(5, 'Clasificación interna', 'El paquete ha sido clasificado internamente según su destino final.', 1, 1),
-(6, 'Almacenado para despacho', 'El paquete está en la zona de salida esperando ser cargado en el vehículo de transporte.', 1, 1);
-INSERT INTO detalle_estado (id, nombre, descripcion, activo, estado_encomiendaid) VALUES
-(7, 'Cargado en unidad de transporte', 'El paquete ha sido cargado en la unidad de transporte interprovincial o interurbana.', 1, 2),
-(8, 'Salida de agencia de origen', 'El vehículo con el paquete ha salido de la agencia de origen.', 1, 2),
-(9, 'En tránsito intermedio', 'El paquete se encuentra en ruta, desplazándose hacia la ciudad de destino.', 1, 2),
-(10, 'Paso por centro logístico intermedio', 'El paquete ha pasado por un centro de distribución o nodo intermedio.', 1, 2),
-(11, 'Revisión en control de ruta', 'El paquete fue revisado por control en tránsito (ej. control de aduanas, pesaje, etc.).', 1, 2),
-(12, 'Próximo a llegar a destino', 'El transporte está llegando a la agencia de destino con el paquete a bordo.', 1, 2);
-INSERT INTO detalle_estado (id, nombre, descripcion, activo, estado_encomiendaid) VALUES
-(13, 'Recepcionado en agencia de destino', 'El paquete ha sido descargado y registrado en la sucursal de destino.', 1, 3),
-(14, 'Clasificación para reparto', 'El paquete ha sido clasificado y programado para reparto domiciliario.', 1, 3),
-(15, 'En espera de salida para reparto', 'El paquete está esperando ser cargado en la unidad de reparto local.', 1, 3),
-(16, 'En ruta de entrega', 'El paquete ha salido de la agencia y se encuentra en proceso de entrega al destinatario.', 1, 3),
-(17, 'Intento de entrega fallido', 'Se intentó la entrega pero no hubo respuesta o no se encontró al destinatario.', 1, 3);
-INSERT INTO detalle_estado (id, nombre, descripcion, activo, estado_encomiendaid) VALUES
-(18, 'Entregado al destinatario', 'El paquete fue entregado correctamente al destinatario registrado.', 1, 4),
-(19, 'Recibido por tercero autorizado', 'El paquete fue recibido por una persona autorizada diferente al destinatario.', 1, 4),
-(20, 'Firmado en conformidad', 'El destinatario o tercero firmó como constancia de la recepción.', 1, 4),
-(21, 'Entrega validada en sistema', 'La entrega fue confirmada en el sistema con hora y firma.', 1, 4);
+INSERT INTO transaccion_encomienda (num_serie, masivo, descripcion, monto_total, recojo_casa, id_sucursal_origen, fecha, hora, direccion_recojo, clienteid) VALUES
+(22, 1, 'Envío masivo', 40.00, 0, 3, '2025-06-25', '20:27:55', NULL, 1),
+(23, 1, 'Envío masivo', 23.80, 0, 16, '2025-06-25', '22:25:27', NULL, 7),
+(24, 1, 'Envío masivo', 26.47, 0, 59, '2025-06-25', '22:50:12', NULL, 8),
+(25, 0, 'Envío individual', 10.47, 0, 10, '2025-06-25', '22:57:32', NULL, 7);
+
+
+INSERT INTO paquete (tracking, clave, valor, peso, qr_url, alto, cantidad_folios, estado_pago, largo, precio_ruta, ancho, descripcion, nombres_contacto_destinatario, apellidos_razon_destinatario, direccion_destinatario, telefono_destinatario, num_documento_destinatario, sucursal_destino_id, tipo_documento_destinatario_id, tipo_empaqueid, contenido_paqueteid, tipo_recepcionid, salidaid, transaccion_encomienda_num_serie, modalidad_pagoid) VALUES
+(161, '7527', 80.00, 5.50, 'comprobantes/161/qr.png', 30.00, NULL, 'P', 45.00, 25.00, 25.00, '', 'Luis', 'Salazar', '', '987000111', '11223344', 8, 1, 1, 4, 1, NULL, 22, 1),
+(162, '1245', 50.00, 1.20, 'comprobantes/162/qr.png', NULL, 10, 'P', NULL, 15.00, NULL, '', 'Lucía', 'Martínez', 'Av. Los Álamos 456, Piura', '999111222', '55667788', 10, 1, 2, NULL, 2, NULL, 22, 2),
+(163, '5435', 8.00, 8.00, 'comprobantes/163/qr.png', 8.00, NULL, 'P', 8.00, 11.90, 8.00, '', 'Nayeli', 'Mestanza', 'Asturias 278', '987654345', '76543273', 19, 1, 1, 12, 2, NULL, 23, 1),
+(164, '7382', 8.00, 8.00, 'comprobantes/164/qr.png', NULL, 8, 'P', NULL, 11.90, NULL, '', 'Marvil', 'Marvil', '', '907355473', '16263547', 19, 1, 2, NULL, 1, NULL, 23, 3),
+(165, '1234', 200.00, 2.00, 'comprobantes/165/qr.png', 15.00, NULL, 'C', 15.00, 15.86, 15.00, '', 'Edgarcito', 'Chiquito', 'Nicolas de Pierola #163', '948811527', '71309189', 61, 1, 1, 13, 2, NULL, 24, 1),
+(166, '9876', 11.00, 11.00, 'comprobantes/166/qr.png', 11.00, NULL, 'P', 11.00, 10.61, 11.00, '', 'Fabianita', 'Chiquitita', '', '923456789', '123456789', 60, 3, 1, 14, 1, NULL, 24, 2),
+(167, '4356', 8.00, 8.00, 'comprobantes/167/qr.png', 8.00, NULL, 'C', 8.00, 10.47, 8.00, '', 'Ñia', 'Mejia', '', '904764673', '72527434', 13, 1, 1, 13, 1, NULL, 25, 1);
 
 
 
-INSERT INTO empleado (nombre, apellidos, correo, n_documento, rolid) VALUES
-('Carlos', 'Ramírez León', 'carlos.ramirez@transportes.com', 'D12345678', 3),
-('Lucía', 'Mendoza Ruiz', 'lucia.mendoza@transportes.com', 'B98765432', 3),
-('Pedro', 'Sánchez Huamán', 'pedro.sanchez@transportes.com', 'C76543210',3),
-('Ana', 'Torres Rivas', 'ana.torres@transportes.com', 'A11223344', 3),
-('Luis', 'Castillo Valverde', 'luis.castillo@transportes.com', 'E55667788',3),
-('María', 'López Espinoza', 'maria.lopez@transportes.com', 'F99887766', 3),
-('Javier', 'Gómez Paredes', 'javier.gomez@transportes.com', 'G33445566', 3),
-('Sofía', 'Fernández Quispe', 'sofia.fernandez@transportes.com', 'H77889900',3);
-
-INSERT INTO salida (fecha, hora, recojo, entrega, estado, unidadid, destino_final_id, conductor_principal, origen_inicio_id) VALUES
-('2025-06-16', '07:30:00', 1, 0, 'P', 1, 2, 5, 3),
-('2025-06-16', '08:15:00', 1, 1, 'P', 2, 2, 6, 5),
-('2025-06-16', '09:00:00', 0, 1, 'P', 3, 3, 5, 6),
-('2025-06-16', '10:45:00', 1, 0, 'P', 4, 4, 7, 5),
-('2025-06-16', '11:30:00', 1, 1, 'P', 5, 4, 7, 7);
 
 
+INSERT INTO transaccion_venta (num_serie, tipo_comprobanteid, estado, monto_total, fecha, hora, clienteid) VALUES
+-- Ventas de Enero 2024
+(1001, 1, 1, 45.50, '2024-01-15', '10:30:00', 1),
+(1002, 2, 1, 128.90, '2024-01-16', '14:20:00', 3),
+(1003, 1, 1, 67.30, '2024-01-18', '16:45:00', 2),
+(1004, 1, 0, 34.70, '2024-01-20', '11:15:00', 4),
+(1005, 1, 1, 89.20, '2024-01-25', '15:30:00', 5),
 
-INSERT INTO usuario (correo, contrasenia, tipo_usuario, activo) VALUES
-('carlos.ramirez@transportes.com', SHA2('123456', 256), 'E', 1),
-('lucia.mendoza@transportes.com', SHA2('123456', 256), 'E', 1),
-('pedro.sanchez@transportes.com', SHA2('123456', 256), 'E', 1),
-('ana.torres@transportes.com', SHA2('123456', 256), 'E', 1),
-('luis.castillo@transportes.com', SHA2('123456', 256), 'E', 1),
-('maria.lopez@transportes.com', SHA2('123456', 256), 'E', 1),
-('javier.gomez@transportes.com', SHA2('123456', 256), 'E', 1),
-('sofia.fernandez@transportes.com', SHA2('123456', 256), 'E', 1);
+-- Ventas de Febrero 2024
+(1006, 1, 1, 156.80, '2024-02-05', '09:30:00', 1),
+(1007, 1, 1, 78.40, '2024-02-10', '15:20:00', 2),
+(1008, 2, 1, 198.60, '2024-02-12', '13:45:00', 3),
+(1009, 1, 1, 92.30, '2024-02-15', '17:30:00', 5),
+(1010, 1, 1, 54.70, '2024-02-28', '12:15:00', 4),
 
-INSERT INTO empleado_salida (salidaid, empleadoid) VALUES 
-(1, 5), -- Pedro Sánchez Huamán (conductor principal de salida 1)
-(1, 3), -- Carlos Ramírez León
-(2, 6), -- Ana Torres Rivas (conductor principal de salida 2)
-(2, 4), -- Lucía Mendoza Ruiz
-(3, 5), -- Pedro Sánchez Huamán (conductor principal de salida 3)
-(3, 8), -- María López Espinoza
-(4, 7), -- Luis Castillo Valverde (conductor principal de salida 4)
-(4, 9), -- Javier Gómez Paredes
-(5, 7), -- Luis Castillo Valverde (conductor principal de salida 5)
-(5, 10); -- Sofía Fernández Quispe
+-- Ventas de Marzo 2024
+(1011, 1, 1, 234.50, '2024-03-02', '10:15:00', 4),
+(1012, 1, 1, 167.80, '2024-03-08', '12:30:00', 1),
+(1013, 2, 1, 345.20, '2024-03-10', '14:45:00', 3),
+(1014, 1, 0, 76.40, '2024-03-15', '16:20:00', 2),
+(1015, 1, 1, 123.90, '2024-03-22', '11:40:00', 5),
 
-INSERT INTO `detalle_estado` (`id`, `nombre`, `descripcion`, `activo`, `estado_encomiendaid`) VALUES (NULL, 'Regresado a origen', 'No se reclamó así que se devolvió.', '1', '1');
+-- Ventas de Abril 2024
+(1016, 1, 1, 189.60, '2024-04-05', '11:30:00', 5),
+(1017, 1, 1, 98.70, '2024-04-12', '15:45:00', 1),
+(1018, 2, 1, 278.50, '2024-04-18', '13:20:00', 3),
+(1019, 1, 1, 134.20, '2024-04-25', '17:10:00', 2),
+(1020, 1, 0, 45.80, '2024-04-30', '10:50:00', 4),
+
+-- Ventas de Mayo 2024
+(1021, 1, 1, 267.40, '2024-05-08', '14:25:00', 2),
+(1022, 1, 1, 87.30, '2024-05-15', '16:30:00', 4),
+(1023, 2, 1, 456.80, '2024-05-20', '12:15:00', 3),
+(1024, 1, 1, 178.90, '2024-05-28', '18:45:00', 1),
+(1025, 1, 1, 213.50, '2024-05-30', '09:20:00', 5),
+
+-- Ventas RECIENTES (Junio 2024)
+(1026, 1, 1, 324.70, '2024-06-20', '10:45:00', 2),
+(1027, 1, 1, 94.60, '2024-06-21', '14:30:00', 4),
+(1028, 2, 1, 567.80, '2024-06-22', '16:15:00', 3),
+(1029, 1, 0, 76.20, '2024-06-23', '12:30:00', 1),
+(1030, 1, 1, 145.30, '2024-06-24', '17:45:00', 5);
+
+-- 3. DETALLES DE VENTA (productos vendidos en cada transacción)
+INSERT INTO detalle_venta (articuloid, ventanum_serie, cantidad) VALUES
+-- Detalles de Enero 2024
+(1, 1001, 10), -- Caja XXS
+(6, 1001, 5),  -- Plumón
+(7, 1001, 8),  -- Sobre A4
+
+(2, 1002, 15), -- Caja XS
+(3, 1002, 20), -- Caja S
+(8, 1002, 3),  -- Cinta Embalaje
+
+(4, 1003, 8),  -- Caja M
+(10, 1003, 12), -- Burbupack
+
+(1, 1004, 5),  -- Caja XXS
+(6, 1004, 2),  -- Plumón
+
+(3, 1005, 12), -- Caja S
+(5, 1005, 6),  -- Caja L
+
+-- Detalles de Febrero 2024
+(1, 1006, 25), -- Caja XXS
+(2, 1006, 20), -- Caja XS
+(8, 1006, 5),  -- Cinta Embalaje
+
+(4, 1007, 10), -- Caja M
+(6, 1007, 8),  -- Plumón
+
+(5, 1008, 30), -- Caja L
+(9, 1008, 4),  -- Stretch Film
+(10, 1008, 15), -- Burbupack
+
+(1, 1009, 18), -- Caja XXS
+(7, 1009, 25), -- Sobre A4
+
+(3, 1010, 8),  -- Caja S
+(6, 1010, 3),  -- Plumón
+
+-- Detalles de Marzo 2024
+(2, 1011, 35), -- Caja XS
+(4, 1011, 25), -- Caja M
+(8, 1011, 8),  -- Cinta Embalaje
+
+(1, 1012, 40), -- Caja XXS
+(5, 1012, 15), -- Caja L
+
+(3, 1013, 50), -- Caja S
+(9, 1013, 10), -- Stretch Film
+(10, 1013, 20), -- Burbupack
+
+(1, 1014, 12), -- Caja XXS
+(7, 1014, 15), -- Sobre A4
+
+(4, 1015, 18), -- Caja M
+(6, 1015, 4),  -- Plumón
+
+-- Detalles de Abril 2024
+(2, 1016, 28), -- Caja XS
+(3, 1016, 22), -- Caja S
+(8, 1016, 6),  -- Cinta Embalaje
+
+(1, 1017, 20), -- Caja XXS
+(10, 1017, 8), -- Burbupack
+
+(4, 1018, 35), -- Caja M
+(5, 1018, 25), -- Caja L
+(9, 1018, 8),  -- Stretch Film
+
+(2, 1019, 24), -- Caja XS
+(7, 1019, 30), -- Sobre A4
+
+(1, 1020, 8),  -- Caja XXS
+(6, 1020, 2),  -- Plumón
+
+-- Detalles de Mayo 2024
+(3, 1021, 45), -- Caja S
+(4, 1021, 30), -- Caja M
+(8, 1021, 10), -- Cinta Embalaje
+
+(1, 1022, 15), -- Caja XXS
+(6, 1022, 5),  -- Plumón
+
+(5, 1023, 60), -- Caja L
+(9, 1023, 15), -- Stretch Film
+(10, 1023, 25), -- Burbupack
+
+(2, 1024, 38), -- Caja XS
+(7, 1024, 40), -- Sobre A4
+
+(1, 1025, 35), -- Caja XXS
+(4, 1025, 28), -- Caja M
+
+-- Detalles de Junio 2024
+(3, 1026, 55), -- Caja S
+(5, 1026, 40), -- Caja L
+(8, 1026, 12), -- Cinta Embalaje
+
+(1, 1027, 18), -- Caja XXS
+(6, 1027, 6),  -- Plumón
+
+(4, 1028, 65), -- Caja M
+(9, 1028, 18), -- Stretch Film
+(10, 1028, 30), -- Burbupack
+
+(2, 1029, 16), -- Caja XS
+(7, 1029, 20), -- Sobre A4
+
+(1, 1030, 25), -- Caja XXS
+(3, 1030, 18), -- Caja S
+(6, 1030, 4);  -- Plumón
+
+-- 4. MÉTODOS DE PAGO PARA LAS VENTAS
+INSERT INTO metodo_pago_venta (num_serie, tipo_comprobante, metodo_pagoid) VALUES
+-- Pagos de Enero
+(1001, 1, 1), -- Efectivo
+(1002, 2, 2), -- Tarjeta Crédito
+(1003, 1, 3), -- Tarjeta Débito
+(1004, 1, 4), -- Yape
+(1005, 1, 1), -- Efectivo
+
+-- Pagos de Febrero
+(1006, 1, 2), -- Tarjeta Crédito
+(1007, 1, 1), -- Efectivo
+(1008, 2, 3), -- Tarjeta Débito
+(1009, 1, 4), -- Yape
+(1010, 1, 1), -- Efectivo
+
+-- Pagos de Marzo
+(1011, 1, 1), -- Efectivo
+(1012, 1, 2), -- Tarjeta Crédito
+(1013, 2, 3), -- Tarjeta Débito
+(1014, 1, 4), -- Yape
+(1015, 1, 1), -- Efectivo
+
+-- Pagos de Abril
+(1016, 1, 2), -- Tarjeta Crédito
+(1017, 1, 1), -- Efectivo
+(1018, 2, 3), -- Tarjeta Débito
+(1019, 1, 4), -- Yape
+(1020, 1, 1), -- Efectivo
+
+-- Pagos de Mayo
+(1021, 1, 1), -- Efectivo
+(1022, 1, 2), -- Tarjeta Crédito
+(1023, 2, 3), -- Tarjeta Débito
+(1024, 1, 4), -- Yape
+(1025, 1, 1), -- Efectivo
+
+-- Pagos de Junio
+(1026, 1, 2), -- Tarjeta Crédito
+(1027, 1, 1), -- Efectivo
+(1028, 2, 3), -- Tarjeta Débito
+(1029, 1, 4), -- Yape
+(1030, 1, 1); -- Efectivo

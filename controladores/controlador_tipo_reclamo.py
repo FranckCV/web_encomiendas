@@ -122,3 +122,5 @@ class ControladorReclamo:
 
     def update_row(self, id, *args):
         return update_row(id, *args)
+
+
