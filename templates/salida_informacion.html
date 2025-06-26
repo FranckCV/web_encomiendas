@@ -408,8 +408,8 @@ Programar nueva salida
  const sucursalesOrigen = {{ sucursal_origen | tojson }};
  const empleados = {{ empleados | tojson }};
  const agencias = {{ agencias | tojson }};
- const paquetes = {{ paquetes | tojson }}
-
+ const paquetes = {{ paquetes | tojson }};
+ const recojo_casa = {{ recojo_casa | tojson }};
 // Variables globales
 let escalas = [];
 let map;
@@ -438,73 +438,6 @@ function inicializarMapa() {
 
 
 
-// Datos de transacciones de recojo en casa
-const transaccionesRecojo = [
-    { 
-        id: 1, 
-        numeroTransaccion: "RC-2024-001", 
-        direccion: "Av. Los Jardines 245, Urb. San Martín", 
-        cliente: "María González Ruiz",
-        telefono: "987654321",
-        estado: "Pendiente"
-    },
-    { 
-        id: 2, 
-        numeroTransaccion: "RC-2024-002", 
-        direccion: "Jr. Las Flores 678, Pueblo Libre", 
-        cliente: "Carlos Mendoza Silva",
-        telefono: "976543210",
-        estado: "Pendiente"
-    },
-    { 
-        id: 3, 
-        numeroTransaccion: "RC-2024-003", 
-        direccion: "Calle Los Pinos 123, San Isidro", 
-        cliente: "Ana Torres Vega",
-        telefono: "965432109",
-        estado: "Pendiente"
-    },
-    { 
-        id: 4, 
-        numeroTransaccion: "RC-2024-004", 
-        direccion: "Av. Industrial 987, Callao", 
-        cliente: "Roberto Silva Morales",
-        telefono: "954321098",
-        estado: "Pendiente"
-    },
-    { 
-        id: 5, 
-        numeroTransaccion: "RC-2024-005", 
-        direccion: "Jr. Comercio 456, Miraflores", 
-        cliente: "Lucía Vargas Castro",
-        telefono: "943210987",
-        estado: "Pendiente"
-    },
-    { 
-        id: 6, 
-        numeroTransaccion: "RC-2024-006", 
-        direccion: "Av. Universitaria 741, Los Olivos", 
-        cliente: "Pedro Ramírez López",
-        telefono: "932109876",
-        estado: "Pendiente"
-    },
-    { 
-        id: 7, 
-        numeroTransaccion: "RC-2024-007", 
-        direccion: "Jr. Ayacucho 852, Breña", 
-        cliente: "Carmen Delgado Ramos",
-        telefono: "921098765",
-        estado: "Pendiente"
-    },
-    { 
-        id: 8, 
-        numeroTransaccion: "RC-2024-008", 
-        direccion: "Av. El Sol 963, San Juan de Miraflores", 
-        cliente: "José Hernández Paz",
-        telefono: "910987654",
-        estado: "Pendiente"
-    }
-];
 
 // Variables de estado
 let vehiculoSeleccionado = null;
