@@ -412,3 +412,63 @@ def get_num_serie_por_tracking(tracking):
     """
     fila = sql_select_fetchone(sql, (tracking,))
     return fila['transaccion_encomienda_num_serie'] if fila else None
+
+
+
+
+#############3
+def get_paquetes_por_ruta_sucursales(sucursal_origen_id, sucursal_destino_id):
+    """
+    Obtiene los tracking de los paquetes que serán enviados desde una sucursal origen
+    hacia una sucursal destino específica.
+    
+    Args:
+        sucursal_origen_id (int): ID de la sucursal origen
+        sucursal_destino_id (int): ID de la sucursal destino
+    
+    Returns:
+        list: Lista de tracking numbers de los paquetes que coinciden con la ruta
+    """
+    sql = """
+        SELECT p.tracking
+        FROM paquete p
+        INNER JOIN salida s ON p.salidaid = s.id
+        WHERE (s.origen_inicio_id = %s OR True) 
+        AND p.sucursal_destino_id = %s
+    """
+    
+    filas = sql_select_fetchall(sql, (sucursal_origen_id, sucursal_destino_id))
+    return [fila['tracking'] for fila in filas] if filas else []
+
+
+# Versión alternativa si necesitas más información de los paquetes
+def get_paquetes_detallados_por_ruta(sucursal_origen_id, sucursal_destino_id):
+    """
+    Obtiene información detallada de los paquetes que serán enviados desde una sucursal origen
+    hacia una sucursal destino específica.
+    
+    Args:
+        sucursal_origen_id (int): ID de la sucursal origen
+        sucursal_destino_id (int): ID de la sucursal destino
+    
+    Returns:
+        list: Lista de diccionarios con información de los paquetes
+    """
+    sql = """
+        SELECT p.tracking, 
+               p.valor, 
+               p.peso, 
+               p.nombres_contacto_destinatario,
+               p.apellidos_razon_destinatario,
+               p.telefono_destinatario,
+               s.fecha as fecha_salida,
+               s.hora as hora_salida
+        FROM paquete p
+        INNER JOIN salida s ON p.salidaid = s.id
+        WHERE s.origen_inicio_id = %s 
+        AND p.sucursal_destino_id = %s
+        ORDER BY s.fecha, s.hora
+    """
+    
+    filas = sql_select_fetchall(sql, (sucursal_origen_id, sucursal_destino_id))
+    return filas if filas else []
