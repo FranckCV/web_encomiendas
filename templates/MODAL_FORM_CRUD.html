@@ -246,7 +246,11 @@
     </div>
 
     {% endif %}
-
+    {% if modo_modal in ['insert', 'update', 'consult'] %}
+    <div class="row">
+      <p>Todos los campos con asterisco <span style="color: red;">*</span> deben ser llenados obligatoriamente.</p>
+    </div>
+    {% endif %}
 
     <div class="row">
 
