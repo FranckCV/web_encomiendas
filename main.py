@@ -5129,6 +5129,126 @@ def sucursales_destino_api():
             'status':-1
         }
 
+@app.route('/api/paquetes/ruta', methods=['GET'])
+def get_paquetes_por_ruta():
+    """
+    Endpoint para obtener paquetes que serán enviados desde una sucursal origen
+    hacia una sucursal destino específica.
+    
+    Parámetros GET:
+    - sucursal_origen_id: ID de la sucursal origen
+    - sucursal_destino_id: ID de la sucursal destino
+    
+    Returns:
+    JSON con la lista de paquetes o error
+    """
+    try:
+        # Obtener parámetros de la URL
+        sucursal_origen_id = request.args.get('sucursal_origen_id', type=int)
+        sucursal_destino_id = request.args.get('sucursal_destino_id', type=int)
+        
+        # Validar que ambos parámetros estén presentes
+        if sucursal_origen_id is None or sucursal_destino_id is None:
+            return jsonify({
+                'error': 'Se requieren los parámetros sucursal_origen_id y sucursal_destino_id'
+            }), 400
+        
+        # Obtener los paquetes usando el controlador
+        paquetes = controlador_paquete.get_paquetes_por_ruta_sucursales(
+            sucursal_origen_id, 
+            sucursal_destino_id
+        )
+        
+        return jsonify({
+            'success': True,
+            'data': paquetes,
+            'count': len(paquetes)
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'error': f'Error al obtener paquetes: {str(e)}'
+        }), 500
+
+
+# Versión alternativa con información detallada
+@app.route('/api/paquetes/ruta/detallado', methods=['GET'])
+def get_paquetes_detallados_por_ruta():
+    """
+    Endpoint para obtener información detallada de paquetes por ruta de sucursales.
+    
+    Parámetros GET:
+    - sucursal_origen_id: ID de la sucursal origen
+    - sucursal_destino_id: ID de la sucursal destino
+    
+    Returns:
+    JSON con la información detallada de los paquetes
+    """
+    try:
+        sucursal_origen_id = request.args.get('sucursal_origen_id', type=int)
+        sucursal_destino_id = request.args.get('sucursal_destino_id', type=int)
+        
+        if sucursal_origen_id is None or sucursal_destino_id is None:
+            return jsonify({
+                'error': 'Se requieren los parámetros sucursal_origen_id y sucursal_destino_id'
+            }), 400
+        
+        paquetes = controlador_paquete.get_paquetes_detallados_por_ruta(
+            sucursal_origen_id, 
+            sucursal_destino_id
+        )
+        
+        return jsonify({
+            'success': True,
+            'data': paquetes,
+            'count': len(paquetes)
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'error': f'Error al obtener paquetes detallados: {str(e)}'
+        }), 500
+    
+@app.route('/api/paquete/disponibilidad/<tracking>', methods=['GET'])
+def verificar_disponibilidad_paquete(tracking):
+    """
+    Verifica si un paquete está disponible para ser asignado a una salida
+    """
+    try:
+        # Verificar que el paquete existe
+        paquete = controlador_paquete.get_paquete_by_tracking(tracking)
+        if not paquete:
+            return jsonify({
+                'disponible': False,
+                'razon': 'Paquete no encontrado'
+            })
+        
+        # Verificar que no esté ya asignado a otra salida
+        ya_asignado = controlador_paquete.verificar_paquete_ya_asignado(tracking)
+        if ya_asignado:
+            return jsonify({
+                'disponible': False,
+                'razon': 'Paquete ya asignado a otra salida'
+            })
+        
+        # Verificar estado del paquete
+        if paquete.get('estado') not in ['pendiente', 'listo_para_envio']:
+            return jsonify({
+                'disponible': False,
+                'razon': f'Paquete en estado: {paquete.get("estado")}'
+            })
+        
+        return jsonify({
+            'disponible': True,
+            'razon': 'Paquete disponible'
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'disponible': False,
+            'razon': f'Error al verificar: {str(e)}'
+        }), 500
+    
 @app.route("/buscar_paquete_devolucion", methods=["POST"])
 @validar_empleado()
 def buscar_paquete_devolucion():
@@ -5180,6 +5300,7 @@ def buscar_paquete_devolucion():
             'success': False,
             'message': f'Error al buscar paquete: {str(e)}'
         }), 500
+
 
 
 @app.route("/obtener_unidades_devolucion", methods=["POST"])
