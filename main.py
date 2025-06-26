@@ -1378,20 +1378,18 @@ REPORTES = {
     # Ventas
     "ventas_periodo": {
         "active" : True ,
-        'icon_page' : 'fa-solid fa-sack-dollar' ,
+        'icon_page' : 'fa-solid fa-sack-dollar' ,   
         "titulo": "Ventas",
-        "table" : controlador_cliente.get_reporte_ventas(),
+        "table" : controlador_articulo.get_reporte_ventas(),
         "filters": [
-            # ['rol_id', 'Rol', lambda: controlador_rol.get_options() , 'select' ],
             ['fecha', 'Fecha', None, 'interval_date' ], 
-            # ['fecha', 'Fecha', None, 'date' ],
         ] ,
     },
     "articulos_mas_vendidos": {
         "active": True,
         "icon_page": "fa-solid fa-boxes-stacked",
         "titulo": "Artículos Más Vendidos",
-        "table": controlador_articulo.get_report_mas_vendidos(),  # referencia a función sin paréntesis
+        "table": controlador_articulo.get_report_mas_vendidos(),  
         "filters": [
             ['fecha', 'Fecha', None, 'interval_date'],  # filtro rango de fechas
         ],
