@@ -3220,6 +3220,7 @@ def insertar_envio_api():
                     )
 
                     for tracking in trackings:
+                        # generar_rotulo_2(tracking)
                         qr_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'qr.png')
                         if os.path.exists(qr_path):
                             with open(qr_path, 'rb') as f:
@@ -3627,7 +3628,46 @@ def generar_rotulo(tracking):
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error al generar rótulo: {str(e)}'}), 500
 
+from controladores import reporte_rotulo as reporte_rotulo
 
+def generar_rotulo_2(tracking):
+    try:
+        # Obtener la transacción con el tracking proporcionado
+        transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
+        if not transaccion:
+            return {'success': False, 'message': 'Transacción no encontrada'}
+
+        num_serie = transaccion.get('num_serie')
+        if not num_serie:
+            return {'success': False, 'message': 'Número de serie no disponible'}
+
+        # Obtener los items relacionados con la transacción
+        items, masivo = controlador_encomienda.obtener_items_por_num_serie(num_serie)
+        if not items:
+            return {'success': False, 'message': 'No hay paquetes asociados'}
+
+        origen = items[0]['origen']
+        destino = items[0]['destino']
+
+        # Preparar los datos para el rótulo
+        datos_rotulo = {
+            'tracking': tracking,
+            'sucursal_origen': f"{origen['sucursal']} - {origen['distrito']}, {origen['provincia']}, {origen['departamento']}",
+            'sucursal_destino': f"{destino['sucursal']} - {destino['distrito']}, {destino['provincia']}, {destino['departamento']}",
+            'remitente': f"{transaccion.get('nombre_remitente', '')}\nDNI: {transaccion.get('dni_remitente', '')}\nCel: {transaccion.get('cel_remitente', '')}",
+            'destinatario': f"{transaccion.get('nombre_destinatario', '')}\nDNI: {transaccion.get('dni_destinatario', '')}\nCel: {transaccion.get('cel_destinatario', '')}",
+            'contenido': transaccion.get('descripcion_contenido', '---'),
+            'pago': 'Pagado' if transaccion.get('estado_pago') == 'C' else 'Por cobrar'
+        }
+
+        # Llamar a la función para generar el PDF sin necesidad de BytesIO ni ruta
+        # Aquí solo generas el PDF y lo devuelves directamente sin guardarlo
+        reporte_rotulo.generar_rotulo_pdf(datos_rotulo)
+
+        return {'success': True, 'message': 'Rótulo generado correctamente'}
+
+    except Exception as e:
+        return {'success': False, 'message': f'Error al generar rótulo: {str(e)}'}
 
 @app.route('/descargar_comprobante/<tracking>', methods=['GET'])
 def descargar_comprobante(tracking):
