@@ -1679,30 +1679,23 @@ def validar_empleado():
                         f_name = f.__name__
                         l_kwarg = list(kwargs.values())
                         f_kwarg = l_kwarg[0] if l_kwarg else None
-                        # print(f_name,' - ',f_kwarg) 
-                        # try:
-                        if request.method == 'GET':
-                        # if (usuario['rolid'] == 1 and usuario['tipo_rolid'] == 1) or permiso.validar_acceso(usuario['rolid'] , f_name , f_kwarg ):
-                            if permiso.validar_acceso(usuario['rolid'] , f_name , f_kwarg ):
+
+                        try:
+                            # if (usuario['rolid'] == 1 and usuario['tipo_rolid'] == 1) or permiso.validar_acceso(usuario['rolid'] , p_key):
+                            if (usuario['rolid'] == 1 and usuario['tipo_rolid'] == 1) or permiso.validar_acceso(usuario['rolid'] , f_name , f_kwarg ):
                                 return page
                             else:
-                                return rdrct_error( main_empleado_page() , 'PAGINA_NO_EXISTE')
-                        else: 
-                            return page
-                        # except Exception as e:
-                        #     return rdrct_error( redirect_url('login') , e) 
-                    # else:
-                    return rdrct_error( main_empleado_page() , 'PAGINA_NO_EXISTE') 
+                                return rdrct_error( main_empleado_page() , 'PAGINA_NO_EXISTE') 
+                        except Exception as e:
+                            return rdrct_error( redirect_url('login') , e) 
+                    else:
+                        return rdrct_error( main_empleado_page() , 'PAGINA_NO_EXISTE') 
                 return rdrct_error( redirect_url('login') , 'LOGIN_INVALIDO') 
             except Exception as e:
                 return rdrct_error( redirect_url('login') , e) 
         return wrapper
     return decorator
 
-@app.route("/test_redirect")
-def test_redirect():
-    page = CONTROLADORES.get('modulo').get('no_crud')
-    return redirect(url_for(page))
 
 def validar_cliente():
     def decorator(f):
@@ -1781,11 +1774,11 @@ def inject_globals():
             datosUsuario = controlador_usuario.get_usuario_empleado_user_id(user_id)
             menu_rolid = datosUsuario['rolid']
             if menu_rolid:
-                # if menu_rolid == 1 :
-                #     menu_modulos = permiso.get_lista_modulos()
-                #     menu_tipos_paginas = permiso.get_lista_tipo_paginas()
-                #     menu_paginas = permiso.get_paginas()
-                # else:
+                if menu_rolid == 1 :
+                    menu_modulos = permiso.get_lista_modulos()
+                    menu_tipos_paginas = permiso.get_lista_tipo_paginas()
+                    menu_paginas = permiso.get_paginas()
+                else:
                     menu_modulos = permiso.get_modulos_rol(menu_rolid)
                     menu_tipos_paginas = permiso.get_tipo_paginas_rol(menu_rolid)
                     menu_paginas = permiso.get_paginas_permiso_rol(menu_rolid)
@@ -4256,9 +4249,9 @@ def panel():
 @validar_empleado()
 def modulo(module_name):
     modulo = permiso.get_modulo_key(module_name)
-    # usuario = controlador_usuario.get_usuario_empleado_user_id(request.cookies.get('user_id'))
+    usuario = controlador_usuario.get_usuario_empleado_user_id(request.cookies.get('user_id'))
 
-    if modulo['activo'] == 1 :
+    if modulo['activo'] == 1 or usuario['rolid'] == 1:
         tipos_pag = permiso.get_tipos_pagina_moduloid(modulo['id'])
         return render_template(
             'MODULO.html' , 
@@ -4279,7 +4272,7 @@ def crud_generico(tabla):
     permisos = permiso.consult_permiso_rol(page['id'] , user_info['rolid'])
 
     if config and page:
-        active = config["active"] and (page['activo'] == 1 )
+        active = config["active"] and (page['activo'] == 1 or user_info['rolid'] == 1 )
         tipo_paginaid = page['tipo_paginaid']
         no_crud = config.get('no_crud')
         # print(active , ' - ',tipo_paginaid ,' - ', no_crud)
@@ -4299,12 +4292,13 @@ def crud_generico(tabla):
             table_columns  = list(filas[0].keys()) if filas else []
             
             CRUD_FORMS = config["crud_forms"]
-            crud_search = CRUD_FORMS.get("crud_search")     and permisos['search']                       
-            crud_consult = CRUD_FORMS.get("crud_consult")   and permisos['consult']                      
-            crud_insert = CRUD_FORMS.get("crud_insert")     and permisos['insert']                       
-            crud_update = CRUD_FORMS.get("crud_update")     and permisos['update']                       
-            crud_delete = CRUD_FORMS.get("crud_delete")     and permisos['delete']                       
-            crud_unactive = CRUD_FORMS.get("crud_unactive") and permisos['unactive'] and existe_activo 
+            # crud_list = CRUD_FORMS.get("crud_list")
+            crud_search = CRUD_FORMS.get("crud_search")     and (permisos['search'] or user_info['rolid'] == 1 )
+            crud_consult = CRUD_FORMS.get("crud_consult")   and (permisos['consult'] or user_info['rolid'] == 1 )
+            crud_insert = CRUD_FORMS.get("crud_insert")     and (permisos['insert'] or user_info['rolid'] == 1 )
+            crud_update = CRUD_FORMS.get("crud_update")     and (permisos['update'] or user_info['rolid'] == 1 )
+            crud_delete = CRUD_FORMS.get("crud_delete")     and (permisos['delete'] or user_info['rolid'] == 1 )
+            crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo and ( permisos['unactive'] or user_info['rolid'] == 1 )
 
             return render_template(
                 "CRUD.html" ,
@@ -4339,7 +4333,7 @@ def transaccion(tabla , pk_foreign):
     permisos = permiso.consult_permiso_rol(page['id'] , user_info['rolid'])
 
     if config and page:
-        active = config["active"] and (page['activo'] == 1 )
+        active = config["active"] and (page['activo'] == 1 or user_info['rolid'] == 1 )
         tipo_paginaid = page['tipo_paginaid']
         no_crud = config.get('no_crud')
 
@@ -4363,32 +4357,35 @@ def transaccion(tabla , pk_foreign):
             table_columns  = list(filas[0].keys()) if filas else []
             
             CRUD_FORMS = config["crud_forms"]
-            crud_search = CRUD_FORMS.get("crud_search") and (permisos['search']                          )
-            crud_consult = CRUD_FORMS.get("crud_consult") and (permisos['consult']                       )
-            crud_insert = CRUD_FORMS.get("crud_insert") and   (permisos['insert']                        )
-            crud_update = CRUD_FORMS.get("crud_update") and   (permisos['update']                        )
-            crud_delete = CRUD_FORMS.get("crud_delete") and   (permisos['delete']                        )
-            crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo and ( permisos['unactive'] )
+            crud_search = CRUD_FORMS.get("crud_search") and (permisos['search'] or user_info['rolid'] == 1 )
+            crud_consult = CRUD_FORMS.get("crud_consult") and (permisos['consult'] or user_info['rolid'] == 1 )
+            crud_insert = CRUD_FORMS.get("crud_insert") and   (permisos['insert'] or user_info['rolid'] == 1 )
+            crud_update = CRUD_FORMS.get("crud_update") and   (permisos['update'] or user_info['rolid'] == 1 )
+            crud_delete = CRUD_FORMS.get("crud_delete") and   (permisos['delete'] or user_info['rolid'] == 1 )
+            crud_unactive = CRUD_FORMS.get("crud_unactive") and existe_activo and ( permisos['unactive'] or user_info['rolid'] == 1 )
             
             buttons = []
             options = []
 
             import json
 
-            
-            for btn in lst_buttons:
-                permiso_otro_button = json.loads(permisos.get('otro')) if permisos.get('otro') is not None else {}
-                if permiso_otro_button and permiso_otro_button.get(btn[6]) and permiso_otro_button.get(btn[6]) == 1:
-                    buttons.append(btn)
-                elif permisos.get(btn[6]) == 1:
-                    buttons.append(btn)
+            if user_info['rolid'] == 1 :
+                buttons = lst_buttons
+                options = lst_options
+            else:
+                for btn in lst_buttons:
+                    permiso_otro_button = json.loads(permisos.get('otro')) if permisos.get('otro') is not None else {}
+                    if permiso_otro_button and permiso_otro_button.get(btn[6]) and permiso_otro_button.get(btn[6]) == 1:
+                        buttons.append(btn)
+                    elif permisos.get(btn[6]) == 1:
+                        buttons.append(btn)
 
-            for btn in lst_options:
-                permiso_otro_option = json.loads(permisos.get('otro')) if permisos.get('otro') is not None else {}
-                if permiso_otro_option and permiso_otro_option.get(btn[6]) and permiso_otro_option.get(btn[6]) == 1:
-                    options.append(btn)
-                elif permisos.get(btn[6]) == 1:
-                    options.append(btn)
+                for btn in lst_options:
+                    permiso_otro_option = json.loads(permisos.get('otro')) if permisos.get('otro') is not None else {}
+                    if permiso_otro_option and permiso_otro_option.get(btn[6]) and permiso_otro_option.get(btn[6]) == 1:
+                        options.append(btn)
+                    elif permisos.get(btn[6]) == 1:
+                        options.append(btn)
 
             return render_template(
                 "TRANSACCION.html" ,
@@ -4624,7 +4621,7 @@ def crud_insert(tabla):
 
 @app.route("/update_row=<tabla>", methods=["POST"])
 @validar_empleado()
-# @validar_error_crud()
+@validar_error_crud()
 def crud_update(tabla):
     # try:
         if tabla in CONTROLADORES.keys():    
@@ -4665,9 +4662,8 @@ def crud_update(tabla):
                 valores.append(valor)
 
         controlador.update_row( *valores )
-
         if no_crud :
-            return redirect(url_for(str(no_crud)))
+            return redirect(url_for(no_crud))
         else:
             return redirect(url_for(url_redirect, tabla = tabla))
     # except Exception as e:
@@ -4772,39 +4768,6 @@ def update_empresa():
     empresa_id = funcion(*valores)
     controlador_empresa.dar_actual_empresa_id(empresa_id)
     return redirect(url_for('informacion_empresa'))
-
-
-
-@app.route("/update_admin_pag=<tabla>", methods=["POST"])
-@validar_empleado()
-def update_admin_pag(tabla):
-        if tabla == 'modulo':
-            controlador = controlador_modulo
-        elif tabla == 'pagina':
-            controlador = controlador_pagina
-
-        firma = inspect.signature(controlador.update_row)
-
-        valores = []
-        for nombre, parametro in firma.parameters.items():
-            if nombre in request.files:
-                archivo = request.files[nombre]
-                if archivo.filename != "":
-                    nuevo_nombre = guardar_imagen_bd(tabla,'' ,archivo)
-                    valores.append(nuevo_nombre)
-                else:
-                    # Si no se selecciona una nueva imagen, mantener la actual
-                    valores.append(request.form.get(f"{nombre}_actual"))
-            else:
-                valor = request.form.get(nombre)
-                if valor == '':
-                    valor = None
-                valores.append(valor)
-
-        controlador.update_row( *valores )
-
-        return redirect(url_for('administrar_paginas'))
-
 
 
 @app.route("/op_crud_empresa=<op>", methods=["POST"])

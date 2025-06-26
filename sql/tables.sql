@@ -192,7 +192,7 @@ CREATE TABLE pagina (
   activo        tinyint(1) DEFAULT 1 NOT NULL, 
   `key`         varchar(150) NOT NULL, 
   mostrar       tinyint(1) DEFAULT 1, 
-  paginaid      int(11), 
+  padrepaginaid int(11), 
   tipo_paginaid int(11) NOT NULL, 
   moduloid      int(11) NOT NULL, 
   PRIMARY KEY (id));
@@ -352,6 +352,7 @@ CREATE TABLE tipo_comprobante (
   nombre      varchar(50) NOT NULL, 
   descripcion text NOT NULL, 
   activo      tinyint(1) DEFAULT 1 NOT NULL, 
+  tipo_uso    char(1), 
   PRIMARY KEY (id));
 CREATE TABLE tipo_documento (
   id     int(11) NOT NULL AUTO_INCREMENT, 
@@ -409,14 +410,12 @@ CREATE TABLE transaccion_encomienda (
  ', 
   descripcion        text, 
   monto_total        numeric(9, 2), 
-  recojo_casa        tinyint(1) DEFAULT 0, 
+  recojo_casa        tinyint(1), 
   id_sucursal_origen int(11) NOT NULL, 
   fecha              date NOT NULL, 
   hora               time NOT NULL, 
   direccion_recojo   varchar(255), 
-  comprobante_serie  char(255) NOT NULL UNIQUE, 
   clienteid          int(10) NOT NULL, 
-  tipo_comprobanteid int(10) NOT NULL, 
   PRIMARY KEY (num_serie));
 CREATE TABLE transaccion_venta (
   num_serie          int(11) NOT NULL AUTO_INCREMENT, 
@@ -487,7 +486,6 @@ ALTER TABLE transaccion_venta ADD CONSTRAINT FKtransaccio322313 FOREIGN KEY (cli
 ALTER TABLE transaccion_encomienda ADD CONSTRAINT FKtransaccio308913 FOREIGN KEY (clienteid) REFERENCES cliente (id);
 ALTER TABLE cliente ADD CONSTRAINT FKcliente404372 FOREIGN KEY (tipo_clienteid) REFERENCES tipo_cliente (id);
 ALTER TABLE transaccion_venta ADD CONSTRAINT FKtransaccio293973 FOREIGN KEY (tipo_comprobanteid) REFERENCES tipo_comprobante (id);
-ALTER TABLE transaccion_encomienda ADD CONSTRAINT FKtransaccio662746 FOREIGN KEY (tipo_comprobanteid) REFERENCES tipo_comprobante (id);
 ALTER TABLE pagina ADD CONSTRAINT FKpagina910561 FOREIGN KEY (tipo_paginaid) REFERENCES tipo_pagina (id);
 ALTER TABLE cliente ADD CONSTRAINT FKcliente66106 FOREIGN KEY (tipo_documentoid) REFERENCES tipo_documento (id);
 ALTER TABLE rol ADD CONSTRAINT FKrol677440 FOREIGN KEY (tipo_rolid) REFERENCES tipo_rol (id);
@@ -508,5 +506,3 @@ ALTER TABLE empleado_salida ADD CONSTRAINT FKempleado_s895470 FOREIGN KEY (emple
 ALTER TABLE escala ADD CONSTRAINT FKescala650496 FOREIGN KEY (salidaid) REFERENCES salida (id);
 ALTER TABLE escala ADD CONSTRAINT FKescala667165 FOREIGN KEY (sucursalid) REFERENCES sucursal (id);
 ALTER TABLE sucursal ADD CONSTRAINT FKsucursal756715 FOREIGN KEY (ubigeocodigo) REFERENCES ubigeo (codigo);
-
-ALTER TABLE `tipo_comprobante` ADD `tipo_uso` CHAR(1) NULL DEFAULT NULL AFTER `activo`;
