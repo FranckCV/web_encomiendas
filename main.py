@@ -1572,6 +1572,7 @@ TRANSACCIONES = {
             # [True, 'fa-solid fa-map-location-dot', "#9856EE", 'seguimiento_tracking', {"tracking": "tracking"} , '' , 'seguimiento'],
             [True, 'fa-solid fa-route', "#9856EE", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"} , '' , 'seguimiento' , False],
             [True, 'fa-solid fa-qrcode', "#2195DC", 'ver_img_qr',  {"tracking": "tracking"} , '' , 'qr_code' , True],
+            [True, 'fa-solid fa-dollar', "#6FDC21", 'pagar_paquete',  {"tracking": "tracking"} , '' , 'pago' , False],
         ],
         "options": [
         # mostrar_url       icon             color                  text                 enlace_function       parametros                    modo(insert ,update , consult)
@@ -1741,20 +1742,41 @@ def inject_cur_modulo_id():
         usuario = controlador_usuario.get_usuario_empleado_user_id(user_id)
         if  usuario :
             if usuario['correo'] == correo and usuario['tipo_usuario'] == 'E' :
-                path = request.path
-                parts = path.strip('/').split('=')
+                path = request.path.strip('/')
                 key = None
-                if len(parts) > 1:
-                    ruta_final = parts[-1]
-                    key = ruta_final.split('/')[0]
-                page = obtener_funcion_desde_url(app, path)
+                pk_foreign = None
 
+                if '=' in path:
+                    # Caso: /transaccion=seguimiento/161
+                    parts = path.split('=')
+                    if len(parts) > 1:
+                        ruta_final = parts[-1]  # seguimiento/161
+                        partes_ruta = ruta_final.split('/')
+                        key = partes_ruta[0]
+                        if len(partes_ruta) > 1:
+                            pk_foreign = partes_ruta[1]
+                else:
+                    # Caso: /pagar_paquete/161 o /crud_delete/usuario/123
+                    partes_ruta = path.split('/')
+                    if len(partes_ruta) >= 2:
+                        key = partes_ruta[0]     # pagar_paquete
+                        pk_foreign = partes_ruta[1]  # 161
+                    elif len(partes_ruta) == 1:
+                        key = partes_ruta[0]
+                page = obtener_funcion_desde_url(app, path)
+                
                 if page == 'modulo':
                     dataPage = permiso.get_modulo_key(key)
                     if dataPage:
                         return dict(cur_modulo_id=dataPage['id'])
-                else:
+                elif page in ['crud_generico' , 'transaccion' , 'reporte']:
                     dataPage = permiso.get_pagina_key(key) if key is not None else permiso.get_pagina_key(page)
+                    if dataPage:                        
+                        return dict(
+                            cur_modulo_id = dataPage['moduloid'] ,
+                        )
+                else:
+                    dataPage = permiso.get_pagina_key(page)
                     if dataPage:                        
                         if dataPage['tipo_paginaid'] == 2:
                             page_titulo = dataPage['titulo']
@@ -5567,11 +5589,13 @@ def api_causas_reclamo(motivo_id):
             'message': f'Error al obtener causas: {str(e)}'
         }), 500
 
-@app.route('/pagar_paquete')
-def pagar_paquete():
+@app.route("/pagar_paquete",defaults={'tracking': None})
+@app.route("/pagar_paquete/<tracking>")
+def pagar_paquete(tracking):
     tipo_comprobante = controlador_tipo_comprobante.get_tipo_comprobante_by_tipo()
     metodo_pago = controlador_metodo_pago.get_options()
-    return render_template('pagar_paquete.html',metodo_pago=metodo_pago,tipo_comprobante=tipo_comprobante)
+    return render_template('pagar_paquete.html',tracking = tracking ,metodo_pago=metodo_pago,tipo_comprobante=tipo_comprobante)
+
 
 @app.route('/insertar_pago_paquete', methods=['POST'])
 def insertar_pago_paquete():

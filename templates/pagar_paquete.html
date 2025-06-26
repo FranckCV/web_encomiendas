@@ -487,7 +487,9 @@ body {
                                id="tracking" 
                                placeholder="Ingrese su número de tracking"
                                name="tracking" 
-                               required>
+                               required value="{{tracking}}" 
+                               {% if tracking %} disabled {% endif %}
+                               >
                         <div class="invalid-feedback">
                             <i class="fas fa-exclamation-circle"></i>
                             Por favor ingrese el código de tracking.
