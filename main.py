@@ -91,9 +91,9 @@ import socket
 from num2words import num2words
 import pdfkit
 import os
-
 from collections import defaultdict
 
+from api_enrutar import ApiEnrutar
 
 
 
@@ -1606,8 +1606,8 @@ TRANSACCIONES = {
         "filters": [], 
         "fields_form": [
         #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
-            ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_options() , 'nombre_det' ] ],
-            ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_options() , 'nombre_det' ] ],
+            ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_detalle() , 'nombre_det' ] ],
+             ['tip_comp',  'Tipo de comprobante', 'Tipo de comprobante', 'select', True ,True, [lambda: controlador_tipo_comprobante.get_options() , 'tip_comp' ] ],
             
         ],
         "crud_forms": {
@@ -1615,12 +1615,13 @@ TRANSACCIONES = {
             "crud_search": False,
             "crud_consult": False,
             "crud_insert": True,
-            "crud_update": True,
+            "crud_update": False,
             "crud_delete": True,
             "crud_unactive": False
         },
         "buttons": [],
         "options": [
+            # [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Encomiendas', 'transaccion' , {"tabla": "::paquete" }],
             # mostrar_url       icon             color                  text                 enlace_function       parametros                    modo(insert ,update , consult)
             [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Paquetes', 'transaccion' , {"tabla": "::paquete" } , 'paquetes'],
         ],
@@ -1782,7 +1783,7 @@ def inject_cur_modulo_id():
                     elif len(partes_ruta) == 1:
                         key = partes_ruta[0]
                 page = obtener_funcion_desde_url(app, path)
-                
+
                 if page == 'modulo':
                     dataPage = permiso.get_modulo_key(key)
                     if dataPage:
@@ -3256,6 +3257,27 @@ def insertar_envio_api():
             'status': 'error',
             'message': 'Ocurrió un error al procesar el envío'
         }), 500
+        
+        
+@app.route("/API_ENRUTAR", methods=["GET"])
+def api_enrutar():
+    try:
+        start = request.args.get('start')  # "lat,lng"
+        end = request.args.get('end')      # "lat,lng"
+
+        start_lat, start_lng = map(float, start.split(','))
+        end_lat, end_lng = map(float, end.split(','))
+
+        enrutar = ApiEnrutar()
+        resultado = enrutar.obtener_ruta(start_lat, start_lng, end_lat, end_lng)
+
+        if resultado:
+            return jsonify(resultado)
+        else:
+            return jsonify({'error': 'No se pudo obtener la ruta'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+        
        
 @app.route('/registrar_envios_masivos', methods=['POST'])
 def registrar_envios_masivos():
@@ -3265,7 +3287,8 @@ def registrar_envios_masivos():
         if not data:
             return jsonify({'status': 'error', 'message': 'No se recibieron datos'}), 400
 
-        tipo_comprobante = data.get('tipo_comprobante')
+        tipo_comprobante = data.get('tipo_comprobante') 
+        metodo_pago = data.get('metodo_pago')
         registros = data.get('registros')
         # modalidad_pago_seleccionada = data.get('modalidad_pago')
 
@@ -3276,7 +3299,7 @@ def registrar_envios_masivos():
 
         origen = data.get('origen')
         sucursal_origen = origen.get('sucursal_origen')
-        
+        modo = data.get('modo')
         remitente = data.get('remitente', {})
         nombre = remitente.get('nombre_remitente', '')
         partes = nombre.split() if nombre else []
@@ -3293,7 +3316,7 @@ def registrar_envios_masivos():
 
 
         num_serie,trackings = controlador_encomienda.crear_transaccion_y_paquetes(
-            registros, cliente_data, tipo_comprobante,sucursal_origen
+            registros, cliente_data, tipo_comprobante,metodo_pago,sucursal_origen,modo
         )
 
         if num_serie:
@@ -4307,13 +4330,10 @@ def procesar_cambio_contrasenia():
 
 ##################_ PAGINAS EMPLEADO _################## 
 
-
-PAGINAS_SIMPLES_ADMIN = [ 
-    # 'panel' , 
-    'programacion_devolucion',
-]
-
-registrar_paginas_con_decorador(app, PAGINAS_SIMPLES_ADMIN, validar_empleado)
+@app.route("/programacion_devolucion")
+@validar_empleado()
+def programacion_devolucion():
+    return render_template('programacion_devolucion.html')
 
 
 @app.route("/panel")
@@ -5901,6 +5921,7 @@ from controladores import controlador_seguimiento_reclamos
 @app.route('/api/eliminar_ultimo_seguimiento/<int:reclamoid>', methods=['DELETE'])
 def eliminar_ultimo_seguimiento(reclamoid):
     return controlador_seguimiento_reclamos.eliminar_ultimo_seguimiento(reclamoid)
+
 
 
 @app.route("/pagar_paquete",defaults={'tracking': None})

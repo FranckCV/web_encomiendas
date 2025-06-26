@@ -326,10 +326,10 @@ td {
 
 .item-tag {
     display: inline-block;
-    background: linear-gradient(135deg, var(--color-insert), var(--color-secondary));
+    background: rgb(4, 63, 105);
     color: white;
     padding: 8px 12px;
-    border-radius: 20px;
+    border-radius: 10px;
     margin: 5px;
     font-size: 0.9em;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
