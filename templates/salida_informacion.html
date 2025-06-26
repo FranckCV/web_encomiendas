@@ -1430,6 +1430,397 @@ function toggleEmpleado(empleadoId) {
     renderizarEmpleados();
 }
 
+function validarCapacidadPorTramos(paquetesAsignados, rutaCompleta, capacidadMaxima = 1000) {
+    const capacidadPorTramo = {};
+    const alertas = [];
+    
+    // 🔧 PASO 1: Inicializar capacidad para cada tramo
+    for (let i = 0; i < rutaCompleta.length - 1; i++) {
+        const claveTramo = `${i}-${i + 1}`;
+        capacidadPorTramo[claveTramo] = {
+            origen: rutaCompleta[i].nombre.split(' / ')[0],
+            destino: rutaCompleta[i + 1].nombre.split(' / ')[0],
+            peso: 0,
+            paquetes: []
+        };
+    }
+    
+    // 🔧 PASO 2: Calcular peso por tramo para cada paquete
+    paquetesAsignados.forEach(paquete => {
+        // Encontrar donde se carga y descarga este paquete
+        const origenPaquete = parseInt(paquete.origen_id || paquete.id_sucursal_origen);
+        const destinoPaquete = parseInt(paquete.destino_id || paquete.sucursal_destino_id);
+        
+        const indiceCarga = rutaCompleta.findIndex(punto => punto.id === origenPaquete);
+        const indiceDescarga = rutaCompleta.findIndex(punto => punto.id === destinoPaquete);
+        
+        // Calcular tramos ocupados
+        const tramosOcupados = calcularTramosOcupados(indiceCarga, indiceDescarga);
+        
+        // Agregar peso a cada tramo ocupado
+        tramosOcupados.forEach(tramo => {
+            if (capacidadPorTramo[tramo]) {
+                capacidadPorTramo[tramo].peso += parseFloat(paquete.peso);
+                capacidadPorTramo[tramo].paquetes.push({
+                    tracking: paquete.tracking,
+                    peso: parseFloat(paquete.peso)
+                });
+            }
+        });
+    });
+    
+    // 🔧 PASO 3: Validar cada tramo y generar alertas
+    let capacidadMaximaUsada = 0;
+    let tramoProblematico = null;
+    
+    Object.entries(capacidadPorTramo).forEach(([tramo, datos]) => {
+        const porcentaje = (datos.peso / capacidadMaxima) * 100;
+        
+        // ❌ ERROR: Sobrepeso
+        if (datos.peso > capacidadMaxima) {
+            alertas.push({
+                tipo: 'error',
+                tramo: tramo,
+                mensaje: `Tramo ${datos.origen} → ${datos.destino}: Sobrepeso (${datos.peso.toFixed(1)}kg > ${capacidadMaxima}kg)`,
+                peso: datos.peso,
+                porcentaje: porcentaje,
+                exceso: datos.peso - capacidadMaxima
+            });
+        } 
+        // ⚠️ WARNING: Capacidad alta
+        else if (porcentaje > 90) {
+            alertas.push({
+                tipo: 'warning',
+                tramo: tramo,
+                mensaje: `Tramo ${datos.origen} → ${datos.destino}: Capacidad casi llena (${porcentaje.toFixed(1)}%)`,
+                peso: datos.peso,
+                porcentaje: porcentaje
+            });
+        }
+        
+        // Rastrear la capacidad máxima usada
+        if (datos.peso > capacidadMaximaUsada) {
+            capacidadMaximaUsada = datos.peso;
+            tramoProblematico = tramo;
+        }
+    });
+    
+    return {
+        capacidadPorTramo: capacidadPorTramo,
+        capacidadMaximaUsada: capacidadMaximaUsada,
+        tramoProblematico: tramoProblematico,
+        alertas: alertas,
+        esValido: alertas.filter(a => a.tipo === 'error').length === 0
+    };
+}
+
+function mostrarResumenCapacidad() {
+    if (!vehiculoSeleccionado || paquetesAsignados.length === 0) return;
+    
+    const vehiculo = vehiculos.find(v => v.unidadid === vehiculoSeleccionado);
+    
+    if (!origenSeleccionado || !destinoSeleccionado) {
+        console.log('📊 No se puede calcular capacidad por tramos: falta ruta completa');
+        return;
+    }
+    
+    try {
+        const rutaCompleta = crearRutaCompleta(origenSeleccionado, destinoSeleccionado, escalas);
+        const validacion = validarCapacidadPorTramos(paquetesAsignados, rutaCompleta, vehiculo.capacidad);
+        
+        console.log('📊 Resumen de capacidad por tramos:');
+        console.table(validacion.capacidadPorTramo);
+        
+        if (validacion.alertas.length > 0) {
+            console.warn('⚠️ Alertas de capacidad:');
+            validacion.alertas.forEach(alerta => {
+                const emoji = alerta.tipo === 'error' ? '❌' : '⚠️';
+                console.warn(`${emoji} ${alerta.mensaje}`);
+            });
+        } else {
+            console.log('✅ Capacidad OK en todos los tramos');
+        }
+        
+        console.log(`📈 Capacidad máxima usada: ${validacion.capacidadMaximaUsada.toFixed(1)}kg de ${vehiculo.capacidad}kg`);
+        
+    } catch (error) {
+        console.error('❌ Error calculando capacidad por tramos:', error);
+    }
+}
+
+// ✅ 3. MEJORAR obtenerPaquetesParaRuta() CON VALIDACIÓN CORRECTA
+function obtenerPaquetesParaRuta() {
+    if (!origenSeleccionado || !destinoSeleccionado) {
+        console.log('⚠️ No hay origen o destino seleccionado');
+        return [];
+    }
+    
+    // Crear ruta completa: [origen, escalas..., destino]
+    const rutaCompleta = [
+        { id: parseInt(origenSeleccionado.id), nombre: origenSeleccionado.nombre },
+        ...escalas.map(escala => ({ id: escala.id, nombre: escala.nombre })),
+        { id: parseInt(destinoSeleccionado.id), nombre: destinoSeleccionado.nombre }
+    ];
+    
+    console.log('🗺️ Ruta completa:', rutaCompleta.map(r => r.nombre).join(' → '));
+    
+    // ✅ VALIDACIÓN MEJORADA: Verificar orden correcto
+    const paquetesValidos = paquetes.filter(paquete => {
+        const origenPaquete = parseInt(paquete.id_sucursal_origen);
+        const destinoPaquete = parseInt(paquete.sucursal_destino_id);
+        
+        // Verificar que origen y destino sean diferentes
+        if (origenPaquete === destinoPaquete) {
+            return false;
+        }
+        
+        // Encontrar índices en la ruta
+        const indiceOrigen = rutaCompleta.findIndex(punto => punto.id === origenPaquete);
+        const indiceDestino = rutaCompleta.findIndex(punto => punto.id === destinoPaquete);
+        
+        // Ambos puntos deben existir en la ruta
+        if (indiceOrigen === -1 || indiceDestino === -1) {
+            return false;
+        }
+        
+        // ✅ CRÍTICO: El origen debe ser ANTERIOR al destino en la ruta
+        if (indiceOrigen >= indiceDestino) {
+            console.log(`❌ Paquete ${paquete.tracking}: Orden incorrecto (origen: ${indiceOrigen}, destino: ${indiceDestino})`);
+            return false;
+        }
+        
+        return true;
+    });
+    
+    console.log(`📦 Paquetes válidos encontrados: ${paquetesValidos.length}/${paquetes.length}`);
+    
+    // Categorizar y enriquecer cada paquete
+    const paquetesCategorizados = paquetesValidos.map(paquete => {
+        const origenPaquete = parseInt(paquete.id_sucursal_origen);
+        const destinoPaquete = parseInt(paquete.sucursal_destino_id);
+        
+        const indiceCarga = rutaCompleta.findIndex(punto => punto.id === origenPaquete);
+        const indiceDescarga = rutaCompleta.findIndex(punto => punto.id === destinoPaquete);
+        
+        // Determinar tipo de paquete
+        let tipo = 'entre_escalas';
+        let descripcionRuta = '';
+        let iconoTipo = '📦';
+        
+        const puntoOrigen = rutaCompleta[indiceCarga]?.nombre.split(' / ')[0] || 'Origen';
+        const puntoDestino = rutaCompleta[indiceDescarga]?.nombre.split(' / ')[0] || 'Destino';
+        
+        if (indiceCarga === 0 && indiceDescarga === rutaCompleta.length - 1) {
+            tipo = 'largo_recorrido';
+            iconoTipo = '🚀';
+            descripcionRuta = `${puntoOrigen} → ${puntoDestino} (Viaje completo)`;
+        } else if (indiceCarga === 0) {
+            tipo = 'entrega_intermedia';
+            iconoTipo = '📤';
+            descripcionRuta = `${puntoOrigen} → ${puntoDestino} (Entrega en escala)`;
+        } else if (indiceDescarga === rutaCompleta.length - 1) {
+            tipo = 'recojo_intermedio';
+            iconoTipo = '📥';
+            descripcionRuta = `${puntoOrigen} → ${puntoDestino} (Recojo en escala)`;
+        } else {
+            tipo = 'entre_escalas';
+            iconoTipo = '🔄';
+            descripcionRuta = `${puntoOrigen} → ${puntoDestino} (Entre escalas)`;
+        }
+        
+        return {
+            id: paquete.tracking,
+            tracking: paquete.tracking,
+            descripcion: descripcionRuta,
+            peso: parseFloat(paquete.peso),
+            punto_carga: indiceCarga,
+            punto_descarga: indiceDescarga,
+            tipo: tipo,
+            origen_id: origenPaquete,
+            destino_id: destinoPaquete,
+            icono: iconoTipo,
+            // ✅ NUEVO: Calcular tramos ocupados
+            tramos_ocupados: calcularTramosOcupados(indiceCarga, indiceDescarga)
+        };
+    });
+    
+    // Estadísticas para debug
+    const estadisticas = paquetesCategorizados.reduce((acc, paquete) => {
+        acc[paquete.tipo] = (acc[paquete.tipo] || 0) + 1;
+        return acc;
+    }, {});
+    
+    console.log('📊 Estadísticas de paquetes:', estadisticas);
+    
+    return paquetesCategorizados;
+}
+
+// ✅ 4. AGREGAR FUNCIÓN PARA DEPURAR CAPACIDAD
+function depurarCapacidadDetallada() {
+    if (!vehiculoSeleccionado || paquetesAsignados.length === 0) {
+        console.log('🔍 No hay vehículo seleccionado o paquetes asignados');
+        return;
+    }
+    
+    const vehiculo = vehiculos.find(v => v.unidadid === vehiculoSeleccionado);
+    
+    console.log('🚛 Análisis detallado de capacidad:');
+    console.log(`📋 Vehículo: ${vehiculo.nombre_unidad} (${vehiculo.capacidad}kg)`);
+    console.log(`📦 Paquetes asignados: ${paquetesAsignados.length}`);
+    
+    // Mostrar cada paquete
+    paquetesAsignados.forEach((paquete, index) => {
+        console.log(`${index + 1}. ${paquete.tracking} - ${paquete.peso}kg - ${paquete.descripcion}`);
+        if (paquete.tramos_ocupados) {
+            console.log(`   Tramos ocupados: ${paquete.tramos_ocupados.join(', ')}`);
+        }
+    });
+    
+    // Mostrar capacidad por tramos si es posible
+    if (origenSeleccionado && destinoSeleccionado) {
+        const rutaCompleta = crearRutaCompleta(origenSeleccionado, destinoSeleccionado, escalas);
+        const validacion = validarCapacidadPorTramos(paquetesAsignados, rutaCompleta, vehiculo.capacidad);
+        
+        console.log('\n📊 Capacidad por tramo:');
+        Object.entries(validacion.capacidadPorTramo).forEach(([tramo, datos]) => {
+            const porcentaje = ((datos.peso / vehiculo.capacidad) * 100).toFixed(1);
+            const estado = datos.peso > vehiculo.capacidad ? '❌ SOBREPESO' : 
+                          porcentaje > 90 ? '⚠️ CASI LLENO' : '✅ OK';
+            
+            console.log(`${tramo}: ${datos.origen} → ${datos.destino}`);
+            console.log(`  Peso: ${datos.peso.toFixed(1)}kg (${porcentaje}%) ${estado}`);
+            console.log(`  Paquetes: ${datos.paquetes.length}`);
+        });
+    }
+}
+
+// ✅ 5. FUNCIÓN PARA VALIDAR TODO EL SISTEMA
+function validarSistemaCompleto() {
+    console.log('🔍 VALIDACIÓN COMPLETA DEL SISTEMA');
+    console.log('================================');
+    
+    // 1. Verificar datos básicos
+    console.log('1. Datos básicos:');
+    console.log(`   - Origen: ${origenSeleccionado ? '✅' : '❌'} ${origenSeleccionado?.nombre || 'No seleccionado'}`);
+    console.log(`   - Destino: ${destinoSeleccionado ? '✅' : '❌'} ${destinoSeleccionado?.nombre || 'No seleccionado'}`);
+    console.log(`   - Escalas: ${escalas.length} configuradas`);
+    console.log(`   - Vehículo: ${vehiculoSeleccionado ? '✅' : '❌'}`);
+    console.log(`   - Empleados: ${empleadosAsignados.length} asignados`);
+    console.log(`   - Paquetes: ${paquetesAsignados.length} asignados`);
+    
+    // 2. Verificar paquetes disponibles
+    console.log('\n2. Paquetes disponibles:');
+    const paquetesDisponibles = window.paquetesDisponibles || [];
+    console.log(`   - Total disponibles: ${paquetesDisponibles.length}`);
+    
+    if (paquetesDisponibles.length > 0) {
+        const tiposCounts = paquetesDisponibles.reduce((acc, p) => {
+            acc[p.tipo] = (acc[p.tipo] || 0) + 1;
+            return acc;
+        }, {});
+        console.log('   - Por tipo:', tiposCounts);
+    }
+    
+    // 3. Verificar capacidad
+    if (vehiculoSeleccionado && paquetesAsignados.length > 0) {
+        console.log('\n3. Capacidad:');
+        depurarCapacidadDetallada();
+    }
+    
+    console.log('\n✅ Validación completa');
+}
+
+
+function puedeAgregarPaquete(paqueteNuevo, paquetesActuales, capacidadVehiculo, origenSeleccionado, destinoSeleccionado, escalas) {
+    
+    // 🔍 PASO 1: Verificaciones básicas
+    if (!paqueteNuevo) {
+        return {
+            puedeAgregar: false,
+            razon: 'Paquete no válido',
+            alertas: [],
+            tipo: 'error'
+        };
+    }
+    
+    if (!origenSeleccionado || !destinoSeleccionado) {
+        return {
+            puedeAgregar: false,
+            razon: 'No hay ruta definida (falta origen o destino)',
+            alertas: [],
+            tipo: 'error'
+        };
+    }
+    
+    if (!capacidadVehiculo || capacidadVehiculo <= 0) {
+        return {
+            puedeAgregar: false,
+            razon: 'Capacidad del vehículo no válida',
+            alertas: [],
+            tipo: 'error'
+        };
+    }
+    
+    // 🔍 PASO 2: Verificar que el paquete no esté ya asignado
+    const yaAsignado = paquetesActuales.some(p => p.id === paqueteNuevo.id || p.tracking === paqueteNuevo.tracking);
+    if (yaAsignado) {
+        return {
+            puedeAgregar: false,
+            razon: 'Este paquete ya está asignado',
+            alertas: [],
+            tipo: 'warning'
+        };
+    }
+    
+    // 🔍 PASO 3: Crear la lista completa de paquetes (actuales + nuevo)
+    const todosLosPaquetes = [...paquetesActuales, paqueteNuevo];
+    
+    // 🔍 PASO 4: Crear ruta completa para validación
+    const rutaCompleta = crearRutaCompleta(origenSeleccionado, destinoSeleccionado, escalas);
+    
+    // 🔍 PASO 5: Validar capacidad por todos los tramos
+    const validacionCapacidad = validarCapacidadPorTramos(todosLosPaquetes, rutaCompleta, capacidadVehiculo);
+    
+    // 🔍 PASO 6: Verificar el resultado
+    if (!validacionCapacidad.esValido) {
+        // Buscar el primer error crítico
+        const errorPrincipal = validacionCapacidad.alertas.find(alerta => alerta.tipo === 'error');
+        
+        if (errorPrincipal) {
+            return {
+                puedeAgregar: false,
+                razon: errorPrincipal.mensaje,
+                alertas: validacionCapacidad.alertas,
+                tipo: 'error',
+                detalles: {
+                    capacidadPorTramo: validacionCapacidad.capacidadPorTramo,
+                    tramoProblematico: validacionCapacidad.tramoProblematico,
+                    capacidadMaximaUsada: validacionCapacidad.capacidadMaximaUsada
+                }
+            };
+        }
+    }
+    
+    // 🔍 PASO 7: Verificar warnings (capacidad alta pero no crítica)
+    const warnings = validacionCapacidad.alertas.filter(alerta => alerta.tipo === 'warning');
+    
+    // ✅ PASO 8: El paquete se puede agregar
+    return {
+        puedeAgregar: true,
+        razon: 'El paquete se puede agregar sin problemas',
+        alertas: warnings, // Incluir warnings si los hay
+        tipo: warnings.length > 0 ? 'warning' : 'success',
+        detalles: {
+            pesoNuevoPaquete: paqueteNuevo.peso,
+            pesoTotalActual: paquetesActuales.reduce((sum, p) => sum + p.peso, 0),
+            pesoTotalNuevo: todosLosPaquetes.reduce((sum, p) => sum + p.peso, 0),
+            capacidadPorTramo: validacionCapacidad.capacidadPorTramo,
+            capacidadMaximaUsada: validacionCapacidad.capacidadMaximaUsada,
+            porcentajeUsoMaximo: ((validacionCapacidad.capacidadMaximaUsada / capacidadVehiculo) * 100).toFixed(1)
+        }
+    };
+}
+
 function togglePaquete(paqueteId) {
     if (!vehiculoSeleccionado) {
         showAlert('errorPaquetes', 'Debe seleccionar un vehículo antes de agregar paquetes', 'error');
@@ -1441,17 +1832,31 @@ function togglePaquete(paqueteId) {
     const index = paquetesAsignados.findIndex(p => p.id === paqueteId);
     
     if (index === -1) {
-        // ✅ USAR NUEVA VALIDACIÓN
-        const validacion = PaquetesManager.puedeAgregarPaquete(
+        // ✅ CORRECCIÓN: Pasar TODOS los parámetros requeridos
+        const validacion = puedeAgregarPaquete(
             paquete, 
             paquetesAsignados, 
-            vehiculo.capacidad
+            vehiculo.capacidad,
+            origenSeleccionado,      // ✅ Agregado
+            destinoSeleccionado,     // ✅ Agregado
+            escalas                  // ✅ Agregado
         );
         
         if (!validacion.puedeAgregar) {
             showAlert('errorPaquetes', 
                 `No se puede agregar el paquete: ${validacion.razon}`, 'error');
             return;
+        }
+        
+        // ✅ Mostrar warnings si los hay
+        if (validacion.alertas && validacion.alertas.length > 0) {
+            const warnings = validacion.alertas.filter(a => a.tipo === 'warning');
+            if (warnings.length > 0) {
+                console.warn('⚠️ Advertencias al agregar paquete:');
+                warnings.forEach(warning => {
+                    console.warn(warning.mensaje);
+                });
+            }
         }
         
         paquetesAsignados.push(paquete);
@@ -1467,8 +1872,8 @@ function togglePaquete(paqueteId) {
     renderizarPaquetes();
     hideAlert('errorPaquetes');
     
-    // ✅ MOSTRAR INFORMACIÓN DETALLADA
-    mostrarCapacidadPorTramos();
+    // ✅ CORRECCIÓN: Llamar función que SÍ existe
+    mostrarResumenCapacidad();
 }
 
 function toggleRecojoItem(transaccionId) {
@@ -1634,6 +2039,52 @@ function mostrarAgenciasEnMapa() {
         map.fitBounds(group.getBounds().pad(0.1));
     }
 }
+
+function crearRutaCompleta(origen, destino, escalas) {
+    const ruta = [
+        { 
+            id: parseInt(origen.id), 
+            nombre: origen.nombre, 
+            lat: origen.lat, 
+            lng: origen.lng,
+            orden: 0,
+            tipo: 'origen'
+        }
+    ];
+    
+    // Agregar escalas con orden secuencial
+    escalas.forEach((escala, index) => {
+        ruta.push({
+            id: parseInt(escala.id),
+            nombre: escala.nombre,
+            lat: escala.lat,
+            lng: escala.lng,
+            orden: index + 1,
+            tipo: 'escala'
+        });
+    });
+    
+    // Agregar destino final
+    ruta.push({
+        id: parseInt(destino.id),
+        nombre: destino.nombre,
+        lat: destino.lat,
+        lng: destino.lng,
+        orden: escalas.length + 1,
+        tipo: 'destino'
+    });
+    
+    return ruta;
+}
+
+function calcularTramosOcupados(indiceCarga, indiceDescarga) {
+    const tramos = [];
+    for (let i = indiceCarga; i < indiceDescarga; i++) {
+        tramos.push(`${i}-${i + 1}`);
+    }
+    return tramos;
+}
+
 
 function agregarEscalaDesdeMapa(idAgencia) {
     // Verificar que no sea origen o destino

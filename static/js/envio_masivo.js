@@ -1586,33 +1586,44 @@ class AppInitializer {
     });
   }
 
+
   static setupBeforeUnloadWarning() {
-    // Para TODOS los intentos de salir/recargar (incluyendo botón del navegador)
-    window.addEventListener('beforeunload', (e) => {
-      if (this.reloadConfirmed) {
-        return;
-      }
+  // Variable para controlar si estamos en proceso de continuar
+  let continuandoProceso = false;
 
+  // Para TODOS los intentos de salir/recargar (incluyendo botón del navegador)
+  window.addEventListener('beforeunload', (e) => {
+    if (this.reloadConfirmed || continuandoProceso) {
+      return;
+    }
+
+    if (this.hasFilledAll()) {
+      const message = '¿Estás seguro de que quieres salir? Perderás todo el progreso actual.';
+      e.preventDefault();
+      e.returnValue = message;
+      return message;
+    }
+  });
+
+  // Detectar teclas de recarga (F5 o Ctrl+R) - mantener separado
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
       if (this.hasFilledAll()) {
-        // Remover la lógica de modalShown aquí
-        // Para botón de recargar o cerrar pestaña - mostrar nativo
-        const message = '¿Estás seguro de que quieres salir? Perderás todo el progreso actual.';
         e.preventDefault();
-        e.returnValue = message;
-        return message;
+        this.showReloadConfirmation();
       }
-    });
+    }
+  });
 
-    // Detectar teclas de recarga (F5 o Ctrl+R) - mantener separado
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'F5' || (e.ctrlKey && e.key === 'r')) {
-        if (this.hasFilledAll()) {
-          e.preventDefault();
-          this.showReloadConfirmation();
-        }
-      }
+  // Agregar listener al botón continuar para marcar que estamos continuando
+  const btnContinuar = document.getElementById('btn-continuar');
+  if (btnContinuar) {
+    btnContinuar.addEventListener('click', () => {
+      continuandoProceso = true;
     });
   }
+}
+  
 
   static showReloadConfirmation() {
     Utils.showModal({
@@ -1666,132 +1677,142 @@ class AppInitializer {
     TableManager.renderTabla();
   }
 
-  static setupButtonEvents() {
-    // Botón agregar
-    const btnAdd = document.querySelector('.btn-agregar');
-    if (btnAdd) {
-      btnAdd.addEventListener('click', e => {
-        e.preventDefault();
-        if (!ShippingManager.validateEnvio()) {
-          Utils.showModal({ message: 'Complete todos los campos visibles' });
-          return;
-        }
+static setupButtonEvents() {
+  // Botón agregar
+  const btnAdd = document.querySelector('.btn-agregar');
+  if (btnAdd) {
+    btnAdd.addEventListener('click', e => {
+      e.preventDefault();
+      if (!ShippingManager.validateEnvio()) {
+        Utils.showModal({ message: 'Complete todos los campos visibles' });
+        return;
+      }
+      Utils.showModal({
+        message: '¿Agregar este envío?',
+        onConfirm: () => ShippingManager.guardarRegistro()
+      });
+    });
+  }
+
+  // Botón limpiar
+  const btnLimpiar = document.querySelector('.btn-limpiar');
+  if (btnLimpiar) {
+    btnLimpiar.addEventListener('click', e => {
+      e.preventDefault();
+
+      const fields = Array.from(
+        document.querySelectorAll('#seccion-masiva input, #seccion-masiva select, #seccion-masiva textarea')
+      );
+
+      const anyFilled = fields.some(f => f.value && f.value.trim() !== '');
+
+      if (!anyFilled) {
+        Utils.showModal({ message: 'No hay campos para limpiar.' });
+      } else {
+        ShippingManager.cancelEdit();
+      }
+    });
+  }
+
+  // Botón limpiar todos
+  const btnLimpiarTodos = document.querySelector('.btn-limpiar-todos');
+  if (btnLimpiarTodos) {
+    btnLimpiarTodos.addEventListener('click', () => {
+      if (window.registros.length === 0) {
+        Utils.showModal({ message: 'No hay registros para eliminar.' });
+      } else {
         Utils.showModal({
-          message: '¿Agregar este envío?',
-          onConfirm: () => ShippingManager.guardarRegistro()
+          message: '¿Eliminar todos los registros?',
+          onConfirm: () => {
+            window.registros = [];
+            TableManager.renderTabla();
+            FormManager.unlockOrigen();
+          }
         });
-      });
-    }
+      }
+    });
+  }
 
-    // Botón limpiar
-    const btnLimpiar = document.querySelector('.btn-limpiar');
-    if (btnLimpiar) {
-      btnLimpiar.addEventListener('click', e => {
-        e.preventDefault();
+  // Botón exportar
+  const btnExportar = document.querySelector('.btn-exportar');
+  if (btnExportar) {
+    btnExportar.addEventListener('click', () => {
+      if (window.registros.length === 0) {
+        Utils.showModal({ message: 'No hay registros para exportar.' });
+      } else {
+        ExportManager.exportXLSX();
+      }
+    });
+  }
 
-        const fields = Array.from(
-          document.querySelectorAll('#seccion-masiva input, #seccion-masiva select, #seccion-masiva textarea')
-        );
+  // Botón continuar
+  const btnContinuar = document.getElementById('btn-continuar');
+  if (btnContinuar) {
+    btnContinuar.addEventListener('click', async (e) => {
+      e.preventDefault();
+      
+      // Validación existente
+      const selectsOrigen = document.querySelectorAll('#seccion-origen select');
+      const camposRemitente = document.querySelectorAll('#seccion_remitente select, #seccion_remitente input');
 
-        const anyFilled = fields.some(f => f.value && f.value.trim() !== '');
+      function destacarCampo(element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.style.transition = 'transform 0.3s ease';
+        element.style.transform = 'scale(1.05)';
+        setTimeout(() => {
+          element.style.transform = '';
+        }, 900);
+      }
 
-        if (!anyFilled) {
-          Utils.showModal({ message: 'No hay campos para limpiar.' });
-        } else {
-          ShippingManager.cancelEdit();
+      let primerInvalido = null;
+
+      for (const select of selectsOrigen) {
+        if (select.value === '') {
+          primerInvalido = select;
+          break;
         }
-      });
-    }
+      }
 
-    // Botón limpiar todos
-    const btnLimpiarTodos = document.querySelector('.btn-limpiar-todos');
-    if (btnLimpiarTodos) {
-      btnLimpiarTodos.addEventListener('click', () => {
-        if (window.registros.length === 0) {
-          Utils.showModal({ message: 'No hay registros para eliminar.' });
-        } else {
-          Utils.showModal({
-            message: '¿Eliminar todos los registros?',
-            onConfirm: () => {
-              window.registros = [];
-              TableManager.renderTabla();
-              FormManager.unlockOrigen();
-            }
-          });
-        }
-      });
-    }
-
-    // Botón exportar
-    const btnExportar = document.querySelector('.btn-exportar');
-    if (btnExportar) {
-      btnExportar.addEventListener('click', () => {
-        if (window.registros.length === 0) {
-          Utils.showModal({ message: 'No hay registros para exportar.' });
-        } else {
-          ExportManager.exportXLSX();
-        }
-      });
-    }
-
-    // Botón continuar
-    const btnContinuar = document.getElementById('btn-continuar');
-    if (btnContinuar) {
-      btnContinuar.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const selectsOrigen = document.querySelectorAll('#seccion-origen select');
-        const camposRemitente = document.querySelectorAll('#seccion_remitente select, #seccion_remitente input');
-
-        function destacarCampo(element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          element.style.transition = 'transform 0.3s ease';
-          element.style.transform = 'scale(1.05)';
-          setTimeout(() => {
-            element.style.transform = '';
-          }, 900);
-        }
-
-        let primerInvalido = null;
-
-        for (const select of selectsOrigen) {
-          if (select.value === '') {
-            primerInvalido = select;
+      if (!primerInvalido) {
+        for (const campo of camposRemitente) {
+          if (!campo.matches(':user-valid')) {
+            primerInvalido = campo;
             break;
           }
         }
+      }
 
-        if (!primerInvalido) {
-          for (const campo of camposRemitente) {
-            if (!campo.matches(':user-valid')) {
-              primerInvalido = campo;
-              break;
-            }
+      if (!primerInvalido) {
+        // CONFIRMACIÓN AGREGADA - Mostrar modal de confirmación
+        Utils.showModal({
+          message: '¿Desea continuar con el proceso de envío?',
+          onConfirm: async () => {
+            // Marcar que estamos continuando para evitar beforeunload
+            AppInitializer.reloadConfirmed = true;
+            await ShippingManager.enviarDatosResumen();
           }
-        }
-
-        if (!primerInvalido) {
-          await ShippingManager.enviarDatosResumen();
-        } else {
+        });
+      } else {
+        setTimeout(() => {
+          destacarCampo(primerInvalido);
           setTimeout(() => {
-            destacarCampo(primerInvalido);
-            setTimeout(() => {
-              Utils.showModal({ message: 'Complete todos los campos necesarios.' });
-            }, 1600)
-          }, 500)
-        }
-
-      });
-    }
-
-    // Botón cancelar edición
-    const btnCancelEdit = document.querySelector('.btn-cancel-edit');
-    if (btnCancelEdit) {
-      btnCancelEdit.style.display = 'none';
-      btnCancelEdit.addEventListener('click', () => {
-        ShippingManager.cancelEdit();
-      });
-    }
+            Utils.showModal({ message: 'Complete todos los campos necesarios.' });
+          }, 1600)
+        }, 500)
+      }
+    });
   }
+
+  // Botón cancelar edición
+  const btnCancelEdit = document.querySelector('.btn-cancel-edit');
+  if (btnCancelEdit) {
+    btnCancelEdit.style.display = 'none';
+    btnCancelEdit.addEventListener('click', () => {
+      ShippingManager.cancelEdit();
+    });
+  }
+}
+
 
 }
 

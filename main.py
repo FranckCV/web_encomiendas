@@ -3080,64 +3080,55 @@ def insertar_envio():
 @app.route('/insertar_envio_api', methods=['POST'])
 def insertar_envio_api():
     try:
-        # Obtener datos JSON desde el frontend (tipo_comprobante y modalidad_pago)
         data = request.get_json()
-        
         if not data:
             return jsonify({'status': 'error', 'message': 'No se recibieron datos'}), 400
 
-        tipo_comprobante = data.get('tipo_comprobante')
-        modalidad_pago_seleccionada = data.get('metodo_pago')
+        modo = data.get('modo')
+        registros = data.get('registros', [])
 
-        # Validaciones básicas
-        if not tipo_comprobante:
-            return jsonify({'status': 'error', 'message': 'Tipo de comprobante es requerido'}), 400
-        # modalidad_pago_seleccionada = 1
-        if modalidad_pago_seleccionada is None:
-            return jsonify({'status': 'error', 'message': 'Modalidad de pago es requerida'}), 400
+        if not registros:
+            return jsonify({'status': 'error', 'message': 'No hay registros de paquetes'}), 400
 
-        # OBTENER DATOS COMPLETOS DE LA SESIÓN
-        datos_pago = session.get('datos_pago')
-        if not datos_pago:
-            return jsonify({'status': 'error', 'message': 'No se encontraron datos del envío en la sesión'}), 400
+        requiere_datos_pago = any(r.get('modalidadPago') == '1' for r in registros)
+        tipo_comprobante = data.get('tipo_comprobante') if requiere_datos_pago else None
+        metodo_pago = data.get('metodo_pago') if requiere_datos_pago else None
 
-        envios = datos_pago.get('envios', [])
-        remitente = datos_pago.get('remitente', {})
-        
-        if not envios:
-            return jsonify({'status': 'error', 'message': 'No se encontraron envíos para procesar'}), 400
+        if requiere_datos_pago and (tipo_comprobante is None or metodo_pago is None):
+            return jsonify({
+                "error": "Debe proporcionar tipo_comprobante y metodo_pago porque al menos un registro tiene modalidadPago = 1"
+            }), 400
 
-        # PROCESAR IGUAL QUE TU insertar_envio_api ORIGINAL
-        nombre_empresa = controlador_empresa.get_nombre()
-        
-        # Preparar datos del cliente desde el remitente
+        origen = data.get('origen', {})
+        sucursal_origen = origen.get('sucursal_origen')
+        if not sucursal_origen:
+            return jsonify({'status': 'error', 'message': 'Sucursal de origen no proporcionada'}), 400
+
+        remitente = data.get('remitente', {})
         nombre = remitente.get('nombre_remitente', '')
         partes = nombre.split() if nombre else []
 
         cliente_data = {
-            'correo':        remitente.get('correo_remitente', ''),
-            'telefono':      remitente.get('num_tel_remitente', ''),
+            'correo': remitente.get('correo_remitente', ''),
+            'telefono': remitente.get('num_tel_remitente', ''),
             'num_documento': remitente.get('num_doc_remitente', ''),
             'nombre_siglas': partes[0] if partes else '',
             'apellidos_razon': ' '.join(partes[1:]) if len(partes) > 1 else '',
             'tipo_documentoid': int(remitente.get('tipo_doc_remitente', 1)),
             'tipo_clienteid': 2 if remitente.get('tipo_doc_remitente') == 2 else 1
         }
-        print(envios)
 
-        # Crear la transacción con los envíos
+        nombre_empresa = controlador_empresa.get_nombre()
         num_serie, trackings = controlador_encomienda.crear_transaccion_y_paquetes(
-            envios, cliente_data, tipo_comprobante
+            registros, cliente_data, tipo_comprobante, metodo_pago, sucursal_origen,modo
         )
 
-        # Generar QR para cada paquete
         if num_serie:
             try:
                 generar_qr_paquetes(trackings)
             except Exception as qr_err:
                 current_app.logger.warning(f"Error generando QR: {qr_err}")
 
-            # Enviar correo al remitente
             destinatario_email = cliente_data['correo']
             if destinatario_email:
                 msg = Message(
@@ -3163,13 +3154,13 @@ def insertar_envio_api():
 
                 mail.send(msg)
 
-        # LIMPIAR SESIÓN DESPUÉS DE PROCESAR
+        # Limpiar la sesión en caso que se haya usado anteriormente
         session.pop('datos_pago', None)
         session.pop('resumen_envios', None)
         session.pop('remitente_data', None)
 
         current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
-        
+
         return jsonify({
             'status': 'success',
             'message': 'Envío procesado correctamente',
@@ -3185,6 +3176,8 @@ def insertar_envio_api():
             'status': 'error',
             'message': 'Ocurrió un error al procesar el envío'
         }), 500
+
+       
        
 @app.route('/registrar_envios_masivos', methods=['POST'])
 def registrar_envios_masivos():
@@ -3290,7 +3283,7 @@ def registrar_envios_masivos():
 #   },
 #   "registros": [
 #     {
-#       "modo": "individual",
+#      "modo": "individual",
 #       "clave": "ABC123",
 #       "valorEnvio": 100.5,
 #       "peso": 4.0,
@@ -3315,7 +3308,7 @@ def registrar_envios_masivos():
 #       }
 #     },
 #     {
-#       "modo": "individual",
+#       "modo": "masivo",
 #       "clave": "DEF456",
 #       "valorEnvio": 120.0,
 #       "peso": 6.2,
@@ -4972,10 +4965,6 @@ def sucursales_destino_api():
             'msg': f"Ocurrió un error al listar las distritos: {repr(e)}",
             'status':-1
         }
-<<<<<<< HEAD
-
-=======
->>>>>>> edaad2ca2c4a5c65179b4106de5d9fe44b544983
 
 @app.route("/buscar_paquete_devolucion", methods=["POST"])
 @validar_empleado()
