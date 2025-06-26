@@ -1764,7 +1764,7 @@ def inject_cur_modulo_id():
                     elif len(partes_ruta) == 1:
                         key = partes_ruta[0]
                 page = obtener_funcion_desde_url(app, path)
-                
+
                 if page == 'modulo':
                     dataPage = permiso.get_modulo_key(key)
                     if dataPage:
@@ -5588,6 +5588,7 @@ def api_causas_reclamo(motivo_id):
             'success': False,
             'message': f'Error al obtener causas: {str(e)}'
         }), 500
+
 
 @app.route("/pagar_paquete",defaults={'tracking': None})
 @app.route("/pagar_paquete/<tracking>")
