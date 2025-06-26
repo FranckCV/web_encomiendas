@@ -1607,7 +1607,7 @@ TRANSACCIONES = {
         "fields_form": [
         #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
             ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_detalle() , 'nombre_det' ] ],
-             ['tip_comp',  'Tipo de comprobante', 'Tipo de comprobante', 'select', True ,True, [lambda: controlador_tipo_comprobante.get_options() , 'tip_comp' ] ],
+             ['tip_comp',  'Tipo de comprobante', 'Tipo de comprobante', 'select', False ,True, [lambda: controlador_tipo_comprobante.get_options() , 'tip_comp' ] ],
             
         ],
         "crud_forms": {
@@ -5975,6 +5975,23 @@ def api_estados_reclamo():
             'success': False,
             'message': f'Error al obtener estados: {str(e)}'
         }), 500
+        
+@app.route('/insertar_salida', methods=['POST'])
+def insertar_salida():
+    data = request.get_json()
+    vehiculo = data.get('vehiculo')
+    empleados = data.get('empleados')
+    escalas = data.get('escalas')            
+    paquetes = data.get('paquetes')    
+    
+    salida_id = controlador_salida.crear_transaccion_salida(vehiculo, empleados, escalas, paquetes)
+    
+    return jsonify({
+        "mensaje": "Salida registrada",
+        "salida_id": salida_id
+    })
+
+    
 ##############################################3
 ##############################################
 
