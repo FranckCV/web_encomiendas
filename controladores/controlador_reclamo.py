@@ -239,3 +239,29 @@ def registrar_reclamo(
 
     
 
+def get_reporte_listado_reclamos():
+    sql = '''
+        SELECT 
+            r.id,
+            r.nombres_razon AS cliente,
+            r.correo,
+            r.telefono,
+            r.fecha_recepcion,
+            e.nombre AS estado,
+            s.direccion AS sucursal
+        FROM reclamo r
+        JOIN estado_reclamo e ON r.estado_reclamoid = e.id
+        JOIN sucursal s ON r.sucursal_id = s.id
+        ORDER BY r.fecha_recepcion DESC
+    '''
+    columnas = {
+        'id': 'ID',
+        'cliente': 'Cliente',
+        'correo': 'Correo',
+        'telefono': 'Teléfono',
+        'fecha_recepcion': 'Fecha',
+        'estado': 'Estado',
+        'sucursal': 'Sucursal'
+    }
+    filas = sql_select_fetchall(sql)
+    return filas, columnas

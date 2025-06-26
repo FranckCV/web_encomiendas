@@ -1,0 +1,757 @@
+<!-- ================================= -->
+<!-- TEMPLATE HTML: responder_reclamo.html -->
+<!-- ================================= -->
+
+{% extends "MAESTRA_ADMIN.html" %}
+
+{% block titulo %}
+{{ titulo }}
+{% endblock %}
+
+{% block estilos %}
+<style>
+    .td_content {
+        min-height: 30px;
+    }
+
+    .reclamo-estado {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.85em;
+        font-weight: 500;
+    }
+
+    .estado-pendiente {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .estado-proceso {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .estado-resuelto {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .btn-responder {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.85em;
+    }
+
+    .btn-responder:hover {
+        background-color: #218838;
+        color: white;
+    }
+
+    .btn-historial {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.85em;
+        margin-left: 5px;
+    }
+
+    .btn-historial:hover {
+        background-color: #138496;
+        color: white;
+    }
+
+    .cliente-info {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        border-left: 4px solid #007bff;
+    }
+
+    .reclamo-descripcion {
+        background-color: #f8f9fa;
+        padding: 12px;
+        border-radius: 4px;
+        border-left: 4px solid #ffc107;
+        margin-bottom: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .foto-reclamo {
+        max-width: 100%;
+        max-height: 150px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+    .foto-reclamo:hover {
+        transform: scale(1.02);
+    }
+
+    .sin-foto {
+        padding: 15px;
+        text-align: center;
+        background-color: #f8f9fa;
+        border: 2px dashed #dee2e6;
+        border-radius: 8px;
+        color: #6c757d;
+        height: 120px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .imagen-formulario-container {
+        display: flex;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .imagen-container {
+        flex: 0 0 200px;
+        min-height: 150px;
+    }
+
+    .formulario-container {
+        flex: 1;
+    }
+
+    .modal-imagen {
+        background-color: rgba(0, 0, 0, 0.9);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 99999;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .modal-imagen img {
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
+    }
+
+    .modal-imagen .cerrar-modal {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        color: white;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 100000;
+    }
+
+    .modal-imagen .cerrar-modal:hover {
+        color: #ccc;
+    }
+
+    .modal-backdrop {
+        display: none;
+    }
+
+    .historial-item {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        position: relative;
+    }
+
+    .historial-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 8px;
+    }
+
+    .historial-fecha {
+        font-size: 0.9em;
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .historial-tipo {
+        background-color: #007bff;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        font-weight: 500;
+    }
+
+    .historial-observaciones {
+        margin-top: 8px;
+        padding: 10px;
+        background-color: white;
+        border-radius: 4px;
+        border-left: 4px solid #007bff;
+    }
+
+    .sin-historial {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+    }
+
+    @media (max-width: 768px) {
+        .imagen-formulario-container {
+            flex-direction: column;
+        }
+
+        .imagen-container {
+            flex: none;
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block contenido %}
+<div class="block_crud">
+    <h3 class="crud_title">
+        {% if HABILITAR_ICON_PAGES %}
+        <i class="{{icon_page_crud}}"></i>
+        {% endif %}
+        {{ titulo }}
+    </h3>
+</div>
+
+<div class="block_crud">
+    <div class="panel_row row">
+        <div class="col">
+            <div class="input_search">
+                <div class="input-group">
+                    <input required type="text" class="form-control"
+                        placeholder="Buscar por cliente, correo o N° reclamo" id="value_search" name="value_search" />
+                    <button class="btn" type="button" onclick="filtrarReclamos()">
+                        <i class="{{ICON_SEARCH}}"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-2">
+            <select name="estado_filter" id="estado_filter" class="filterSelect">
+                <option value="" selected>Todos los estados</option>
+                {% for estado in estados_disponibles %}
+                <option value="{{ estado.id }}">{{ estado.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="block_crud block_table">
+    <div class="table-container" style="overflow-x: auto;">
+        <table cellspacing="0" class="table_listado">
+            <thead>
+                <tr>
+                    <th>
+                        <div class="th_content">
+                            <p>ID</p>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="th_content">
+                            <p>Cliente</p>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="th_content">
+                            <p>Correo</p>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="th_content">
+                            <p>Teléfono</p>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="th_content">
+                            <p>Fecha</p>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="th_content">
+                            <p>Descripción</p>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="th_content">
+                            <p>Último Estado</p>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="th_content">
+                            <p>Acciones</p>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="reclamosTableBody">
+                {% for reclamo in reclamos %}
+                <tr data-reclamo-id="{{ reclamo.id }}" data-estado-id="{{ reclamo.ultimo_estado_id or '' }}">
+                    <td>
+                        <div class="td_content">
+                            <p>{{ reclamo.id }}</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="td_content">
+                            <p>{{ reclamo.nombres_razon }}</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="td_content">
+                            <p>{{ reclamo.correo }}</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="td_content">
+                            <p>{{ reclamo.telefono }}</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="td_content">
+                            <p>{{ reclamo.fecha_recepcion.strftime('%d/%m/%Y') if reclamo.fecha_recepcion else '' }}</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="td_content">
+                            <p>{{ reclamo.descripcion[:50] }}{% if reclamo.descripcion|length > 50 %}...{% endif %}</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="td_content">
+                            <span class="reclamo-estado">
+                                {{ reclamo.ultimo_estado_nombre or 'Sin estado' }}
+                            </span>
+                        </div>
+                    </td>
+                    <td class="opciones_column">
+                        <button class="btn btn-responder" onclick="abrirModalRespuesta({{ reclamo.id }})">
+                            <i class="fa-solid fa-reply"></i>
+                        </button>
+                        <button class="btn btn-historial" onclick="abrirModalHistorial({{ reclamo.id }})">
+                            <i class="fa-solid fa-history"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal para responder reclamo -->
+<div class="modal fade" id="modalResponder" tabindex="-1" aria-labelledby="modalResponderLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalResponderLabel">
+                    <i class="fa-solid fa-reply"></i> Responder Reclamo #<span id="modalReclamoId"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form method="POST" action="/procesar_respuesta_reclamo" id="formRespuesta">
+                <div class="modal-body">
+                    <input type="hidden" name="reclamo_id" id="inputReclamoId">
+
+                    <div class="cliente-info">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong><i class="fa-solid fa-user"></i> Cliente:</strong> <span
+                                    id="modalCliente"></span><br>
+                                <strong><i class="fa-solid fa-envelope"></i> Correo:</strong> <span
+                                    id="modalCorreo"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <strong><i class="fa-solid fa-phone"></i> Teléfono:</strong> <span
+                                    id="modalTelefono"></span><br>
+                                <strong><i class="fa-solid fa-calendar"></i> Fecha:</strong> <span
+                                    id="modalFecha"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fa-solid fa-file-text"></i> Descripción del Reclamo:
+                        </label>
+                        <div class="reclamo-descripcion" id="modalDescripcion"></div>
+                    </div>
+
+                    <div class="imagen-formulario-container">
+                        <div class="imagen-container">
+                            <label class="form-label">
+                                <i class="fa-solid fa-camera"></i> Foto del Reclamo:
+                            </label>
+                            <div id="modalFotoContainer">
+                                <div class="sin-foto">
+                                    <i class="fa-solid fa-image fa-2x"></i>
+                                    <p>No hay foto disponible</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="formulario-container">
+                            <div class="form-group">
+                                <label class="form-label" for="detalle_reclamo_id">
+                                    <i class="fa-solid fa-tags"></i> Tipo de Respuesta: <span
+                                        class="text-danger">*</span>
+                                </label>
+                                <select name="detalle_reclamo_id" id="detalle_reclamo_id" class="form-control" required>
+                                    <option value="">Seleccione...</option>
+                                    {% for detalle in detalles_reclamo %}
+                                    <option value="{{ detalle.id }}">{{ detalle.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="observaciones">
+                                    <i class="fa-solid fa-comment"></i> Observaciones:
+                                </label>
+                                <textarea name="observaciones" id="observaciones" class="form-control" rows="4"
+                                    placeholder="Observaciones adicionales (opcional)..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fa-solid fa-times"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fa-solid fa-paper-plane"></i> Enviar Respuesta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para imagen ampliada -->
+<div class="modal-imagen" id="modalImagen" onclick="cerrarModalImagen()">
+    <span class="cerrar-modal" onclick="cerrarModalImagen()">&times;</span>
+    <img id="imagenAmpliada" src="" alt="Imagen ampliada">
+</div>
+
+<!-- Modal para historial -->
+<div class="modal fade" id="modalHistorial" tabindex="-1" aria-labelledby="modalHistorialLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalHistorialLabel">
+                    <i class="fa-solid fa-history"></i> Historial de Seguimiento - Reclamo #<span
+                        id="historialReclamoId"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div id="historialContent">
+                    <div class="text-center">
+                        <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+                        <p>Cargando historial...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Paginación -->
+<div class="block_crud">
+    <div class="row pagination_block">
+        <div class="col-4">
+            <div class="form_field">
+                <p>Mostrar</p>
+                <select name="cant_pag" id="cant_pag">
+                    {% for option in options_pagination_crud %}
+                    <option value="{{ option }}" {% if option==selected_option_crud %}selected{% endif %}>
+                        {{ option }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <p>registros por página | Total: {{ reclamos|length }}</p>
+            </div>
+        </div>
+        <div class="col">
+            <div class="pagination" id="paginationControls">
+                <a href="javascript:void(0)" class="previous-page disable">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+                <div id="pageNumbers" class="page-numbers"></div>
+                <a href="javascript:void(0)" class="next-page">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/paginationCrud.js"></script>
+
+<script>
+    // Función para abrir el modal con los datos del reclamo
+    function abrirModalRespuesta(reclamoId) {
+        document.getElementById('modalReclamoId').textContent = reclamoId;
+        document.getElementById('inputReclamoId').value = reclamoId;
+        document.getElementById('formRespuesta').reset();
+
+        // Cargar datos del reclamo
+        fetch(`/api/reclamo/${reclamoId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const reclamo = data.reclamo;
+                    document.getElementById('modalCliente').textContent = reclamo.nombres_razon;
+                    document.getElementById('modalCorreo').textContent = reclamo.correo;
+                    document.getElementById('modalTelefono').textContent = reclamo.telefono;
+                    document.getElementById('modalFecha').textContent = reclamo.fecha_recepcion;
+                    document.getElementById('modalDescripcion').textContent = reclamo.descripcion;
+
+                    // Manejar foto
+                    const fotoContainer = document.getElementById('modalFotoContainer');
+                    if (reclamo.foto && reclamo.foto.trim() !== '' && reclamo.foto !== 'None') {
+                        fotoContainer.innerHTML = `
+                        <img src="/static/img/img_reclamo/${reclamo.foto}" 
+                             class="foto-reclamo" 
+                             alt="Foto del reclamo"
+                             onclick="abrirModalImagen('/static/img/img_reclamo/${reclamo.foto}')"
+                             onerror="this.parentElement.innerHTML='<div class=\\'sin-foto\\'><i class=\\'fa-solid fa-image fa-2x\\'></i><p>Error al cargar imagen</p></div>'">
+                    `;
+                    } else {
+                        fotoContainer.innerHTML = `
+                        <div class="sin-foto">
+                            <i class="fa-solid fa-image fa-2x"></i>
+                            <p>No hay foto disponible</p>
+                        </div>
+                    `;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al cargar datos del reclamo');
+            });
+
+        const modal = new bootstrap.Modal(document.getElementById('modalResponder'));
+        modal.show();
+    }
+
+    // Función para abrir modal de historial
+    function abrirModalHistorial(reclamoId) {
+        document.getElementById('historialReclamoId').textContent = reclamoId;
+        const modal = new bootstrap.Modal(document.getElementById('modalHistorial'));
+        modal.show();
+        cargarHistorial(reclamoId);
+    }
+
+    // Función para cargar historial
+    function cargarHistorial(reclamoId) {
+        const historialContent = document.getElementById('historialContent');
+
+        historialContent.innerHTML = `
+        <div class="text-center">
+            <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+            <p>Cargando historial...</p>
+        </div>
+    `;
+
+        fetch(`/api/obtener_historial_reclamo/${reclamoId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    mostrarHistorial(data.historial);
+                } else {
+                    historialContent.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fa-solid fa-exclamation-triangle"></i>
+                        Error: ${data.message}
+                    </div>
+                `;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                historialContent.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fa-solid fa-exclamation-triangle"></i>
+                    Error de conexión
+                </div>
+            `;
+            });
+    }
+
+    // Función para mostrar historial
+    function mostrarHistorial(historial) {
+        const historialContent = document.getElementById('historialContent');
+
+        if (!historial || historial.length === 0) {
+            historialContent.innerHTML = `
+            <div class="sin-historial">
+                <i class="fa-solid fa-history fa-3x"></i>
+                <h5>Sin historial</h5>
+                <p>Este reclamo aún no tiene seguimiento.</p>
+            </div>
+        `;
+            return;
+        }
+
+        let historialHtml = '';
+        historial.forEach((item, index) => {
+            const esPrimero = index === 0;
+            historialHtml += `
+        <div class="historial-item" data-id="${item.id}" data-reclamo-id="${item.id_reclamo}">
+            <div class="historial-header">
+                <div>
+                    <span class="historial-tipo">${item.detalle_nombre || 'Seguimiento'}</span>
+                </div>
+                <div class="historial-fecha">
+                    <i class="fa-solid fa-calendar"></i> ${item.fecha} ${item.hora}
+                </div>
+            </div>
+            ${item.comentario ? `
+            <div class="historial-observaciones">
+                <strong>Observaciones:</strong><br>
+                ${item.comentario}
+            </div>` : ''}
+            ${esPrimero ? `
+            <div class="text-end mt-2">
+                <button class="btn btn-sm btn-danger" onclick="eliminarUltimoSeguimiento(${item.reclamoid})">
+                    <i class="fa-solid fa-trash"></i> Eliminar último seguimiento
+                </button>
+
+            </div>` : ''}
+        </div>
+    `;
+        });
+
+
+        historialContent.innerHTML = historialHtml;
+    }
+
+    // Función para abrir imagen ampliada
+    function abrirModalImagen(src) {
+        document.getElementById('imagenAmpliada').src = src;
+        document.getElementById('modalImagen').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function eliminarUltimoSeguimiento(reclamoid) {
+        fetch(`/api/eliminar_ultimo_seguimiento/${reclamoid}`, {
+            method: 'DELETE'
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Último seguimiento eliminado correctamente.');
+                    cargarHistorial(reclamoid); // recarga el historial actualizado
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Ocurrió un error al intentar eliminar el seguimiento.');
+            });
+    }
+
+    // Función para cerrar imagen ampliada
+    function cerrarModalImagen() {
+        document.getElementById('modalImagen').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    // Función para filtrar reclamos
+    function filtrarReclamos() {
+        const searchValue = document.getElementById('value_search').value.toLowerCase();
+        const estadoFilter = document.getElementById('estado_filter').value;
+
+        const filas = document.querySelectorAll('#reclamosTableBody tr');
+
+        filas.forEach(fila => {
+            const cliente = fila.cells[1].textContent.toLowerCase();
+            const correo = fila.cells[2].textContent.toLowerCase();
+            const id = fila.cells[0].textContent.toLowerCase();
+            const estadoId = fila.getAttribute('data-estado-id');
+
+            let mostrar = true;
+
+            if (searchValue && !cliente.includes(searchValue) &&
+                !correo.includes(searchValue) && !id.includes(searchValue)) {
+                mostrar = false;
+            }
+
+            if (estadoFilter && estadoId !== estadoFilter) {
+                mostrar = false;
+            }
+
+            fila.style.display = mostrar ? '' : 'none';
+        });
+    }
+
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('value_search').addEventListener('input', filtrarReclamos);
+        document.getElementById('estado_filter').addEventListener('change', filtrarReclamos);
+
+        document.getElementById('formRespuesta').addEventListener('submit', function (e) {
+            const detalle = document.getElementById('detalle_reclamo_id').value;
+            if (!detalle) {
+                e.preventDefault();
+                alert('Por favor seleccione un tipo de respuesta.');
+                return false;
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                cerrarModalImagen();
+            }
+        });
+    });
+</script>
+
+{% endblock %}
