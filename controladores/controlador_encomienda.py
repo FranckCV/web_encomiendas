@@ -54,15 +54,11 @@ def get_table():
             te.monto_total,
             te.fecha,
             te.hora,
-            te.comprobante_serie,
             te.clienteid,
-            te.tipo_comprobanteid,
             te.monto_total,
             te.recojo_casa,
             te.direccion_recojo,
             te.descripcion,
-
-            tc.nombre AS nom_tip_comprobante,
             CASE 
                 WHEN te.masivo = 1 THEN 'Masivo'
                 ELSE 'Individual'
@@ -80,10 +76,9 @@ def get_table():
 
         FROM transaccion_encomienda te
         INNER JOIN cliente c ON c.id = te.clienteid
-        INNER JOIN tipo_comprobante tc ON tc.id = te.tipo_comprobanteid
         INNER JOIN sucursal s ON s.id = te.id_sucursal_origen
         INNER JOIN ubigeo u ON u.codigo = s.ubigeocodigo
-        ORDER BY te.fecha DESC, te.hora DESC
+        ORDER BY te.fecha DESC, te.hora DESC;
     '''
 
     columnas = {
@@ -94,7 +89,6 @@ def get_table():
         'recojo_casa_txt': ['¿Recojo en casa?', 1],
         'fecha': ['Fecha', 1],
         'hora': ['Hora', 1],
-        'nom_tip_comprobante': ['Comprobante', 1.5],
         'nombre_cliente': ['Cliente', 2],
     }
 

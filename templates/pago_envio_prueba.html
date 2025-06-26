@@ -17,7 +17,9 @@
       align-items: center;
       z-index: 999999;
     }
-    
+    #text-mixto{
+      margin:10px 0px;
+    }
     .modal-content {
       background-color: #ffffff;
       border-radius: 15px;
@@ -92,12 +94,12 @@
     }
 
     .info-mixto {
-      background: #fff3cd;
+      background: #93e0ef;
       border: 1px solidrgb(10, 37, 168);
       padding: 1rem;
       border-radius: 8px;
       margin-bottom: 1.5rem;
-      color: #856404;
+      color:rgb(17, 2, 68);
     }
 
     .detalles-envios {
@@ -200,7 +202,7 @@
       {% if envios_otras_modalidades|length > 0 %}
         <div class="info-mixto">
           <h4>Envíos mixtos</h4>
-          <p><strong>Tu pedido incluye envíos con diferentes modalidades de pago:</strong></p>
+          <p id="text-mixto"  ><strong>Tu pedido incluye envíos con diferentes modalidades de pago</strong></p>
           <!---
           <div class="detalles-envios">
             <h4>🌐 Envíos con Pago en Línea ({{ envios_pago_online|length }})</h4>
@@ -286,11 +288,11 @@
               </tr>
               {% if envios_otras_modalidades|length > 0 %}
               <tr>
-                <td>Envíos pago en línea:</td>
+                <td>Envíos con pago en línea:</td>
                 <td class="value-td">{{ envios_pago_online|length }}</td>
               </tr>
               <tr>
-                <td>Envíos otras modalidades:</td>
+                <td>Envíos con otras modalidades:</td>
                 <td class="value-td">{{ envios_otras_modalidades|length }}</td>
               </tr>
               <tr style="border-top: 1px solid #ddd;">
@@ -299,7 +301,7 @@
               </tr>
               {% endif %}
               <tr>
-                <td>Sub Total (Pago Online):</td>
+                <td>Sub Total (Pago en línea):</td>
                 <td class="value-td">S/ {{ "%.2f"|format((total_pago_online / 1.18)|round(2)) }}</td>
               </tr>
               <tr>
@@ -307,7 +309,7 @@
                 <td class="value-td">S/ {{ "%.2f"|format((total_pago_online * 0.18 / 1.18)|round(2)) }}</td>
               </tr>
               <tr class="total">
-                <td><strong>Total a Pagar Online:</strong></td>
+                <td><strong>Total a Pagar en línea:</strong></td>
                 <td class="value-td"><strong>S/ {{ "%.2f"|format(total_pago_online) }}</strong></td>
               </tr>
             </table>
@@ -334,7 +336,9 @@
     {% else %}
       <!-- SOLO GENERAR RÓTULO -->
       <div class="mensaje-simple">
-        <h3>🏷️ Generar Rótulo de Envío</h3>
+        <h3>
+          
+          Generar Rótulo de Envío</h3>
         <p>Tus envíos han sido registrados. Se generará el rótulo correspondiente.</p>
         
         <div class="resumen-box" style="margin: 2rem auto; max-width: 400px;">
@@ -493,7 +497,7 @@ function enviarDatos() {
   .then(res => res.json())
   .then(response => {
     if (response.status === 'success') {
-      mostrarExito('¡Pago procesado exitosamente!', () => {
+      mostrarExito('¡Procesado exitosamente!', () => {
         window.location.href = '/index';
       });
     } else {
