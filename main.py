@@ -3195,6 +3195,7 @@ def registrar_envios_masivos():
             return jsonify({'status': 'error', 'message': 'No se recibieron datos'}), 400
 
         tipo_comprobante = data.get('tipo_comprobante')
+        registros = data.get('registros')
         # modalidad_pago_seleccionada = data.get('modalidad_pago')
 
         if not tipo_comprobante:
