@@ -93,7 +93,7 @@
 
     .info-mixto {
       background: #fff3cd;
-      border: 1px solid #ffeaa7;
+      border: 1px solidrgb(10, 37, 168);
       padding: 1rem;
       border-radius: 8px;
       margin-bottom: 1.5rem;
@@ -199,9 +199,9 @@
       <!-- PASARELA DE PAGO -->
       {% if envios_otras_modalidades|length > 0 %}
         <div class="info-mixto">
-          <h4>📋 Resumen de Envíos Mixtos</h4>
+          <h4>Envíos mixtos</h4>
           <p><strong>Tu pedido incluye envíos con diferentes modalidades de pago:</strong></p>
-          
+          <!---
           <div class="detalles-envios">
             <h4>🌐 Envíos con Pago en Línea ({{ envios_pago_online|length }})</h4>
             <ul>
@@ -218,11 +218,11 @@
                 <li>Clave: {{ envio.clave }} - S/ {{ "%.2f"|format(envio.tarifa) }} (pago en sucursal/destino)</li>
               {% endfor %}
             </ul>
-          </div>
+          </div>-->
         </div>
       {% else %}
         <div class="info-pago">
-          💳 Pago en Línea - Completa el pago para generar tu comprobante
+          Pago en línea - Completa el pago para generar tu comprobante
         </div>
       {% endif %}
 
