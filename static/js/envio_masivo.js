@@ -518,42 +518,41 @@ class FormManager {
     });
   }
 
-  static setupPinInputs() {
-    const pinInputs = document.querySelectorAll('.pin-input');
+static setupPinInputs() {
+  const pinInputs = document.querySelectorAll('.pin-input');
 
-    pinInputs.forEach((input, idx) => {
-      input.addEventListener('input', e => {
-        if (e.target.value.length > 1) e.target.value = e.target.value.slice(0, 1);
+  pinInputs.forEach((input, idx) => {
+    input.addEventListener('input', e => {
+      if (e.target.value.length > 1) e.target.value = e.target.value.slice(0, 1);
 
-        if (e.target.value && idx < pinInputs.length - 1) {
-          pinInputs[idx + 1].focus();
-        }
+      if (e.target.value && idx < pinInputs.length - 1) {
+        pinInputs[idx + 1].focus();
+      }
 
-        const valores = Array.from(pinInputs).map(i => i.value);
-        if (valores.every(v => v.length === 1)) {
-          const pin = valores.join('');
-          console.log('PIN completo:', pin);
-          const hiddenField = document.getElementById('destino-sucursal-id');
-          if (hiddenField) hiddenField.value = pin;
-        }
-      });
+      const valores = Array.from(pinInputs).map(i => i.value);
+      if (valores.every(v => v.length === 1)) {
+        const pin = valores.join('');
+        console.log('PIN completo:', pin);
 
-      input.addEventListener('keydown', e => {
-        if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'Tab', 'Enter'].includes(e.key)) {
-          e.preventDefault();
-        }
-      });
-
-      input.addEventListener('paste', e => {
-        e.preventDefault();
-        const digits = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 4);
-        digits.split('').forEach((d, i) => {
-          if (pinInputs[i]) pinInputs[i].value = d;
-        });
-        pinInputs[digits.length - 1]?.dispatchEvent(new Event('input'));
-      });
+      }
     });
-  }
+
+    input.addEventListener('keydown', e => {
+      if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'Tab', 'Enter'].includes(e.key)) {
+        e.preventDefault();
+      }
+    });
+
+    input.addEventListener('paste', e => {
+      e.preventDefault();
+      const digits = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 4);
+      digits.split('').forEach((d, i) => {
+        if (pinInputs[i]) pinInputs[i].value = d;
+      });
+      pinInputs[digits.length - 1]?.dispatchEvent(new Event('input'));
+    });
+  });
+}
 
   static clearForm(full = true) {
     const seccion = document.getElementById('seccion-masiva');
@@ -900,98 +899,291 @@ class LocationManager {
 // ===========================
 // GESTIÓN DE ENVÍOS
 // ===========================
+
 class ShippingManager {
+  
+  // Método principal para recoger datos del formulario actual
   static collectFormData() {
     const getValue = (id) => {
       const element = document.getElementById(id);
       return element ? element.value.trim() : '';
     };
 
-    const getSelectText = (id) => {
-      const select = document.getElementById(id);
-      return select?.selectedOptions[0]?.textContent?.trim() || '';
+    const getCheckedRadio = (name) => {
+      const radio = document.querySelector(`input[name="${name}"]:checked`);
+      return radio ? radio.value : '';
+    };
+
+    // Recopilar datos del registro individual
+    const registro = {
+      clave: Array.from(document.querySelectorAll('.pin-input')).map(i => i.value || '').join(''),
+      valorEnvio: parseFloat(getValue('m-valorEnvio')) || 0,
+      peso: parseFloat(getValue('m-peso')) || 0,
+      alto: parseFloat(getValue('m-alto')) || 0,
+      largo: parseFloat(getValue('m-largo')) || 0,
+      ancho: parseFloat(getValue('m-ancho')) || 0,
+      tarifa: 0, // Se calculará en el backend
+      tipoEmpaqueId: parseInt(getValue('m-tipoEmpaque')) || null,
+      tipoArticuloId: parseInt(getValue('m-tipoArticulo')) || null,
+      tipoEntregaId: parseInt(getValue('m-tipoEntrega')) || null,
+      estado_pago: "P", // Por defecto pendiente
+      modalidadPago: getCheckedRadio('modalidad_pago'),
+      destino: {
+        sucursal_destino: parseInt(getValue('select-sucursal')) || null
+      },
+      destinatario: {
+        nombres: getValue('m-nombres'),
+        apellidos: getValue('m-apellidos'),
+        tipo_doc_destinatario: parseInt(getValue('m-tipoDocumento')) || null,
+        num_doc_destinatario: getValue('m-nroDocumento'),
+        num_tel_destinatario: getValue('m-celular')
+      }
+    };
+
+    // Campos adicionales según el tipo de empaque
+    if (parseInt(getValue('m-tipoEmpaque')) === 2) {
+      // Es sobre (folios)
+      registro.cantidad_folios = parseInt(getValue('m-folios')) || null;
+    }
+
+    // Campo adicional según el tipo de entrega
+    if (parseInt(getValue('m-tipoEntrega')) === 2) {
+      // Es entrega a domicilio
+      registro.direccion_destinatario = getValue('m-direccion');
+    }
+
+    // Campos adicionales para RUC (tipo documento 2)
+    if (parseInt(getValue('m-tipoDocumento')) === 2) {
+      registro.destinatario.razon_social = getValue('m-razonSocial');
+      registro.destinatario.contacto = getValue('m-contacto');
+      // Para RUC, usar razón social como nombre
+      registro.destinatario.nombres = getValue('m-razonSocial');
+      registro.destinatario.apellidos = ''; // Vacío para RUC
+    }
+
+    // Determinar el modo correcto
+    let modoEnvio = 'masivo'; // Por defecto
+    if (typeof mode !== 'undefined' && (mode === 'caja' || mode === 'sobre')) {
+      modoEnvio = 'individual';
+    }
+
+    // Estructura principal del payload
+    const formData = {
+      modo: modoEnvio,
+      origen: {
+        sucursal_origen: parseInt(getValue('origen-sucursal')) || null
+      },
+      remitente: {
+        nombre_remitente: getValue('remitente-nombre'),
+        correo_remitente: getValue('remitente-email'),
+        num_tel_remitente: getValue('remitente-telefono'),
+        num_doc_remitente: getValue('remitente-numero-doc'),
+        tipo_doc_remitente: parseInt(getValue('remitente-tipo-doc')) || null
+      },
+      registros: [registro]
+    };
+
+    console.log('Datos recolectados del formulario:', formData);
+    return formData;
+  }
+
+  // Método para envíos masivos
+  static collectMassiveFormData() {
+    // Para envíos masivos, usar los datos del primer registro para remitente y origen
+    const primerRegistro = window.registros && window.registros.length > 0 ? window.registros[0] : null;
+    
+    if (!primerRegistro) {
+      throw new Error('No hay registros para procesar');
+    }
+
+    // Convertir registros al formato correcto
+    const registrosFormateados = window.registros.map(envio => {
+      const registro = {
+        clave: envio.clave || '',
+        valorEnvio: parseFloat(envio.valorEnvio) || 0,
+        peso: parseFloat(envio.peso) || 0,
+        alto: parseFloat(envio.alto) || 0,
+        largo: parseFloat(envio.largo) || 0,
+        ancho: parseFloat(envio.ancho) || 0,
+        tarifa: 0, // Se calculará en el backend
+        tipoEmpaqueId: parseInt(envio.tipoEmpaqueId) || null,
+        tipoArticuloId: parseInt(envio.tipoArticuloId) || null,
+        tipoEntregaId: parseInt(envio.tipoEntregaId) || null,
+        estado_pago: "P",
+        modalidadPago: envio.modalidadPago,
+        destino: {
+          sucursal_destino: parseInt(envio.destino?.sucursal_destino) || null
+        },
+        destinatario: {
+          nombres: envio.destinatario?.nombres || '',
+          apellidos: envio.destinatario?.apellidos || '',
+          tipo_doc_destinatario: parseInt(envio.destinatario?.tipo_doc_destinatario) || null,
+          num_doc_destinatario: envio.destinatario?.num_doc_destinatario || '',
+          num_tel_destinatario: envio.destinatario?.num_tel_destinatario || ''
+        }
+      };
+
+      // Campos condicionales
+      if (parseInt(envio.tipoEmpaqueId) === 2) {
+        registro.cantidad_folios = parseInt(envio.folios) || null;
+      }
+
+      if (parseInt(envio.tipoEntregaId) === 2) {
+        registro.direccion_destinatario = envio.destino?.direccion || '';
+      }
+
+      if (parseInt(envio.destinatario?.tipo_doc_destinatario) === 2) {
+        registro.destinatario.razon_social = envio.destinatario?.razon_social || '';
+        registro.destinatario.contacto = envio.destinatario?.contacto || '';
+        registro.destinatario.nombres = envio.destinatario?.razon_social || '';
+        registro.destinatario.apellidos = '';
+      }
+
+      return registro;
+    });
+
+    const formData = {
+      modo: 'masivo', // Los envíos masivos siempre son modo "masivo"
+      origen: {
+        sucursal_origen: parseInt(primerRegistro.origen?.sucursal_origen) || null
+      },
+      remitente: {
+        nombre_remitente: primerRegistro.remitente?.nombre_remitente || '',
+        correo_remitente: primerRegistro.remitente?.correo_remitente || '',
+        num_tel_remitente: primerRegistro.remitente?.num_tel_remitente || '',
+        num_doc_remitente: primerRegistro.remitente?.num_doc_remitente || '',
+        tipo_doc_remitente: parseInt(primerRegistro.remitente?.tipo_doc_remitente) || null
+      },
+      registros: registrosFormateados
+    };
+
+    return formData;
+  }
+
+  // CORREGIDO: Mejor manejo de errores y múltiples formas de encontrar el texto
+  static getModalidadPagoTexto(value) {
+    if (!value) return 'No especificado';
+
+    const radio = document.querySelector(`input[name="modalidad_pago"][value="${value}"]`);
+    if (!radio) return value;
+
+    // Buscar el texto en múltiples formas posibles
+    const container = radio.closest('div') || radio.parentElement;
+    
+    // Intentar diferentes selectores para encontrar el texto
+    const textElement = 
+      container.querySelector('label[for="' + radio.id + '"]') ||  // Label específico
+      container.querySelector('label') ||                          // Cualquier label
+      container.querySelector('.payment-text') ||                 // Clase específica
+      container.querySelector('span') ||                          // Span
+      radio.nextElementSibling ||                                 // Elemento siguiente
+      container;                                                  // Container mismo
+
+    if (textElement && textElement.textContent) {
+      const texto = textElement.textContent.trim();
+      // Filtrar texto que no sea útil (como solo números o símbolos)
+      return texto && texto !== value ? texto : value;
+    }
+
+    return value;
+  }
+
+  // Método para guardar registro en window.registros
+  static guardarRegistro() {
+    if (!this.validateEnvio()) {
+      Utils.showModal({ message: 'Complete todos los campos visibles' });
+      return;
+    }
+
+    const getValue = (id) => {
+      const element = document.getElementById(id);
+      return element ? element.value.trim() : '';
     };
 
     const getCheckedRadio = (name) => {
       const radio = document.querySelector(`input[name="${name}"]:checked`);
       return radio ? radio.value : '';
     };
-      let valorDireccion=''; 
-      if(getValue('m-tipoEntrega')=='2'){
-           valorDireccion= document.getElementById('m-direccion').value
-        }
 
-    const formData = {
-      modo: typeof mode !== 'undefined' ? mode : null,
-      remitente: {
-        tipo_doc_remitente: getValue('remitente-tipo-doc'),
-        num_doc_remitente: getValue('remitente-numero-doc'),
-        num_tel_remitente: getValue('remitente-telefono'),
-        nombre_remitente: getValue('remitente-nombre'),
-        correo_remitente: getValue('remitente-email'),
-      },
-      origen: {
-        departamento_origen: getValue('origen-departamento'),
-        provincia_origen: getValue('origen-provincia'),
-        distrito_origen: getValue('origen-distrito'),
-        sucursal_origen: getValue('origen-sucursal')
-      },
-      tipoEntrega: getSelectText('m-tipoEntrega'),
-      tipoEntregaId: getValue('m-tipoEntrega'),
-      destino: {
-        departamento: getValue('select-departamento'),
-        provincia: getValue('select-provincia'),
-        distrito: getValue('select-distrito'),
-        sucursal_destino: getValue('select-sucursal'),
-        direccion : valorDireccion,
-      },
-      tipoEmpaque: getSelectText('m-tipoEmpaque'),
-      tipoEmpaqueId: getValue('m-tipoEmpaque'),
-      tipoArticulo: getSelectText('m-tipoArticulo'),
-      tipoArticuloId: getValue('m-tipoArticulo'),
-      folios: getValue('m-folios') || null,
+    const modalidadPagoValue = getCheckedRadio('modalidad_pago');
+    const modalidadPagoTexto = this.getModalidadPagoTexto(modalidadPagoValue);
+
+    // Crear el registro en el formato correcto para window.registros
+    const registro = {
+      clave: Array.from(document.querySelectorAll('.pin-input')).map(i => i.value || '').join(''),
       valorEnvio: parseFloat(getValue('m-valorEnvio')) || 0,
       peso: parseFloat(getValue('m-peso')) || 0,
+      alto: parseFloat(getValue('m-alto')) || 0,
       largo: parseFloat(getValue('m-largo')) || 0,
       ancho: parseFloat(getValue('m-ancho')) || 0,
-      alto: parseFloat(getValue('m-alto')) || 0,
-      descripcion: getValue('m-descripcionArticulo'),
+      tipoEmpaqueId: parseInt(getValue('m-tipoEmpaque')) || null,
+      tipoArticuloId: parseInt(getValue('m-tipoArticulo')) || null,
+      tipoEntregaId: parseInt(getValue('m-tipoEntrega')) || null,
+      modalidadPago: modalidadPagoValue,
+      modalidadPagoTexto: modalidadPagoTexto, // CORREGIDO: Espaciado
+      
+      folios: getValue('m-folios') ? parseInt(getValue('m-folios')) : null,
+      
+      // Datos para mostrar en la tabla (mantener compatibilidad)
+      tipoEntrega: this.getSelectText('m-tipoEntrega'),
+      tipoEmpaque: this.getSelectText('m-tipoEmpaque'),
+      tipoArticulo: this.getSelectText('m-tipoArticulo'),
+      
+      origen: {
+        sucursal_origen: parseInt(getValue('origen-sucursal')) || null,
+        departamento_origen: this.getSelectText('origen-departamento'), // CORREGIDO: Usar texto
+        provincia_origen: this.getSelectText('origen-provincia'),       // CORREGIDO: Usar texto
+        distrito_origen: this.getSelectText('origen-distrito')          // CORREGIDO: Usar texto
+      },
+      
+      destino: {
+        sucursal_destino: parseInt(getValue('select-sucursal')) || null,
+        departamento: this.getSelectText('select-departamento'),        // CORREGIDO: Usar texto
+        provincia: this.getSelectText('select-provincia'),              // CORREGIDO: Usar texto
+        distrito: this.getSelectText('select-distrito'),                // CORREGIDO: Usar texto
+        direccion: getValue('m-direccion') || null
+      },
+      
       destinatario: {
-        tipo_doc_destinatario: getValue('m-tipoDocumento'),
+        nombres: getValue('m-nombres'),
+        apellidos: getValue('m-apellidos'),
+        tipo_doc_destinatario: parseInt(getValue('m-tipoDocumento')) || null,
         num_doc_destinatario: getValue('m-nroDocumento'),
         num_tel_destinatario: getValue('m-celular'),
-        nombre_destinatario: this.getDestinatarioName(),
         razon_social: getValue('m-razonSocial'),
         contacto: getValue('m-contacto'),
-        nombres: getValue('m-nombres'),
-        apellidos: getValue('m-apellidos')
+        // Para compatibilidad con la tabla
+        nombre_destinatario: this.getDestinatarioName()
       },
-      modalidadPago: getCheckedRadio('modalidad_pago'),
-      clave: Array.from(document.querySelectorAll('.pin-input')).map(i => i.value || '').join('')
+      
+      remitente: {
+        nombre_remitente: getValue('remitente-nombre'),
+        correo_remitente: getValue('remitente-email'),
+        num_tel_remitente: getValue('remitente-telefono'),
+        num_doc_remitente: getValue('remitente-numero-doc'),
+        tipo_doc_remitente: parseInt(getValue('remitente-tipo-doc')) || null
+      }
     };
 
-    // Validar que los campos críticos no estén vacíos
-    const requiredFields = [
-      'tipoEntregaId', 'tipoEmpaqueId', 'valorEnvio', 'peso',
-      'largo', 'ancho', 'alto', 'modalidadPago'
-    ];
-
-    for (let field of requiredFields) {
-      if (!formData[field] && formData[field] !== 0) {
-        console.warn(`Campo requerido vacío: ${field}`);
-      }
+    if (editingIndex !== null) {
+      window.registros[editingIndex] = registro;
+      editingIndex = null;
+    } else {
+      window.registros.push(registro);
     }
 
-    console.log('Datos recolectados del formulario:', formData);
-    return formData;
+    TableManager.renderTabla();
+    FormManager.clearForm(false);
+    FormManager.lockOrigen();
   }
 
+  // Método para obtener texto de select
   static getSelectText(selectId) {
     const select = document.getElementById(selectId);
-    return select?.selectedOptions[0]?.textContent || '';
+    return select?.selectedOptions[0]?.textContent?.trim() || '';
   }
 
-
+  // Método para obtener nombre del destinatario
   static getDestinatarioName() {
     const tipoDoc = document.getElementById('m-tipoDocumento')?.value;
     if (tipoDoc === '2') {
@@ -1003,59 +1195,64 @@ class ShippingManager {
     }
   }
 
-  static recolectarDatosEnvio() {
-    return {
-      tipo_documento_origen: document.getElementById('remitente-tipo-doc')?.value || null,
-      dni_origen: document.getElementById('remitente-numero-doc')?.value.trim(),
-      cel_origen: document.getElementById('remitente-telefono')?.value.trim(),
-      nombre_remitente: document.getElementById('remitente-nombre')?.value.trim(),
-      email: document.getElementById('remitente-email')?.value.trim(),
-      id_origen: document.getElementById('origen-sucursal-id')?.value,
-      tipo_recepcion: document.getElementById('m-tipoEntrega')?.value || null,
-      cod_seguridad: document.getElementById('remitente-codigo')?.value.trim(),
-      id_destino: document.getElementById('destino-sucursal-id')?.value || null,
-      id_empaque: document.getElementById('m-tipoEmpaque')?.value,
-      valor_paquete: document.getElementById('m-valorEnvio')?.value,
-      peso: document.getElementById('m-peso')?.value,
-      largo: document.getElementById('m-largo')?.value,
-      ancho: document.getElementById('m-ancho')?.value,
-      alto: document.getElementById('m-alto')?.value,
-      descripcion: document.getElementById('m-descripcionArticulo')?.value.trim(),
-      tipo_documento_destino: document.getElementById('m-tipoDocumento')?.value,
-      dni_destino: document.getElementById('m-nroDocumento')?.value.trim(),
-      cel_destino: document.getElementById('m-celular')?.value.trim(),
-      nombre_destinatario: this.getDestinatarioName(),
-      contacto_destino: document.getElementById('m-contacto')?.value.trim(),
-      distrito_origen: document.getElementById('origen-distrito')?.value,
-      distrito_destino_sucursal: document.getElementById('select-distrito')?.value,
-      direccion_destino: document.getElementById('m-direccion')?.value.trim(),
-      folios: document.getElementById('m-folios')?.value ?
-        parseInt(document.getElementById('m-folios').value) : null,
-      tipo_articulo: document.getElementById('m-tipoArticulo')?.value,
-    };
+  // Método principal para enviar datos
+  static async enviarDatosResumen() {
+    try {
+      // Determinar si es envío individual o masivo
+      const btnAdd = document.querySelector('.btn-agregar');
+      const isIndividualShipment = btnAdd && window.getComputedStyle(btnAdd).display === 'none';
+      
+      // También verificar si el mode es 'caja' o 'sobre' (siempre individual)
+      const isModeIndividual = typeof mode !== 'undefined' && (mode === 'caja' || mode === 'sobre');
+
+      let datosParaEnviar;
+
+      if (isIndividualShipment || isModeIndividual) {
+        console.log('Procesando envío individual...');
+
+        // Validar formulario antes de continuar
+        if (!this.validateEnvio()) {
+          Utils.showModal({ message: 'Complete todos los campos visibles antes de continuar.' });
+          return;
+        }
+
+        // Usar el método corregido para envío individual
+        datosParaEnviar = this.collectFormData();
+      } else {
+        // Envío masivo
+        if (!window.registros || window.registros.length === 0) {
+          Utils.showModal({ message: 'Agrega al menos un envío antes de continuar.' });
+          return;
+        }
+
+        // Usar el método para envíos masivos
+        datosParaEnviar = this.collectMassiveFormData();
+      }
+
+      console.log('Datos finales para enviar:', datosParaEnviar); // AGREGADO: Log para debugging
+
+      // Crear form para envío
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/resumen_envio_prueba';
+      form.style.display = 'none';
+
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'payload';
+      input.value = JSON.stringify(datosParaEnviar);
+      form.appendChild(input);
+
+      document.body.appendChild(form);
+      form.submit();
+
+    } catch (err) {
+      console.error("Error en el envío:", err);
+      Utils.showModal({ message: "Error al procesar el envío: " + err.message });
+    }
   }
 
-  static guardarRegistro() {
-    if (!this.validateEnvio()) {
-      Utils.showModal({ message: 'Complete todos los campos visibles' });
-      return;
-    }
-
-    const envio = this.collectFormData();
-
-    if (editingIndex !== null) {
-      window.registros[editingIndex] = envio;
-      editingIndex = null;
-    } else {
-      window.registros.push(envio);
-    }
-
-    TableManager.renderTabla();
-    FormManager.clearForm(false);
-    FormManager.lockOrigen();
-  }
-
-
+  // CORREGIDO: Validación mejorada de radio buttons
   static validateEnvio() {
     function isHidden(el) {
       while (el) {
@@ -1066,73 +1263,43 @@ class ShippingManager {
       }
       return false;
     }
+
     const panels = document.querySelectorAll('.tabs-content .tab-panel');
-    console.log('Total de paneles:', panels.length);
 
     for (const panel of panels) {
-      console.group(`Panel: ${panel.id}`);
-
       const selectAndTextInputs = panel.querySelectorAll('select, input[type="text"], input[type="number"]');
-      console.log(`Campos encontrados: ${selectAndTextInputs.length}`);
-
-      const fieldDetails = [];
 
       for (const f of selectAndTextInputs) {
         if (f.id === 'm-descripcionArticulo') continue;
         if (isHidden(f)) continue;
-        const fieldInfo = {
-          id: f.id || f.name,
-          type: f.tagName.toLowerCase() === 'select' ? 'select' : f.type,
-          value: f.value.trim(),
-          valid: !!f.value.trim()
-        };
-
-        fieldDetails.push(fieldInfo);
-
-        if (!fieldInfo.valid) {
-          console.warn(`Campo inválido: ${fieldInfo.id}`);
-          console.log('Detalles del campo:', fieldInfo);
-          console.groupEnd();
+        
+        if (!f.value.trim()) {
+          console.warn('Campo vacío encontrado:', f.id || f.name);
           return false;
         }
       }
 
-      console.log('Detalles de campos:', fieldDetails);
+      // CORREGIDO: Mejor validación de radio buttons
+      const radioGroups = {};
+      panel.querySelectorAll('input[type="radio"]').forEach(radio => {
+        if (radio.name && !isHidden(radio)) {
+          radioGroups[radio.name] = radioGroups[radio.name] || [];
+          radioGroups[radio.name].push(radio);
+        }
+      });
 
-      const requiredRadios = Array.from(
-        panel.querySelectorAll('input[type="radio"][required]')
-      );
-
-      const radioGroups = [...new Set(requiredRadios.map(r => r.name))];
-
-      console.log('Grupos de Radio Requeridos:', radioGroups);
-
-      for (const name of radioGroups) {
-        const grupo = panel.querySelectorAll(`input[name="${name}"]`);
-
-        const radioGroupInfo = {
-          name: name,
-          totalRadios: grupo.length,
-          checkedRadios: Array.from(grupo).filter(r => r.checked),
-          isValid: Array.from(grupo).some(r => r.checked)
-        };
-
-        console.log('Grupo de Radio:', radioGroupInfo);
-
-        if (grupo.length > 0 && !radioGroupInfo.isValid) {
-          console.warn(`Grupo de Radio "${name}" sin selección`);
-          console.groupEnd();
+      for (const [groupName, radios] of Object.entries(radioGroups)) {
+        if (radios.length > 0 && !radios.some(r => r.checked)) {
+          console.warn(`Grupo de radio "${groupName}" sin selección`);
           return false;
         }
       }
-
-      console.log('Validación de panel: ÉXITO');
-      console.groupEnd();
     }
 
     return true;
   }
 
+  // Métodos auxiliares para compatibilidad
   static startEdit(idx) {
     editingIndex = idx;
     this.fillFormData(window.registros[idx]);
@@ -1150,9 +1317,9 @@ class ShippingManager {
   }
 
   static fillFormData(r) {
-    // Implementar llenado de formulario basado en los datos del registro
-    // Esta función necesitaría ser adaptada según la estructura exacta de tus datos
     console.log('Llenando formulario con:', r);
+    // TODO: Implementar llenado de formulario para edición
+    // Esta función debería llenar todos los campos del formulario con los datos del registro
   }
 
   static limpiarCampos() {
@@ -1169,69 +1336,7 @@ class ShippingManager {
     document.querySelectorAll(".pin-input").forEach(input => input.value = "");
   }
 
-  static async enviarDatosResumen() {
-    try {
-      // Si es envío individual, recolectar datos del formulario actual
-      const btnAdd = document.querySelector('.btn-agregar');
-      const isIndividualShipment = btnAdd && window.getComputedStyle(btnAdd).display === 'none';
-
-      let datosParaEnviar;
-
-      if (isIndividualShipment) {
-        console.log('Procesando envío individual...');
-
-        // Validar formulario antes de continuar
-        if (!this.validateEnvio()) {
-          Utils.showModal({ message: 'Complete todos los campos visibles antes de continuar.' });
-          return;
-        }
-
-        // Recoger datos del formulario actual
-        const envioIndividual = this.collectFormData();
-        datosParaEnviar = {
-          envios: [envioIndividual],
-          remitente: envioIndividual.remitente,
-          modalidad_pago: envioIndividual.modalidadPago,
-          tipo_envio: 'individual'
-        };
-      } else {
-        // Envío masivo - usar registros existentes
-        if (!window.registros || window.registros.length === 0) {
-          Utils.showModal({ message: 'Agrega al menos un envío antes de continuar.' });
-          return;
-        }
-
-        datosParaEnviar = {
-          envios: window.registros,
-          remitente: window.registros[0]?.remitente || {},
-          modalidad_pago: window.registros[0]?.modalidadPago || '',
-          tipo_envio: 'masivo'
-        };
-      }
-      // Crear un form "invisible"
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = '/resumen_envio_prueba';
-      form.style.display = 'none';
-
-      // Meter el JSON en un input oculto
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'payload';
-      input.value = JSON.stringify(datosParaEnviar);
-      form.appendChild(input);
-
-      document.body.appendChild(form);
-
-      // Enviar el form → navega a /resumen_envio_prueba
-      form.submit();
-    } catch (err) {
-      console.error("Error en el envío:", err);
-      Utils.showModal({ message: "Error al procesar el envío: " + err.message });
-    }
-  }
-
-  // Mantener el método anterior para compatibilidad, pero que use el nuevo
+  // Métodos legacy para compatibilidad
   static async continuarProceso() {
     return this.enviarDatosResumen();
   }
@@ -1239,50 +1344,111 @@ class ShippingManager {
   static async enviarDatos() {
     return this.enviarDatosResumen();
   }
+
+  static recolectarDatosEnvio() {
+    // Método legacy - mantener por compatibilidad
+    return this.collectFormData();
+  }
 }
+
 // ===========================
 // GESTIÓN DE TABLA
 // ===========================
 class TableManager {
-  static renderTabla() {
-    const container = document.getElementById('tableContent');
-    if (!container) return;
+static renderTabla() {
+  const container = document.getElementById('tableContent');
+  const totalEnvios = document.getElementById('totalEnvios');
+  const pesoTotal = document.getElementById('pesoTotal');
+  const valorTotal = document.getElementById('valorTotal');
+  
+  if (!container) return;
 
-    if (window.registros.length === 0) {
-      container.innerHTML = '<div class="empty-state"><p>No hay envíos registrados aún</p><p>Comienza agregando tu primer envío</p></div>';
-      return;
+  if (window.registros.length === 0) {
+    container.innerHTML = '<div class="empty-state"><p>No hay envíos registrados aún</p><p>Comienza agregando tu primer envío</p></div>';
+    
+    // Actualizar totales a cero
+    if (totalEnvios) totalEnvios.textContent = '0';
+    if (pesoTotal) pesoTotal.textContent = '0';
+    if (valorTotal) valorTotal.textContent = '0.00';
+    return;
+  }
+
+  let sumaPeso = 0;
+  let sumaValor = 0;
+
+  let html = '<div style="overflow-x: auto;"><table><thead><tr>' +
+    '<th>#</th><th>Recepción</th><th>Destino</th><th>Paquete</th>' +
+    '<th>Valor</th><th>Peso</th><th>Dimensiones</th>' +
+    '<th>Destinatario</th><th>Modalidad pago</th><th>Clave</th><th>Acciones</th>' +
+    '</tr></thead><tbody>';
+
+  window.registros.forEach((r, i) => {
+    // Extraer valores seguros
+    const tipoEntrega = r.tipoEntrega || 'N/A';
+    const departamento = r.destino?.departamento || 'N/A';
+    const provincia = r.destino?.provincia || 'N/A';
+    const distrito = r.destino?.distrito || 'N/A';
+    const valorEnvio = parseFloat(r.valorEnvio) || 0;
+    const peso = parseFloat(r.peso) || 0;
+    const largo = r.largo || 0;
+    const ancho = r.ancho || 0;
+    const alto = r.alto || 0;
+    const nombreDestinatario = r.destinatario?.nombre_destinatario || 'N/A';
+    const modalidadPago = r.modalidadPagoTexto || 'N/A';
+    const clave = r.clave || '';
+
+    // Acumular totales
+    sumaPeso += peso;
+    sumaValor += valorEnvio;
+
+    // Determinar el tipo de paquete
+    let tipoPaquete = '';
+    if (parseInt(r.tipoEmpaqueId) === 2) {
+      tipoPaquete = `${r.folios || 0} folios`;
+    } else {
+      tipoPaquete = `${r.tipoEmpaque || 'Paquete'} - ${r.tipoArticulo || 'Artículo'}`;
     }
 
-    let html = '<table><thead><tr>' +
-      '<th>#</th><th>Recepción</th><th>Destino</th><th>Paquete</th>' +
-      '<th>Valor</th><th>Peso</th><th>Dimensiones</th>' +
-      '<th>Destinatario</th><th>Modalidad pago</th><th>Clave</th><th>Acciones</th>' +
-      '</tr></thead><tbody>';
+    html += `<tr>` +
+      `<td>${i + 1}</td>` +
+      `<td>${tipoEntrega}</td>` +
+      `<td>` +
+        `<div>${distrito}</div>` +
+        `<small>${provincia}, ${departamento}</small>` +
+      `</td>` +
+      `<td>` +
+        `<div>${tipoPaquete}</div>` +
+        `<small>${r.descripcion || ''}</small>` +
+      `</td>` +
+      `<td><strong>S/ ${valorEnvio.toFixed(2)}</strong></td>` +
+      `<td>${peso} kg</td>` +
+      `<td><small>${largo}x${ancho}x${alto} cm</small></td>` +
+      `<td>` +
+        `<div><strong>${nombreDestinatario}</strong></div>` +
+        `<small>${r.destinatario?.tipo_doc_destinatario === 2 ? 'RUC' : 'DNI'}: ${r.destinatario?.num_doc_destinatario || ''}</small>` +
+      `</td>` +
+      `<td>${modalidadPago}</td>` +
+      `<td>${clave}</td>` +
+      `<td>` +
+      ` <div class="btn-actions">` +
+      `<button class="btn-small btn-edit" data-index="${i}" title="Editar"><i class="fa fa-edit"></i></button>` +
+      `<button class="btn-small btn-delete" data-index="${i}" title="Eliminar"><i class="fa fa-trash"></i></button>` +
+      `</div>` +
+      `</td></tr>`;
+  });
 
-    window.registros.forEach((r, i) => {
-      html += `<tr>` +
-        `<td>${i + 1}</td>` +
-        `<td>${r.tipoEntrega}</td>` +
-        `<td>${r.destino.departamento}/${r.destino.provincia}/${r.destino.distrito}</td>` +
-        `<td>${r.tipoEmpaque === '2' ? r.folios + ' folios' : r.tipoEmpaque + ' - ' + r.tipoArticulo}</td>` +
-        `<td>${r.valorEnvio}</td>` +
-        `<td>${r.peso}</td>` +
-        `<td>${r.largo} cm x ${r.ancho} cm x ${r.alto} cm</td>` +
-        `<td>${r.destinatario.nombre_destinatario}</td>` +
-        `<td>${r.modalidadPago}</td>` +
-        `<td>${r.clave}</td>` +
-        `<td>` +
-        ` <div class="btn-actions">` +
-        `<button class="btn-small btn-edit" data-index="${i}"><i class="fa fa-edit"></i></button>` +
-        `<button class="btn-small btn-delete" data-index="${i}"><i class="fa fa-trash"></i></button>` +
-        `</div>` +
-        `</td></tr>`;
-    });
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
 
-    html += '</tbody></table>';
-    container.innerHTML = html;
-    this.attachTableActions();
-  }
+  // Actualizar totales
+  if (totalEnvios) totalEnvios.textContent = window.registros.length;
+  if (pesoTotal) pesoTotal.textContent = sumaPeso.toFixed(2);
+  if (valorTotal) valorTotal.textContent = sumaValor.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+  // Adjuntar eventos de la tabla
+  this.attachTableActions();
+}
+
 
   static attachTableActions() {
     document.querySelectorAll('.btn-delete').forEach(btn => {
@@ -1312,136 +1478,47 @@ class TableManager {
     });
   }
 
-  static actualizarTabla() {
-    const tableContent = document.getElementById('tableContent');
-    const totalEnvios = document.getElementById('totalEnvios');
-    const pesoTotal = document.getElementById('pesoTotal');
-    const valorTotal = document.getElementById('valorTotal');
 
-    if (!tableContent) return;
-
-    const stored = localStorage.getItem(CONFIG.STORAGE_KEY);
-    const envios = stored ? JSON.parse(stored) : [];
-
-    if (envios.length === 0) {
-      tableContent.innerHTML = `
-        <div class="empty-state">
-          <p>No hay envíos registrados aún</p>
-          <p>Comienza agregando tu primer envío</p>
-        </div>
-      `;
-      if (totalEnvios) totalEnvios.textContent = '0';
-      if (pesoTotal) pesoTotal.textContent = '0';
-      if (valorTotal) valorTotal.textContent = '0.00';
-      return;
-    }
-
-    let sumaPeso = 0;
-    let sumaValor = 0;
-
-    let html = `
-      <div style="overflow-x: auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th><th>Tipo</th><th>Destinatario</th><th>Destino</th>
-              <th>Descripción</th><th>Dimensiones</th><th>Peso</th><th>Valor</th><th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-    `;
-
-    envios.forEach((envio, index) => {
-      const paquete = envio.paquete || {};
-      const destino = envio.destino || {};
-      const destinatario = envio.destinatario || {};
-
-      sumaPeso += parseFloat(paquete.peso) || 0;
-      sumaValor += parseFloat(paquete.valorEnvio) || 0;
-
-      let nombreDest = '';
-      if (destinatario.tipoDocumento === '2') {
-        nombreDest = destinatario.razonSocial || '';
-      } else {
-        nombreDest = `${destinatario.nombres || ''} ${destinatario.apellidos || ''}`.trim();
-      }
-
-      html += `
-        <tr>
-          <td>${index + 1}</td>
-          <td><span class="badge">${destino.tipoEntregaNombre}</span></td>
-          <td>
-            <div><strong>${nombreDest}</strong></div>
-            <small>${destinatario.tipoDocumentoNombre || ''}: ${destinatario.nroDocumento || ''}</small>
-          </td>
-          <td>
-            <div>${destino.distrito || ''}</div>
-            <small>${destino.provincia || ''}, ${destino.departamento || ''}</small>
-          </td>
-          <td>
-            <div>${paquete.descripcion || ''}</div>
-            <small>${paquete.contenidoPaqueteNombre || ''} - ${paquete.tipoEmpaqueNombre || ''}</small>
-          </td>
-          <td><small>${paquete.largo || 0}x${paquete.ancho || 0}x${paquete.alto || 0} cm</small></td>
-          <td>${paquete.peso || 0} kg</td>
-          <td><strong>S/ ${(parseFloat(paquete.valorEnvio) || 0).toFixed(2)}</strong></td>
-          <td>
-            <div class="btn-actions">
-              <button class="btn-small btn-editar" onclick="editarEnvio(${index})"><i class="fa fa-edit"></i></button>
-              <button class="btn-small btn-eliminar" onclick="eliminarEnvio(${index})"><i class="fa fa-trash"></i></button>
-            </div>
-          </td>
-        </tr>
-      `;
-    });
-
-    html += `</tbody></table></div>`;
-    tableContent.innerHTML = html;
-
-    if (totalEnvios) totalEnvios.textContent = envios.length;
-    if (pesoTotal) pesoTotal.textContent = sumaPeso.toFixed(2);
-    if (valorTotal) valorTotal.textContent = sumaValor.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
 }
 
 // ===========================
 // GESTIÓN DE EXPORT
 // ===========================
 class ExportManager {
-  static exportXLSX() {
-    if (!window.registros || window.registros.length === 0) {
-      return Utils.showModal({ message: 'No hay envíos para exportar.' });
-    }
-
-    const data = window.registros.map(e => ({
-      'Modalidad de Pago': e.modalidadPago,
-      'Tipo de Entrega': e.tipoEntrega,
-      'Depto. Destino': e.destino.departamento,
-      'Provincia Destino': e.destino.provincia,
-      'Distrito Destino': e.destino.distrito,
-      'Tipo de Empaque': e.tipoEmpaque,
-      'Tipo de Contenido': e.tipoArticulo || '',
-      '# Folios': e.folios || '',
-      'Valor (S/)': e.valorEnvio,
-      'Peso (kg)': e.peso,
-      'Largo (cm)': e.largo,
-      'Ancho (cm)': e.ancho,
-      'Alto (cm)': e.alto,
-      'Destinatario': e.destinatario.nombre_destinatario,
-      'Clave de seguridad': e.clave
-    }));
-
-    // Si XLSX está disponible globalmente
-    if (typeof XLSX !== 'undefined') {
-      const ws = XLSX.utils.json_to_sheet(data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Envíos Masivos');
-      XLSX.writeFile(wb, 'envios_masivos.xlsx');
-    } else {
-      console.error('XLSX library not available');
-      Utils.showModal({ message: 'Error: Biblioteca de exportación no disponible.' });
-    }
+static exportXLSX() {
+  if (!window.registros || window.registros.length === 0) {
+    return Utils.showModal({ message: 'No hay envíos para exportar.' });
   }
+
+  const data = window.registros.map(e => ({
+    'Modalidad de Pago': e.modalidadPago || '',
+    'Tipo de Entrega': e.tipoEntrega || '',
+    'Depto. Destino': e.destino?.departamento || '',
+    'Provincia Destino': e.destino?.provincia || '',
+    'Distrito Destino': e.destino?.distrito || '',
+    'Tipo de Empaque': e.tipoEmpaque || '',
+    'Tipo de Contenido': e.tipoArticulo || '',
+    '# Folios': e.folios || '',
+    'Valor (S/)': e.valorEnvio || 0,
+    'Peso (kg)': e.peso || 0,
+    'Largo (cm)': e.largo || 0,
+    'Ancho (cm)': e.ancho || 0,
+    'Alto (cm)': e.alto || 0,
+    'Destinatario': e.destinatario?.nombre_destinatario || '',
+    'Clave de seguridad': e.clave || ''
+  }));
+
+  // Si XLSX está disponible globalmente
+  if (typeof XLSX !== 'undefined') {
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Envíos Masivos');
+    XLSX.writeFile(wb, 'envios_masivos.xlsx');
+  } else {
+    console.error('XLSX library not available');
+    Utils.showModal({ message: 'Error: Biblioteca de exportación no disponible.' });
+  }
+}
 }
 
 // ===========================

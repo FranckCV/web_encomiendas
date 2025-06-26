@@ -164,7 +164,6 @@
               <span class="info-label">Tipo de envío:</span>
               <span class="info-value">{{ tipo_envio|title or 'No especificado' }}</span>
             </div>
-
             <div class="info-item">
               <span class="info-label">Total de paquetes:</span>
               <span class="info-value">{{ envios|length }}</span>
@@ -172,16 +171,12 @@
           </div>
         </div>
 
-        {% if envios[0].origen %}
+        <!-- CORREGIDO: Mostrar información de origen desde la variable origen -->
+        {% if origen and origen.sucursal_origen %}
         <div class="info-item">
           <span class="info-label">Origen:</span>
           <span class="info-value">
-            {{ envios[0].origen.departamento_origen or 'N/A' }} / 
-            {{ envios[0].origen.provincia_origen or 'N/A' }} / 
-            {{ envios[0].origen.distrito_origen or 'N/A' }}
-            {% if envios[0].origen.sucursal_origen %}
-              (Sucursal: {{ envios[0].origen.sucursal_origen }})
-            {% endif %}
+            Sucursal ID: {{ origen.sucursal_origen }}
           </span>
         </div>
         {% endif %}
@@ -209,33 +204,46 @@
             <tr>
               <td><strong>{{ loop.index }}</strong></td>
               <td>
-                <span class="badge {% if envio.tipoEntregaId == '2' %}badge-domicilio{% else %}badge-agencia{% endif %}">
-                  {{ envio.tipoEntrega or 'No especificado' }}
+                <!-- CORREGIDO: Usar tipoEntregaId correcto -->
+                <span class="badge {% if envio.tipoEntregaId == 2 %}badge-domicilio{% else %}badge-agencia{% endif %}">
+                  {% if envio.tipoEntregaId == 2 %}
+                    Entrega a domicilio
+                  {% elif envio.tipoEntregaId == 1 %}
+                    Recojo en agencia
+                  {% else %}
+                    Tipo {{ envio.tipoEntregaId or 'N/A' }}
+                  {% endif %}
                 </span>
               </td>
               <td>
                 <div style="text-align: left;">
-                  <strong>{{ envio.destino.departamento or 'N/A' }} / {{ envio.destino.provincia or 'N/A' }}</strong><br>
-                  <small>{{ envio.destino.distrito or 'N/A' }}</small>
-                  {% if envio.destino.sucursal_destino %}
-                    <br><small>Sucursal: {{ envio.destino.sucursal_destino }}</small>
+                  <!-- CORREGIDO: Mostrar sucursal de destino -->
+                  {% if envio.destino and envio.destino.sucursal_destino %}
+                    <strong>Sucursal ID: {{ envio.destino.sucursal_destino }}</strong>
+                  {% else %}
+                    <strong>Destino no especificado</strong>
                   {% endif %}
-                  {% if envio.destino.direccion %}
-                    <br><small>{{ envio.destino.direccion }}</small>
+                  
+                  <!-- CORREGIDO: Mostrar dirección solo si es entrega a domicilio -->
+                  {% if envio.direccion_destinatario %}
+                    <br><small style="color: #28a745;">📍 {{ envio.direccion_destinatario }}</small>
                   {% endif %}
                 </div>
               </td>
               <td>
                 <div style="text-align: left;">
-                  {% if envio.folios and envio.folios != 'null' and envio.folios != '' %}
-                    <strong>{{ envio.folios }} folios</strong><br>
+                  <!-- CORREGIDO: Lógica de empaque usando cantidad_folios e IDs -->
+                  {% if envio.cantidad_folios %}
+                    <strong>{{ envio.cantidad_folios }} folios</strong><br>
+                    <small>Documentos</small>
+                  {% elif envio.tipoEmpaqueId == 1 %}
+                    <strong>Paquete</strong><br>
+                    <small>Artículo ID: {{ envio.tipoArticuloId or 'N/A' }}</small>
+                  {% elif envio.tipoEmpaqueId == 2 %}
+                    <strong>Sobre</strong><br>
                     <small>Documentos</small>
                   {% else %}
-                    <strong>{{ envio.tipoEmpaque or 'N/A' }}</strong><br>
-                    <small>{{ envio.tipoArticulo or 'Sin especificar' }}</small>
-                  {% endif %}
-                  {% if envio.descripcion %}
-                    <br><small style="color: #6c757d;">{{ envio.descripcion }}</small>
+                    <strong>Empaque ID: {{ envio.tipoEmpaqueId or 'N/A' }}</strong>
                   {% endif %}
                 </div>
               </td>
@@ -249,7 +257,17 @@
               <td>
                 <div style="text-align: left;">
                   {% if envio.destinatario %}
-                    <strong>{{ envio.destinatario.nombre_destinatario or 'No especificado' }}</strong><br>
+                    <!-- CORREGIDO: Mostrar nombres y apellidos por separado -->
+                    <strong>
+                      {% if envio.destinatario.nombres and envio.destinatario.apellidos %}
+                        {{ envio.destinatario.nombres }} {{ envio.destinatario.apellidos }}
+                      {% elif envio.destinatario.nombres %}
+                        {{ envio.destinatario.nombres }}
+                      {% else %}
+                        No especificado
+                      {% endif %}
+                    </strong><br>
+                    
                     {% if envio.destinatario.num_doc_destinatario %}
                       <small>Doc: {{ envio.destinatario.num_doc_destinatario }}</small><br>
                     {% endif %}
@@ -279,18 +297,49 @@
         </table>
       </div>
 
+      <!-- CORREGIDO: Totales calculados dinámicamente -->
+      <div class="totales-container">
+        <h4 style="margin-top: 0; color: #007bff;">Resumen de Totales</h4>
+        <div class="totales-grid">
+          <div class="total-item">
+            <div class="total-valor">{{ envios|length }}</div>
+            <div class="total-label">Total Envíos</div>
+          </div>
+          <div class="total-item">
+            <div class="total-valor">
+              {% set total_peso = envios|sum(attribute='peso')|float %}
+              {{ "%.2f"|format(total_peso) }} kg
+            </div>
+            <div class="total-label">Peso Total</div>
+          </div>
+          <div class="total-item">
+            <div class="total-valor">
+              {% set total_valor = envios|sum(attribute='valorEnvio')|float %}
+              S/ {{ "%.2f"|format(total_valor) }}
+            </div>
+            <div class="total-label">Valor Total Declarado</div>
+          </div>
+          <div class="total-item">
+            <div class="total-valor">
+              {% set total_tarifa = envios|sum(attribute='tarifa')|float %}
+              S/ {{ "%.2f"|format(total_tarifa) }}
+            </div>
+            <div class="total-label">Total a Pagar</div>
+          </div>
+        </div>
+      </div>
 
-      <!-- Botones de acción -->
-<div class="botones-acciones" style="margin-top: 2rem;">
-  <a href="javascript:history.back();" class="btn-volver">VOLVER</a>
-  <form id="formPago" action="{{ url_for('pago_envio_prueba') }}" method="post" style="display: inline;">
-    <input type="hidden" name="envios_data" id="envios_data" value="">
-    <input type="hidden" name="remitente_data" id="remitente_data" value="">
-    <input type="hidden" name="modalidad_pago" value="{{ modalidad_pago }}">
-    <input type="hidden" name="tipo_envio" value="{{ tipo_envio }}">
-    <button type="submit" class="btn-continuar" onclick="prepararDatosPago(event)">IR A PAGAR</button>
-  </form>
-</div>
+      <!-- CORREGIDO: Botones de acción sin modalidad_pago -->
+      <div class="botones-acciones" style="margin-top: 2rem;">
+        <a href="javascript:history.back();" class="btn-volver">VOLVER</a>
+        <form id="formPago" action="{{ url_for('pago_envio_prueba') }}" method="post" style="display: inline;">
+          <input type="hidden" name="envios_data" id="envios_data" value="">
+          <input type="hidden" name="remitente_data" id="remitente_data" value="">
+          <input type="hidden" name="origen_data" id="origen_data" value="">
+          <input type="hidden" name="tipo_envio" value="{{ tipo_envio }}">
+          <button type="submit" class="btn-continuar" onclick="prepararDatosPago(event)">IR A PAGAR</button>
+        </form>
+      </div>
 
     {% else %}
       <div class="error-message">
@@ -303,22 +352,23 @@
     {% endif %}
   </div>
 
-<!-- Script necesario -->
 <script>
 function prepararDatosPago(event) {
   try {
     // Obtener datos del template de forma segura
     var enviosData = {{ envios|tojson|safe }};
     var remitenteData = {{ remitente|tojson|safe }};
+    var origenData = {{ origen|tojson|safe }};
     
     // Convertir a JSON string para enviar por formulario
     document.getElementById('envios_data').value = JSON.stringify(enviosData);
     document.getElementById('remitente_data').value = JSON.stringify(remitenteData);
+    document.getElementById('origen_data').value = JSON.stringify(origenData);
     
     console.log('Datos preparados para envío:');
     console.log('- Envíos:', enviosData.length);
     console.log('- Remitente:', remitenteData.nombre_remitente || 'Sin nombre');
-    console.log('- Modalidad pago:', '{{ modalidad_pago }}');
+    console.log('- Origen:', origenData);
     console.log('- Tipo envío:', '{{ tipo_envio }}');
     
     // Permitir que el formulario se envíe
@@ -330,11 +380,6 @@ function prepararDatosPago(event) {
     alert('Error preparando los datos. Por favor, inténtelo nuevamente.');
     return false;
   }
-}
-
-// También puedes usar esta función alternativa si prefieres
-function enviarDatosPago() {
-  document.getElementById('formPago').submit();
 }
 </script>
 
