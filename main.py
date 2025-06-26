@@ -57,6 +57,7 @@ from controladores import reporte_listar_enco
 from controladores import reporte_reclamo_causa
 from controladores import reporte_UsoUnidades
 from controladores import reporte_Viajes_por_Unidad
+from controladores import reporte_encomiendas_rutas as reporte_encomiendas_rutas
 # import BytesIO
 from itsdangerous import URLSafeSerializer
 from controladores.bd import sql_execute
@@ -435,7 +436,7 @@ CONTROLADORES = {
         ['correo', 'Correo', 'Correo', 'email', True, True, None],
         ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
         ['n_documento', 'N° Documento', '', 'text', True, True, None],
-        ['bien_contratado', 'Bien Contratado', '', 'text', True, True, None],
+        ['bien_contratado', 'Bien Contratado', '', 'select', True, True, [lambda:controlador_reclamo.get_list_bien_contratado(), '']],
         ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
         ['monto_indemnizado', 'Monto Indemnizado', '0.00', 'number', True, True, None],
         ['relacion', 'Relación con el bien', '', 'text', True, True, None],
@@ -448,7 +449,7 @@ CONTROLADORES = {
         ['causa_reclamoid', 'Causa del Reclamo', '', 'select', True, True, [lambda: controlador_causa_reclamo.get_options(), 'nombre']],
         ['tipo_indemnizacionid', 'Tipo de Indemnización', '', 'select', True, True, [lambda: controlador_tipo_indemnizacion.get_options(), 'nombre']],
         ['paquetetracking', 'Tracking', '', 'text', True, True, None],
-        ['ubigeocodigo', 'Ubigeo', '', 'text', True, True, None],
+        ['ubigeocodigo', 'Ubigeo', '', 'select', True, True, [lambda: controlador_ubigeo.get_options(), 'codigo']],
         ['tipo_documentoid', 'Tipo Documento', '', 'select', True, True, [lambda: controlador_tipo_documento.get_options(), 'nombre']]
     ],
     "crud_forms": {
@@ -1377,20 +1378,18 @@ REPORTES = {
     # Ventas
     "ventas_periodo": {
         "active" : True ,
-        'icon_page' : 'fa-solid fa-sack-dollar' ,
+        'icon_page' : 'fa-solid fa-sack-dollar' ,   
         "titulo": "Ventas",
-        "table" : controlador_cliente.get_reporte_ventas(),
+        "table" : controlador_articulo.get_reporte_ventas(),
         "filters": [
-            # ['rol_id', 'Rol', lambda: controlador_rol.get_options() , 'select' ],
             ['fecha', 'Fecha', None, 'interval_date' ], 
-            # ['fecha', 'Fecha', None, 'date' ],
         ] ,
     },
     "articulos_mas_vendidos": {
         "active": True,
         "icon_page": "fa-solid fa-boxes-stacked",
         "titulo": "Artículos Más Vendidos",
-        "table": controlador_articulo.get_report_mas_vendidos(),  # referencia a función sin paréntesis
+        "table": controlador_articulo.get_report_mas_vendidos(),  
         "filters": [
             ['fecha', 'Fecha', None, 'interval_date'],  # filtro rango de fechas
         ],
@@ -1399,9 +1398,8 @@ REPORTES = {
         "active": True,
         "icon_page": "fa-solid fa-boxes-stacked",
         "titulo": "Artículos que Necesitan Reposición",
-        "table": controlador_articulo.get_report_reposicion(),  # función sin paréntesis
+        "table": controlador_articulo.get_report_reposicion(), 
         "filters": [
-            ['stock_minimo', 'Sin Stock ', lambda: controlador_articulo.get_stock_minimo_options(), 'select'],
         ],
     },
 
@@ -1434,18 +1432,25 @@ REPORTES = {
     "encomiendas_listar": {
         "active": True,
         "icon_page": "fa-solid fa-boxes-packing",
-        "titulo": "Listado de encomiendas por empaque ",
-        "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo,
+        "titulo": "Listado de encomiendas segun tipo de empaque ",
+        "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo(),
         "filters": []
     },
 
     "reporte_reclamos_tipo_causa_periodo": {
-        "active": True,
-        "icon_page": "fa-solid fa-clipboard-list",
-        "titulo": "Reporte de reclamos por tipo, causa y periodo",
-        "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),
-        "filters": ['stock_minimo', 'Stock Mínimo', lambda: controlador_articulo.get_stock_minimo_options(), 'select'],
-    },
+    "active": True,
+    "icon_page": "fa-solid fa-clipboard-list",
+    "titulo": "Reporte de reclamos por tipo, causa y periodo",
+    "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),  # ✅ con paréntesis
+    "filters": []
+},
+"encomiendas_rutas_estado": {
+    "active": True,
+    "icon_page": "fa-solid fa-route",
+    "titulo": "Listado de encomiendas asignadas a rutas específicas y su estado",
+    "table": reporte_encomiendas_rutas.get_reporte_encomiendas_rutas_estado(),  # 👈 con paréntesis
+    "filters": []
+},
 }
 
 
@@ -1504,9 +1509,7 @@ TRANSACCIONES = {
             ['hora',                'Hora',               'Hora',                      'time',      True,  True,   None],
             ['id_sucursal_origen',  'Sucursal de origen', 'Sucursales de origen',                          'select',    True,  True,   [lambda: controlador_tarifa_ruta.get_options_select_sucursal_origen(), 'nombre']],
             ['clienteid',           'Cliente',            'Clientes',                          'select',    True,  True,   [lambda: controlador_cliente.get_select_cliente(), 'nombre']],
-            ['tipo_comprobanteid', 'Tipo Comprobante',    'Tipos de comprobante',                          'select',    True,  True,   [lambda: controlador_tipo_comprobante.get_options(), 'nombre']],
 
-            ['comprobante_serie',   'Serie de Comprobante',    'Serie de Comprobante',            'text',    True,  True,   None],
             ['monto_total',         'Monto Total',        'Monto total',             'decimal_2', True,  True,   None],
             ['direccion_recojo',    'Direccion de recojo',    'Direccion de recojo',            'text',    True,  True,   None],
             ['descripcion',         'Descripcion',            'Descripcion',        'textarea',    True,  True,   None],
@@ -2664,80 +2667,207 @@ def seguimiento_encomienda():
     estado_encomienda = controlador_estado_encomienda.get_last_state()
     return render_template('seguimiento.html',estado_encomienda=estado_encomienda)
 
+
+# @app.route('/resumen_envio_prueba', methods=['POST'])
+# def resumen_envio_prueba():
+#     try:
+#         raw = request.form.get('payload')
+#         print("Payload recibido:", raw)
+        
+#         if not raw:
+#             return "No se recibió payload", 400
+
+#         # Obtener datos del request
+#         data = json.loads(raw)
+#         print("Datos parseados:", data)
+        
+#         if not data:
+#             return jsonify({
+#                 'error': 'No se recibieron datos',
+#                 'message': 'El request no contiene datos JSON válidos'
+#             }), 400
+
+#         # Extraer información del payload
+#         envios = data.get('registros', [])
+#         remitente = data.get('remitente', {})
+#         origen = data.get('origen', {})
+#         modo_envio = data.get('modo', 'individual')
+
+#         # Validaciones básicas
+#         if not envios:
+#             return render_template('resumen_envio_prueba.html',
+#                                  error_message='No se encontraron envíos para procesar',
+#                                  envios=[],
+#                                  remitente={},
+#                                  origen={},
+#                                  tipo_envio='')
+
+#         # Procesar cada envío para calcular tarifas
+#         for i, envio in enumerate(envios):
+#             try:
+#                 # Mejor manejo de origen/destino
+#                 origen_id = envio.get('origen', {}).get('sucursal_origen') or origen.get('sucursal_origen')
+#                 destino_id = envio.get('destino', {}).get('sucursal_destino')
+                
+#                 if not origen_id or not destino_id:
+#                     print(f"Error: origen_id={origen_id}, destino_id={destino_id} para envío {i}")
+#                     continue
+                
+#                 valor = Decimal(str(envio.get('valorEnvio', 0)))
+#                 peso = Decimal(str(envio.get('peso', 0)))
+
+#                 # Obtener tarifas
+#                 tarifa_row = controlador_tarifa_ruta.get_tarifa_ids(origen_id, destino_id) or {}
+#                 tarifa_base = Decimal(str(tarifa_row.get('tarifa', 0)))
+
+#                 # Obtener reglas de cargo
+#                 regla_p = controlador_regla_cargo.get_regla_cargo_condicion('P', float(peso)) or {}
+#                 regla_v = controlador_regla_cargo.get_regla_cargo_condicion('V', float(valor)) or {}
+#                 porcentaje_p = Decimal(str(regla_p.get('porcentaje', 0)))
+#                 porcentaje_v = Decimal(str(regla_v.get('porcentaje', 0)))
+#                 porcentaje_r = Decimal(str(controlador_empresa.get_porcentaje_recojo()))
+
+#                 # Calcular tarifa total
+#                 total = controlador_tarifa_ruta.calcularTarifaTotal(
+#                     tarifa_base, peso, porcentaje_r, porcentaje_v, porcentaje_p
+#                 )
+#                 envios[i]['tarifa'] = float(total)  # Convertir a float para JSON
+                
+#                 print(f"Envío {i}: tarifa calculada = {total}")
+                
+#             except Exception as e:
+#                 print(f"Error calculando tarifa para envío {i}: {str(e)}")
+#                 envios[i]['tarifa'] = 0
+
+#         # GUARDAR EN SESIÓN PARA EL SIGUIENTE PASO
+#         session['resumen_envios'] = envios
+#         session['remitente_data'] = remitente
+#         session['origen_data'] = origen
+#         session['tipo_envio'] = modo_envio
+
+#         # Log para debugging
+#         print(f"Procesando {len(envios)} envíos de tipo {modo_envio}")
+#         print(f"Remitente: {remitente.get('nombre_remitente', 'No especificado')}")
+#         print(f"Datos guardados en sesión para pago_envio_prueba")
+
+#         # Renderizar la plantilla con los datos
+#         return render_template('resumen_envio_prueba.html',
+#                              envios=envios,
+#                              remitente=remitente,
+#                              origen=origen,
+#                              tipo_envio=modo_envio,
+#                              error_message=None)
+
+        
+#     except Exception as e:
+#         print(f"Error en resumen_envio_prueba: {str(e)}")
+#         import traceback
+#         traceback.print_exc()
+#         return jsonify({
+#             'error': 'Error procesando resumen',
+#             'message': str(e)
+#         }), 500
+
+
+#     except Exception as e:
+#         print(f"Error en resumen_envio_prueba: {str(e)}")
+#         import traceback
+#         traceback.print_exc()
+#         return jsonify({
+#             'error': 'Error procesando resumen',
+#             'message': str(e)
+#         }), 500
+
 @app.route('/resumen_envio_prueba', methods=['POST'])
 def resumen_envio_prueba():
     try:
         raw = request.form.get('payload')
+        print("Payload recibido:", raw)
+        
         if not raw:
             return "No se recibió payload", 400
 
         # Obtener datos del request
         data = json.loads(raw)
+        print("Datos parseados:", data)
         
         if not data:
             return jsonify({
                 'error': 'No se recibieron datos',
                 'message': 'El request no contiene datos JSON válidos'
             }), 400
-        
+
         # Extraer información del payload
-        envios = data.get('envios', [])
+        envios = data.get('registros', [])
         remitente = data.get('remitente', {})
-        modalidad_pago = data.get('modalidad_pago', '')
-        tipo_envio = data.get('tipo_envio', 'individual')
-        
+        origen = data.get('origen', {})
+        modo_envio = data.get('modo', 'individual')
+
         # Validaciones básicas
         if not envios:
-            return render_template('resumen_envio.html', 
+            return render_template('resumen_envio_prueba.html',
                                  error_message='No se encontraron envíos para procesar',
                                  envios=[],
                                  remitente={},
-                                 modalidad_pago='',
+                                 origen={},
                                  tipo_envio='')
-        
+
         # Procesar cada envío para calcular tarifas
         for i, envio in enumerate(envios):
-            origen_id  = envio['origen']['sucursal_origen']
-            destino_id = envio['destino']['sucursal_destino']
-            valor      = Decimal(str(envio['valorEnvio']))
-            peso       = Decimal(str(envio['peso']))
+            try:
+                # Mejor manejo de origen/destino
+                origen_id = envio.get('origen', {}).get('sucursal_origen') or origen.get('sucursal_origen')
+                destino_id = envio.get('destino', {}).get('sucursal_destino')
+                
+                if not origen_id or not destino_id:
+                    print(f"Error: origen_id={origen_id}, destino_id={destino_id} para envío {i}")
+                    continue
+                
+                valor = Decimal(str(envio.get('valorEnvio', 0)))
+                peso = Decimal(str(envio.get('peso', 0)))
 
-            tarifa_row  = controlador_tarifa_ruta.get_tarifa_ids(origen_id, destino_id) or {}
-            tarifa_base = Decimal(str(tarifa_row.get('tarifa', 0)))
+                # Obtener tarifas
+                tarifa_row = controlador_tarifa_ruta.get_tarifa_ids(origen_id, destino_id) or {}
+                tarifa_base = Decimal(str(tarifa_row.get('tarifa', 0)))
 
-            regla_p      = controlador_regla_cargo.get_regla_cargo_condicion('P', float(peso)) or {}
-            regla_v      = controlador_regla_cargo.get_regla_cargo_condicion('V', float(valor)) or {}
-            porcentaje_p = Decimal(str(regla_p.get('porcentaje', 0)))
-            porcentaje_v = Decimal(str(regla_v.get('porcentaje', 0)))
-            porcentaje_r = Decimal(str(controlador_empresa.get_porcentaje_recojo()))
+                # Obtener reglas de cargo
+                regla_p = controlador_regla_cargo.get_regla_cargo_condicion('P', float(peso)) or {}
+                regla_v = controlador_regla_cargo.get_regla_cargo_condicion('V', float(valor)) or {}
+                porcentaje_p = Decimal(str(regla_p.get('porcentaje', 0)))
+                porcentaje_v = Decimal(str(regla_v.get('porcentaje', 0)))
+                porcentaje_r = Decimal(str(controlador_empresa.get_porcentaje_recojo()))
 
-            total = controlador_tarifa_ruta.calcularTarifaTotal(
-                tarifa_base, peso, porcentaje_r, porcentaje_v, porcentaje_p
-            )
-            envios[i]['tarifa'] = total
-            
-            # Asegurar que todos los campos necesarios existan
-            envios[i] = normalizar_envio(envio)
-        
-        # ✅ GUARDAR EN SESIÓN PARA EL SIGUIENTE PASO
+                # Calcular tarifa total
+                total = controlador_tarifa_ruta.calcularTarifaTotal(
+                    tarifa_base, peso, porcentaje_r, porcentaje_v, porcentaje_p
+                )
+                envios[i]['tarifa'] = float(total)  # Convertir a float para JSON
+                
+                print(f"Envío {i}: tarifa calculada = {total}")
+                
+            except Exception as e:
+                print(f"Error calculando tarifa para envío {i}: {str(e)}")
+                envios[i]['tarifa'] = 0
+
+        # GUARDAR EN SESIÓN PARA EL SIGUIENTE PASO
         session['resumen_envios'] = envios
         session['remitente_data'] = remitente
-        session['modalidad_pago'] = modalidad_pago
-        session['tipo_envio'] = tipo_envio
-        
+        session['origen_data'] = origen
+        session['tipo_envio'] = modo_envio
+
         # Log para debugging
-        print(f"Procesando {len(envios)} envíos de tipo {tipo_envio}")
+        print(f"Procesando {len(envios)} envíos de tipo {modo_envio}")
         print(f"Remitente: {remitente.get('nombre_remitente', 'No especificado')}")
         print(f"Datos guardados en sesión para pago_envio_prueba")
-        
+
         # Renderizar la plantilla con los datos
         return render_template('resumen_envio_prueba.html',
                              envios=envios,
                              remitente=remitente,
-                             modalidad_pago=modalidad_pago,
-                             tipo_envio=tipo_envio,
+                             origen=origen,
+                             tipo_envio=modo_envio,
                              error_message=None)
-        
+
     except Exception as e:
         print(f"Error en resumen_envio_prueba: {str(e)}")
         import traceback
@@ -2751,205 +2881,92 @@ def resumen_envio_prueba():
 @app.route('/pago_envio_prueba', methods=['POST'])
 def pago_envio_prueba():
     try:
-        # Obtener datos del formulario o de la sesión
+        # Obtener datos del formulario
         envios_data = request.form.get('envios_data')
         remitente_data = request.form.get('remitente_data')
-        modalidad_pago = request.form.get('modalidad_pago')
+        origen_data = request.form.get('origen_data')
         tipo_envio = request.form.get('tipo_envio')
         
         print(f"Datos recibidos del formulario:")
-        print(f"- envios_data_form: {envios_data[:100] if envios_data else 'None'}...")
-        print(f"- remitente_data: {remitente_data[:100] if remitente_data else 'None'}...")
-        print(f"- modalidad_pago: {modalidad_pago}")
-        print(f"- tipo_envio: {tipo_envio}")
+        print(f"- Número de envíos: {len(json.loads(envios_data)) if envios_data else 0}")
+        print(f"- Tipo envío: {tipo_envio}")
         
-        # Si no vienen del formulario, obtener de la sesión
+        # Convertir de JSON string a objetos Python
         if not envios_data:
-            print("No hay datos en formulario, obteniendo de sesión...")
-            envios = session.get('resumen_envios', [])
-            remitente = session.get('remitente_data', {})
-            modalidad_pago = session.get('modalidad_pago', '')
-            tipo_envio = session.get('tipo_envio', 'individual')
-        else:
-            try:
-                # Convertir de JSON string a objetos Python
-                envios = json.loads(envios_data) if envios_data else []
-                remitente = json.loads(remitente_data) if remitente_data else {}
-                
-                print(f"Datos parseados correctamente:")
-                print(f"- Número de envíos: {len(envios)}")
-                print(f"- Remitente: {remitente.get('nombre_remitente', 'No especificado')}")
-                
-            except json.JSONDecodeError as e:
-                print(f"Error parseando JSON: {e}")
-                print(f"Datos problemáticos - envios_data: {envios_data}")
-                print(f"Datos problemáticos - remitente_data: {remitente_data}")
-                
-                # Intentar obtener de la sesión como fallback
-                envios = session.get('resumen_envios', [])
-                remitente = session.get('remitente_data', {})
-                modalidad_pago = session.get('modalidad_pago', modalidad_pago or '')
-                tipo_envio = session.get('tipo_envio', tipo_envio or 'individual')
-                
-                if not envios:
-                    return jsonify({
-                        'error': 'Error en formato de datos',
-                        'message': 'Los datos enviados no tienen un formato válido'
-                    }), 400
+            return redirect(url_for('tipos_envio'))
+            
+        envios = json.loads(envios_data)
+        remitente = json.loads(remitente_data) if remitente_data else {}
+        origen = json.loads(origen_data) if origen_data else {}
         
         if not envios:
-            print("No se encontraron envíos, redirigiendo...")
             return redirect(url_for('tipos_envio'))
         
-        # Calcular total a pagar
-        total_pagar = 0
-        for envio in envios:
-            try:
-                tarifa = float(envio.get('tarifa', 0))
-                total_pagar += tarifa
-            except (ValueError, TypeError):
-                print(f"Error calculando tarifa para envío: {envio}")
-                pass
+        # Separar envíos por modalidad de pago
+        envios_pago_online = [envio for envio in envios if envio.get('modalidadPago') == '1']
+        envios_otras_modalidades = [envio for envio in envios if envio.get('modalidadPago') != '1']
         
-        print(f"Total a pagar calculado: S/ {total_pagar}")
+        # Calcular totales
+        total_general = sum(float(envio.get('tarifa', 0)) for envio in envios)
+        total_pago_online = sum(float(envio.get('tarifa', 0)) for envio in envios_pago_online)
+        total_otras_modalidades = sum(float(envio.get('tarifa', 0)) for envio in envios_otras_modalidades)
+        
+        # Detectar si hay envíos con modalidad de pago 1 (pago en línea)
+        tiene_pago_online = len(envios_pago_online) > 0
+        
+        print(f"Total general: S/ {total_general}")
+        print(f"Total pago online: S/ {total_pago_online}")
+        print(f"Total otras modalidades: S/ {total_otras_modalidades}")
+        print(f"¿Tiene pago online?: {tiene_pago_online}")
+        print(f"Envíos pago online: {len(envios_pago_online)}")
+        print(f"Envíos otras modalidades: {len(envios_otras_modalidades)}")
         
         # Guardar datos para el proceso de pago
         session['datos_pago'] = {
             'envios': envios,
+            'envios_pago_online': envios_pago_online,
+            'envios_otras_modalidades': envios_otras_modalidades,
             'remitente': remitente,
-            'modalidad_pago': modalidad_pago,
+            'origen': origen,
             'tipo_envio': tipo_envio,
-            'total_pagar': total_pagar
+            'total_general': total_general,
+            'total_pago_online': total_pago_online,
+            'total_otras_modalidades': total_otras_modalidades,
+            'tiene_pago_online': tiene_pago_online
         }
         
-        print(f"Datos guardados en sesión, renderizando template...")
+        # Obtener opciones de pago solo si hay modalidad 1
+        tipos_comprobante = []
+        metodos_pago = []
         
-        tipos_comprobante = controlador_tipo_comprobante.get_tipo_comprobante_by_tipo()
-        metodos_pago = controlador_metodo_pago.get_metodo_pago_online()
+        if tiene_pago_online:
+            tipos_comprobante = controlador_tipo_comprobante.get_tipo_comprobante_by_tipo()
+            metodos_pago = controlador_metodo_pago.get_metodo_pago_online()
         
         return render_template('pago_envio_prueba.html',
                              envios=envios,
+                             envios_pago_online=envios_pago_online,
+                             envios_otras_modalidades=envios_otras_modalidades,
                              remitente=remitente,
-                             modalidad_pago=modalidad_pago,
+                             origen=origen,
                              tipo_envio=tipo_envio,
-                             total_pagar=total_pagar,
+                             total_general=total_general,
+                             total_pago_online=total_pago_online,
+                             total_otras_modalidades=total_otras_modalidades,
+                             tiene_pago_online=tiene_pago_online,
                              tipos_comprobante=tipos_comprobante,
                              metodos_pago=metodos_pago)
         
+        
     except Exception as e:
-        print(f"Error general en pago_envio_prueba: {str(e)}")
+        print(f"Error en pago_envio_prueba: {str(e)}")
         import traceback
         traceback.print_exc()
-        
         return jsonify({
             'error': 'Error procesando pago',
             'message': str(e)
         }), 500
 
-# Función auxiliar para debug
-def debug_request_data():
-    """Función para hacer debug de los datos recibidos"""
-    print("=== DEBUG REQUEST DATA ===")
-    print(f"Method: {request.method}")
-    print(f"Content-Type: {request.content_type}")
-    print(f"Form data: {dict(request.form)}")
-    print(f"JSON data: {request.get_json(silent=True)}")
-    print(f"Raw data: {request.data}")
-    print("=" * 30)
-
-
-
-def normalizar_envio(envio):
-    """
-    Normaliza los datos del envío para asegurar que todos los campos existan
-    """
-    campos_default = {
-        'tipoEntrega': '',
-        'tipoEntregaId': '',
-        'valorEnvio': 0,
-        'peso': 0,
-        'largo': 0,
-        'ancho': 0,
-        'alto': 0,
-        'folios': '',
-        'descripcion': '',
-        'clave': '',
-        'tarifa': 0,
-        'tipoEmpaque': '',
-        'tipoArticulo': '',
-        'destino': {
-            'departamento': '',
-            'provincia': '',
-            'distrito': '',
-            'sucursal_destino': '',
-            'direccion': ''
-        },
-        'origen': {
-            'departamento_origen': '',
-            'provincia_origen': '',
-            'distrito_origen': '',
-            'sucursal_origen': ''
-        },
-        'destinatario': {
-            'nombre_destinatario': '',
-            'num_doc_destinatario': '',
-            'num_tel_destinatario': ''
-        }
-    }
-    
-    # Combinar datos default con los datos recibidos
-    envio_normalizado = {**campos_default, **envio}
-    
-    # Normalizar objetos anidados
-    if 'destino' in envio:
-        envio_normalizado['destino'] = {**campos_default['destino'], **envio.get('destino', {})}
-    
-    if 'origen' in envio:
-        envio_normalizado['origen'] = {**campos_default['origen'], **envio.get('origen', {})}
-        
-    if 'destinatario' in envio:
-        envio_normalizado['destinatario'] = {**campos_default['destinatario'], **envio.get('destinatario', {})}
-    
-    return envio_normalizado
-
-
-"""
-@app.route('/resumen_envio_prueba', methods=['POST'])
-def resumen_envio():
-    data = request.get_json(force=True)
-    envios = data.get('registros')
-    print(envios)
-    if not envios:
-        abort(400, "No vinieron registros")
-
-    resultados = []
-    for envio in envios:
-        origen_id  = envio['origen']['sucursal_origen']
-        destino_id = envio['destino']['sucursal_destino']
-        valor      = Decimal(str(envio['valorEnvio']))
-        peso       = Decimal(str(envio['peso']))
-
-        tarifa_row  = controlador_tarifa_ruta.get_tarifa_ids(origen_id, destino_id) or {}
-        tarifa_base = Decimal(str(tarifa_row.get('tarifa', 0)))
-
-        regla_p      = controlador_regla_cargo.get_regla_cargo_condicion('P', float(peso)) or {}
-        regla_v      = controlador_regla_cargo.get_regla_cargo_condicion('V', float(valor)) or {}
-        porcentaje_p = Decimal(str(regla_p.get('porcentaje', 0)))
-        porcentaje_v = Decimal(str(regla_v.get('porcentaje', 0)))
-        porcentaje_r = Decimal(str(controlador_empresa.get_porcentaje_recojo()))
-
-        total = controlador_tarifa_ruta.calcularTarifaTotal(
-            tarifa_base, peso, porcentaje_r, porcentaje_v, porcentaje_p
-        )
-
-        envio_con_tarifa = envio.copy()
-        envio_con_tarifa['tarifa'] = total.quantize(Decimal('0.01'))
-        resultados.append(envio_con_tarifa)
-        print(resultados)
-    session['resumen_envios'] = resultados
-
-    return redirect(url_for('resumen'))
-"""
 
 @app.route('/resumen')
 def resumen():
@@ -3085,96 +3102,98 @@ def insertar_envio():
 @app.route('/insertar_envio_api', methods=['POST'])
 def insertar_envio_api():
     try:
-        # Obtener datos JSON desde el frontend (tipo_comprobante y modalidad_pago)
         data = request.get_json()
-        
         if not data:
             return jsonify({'status': 'error', 'message': 'No se recibieron datos'}), 400
 
-        tipo_comprobante = data.get('tipo_comprobante')
-        modalidad_pago_seleccionada = data.get('metodo_pago')
-
-        # Validaciones básicas
-        if not tipo_comprobante:
-            return jsonify({'status': 'error', 'message': 'Tipo de comprobante es requerido'}), 400
-        # modalidad_pago_seleccionada = 1
-        if modalidad_pago_seleccionada is None:
-            return jsonify({'status': 'error', 'message': 'Modalidad de pago es requerida'}), 400
-
-        # OBTENER DATOS COMPLETOS DE LA SESIÓN
-        datos_pago = session.get('datos_pago')
-        if not datos_pago:
-            return jsonify({'status': 'error', 'message': 'No se encontraron datos del envío en la sesión'}), 400
-
-        envios = datos_pago.get('envios', [])
-        remitente = datos_pago.get('remitente', {})
+        # Obtener datos de la sesión
+        registros = session.get('resumen_envios', [])
+        modo = session.get('tipo_envio')
+        origen_data = session.get('origen_data')
+        sucursal_origen = origen_data.get('sucursal_origen') if isinstance(origen_data, dict) else origen_data
+        remitente = session.get('remitente_data', {})
         
-        if not envios:
-            return jsonify({'status': 'error', 'message': 'No se encontraron envíos para procesar'}), 400
+        # Validaciones
+        if not registros:
+            return jsonify({'status': 'error', 'message': 'No hay registros de paquetes'}), 400
+            
+        if not sucursal_origen:
+            return jsonify({'status': 'error', 'message': 'Sucursal de origen no proporcionada'}), 400
 
-        # PROCESAR IGUAL QUE TU insertar_envio_api ORIGINAL
-        nombre_empresa = controlador_empresa.get_nombre()
-        
-        # Preparar datos del cliente desde el remitente
+        # Verificar si requiere datos de pago
+        requiere_datos_pago = any(r.get('modalidadPago') == '1' for r in registros)
+        tipo_comprobante = data.get('tipo_comprobante') if requiere_datos_pago else None
+        metodo_pago = data.get('metodo_pago') if requiere_datos_pago else None
+
+        if requiere_datos_pago and (tipo_comprobante is None or metodo_pago is None):
+            return jsonify({
+                "status": "error",
+                "message": "Debe proporcionar tipo_comprobante y metodo_pago porque al menos un registro tiene modalidadPago = 1"
+            }), 400
+
+        # Preparar datos del cliente
         nombre = remitente.get('nombre_remitente', '')
         partes = nombre.split() if nombre else []
 
         cliente_data = {
-            'correo':        remitente.get('correo_remitente', ''),
-            'telefono':      remitente.get('num_tel_remitente', ''),
+            'correo': remitente.get('correo_remitente', ''),
+            'telefono': remitente.get('num_tel_remitente', ''),
             'num_documento': remitente.get('num_doc_remitente', ''),
             'nombre_siglas': partes[0] if partes else '',
             'apellidos_razon': ' '.join(partes[1:]) if len(partes) > 1 else '',
             'tipo_documentoid': int(remitente.get('tipo_doc_remitente', 1)),
             'tipo_clienteid': 2 if remitente.get('tipo_doc_remitente') == 2 else 1
         }
-        print(envios)
 
-        # Crear la transacción con los envíos
+        # Procesar la transacción
+        nombre_empresa = controlador_empresa.get_nombre()
         num_serie, trackings = controlador_encomienda.crear_transaccion_y_paquetes(
-            envios, cliente_data, tipo_comprobante
+            registros, cliente_data, tipo_comprobante, metodo_pago, sucursal_origen, modo
         )
 
-        # Generar QR para cada paquete
+        # Generar QR y enviar email si es exitoso
         if num_serie:
             try:
                 generar_qr_paquetes(trackings)
             except Exception as qr_err:
                 current_app.logger.warning(f"Error generando QR: {qr_err}")
 
-            # Enviar correo al remitente
             destinatario_email = cliente_data['correo']
             if destinatario_email:
-                msg = Message(
-                    subject=f"{nombre_empresa} Envío registrado: {num_serie}",
-                    sender=app.config['MAIL_USERNAME'],
-                    recipients=[destinatario_email]
-                )
-                msg.body = (
-                    f"Hola {cliente_data['nombre_siglas']},\n\n"
-                    f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
-                    "Adjunto encontrarás los códigos QR para el seguimiento de cada paquete.\n\n"
-                    f"¡Gracias por confiar en {nombre_empresa}!"
-                )
+                try:
+                    msg = Message(
+                        subject=f"{nombre_empresa} Envío registrado: {num_serie}",
+                        sender=app.config['MAIL_USERNAME'],
+                        recipients=[destinatario_email]
+                    )
+                    msg.body = (
+                        f"Hola {cliente_data['nombre_siglas']},\n\n"
+                        f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
+                        "Adjunto encontrarás los códigos QR para el seguimiento de cada paquete.\n\n"
+                        f"¡Gracias por confiar en {nombre_empresa}!"
+                    )
 
-                for tracking in trackings:
-                    qr_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'qr.png')
-                    if os.path.exists(qr_path):
-                        with open(qr_path, 'rb') as f:
-                            qr_data = f.read()
-                        msg.attach(f"qr_{tracking}.png", 'image/png', qr_data)
-                    else:
-                        current_app.logger.warning(f"QR no encontrado para tracking {tracking}")
+                    for tracking in trackings:
+                        qr_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'qr.png')
+                        if os.path.exists(qr_path):
+                            with open(qr_path, 'rb') as f:
+                                qr_data = f.read()
+                            msg.attach(f"qr_{tracking}.png", 'image/png', qr_data)
+                        else:
+                            current_app.logger.warning(f"QR no encontrado para tracking {tracking}")
 
-                mail.send(msg)
+                    mail.send(msg)
+                except Exception as email_err:
+                    current_app.logger.warning(f"Error enviando email: {email_err}")
 
-        # LIMPIAR SESIÓN DESPUÉS DE PROCESAR
         session.pop('datos_pago', None)
         session.pop('resumen_envios', None)
         session.pop('remitente_data', None)
+        session.pop('origen_data', None)     
+        session.pop('tipo_envio', None)      
 
         current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
-        
+
         return jsonify({
             'status': 'success',
             'message': 'Envío procesado correctamente',
@@ -3195,15 +3214,18 @@ def insertar_envio_api():
 def registrar_envios_masivos():
     try:
         data = request.get_json()
-        # print(data)
+
         if not data:
-            return jsonify({'status': 'error', 'message': 'No se recibió un JSON válido'}), 400
+            return jsonify({'status': 'error', 'message': 'No se recibieron datos'}), 400
 
         tipo_comprobante = data.get('tipo_comprobante')
-        registros = data.get('registros') 
+        registros = data.get('registros')
+        # modalidad_pago_seleccionada = data.get('modalidad_pago')
 
-        if not registros or not isinstance(registros, list):
-            return jsonify({'status': 'error', 'message': 'No se encontraron registros válidos'}), 400
+        if not tipo_comprobante:
+            return jsonify({'status': 'error', 'message': 'Tipo de comprobante es requerido'}), 400
+        # if modalidad_pago_seleccionada is None:
+        #     return jsonify({'status': 'error', 'message': 'Modalidad de pago es requerida'}), 400
 
         origen = data.get('origen')
         sucursal_origen = origen.get('sucursal_origen')
@@ -3227,7 +3249,6 @@ def registrar_envios_masivos():
             registros, cliente_data, tipo_comprobante,sucursal_origen
         )
 
-        # 2) Generar QR para cada paquete
         if num_serie:
             try:
                 generar_qr_paquetes(trackings)
@@ -3263,23 +3284,26 @@ def registrar_envios_masivos():
             #     mail.send(msg)
 
 
-        current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
+        session.pop('datos_pago', None)
+        session.pop('resumen_envios', None)
+        session.pop('remitente_data', None)
+
         return jsonify({
             'status': 'success',
-            'message': 'Transacción creada correctamente',
-            'comprobante_serie': num_serie
-        }), 201
-
-    except ValueError as ve:
-        current_app.logger.warning(f"Bad request: {ve}")
-        return jsonify({'status': 'error', 'message': str(ve)}), 400
+            'message': 'Envío procesado correctamente',
+            'num_serie': num_serie,
+            'trackings': trackings
+        }), 200
 
     except Exception as e:
+        current_app.logger.error(f"Error en insertar_envio: {str(e)}")
+        import traceback
         traceback.print_exc()
         return jsonify({
             'status': 'error',
             'message': 'Ocurrió un error al procesar el envío'
         }), 500
+        
 ##PARA PROBAR EL API E INSERTAR 
 # {
 #   "tipo_comprobante": 2,
@@ -3295,7 +3319,7 @@ def registrar_envios_masivos():
 #   },
 #   "registros": [
 #     {
-#       "modo": "individual",
+#      "modo": "individual",
 #       "clave": "ABC123",
 #       "valorEnvio": 100.5,
 #       "peso": 4.0,
@@ -3320,7 +3344,7 @@ def registrar_envios_masivos():
 #       }
 #     },
 #     {
-#       "modo": "individual",
+#       "modo": "masivo",
 #       "clave": "DEF456",
 #       "valorEnvio": 120.0,
 #       "peso": 6.2,
@@ -3505,7 +3529,6 @@ def envio_masivo():
     departamento_origen = controlador_tarifa_ruta.get_departamentos_origen()
     articulos = controlador_contenido_paquete.get_options()
     empaque = controlador_tipo_empaque.get_options()
-    condiciones = controlador_regla_cargo.get_condiciones_tarifa()
     modalidad_pago = controlador_modalidad_pago.get_options()
     peso = controlador_tipo_empaque.get_peso()
     valor_max = controlador_regla_cargo.get_max_valor()

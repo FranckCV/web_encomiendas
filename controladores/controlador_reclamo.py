@@ -18,91 +18,107 @@ def delete_row(id):
     sql = f"DELETE FROM {table_name} WHERE id = %s"
     sql_execute(sql, (id,))
 
+def unactive_row(id):
+    unactive_row_table(table_name, id)
+
+def get_by_id(id):
+    sql = f"SELECT * FROM {table_name} WHERE id = %s"
+    return sql_select_fetchone(sql, (id,))
+
 def get_table():
-    sql = f'''
-        SELECT id, nombres_razon, direccion, correo, telefono, n_documento,
-               monto_indemnizado, bien_contratado, monto_reclamado,
-               relacion, fecha_recepcion, sucursal_id, descripcion,
-               detalles, pedido, foto,
-               causa_reclamoid, tipo_indemnizacionid, paquetetracking,
-               ubigeocodigo, tipo_documentoid
-        FROM {table_name}
-    '''
-
+    sql = f"SELECT * FROM {table_name}"
     columnas = {
-        'id': ['ID', 0.5],
-        'nombres_razon': ['Cliente', 1.5],
-        'direccion': ['Dirección', 1.5],
-        'correo': ['Correo', 1.2],
-        'telefono': ['Teléfono', 1.2],
-        'monto_reclamado': ['Monto Reclamado', 1],
-        'fecha_recepcion': ['Fecha', 1],
-        'tipo_documentoid': ['Tipo Documento', 1],
-        'sucursal_id': ['Sucursal', 1],
+        "id": ["ID", 0.3],
+        "nombres_razon": ["Nombres/Razón social", 2.5],
+        "direccion": ["Dirección", 2.5],
+        "correo": ["Correo", 2],
+        "telefono": ["Teléfono", 1],
+        "n_documento": ["N° Documento", 1.5],
+        "monto_indemnizado": ["Indemnización", 1.5],
+        "bien_contratado": ["Bien contratado", 2.5],
+        "monto_reclamado": ["Monto reclamado", 1.5],
+        "relacion": ["Relación", 1],
+        "fecha_recepcion": ["Recepción", 1.5],
+        "fecha_recojo": ["Recojo", 1.5],
+        "descripcion": ["Descripción", 2.5],
+        "detalles": ["Detalles", 2.5],
+        "pedido": ["Pedido", 2],
+        "foto": ["Foto", 1],
+        "sucursal_id": ["Sucursal", 1],
+        "causa_reclamoid": ["Causa", 1],
+        "tipo_indemnizacionid": ["Tipo indemnización", 1.5],
+        "paquetetracking": ["N° Tracking", 1.5],
+        "ubigeocodigo": ["Ubigeo", 1],
+        "tipo_documentoid": ["Tipo Documento", 1]
     }
-
-    try:
-        filas = sql_select_fetchall(sql)
-    except Exception as e:
-        print("❌ Error en get_table reclamo:", e)
-        filas = []
-
+    filas = sql_select_fetchall(sql)
     return columnas, filas
 
-def insert_row(form):
-    if not form:
-        raise ValueError("❌ Formulario vacío.")
-
-    form = dict(form)  # Convierte ImmutableMultiDict a dict
-
-    campos = [
-        "nombres_razon", "direccion", "correo", "telefono", "n_documento",
-        "monto_indemnizado", "bien_contratado", "monto_reclamado",
-        "relacion", "fecha_recepcion", "sucursal_id", "descripcion",
-        "detalles", "pedido", "foto", "causa_reclamoid", "tipo_indemnizacionid",
-        "paquetetracking", "ubigeocodigo", "tipo_documentoid"
-    ]
-
-    valores = []
-    for campo in campos:
-        valor = form.get(campo)
-        if valor == '':
-            valor = None
-        valores.append(valor)
-
-    if any(v is None for v in valores):
-        raise ValueError("❌ Algunos campos requeridos están vacíos o mal nombrados")
+def insert_row(nombres_razon, direccion, correo, telefono, n_documento,
+               monto_indemnizado, bien_contratado, monto_reclamado,
+               relacion, fecha_recepcion, sucursal_id, descripcion,
+               detalles, pedido, foto, causa_reclamoid, tipo_indemnizacionid,
+               paquetetracking, ubigeocodigo, tipo_documentoid):
 
     sql = f'''
         INSERT INTO {table_name} (
-            {', '.join(campos)}
-        ) VALUES ({', '.join(['%s'] * len(valores))})
+            nombres_razon, direccion, correo, telefono, n_documento,
+            monto_indemnizado, bien_contratado, monto_reclamado,
+            relacion, fecha_recepcion, sucursal_id, descripcion,
+            detalles, pedido, foto, causa_reclamoid, tipo_indemnizacionid,
+            paquetetracking, ubigeocodigo, tipo_documentoid
+        ) VALUES (
+            %s, %s, %s, %s, %s,
+            %s, %s, %s, %s, %s,
+            %s, %s, %s, %s, %s,
+            %s, %s, %s, %s, %s
+        )
     '''
+    sql_execute(sql, (
+        nombres_razon, direccion, correo, telefono, n_documento,
+        monto_indemnizado, bien_contratado, monto_reclamado,
+        relacion, fecha_recepcion, sucursal_id, descripcion,
+        detalles, pedido, foto, causa_reclamoid, tipo_indemnizacionid,
+        paquetetracking, ubigeocodigo, tipo_documentoid
+    ))
 
-    sql_execute(sql, valores)
-    return True
-
-def update_row(id, *args):
-    campos = [
-        "nombres_razon", "direccion", "correo", "telefono", "n_documento",
-        "monto_indemnizado", "bien_contratado", "monto_reclamado",
-        "relacion", "fecha_recepcion", "sucursal_id", "descripcion",
-        "detalles", "pedido", "foto", "causa_reclamoid", "tipo_indemnizacionid",
-        "paquetetracking", "ubigeocodigo", "tipo_documentoid"
-    ]
-
-    if len(args) != len(campos):
-        raise ValueError("❌ Número incorrecto de argumentos para update")
+def update_row(id, nombres_razon, direccion, correo, telefono, n_documento,
+               monto_indemnizado, bien_contratado, monto_reclamado,
+               relacion, fecha_recepcion, sucursal_id, descripcion,
+               detalles, pedido, foto, causa_reclamoid, tipo_indemnizacionid,
+               paquetetracking, ubigeocodigo, tipo_documentoid):
 
     sql = f'''
         UPDATE {table_name} SET
-            {', '.join([f"{campo} = %s" for campo in campos])}
+            nombres_razon = %s,
+            direccion = %s,
+            correo = %s,
+            telefono = %s,
+            n_documento = %s,
+            monto_indemnizado = %s,
+            bien_contratado = %s,
+            monto_reclamado = %s,
+            relacion = %s,
+            fecha_recepcion = %s,
+            sucursal_id = %s,
+            descripcion = %s,
+            detalles = %s,
+            pedido = %s,
+            foto = %s,
+            causa_reclamoid = %s,
+            tipo_indemnizacionid = %s,
+            paquetetracking = %s,
+            ubigeocodigo = %s,
+            tipo_documentoid = %s
         WHERE id = %s
     '''
-
-    sql_execute(sql, (*args, id))
-    return True
-
+    sql_execute(sql, (
+        nombres_razon, direccion, correo, telefono, n_documento,
+        monto_indemnizado, bien_contratado, monto_reclamado,
+        relacion, fecha_recepcion, sucursal_id, descripcion,
+        detalles, pedido, foto, causa_reclamoid, tipo_indemnizacionid,
+        paquetetracking, ubigeocodigo, tipo_documentoid, id
+    ))
 # Clase usada por main.py
 class ControladorReclamo:
     def get_info_columns(self):
@@ -127,6 +143,7 @@ class ControladorReclamo:
         return update_row(id, *args)
 
 
+####pagina reclamo
 
 BIEN_CONTRATADO = {
     "P" : "Producto" ,

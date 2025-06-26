@@ -183,6 +183,7 @@ def my_sql_select_fetchall(sql, params=None):
         print(f"Error en consulta SQL: {e}")
         return []
 
+### REPORTES ###
 def get_report_mas_vendidos(fecha_inicio=None, fecha_fin=None):
     try:
         sql = '''
@@ -201,7 +202,6 @@ def get_report_mas_vendidos(fecha_inicio=None, fecha_fin=None):
         params = []
 
         if fecha_inicio and fecha_fin:
-            # Asumo formato 'YYYY-MM-DD' y validación simple de longitud
             if len(fecha_inicio) == 10 and len(fecha_fin) == 10:
                 sql += " AND tv.fecha BETWEEN %s AND %s "
                 params.extend([fecha_inicio, fecha_fin])
@@ -227,47 +227,40 @@ def get_report_mas_vendidos(fecha_inicio=None, fecha_fin=None):
         print(f"Error en get_report_mas_vendidos: {e}")
         return {}, []
 
-def get_report_reposicion(stock_minimo=10):
+def get_report_reposicion():
     """
-    Obtiene un reporte de artículos que necesitan reposición
-    basado en un stock mínimo definido
+    Obtiene un reporte de todos los artículos con clasificación automática de estado de stock
     """
     try:
         sql = '''
-            SELECT 
+           SELECT 
                 a.id,
                 a.nombre,
                 a.precio,
                 a.stock,
                 a.dimensiones,
-                tam.nombre as tam_nombre,
-                CASE 
-                    WHEN a.stock = 0 THEN 'Sin Stock'
-                    WHEN a.stock <= %s THEN 'Stock Bajo'
-                    ELSE 'Stock Normal'
-                END as estado_stock,
-                COALESCE(SUM(dv.cantidad), 0) AS total_vendido
+                COALESCE(tam.nombre, 'Sin tamaño') as tam_nombre,
+                    CASE 
+                        WHEN a.stock = 0 THEN 'Sin Stock'
+                        WHEN a.stock <= 5 THEN 'Stock Crítico'
+                        WHEN a.stock <= 10 THEN 'Stock Bajo'
+                        ELSE 'Stock Normal'
+                    END as estado_stock
             FROM articulo a
             LEFT JOIN tamanio_caja tam ON tam.id = a.tamaño_cajaid
-            LEFT JOIN detalle_venta dv ON a.id = dv.articuloid
-            WHERE a.activo = 1 
-                AND a.stock <= %s
-            GROUP BY a.id, a.nombre, a.precio, a.stock, a.dimensiones, tam.nombre
-            ORDER BY a.stock ASC, total_vendido DESC
+            WHERE a.activo = 1
+            ORDER BY id
         '''
         
         columnas = {
             'id': ['ID', 0.5],
-            'nombre': ['Artículo', 3],
-            'precio': ['Precio', 1],
-            'stock': ['Stock Actual', 1],
-            'dimensiones': ['Dimensiones', 2],
-            'tam_nombre': ['Tamaño Caja', 2],
-            'estado_stock': ['Estado', 1.5],
-            'total_vendido': ['Total Vendido', 1.5],
+            'nombre': ['Artículo', 0.5],
+            'precio': ['Precio S/.', 0.5],
+            'stock': ['Stock Actual', 0.5],
+            'estado_stock': ['Estado', 0.5],
         }
         
-        filas = sql_select_fetchall(sql, (stock_minimo, stock_minimo))
+        filas = sql_select_fetchall(sql)
         
         return columnas, filas
         
@@ -275,18 +268,80 @@ def get_report_reposicion(stock_minimo=10):
         print(f"Error en get_report_reposicion: {e}")
         return {}, []
 
-def get_stock_minimo_options():
-    """Retorna opciones predefinidas para el stock mínimo"""
-    return [
-        (5, "5 unidades"),
-        (10, "10 unidades"), 
-        (15, "15 unidades"),
-        (20, "20 unidades"),
-        (25, "25 unidades"),
-        (50, "50 unidades")
-    ]
-
-
+def get_reporte_ventas(fecha_inicio=None, fecha_fin=None):
+    """
+    Obtiene un reporte de ventas por periodo con detalles de transacciones
+    """
+    try:
+        # Construir la consulta base
+        sql = '''
+            SELECT 
+                tv.num_serie,
+                tv.fecha,
+                tv.hora,
+                CONCAT(c.nombre_siglas, ' ', c.apellidos_razon) as cliente,
+                c.num_documento,
+                td.siglas as tipo_documento,
+                tc.nombre as tipo_comprobante,
+                tv.monto_total,
+                tv.estado,
+                CASE 
+                    WHEN tv.estado = 0 THEN 'Pendiente'
+                    WHEN tv.estado = 1 THEN 'Completado'
+                    ELSE 'Cancelado'
+                END as estado_descripcion,
+                COUNT(dv.articuloid) as cantidad_articulos,
+                SUM(dv.cantidad) as total_unidades,
+                ROUND(tv.monto_total / 1.18, 2) as subtotal,
+                ROUND(tv.monto_total - (tv.monto_total / 1.18), 2) as igv
+            FROM transaccion_venta tv
+            INNER JOIN cliente c ON tv.clienteid = c.id
+            INNER JOIN tipo_documento td ON c.tipo_documentoid = td.id
+            INNER JOIN tipo_comprobante tc ON tv.tipo_comprobanteid = tc.id
+            LEFT JOIN detalle_venta dv ON tv.num_serie = dv.ventanum_serie
+            WHERE 1=1
+        '''
+        
+        params = []
+        
+        # Aplicar filtros de fecha si se proporcionan
+        if fecha_inicio and fecha_fin:
+            # Validar formato de fecha
+            if len(fecha_inicio) == 10 and len(fecha_fin) == 10:
+                sql += " AND tv.fecha BETWEEN %s AND %s "
+                params.extend([fecha_inicio, fecha_fin])
+            else:
+                print("Formato de fecha incorrecto, filtro ignorado.")
+        
+        sql += '''
+            GROUP BY tv.num_serie, tv.fecha, tv.hora, c.id, td.siglas, tc.nombre, tv.monto_total, tv.estado
+            ORDER BY tv.fecha DESC, tv.hora DESC
+        '''
+        
+        columnas = {
+            'num_serie': ['N° Serie', 1],
+            'fecha': ['Fecha', 1.2],
+            'hora': ['Hora', 1],
+            'cliente': ['Cliente', 3],
+            'num_documento': ['Documento', 1.5],
+            'tipo_documento': ['Tipo Doc.', 1],
+            'tipo_comprobante': ['Comprobante', 1.5],
+            'cantidad_articulos': ['Artículos', 1],
+            'total_unidades': ['Unidades', 1],
+            'subtotal': ['Subtotal S/.', 1.5],
+            'igv': ['IGV S/.', 1.2],
+            'monto_total': ['Total S/.', 1.5],
+            'estado_descripcion': ['Estado', 1.2],
+        }
+        
+        filas = sql_select_fetchall(sql, tuple(params))
+        
+        return columnas, filas
+        
+    except Exception as e:
+        print(f"Error en get_reporte_ventas: {e}")
+        return {}, []
+    
 ################## TRANSACCION VENTA ############
 def obtener_precio_articulo(articulo_id):
     sql = "SELECT precio FROM articulo WHERE id = %s"
