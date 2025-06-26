@@ -3,7 +3,7 @@ from controladores.bd import (
     show_columns, show_primary_key, exists_column_Activo, unactive_row_table
 )
 
-table_name = 'reclamo'
+table_name = 'tipo_reclamo'
 
 def get_info_columns():
     return show_columns(table_name)
@@ -20,25 +20,16 @@ def delete_row(id):
 
 def get_table():
     sql = f'''
-        SELECT id, nombres_razon, direccion, correo, telefono, n_documento,
-               monto_indemnizado, titulo_incidencia, bien_contratado, monto_reclamado,
-               relacion, fecha_recojo, sucursal_id, descripcion, pedido,
-               causa_reclamoid, tipo_indemnizacionid, paquetetracking, ubigeocodigo, tipo_documentoid
-        FROM {table_name}
+        SELECT id, nombre, descripcion , activo
+        FROM tipo_reclamo
     '''
 
     columnas = {
-        'id': ['ID', 0.5],
-        'nombres_razon': ['Cliente', 1.5],
-        'direccion': ['Dirección', 1.5],
-        'correo': ['Correo', 1.2],
-        'telefono': ['Teléfono', 1.2],
-        'titulo_incidencia': ['Incidencia', 1.5],
-        'monto_reclamado': ['Monto Reclamado', 1],
-        'fecha_recojo': ['Fecha', 1],
-        'tipo_documentoid': ['Tipo Documento', 1],
-        'sucursal_id': ['Sucursal', 1],
-    }
+        'id': ['ID' , 0.5] , 
+        'nombre' : ['Nombre' , 2] , 
+        'descripcion' : ['Descripción' , 4.5] , 
+        'activo' : ['Actividad' , 1] 
+        }
 
     try:
         filas = sql_select_fetchall(sql)
@@ -122,5 +113,22 @@ class ControladorReclamo:
 
     def update_row(self, id, *args):
         return update_row(id, *args)
+
+
+def get_options():
+    sql= f'''
+        select 
+            id,
+            nombre
+        from {table_name}
+        where activo = 1
+        order by nombre asc
+    '''
+    filas = sql_select_fetchall(sql)
+    
+    lista = [(fila[get_primary_key()], fila["nombre"]) for fila in filas]
+
+    return lista
+
 
 

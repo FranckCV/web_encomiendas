@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 26-06-2025 a las 11:46:39
+-- Tiempo de generación: 26-06-2025 a las 13:36:10
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.1.17
 
@@ -12,7 +12,7 @@ START TRANSACTION;
 SET time_zone = "+00:00";
 
 --
--- Base de datos: `bd_encomiendas`
+-- Base de datos: `bd_encomiendas2`
 --
 
 -- --------------------------------------------------------
@@ -1213,6 +1213,22 @@ CREATE TABLE `reclamo` (
   `tipo_documentoid` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `reclamo`
+--
+
+INSERT INTO `reclamo` (`id`, `nombres_razon`, `direccion`, `correo`, `telefono`, `n_documento`, `monto_indemnizado`, `bien_contratado`, `monto_reclamado`, `relacion`, `fecha_recepcion`, `sucursal_id`, `descripcion`, `detalles`, `pedido`, `foto`, `causa_reclamoid`, `tipo_indemnizacionid`, `paquetetracking`, `ubigeocodigo`, `tipo_documentoid`) VALUES
+(1, 'Luis Sánchez', 'Av. Perú 123', 'luis.sanchez@mail.com', '987654321', '12345678', 50.00, 'P', 80.00, 'E', '2024-06-10', 1, 'Producto llegó roto', 'Caja abollada y mojada', 'Cambio del producto', NULL, 1, 1, 161, '140101', 1),
+(2, 'María Torres', 'Jr. Los Ángeles 234', 'maria.torres@mail.com', '912345678', '87654321', NULL, 'S', 20.00, 'R', '2024-06-11', 2, 'Servicio no cumplido', 'No recogieron la encomienda', 'Reembolso total', NULL, 2, 2, 162, '140102', 1),
+(3, 'Carlos Fernández', 'Calle Lima 456', 'carlos.fernandez@mail.com', '923456789', '11223344', 30.00, 'P', 60.00, 'E', '2024-06-12', 1, 'Producto extraviado', 'Nunca llegó a destino', 'Reembolso parcial', NULL, 3, 1, 163, '140103', 1),
+(4, 'Ana Ruiz', 'Av. Grau 789', 'ana.ruiz@mail.com', '934567890', '22334455', 45.00, 'S', 90.00, 'R', '2024-06-13', 3, 'Servicio de entrega tardío', 'Llegó 2 días después', 'Descuento en siguiente envío', NULL, 1, 3, 164, '140104', 1),
+(5, 'José Vargas', 'Jr. Libertad 321', 'jose.vargas@mail.com', '945678901', '33445566', NULL, 'P', 100.00, 'E', '2024-06-14', 2, 'Daño parcial del artículo', 'Empaque roto', 'Indemnización parcial', NULL, 2, 2, 165, '140105', 1),
+(6, 'Lucía Gómez', 'Calle Bolívar 654', 'lucia.gomez@mail.com', '956789012', '44556677', NULL, 'S', 35.00, 'R', '2024-06-15', 1, 'No llegó el recibo', 'Falta comprobante físico', 'Reenvío del documento', NULL, 3, NULL, 167, '140106', 1),
+(7, 'Miguel Rojas', 'Av. Arequipa 987', 'miguel.rojas@mail.com', '967890123', '55667788', 70.00, 'P', 120.00, 'E', '2024-06-16', 3, 'Rotura de contenido', 'Vidrio quebrado', 'Cambio inmediato', NULL, 1, 2, 162, '140107', 1),
+(8, 'Patricia Salinas', 'Jr. Sucre 111', 'patricia.salinas@mail.com', '978901234', '66778899', NULL, 'S', 25.00, 'R', '2024-06-17', 2, 'Maltrato al cliente', 'Empleado grosero', 'Disculpa formal', NULL, 2, NULL, 167, '140108', 1),
+(9, 'Ricardo Lozano', 'Calle San Martín 222', 'ricardo.lozano@mail.com', '989012345', '77889900', 20.00, 'P', 50.00, 'E', '2024-06-18', 1, 'Error en la dirección', 'Se envió al lugar equivocado', 'Reenvío gratuito', NULL, 3, 3, 162, '140109', 1),
+(10, 'Daniela Chávez', 'Av. Colonial 333', 'daniela.chavez@mail.com', '990123456', '88990011', 15.00, 'S', 40.00, 'R', '2024-06-19', 2, 'Atención lenta', 'Tuve que esperar 2 horas', 'Compensación por espera', NULL, 1, 1, 161, '140110', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -1354,84 +1370,86 @@ CREATE TABLE `sucursal` (
 --
 
 INSERT INTO `sucursal` (`id`, `abreviatura`, `codigo_postal`, `direccion`, `horario_l_v`, `horario_s_d`, `latitud`, `longitud`, `teléfono`, `referencia`, `activo`, `ubigeocodigo`) VALUES
-(1, 'AMA01', '01001', 'Jr. Octavio Ortiz Arrieta 270, Chachapoyas', '8:30am a 1pm y de 3pm a 6pm', '9am a 2pm', -6.232460, -77.872700, '', '', 1, '10101'),
-(2, 'AMA02', '', 'Av. CAHUIDE S/N, CAMPORREDONDO, LUYA - AMAZONAS', '8am a 1pm y de 3pm a 6pm', '8am a 12pm', -6.213162, -78.319717, '', '', 1, '10402'),
-(3, 'AMA03', '', 'JR. MIGUEL GRAU NRO. 275, OCALLI, LUYA - AMAZONAS', '8am a 1pm y de 3pm a 6pm', '8am a 12pm', -6.235146, -78.266227, '', '', 1, '10402'),
-(4, 'AMA05', '', 'Jr. Mesones Muro 394, BAGUA GRANDE. Ref. Frente a la PNP', '8am a 6pm', '8am a 6pm', NULL, NULL, '', '', 1, '10701'),
-(5, 'AMA07', '', 'JR. SAN MARTIN 199 - EL MILAGRO', '9am - 7:00pm', '9am - 7:00pm', NULL, NULL, '', '', 1, '10703'),
-(6, 'ANC01', '', 'Av. Magdalena 240, Casma', '9am a 1pm y de 3pm a 7pm', '9am a 5pm', NULL, NULL, '', '', 1, '20501'),
-(7, 'ANC02', '', 'Av. Alberto Reyes 239, Huarmey', '9am a 1:30pm y de 4:30pm a 8:30pm', '9am a 2pm', NULL, NULL, '', '', 1, '21901'),
-(8, 'ANC03', '', 'JR. INDEPENDENCIA NRO. 310, AIJA - ANCASH', '8am a 1pm y 4pm a 6pm', '8am a 1pm y 4pm a 6pm', NULL, NULL, '', '', 1, '20201'),
-(9, 'ANC11', '', 'Av. Ramón Castilla S/N, Cdra 8 - Caraz', '9am a 1pm y 3pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '20701'),
-(10, 'ANC12', '', 'Av. Arias Graziani S/N Yungay', '9am a 1pm y de 3pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '21501'),
-(11, 'ANC13', '', 'Jr. Manuel Alvarez -1065, Barrio San Bartolomé - Huari.', '9am a 12:30pm y de 2:30pm a 7pm', '9am a 1pm', NULL, NULL, '', '', 1, '140806'),
-(12, 'ANC14', '', 'Av. Agustín Gamarra Nro. 743, Soledad Baja - Huaraz', '9am a 6:30pm', '9am a 3pm', NULL, NULL, '', '', 1, '20101'),
-(13, 'ANC15', '', 'Av Jose Pardo 456, Chimbote', 'Central: 8:30am a 10pm', 'Central: 8:30am a 9pm', NULL, NULL, 'Frente A Plaza De Armas', '', 1, '21301'),
-(14, 'ANC16', '', 'AV. Pacifico Mz. S3 Lt. 36 Urb José Mariátegui, Nuevo Chimbote. Ref: Frente A La Ferretería Becor.', 'Central: 8:30am a 8pm', 'Central: 8:30am a 7pm', NULL, NULL, '', '', 1, '21309'),
-(15, 'ANC17', '', 'Av. 28 De Julio 330, Sihuas', '8am a 1pm y de 3pm a 7pm', '9am a 1pm', NULL, NULL, '', '', 1, '21410'),
-(16, 'APU01', '', 'Jr. Elias N° 118, Abancay', '8am a 1pm y de 3pm a 5:30pm', '8am a 1pm y de 3pm a 5:30pm', NULL, NULL, '', '', 1, '30101'),
-(17, 'APU02', '', 'Av. Panamericana Nro. 503, Curahuasi. Ref: A media cuadra del semáforo.', '9am a 12:30pm y de 3pm a 6pm', '9am a 12:30pm', NULL, NULL, '', '', 1, '30103'),
-(18, 'APU03', '', 'Jr. Juan Francisco Ramos 559, Andahuaylas', '8:30am a 5pm', '8:30am a 1pm', NULL, NULL, '', '', 1, '30301'),
-(19, 'APU04', '', 'Av. Panamericana # 528, Chalhuanca', '9am a 3pm', 'NO HAY ATENCIÓN', NULL, NULL, '', '', 1, '30201'),
-(20, 'APU05', '', 'Av. Los Incas S/N, Uripa, Chincheros.', '9am a 5pm', '9am a 1pm', NULL, NULL, 'Frente a la comisaría de Uripa - Anco Huallo', '', 1, '30705'),
-(21, 'APU06', '', 'Av. Grau 117, Chuquibambilla.', '9am a 1pm y de 3pm a 5pm', '9am a 1pm', NULL, NULL, '', '', 1, '30601'),
-(22, 'ARE01', '', 'Av. San José N.º 103-A, Cercado - Arequipa.', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '40102'),
-(23, 'ARE02', '', 'Av. Parra Nro. 388, Cercado - Arequipa.', '9am a 6:30pm', '9am a 6pm', NULL, NULL, '', '', 1, '40102'),
-(24, 'ARE03', '', 'CALLE MAYTA CAPAC 601 IV CENTENARIO, CERCADO, AREQUIPA', '8:30am a 6pm', '9:30am a 3pm', NULL, NULL, '', '', 1, '40102'),
-(25, 'ARE04', '', 'Av. Panamericana - Pueblo joven El Triunfo ZN B MZ A Lote 12', '8:30am a 1pm y de 2pm a 6pm', '8:30am a 2pm', NULL, NULL, '', '', 1, '40106'),
-(26, 'ARE05', '', 'Calle Miguel Grau 214  Plaza De Las Americas, Cerro Colorado. Arequipa', '9am a 7pm', '9:30am a 3pm', NULL, NULL, '', '', 1, '40105'),
-(27, 'ARE06', '', 'Av. Daniel Alcides Carrión N° 269, José Luis Bustamante Rivero, Arequipa.', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '40110'),
-(28, 'LIM01', '', 'Av. Primavera 275, Barranca', '9am a 7pm', '9am a 5pm', NULL, NULL, '', '', 1, '150701'),
-(29, 'LIM02', '', 'AV.- 26 DE JUNIO 405, Canta.', '8am a 6pm', 'NO HAY ATENCION', NULL, NULL, '', '', 1, '150107'),
-(30, 'LIM03', '', 'Jr. 2 De Mayo 601-D San Vicente, Cañete', '9am a 7pm', '9am a 1pm', NULL, NULL, '', '', 1, '150502'),
-(31, 'LIM04', '', 'Av. Antigua Pan. Sur 243, Mala', '9am a 1pm y 2pm a 6pm', '9am a 2pm', NULL, NULL, '', '', 1, '150505'),
-(32, 'LIM05', '', 'Jr. Mariscal Castilla 117, Huacho', '9am a 8pm', '9am a 5pm', NULL, NULL, '', '', 1, '150701'),
-(33, 'LIM06', '', 'Av. Chancay Nro. 245 - Huaral. Ref. Al frente del Restaurant la Estacion.', '8:30am a 7pm', '8:30am a 6:30pm', NULL, NULL, '', '', 1, '150603'),
-(34, 'LIM07', '', 'Calle Mariscal Sucre Nro. 104, Chancay. Ref: Frente a Panadería El Tanta.', '9am a 1pm y de 3pm a 7pm', '9am a 5pm', NULL, NULL, '', '', 1, '150602'),
-(35, 'LIM08', '', 'Jr. Bolognesi 398, Lurin', '8am a 5pm', '9am a 2pm', NULL, NULL, '', '', 1, '150603'),
-(36, 'LIM09', '', 'Plaza de armas S/N, al frente del hotel Inga, Yauyos-Lima', '8am a 5pm', 'NO HAY ATENCION', NULL, NULL, '', '', 1, '150603'),
-(37, 'CAJ01', '', 'Jr. Los Nogales N° 426, Villa Universitaria, Cajamarca.', '9:00 am a 7:00pm', '9:00am a 7:00 pm', NULL, NULL, '', '', 1, '60101'),
-(38, 'CAJ02', '', 'Jr. Bolognesi 117, Cajabamba. Ref: Esquina del Jr. Zavala y Bologensi, a una cuadra de la RENIEC.', '11:00am a 1:30pm - 4:00pm a 7:30pm', '9am a 1pm', NULL, NULL, '', '', 1, '60201'),
-(39, 'CAJ03', '', 'Esquina entre Bolognesi y Pedro Ortiz Montoya, Celendin.', '9am a 12pm y de 2:30pm a 6pm', '9am a 12pm', NULL, NULL, '', '', 1, '60301'),
-(40, 'CAJ04', '', 'JR. GREGORIO MALCA N° 625, Chota', '8:30am a 7:00 pm', '9:00 am a 1:00pm', NULL, NULL, '', '', 1, '60401'),
-(41, 'CAJ05', '', 'Jr. José Galvez S/N, Contumaza.', '9am a 12pm y de 3pm a 5pm', '9am a 12pm', NULL, NULL, '', '', 1, '60501'),
-(42, 'CAJ06', '', 'Jr. Contumazá 318, Chilete', '8am a 1pm y de 3pm a 7:30pm', '9am a 12pm', NULL, NULL, '', '', 1, '60601'),
-(43, 'CAJ07', '', 'Jr. Ramón Castilla 353, Cutervo', '9am a 1pm y de 3pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '60701'),
-(44, 'CAJ08', '', 'Jr. San Carlos 1015, Bambamarca', '9am a 1pm y de 3pm a 7:30pm', '9am a 1pm', NULL, NULL, '', '', 1, '60801'),
-(45, 'CAJ09', '', 'Jr. Miguel Grau 338, San Miguel.', '9am a 12:30pm y de 2:30pm a 7pm', '9am a 1pm', NULL, NULL, '', '', 1, '60901'),
-(46, 'CAJ10', '', 'Jr. Néstor Batanero Nro. 478, San Pablo.', '8am a 8pm', 'NO HAY ATENCIÓN', NULL, NULL, '', '', 1, '61001'),
-(47, 'CAJ11', '', 'Entre Jr. Miguel Grau y Jr. Túpac Amaru, San Marcos.', '7am a 2pm / 2pm a 5pm', '9am a 12pm', NULL, NULL, '', '', 1, '61101'),
-(48, 'CAJ12', '', 'Jr. Cajamarca 484, Tembladera.', '8am a 7pm', '9am a 1pm', NULL, NULL, '', '', 1, '61201'),
-(49, 'CAJ13', '', 'Calle San Martín 1255, Jaen', '9am a 1 pm / 3pm a 7 pm', '9am a 1 pm / 3pm a 7 pm', NULL, NULL, '', '', 1, '60801'),
-(50, 'CAJ14', '', 'Av. Lindo Nro. 150, Pucará', '8am a 2pm y de 4pm a 6pm', '8am a 2pm y de 4pm a 6pm', NULL, NULL, '', '', 1, '60110'),
-(51, 'CAJ15', '', 'JR.SAN MARTIN #456 - Ref.Frente al parque principal, costado de la agencia agraria.', '9am a 1pm y de 3pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '60102'),
-(52, 'CAJ16', '', 'JR. CAUTIVO S/N, NAMBALLE, SAN IGNACIO', '8am a 1pm y de 3pm a 5pm', '8am a 1pm y de 3pm a 5pm', NULL, NULL, '', '', 1, '60802'),
-(53, 'CAJ17', '', 'Jr. Zarrumillas 150, Santa Cruz.', '8am a 12pm y de 5pm a 6pm', '8am a 12pm', NULL, NULL, '', '', 1, '60111'),
-(54, 'CHI01', '', 'Mariscal Castilla 208, Chiclayo', '8am a 7pm', '9am a 7pm', NULL, NULL, '', '', 1, '140101'),
-(55, 'CHI02', '', 'AV. Miguel Grau 675, Urb. Santa Victoria, Chiclayo', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '140102'),
-(56, 'CHI03', '', 'Av. Tacna 164, Chiclayo', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '140103'),
-(57, 'CHI04', '', 'Calle Torres Paz Nro. 224, Interior C, Pimentel', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '140113'),
-(58, 'CHI05', '', 'Av. Huamachuco Nro. 809, Lambayeque. Frente al parque infantil.', '9am a 2pm y de 3pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '140108'),
-(59, 'TRU01', '', 'Av. Tupac Amaru 1675 Urb Alto Mochica, Trujillo', '9am a 1pm y 1:45pm a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '120105'),
-(60, 'TRU02', '', 'Av. Santa 1260, Trujillo Ref. A media cuadra del cruce con Av. América', '8am a 6pm', '9am a 1pm', NULL, NULL, '', '', 1, '120105'),
-(61, 'TRU03', '', 'Av. España 1234, Trujillo', '8am a 5pm', '9am a 1pm', NULL, NULL, '', '', 1, '120101'),
-(62, 'TRU04', '', 'Calle San Martín 234, Trujillo', '9am a 5pm', '9am a 1pm', NULL, NULL, '', '', 1, '120103'),
-(63, 'TRU05', '', 'Jr. Los Pinos 567, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '120103'),
-(64, 'TRU06', '', 'Av. América 900, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, '120109'),
-(65, 'TRU07', '', 'Jr. Francisco Pizarro 876, Trujillo', '8am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '120111'),
-(66, 'TRU08', '', 'Av. Larco 123, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '120103'),
-(67, 'TRU09', '', 'Calle Grau 321, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, '120109'),
-(68, 'TRU10', '', 'Av. España 789, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '120111'),
-(69, 'TRU11', '', 'Jr. San Juan 456, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, '120101'),
-(70, 'TRU12', '', 'Av. Perú 123, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '120105'),
-(71, 'TRU13', '', 'Jr. Libertad 890, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, '120101'),
-(72, 'TRU14', '', 'Av. Bolívar 456, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '120101'),
-(73, 'TRU15', '', 'Calle Huamachuco 123, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, '120107'),
-(74, 'TRU16', '', 'Av. La Marina 789, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '120107'),
-(75, 'TRU17', '', 'Jr. Cajamarca 456, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, '120101'),
-(76, 'TRU18', '', 'Av. Brasil 123, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '120101'),
-(77, 'TRU19', '', 'Calle San Martín 789, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, '', '', 1, '120103'),
-(78, 'TRU20', '', 'Av. 28 de Julio 456, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, '', '', 1, '120101');
+(1, 'AMA01', '01001', 'Jr. Octavio Ortiz Arrieta 270, Chachapoyas', '8:30am a 1pm y de 3pm a 6pm', '9am a 2pm', -6.232460, -77.872700, NULL, NULL, 1, '10101'),
+(2, 'AMA02', '01551', 'AM-103, Camporredondo, Luya, Amazonas, Perú', '8am a 1pm y de 3pm a 6pm', '8am a 12pm', -6.213162, -78.319717, NULL, NULL, 1, '10402'),
+(3, 'AMA03', '01380', 'Selcho, Ocalli, Luya, Amazonas, Perú', '8am a 1pm y de 3pm a 6pm', '8am a 12pm', -6.235146, -78.266227, NULL, NULL, 1, '10402'),
+(4, 'AMA05', '01621', 'Jr. Mesones Muro 394, BAGUA GRANDE', '8am a 6pm', '8am a 6pm', -5.756166, -78.440103, NULL, NULL, 1, '10701'),
+(5, 'AMA07', '01566', 'JR. SAN MARTIN 199 - EL MILAGRO', '9am - 7:00pm', '9am - 7:00pm', NULL, NULL, NULL, NULL, 1, '10703'),
+(6, 'ANC01', '02661', 'Avenida Magdalena, Casma, Áncash, 02661, Perú', '9am a 1pm y de 3pm a 7pm', '9am a 5pm', -9.473000, -78.307927, NULL, NULL, 1, '20501'),
+(7, 'ANC02', '02435', 'Av. Alberto Reyes 239, Huarmey', '9am a 1:30pm y de 4:30pm a 8:30pm', '9am a 2pm', NULL, NULL, NULL, NULL, 1, '21901'),
+(8, 'ANC03', '02435', 'JR. INDEPENDENCIA NRO. 310, AIJA - ANCASH', '8am a 1pm y 4pm a 6pm', '8am a 1pm y 4pm a 6pm', NULL, NULL, NULL, NULL, 1, '20201'),
+(9, 'ANC11', '02613', 'Av. Ramón Castilla S/N, Cdra 8 - Caraz', '9am a 1pm y 3pm a 6pm', '9am a 1pm', NULL, NULL, NULL, NULL, 1, '20701'),
+(10, 'ANC12', '13006', 'Av. Arias Graziani S/N Yungay', '9am a 1pm y de 3pm a 6pm', '9am a 1pm', NULL, NULL, NULL, NULL, 1, '21501'),
+(11, 'ANC13', '1403', 'Jiron, Barrio San Bartolome, Manuel Álvarez González Nro 1064', '9am a 12:30pm y de 2:30pm a 7pm', '9am a 1pm', NULL, NULL, NULL, NULL, 1, '20403'),
+(12, 'ANC14', '02489', 'Av. Agustín Gamarra Nro. 743, Soledad Baja - Huaraz', '9am a 6:30pm', '9am a 3pm', NULL, NULL, NULL, NULL, 1, '20101'),
+(13, 'ANC15', '02800', 'Avenida José Pardo, Chimbote, Santa, Áncash, 02800, Perú', 'Central: 8:30am a 10pm', 'Central: 8:30am a 9pm', -9.092296, -78.566704, 'Frente A Plaza De Armas', NULL, 1, '21301'),
+(14, 'ANC16', '02489', 'AV. Pacifico Mz. S3 Lt. 36 Urb José Mariátegui, Nuevo Chimbote. Ref: Frente A La Ferretería Becor.', 'Central: 8:30am a 8pm', 'Central: 8:30am a 7pm', NULL, NULL, NULL, NULL, 1, '21309'),
+(15, 'ANC17', '02225', 'Avenida 28 de Julio, Mitobamba, Sihuas, Áncash, 02225, Perú', '8am a 1pm y de 3pm a 7pm', '9am a 1pm', -8.550973, -77.639555, NULL, NULL, 1, '21410'),
+(16, 'APU01', '03700', 'Jr. Elias N° 118, Abancay', '8am a 1pm y de 3pm a 5:30pm', '8am a 1pm y de 3pm a 5:30pm', NULL, NULL, NULL, NULL, 1, '30101'),
+(17, 'APU02', '03330', 'Av. Panamericana Nro. 503, Curahuasi. Ref: A media cuadra del semáforo.', '9am a 12:30pm y de 3pm a 6pm', '9am a 12:30pm', NULL, NULL, NULL, NULL, 1, '30103'),
+(18, 'APU03', '03200', 'Jr. Juan Francisco Ramos 559, Andahuaylas', '8:30am a 5pm', '8:30am a 1pm', NULL, NULL, NULL, NULL, 1, '30301'),
+(19, 'APU04', '03707', 'Av. Panamericana # 528, Chalhuanca', '9am a 3pm', 'NO HAY ATENCIÓN', NULL, NULL, NULL, NULL, 1, '30201'),
+(20, 'APU05', '03840', 'Avenida Los Incas, Sayhua Pata, Uripa, Anco-Huallo, Chincheros, Apurímac, Perú', '9am a 5pm', '9am a 1pm', -13.536864, -73.676838, 'Frente a la comisaría de Uripa - Anco Huallo', NULL, 1, '30705'),
+(21, 'APU06', '03760', 'Av. Grau 117, Chuquibambilla.', '9am a 1pm y de 3pm a 5pm', '9am a 1pm', NULL, NULL, NULL, NULL, 1, '30601'),
+(22, 'ARE01', '04017', 'Av. San José N.º 103-A, Cercado - Arequipa.', '9am a 7pm', '9am a 6pm', NULL, NULL, NULL, NULL, 1, '40102'),
+(23, 'ARE02', '04014', 'Av. Parra Nro. 388, Cercado - Arequipa.', '9am a 6:30pm', '9am a 6pm', NULL, NULL, NULL, NULL, 1, '40102'),
+(24, 'ARE03', '04011', 'CALLE MAYTA CAPAC 601 IV CENTENARIO, CERCADO, AREQUIPA', '8:30am a 6pm', '9:30am a 3pm', NULL, NULL, NULL, NULL, 1, '40102'),
+(25, 'ARE04', '04001', 'Av. Panamericana - Pueblo joven El Triunfo ZN B MZ A Lote 12', '8:30am a 1pm y de 2pm a 6pm', '8:30am a 2pm', NULL, NULL, NULL, NULL, 1, '40106'),
+(26, 'ARE05', '04002', 'Calle Miguel Grau 214  Plaza De Las Americas, Cerro Colorado. Arequipa', '9am a 7pm', '9:30am a 3pm', NULL, NULL, NULL, NULL, 1, '40105'),
+(27, 'ARE06', '04013', 'Av. Daniel Alcides Carrión N° 269, José Luis Bustamante Rivero, Arequipa.', '9am a 7pm', '9am a 6pm', NULL, NULL, NULL, NULL, 1, '40110'),
+(28, 'LIM01', '15170', 'Institución Educativa No. 62386, Primavera, Barranca, Datem del Marañón, Loreto, Perú', '9am a 7pm', '9am a 5pm', -4.846032, -76.848702, NULL, NULL, 1, '140903'),
+(29, 'LIM02', '15200', 'AV.- 26 DE JUNIO 405, Canta.', '8am a 6pm', 'NO HAY ATENCION', NULL, NULL, NULL, NULL, 1, '140304'),
+(30, 'LIM03', '15701', 'Calle 2 de Mayo, Asunción 8, Imperial, Cañete, Lima, 15701, Perú', '9am a 7pm', '9am a 1pm', -13.062124, -76.352014, NULL, NULL, 1, '140401'),
+(31, 'LIM04', '15608', 'Antigua Carretera Panamericana Sur, Mala, Cañete, Lima, 15608, Perú', '9am a 1pm y 2pm a 6pm', '9am a 2pm', -12.650370, -76.641517, NULL, NULL, 1, '140408'),
+(32, 'LIM05', '15136', 'Jr, Mariscal Castilla 117, Huacho', '9am a 8pm', '9am a 5pm', NULL, NULL, NULL, NULL, 1, '140501'),
+(33, 'LIM06', '15200', 'Av. Chancay Nro. 245 - Huaral. Ref. Al frente del Restaurant la Estacion.', '8:30am a 7pm', '8:30am a 6:30pm', NULL, NULL, NULL, NULL, 1, '140801'),
+(34, 'LIM07', ' 1513', 'Calle Mariscal Cáceres, Chancay, Coronado, Bernal, Sechura, Piura, Perú', '9am a 1pm y de 3pm a 7pm', '9am a 5pm', -5.464529, -80.744181, NULL, NULL, 1, '140801'),
+(35, 'LIM08', '15020', 'Jr. Bolognesi 398, Lurin', '8am a 5pm', '9am a 2pm', NULL, NULL, NULL, NULL, 1, '140113'),
+(36, 'LIM09', '15775', 'Plaza de armas S/N, al frente del hotel Inga, Yauyos-Lima', '8am a 5pm', 'NO HAY ATENCION', NULL, NULL, NULL, NULL, 1, '140709'),
+(37, 'CAJ01', '06001', 'Jr. Los Nogales N° 426, Villa Universitaria, Cajamarca.', '9:00 am a 7:00pm', '9:00am a 7:00 pm', NULL, NULL, NULL, NULL, 1, '60101'),
+(38, 'CAJ02', '06002', 'Jr. Bolognesi 117, Cajabamba. Ref: Esquina del Jr. Zavala y Bologensi, a una cuadra de la RENIEC.', '11:00am a 1:30pm - 4:00pm a 7:30pm', '9am a 1pm', NULL, NULL, NULL, NULL, 1, '60201'),
+(39, 'CAJ03', '06001', 'Esquina entre Bolognesi y Pedro Ortiz Montoya, Celendin.', '9am a 12pm y de 2:30pm a 6pm', '9am a 12pm', NULL, NULL, NULL, NULL, 1, '60301'),
+(40, 'CAJ04', '06003', 'JR. GREGORIO MALCA N° 625, Chota', '8:30am a 7:00 pm', '9:00 am a 1:00pm', NULL, NULL, NULL, NULL, 1, '60401'),
+(41, 'CAJ05', '06001', 'Jr. José Galvez S/N, Contumaza.', '9am a 12pm y de 3pm a 5pm', '9am a 12pm', NULL, NULL, NULL, NULL, 1, '60501'),
+(42, 'CAJ06', '06003', 'Jr. Contumazá 318, Chilete', '8am a 1pm y de 3pm a 7:30pm', '9am a 12pm', NULL, NULL, NULL, NULL, 1, '60601'),
+(43, 'CAJ07', '06001', 'Jr. Ramón Castilla 353, Cutervo', '9am a 1pm y de 3pm a 6pm', '9am a 1pm', NULL, NULL, NULL, NULL, 1, '60701'),
+(44, 'CAJ08', '06001', 'Jr. San Carlos 1015, Bambamarca', '9am a 1pm y de 3pm a 7:30pm', '9am a 1pm', NULL, NULL, NULL, NULL, 1, '60801'),
+(45, 'CAJ09', '06002', 'Jr. Miguel Grau 338, San Miguel.', '9am a 12:30pm y de 2:30pm a 7pm', '9am a 1pm', NULL, NULL, NULL, NULL, 1, '60901'),
+(46, 'CAJ10', '06001', 'Jr. Néstor Batanero Nro. 478, San Pablo.', '8am a 8pm', 'NO HAY ATENCIÓN', NULL, NULL, NULL, NULL, 1, '61001'),
+(47, 'CAJ11', '06001', 'Entre Jr. Miguel Grau y Jr. Túpac Amaru, San Marcos.', '7am a 2pm / 2pm a 5pm', '9am a 12pm', NULL, NULL, NULL, NULL, 1, '61101'),
+(48, 'CAJ12', '06001', 'Jr. Cajamarca 484, Tembladera.', '8am a 7pm', '9am a 1pm', NULL, NULL, NULL, NULL, 1, '61201'),
+(49, 'CAJ13', '06003', 'Calle San Martín 1255, Jaen', '9am a 1 pm / 3pm a 7 pm', '9am a 1 pm / 3pm a 7 pm', NULL, NULL, NULL, NULL, 1, '60801'),
+(50, 'CAJ14', '06002', 'Av. Lindo Nro. 150, Pucará', '8am a 2pm y de 4pm a 6pm', '8am a 2pm y de 4pm a 6pm', NULL, NULL, NULL, NULL, 1, '60110'),
+(51, 'CAJ15', '06001', 'JR.SAN MARTIN #456 - Ref.Frente al parque principal, costado de la agencia agraria.', '9am a 1pm y de 3pm a 6pm', '9am a 1pm', NULL, NULL, NULL, NULL, 1, '60102'),
+(52, 'CAJ16', '06001', 'JR. CAUTIVO S/N, NAMBALLE, SAN IGNACIO', '8am a 1pm y de 3pm a 5pm', '8am a 1pm y de 3pm a 5pm', NULL, NULL, NULL, NULL, 1, '60802'),
+(53, 'CAJ17', '06001', 'Jr. Zarrumillas 150, Santa Cruz.', '8am a 12pm y de 5pm a 6pm', '8am a 12pm', NULL, NULL, NULL, NULL, 1, '60111'),
+(54, 'CHI01', '14001', 'Mariscal Castilla, Urbanizacion Santa Victoria, Chiclayo, Lambayeque, 14001, Perú', '8am a 7pm', '9am a 7pm', -6.774925, -79.836803, NULL, NULL, 1, '130101'),
+(55, 'CHI02', '14008', 'Avenida Grau, Residencial Santa Fe del Valle, Picsi, Chiclayo, Lambayeque, Perú', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', -6.717460, -79.771240, NULL, NULL, 1, '130101'),
+(56, 'CHI03', '14013', 'Avenida Tacna, José Leonardo Ortiz, Chiclayo, Lambayeque, 14013, Perú', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', -6.774244, -79.846156, NULL, NULL, 1, '130101'),
+(57, 'CHI04', ' 1400', '549, Calle José Balta, Área residencial Pimentel Centro, Pimentel, Chiclayo, Lambayeque, Perú', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', -6.838447, -79.934983, NULL, NULL, 1, '130110'),
+(58, 'LAM01', '14013', 'Avenida Huamachuco, Lambayeque, Perú', '9am a 2pm y de 3pm a 6pm', '9am a 1pm', -6.708217, -79.903525, NULL, NULL, 1, '130301'),
+(59, 'TRU01', '13011', 'Av. Tupac Amaru 1675 Urb Alto Mochica, Trujillo', '9am a 1pm y 1:45pm a 6pm', '9am a 1pm', NULL, NULL, NULL, NULL, 1, '120105'),
+(60, 'TRU02', '13008', 'Av. Santa 1260, Trujillo Ref. A media cuadra del cruce con Av. América', '8am a 6pm', '9am a 1pm', NULL, NULL, NULL, NULL, 1, '120105'),
+(61, 'TRU03', '13006', 'Centro Comercial La Baratura del Calzado, 2050, Avenida España, Urbanización El Recreo, Trujillo, La Libertad, 13006, Perú', '8am a 5pm', '9am a 1pm', -8.112718, -79.023235, NULL, NULL, 1, '120101'),
+(62, 'TRU04', '13004', 'Calle San Martín, Laredo, Trujillo, La Libertad, 13004, Perú', '9am a 5pm', '9am a 1pm', -8.078842, -78.953958, NULL, NULL, 1, '120103'),
+(63, 'TRU05', '13007', 'Jr. Los Pinos 567, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, NULL, NULL, 1, '120103'),
+(64, 'TRU06', '13008', 'Avenida América Sur, Asentamiento Humano San Luis, Trujillo, La Libertad, 13008, Perú', '8am a 6pm', '9am a 5pm', -8.124091, -79.023943, NULL, NULL, 1, '120109'),
+(65, 'TRU07', '13001', '545, Jirón Zepita, Trujillo, La Libertad, 13001, Perú', '8am a 7pm', '9am a 6pm', -8.108574, -79.029892, NULL, NULL, 1, '120111'),
+(66, 'TRU08', '13008', '699, Avenida Victor Larco Herrera, Urbanización El Recreo, Trujillo, La Libertad, 13008, Perú', '9am a 7pm', '9am a 6pm', -8.120872, -79.035556, NULL, NULL, 1, '120103'),
+(67, 'TRU09', '13013', 'Calle Miguel Grau, Urbanizacion San Isidro, 2 Etapa, Trujillo, La Libertad, 13013, Perú', '8am a 6pm', '9am a 5pm', -8.095814, -79.050132, NULL, NULL, 1, '120109'),
+(68, 'TRU10', '13006', 'Centro Comercial La Baratura del Calzado, 2050, Avenida España, Urbanización El Recreo, Trujillo, La Libertad, 13006, Perú', '9am a 7pm', '9am a 6pm', -8.112718, -79.023235, NULL, NULL, 1, '120111'),
+(69, 'TRU11', '15423', 'Trujillo, Urbanización Canto Grande, San Juan de Lurigancho, Lima, Lima Metropolitana', '8am a 6pm', '9am a 5pm', -11.966646, -77.008604, NULL, NULL, 1, '120101'),
+(70, 'TRU12', '13006', '934, Avenida Perú, Molino, Trujillo, La Libertad, 13006, Perú', '9am a 7pm', '9am a 6pm', -8.102120, -79.016829, NULL, NULL, 1, '120105'),
+(71, 'TRU13', '13000', 'Jr. Libertad 890, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, NULL, NULL, 1, '120101'),
+(72, 'TRU14', '13001', 'Av. Bolívar 456, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, NULL, NULL, 1, '120101'),
+(73, 'TRU15', '13006', '244, Calle Huamachuco, Trujillo, La Libertad, 13006, Perú', '8am a 6pm', '9am a 5pm', -8.104566, -79.014524, NULL, NULL, 1, '120107'),
+(74, 'TRU16', '13008', '1320, Avenida la Marina, Asentamiento Humano San Luis, Trujillo, La Libertad, 13008, Perú', '9am a 7pm', '9am a 6pm', -8.126090, -79.022452, NULL, NULL, 1, '120107'),
+(75, 'TRU17', '13000', 'Jr. Cajamarca 456, Trujillo', '8am a 6pm', '9am a 5pm', NULL, NULL, NULL, NULL, 1, '120101'),
+(76, 'TRU18', '13011', 'Av. Brasil 123, Trujillo', '9am a 7pm', '9am a 6pm', NULL, NULL, NULL, NULL, 1, '120101'),
+(77, 'TRU19', '13600', 'Hospital Walter Cruz Vilca, 37, Calle San Martín, Miramar, Salaverry, Trujillo, La Libertad, 13600, Perú', '8am a 6pm', '9am a 5pm', -8.185835, -78.988743, NULL, NULL, 1, '120103'),
+(78, 'TRU20', '13008', '456, Avenida 28 de Julio, Urbanización El Recreo, Trujillo, La Libertad, 13008, Perú', '9am a 7pm', '9am a 6pm', -8.120126, -79.025782, NULL, NULL, 1, '120101'),
+(80, 'CHI05', '14001', 'Calle Tacna, Chiclayo, Lambayeque, 14001, Perú', NULL, NULL, -6.774944, -79.837646, NULL, NULL, 1, '130101'),
+(81, 'ANC18', '14820', 'Chimbote, Santa, Áncash, Perú', NULL, NULL, -8.806674, -78.280334, '4646', NULL, 1, '21301');
 
 -- --------------------------------------------------------
 
@@ -4321,7 +4339,7 @@ ALTER TABLE `pregunta_frecuente`
 -- AUTO_INCREMENT de la tabla `reclamo`
 --
 ALTER TABLE `reclamo`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de la tabla `regla_cargo`
@@ -4345,7 +4363,7 @@ ALTER TABLE `salida`
 -- AUTO_INCREMENT de la tabla `sucursal`
 --
 ALTER TABLE `sucursal`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
 
 --
 -- AUTO_INCREMENT de la tabla `tamanio_caja`
