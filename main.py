@@ -3220,7 +3220,7 @@ def insertar_envio_api():
                     )
 
                     for tracking in trackings:
-                        # generar_rotulo_2(tracking)
+                        generar_rotulo_2(tracking)
                         qr_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'qr.png')
                         if os.path.exists(qr_path):
                             with open(qr_path, 'rb') as f:
