@@ -57,6 +57,7 @@ from controladores import reporte_listar_enco
 from controladores import reporte_reclamo_causa
 from controladores import reporte_UsoUnidades
 from controladores import reporte_Viajes_por_Unidad
+from controladores import reporte_encomiendas_rutas as reporte_encomiendas_rutas
 # import BytesIO
 from itsdangerous import URLSafeSerializer
 from controladores.bd import sql_execute
@@ -435,7 +436,7 @@ CONTROLADORES = {
         ['correo', 'Correo', 'Correo', 'email', True, True, None],
         ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
         ['n_documento', 'N° Documento', '', 'text', True, True, None],
-        ['bien_contratado', 'Bien Contratado', '', 'text', True, True, None],
+        ['bien_contratado', 'Bien Contratado', '', 'select', True, True, [lambda:controlador_reclamo.get_list_bien_contratado(), '']],
         ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
         ['monto_indemnizado', 'Monto Indemnizado', '0.00', 'number', True, True, None],
         ['relacion', 'Relación con el bien', '', 'text', True, True, None],
@@ -448,7 +449,7 @@ CONTROLADORES = {
         ['causa_reclamoid', 'Causa del Reclamo', '', 'select', True, True, [lambda: controlador_causa_reclamo.get_options(), 'nombre']],
         ['tipo_indemnizacionid', 'Tipo de Indemnización', '', 'select', True, True, [lambda: controlador_tipo_indemnizacion.get_options(), 'nombre']],
         ['paquetetracking', 'Tracking', '', 'text', True, True, None],
-        ['ubigeocodigo', 'Ubigeo', '', 'text', True, True, None],
+        ['ubigeocodigo', 'Ubigeo', '', 'select', True, True, [lambda: controlador_ubigeo.get_options(), 'codigo']],
         ['tipo_documentoid', 'Tipo Documento', '', 'select', True, True, [lambda: controlador_tipo_documento.get_options(), 'nombre']]
     ],
     "crud_forms": {
@@ -1399,9 +1400,8 @@ REPORTES = {
         "active": True,
         "icon_page": "fa-solid fa-boxes-stacked",
         "titulo": "Artículos que Necesitan Reposición",
-        "table": controlador_articulo.get_report_reposicion(),  # función sin paréntesis
+        "table": controlador_articulo.get_report_reposicion(), 
         "filters": [
-            ['stock_minimo', 'Sin Stock ', lambda: controlador_articulo.get_stock_minimo_options(), 'select'],
         ],
     },
 
@@ -1434,18 +1434,25 @@ REPORTES = {
     "encomiendas_listar": {
         "active": True,
         "icon_page": "fa-solid fa-boxes-packing",
-        "titulo": "Listado de encomiendas por empaque ",
-        "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo,
+        "titulo": "Listado de encomiendas segun tipo de empaque ",
+        "table": reporte_listar_enco.get_reporte_encomiendas_por_tipo(),
         "filters": []
     },
 
     "reporte_reclamos_tipo_causa_periodo": {
-        "active": True,
-        "icon_page": "fa-solid fa-clipboard-list",
-        "titulo": "Reporte de reclamos por tipo, causa y periodo",
-        "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),
-        "filters": ['stock_minimo', 'Stock Mínimo', lambda: controlador_articulo.get_stock_minimo_options(), 'select'],
-    },
+    "active": True,
+    "icon_page": "fa-solid fa-clipboard-list",
+    "titulo": "Reporte de reclamos por tipo, causa y periodo",
+    "table": reporte_reclamo_causa.get_reporte_reclamos_tipo_causa_periodo(),  # ✅ con paréntesis
+    "filters": []
+},
+"encomiendas_rutas_estado": {
+    "active": True,
+    "icon_page": "fa-solid fa-route",
+    "titulo": "Listado de encomiendas asignadas a rutas específicas y su estado",
+    "table": reporte_encomiendas_rutas.get_reporte_encomiendas_rutas_estado(),  # 👈 con paréntesis
+    "filters": []
+},
 }
 
 
