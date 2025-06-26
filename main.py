@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app , send_file, flash #, after_this_request, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app , send_file, flash , send_from_directory #, after_this_request, flash, jsonify, session
 from controladores import bd as bd 
 from controladores import permiso as permiso
 from controladores import controlador_pagina as controlador_pagina
@@ -1570,8 +1570,8 @@ TRANSACCIONES = {
         "buttons": [
         # hay_parametros  icon         color              enlace_function      parametros   clase_html   modo(insert ,update , consult)
             # [True, 'fa-solid fa-map-location-dot', "#9856EE", 'seguimiento_tracking', {"tracking": "tracking"} , '' , 'seguimiento'],
-            [True, 'fa-solid fa-route', "#9856EE", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"} , '' , 'seguimiento'],
-            [True, 'fa-solid fa-qrcode', "#B8CBD7", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"} , '' , 'qr_code'],
+            [True, 'fa-solid fa-route', "#9856EE", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"} , '' , 'seguimiento' , False],
+            [True, 'fa-solid fa-qrcode', "#B8CBD7", 'ver_img_qr',  {"tracking": "tracking"} , '' , 'qr_code' , True],
         ],
         "options": [
         # mostrar_url       icon             color                  text                 enlace_function       parametros                    modo(insert ,update , consult)
@@ -4352,6 +4352,7 @@ def crud_generico(tabla):
             )
 
 
+
 @app.route("/transaccion=<tabla>",defaults={'pk_foreign': None})
 @app.route("/transaccion=<tabla>/<pk_foreign>")
 # @validar_empleado()
@@ -4982,6 +4983,12 @@ def interfaz_insertar_estado():
     return render_template("simulacion_escaneo_qr.html",
                            tracking=tracking,
                            detalles_estado=detalles_estado)
+
+
+
+@app.route("/ver_img_qr=<int:tracking>")
+def ver_img_qr(tracking):
+    return send_from_directory(f"static/comprobantes/{tracking}","qr.png")
 
 
 @app.route('/api_insertar_estado', methods=['POST'])
