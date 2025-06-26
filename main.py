@@ -1606,9 +1606,8 @@ TRANSACCIONES = {
         "filters": [], 
         "fields_form": [
         #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
-            ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_detalle() , 'nombre_det' ] ],
-             ['tip_comp',  'Tipo de comprobante', 'Tipo de comprobante', 'select', True ,True, [lambda: controlador_tipo_comprobante.get_options() , 'tip_comp' ] ],
-            
+            ['detalle_estadoid',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_detalle() , 'nombre_det' ] ],
+            ['tipo_comprobante',  'Tipo de comprobante', 'Tipo de comprobante', 'select', True ,True, [lambda: controlador_tipo_comprobante.get_options() , 'tip_comp' ] ],
         ],
         "crud_forms": {
             "crud_list": True,
@@ -4664,8 +4663,8 @@ def informacion_empresa():
 ##################_ PAGINAS EMPLEADO METHOD POST _################## 
 
 @app.route("/insert_row=<tabla>", methods=["POST"])
-@validar_empleado()
-@validar_error_crud()
+# @validar_empleado()
+# @validar_error_crud()
 def crud_insert(tabla):
     # try:
         if tabla in CONTROLADORES.keys():    
@@ -4704,18 +4703,23 @@ def crud_insert(tabla):
 
         controlador.insert_row( *valores )
 
+        pk_foreign = request.form.get(f"pk_foreign")
 
         if no_crud :
             return redirect(url_for(no_crud))
         else:
-            return redirect(url_for(url_redirect , tabla = tabla))
+            if pk_foreign:
+                return redirect(url_for(url_redirect , tabla = tabla, pk_foreign = pk_foreign))
+            else:
+                return redirect(url_for(url_redirect , tabla = tabla))
+        
     # except Exception as e:
     #     return f"No se aceptan carácteres especiales", 400
 
 
 @app.route("/update_row=<tabla>", methods=["POST"])
 @validar_empleado()
-# @validar_error_crud()
+@validar_error_crud()
 def crud_update(tabla):
     # try:
         if tabla in CONTROLADORES.keys():    
@@ -4757,10 +4761,14 @@ def crud_update(tabla):
 
         controlador.update_row( *valores )
 
+        pk_foreign = request.form.get(f"pk_foreign")
         if no_crud :
-            return redirect(url_for(str(no_crud)))
+            return redirect(url_for(no_crud))
         else:
-            return redirect(url_for(url_redirect, tabla = tabla))
+            if pk_foreign:
+                return redirect(url_for(url_redirect , tabla = tabla, pk_foreign = pk_foreign))
+            else:
+                return redirect(url_for(url_redirect , tabla = tabla))
     # except Exception as e:
     #     return f"No se aceptan carácteres especiales", 400
 
@@ -4794,10 +4802,14 @@ def crud_delete(tabla):
     else:
         controlador.delete_row(request.form.get(primary_key))
 
+    pk_foreign = request.form.get(f"pk_foreign")
     if no_crud :
         return redirect(url_for(no_crud))
     else:
-        return redirect(url_for(url_redirect, tabla = tabla))
+        if pk_foreign:
+            return redirect(url_for(url_redirect , tabla = tabla, pk_foreign = pk_foreign))
+        else:
+            return redirect(url_for(url_redirect , tabla = tabla))
 
 
 @app.route("/unactive_row=<tabla>", methods=["POST"])
@@ -4831,10 +4843,15 @@ def crud_unactive(tabla):
         else:
             controlador.unactive_row(request.form.get(primary_key))
 
+
+    pk_foreign = request.form.get(f"pk_foreign")
     if no_crud :
         return redirect(url_for(no_crud))
     else:
-        return redirect(url_for(url_redirect, tabla = tabla))
+        if pk_foreign:
+            return redirect(url_for(url_redirect , tabla = tabla, pk_foreign = pk_foreign))
+        else:
+            return redirect(url_for(url_redirect , tabla = tabla))
 
 
 @app.route("/update_empresa", methods=["POST"])
@@ -6096,6 +6113,23 @@ def api_estados_reclamo():
             'success': False,
             'message': f'Error al obtener estados: {str(e)}'
         }), 500
+        
+@app.route('/insertar_salida', methods=['POST'])
+def insertar_salida():
+    data = request.get_json()
+    vehiculo = data.get('vehiculo')
+    empleados = data.get('empleados')
+    escalas = data.get('escalas')            
+    paquetes = data.get('paquetes')    
+    
+    salida_id = controlador_salida.crear_transaccion_salida(vehiculo, empleados, escalas, paquetes)
+    
+    return jsonify({
+        "mensaje": "Salida registrada",
+        "salida_id": salida_id
+    })
+
+    
     
 
 @app.route('/api/guia_remision/<int:transaccion_id>')

@@ -191,3 +191,44 @@ def get_data_by_id_salida(id):
     '''
     fila = sql_select_fetchone(sql,(id,))
     return fila
+
+
+def crear_transaccion_salida(vehiculo, empleados, escalas, paquetes):
+    conexion = obtener_conexion()
+    with conexion:
+        with conexion.cursor() as cursor:
+            # 1. Determinar conductor principal (primer empleado)
+            conductor_principal = empleados[0]
+
+            # 2. Insertar en tabla salida
+            sql_salida = '''
+                INSERT INTO salida (fecha, hora, recojo, entrega, estado, unidadid, destino_final_id, conductor_principal, origen_inicio_id)
+                VALUES (CURDATE(), CURTIME(), 0, 0, 'P', %s, %s, %s, %s)
+            '''
+            cursor.execute(sql_salida, (
+                vehiculo['id'],
+                vehiculo['destino_final_id'],
+                conductor_principal,
+                vehiculo['origen_inicio_id']
+            ))
+
+            salida_id = cursor.lastrowid  # Obtener el ID generado
+
+            # 3. Insertar en empleado_salida
+            sql_empleado = 'INSERT INTO empleado_salida (salidaid, empleadoid) VALUES (%s, %s)'
+            for empleado_id in empleados:
+                cursor.execute(sql_empleado, (salida_id, empleado_id))
+
+            # 4. Insertar escalas
+            sql_escala = 'INSERT INTO escala (sucursalid, salidaid) VALUES (%s, %s)'
+            for sucursal_id in escalas:
+                cursor.execute(sql_escala, (sucursal_id, salida_id))
+
+            # 5. Actualizar paquetes
+            sql_paquete = 'UPDATE paquete SET salidaid = %s WHERE tracking = %s'
+            for paquete in paquetes:
+                cursor.execute(sql_paquete, (salida_id, paquete['tracking']))
+
+        conexion.commit()
+        return salida_id
+

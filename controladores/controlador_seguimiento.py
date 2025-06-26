@@ -60,7 +60,27 @@ def get_table_pk_foreign(pk_foreign):
     filas = sql_select_fetchall(sql,pk_foreign)
     return columnas, filas
 
+def get_table():
+    sql = '''
+        SELECT 
+	e.nombre as estado,
+	de.nombre as nombre_det,
+    tc.nombre as tip_comp
+        FROM 
+            seguimiento s
+        INNER JOIN detalle_estado de ON de.id = s.detalle_estadoid
+        inner join estado_encomienda e on e.id = de.estado_encomiendaid
+        LEFT join tipo_comprobante tc on tc.id = s.tipo_comprobanteid
+    '''
 
+    columnas = {
+        'estado':['Estado',2],
+        'nombre_det': ['Detalle estado', 3],
+        'tip_comp':['Comprobante',2]
+    }
+
+    filas = sql_select_fetchall(sql)
+    return columnas, filas
 
 ######_ CRUD ESPECIFICAS _###### 
 
