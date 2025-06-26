@@ -484,3 +484,12 @@ def get_recojo_casa():
     '''
     fila = sql_select_fetchall(sql)
     return fila
+
+
+def get_num_serie_by_tracking(tracking):
+    sql = '''
+        select transaccion_encomienda_num_serie from paquete where tracking = %s
+    '''
+    fila = sql_select_fetchone(sql,(tracking,))
+    
+    return fila

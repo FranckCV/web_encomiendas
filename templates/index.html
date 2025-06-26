@@ -25,7 +25,7 @@ Bienvenido a {{SYSTEM_NAME}}
             <h2 class="tracking-title">Rastrea tu encomienda</h2>
             <form class="tracking-form"  action="{{ url_for('buscar_paquete') }}" method="post">
                 <input type="text" class="tracking-input" placeholder="Ingresa tu número de tracking" name="tracking">
-                <input type="text" class="tracking-input" placeholder="Ingresa el año de registro" name="anio">
+                <input type="text" class="tracking-input" placeholder="Ingresa el año de registro" name="anio" maxlength="4">
                 <button type="submit" class="tracking-btn">
                     <i class="fas fa-paper-plane"></i>
                 </button>
@@ -181,5 +181,18 @@ Bienvenido a {{SYSTEM_NAME}}
 
 
 {% block scripts %}
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  {% if paquete_no_encontrado %}
+    Swal.fire({
+      title: 'Paquete no encontrado',
+      text: 'No se encontró un paquete con los datos proporcionados.',
+      confirmButtonText: 'Aceptar'
+    });
+  {% endif %}
+</script>
+
 
 {% endblock %}

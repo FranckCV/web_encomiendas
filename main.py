@@ -1587,7 +1587,9 @@ TRANSACCIONES = {
         "filters": [], 
         "fields_form": [
         #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
-            # ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_options() , 'nombre_det' ] ],
+            ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_options() , 'nombre_det' ] ],
+             ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_options() , 'nombre_det' ] ],
+            
         ],
         "crud_forms": {
             "crud_list": True,
@@ -4929,11 +4931,12 @@ def buscar_paquete():
     tracking = request.form.get('tracking')
     anio = request.form.get('anio')
     paquete = controlador_paquete.buscar_paquete(tracking, anio)
-    print(paquete)
-    if paquete is not None:
+    
+    if paquete and anio:
         return redirect(url_for('seguimiento_tracking', tracking=paquete))
     else:
-        return redirect(url_for('seguimiento_tracking', tracking=0))
+        return render_template('index.html', paquete_no_encontrado=True)
+
 
 
    
@@ -5558,6 +5561,36 @@ def api_causas_reclamo(motivo_id):
             'success': False,
             'message': f'Error al obtener causas: {str(e)}'
         }), 500
+
+@app.route('/pagar_paquete')
+def pagar_paquete():
+    tipo_comprobante = controlador_tipo_comprobante.get_tipo_comprobante_by_tipo()
+    metodo_pago = controlador_metodo_pago.get_options()
+    return render_template('pagar_paquete.html',metodo_pago=metodo_pago,tipo_comprobante=tipo_comprobante)
+
+@app.route('/insertar_pago_paquete', methods=['POST'])
+def insertar_pago_paquete():
+    data = request.get_json()
+    tracking = data.get('tracking')
+    num_serie_data = controlador_encomienda.get_num_serie_by_tracking(tracking)
+    num_serie = num_serie_data['transaccion_encomienda_num_serie']
+    tipo_comprobante = data.get('tipo_comprobante')
+    metodo_pago = data.get('metodo_pago')
+    
+    try:
+        pago = controlador_metodo_pago_venta.pagar_encomienda(num_serie, tipo_comprobante, metodo_pago, tracking)
+        return jsonify({
+            'success': True,
+            'message': 'Pago procesado exitosamente',
+            'tracking': tracking
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': 'Error al procesar el pago',
+            'error': str(e)
+        }), 500
+
 
 # Endpoint para obtener estados de reclamo
 @app.route("/api/estados_reclamo", methods=["GET"])
