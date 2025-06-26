@@ -6192,7 +6192,7 @@ def insertar_salida():
     })
 
     
-    
+
 
 @app.route('/api/guia_remision/<int:transaccion_id>')
 def generar_guia_remision(transaccion_id):
