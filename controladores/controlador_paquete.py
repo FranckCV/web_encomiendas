@@ -329,3 +329,86 @@ def listar_paquetes_por_sucursal_escalas():
     '''
     filas = sql_select_fetchall(sql)
     return filas
+
+def obtener_datos_guia_remision(transaccion_id):
+    sql = """
+        SELECT 
+            -- Emisor
+            e.ruc AS emisor_ruc,
+            e.nombre AS emisor_razon_social,
+            s_origen.direccion AS emisor_direccion,
+
+            -- Destinatario
+            p.num_documento_destinatario AS destinatario_doc,
+            p.nombres_contacto_destinatario AS destinatario_nombres,
+            p.apellidos_razon_destinatario AS destinatario_apellidos,
+            p.direccion_destinatario AS destinatario_direccion,
+
+            -- Transporte
+            sa.fecha AS fecha_inicio_traslado,
+            suc_origen.direccion AS punto_partida,
+            suc_destino.direccion AS punto_llegada,
+            u.placa AS vehiculo_placa,
+            emp.nombre AS conductor_nombre,
+            emp.n_documento AS conductor_dni,
+
+            -- Bienes
+            p.descripcion AS descripcion_item,
+            te.unidad_medida AS unidad_medida,
+            p.peso AS peso,
+            1 AS cantidad
+
+        FROM transaccion_encomienda tec
+        JOIN paquete p ON p.transaccion_encomienda_num_serie = tec.num_serie
+        JOIN salida sa ON sa.id = p.salidaid
+        JOIN unidad u ON u.id = sa.unidadid
+        JOIN empleado emp ON emp.id = sa.conductor_principal
+        JOIN sucursal s_origen ON s_origen.id = tec.id_sucursal_origen
+        JOIN sucursal suc_origen ON suc_origen.id = sa.origen_inicio_id
+        JOIN sucursal suc_destino ON suc_destino.id = sa.destino_final_id
+        JOIN empresa e ON e.actual = 1
+        JOIN tipo_empaque te ON te.id = p.tipo_empaqueid
+        WHERE tec.num_serie = %s
+        LIMIT 1
+    """
+    fila = sql_select_fetchone(sql, (transaccion_id,))
+    if not fila:
+        return None
+
+    return {
+        "emisor": {
+            "ruc": fila["emisor_ruc"],
+            "razon_social": fila["emisor_razon_social"],
+            "direccion": fila["emisor_direccion"],
+        },
+        "destinatario": {
+            "ruc_dni": fila["destinatario_doc"],
+            "nombre": f"{fila['destinatario_nombres']} {fila['destinatario_apellidos']}",
+            "direccion": fila["destinatario_direccion"],
+        },
+        "transporte": {
+            "fecha_inicio": fila["fecha_inicio_traslado"].strftime("%Y-%m-%d"),
+            "punto_partida": fila["punto_partida"],
+            "punto_llegada": fila["punto_llegada"],
+            "placa": fila["vehiculo_placa"],
+            "conductor": fila["conductor_nombre"],
+            "dni_conductor": fila["conductor_dni"],
+        },
+        "bienes": [{
+            "descripcion": fila["descripcion_item"],
+            "unidad": fila["unidad_medida"],
+            "cantidad": fila["cantidad"],
+            "peso": fila["peso"]
+        }]
+    }
+
+
+def get_num_serie_por_tracking(tracking):
+    sql = """
+        SELECT transaccion_encomienda_num_serie 
+        FROM paquete 
+        WHERE tracking = %s
+        LIMIT 1
+    """
+    fila = sql_select_fetchone(sql, (tracking,))
+    return fila['transaccion_encomienda_num_serie'] if fila else None

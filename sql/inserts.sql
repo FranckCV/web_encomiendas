@@ -6365,7 +6365,7 @@ VALUES ('F', 'Factura', 'Factura', 1, 'V'),
     1,
     'R'
   ),
-  ('ND', 'D', 'Nota de Débito', 1, 'R');
+  ('ND', 'Nota de débito', 'Nota de Débito', 1, 'R');
 INSERT INTO `tipo_recepcion` (`id`, `nombre`, `activo`)
 VALUES (1, 'Recepción en sucursal', 1),
   (2, 'Recepción en domicilio', 1);

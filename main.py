@@ -91,9 +91,9 @@ import socket
 from num2words import num2words
 import pdfkit
 import os
-
 from collections import defaultdict
 
+from api_enrutar import ApiEnrutar
 
 
 
@@ -1606,8 +1606,8 @@ TRANSACCIONES = {
         "filters": [], 
         "fields_form": [
         #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
-            ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_options() , 'nombre_det' ] ],
-            ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_options() , 'nombre_det' ] ],
+            ['nombre_det',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_detalle() , 'nombre_det' ] ],
+             ['tip_comp',  'Tipo de comprobante', 'Tipo de comprobante', 'select', True ,True, [lambda: controlador_tipo_comprobante.get_options() , 'tip_comp' ] ],
             
         ],
         "crud_forms": {
@@ -1615,12 +1615,13 @@ TRANSACCIONES = {
             "crud_search": False,
             "crud_consult": False,
             "crud_insert": True,
-            "crud_update": True,
+            "crud_update": False,
             "crud_delete": True,
             "crud_unactive": False
         },
         "buttons": [],
         "options": [
+            # [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Encomiendas', 'transaccion' , {"tabla": "::paquete" }],
             # mostrar_url       icon             color                  text                 enlace_function       parametros                    modo(insert ,update , consult)
             [True,   f'fa-solid fa-arrow-left',   "#3e5376",  'Volver a Paquetes', 'transaccion' , {"tabla": "::paquete" } , 'paquetes'],
         ],
@@ -3256,6 +3257,27 @@ def insertar_envio_api():
             'status': 'error',
             'message': 'Ocurrió un error al procesar el envío'
         }), 500
+        
+        
+@app.route("/API_ENRUTAR", methods=["GET"])
+def api_enrutar():
+    try:
+        start = request.args.get('start')  # "lat,lng"
+        end = request.args.get('end')      # "lat,lng"
+
+        start_lat, start_lng = map(float, start.split(','))
+        end_lat, end_lng = map(float, end.split(','))
+
+        enrutar = ApiEnrutar()
+        resultado = enrutar.obtener_ruta(start_lat, start_lng, end_lat, end_lng)
+
+        if resultado:
+            return jsonify(resultado)
+        else:
+            return jsonify({'error': 'No se pudo obtener la ruta'}), 500
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+        
        
 @app.route('/registrar_envios_masivos', methods=['POST'])
 def registrar_envios_masivos():
@@ -3265,7 +3287,8 @@ def registrar_envios_masivos():
         if not data:
             return jsonify({'status': 'error', 'message': 'No se recibieron datos'}), 400
 
-        tipo_comprobante = data.get('tipo_comprobante')
+        tipo_comprobante = data.get('tipo_comprobante') 
+        metodo_pago = data.get('metodo_pago')
         registros = data.get('registros')
         # modalidad_pago_seleccionada = data.get('modalidad_pago')
 
@@ -3276,7 +3299,7 @@ def registrar_envios_masivos():
 
         origen = data.get('origen')
         sucursal_origen = origen.get('sucursal_origen')
-        
+        modo = data.get('modo')
         remitente = data.get('remitente', {})
         nombre = remitente.get('nombre_remitente', '')
         partes = nombre.split() if nombre else []
@@ -3293,7 +3316,7 @@ def registrar_envios_masivos():
 
 
         num_serie,trackings = controlador_encomienda.crear_transaccion_y_paquetes(
-            registros, cliente_data, tipo_comprobante,sucursal_origen
+            registros, cliente_data, tipo_comprobante,metodo_pago,sucursal_origen,modo
         )
 
         if num_serie:
@@ -5393,7 +5416,7 @@ def seguimiento_reclamo_directo(reclamo_id):
 # ========== ENDPOINTS PARA GESTIÓN ADMINISTRATIVA DE RECLAMOS ==========
 
 @app.route("/responder_reclamos", methods=["GET"])
-@validar_empleado()
+# @validar_empleado()
 def vista_responder_reclamos():
     """
     Vista principal para que los administradores respondan reclamos
@@ -5571,7 +5594,7 @@ def api_info_reclamo(reclamo_id):
         }), 500
     
 @app.route("/api/obtener_historial_reclamo/<int:reclamo_id>", methods=["GET"])
-@validar_empleado()
+# @validar_empleado()
 def api_obtener_historial_reclamo(reclamo_id):
     """
     Obtiene el historial de seguimiento de un reclamo (para modal administrativo)
@@ -5952,6 +5975,43 @@ def api_estados_reclamo():
             'success': False,
             'message': f'Error al obtener estados: {str(e)}'
         }), 500
+    
+
+@app.route('/api/guia_remision/<int:transaccion_id>')
+def generar_guia_remision(transaccion_id):
+    from controladores import reporte_pepo as reporte_pepo  # Suponiendo que ya tienes esta función
+
+    data = controlador_paquete.obtener_datos_guia_remision(transaccion_id)
+
+    if not data:
+        return jsonify({'success': False, 'message': 'Datos no encontrados para la transacción'})
+
+    filename = f'guia_{transaccion_id}.pdf'
+    path = f'img/guias/{filename}'
+    reporte_pepo.generar_guia_pdf(data, filename="guia_remision.pdf")
+
+    return send_file(path, as_attachment=True)
+
+@app.route("/descargar_guia/<string:tracking>")
+def descargar_guia_remision(tracking):
+    from controladores import reporte_pepo as reporte_pepo
+
+    num_serie = controlador_paquete.get_num_serie_por_tracking(tracking)
+    if not num_serie:
+        return "No se encontró la transacción para este paquete", 404
+
+    data = controlador_paquete.obtener_datos_guia_remision(num_serie)
+    if not data:
+        return "Datos insuficientes para generar la guía", 400
+
+    filename = f"guia_{num_serie}.pdf"
+    path = f"static/img/guias/{filename}"
+
+    reporte_pepo.generar_guia_pdf(data, filename=path)
+
+    return send_file(path, as_attachment=True)
+
+
 ##############################################3
 ##############################################
 

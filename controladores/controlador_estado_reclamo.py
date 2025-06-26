@@ -96,3 +96,16 @@ def get_options():
 
 
 
+def get_detalle():
+    sql= f'''
+        select 
+            id ,
+            nombre
+        from detalle_estado
+        order by id asc
+    '''
+    filas = sql_select_fetchall(sql)
+    
+    lista = [(fila['id'], fila["nombre"]) for fila in filas]
+
+    return lista
