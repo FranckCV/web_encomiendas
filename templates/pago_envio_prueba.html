@@ -91,12 +91,79 @@
       text-align: center;
     }
 
+    .info-mixto {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      color: #856404;
+    }
+
+    .detalles-envios {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .detalles-envios h4 {
+      margin: 0 0 0.5rem 0;
+      color: #495057;
+      font-size: 0.9rem;
+    }
+
+    .detalles-envios ul {
+      margin: 0;
+      padding-left: 1.2rem;
+      font-size: 0.85rem;
+      color: #6c757d;
+    }
+
     .mensaje-simple {
       text-align: center;
       padding: 2rem;
       background: #f8f9fa;
       border-radius: 8px;
       margin: 2rem 0;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #007bff;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      background: #28a745;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: scaleIn 0.5s ease-out;
+    }
+
+    @keyframes scaleIn {
+      0% { transform: scale(0); }
+      100% { transform: scale(1); }
+    }
+
+    .checkmark {
+      width: 40px;
+      height: 40px;
+      fill: white;
     }
   </style>
 {% endblock %}
@@ -130,9 +197,34 @@
 
     {% if tiene_pago_online %}
       <!-- PASARELA DE PAGO -->
-      <div class="info-pago">
-        💳 Pago en Línea - Completa el pago para generar tu comprobante
-      </div>
+      {% if envios_otras_modalidades|length > 0 %}
+        <div class="info-mixto">
+          <h4>📋 Resumen de Envíos Mixtos</h4>
+          <p><strong>Tu pedido incluye envíos con diferentes modalidades de pago:</strong></p>
+          
+          <div class="detalles-envios">
+            <h4>🌐 Envíos con Pago en Línea ({{ envios_pago_online|length }})</h4>
+            <ul>
+              {% for envio in envios_pago_online %}
+                <li>Clave: {{ envio.clave }} - S/ {{ "%.2f"|format(envio.tarifa) }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+
+          <div class="detalles-envios">
+            <h4>🏢 Envíos con Otras Modalidades ({{ envios_otras_modalidades|length }})</h4>
+            <ul>
+              {% for envio in envios_otras_modalidades %}
+                <li>Clave: {{ envio.clave }} - S/ {{ "%.2f"|format(envio.tarifa) }} (pago en sucursal/destino)</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      {% else %}
+        <div class="info-pago">
+          💳 Pago en Línea - Completa el pago para generar tu comprobante
+        </div>
+      {% endif %}
 
       <div class="contenido">
         <div>
@@ -189,27 +281,41 @@
             <h3>Resumen del pago</h3>
             <table>
               <tr>
-                <td>Cantidad de envíos:</td>
+                <td>Total de envíos:</td>
                 <td class="value-td">{{ envios|length }}</td>
               </tr>
+              {% if envios_otras_modalidades|length > 0 %}
               <tr>
-                <td>Sub Total:</td>
-                <td class="value-td">S/ {{ "%.2f"|format((total_pagar / 1.18)|round(2)) }}</td>
+                <td>Envíos pago en línea:</td>
+                <td class="value-td">{{ envios_pago_online|length }}</td>
+              </tr>
+              <tr>
+                <td>Envíos otras modalidades:</td>
+                <td class="value-td">{{ envios_otras_modalidades|length }}</td>
+              </tr>
+              <tr style="border-top: 1px solid #ddd;">
+                <td>Monto total general:</td>
+                <td class="value-td">S/ {{ "%.2f"|format(total_general) }}</td>
+              </tr>
+              {% endif %}
+              <tr>
+                <td>Sub Total (Pago Online):</td>
+                <td class="value-td">S/ {{ "%.2f"|format((total_pago_online / 1.18)|round(2)) }}</td>
               </tr>
               <tr>
                 <td>I.G.V. (18%):</td>
-                <td class="value-td">S/ {{ "%.2f"|format((total_pagar * 0.18 / 1.18)|round(2)) }}</td>
+                <td class="value-td">S/ {{ "%.2f"|format((total_pago_online * 0.18 / 1.18)|round(2)) }}</td>
               </tr>
               <tr class="total">
-                <td><strong>Total a Pagar:</strong></td>
-                <td class="value-td"><strong>S/ {{ "%.2f"|format(total_pagar) }}</strong></td>
+                <td><strong>Total a Pagar Online:</strong></td>
+                <td class="value-td"><strong>S/ {{ "%.2f"|format(total_pago_online) }}</strong></td>
               </tr>
             </table>
           </div>
 
           <div class="boton-pagar-container">
             <button id="btn-pagar" class="btn-pagar oculto" disabled onclick="mostrarModal()">
-              PAGAR S/ {{ "%.2f"|format(total_pagar) }}
+              PAGAR S/ {{ "%.2f"|format(total_pago_online) }}
             </button>
           </div>
         </div>
@@ -240,7 +346,7 @@
             </tr>
             <tr class="total">
               <td><strong>Costo total:</strong></td>
-              <td class="value-td"><strong>S/ {{ "%.2f"|format(total_pagar) }}</strong></td>
+              <td class="value-td"><strong>S/ {{ "%.2f"|format(total_general) }}</strong></td>
             </tr>
           </table>
         </div>
@@ -259,7 +365,7 @@
 let tipoComprobanteSeleccionado = null;
 let metodoPagoSeleccionado = null;
 let nombreMetodoPago = null;
-let totalPagar = {{ total_pagar }};
+let totalPagarOnline = {{ total_pago_online if tiene_pago_online else 0 }};
 
 function toggleSelection(label, tipo) {
   document.querySelectorAll(`input[name="${tipo}"]`).forEach(input => {
@@ -301,7 +407,7 @@ function mostrarModal() {
         <input type="text" id="numeroConfirmacion" placeholder="Ej: 972345678" maxlength="9" required>
       </div>
       <p style="font-size: 0.9em; color: #666;">
-        Realiza el pago de <strong>S/ ${totalPagar.toFixed(2)}</strong> e ingresa el número de confirmación.
+        Realiza el pago de <strong>S/ ${totalPagarOnline.toFixed(2)}</strong> e ingresa el número de confirmación.
       </p>
     `;
   } else {
@@ -332,20 +438,45 @@ function mostrarModal() {
 }
 
 function procesarPago() {
-  // Simular procesamiento de pago
-  mostrarProcesando();
+  // Validar campos del modal
+  if (!validarCamposModal()) {
+    return;
+  }
+  
+  cerrarModal();
+  mostrarProcesando('Procesando pago...');
+  
+  setTimeout(() => {
+    enviarDatos();
+  }, 3000); // Simular tiempo de procesamiento de pago
+}
+
+function generarRotulo() {
+  mostrarProcesando('Generando rótulo...');
   
   setTimeout(() => {
     enviarDatos();
   }, 2000);
 }
 
-function generarRotulo() {
-  mostrarProcesando();
+function validarCamposModal() {
+  const inputs = document.querySelectorAll('#contenidoModal input[required]');
+  let esValido = true;
   
-  setTimeout(() => {
-    enviarDatos();
-  }, 1500);
+  inputs.forEach(input => {
+    if (!input.value.trim()) {
+      input.style.borderColor = '#dc3545';
+      esValido = false;
+    } else {
+      input.style.borderColor = '#dce3f5';
+    }
+  });
+  
+  if (!esValido) {
+    alert('Por favor, completa todos los campos requeridos.');
+  }
+  
+  return esValido;
 }
 
 function enviarDatos() {
@@ -362,20 +493,22 @@ function enviarDatos() {
   .then(res => res.json())
   .then(response => {
     if (response.status === 'success') {
-      mostrarExito('¡Operación completada exitosamente!', () => {
+      mostrarExito('¡Pago procesado exitosamente!', () => {
         window.location.href = '/index';
       });
     } else {
+      ocultarProcesando();
       alert(response.message || 'Error en la operación');
     }
   })
   .catch(err => {
     console.error('Error:', err);
+    ocultarProcesando();
     alert('Error al comunicar con el servidor');
   });
 }
 
-function mostrarProcesando() {
+function mostrarProcesando(mensaje = 'Procesando...') {
   const overlay = document.createElement('div');
   overlay.id = 'procesandoOverlay';
   overlay.style.cssText = `
@@ -385,20 +518,25 @@ function mostrarProcesando() {
   `;
   
   overlay.innerHTML = `
-    <div style="background: white; padding: 40px; border-radius: 15px; text-align: center;">
-      <div style="border: 4px solid #f3f3f3; border-top: 4px solid #007bff; border-radius: 50%; 
-                  width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-      <p>Procesando...</p>
+    <div style="background: white; padding: 40px; border-radius: 15px; text-align: center; min-width: 300px;">
+      <div class="spinner"></div>
+      <p style="margin: 0; font-size: 1.1em; font-weight: 600; color: #333;">${mensaje}</p>
+      <p style="margin: 0.5rem 0 0 0; font-size: 0.9em; color: #666;">Por favor espera...</p>
     </div>
-    <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
   `;
   
   document.body.appendChild(overlay);
 }
 
-function mostrarExito(mensaje, callback) {
+function ocultarProcesando() {
   const overlay = document.getElementById('procesandoOverlay');
-  if (overlay) overlay.remove();
+  if (overlay) {
+    overlay.remove();
+  }
+}
+
+function mostrarExito(mensaje, callback) {
+  ocultarProcesando();
   
   const exitoOverlay = document.createElement('div');
   exitoOverlay.style.cssText = `
@@ -409,14 +547,14 @@ function mostrarExito(mensaje, callback) {
   
   exitoOverlay.innerHTML = `
     <div style="background: white; padding: 50px; border-radius: 20px; text-align: center; max-width: 400px;">
-      <div style="width: 80px; height: 80px; background: #28a745; border-radius: 50%; 
-                  margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="white">
-          <path d="M9 12l2 2 4-4" stroke="white" stroke-width="3" stroke-linecap="round"/>
+      <div class="success-icon">
+        <svg class="checkmark" viewBox="0 0 24 24">
+          <path d="M9 12l2 2 4-4" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <h2 style="color: #28a745; margin-bottom: 15px;">¡Éxito!</h2>
       <p style="color: #666; margin-bottom: 30px;">${mensaje}</p>
+      <p style="color: #999; font-size: 0.9em;">Redirigiendo...</p>
     </div>
   `;
   
@@ -431,5 +569,28 @@ function mostrarExito(mensaje, callback) {
 function cerrarModal() {
   document.getElementById('modalPago').style.display = 'none';
 }
+
+// Formateo automático de campos en el modal
+document.addEventListener('input', function(e) {
+  if (e.target.id === 'numeroTarjeta') {
+    // Formatear número de tarjeta
+    let value = e.target.value.replace(/\D/g, '');
+    value = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+    e.target.value = value;
+  } else if (e.target.id === 'fechaVencimiento') {
+    // Formatear fecha MM/AA
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length >= 2) {
+      value = value.substring(0, 2) + '/' + value.substring(2, 4);
+    }
+    e.target.value = value;
+  } else if (e.target.id === 'cvv') {
+    // Solo números para CVV
+    e.target.value = e.target.value.replace(/\D/g, '');
+  } else if (e.target.id === 'numeroConfirmacion') {
+    // Solo números para confirmación Yape
+    e.target.value = e.target.value.replace(/\D/g, '');
+  }
+});
 </script>
 {% endblock %}

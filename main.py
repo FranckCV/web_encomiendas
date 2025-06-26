@@ -2876,6 +2876,7 @@ def resumen_envio_prueba():
             'message': str(e)
         }), 500
 
+
 @app.route('/pago_envio_prueba', methods=['POST'])
 def pago_envio_prueba():
     try:
@@ -2900,22 +2901,36 @@ def pago_envio_prueba():
         if not envios:
             return redirect(url_for('tipos_envio'))
         
-        # Calcular total a pagar
-        total_pagar = sum(float(envio.get('tarifa', 0)) for envio in envios)
+        # Separar envíos por modalidad de pago
+        envios_pago_online = [envio for envio in envios if envio.get('modalidadPago') == '1']
+        envios_otras_modalidades = [envio for envio in envios if envio.get('modalidadPago') != '1']
+        
+        # Calcular totales
+        total_general = sum(float(envio.get('tarifa', 0)) for envio in envios)
+        total_pago_online = sum(float(envio.get('tarifa', 0)) for envio in envios_pago_online)
+        total_otras_modalidades = sum(float(envio.get('tarifa', 0)) for envio in envios_otras_modalidades)
         
         # Detectar si hay envíos con modalidad de pago 1 (pago en línea)
-        tiene_pago_online = any(envio.get('modalidadPago') == '1' for envio in envios)
+        tiene_pago_online = len(envios_pago_online) > 0
         
-        print(f"Total a pagar: S/ {total_pagar}")
+        print(f"Total general: S/ {total_general}")
+        print(f"Total pago online: S/ {total_pago_online}")
+        print(f"Total otras modalidades: S/ {total_otras_modalidades}")
         print(f"¿Tiene pago online?: {tiene_pago_online}")
+        print(f"Envíos pago online: {len(envios_pago_online)}")
+        print(f"Envíos otras modalidades: {len(envios_otras_modalidades)}")
         
         # Guardar datos para el proceso de pago
         session['datos_pago'] = {
             'envios': envios,
+            'envios_pago_online': envios_pago_online,
+            'envios_otras_modalidades': envios_otras_modalidades,
             'remitente': remitente,
             'origen': origen,
             'tipo_envio': tipo_envio,
-            'total_pagar': total_pagar,
+            'total_general': total_general,
+            'total_pago_online': total_pago_online,
+            'total_otras_modalidades': total_otras_modalidades,
             'tiene_pago_online': tiene_pago_online
         }
         
@@ -2929,10 +2944,14 @@ def pago_envio_prueba():
         
         return render_template('pago_envio_prueba.html',
                              envios=envios,
+                             envios_pago_online=envios_pago_online,
+                             envios_otras_modalidades=envios_otras_modalidades,
                              remitente=remitente,
                              origen=origen,
                              tipo_envio=tipo_envio,
-                             total_pagar=total_pagar,
+                             total_general=total_general,
+                             total_pago_online=total_pago_online,
+                             total_otras_modalidades=total_otras_modalidades,
                              tiene_pago_online=tiene_pago_online,
                              tipos_comprobante=tipos_comprobante,
                              metodos_pago=metodos_pago)

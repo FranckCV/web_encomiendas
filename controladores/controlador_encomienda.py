@@ -261,7 +261,7 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante, meto
 
                 suc_dest_id = int(r['destino']['sucursal_destino'])
                 modalidad_pago = r.get('modalidadPago')
-                estado_pago = 'P' if modalidad_pago == '1' else r.get('estado_pago', 'P')
+                estado_pago = 'C' if modalidad_pago == '1' else 'P'
                 contenido_paqueteid = int(r.get('tipoArticuloId')) if tipo_empaque == 1 else None
                 cantidad_folios = r.get('cantidad_folios') if tipo_empaque == 2 else None
                 direccion_destinatario = r.get('direccion_destinatario') if tipo_entrega == 2 else ''
