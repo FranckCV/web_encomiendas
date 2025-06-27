@@ -1,4 +1,4 @@
-const API_URL = 'http://192.168.100.15:8000/obtener_coordenadas';
+const API_URL = 'http://192.168.136.37:8000/obtener_coordenadas';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBjGScX3XgV30r1tI31_Xa21gYQDH04caA",
