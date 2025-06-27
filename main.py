@@ -3201,6 +3201,7 @@ def insertar_envio_api():
         if num_serie:
             try:
                 generar_qr_paquetes(trackings)
+                generar_rotulos_paquetes(trackings) 
             except Exception as qr_err:
                 current_app.logger.warning(f"Error generando QR: {qr_err}")
 
@@ -3215,18 +3216,19 @@ def insertar_envio_api():
                     msg.body = (
                         f"Hola {cliente_data['nombre_siglas']},\n\n"
                         f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
-                        "Adjunto encontrarás los códigos QR para el seguimiento de cada paquete.\n\n"
+                        "Adjunto encontrarás el rótulo PDF para cada paquete con los datos de envío.\n\n"
                         f"¡Gracias por confiar en {nombre_empresa}!"
                     )
 
                     for tracking in trackings:
-                        qr_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'qr.png')
-                        if os.path.exists(qr_path):
-                            with open(qr_path, 'rb') as f:
-                                qr_data = f.read()
-                            msg.attach(f"qr_{tracking}.png", 'image/png', qr_data)
-                        else:
-                            current_app.logger.warning(f"QR no encontrado para tracking {tracking}")
+
+                        rotulo_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'rotulo.pdf')
+                        
+                        if os.path.exists(rotulo_path):
+                            with open(rotulo_path, 'rb') as f:
+                                rotulo_data = f.read()
+                            msg.attach(f"rotulo_{tracking}.pdf", 'application/pdf', rotulo_data)
+
 
                     mail.send(msg)
                 except Exception as email_err:
@@ -3585,48 +3587,20 @@ def generar_comprobante(tracking):
         }), 500
 
 
-@app.route('/rotulo=<tracking>', methods=['GET'])
-def generar_rotulo(tracking):
+def generar_rotulos_paquetes(trackings):
     from controladores import reporte_rotulo as reporte_rotulo
-    try:
-        transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
-        if not transaccion:
-            return jsonify({'success': False, 'message': 'Transacción no encontrada'}), 404
+    for tracking in trackings:
+        try:
+            datos_rotulo = controlador_encomienda.datos_rotulo(tracking)
 
-        num_serie = transaccion.get('num_serie')
-        if not num_serie:
-            return jsonify({'success': False, 'message': 'Número de serie no disponible'}), 400
+            carpeta = os.path.join(current_app.static_folder, "comprobantes", str(tracking))
+            os.makedirs(carpeta, exist_ok=True)
+            ruta_rotulo = os.path.join(carpeta, "rotulo.pdf")
 
-        items, masivo = controlador_encomienda.obtener_items_por_num_serie(num_serie)
-        if not items:
-            return jsonify({'success': False, 'message': 'No hay paquetes asociados'}), 404
+            reporte_rotulo.generar_rotulo_pdf(datos_rotulo, ruta_pdf=ruta_rotulo)
 
-        origen = items[0]['origen']
-        destino = items[0]['destino']
-
-        datos_rotulo = {
-            'tracking': tracking,
-            'sucursal_origen': f"{origen['sucursal']} - {origen['distrito']}, {origen['provincia']}, {origen['departamento']}",
-            'sucursal_destino': f"{destino['sucursal']} - {destino['distrito']}, {destino['provincia']}, {destino['departamento']}",
-            'remitente': f"{transaccion.get('nombre_remitente', '')}\nDNI: {transaccion.get('dni_remitente', '')}\nCel: {transaccion.get('cel_remitente', '')}",
-            'destinatario': f"{transaccion.get('nombre_destinatario', '')}\nDNI: {transaccion.get('dni_destinatario', '')}\nCel: {transaccion.get('cel_destinatario', '')}",
-            'contenido': transaccion.get('descripcion_contenido', '---'),
-            'pago': 'Pagado' if transaccion.get('estado_pago') == 'C' else 'Por cobrar'
-        }
-
-        # Crear carpeta dentro de 'static/comprobantes/{tracking}/'
-        carpeta = os.path.join("static", "comprobantes", str(tracking))
-        os.makedirs(carpeta, exist_ok=True)
-        ruta_rotulo = os.path.join(carpeta, "rotulo.pdf")
-
-        # Generar PDF
-        reporte_rotulo.generar_rotulo_pdf(datos_rotulo, ruta_pdf=ruta_rotulo)
-
-        return send_file(ruta_rotulo, as_attachment=True, download_name=f"rotulo_{tracking}.pdf")
-
-    except Exception as e:
-        return jsonify({'success': False, 'message': f'Error al generar rótulo: {str(e)}'}), 500
-
+        except Exception as e:
+            current_app.logger.warning(f"Error generando rótulo para tracking {tracking}: {e}")
 
 
 @app.route('/descargar_comprobante/<tracking>', methods=['GET'])
