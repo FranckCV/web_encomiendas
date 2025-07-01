@@ -869,9 +869,10 @@ CONTROLADORES = {
         "fields_form": [
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
             ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['correo',      'correo',          'Correo',      'text',     True ,     True  ,        None ],
-            ['contrasenia',      'contrasenia',          'Contraseña',      'password',     True ,     True  ,        None ],
-            ['tipo_usuario',      'tipo_usuario',          'Tipo de usuario',      'text',     True ,     True  ,        None ],
+            ['correo',      'Correo electronico',          'Correo',      'text',     True ,     True  ,        None ],
+            ['contrasenia',      'Contraseña',          'Contraseña',      'password',     True ,     True  ,        None ],
+            # ['tipo_usuario',      'Tipo de usuario',          'Tipo de usuario',      'text',     True ,     True  ,        None ],
+            ['tipo_usuario', 'Tipo de usuario', 'Tipo de usuario', 'select', True, True, [lambda: controlador_usuario.get_tipos_usuarios(), '                                                       ']],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
         ],
         "crud_forms": {
@@ -883,7 +884,7 @@ CONTROLADORES = {
             "crud_delete": True ,
             "crud_unactive": True ,
         }
-    },
+    }, 
     "cliente": {
         "active": True,
         "titulo": "clientes",
