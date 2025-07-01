@@ -197,7 +197,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  addToCartBtn.addEventListener('click', () => {
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+  }
+
+  addToCartBtn.addEventListener('click', async () => {
+  const correo = getCookie('correo');
+  if (!correo) {
+    await Swal.fire({
+      icon: 'warning',
+      title: 'Iniciar sesión',
+      text: 'Debes iniciar sesión para agregar productos al carrito.',
+      confirmButtonText: 'Ir al login',
+      showCancelButton: true,
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        popup: 'swal2-popup-custom'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = '/login';
+      }
+    });
+    return;
+  }
+
     if (currentQuantity < 1 || currentQuantity > (productos[currentKey].stock || 100)) {
       quantityLimit.classList.add('active');
       setTimeout(() => quantityLimit.classList.remove('active'), 1500);

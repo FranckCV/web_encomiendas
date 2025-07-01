@@ -160,7 +160,9 @@ def get_data_package(tracking):
                 WHEN p.estado_pago = 1 THEN 'Cancelado'
                 ELSE 'Desconocido'
             END AS estado_pago,
-            te.monto_total
+            te.monto_total,
+            p.salidaid ,
+            te.num_serie
         FROM paquete p
         INNER JOIN transaccion_encomienda te ON te.num_serie = p.transaccion_encomienda_num_serie
         INNER JOIN sucursal so ON so.id = te.id_sucursal_origen
