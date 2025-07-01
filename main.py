@@ -655,7 +655,7 @@ CONTROLADORES = {
     "causa_reclamo": {
         "active" : True ,
         "titulo": "Causa de reclamo",
-        "nombre_tabla": "causa_reclamo",
+        "nombre_tabla": "causa de reclamo",
         "controlador": controlador_causa_reclamo,
         "icon_page": '',
         "filters": [
@@ -665,8 +665,8 @@ CONTROLADORES = {
 #            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
             ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
             ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
             ['motivo_reclamoid',  'Nombre de motivo de reclamo', 'Elegir motivo de reclamo', 'select', True ,True, [lambda: controlador_motivo_reclamo.get_options() , 'nom_motivo' ] ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
         ],
         "crud_forms": {
             "crud_list": True ,
