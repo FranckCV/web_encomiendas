@@ -315,6 +315,7 @@ ERRORES = {
     "'NoneType' object is not subscriptable" : "Inicie sesión con su cuenta correspondiente",
     "foreign key constraint fails" : 'No es posible eliminar dicha fila' ,
     "404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again." : "El enlace al que intentó ingresar no existe." ,
+    "INICIAR_SESION_REQUERIDO" : "Debes iniciar sesion para poder agregar a carrito",
 }
 
 
@@ -2324,7 +2325,8 @@ def registrar_item_carrito():
     # clienteid = data.get("clienteid", 1)
     clientecorreo = request.cookies.get('correo')
     if not clientecorreo:
-        return jsonify({"error": "No se encontró la cookie de correo"}), 400
+        return rdrct_error(redirect_url('login'), "INICIAR_SESION_REQUERIDO")
+        # return jsonify({"error": "No se encontró la cookie de correo"}), 400
 
     cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
     if not cliente:
@@ -2368,6 +2370,14 @@ def registrar_item_carrito_json():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# @app.route("/verificar_sesion")
+# def verificar_sesion():
+#     clientecorreo = request.cookies.get("correo")
+#     if not clientecorreo:
+#         return rdrct_error(redirect_url("login"), "INICIAR_SESION_REQUERIDO")
+    
+#     # Si hay cookie, no hace nada, responde sin contenido
+#     return "", 204
 
 @app.route("/eliminar-item-carrito", methods=["POST"])
 def eliminar_item_carrito():
@@ -2469,7 +2479,7 @@ def metodo_pago():
     # clienteid = 1  # O request.cookies.get("idlogin")
     clientecorreo = request.cookies.get('correo')
     if not clientecorreo:
-        return jsonify({"error": "No se encontró la cookie de correo"}), 400
+        return redirect("/login")
 
     cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
     if not cliente:
