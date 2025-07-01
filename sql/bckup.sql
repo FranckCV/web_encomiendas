@@ -488,7 +488,7 @@ CREATE TABLE `empresa` (
   `id_sucursal` int(11) NOT NULL,
   `igv` decimal(9,2) NOT NULL,
   `actual` tinyint(1) NOT NULL DEFAULT 1,
-  `fecha` date NOT NULL DEFAULT curdate()
+  `fecha` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -928,7 +928,7 @@ CREATE TABLE `paquete_descuento` (
 
 CREATE TABLE `permiso` (
   `paginaid` int(11) NOT NULL,
-  `rolid` int(11) NOT NULL,
+  `rolid`    int(11) NOT NULL,
   `acceso` tinyint(1) NOT NULL,
   `search` tinyint(1) NOT NULL,
   `consult` tinyint(1) NOT NULL,
@@ -936,7 +936,7 @@ CREATE TABLE `permiso` (
   `update` tinyint(1) NOT NULL,
   `delete` tinyint(1) NOT NULL,
   `unactive` tinyint(1) NOT NULL,
-  `otro` text DEFAULT '{}'
+  `otro` text NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

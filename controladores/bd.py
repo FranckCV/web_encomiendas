@@ -1,16 +1,26 @@
 import pymysql
 from pymysql.cursors import DictCursor
-#Establecemos la conexión
-def obtener_conexion():
-    return pymysql.connect(host='localhost',
-                                port=3306,
-                                # port=3307,
-                                user='root',
-                                password='',
-                                db='bd_encomiendas' ,
-                                cursorclass=DictCursor
-                                )
 
+def obtener_conexion():
+    return pymysql.connect(
+        host='localhost',
+        port=3306,
+        # port=3307,
+        user='root',
+        password='',
+        db='bd_encomiendas' ,
+        cursorclass=DictCursor
+        )
+
+# def obtener_conexion():
+#     return pymysql.connect(
+#         host='b7clkjmidzg8eahjzs1v-mysql.services.clever-cloud.com',
+#         port=3306,
+#         user='uodpllhcqs4wfrlv',
+#         password='T44NYEhrphrENJP8shnq',
+#         db='b7clkjmidzg8eahjzs1v' ,
+#         cursorclass=DictCursor
+#         )
 
 def sql_select_fetchall(sql , args = None):
     conexion = obtener_conexion()
