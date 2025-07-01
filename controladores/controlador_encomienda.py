@@ -488,3 +488,25 @@ def get_num_serie_by_tracking(tracking):
     fila = sql_select_fetchone(sql,(tracking,))
     
     return fila
+
+def datos_rotulo(tracking):
+    sql = '''
+        select te.fecha, 
+        concat(c.nombre_siglas,' ',c.apellidos_razon) as nombre_remitente, 
+        c.num_documento as doc_remitente,
+        concat(u.departamento,' / ',u.provincia,' / ',u.distrito) as origen 
+        ,concat(p.nombres_contacto_destinatario,' ',p.apellidos_razon_destinatario) as nom_destinatario,
+        p.num_documento_destinatario as doc_destinatario,
+        concat(ud.departamento,' / ',ud.provincia,' / ',ud.distrito) as destino,
+        p.tracking
+        from paquete p
+        inner join transaccion_encomienda te on te.num_serie = p.transaccion_encomienda_num_serie
+        inner join cliente c on c.id = te.clienteid
+        inner join sucursal so on so.id = te.id_sucursal_origen
+        inner join sucursal sd on sd.id = p.sucursal_destino_id
+        inner join ubigeo u on u.codigo = so.ubigeocodigo
+        inner join ubigeo ud on ud.codigo = sd.ubigeocodigo
+        where p.tracking = %s
+    '''
+    fila = sql_select_fetchone(sql,(tracking,))
+    return fila

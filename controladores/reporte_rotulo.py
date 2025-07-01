@@ -1,46 +1,106 @@
 from fpdf import FPDF
-import os
 import qrcode
+import os
 
-class RotuloPDF(FPDF):
-    def __init__(self):
-        super().__init__(orientation='P', unit='mm', format=(100, 150))  # etiqueta tamaño 100x150 mm
+def generar_rotulo_pdf(datos, ruta_pdf):
+    # Crear QR con el tracking
+    tracking = datos['tracking']
+    qr = qrcode.make(str(tracking))
+    ruta_qr = "temp_qr.png"
+    qr.save(ruta_qr)
 
-    def header(self):
-        self.set_font("Helvetica", "B", 13)
-        self.cell(0, 10, "RÓTULO DE ENCOMIENDA", ln=True, align="C")
-        self.ln(3)
-
-    def cuerpo(self, data):
-        self.set_font("Helvetica", "", 10)
-
-        self._fila_dato("Tracking:", data.get("tracking", ""))
-        self._fila_dato("Sucursal Origen:", data.get("sucursal_origen", ""))
-        self._fila_dato("Sucursal Destino:", data.get("sucursal_destino", ""))
-
-        self.ln(5)
-
-    def _fila_dato(self, etiqueta, valor):
-        self.set_font("Helvetica", "", 10)
-        self.set_x(10)
-        self.cell(35, 6, etiqueta, ln=0)
-        self.set_font("Helvetica", "B", 10)
-        self.multi_cell(0, 6, valor)
-
-    def agregar_qr(self, texto, ruta_qr):
-        qr = qrcode.make(texto)
-        qr.save(ruta_qr)
-        # Centrado horizontalmente
-        x_centro = (100 - 40) / 2  # etiqueta es 100 mm de ancho
-        self.image(ruta_qr, x=x_centro, y=self.get_y(), w=40)
-        os.remove(ruta_qr)
-
-def generar_rotulo_pdf(data, ruta_pdf="rotulo.pdf"):
-    pdf = RotuloPDF()
+    # Crear PDF
+    pdf = FPDF()
     pdf.add_page()
-    pdf.cuerpo(data)
+    pdf.set_font("Arial", size=12)
+    
+    # Dimensiones y posiciones
+    x_inicio = 10
+    y_inicio = 15
+    ancho_total = 190
+    alto_total = 120
+    
+    # Borde principal
+    pdf.rect(x_inicio, y_inicio, ancho_total, alto_total)
 
-    qr_texto = f"Tracking: {data.get('tracking', '')}\nDestino: {data.get('sucursal_destino', '')}"
-    pdf.agregar_qr(qr_texto, "temp_qr.png")
+    # Tracking y Fecha (líneas guía + texto)
+    pdf.set_xy(x_inicio + 5, y_inicio + 10)
+    pdf.cell(100, 8, f"Tracking : ___________________", ln=0)
+    pdf.cell(0, 8, f"Fecha : ______________", ln=1)
 
+    # Sobreponer texto real
+    pdf.set_xy(x_inicio + 35, y_inicio + 10)
+    pdf.cell(0, 8, str(tracking))
+    
+    pdf.set_xy(x_inicio + 130, y_inicio + 10)
+    pdf.cell(0, 8, datos['fecha'].strftime('%d/%m/%Y'))
+
+    # Espacio
+    pdf.ln(8)
+
+    # Datos del remitente
+    pdf.set_x(x_inicio + 5)
+    pdf.set_font("Arial", "B", 12)
+    pdf.cell(0, 8, "Datos de remitente :", ln=1)
+
+    pdf.set_font("Arial", size=12)
+    pdf.ln(3)
+    pdf.set_x(x_inicio + 5)
+    pdf.cell(0, 8, "Nombre : _______________________", ln=1)
+    pdf.set_xy(x_inicio + 35, pdf.get_y() - 8)
+    pdf.cell(0, 8, datos['nombre_remitente'])
+
+    pdf.ln(8)
+    pdf.set_x(x_inicio + 5)
+    pdf.cell(0, 10, "N° documento: ___________________", ln=1)
+    pdf.set_xy(x_inicio + 40, pdf.get_y() - 9)
+    pdf.cell(0, 8, datos['doc_remitente'])
+
+    # Espacio
+    pdf.ln(8)
+
+    # Datos del destinatario
+    pdf.set_x(x_inicio + 5)
+    pdf.set_font("Arial", "B", 12)
+    pdf.cell(0, 10, "Datos del destinatario:", ln=1)
+
+    pdf.set_font("Arial", size=12)
+    pdf.ln(3)
+    pdf.set_x(x_inicio + 5)
+    pdf.cell(0, 8, "Nombre : _______________________", ln=1)
+    pdf.set_xy(x_inicio + 35, pdf.get_y() - 8)
+    pdf.cell(0, 8, datos['nom_destinatario'])
+
+    pdf.ln(8)
+    pdf.set_x(x_inicio + 5)
+    pdf.cell(0, 8, "N° documento: ___________________", ln=1)
+    pdf.set_xy(x_inicio + 45, pdf.get_y() - 8)
+    pdf.cell(0, 8, datos['doc_destinatario'])
+
+    # Línea horizontal inferior (guía visual)
+    pdf.line(x_inicio, y_inicio + alto_total, x_inicio + ancho_total, y_inicio + alto_total)
+
+    # Origen
+    pdf.set_xy(x_inicio, y_inicio + alto_total + 10)
+    pdf.cell(0, 8, "Origen: _____________________________________________________________", ln=1)
+    pdf.set_xy(x_inicio + 25, pdf.get_y() - 8)
+    pdf.cell(0, 8, datos['origen'])
+
+    # Espacio
+    pdf.ln(5)
+
+    # Destino
+    pdf.set_x(x_inicio)
+    pdf.cell(0, 8, "Destino: ____________________________________________________________", ln=1)
+    pdf.set_xy(x_inicio + 27, pdf.get_y() - 8)
+    pdf.cell(0, 8, datos['destino'])
+
+    # Agregar el QR (dentro del rectángulo)
+    pdf.image(ruta_qr, x=x_inicio + ancho_total - 100, y=y_inicio + 25, w=90)
+
+    # Guardar PDF
     pdf.output(ruta_pdf)
+
+    # Eliminar QR temporal
+    if os.path.exists(ruta_qr):
+        os.remove(ruta_qr)

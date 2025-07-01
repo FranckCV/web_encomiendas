@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app , send_file, flash , send_from_directory #, after_this_request, flash, jsonify, session
+import requests
 from controladores import bd as bd 
 from controladores import permiso as permiso
 from controladores import controlador_pagina as controlador_pagina
@@ -3201,6 +3202,7 @@ def insertar_envio_api():
         if num_serie:
             try:
                 generar_qr_paquetes(trackings)
+                generar_rotulos_paquetes(trackings) 
             except Exception as qr_err:
                 current_app.logger.warning(f"Error generando QR: {qr_err}")
 
@@ -3215,18 +3217,18 @@ def insertar_envio_api():
                     msg.body = (
                         f"Hola {cliente_data['nombre_siglas']},\n\n"
                         f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
-                        "Adjunto encontrarás los códigos QR para el seguimiento de cada paquete.\n\n"
+                        "Adjunto encontrarás el rótulo PDF para cada paquete con los datos de envío.\n\n"
                         f"¡Gracias por confiar en {nombre_empresa}!"
                     )
 
                     for tracking in trackings:
-                        qr_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'qr.png')
-                        if os.path.exists(qr_path):
-                            with open(qr_path, 'rb') as f:
-                                qr_data = f.read()
-                            msg.attach(f"qr_{tracking}.png", 'image/png', qr_data)
-                        else:
-                            current_app.logger.warning(f"QR no encontrado para tracking {tracking}")
+
+                        rotulo_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'rotulo.pdf')
+                        
+                        if os.path.exists(rotulo_path):
+                            with open(rotulo_path, 'rb') as f:
+                                rotulo_data = f.read()
+                            msg.attach(f"rotulo_{tracking}.pdf", 'application/pdf', rotulo_data)
 
                     mail.send(msg)
                 except Exception as email_err:
@@ -3585,48 +3587,20 @@ def generar_comprobante(tracking):
         }), 500
 
 
-@app.route('/rotulo=<tracking>', methods=['GET'])
-def generar_rotulo(tracking):
+def generar_rotulos_paquetes(trackings):
     from controladores import reporte_rotulo as reporte_rotulo
-    try:
-        transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
-        if not transaccion:
-            return jsonify({'success': False, 'message': 'Transacción no encontrada'}), 404
+    for tracking in trackings:
+        try:
+            datos_rotulo = controlador_encomienda.datos_rotulo(tracking)
 
-        num_serie = transaccion.get('num_serie')
-        if not num_serie:
-            return jsonify({'success': False, 'message': 'Número de serie no disponible'}), 400
+            carpeta = os.path.join(current_app.static_folder, "comprobantes", str(tracking))
+            os.makedirs(carpeta, exist_ok=True)
+            ruta_rotulo = os.path.join(carpeta, "rotulo.pdf")
 
-        items, masivo = controlador_encomienda.obtener_items_por_num_serie(num_serie)
-        if not items:
-            return jsonify({'success': False, 'message': 'No hay paquetes asociados'}), 404
+            reporte_rotulo.generar_rotulo_pdf(datos_rotulo, ruta_pdf=ruta_rotulo)
 
-        origen = items[0]['origen']
-        destino = items[0]['destino']
-
-        datos_rotulo = {
-            'tracking': tracking,
-            'sucursal_origen': f"{origen['sucursal']} - {origen['distrito']}, {origen['provincia']}, {origen['departamento']}",
-            'sucursal_destino': f"{destino['sucursal']} - {destino['distrito']}, {destino['provincia']}, {destino['departamento']}",
-            'remitente': f"{transaccion.get('nombre_remitente', '')}\nDNI: {transaccion.get('dni_remitente', '')}\nCel: {transaccion.get('cel_remitente', '')}",
-            'destinatario': f"{transaccion.get('nombre_destinatario', '')}\nDNI: {transaccion.get('dni_destinatario', '')}\nCel: {transaccion.get('cel_destinatario', '')}",
-            'contenido': transaccion.get('descripcion_contenido', '---'),
-            'pago': 'Pagado' if transaccion.get('estado_pago') == 'C' else 'Por cobrar'
-        }
-
-        # Crear carpeta dentro de 'static/comprobantes/{tracking}/'
-        carpeta = os.path.join("static", "comprobantes", str(tracking))
-        os.makedirs(carpeta, exist_ok=True)
-        ruta_rotulo = os.path.join(carpeta, "rotulo.pdf")
-
-        # Generar PDF
-        reporte_rotulo.generar_rotulo_pdf(datos_rotulo, ruta_pdf=ruta_rotulo)
-
-        return send_file(ruta_rotulo, as_attachment=True, download_name=f"rotulo_{tracking}.pdf")
-
-    except Exception as e:
-        return jsonify({'success': False, 'message': f'Error al generar rótulo: {str(e)}'}), 500
-
+        except Exception as e:
+            current_app.logger.warning(f"Error generando rótulo para tracking {tracking}: {e}")
 
 
 @app.route('/descargar_comprobante/<tracking>', methods=['GET'])
@@ -6384,6 +6358,107 @@ def descargar_guia_remision(tracking):
     return send_file(path, as_attachment=True)
 
 
+
+
+############CONSULTA_RENIEC###########
+# @app.route('/api/consulta_documento', methods=['POST'])
+# def consulta_documento():
+#     from flask import request, jsonify
+#     import requests
+
+#     data = request.get_json()
+#     numero = data.get('numero')
+#     tipo = data.get('tipo')
+
+#     token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InBlcmV6ZGowOTA0QGdtYWlsLmNvbSJ9.8rz9gE8oTMuGHoGvePcZA50zZjUDMph_jVX3PK8npWc' 
+
+#     if tipo == 'DNI' and len(numero) == 8:
+#         url = f'https://dniruc.apisperu.com/api/v1/dni/{numero}?token={token}'
+#     elif tipo == 'RUC' and len(numero) == 11:
+#         url = f'https://dniruc.apisperu.com/api/v1/ruc/{numero}?token={token}'
+#     else:
+#         return jsonify({'success': False, 'message': 'Tipo o número inválido'}), 400
+
+#     response = requests.get(url)
+#     if response.status_code == 200:
+#         return jsonify(response.json())
+#     else:
+#         return jsonify({'success': False, 'message': 'Error al consultar API externa'}), 500
+
+@app.route('/api/buscar_cliente', methods=['POST'])
+def buscar_cliente():
+    data = request.get_json()
+    print(f"data {data}")
+
+    if not data:
+        return jsonify({'success': False, 'message': 'No se recibieron datos JSON'}), 400
+
+    tipo = int(data.get('tipo', 0))
+    numero = data.get('numero', '').strip()
+
+    if not tipo or not numero:
+        return jsonify({'success': False, 'message': 'Datos incompletos'}), 400
+    tipo = int(data.get('tipo'))
+    numero = data.get('numero')
+
+    cliente = controlador_cliente.get_cliente_tipo_nro_documento(tipo, numero)
+    # print(f"Cliente: {cliente}")
+    if cliente:
+        return jsonify({
+            'fuente': 'local',
+            'nombre_siglas': cliente['nombre_siglas'],
+            'apellidos_razon': cliente['apellidos_razon']
+        })
+
+    token = 'apis-token-16482.c1UdnTdTw5SjRF5r0baBi9TW2dSDGWKc'
+    headers = {'Authorization': f'Bearer {token}'}
+    # numero = '002210601'
+    if tipo == 1 and len(numero) == 8:
+        url = f"https://api.apis.net.pe/v2/dni?numero={numero}"
+    elif tipo == 2 and len(numero) == 11:
+        url = f"https://api.apis.net.pe/v2/ruc?numero={numero}"
+    else:
+        return jsonify({'success': False, 'message': 'Documento inválido'}), 400
+
+    try:
+        r = requests.get(url, headers=headers)
+        # print(url)
+        if r.status_code != 200:
+            # print(f'Esta es la respuesta de la api: {r}')
+            return jsonify({'success': False, 'message': 'Error consultando API'}), 500
+
+        data_api = r.json()
+        # print(data_api)
+        if tipo == 1:
+            nombres = data_api.get('nombres')
+            apellido_paterno = data_api.get('apellidoPaterno')
+            apellido_materno = data_api.get('apellidoMaterno')
+            if not (nombres and apellido_paterno and apellido_materno):
+                return jsonify({'success': False, 'message': 'DNI no encontrado en RENIEC'}), 404
+
+            return jsonify({
+                'fuente': 'api',
+                'nombre_siglas': nombres,
+                'apellidos_razon': f"{apellido_paterno} {apellido_materno}"
+            })
+        
+        elif tipo == 2:
+            razon = data_api.get('nombre')  # nombre, no razonSocial
+            if not razon:
+                return jsonify({'success': False, 'message': 'RUC no encontrado'}), 404
+            return jsonify({
+                'fuente': 'api',
+                'nombre_siglas': razon,
+                'apellidos_razon': ''
+            })
+
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+######################################
+##############################################3
+##############################################
 
 if __name__ == "__main__":
     # app.run(host='192.168.48.178', port=8000, debug=True, use_reloader=True)
