@@ -1591,6 +1591,7 @@ TRANSACCIONES = {
             # [True, 'fa-solid fa-map-location-dot', "#9856EE", 'seguimiento_tracking', {"tracking": "tracking"} , '' , 'seguimiento'],
             [True, 'fa-solid fa-route', "#9856EE", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"} , '' , 'seguimiento' , False],
             [True, 'fa-solid fa-qrcode', "#2195DC", 'ver_img_qr',  {"tracking": "tracking"} , '' , 'qr_code' , True],
+            [True, 'fa-solid fa-qrcode', "#DC8521", 'ver_guia_remision',  {"tracking": "tracking"} , '' , 'guia_remision' , True],
             [True, 'fa-solid fa-dollar', "#6FDC21", 'pagar_paquete',  {"tracking": "tracking"} , '' , 'pago' , False],
         ],
         "options": [
@@ -3457,7 +3458,7 @@ def generar_qr_paquetes(trackings):
     ip_address = socket.gethostbyname(hostname)
     print(ip_address)
     for tracking in trackings:
-        qr_data = f"http://192.168.100.15:8000/insertar_estado?tracking={tracking}"
+        qr_data = f"http://192.168.239.37:8000/insertar_estado?tracking={tracking}"
 
         img = qrcode.make(qr_data)
 
@@ -5275,6 +5276,16 @@ def interfaz_insertar_estado():
 
 
 
+@app.route("/ver_guia_remision=<int:tracking>")
+def ver_guia_remision(tracking):
+    datos = controlador_estado_encomienda.get_data_package(tracking)
+    if datos.get('salidaid') is None:
+        return rdrct_error(redirect(url_for('transaccion',tabla = 'paquete',pk_foreign = datos.get('num_serie'))) ,'No posee guia de remisión')
+    else:
+        return send_from_directory(f"static/img/guias/",f"guia_{tracking}.pdf")
+
+
+
 @app.route("/ver_img_qr=<int:tracking>")
 def ver_img_qr(tracking):
     return send_from_directory(f"static/comprobantes/{tracking}","qr.png")
@@ -6348,6 +6359,7 @@ def generar_guia_remision(transaccion_id):
 
     return send_file(path, as_attachment=True)
 
+
 @app.route("/descargar_guia/<string:tracking>")
 def descargar_guia_remision(tracking):
     from controladores import reporte_pepo as reporte_pepo
@@ -6360,7 +6372,7 @@ def descargar_guia_remision(tracking):
     if not data:
         return "Datos insuficientes para generar la guía", 400
 
-    filename = f"guia_{num_serie}.pdf"
+    filename = f"guia_{tracking}.pdf"
     path = f"static/img/guias/{filename}"
 
     reporte_pepo.generar_guia_pdf(data, filename=path)

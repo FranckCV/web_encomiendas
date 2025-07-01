@@ -352,10 +352,11 @@ def obtener_datos_guia_remision(transaccion_id):
             emp.n_documento AS conductor_dni,
 
             -- Bienes
-            p.descripcion AS descripcion_item,
+            p.descripcion AS descripcion,
             te.unidad_medida AS unidad_medida,
             p.peso AS peso,
-            1 AS cantidad
+            1 AS cantidad,
+            conpa.nombre as contenido_paquete
 
         FROM transaccion_encomienda tec
         JOIN paquete p ON p.transaccion_encomienda_num_serie = tec.num_serie
@@ -367,8 +368,9 @@ def obtener_datos_guia_remision(transaccion_id):
         JOIN sucursal suc_destino ON suc_destino.id = sa.destino_final_id
         JOIN empresa e ON e.actual = 1
         JOIN tipo_empaque te ON te.id = p.tipo_empaqueid
+        JOIN contenido_paquete conpa ON p.contenido_paqueteid = conpa.id
         WHERE tec.num_serie = %s
-        LIMIT 1
+        LIMIT 1;
     """
     fila = sql_select_fetchone(sql, (transaccion_id,))
     if not fila:
@@ -394,7 +396,7 @@ def obtener_datos_guia_remision(transaccion_id):
             "dni_conductor": fila["conductor_dni"],
         },
         "bienes": [{
-            "descripcion": fila["descripcion_item"],
+            "descripcion": fila["descripcion"] if fila['descripcion'] != '' or fila['descripcion'] is None else fila['contenido_paquete'],
             "unidad": fila["unidad_medida"],
             "cantidad": fila["cantidad"],
             "peso": fila["peso"]
