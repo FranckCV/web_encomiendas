@@ -1393,7 +1393,7 @@ REPORTES = {
         ],
     },     
     
-    # Ventas
+    # Ventas 
     "ventas_periodo": {
         "active" : True ,
         'icon_page' : 'fa-solid fa-sack-dollar' ,   
