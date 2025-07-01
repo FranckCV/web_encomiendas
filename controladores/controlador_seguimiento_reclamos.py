@@ -253,14 +253,22 @@ def obtener_estados_usados_reclamo(reclamo_id):
     result = sql_select_fetchall(sql, (reclamo_id,))
     return [r['estado_reclamoid'] for r in result]
 
+from collections import defaultdict
+import pymysql
+
 def agrupar_seguimientos_por_estado(seguimientos):
     """
     Agrupa los seguimientos por estado para mostrar en el timeline
     """
+    if isinstance(seguimientos, Exception):
+        print("❌ Error al obtener seguimientos:", seguimientos)
+        return {}  # o lanza error, o devuelve vacío
+
     seguimientos_por_estado = defaultdict(list)
     for seg in seguimientos:
         seguimientos_por_estado[seg['estado_reclamoid']].append(seg)
     return seguimientos_por_estado
+
 
 def obtener_historial_reclamo(reclamo_id):
     """

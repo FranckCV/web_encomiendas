@@ -67,7 +67,7 @@ def unactive_row(id):
 def insert_row(nombre, descripcion , motivo_reclamoid):
     sql = f'''
         INSERT INTO 
-            motivo_reclamo (nombre,descripcion,motivo_reclamoid) 
+            causa_reclamo (nombre,descripcion,motivo_reclamoid) 
         VALUES 
             (%s, %s, %s)
     '''

@@ -333,10 +333,11 @@ Información de la empresa
                 <input type="number" id="igv" name="igv" required value="{{information['igv']}}">
             </div>
             
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <label for="porcentaje_recojo">Porcentaje de tarifa de recojo de paquete</label>
                 <input type="number" id="porcentaje_recojo" name="porcentaje_recojo" required value="{{information['porcentaje_recojo']}}">
-            </div>
+            </div> -->
+            <input type="hidden" id="porcentaje_recojo" name="porcentaje_recojo" required value="{{information['porcentaje_recojo']}}">
             
             <div class="form-group" style="grid-column: span 3 ;">
                 <label for="correo">Sucursal principal</label>

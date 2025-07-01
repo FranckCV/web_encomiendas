@@ -259,12 +259,14 @@
         </div>
 
         <div class="col-2">
-            <select name="estado_filter" id="estado_filter" class="filterSelect">
+            <div class="form_field">
+                <select name="estado_filter" id="estado_filter" class="filterSelect">
                 <option value="" selected>Todos los estados</option>
                 {% for estado in estados_disponibles %}
                 <option value="{{ estado.id }}">{{ estado.nombre }}</option>
                 {% endfor %}
             </select>
+            </div>
         </div>
     </div>
 </div>

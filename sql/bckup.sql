@@ -488,7 +488,7 @@ CREATE TABLE `empresa` (
   `id_sucursal` int(11) NOT NULL,
   `igv` decimal(9,2) NOT NULL,
   `actual` tinyint(1) NOT NULL DEFAULT 1,
-  `fecha` date NOT NULL DEFAULT curdate()
+  `fecha` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -928,7 +928,7 @@ CREATE TABLE `paquete_descuento` (
 
 CREATE TABLE `permiso` (
   `paginaid` int(11) NOT NULL,
-  `rolid` int(11) NOT NULL,
+  `rolid`    int(11) NOT NULL,
   `acceso` tinyint(1) NOT NULL,
   `search` tinyint(1) NOT NULL,
   `consult` tinyint(1) NOT NULL,
@@ -936,7 +936,7 @@ CREATE TABLE `permiso` (
   `update` tinyint(1) NOT NULL,
   `delete` tinyint(1) NOT NULL,
   `unactive` tinyint(1) NOT NULL,
-  `otro` text DEFAULT '{}'
+  `otro` text NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1426,7 +1426,7 @@ INSERT INTO `sucursal` (`id`, `abreviatura`, `codigo_postal`, `direccion`, `hora
 (54, 'CHI01', '14001', 'Mariscal Castilla, Urbanizacion Santa Victoria, Chiclayo, Lambayeque, 14001, Perú', '8am a 7pm', '9am a 7pm', -6.774925, -79.836803, NULL, NULL, 1, '130101'),
 (55, 'CHI02', '14008', 'Avenida Grau, Residencial Santa Fe del Valle, Picsi, Chiclayo, Lambayeque, Perú', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', -6.717460, -79.771240, NULL, NULL, 1, '130101'),
 (56, 'CHI03', '14013', 'Avenida Tacna, José Leonardo Ortiz, Chiclayo, Lambayeque, 14013, Perú', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', -6.774244, -79.846156, NULL, NULL, 1, '130101'),
-(57, 'CHI04', ' 1400', '549, Calle José Balta, Área residencial Pimentel Centro, Pimentel, Chiclayo, Lambayeque, Perú', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', -6.838447, -79.934983, NULL, NULL, 1, '130110'),
+(57, 'CHI04',  '1400', '549, Calle José Balta, Área residencial Pimentel Centro, Pimentel, Chiclayo, Lambayeque, Perú', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', -6.838447, -79.934983, NULL, NULL, 1, '130110'),
 (58, 'LAM01', '14013', 'Avenida Huamachuco, Lambayeque, Perú', '9am a 2pm y de 3pm a 6pm', '9am a 1pm', -6.708217, -79.903525, NULL, NULL, 1, '130301'),
 (59, 'TRU01', '13011', 'Av. Tupac Amaru 1675 Urb Alto Mochica, Trujillo', '9am a 1pm y 1:45pm a 6pm', '9am a 1pm', NULL, NULL, NULL, NULL, 1, '120105'),
 (60, 'TRU02', '13008', 'Av. Santa 1260, Trujillo Ref. A media cuadra del cruce con Av. América', '8am a 6pm', '9am a 1pm', NULL, NULL, NULL, NULL, 1, '120105'),
@@ -4653,3 +4653,5 @@ ALTER TABLE `transaccion_venta`
 ALTER TABLE `unidad`
   ADD CONSTRAINT `FKunidad608127` FOREIGN KEY (`modeloid`) REFERENCES `modelo` (`id`);
 COMMIT;
+
+Alter table seguimiento_reclamo add column comentario text;

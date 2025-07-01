@@ -2,6 +2,16 @@
 
 {% block estilos %}
 <link rel="stylesheet" href="/static/css/cajas.css" />
+<style>
+  .swal2-container {
+    z-index: 999999 !important;
+  }
+  .swal2-confirm {
+    background-color: #1a73e8 !important; /* Azul Google */
+    color: white !important;
+    border: none !important;
+  }
+</style>
 {% endblock %}
 
 {% block titulo %}
@@ -75,5 +85,6 @@ Producto - Caja
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="/static/js/cajas.js"></script>
 {% endblock %}

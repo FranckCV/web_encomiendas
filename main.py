@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, make_response, url_for , g,jsonify,json,abort,session,current_app , send_file, flash , send_from_directory #, after_this_request, flash, jsonify, session
+import requests
 from controladores import bd as bd 
 from controladores import permiso as permiso
 from controladores import controlador_pagina as controlador_pagina
@@ -314,6 +315,7 @@ ERRORES = {
     "'NoneType' object is not subscriptable" : "Inicie sesión con su cuenta correspondiente",
     "foreign key constraint fails" : 'No es posible eliminar dicha fila' ,
     "404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again." : "El enlace al que intentó ingresar no existe." ,
+    "INICIAR_SESION_REQUERIDO" : "Debes iniciar sesion para poder agregar a carrito",
 }
 
 
@@ -654,7 +656,7 @@ CONTROLADORES = {
     "causa_reclamo": {
         "active" : True ,
         "titulo": "Causa de reclamo",
-        "nombre_tabla": "causa_reclamo",
+        "nombre_tabla": "causa de reclamo",
         "controlador": controlador_causa_reclamo,
         "icon_page": '',
         "filters": [
@@ -664,8 +666,8 @@ CONTROLADORES = {
 #            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
             ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
             ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
             ['motivo_reclamoid',  'Nombre de motivo de reclamo', 'Elegir motivo de reclamo', 'select', True ,True, [lambda: controlador_motivo_reclamo.get_options() , 'nom_motivo' ] ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -2323,7 +2325,8 @@ def registrar_item_carrito():
     # clienteid = data.get("clienteid", 1)
     clientecorreo = request.cookies.get('correo')
     if not clientecorreo:
-        return jsonify({"error": "No se encontró la cookie de correo"}), 400
+        return rdrct_error(redirect_url('login'), "INICIAR_SESION_REQUERIDO")
+        # return jsonify({"error": "No se encontró la cookie de correo"}), 400
 
     cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
     if not cliente:
@@ -2367,6 +2370,14 @@ def registrar_item_carrito_json():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# @app.route("/verificar_sesion")
+# def verificar_sesion():
+#     clientecorreo = request.cookies.get("correo")
+#     if not clientecorreo:
+#         return rdrct_error(redirect_url("login"), "INICIAR_SESION_REQUERIDO")
+    
+#     # Si hay cookie, no hace nada, responde sin contenido
+#     return "", 204
 
 @app.route("/eliminar-item-carrito", methods=["POST"])
 def eliminar_item_carrito():
@@ -2468,7 +2479,7 @@ def metodo_pago():
     # clienteid = 1  # O request.cookies.get("idlogin")
     clientecorreo = request.cookies.get('correo')
     if not clientecorreo:
-        return jsonify({"error": "No se encontró la cookie de correo"}), 400
+        return redirect("/login")
 
     cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
     if not cliente:
@@ -3201,6 +3212,7 @@ def insertar_envio_api():
         if num_serie:
             try:
                 generar_qr_paquetes(trackings)
+                generar_rotulos_paquetes(trackings) 
             except Exception as qr_err:
                 current_app.logger.warning(f"Error generando QR: {qr_err}")
 
@@ -3215,18 +3227,18 @@ def insertar_envio_api():
                     msg.body = (
                         f"Hola {cliente_data['nombre_siglas']},\n\n"
                         f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
-                        "Adjunto encontrarás los códigos QR para el seguimiento de cada paquete.\n\n"
+                        "Adjunto encontrarás el rótulo PDF para cada paquete con los datos de envío.\n\n"
                         f"¡Gracias por confiar en {nombre_empresa}!"
                     )
 
                     for tracking in trackings:
-                        qr_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'qr.png')
-                        if os.path.exists(qr_path):
-                            with open(qr_path, 'rb') as f:
-                                qr_data = f.read()
-                            msg.attach(f"qr_{tracking}.png", 'image/png', qr_data)
-                        else:
-                            current_app.logger.warning(f"QR no encontrado para tracking {tracking}")
+
+                        rotulo_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'rotulo.pdf')
+                        
+                        if os.path.exists(rotulo_path):
+                            with open(rotulo_path, 'rb') as f:
+                                rotulo_data = f.read()
+                            msg.attach(f"rotulo_{tracking}.pdf", 'application/pdf', rotulo_data)
 
                     mail.send(msg)
                 except Exception as email_err:
@@ -3585,37 +3597,45 @@ def generar_comprobante(tracking):
         }), 500
 
 
-@app.route('/api/rotulo/<int:tracking>')
-def generar_rotulo(tracking):
-    from controladores import reporte_rotulo  # Suponiendo que aquí está tu lógica de generación
-
-    paquete = controlador_paquete.get_paquete_by_tracking(tracking)
-    if not paquete:
-        return jsonify({'success': False, 'message': 'Paquete no encontrado'}), 404
-
-    transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
-    if not transaccion:
-        return jsonify({'success': False, 'message': 'Transacción no encontrada'}), 404
-
-    empresa = controlador_empresa.getDataComprobante()
-    cliente = {
-        'nombre_siglas': transaccion['nombre_siglas'],
-        'apellidos_razon': transaccion['apellidos_razon']
-    }
-    contenido = controlador_paquete.get_contenido(tracking)
-
-    carpeta = os.path.join("static", "comprobantes", str(tracking))
-    os.makedirs(carpeta, exist_ok=True)
-    ruta_pdf = os.path.join(carpeta, "rotulo.pdf")
-
-    if not os.path.exists(ruta_pdf):
+def generar_rotulos_paquetes(trackings):
+    from controladores import reporte_rotulo as reporte_rotulo
+    for tracking in trackings:
         try:
-            qr_path = url_for('static', filename=f"comprobantes/{tracking}/qr.png", _external=True)
-            reporte_rotulo.generar_rotulo_pdf(transaccion, cliente, empresa, paquete, contenido, qr_path, ruta_pdf)
-        except Exception as e:
-            return jsonify({'success': False, 'message': f'Error al generar PDF: {e}'}), 500
+            datos_rotulo = controlador_encomienda.datos_rotulo(tracking)
 
-    return send_file(ruta_pdf, as_attachment=True)
+            carpeta = os.path.join(current_app.static_folder, "comprobantes", str(tracking))
+            os.makedirs(carpeta, exist_ok=True)
+            ruta_rotulo = os.path.join(carpeta, "rotulo.pdf")
+
+            reporte_rotulo.generar_rotulo_pdf(datos_rotulo, ruta_pdf=ruta_rotulo)
+
+        except Exception as e:
+            current_app.logger.warning(f"Error generando rótulo para tracking {tracking}: {e}")
+
+
+@app.route('/descargar_comprobante/<tracking>', methods=['GET'])
+def descargar_comprobante(tracking):
+    try:
+        ruta_pdf = os.path.join("static", "comprobantes", str(tracking), "comprobante.pdf")
+
+        if not os.path.exists(ruta_pdf):
+            return jsonify({
+                'success': False,
+                'message': 'Comprobante no encontrado'
+            }), 404
+
+        return send_file(
+            ruta_pdf,
+            as_attachment=True,
+            download_name=f"comprobante_{tracking}.pdf"
+        )
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f"Error al descargar comprobante: {str(e)}"
+        }), 500
+
 
 
 @app.route('/envio_masivo')
@@ -4024,10 +4044,168 @@ def generar_qr_boleta(datos):
 
 
 
-@app.route("/perfil")
-def perfil():
-    return render_template('perfil.html')
+# Agregar esta importación al inicio del archivo main.py
+from controladores import controlador_perfil as controlador_perfil
 
+# Reemplazar el endpoint existente /perfil con este:
+@app.route("/perfil")
+# @validar_cliente()
+def perfil():
+    # try:
+        # Obtener datos del usuario logueado
+        clientecorreo = request.cookies.get('correo')
+        if not clientecorreo:
+            return redirect(url_for('login'))
+
+        cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
+        if not cliente:
+            return redirect(url_for('login'))
+
+        cliente_id = cliente.get("id")
+        
+        # Obtener estadísticas del cliente
+        estadisticas = controlador_perfil.get_estadisticas_cliente(cliente_id)
+        reclamos_count = controlador_perfil.get_reclamos_cliente(cliente_id)
+        estadisticas['reclamos'] = reclamos_count
+        
+        # Obtener datos para los tabs
+        paquetes = controlador_perfil.get_paquetes_cliente(cliente_id)
+        compras = controlador_perfil.get_compras_cliente(cliente_id)
+        ordenes = controlador_perfil.get_ordenes_cliente(cliente_id)
+        reclamos = controlador_perfil.get_reclamos_detalle_cliente(cliente_id)
+        
+        # Obtener opciones para los selects
+        tipos_documento = controlador_perfil.get_opciones_tipo_documento()
+        tipos_cliente = controlador_perfil.get_opciones_tipo_cliente()
+        
+        # Procesar órdenes para separar paquetes
+        for orden in ordenes:
+            if orden.get('paquetes_info'):
+                paquetes_list = []
+                for paquete_info in orden['paquetes_info'].split('|'):
+                    if ':' in paquete_info:
+                        tracking, contenido = paquete_info.split(':', 1)
+                        paquetes_list.append({
+                            'tracking': tracking.strip(),
+                            'contenido': contenido.strip()
+                        })
+                orden['paquetes_lista'] = paquetes_list
+            else:
+                orden['paquetes_lista'] = []
+        
+        return render_template('perfil.html',
+                             estadisticas=estadisticas,
+                             paquetes=paquetes,
+                             compras=compras,
+                             ordenes=ordenes,
+                             reclamos=reclamos,
+                             tipos_documento=tipos_documento,
+                             tipos_cliente=tipos_cliente)
+        
+    # except Exception as e:
+    #     print(f"Error en perfil: {e}")
+    #     flash('Error al cargar el perfil', 'error')
+    #     return redirect(url_for('index'))
+
+@app.route("/actualizar_perfil", methods=["POST"])
+@validar_cliente()
+def actualizar_perfil():
+    try:
+        # Obtener datos del usuario logueado
+        clientecorreo = request.cookies.get('correo')
+        if not clientecorreo:
+            return jsonify({'success': False, 'message': 'Sesión no válida'})
+
+        cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
+        if not cliente:
+            return jsonify({'success': False, 'message': 'Cliente no encontrado'})
+
+        cliente_id = cliente.get("id")
+        
+        # Obtener datos del formulario
+        data = request.get_json()
+        
+        datos_actualizacion = {
+            'nombre_siglas': data.get('nombre', '').strip(),
+            'apellidos_razon': data.get('apellidos', '').strip(),
+            'correo': data.get('correo', '').strip(),
+            'telefono': data.get('telefono', '').strip(),
+            'num_documento': data.get('num_documento', '').strip(),
+            'tipo_documentoid': data.get('tipo_documentoid'),
+            'tipo_clienteid': data.get('tipo_clienteid')
+        }
+        
+        # Validaciones básicas
+        if not all([datos_actualizacion['nombre_siglas'], 
+                   datos_actualizacion['apellidos_razon'],
+                   datos_actualizacion['correo'],
+                   datos_actualizacion['num_documento']]):
+            return jsonify({'success': False, 'message': 'Todos los campos obligatorios deben estar completos'})
+        
+        # Validar que tipo_documentoid y tipo_clienteid sean números válidos
+        try:
+            datos_actualizacion['tipo_documentoid'] = int(datos_actualizacion['tipo_documentoid'])
+            datos_actualizacion['tipo_clienteid'] = int(datos_actualizacion['tipo_clienteid'])
+        except (ValueError, TypeError):
+            return jsonify({'success': False, 'message': 'Tipo de documento y tipo de cliente deben ser válidos'})
+        
+        # Verificar que el correo no esté en uso por otro cliente
+        if datos_actualizacion['correo'] != clientecorreo:
+            cliente_existente = controlador_cliente.get_cliente_por_correo(datos_actualizacion['correo'])
+            if cliente_existente and cliente_existente.get('id') != cliente_id:
+                return jsonify({'success': False, 'message': 'El correo ya está en uso por otro cliente'})
+        
+        # Actualizar datos
+        if controlador_perfil.actualizar_datos_cliente(cliente_id, datos_actualizacion):
+            # Si se cambió el correo, actualizar la cookie
+            if datos_actualizacion['correo'] != clientecorreo:
+                resp = make_response(jsonify({'success': True, 'message': 'Datos actualizados correctamente', 'correo_cambiado': True}))
+                resp.set_cookie('correo', datos_actualizacion['correo'])
+                return resp
+            else:
+                return jsonify({'success': True, 'message': 'Datos actualizados correctamente'})
+        else:
+            return jsonify({'success': False, 'message': 'Error al actualizar los datos en la base de datos'})
+        
+    except Exception as e:
+        print(f"Error en actualizar_perfil: {e}")
+        return jsonify({'success': False, 'message': 'Error interno del servidor'})
+
+@app.route("/api/estadisticas_perfil")
+@validar_cliente()
+def api_estadisticas_perfil():
+    try:
+        clientecorreo = request.cookies.get('correo')
+        cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
+        if not cliente:
+            return jsonify({'success': False, 'message': 'Cliente no encontrado'})
+
+        cliente_id = cliente.get("id")
+        estadisticas = controlador_perfil.get_estadisticas_cliente(cliente_id)
+        reclamos_count = controlador_perfil.get_reclamos_cliente(cliente_id)
+        estadisticas['reclamos'] = reclamos_count
+        
+        return jsonify({'success': True, 'estadisticas': estadisticas})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route("/descargar_comprobante/<num_serie>")
+@validar_cliente()
+def descargar_comprobante_venta(num_serie):
+    try:
+        # Verificar que el comprobante pertenece al cliente
+        clientecorreo = request.cookies.get('correo')
+        cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
+        if not cliente:
+            return "Cliente no encontrado", 404
+
+        # Aquí puedes implementar la generación del PDF del comprobante
+        # Por ahora solo retornamos un mensaje
+        return f"Comprobante {num_serie} - Funcionalidad en desarrollo"
+        
+    except Exception as e:
+        return f"Error al generar comprobante: {e}", 500
 
 ##################_ METHOD POST GENERALES _################## 
 
@@ -5498,10 +5676,7 @@ def seguimiento_reclamo():
 
 @app.route("/buscar_reclamo", methods=["POST"])
 def buscar_reclamo():
-    """
-    Busca un reclamo por ID o documento (público)
-    """
-    try:
+    # try:
         reclamo_id = request.form.get('reclamo_id', '').strip()
         numero_documento = request.form.get('documento', '').strip()
         
@@ -5540,9 +5715,9 @@ def buscar_reclamo():
                              ultimo_seguimiento=ultimo_seguimiento,
                              estados_usados=estados_usados)
         
-    except Exception as e:
-        flash(f'Error al buscar reclamo: {str(e)}', 'error')
-        return redirect(url_for('seguimiento_reclamo'))
+    # except Exception as e:
+    #     flash(f'Error al buscar reclamo: {str(e)}', 'error')
+    #     return redirect(url_for('seguimiento_reclamo'))
 
 @app.route("/seguimiento_reclamo/<int:reclamo_id>")
 def seguimiento_reclamo_directo(reclamo_id):
@@ -6193,6 +6368,105 @@ def descargar_guia_remision(tracking):
     return send_file(path, as_attachment=True)
 
 
+
+
+############CONSULTA_RENIEC###########
+# @app.route('/api/consulta_documento', methods=['POST'])
+# def consulta_documento():
+#     from flask import request, jsonify
+#     import requests
+
+#     data = request.get_json()
+#     numero = data.get('numero')
+#     tipo = data.get('tipo')
+
+#     token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InBlcmV6ZGowOTA0QGdtYWlsLmNvbSJ9.8rz9gE8oTMuGHoGvePcZA50zZjUDMph_jVX3PK8npWc' 
+
+#     if tipo == 'DNI' and len(numero) == 8:
+#         url = f'https://dniruc.apisperu.com/api/v1/dni/{numero}?token={token}'
+#     elif tipo == 'RUC' and len(numero) == 11:
+#         url = f'https://dniruc.apisperu.com/api/v1/ruc/{numero}?token={token}'
+#     else:
+#         return jsonify({'success': False, 'message': 'Tipo o número inválido'}), 400
+
+#     response = requests.get(url)
+#     if response.status_code == 200:
+#         return jsonify(response.json())
+#     else:
+#         return jsonify({'success': False, 'message': 'Error al consultar API externa'}), 500
+
+@app.route('/api/buscar_cliente', methods=['POST'])
+def buscar_cliente():
+    data = request.get_json()
+    print(f"data {data}")
+
+    if not data:
+        return jsonify({'success': False, 'message': 'No se recibieron datos JSON'}), 400
+
+    tipo = int(data.get('tipo', 0))
+    numero = data.get('numero', '').strip()
+
+    if not tipo or not numero:
+        return jsonify({'success': False, 'message': 'Datos incompletos'}), 400
+    tipo = int(data.get('tipo'))
+    numero = data.get('numero')
+
+    cliente = controlador_cliente.get_cliente_tipo_nro_documento(tipo, numero)
+    # print(f"Cliente: {cliente}")
+    if cliente:
+        return jsonify({
+            'fuente': 'local',
+            'nombre_siglas': cliente['nombre_siglas'],
+            'apellidos_razon': cliente['apellidos_razon']
+        })
+
+    token = 'apis-token-16482.c1UdnTdTw5SjRF5r0baBi9TW2dSDGWKc'
+    headers = {'Authorization': f'Bearer {token}'}
+    # numero = '002210601'
+    if tipo == 1 and len(numero) == 8:
+        url = f"https://api.apis.net.pe/v2/dni?numero={numero}"
+    elif tipo == 2 and len(numero) == 11:
+        url = f"https://api.apis.net.pe/v2/ruc?numero={numero}"
+    else:
+        return jsonify({'success': False, 'message': 'Documento inválido'}), 400
+
+    try:
+        r = requests.get(url, headers=headers)
+        # print(url)
+        if r.status_code != 200:
+            # print(f'Esta es la respuesta de la api: {r}')
+            return jsonify({'success': False, 'message': 'Error consultando API'}), 500
+
+        data_api = r.json()
+        # print(data_api)
+        if tipo == 1:
+            nombres = data_api.get('nombres')
+            apellido_paterno = data_api.get('apellidoPaterno')
+            apellido_materno = data_api.get('apellidoMaterno')
+            if not (nombres and apellido_paterno and apellido_materno):
+                return jsonify({'success': False, 'message': 'DNI no encontrado en RENIEC'}), 404
+
+            return jsonify({
+                'fuente': 'api',
+                'nombre_siglas': nombres,
+                'apellidos_razon': f"{apellido_paterno} {apellido_materno}"
+            })
+        
+        elif tipo == 2:
+            razon = data_api.get('nombre')  # nombre, no razonSocial
+            if not razon:
+                return jsonify({'success': False, 'message': 'RUC no encontrado'}), 404
+            return jsonify({
+                'fuente': 'api',
+                'nombre_siglas': razon,
+                'apellidos_razon': ''
+            })
+
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+######################################
 ##############################################3
 ##############################################
 
