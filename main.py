@@ -6384,8 +6384,6 @@ def descargar_guia_remision(tracking):
     return send_file(path, as_attachment=True)
 
 
-##############################################3
-##############################################
 
 if __name__ == "__main__":
     # app.run(host='192.168.48.178', port=8000, debug=True, use_reloader=True)
