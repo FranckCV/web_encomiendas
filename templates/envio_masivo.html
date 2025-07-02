@@ -544,10 +544,14 @@ Registro de Envíos Masivos
     if (numero.length === 8 && tipo === '1') {
       consultarDocumento(parseInt(tipo), numero, data => {
         document.getElementById("remitente-nombre").value = `${data.nombre_siglas} ${data.apellidos_razon}`.trim();
+        document.getElementById("remitente-nombre").dispatchEvent(new Event('input'));
+      
       });
     } else if (numero.length === 11 && tipo === '2') {
       consultarDocumento(parseInt(tipo), numero, data => {
         document.getElementById("remitente-nombre").value = `${data.nombre_siglas}`.trim();
+        document.getElementById("remitente-nombre").dispatchEvent(new Event('input'));
+
       });
     } else {
       console.log("Tipo Doc no soportado")

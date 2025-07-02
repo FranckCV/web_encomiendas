@@ -464,7 +464,6 @@ CONTROLADORES = {
         "crud_unactive": False
     }
 },
-
     "pregunta_frecuente": {
         "active": True,
         "titulo": "preguntas frecuentes",

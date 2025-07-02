@@ -2,7 +2,7 @@
 - Validaciones de campos de crud
 - Pasarela de pago en parte administrativa
 - En el registro de la encomienda, si recarga la página aunque no haya hecho nada, sale estás seguro de recargar? 
-- Campos con autocompletado, se toma como que nunca tocaste el campo y te pide "completa todos los campos"
+<!-- - Campos con autocompletado, se toma como que nunca tocaste el campo y te pide "completa todos los campos" -->
 <!-- - Por paquete: rótulo , boleta o factura , guía de remisión -->
 
 
