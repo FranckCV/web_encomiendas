@@ -43,7 +43,7 @@ def get_table():
             tr.sucursal_origen_id,
             tr.sucursal_destino_id,
             concat(so.abreviatura,' - ',uo.departamento,' / ',uo.provincia,' / ',uo.distrito) AS sucursal_origen,
-            concat(sd.abreviatura,'-',ud.departamento,' / ',ud.provincia,' / ',ud.distrito) AS sucursal_destino,
+            concat(sd.abreviatura,' - ',ud.departamento,' / ',ud.provincia,' / ',ud.distrito) AS sucursal_destino,
             tr.tarifa
         FROM 
             tarifa_ruta tr
@@ -54,9 +54,9 @@ def get_table():
     '''
 
     columnas = {
-        'sucursal_origen': ['Sucursal Origen', 2],
-        'sucursal_destino': ['Sucursal Destino', 2],
-        'tarifa': ['Tarifa (S/)', 1.5]
+        'sucursal_origen': ['Sucursal Origen', 4],
+        'sucursal_destino': ['Sucursal Destino', 4],
+        'tarifa': ['Tarifa (S/.)', 2] 
     }
 
     filas = sql_select_fetchall(sql)

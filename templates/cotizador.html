@@ -91,13 +91,13 @@ Cotizador de Tarifas de Envío
                 <div class="form-row">
                     <div class="form-col">
                         <div class="form-row">
-                            <div class="form-col">
+                            <!-- <div class="form-col">
                                 <label>¿LO RECOGEMOS?</label>
                                 <select id="pickup-option">
                                     <option value="0">Sin recojo</option>
                                     <option value="1">Con recojo</option>
                                 </select>
-                            </div>
+                            </div> -->
 
                             <div class="form-col">
                                 <label>¿CUÁNTO VALE?</label>
@@ -344,7 +344,8 @@ Cotizador de Tarifas de Envío
         let destino_id = destSuc.value;
 
         const weightUnit = document.getElementById('weight-unit').value;
-        let pickup = document.getElementById('pickup-option').value;
+       // let pickup = document.getElementById('pickup-option').value;
+        let pickup = 0;
         let valor_declarado = parseFloat(document.getElementById('valor_declarado').value);
         let weightValue = parseFloat(inputWeight.value) || 0;
         let weightInKg = weightUnit === 'g' ? parseFloat(weightValue / 1000) : parseFloat(weightValue);

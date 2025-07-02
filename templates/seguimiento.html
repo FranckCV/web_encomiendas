@@ -31,7 +31,7 @@ Seguimiento
         <div class="status-content">
           <div class="status-header">
             <div class="status-title">
-              {% if comprobantes and comprobantes|length > 0 %}
+              {% if datos.salidaid or (comprobantes and comprobantes|length > 0 ) %}
               <div class="documents">
                 <h3>Descargar documentos disponibles</h3>
 
@@ -42,6 +42,13 @@ Seguimiento
                         class="fa-solid fa-file-pdf"></i> {{ comp.tipo_comprobante|capitalize }}</a>
                   </li>
                   {% endfor %}
+                  {% if datos.salidaid is not none %}
+                  <li>
+                    <a href="{{ url_for('descargar_guia_remision', tracking=tracking) }}" target="_blank">
+                      <i class="fa-solid fa-truck"></i> Guía de Remisión Transportista
+                    </a>
+                  </li>
+                  {% endif %}
                   
 
                 </ul>
@@ -49,11 +56,7 @@ Seguimiento
               {% else %}
               <div class="documents">
                 <h5 class="text-muted">No hay documentos disponibles por ahora.</h5>
-                <li>
-                    <a href="{{ url_for('descargar_guia_remision', tracking=tracking) }}" target="_blank">
-                      <i class="fa-solid fa-truck"></i> Guía de Remisión Transportista
-                    </a>
-                  </li>
+          
               </div>
               {% endif %}
             </div>

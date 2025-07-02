@@ -138,7 +138,7 @@ def get_table():
           p.apellidos_razon_destinatario,
           p.num_documento_destinatario,
 
-          td.nombre AS tipo_documento,
+          td.siglas AS tipo_documento, 
           te.nombre AS tipo_empaque,
           cp.nombre AS contenido_paquete,
           tr.nombre AS tipo_recepcion,
@@ -172,12 +172,12 @@ def get_table():
         'nombres_contacto_destinatario': ['Nombre destinatario', 2],
         'apellidos_razon_destinatario': ['Apellido/Razón', 2],
         'num_documento_destinatario': ['Doc. Identidad', 1.2],
-        'tipo_documento': ['Tipo doc', 1],
+        'tipo_documento': ['Tipo Doc.', 1],
         'tipo_empaque': ['Empaque', 1],
         'contenido_paquete': ['Contenido', 1.5],
         'tipo_recepcion': ['Recepción', 1.3],
         'modalidad_pago': ['Pago modalidad', 1.3],
-        'direccion_destino': ['Dirección destino', 2.5],
+        # 'direccion_destino': ['Dirección destino', 2.5],
         'localidad': ['Ubigeo destino', 2],
         'num_serie': ['N° Serie', 1],
         'fecha': ['Fecha envío', 1],
@@ -208,7 +208,7 @@ def get_table_pk_foreign(pk_foreign):
           p.apellidos_razon_destinatario,
           p.num_documento_destinatario,
 
-          td.nombre AS tipo_documento,
+          td.siglas AS tipo_documento,
           te.nombre AS tipo_empaque,
           cp.nombre AS contenido_paquete,
           tr.nombre AS tipo_recepcion,
@@ -243,12 +243,12 @@ def get_table_pk_foreign(pk_foreign):
         'nombres_contacto_destinatario': ['Nombre destinatario', 2],
         'apellidos_razon_destinatario': ['Apellido/Razón', 2],
         'num_documento_destinatario': ['Doc. Identidad', 1.2],
-        'tipo_documento': ['Tipo doc', 1],
+        'tipo_documento': ['Tipo Doc.', 1],
         'tipo_empaque': ['Empaque', 1],
         'contenido_paquete': ['Contenido', 1.5],
         'tipo_recepcion': ['Recepción', 1.3],
         'modalidad_pago': ['Pago modalidad', 1.3],
-        'direccion_destino': ['Dirección destino', 2.5],
+        # 'direccion_destino': ['Dirección destino', 5],
         'localidad': ['Ubigeo destino', 2],
         'num_serie': ['N° Serie', 1],
         'fecha': ['Fecha envío', 1],
@@ -352,10 +352,11 @@ def obtener_datos_guia_remision(transaccion_id):
             emp.n_documento AS conductor_dni,
 
             -- Bienes
-            p.descripcion AS descripcion_item,
+            p.descripcion AS descripcion,
             te.unidad_medida AS unidad_medida,
             p.peso AS peso,
-            1 AS cantidad
+            1 AS cantidad,
+            conpa.nombre as contenido_paquete
 
         FROM transaccion_encomienda tec
         JOIN paquete p ON p.transaccion_encomienda_num_serie = tec.num_serie
@@ -367,8 +368,9 @@ def obtener_datos_guia_remision(transaccion_id):
         JOIN sucursal suc_destino ON suc_destino.id = sa.destino_final_id
         JOIN empresa e ON e.actual = 1
         JOIN tipo_empaque te ON te.id = p.tipo_empaqueid
+        JOIN contenido_paquete conpa ON p.contenido_paqueteid = conpa.id
         WHERE tec.num_serie = %s
-        LIMIT 1
+        LIMIT 1;
     """
     fila = sql_select_fetchone(sql, (transaccion_id,))
     if not fila:
@@ -394,7 +396,7 @@ def obtener_datos_guia_remision(transaccion_id):
             "dni_conductor": fila["conductor_dni"],
         },
         "bienes": [{
-            "descripcion": fila["descripcion_item"],
+            "descripcion": fila["descripcion"] if fila['descripcion'] != '' or fila['descripcion'] is None else fila['contenido_paquete'],
             "unidad": fila["unidad_medida"],
             "cantidad": fila["cantidad"],
             "peso": fila["peso"]

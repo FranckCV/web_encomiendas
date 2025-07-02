@@ -473,7 +473,7 @@ def consult_permiso_rol( paginaid, rolid):
 
 def nuevo_permiso_pagina_rol( paginaid , rolid):
     sql = f'''
-        INSERT INTO `permiso`(`paginaid`, `rolid`, `acceso`, `search`, `consult`, `insert`, `update`, `delete`, `unactive`) VALUES 
+        INSERT INTO `permiso`(`paginaid`, `rolid`, `acceso`, `search`, `consult`, `insert`, `update`, `delete`, `unactive` ) VALUES 
         ( %s , %s , 0 , 0 , 0 , 0 , 0 , 0 , 0 )
     '''
     bd.sql_execute(sql, (paginaid , rolid))
