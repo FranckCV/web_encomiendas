@@ -18,6 +18,38 @@ const tiposValidacion = {
         regex: /^[a-zA-Z0-9]+$/, // sin espacios
         mensaje: "Solo letras y números"
     },
+    alfanumerico_espacios: {
+        regex: /^[a-zA-Z0-9\s]+$/,
+        mensaje: "Solo letras, números y espacios"
+    },
+    alfanumerico_simbolos: {
+        regex: /^[a-zA-Z0-9\s.,\-_/()]+$/,
+        mensaje: "Solo letras, números y algunos símbolos (.,-_/())"
+    },
+    texto_avanzado: {
+        regex: /^[a-zA-Z0-9\s.,;:!¡¿?()@#&%$'"\-_/]+$/,
+        mensaje: "Texto con caracteres inválidos"
+    },
+    url: {
+        regex: /^(https?:\/\/)?([\w\-]+(\.[\w\-]+)+)(\/[\w\-.,@?^=%&:/~+#]*)?$/,
+        mensaje: "URL inválida"
+    },
+    placa_peru: {
+        regex: /^[A-Z]{3}\d{3}$/,
+        mensaje: "Placa inválida (formato ABC123)"
+    },
+    ip: {
+        regex: /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/,
+        mensaje: "IP inválida"
+    },
+    mayusculas: {
+        regex: /^[A-Z]+$/,
+        mensaje: "Solo letras mayúsculas"
+    },
+    minusculas: {
+        regex: /^[a-z]+$/,
+        mensaje: "Solo letras minúsculas"
+    },
     dni: {
         regex: /^\d{8}$/,
         mensaje: "DNI debe tener 8 dígitos"
@@ -41,12 +73,16 @@ const tiposValidacion = {
         mensaje: "Debe seleccionar una opción válida"
     },
     decimal2: {
-        regex: /^\d+(\.\d{1,2})?$/,
-        mensaje: "Máximo 2 decimales"
+        regex: /^(0|[1-9]\d*)(\.\d{1,2})?$/,
+        mensaje: "Solo números positivos con máximo 2 decimales"
     },
     decimal6: {
-        regex: /^\d+(\.\d{1,6})?$/,
-        mensaje: "Máximo 6 decimales"
+        regex: /^(0|[1-9]\d*)(\.\d{1,6})?$/,
+        mensaje: "Solo números positivos con máximo 6 decimales"
+    },
+    coordenada: {
+        regex: /^-?(0|[1-9]\d*)(\.\d{1,10})?$/,
+        mensaje: "Coordenada inválida (número con decimales, puede ser negativo)"
     },
     min8: {
         regex: /^.{8,}$/,
@@ -59,6 +95,11 @@ const tiposValidacion = {
         regex: /^\d{9,15}$/,  // entre 9 y 15 dígitos
         mensaje: "Teléfono inválido (mínimo 9 dígitos)"
     },
+    hexadecimal: {
+        regex: /^[0-9A-Fa-f]+$/,
+        mensaje: "Valor hexadecimal inválido"
+    },
+
 
 };
 

@@ -1,0 +1,251 @@
+
+🔹 tipo_documento (tipos de documentos)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+
+🔹 tipo_comprobante (tipos de comprobantes)
+
+['inicial', 'Inicial', 'Inicial', 'text', True, True, None]
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+['descripcion', 'Descripción', 'descripcion', 'textarea', False, True, None]
+
+🔹 tipo_indemnizacion (tipos de indemnización)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+
+🔹 estado_reclamo (estados de reclamos)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+
+🔹 reclamo (Reclamos)
+
+['nombres_razon', 'Cliente', 'Cliente', 'text', True, True, None]
+['direccion', 'Dirección', 'Dirección', 'text', True, True, None]
+['correo', 'Correo', 'Correo', 'email', True, True, None]
+['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None]
+['n_documento', 'N° Documento', '', 'text', True, True, None]
+['bien_contratado', 'Bien Contratado', '', 'select', True, True, [<function <lambda> at 0x00000281A99916C0>, '']]
+['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None]
+['monto_indemnizado', 'Monto Indemnizado', '0.00', 'number', True, True, None]
+['relacion', 'Relación con el bien', '', 'text', True, True, None]
+['fecha_recepcion', 'Fecha de recepción', '', 'date', True, True, None]
+['descripcion', 'Descripción', '', 'textarea', True, True, None]
+['detalles', 'Detalles adicionales', '', 'textarea', True, True, None]
+['pedido', 'Pedido', '', 'text', True, True, None]
+['foto', 'Foto del reclamo', '', 'img', False, True, None]
+['sucursal_id', 'Sucursal', '', 'select', True, True, [<function <lambda> at 0x00000281A9991760>, 'direccion']]
+['causa_reclamoid', 'Causa del Reclamo', '', 'select', True, True, [<function <lambda> at 0x00000281A9991800>, 'nombre']]
+['tipo_indemnizacionid', 'Tipo de Indemnización', '', 'select', True, True, [<function <lambda> at 0x00000281A99918A0>, 'nombre']]
+['paquetetracking', 'Tracking', '', 'text', True, True, None]
+['ubigeocodigo', 'Ubigeo', '', 'select', True, True, [<function <lambda> at 0x00000281A9991940>, 'codigo']]
+['tipo_documentoid', 'Tipo Documento', '', 'select', True, True, [<function <lambda> at 0x00000281A99919E0>, 'nombre']]
+
+🔹 pregunta_frecuente (preguntas frecuentes)
+
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+['titulo', 'Título', 'Título', 'textarea', True, True, None]
+['descripcion', 'Descripción', 'Descripción', 'textarea', True, True, None]
+
+🔹 tamanio_caja (tamaños de cajas)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+
+🔹 contenido_paquete (contenido de paquetes)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+
+🔹 articulo (articulos para encomiendas)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['precio', 'Precio', 'Precio', 'number', True, True, None]
+['stock', 'Stock', 'Stock', 'number', True, True, None]
+['dimensiones', 'Dimensiones', 'Dimensiones', 'text', False, True, None]
+['tamaño_cajaid', 'Tamaño de Caja', 'Tamaño de Caja', 'select', False, True, [<function <lambda> at 0x00000281A9991A80>, 'tam_nombre']]
+['img', 'Imagen', 'Imagen', 'img', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+
+🔹 estado_encomienda (estados de encomiendas)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+['descripcion', 'Descripción', 'descripcion', 'textarea', False, True, None]
+
+🔹 tipo_rol (tipos de roles)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+['descripcion', 'Descripción', 'descripcion', 'textarea', False, True, None]
+
+🔹 motivo_reclamo (Motivo de reclamo)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['descripcion', 'Descripción', 'descripcion', 'textarea', False, True, None]
+['tipo_reclamoid', 'Nombre de tipo de reclamo', 'Elegir tipo de reclamo', 'select', True, True, [<function <lambda> at 0x00000281A9991BC0>, 'nom_tip']]
+
+🔹 causa_reclamo (Causa de reclamo)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['motivo_reclamoid', 'Nombre de motivo de reclamo', 'Elegir motivo de reclamo', 'select', True, True, [<function <lambda> at 0x00000281A9991D00>, 'nom_motivo']]
+['descripcion', 'Descripción', 'descripcion', 'textarea', False, True, None]
+
+🔹 tarifa_ruta (Tarifas de rutas)
+['tarifa', 'Tarifa', 'Tarifa', 'decimal_2', True, True, None]
+['sucursal_origen_id', 'Sucursal de origen', 'Sucursal de origen', 'select', True, True, [<function <lambda> at 0x00000281A9991DA0>, 'sucursal_origen']]
+['sucursal_destino_id', 'Sucursal de destino', 'Sucursal de destino', 'select', True, True, [<function <lambda> at 0x00000281A9991E40>, 'sucursal_destino']]
+
+🔹 sucursal (Sucursal)
+['id', 'ID', 'ID', 'text', True, False, True]
+['activo', 'Actividad', 'activo', 'p', True, False, None]
+['codigo_postal', 'Código Postal', 'Código Postal', 'text', True, True, 'map']
+['abreviatura', 'Abreviatura', 'Abreviatura', 'text', True, True, None]
+['ubigeocodigo', 'Ubigeo', 'Elegir ubigeo', 'select', True, True, [<function <lambda> at 0x00000281A9991EE0>, 'ubigeo']]
+['direccion', 'Dirección', 'Dirección', 'text', True, True, 'map']
+['teléfono', 'Teléfono', 'Teléfono', 'text', False, True, None]
+['horario_l_v', 'Horario L-V', 'Ej: 9am - 6pm', 'text', False, True, None]
+['latitud', 'Latitud', 'Latitud', 'decimal_6', False, True, 'map']
+['horario_s_d', 'Horario S-D', 'Ej: 9am - 1pm', 'text', False, True, None]
+['referencia', 'Referencia', 'Referencia', 'text', False, True, None]
+['longitud', 'Longitud', 'Longitud', 'decimal_6', False, True, 'map']
+
+🔹 tipo_reclamo (tipos de reclamos)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+['descripcion', 'Descripción', 'descripcion', 'textarea', False, True, None]
+
+🔹 metodo_pago (métodos de pago)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+
+🔹 empleado (empleados)
+['usuarioid', 'ID', 'ID', 'text', False, False, True]
+['nombre', 'Nombre', 'Nombre', 'text', True, True, True]
+['apellidos', 'Apellidos', 'Apellidos', 'text', True, True, True]
+['correo', 'Correo electrónico', 'Correo', 'email', True, True, True]
+['rolid', 'Rol', 'Seleccionar rol', 'select', True, True, [<function <lambda> at 0x00000281A9991F80>, 'nombre']]
+
+🔹 seguimiento_reclamos (gestión de reclamos)
+
+🔹 tipo_cliente (tipos de clientes)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+
+🔹 usuario (Usuarios)
+
+['correo', 'Correo electronico', 'Correo', 'text', True, True, None]
+['contrasenia', 'Contraseña', 'Contraseña', 'password', True, True, None]
+['tipo_usuario', 'Tipo de usuario', 'Tipo de usuario', 'select', True, True, [<function <lambda> at 0x00000281A9992020>, '                                                       ']]    
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+
+🔹 cliente (clientes)
+
+['nombre_siglas', 'Nombre o Siglas', 'Nombre', 'text', True, True, True]
+['apellidos_razon', 'Apellidos/Razón Social', 'Apellidos o razón', 'text', True, True, True]
+['correo', 'Correo', 'Correo electrónico', 'email', True, True, True]
+['telefono', 'Teléfono', 'Teléfono', 'text', False, True, True]
+['num_documento', 'N° Documento', 'Número doc.', 'text', True, True, True]
+['tipo_documentoid', 'Tipo de Documento', 'Seleccionar', 'select', True, True, [<function <lambda> at 0x00000281A9992200>, 'siglas']]
+['tipo_clienteid', 'Tipo de Cliente', 'Seleccionar', 'select', True, True, [<function <lambda> at 0x00000281A99922A0>, 'nombre']]
+
+🔹 rol (roles)
+
+['nombre', 'Nombre del Rol', 'Rol', 'text', True, True, True]
+['descripcion', 'Descripción', 'Descripción del rol', 'textarea', False, True, None]
+['activo', 'Actividad', 'activo', 'p', True, True, None]
+['tipo_rolid', 'Tipo de Rol', 'Seleccionar', 'select', True, True, [<function <lambda> at 0x00000281A99923E0>, 'nombre']]
+
+🔹 tipo_unidad (tipos de unidades)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+['descripcion', 'Descripción', 'descripcion', 'textarea', False, True, None]
+
+🔹 marca (marcas de unidades)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+
+🔹 modelo (modelos de unidades)
+['id', 'ID', 'ID', 'text', False, False, None]
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+['marcaid', 'Marca', 'Marca', 'select', True, None, [<function <lambda> at 0x00000281A9992480>, 'nom_mar']]
+['tipo_unidadid', 'Tipo de Unidad', 'Tipo de Unidad', 'select', True, None, [<function <lambda> at 0x00000281A9992520>, 'nom_tip']]
+
+🔹 unidad (unidades)
+
+['modeloid', 'Nombre de Modelo', 'Elegir modelo', 'select', True, True, [<function <lambda> at 0x00000281A9992660>, 'nom_modelo']]
+['estado', 'Estado', 'Elegir estado', 'select', True, True, [<function <lambda> at 0x00000281A9992700>, 'estado']]
+['placa', 'Placa', 'Placa', 'text', True, True, True]
+['mtc', 'MTC', 'MTC', 'text', True, True, True]
+['tuc', 'TUC', 'TUC', 'text', True, True, True]
+['capacidad', 'Capacidad', 'Capacidad', 'number', True, True, True]
+['volumen', 'Volumen', 'Volumen', 'number', True, True, None]
+['descripcion', 'Descripción', 'Descripción', 'textarea', False, True, None]
+
+🔹 tipo_empaque (tipos de empaques para paquetes)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+['peso_maximo', 'Peso Máximo', 'Peso Máximo', 'number', True, True, None]
+['unidad_medida', 'Unidad de Medida', 'Unidad de Medida', 'text', True, True, None]
+
+🔹 tipo_recepcion (tipos de recepción de paquetes)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+
+🔹 detalle_reclamo (detalles de estados de reclamo)
+
+['nombre', 'Nombre del Rol', 'Rol', 'text', True, True, True]
+['descripcion', 'Descripción', 'Descripción del rol', 'textarea', False, True, None]
+['activo', 'Actividad', 'activo', 'p', True, True, None]
+['estado_reclamoid', 'Estado de reclamo', 'Seleccionar', 'select', True, True, [<function <lambda> at 0x00000281A99927A0>, 'est_nom']]
+
+🔹 modalidad_pago (modalidades de pago)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+['descripcion', 'Descripción', 'descripcion', 'textarea', False, True, None]
+
+🔹 regla_cargo (reglas de cargo)
+
+['tipo_condicion', 'Tipo de condición', 'Tipo de condición', 'text', True, True, None]
+['inferior', 'Inferior', 'Activo', 'p', True, False, None]
+['superior', 'Superior', 'Superior', 'textarea', False, True, None]
+['porcentaje', 'Porcentaje', 'Porcentaje', 'textarea', False, True, None]
+
+🔹 descuento (Descuentos)
+
+['nombre', 'Nombre', 'Nombre', 'text', True, True, None]
+['descripcion', 'Descripcion', 'Descripcion', 'text', True, True, None]
+['fecha_inicio', 'Fecha de inicio', 'Fecha de inicio', 'date', True, True, None]
+['fecha_fin', 'Fecha de fin', 'Fecha de fin', 'date', True, True, None]
+['activo', 'Actividad', 'Activo', 'p', True, False, None]
+
+🔹 descuento_articulo (Descuentos de artículos)
+['descuentoid', 'Descuento', 'Seleccione un descuento', 'select', True, False, [<function <lambda> at 0x00000281A9992980>, 'nom_descuento']]
+['articuloid', 'Articulo', 'Seleccione un articulo', 'select', True, False, [<function <lambda> at 0x00000281A9992A20>, 'nom_articulo']]
+['cantidad_descuento', 'Cantidad descontada', '30%', 'number', True, True, None]
+
+🔹 modulo (Sin título)
+['nombre', 'Nombre del módulo', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Color', 'p', True, True, None]
+['icono', 'Icono', 'Icono', 'icon', True, True, None]
+['color', 'Color', 'color', 'color', True, True, None]
+['img', 'Imagen', 'Imagen', 'img', True, True, None]
+
+🔹 pagina (Sin título)
+['nombre', 'Nombre del módulo', 'Nombre', 'text', True, True, None]
+['activo', 'Actividad', 'Color', 'p', True, True, None]
+['icono', 'Icono', 'Icono', 'icon', True, True, None]
+['color', 'Color', 'color', 'color', True, True, None]
+['img', 'Imagen', 'Imagen', 'img', True, True, None]
