@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 26-06-2025 a las 13:36:10
+-- Tiempo de generación: 02-07-2025 a las 09:49:06
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.1.17
 
@@ -12,7 +12,7 @@ START TRANSACTION;
 SET time_zone = "+00:00";
 
 --
--- Base de datos: `bd_encomiendas2`
+-- Base de datos: `bd_encomiendas`
 --
 
 -- --------------------------------------------------------
@@ -488,7 +488,7 @@ CREATE TABLE `empresa` (
   `id_sucursal` int(11) NOT NULL,
   `igv` decimal(9,2) NOT NULL,
   `actual` tinyint(1) NOT NULL DEFAULT 1,
-  `fecha` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `fecha` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -496,7 +496,7 @@ CREATE TABLE `empresa` (
 --
 
 INSERT INTO `empresa` (`id`, `nombre`, `correo`, `nro_telefono`, `logo`, `color_pri`, `color_sec`, `color_ter`, `porcentaje_recojo`, `ruc`, `id_sucursal`, `igv`, `actual`, `fecha`) VALUES
-(1, 'New Olva', 'info@newolva.com', '+123 456 789', 'logo.png', '#1d4c82', '#13e2da', '#1b98e0', 5.00, '20512528458', 54, 18.00, 1, '2025-06-26');
+(4, 'New Olva', 'info@newolva.com', '+51 838 283 437', 'logo.png', '#1d4c82', '#13e2da', '#1b98e0', 5.00, '20512528458', 54, 18.00, 1, '2025-07-01 13:03:23');
 
 -- --------------------------------------------------------
 
@@ -716,18 +716,18 @@ CREATE TABLE `modelo` (
 --
 
 INSERT INTO `modelo` (`id`, `nombre`, `activo`, `marcaid`, `tipo_unidadid`) VALUES
-(1, 'FH16', 0, 1, 1),
-(2, 'Daily', 0, 2, 2),
-(3, 'R-Series', 0, 3, 1),
-(4, 'Actros', 0, 4, 1),
-(5, 'XF', 0, 5, 1),
-(6, 'Premium Lander', 0, 6, 1),
-(7, '500 Series', 0, 7, 4),
-(8, 'Fighter', 0, 8, 1),
-(9, 'N-Series', 0, 9, 2),
-(10, 'HD65', 0, 10, 5),
-(11, 'ProStar', 0, 11, 1),
-(12, 'T680', 0, 12, 3);
+(1, 'FH16', 1, 1, 1),
+(2, 'Daily', 1, 2, 2),
+(3, 'R-Series', 1, 3, 1),
+(4, 'Actros', 1, 4, 1),
+(5, 'XF', 1, 5, 1),
+(6, 'Premium Lander', 1, 6, 1),
+(7, '500 Series', 1, 7, 4),
+(8, 'Fighter', 1, 8, 1),
+(9, 'N-Series', 1, 9, 2),
+(10, 'HD65', 1, 10, 5),
+(11, 'ProStar', 1, 11, 1),
+(12, 'T680', 1, 12, 3);
 
 -- --------------------------------------------------------
 
@@ -826,8 +826,8 @@ INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `mostrar`, `padr
 (19, 'articulos para encomiendas', 'fa-solid fa-box-open', 1, 'articulo', 1, NULL, 1, 5),
 (20, 'estados de encomiendas', 'fa-solid fa-boxes-packing', 1, 'estado_encomienda', 1, NULL, 1, 3),
 (21, 'tipos de roles', 'ri-file-user-fill', 1, 'tipo_rol', 1, NULL, 1, 7),
-(22, 'Motivos de reclamo', '', 1, 'motivo_reclamo', 1, NULL, 1, 4),
-(23, 'Causas de reclamo', '', 1, 'causa_reclamo', 1, NULL, 1, 4),
+(22, 'Motivos de reclamo', 'fa-solid fa-file-circle-exclamation', 1, 'motivo_reclamo', 1, NULL, 1, 4),
+(23, 'Causas de reclamo', 'fa-solid fa-triangle-exclamation', 1, 'causa_reclamo', 1, NULL, 1, 4),
 (24, 'Tarifas de ruta', 'fa-solid fa-dollar', 1, 'tarifa_ruta', 1, NULL, 1, 1),
 (25, 'Sucursales', 'ri-store-3-line', 1, 'sucursal', 1, NULL, 1, 1),
 (26, 'tipos de reclamos', 'fa-solid fa-book-open-reader', 1, 'tipo_reclamo', 1, NULL, 1, 4),
@@ -837,7 +837,7 @@ INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `mostrar`, `padr
 (31, 'Preguntas frecuentes', 'fa-solid fa-circle-question', 1, 'pregunta_frecuente', 1, NULL, 1, 4),
 (32, 'Listado de paquetes por estado actual y fecha', 'fa-solid fa-boxes', 1, 'paquete_estado_fecha', 1, NULL, 4, 3),
 (33, 'Salidas', 'fa-solid fa-van-shuttle', 1, 'salida', 1, NULL, 3, 2),
-(34, 'Programación de encomiendas', 'fa-solid fa-boxes-packing', 1, 'transaccion_encomienda', 1, NULL, 3, 3),
+(34, 'Encomiendas', 'fa-solid fa-boxes-packing', 1, 'transaccion_encomienda', 1, NULL, 3, 3),
 (35, 'Programar nueva salida', 'fas fa-shipping-fast', 1, 'salida_informacion', 1, NULL, 2, 2),
 (36, 'Reporte de horarios de sucursales', 'fa-solid fa-clock', 1, 'horarios_sucursal', 1, NULL, 4, 1),
 (37, 'Reporte de ingresos por periodo', 'fa-solid fa-coins', 1, 'ingresos_periodo', 1, NULL, 4, 1),
@@ -856,10 +856,12 @@ INSERT INTO `pagina` (`id`, `titulo`, `icono`, `activo`, `key`, `mostrar`, `padr
 (51, 'Reporte de reclamos segun tipo , causa y periodo', 'fa-solid fa-clipboard-list', 1, 'reporte_reclamos_tipo_causa_periodo', 1, NULL, 4, 4),
 (52, 'Reporte de viajes realizados por unidad', 'fa-solid fa-truck-fast', 1, 'viajes_por_unidad', 1, NULL, 4, 2),
 (53, 'Listado de encomiendas por tipo empaque', 'fa-solid fa-boxes-packing', 1, 'encomiendas_listar', 1, NULL, 4, 3),
-(54, 'Seguimiento de paquete', NULL, 1, 'seguimiento', 0, NULL, 3, 3),
+(54, 'Seguimiento de paquete', 'fa-solid fa-map-location-dot', 1, 'seguimiento', 0, NULL, 3, 3),
 (55, 'Permisos de acceso', 'ri-file-lock-fill', 1, 'permiso_rol', 0, NULL, 2, 6),
 (56, 'Procesar Pago de Paquete', 'fas fa-credit-card', 1, 'pagar_paquete', 0, NULL, 2, 3),
-(57, 'Responder reclamos', 'fa-solid fa-headset', 1, 'vista_responder_reclamos', 1, NULL, 2, 4);
+(57, 'Responder reclamos', 'fa-solid fa-headset', 1, 'vista_responder_reclamos', 1, NULL, 2, 4),
+(58, 'modalidades de pago', 'fa-solid fa-truck-plane', 1, 'modalidad_pago', 1, NULL, 1, 1),
+(59, 'reglas de cargo', 'fa-solid fa-dollar', 1, 'regla_cargo', 1, NULL, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -928,7 +930,7 @@ CREATE TABLE `paquete_descuento` (
 
 CREATE TABLE `permiso` (
   `paginaid` int(11) NOT NULL,
-  `rolid`    int(11) NOT NULL,
+  `rolid` int(11) NOT NULL,
   `acceso` tinyint(1) NOT NULL,
   `search` tinyint(1) NOT NULL,
   `consult` tinyint(1) NOT NULL,
@@ -936,7 +938,7 @@ CREATE TABLE `permiso` (
   `update` tinyint(1) NOT NULL,
   `delete` tinyint(1) NOT NULL,
   `unactive` tinyint(1) NOT NULL,
-  `otro` text NULL
+  `otro` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1119,7 +1121,7 @@ INSERT INTO `permiso` (`paginaid`, `rolid`, `acceso`, `search`, `consult`, `inse
 (48, 2, 1, 1, 1, 1, 1, 1, 1, '{}'),
 (48, 10, 1, 1, 0, 1, 0, 0, 1, '{}'),
 (48, 11, 1, 1, 1, 0, 0, 0, 0, '{}'),
-(49, 1, 1, 1, 1, 1, 1, 1, 1, '{\"qr_code\": 1, \"seguimiento\": 1, \"encomiendas\": 1, \"pago\": 1}'),
+(49, 1, 1, 1, 1, 1, 1, 1, 1, '{\"qr_code\": 1, \"seguimiento\": 1, \"encomiendas\": 1, \"pago\": 1, \"guia_remision\": 1, \"rotulo\": 1}'),
 (49, 6, 1, 1, 1, 1, 1, 0, 0, '{\"encomiendas\": 1, \"seguimiento\": 1, \"qr_code\": 1, \"pago\": 1}'),
 (49, 7, 1, 1, 1, 1, 1, 1, 0, '{\"encomiendas\": 1, \"seguimiento\": 1, \"qr_code\": 1, \"pago\": 1}'),
 (49, 8, 1, 1, 1, 1, 1, 1, 0, '{\"seguimiento\": 1, \"encomiendas\": 1, \"qr_code\": 1, \"pago\": 1}'),
@@ -1158,7 +1160,9 @@ INSERT INTO `permiso` (`paginaid`, `rolid`, `acceso`, `search`, `consult`, `inse
 (56, 11, 1, 1, 1, 1, 0, 0, 0, '{}'),
 (57, 1, 1, 0, 0, 0, 0, 0, 0, '{}'),
 (57, 5, 1, 1, 1, 1, 1, 1, 1, '{}'),
-(57, 9, 1, 1, 1, 0, 0, 0, 0, '{}');
+(57, 9, 1, 1, 1, 0, 0, 0, 0, '{}'),
+(58, 1, 1, 1, 1, 1, 1, 1, 1, NULL),
+(59, 1, 1, 1, 1, 1, 1, 1, 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -1227,7 +1231,8 @@ INSERT INTO `reclamo` (`id`, `nombres_razon`, `direccion`, `correo`, `telefono`,
 (7, 'Miguel Rojas', 'Av. Arequipa 987', 'miguel.rojas@mail.com', '967890123', '55667788', 70.00, 'P', 120.00, 'E', '2024-06-16', 3, 'Rotura de contenido', 'Vidrio quebrado', 'Cambio inmediato', NULL, 1, 2, 162, '140107', 1),
 (8, 'Patricia Salinas', 'Jr. Sucre 111', 'patricia.salinas@mail.com', '978901234', '66778899', NULL, 'S', 25.00, 'R', '2024-06-17', 2, 'Maltrato al cliente', 'Empleado grosero', 'Disculpa formal', NULL, 2, NULL, 167, '140108', 1),
 (9, 'Ricardo Lozano', 'Calle San Martín 222', 'ricardo.lozano@mail.com', '989012345', '77889900', 20.00, 'P', 50.00, 'E', '2024-06-18', 1, 'Error en la dirección', 'Se envió al lugar equivocado', 'Reenvío gratuito', NULL, 3, 3, 162, '140109', 1),
-(10, 'Daniela Chávez', 'Av. Colonial 333', 'daniela.chavez@mail.com', '990123456', '88990011', 15.00, 'S', 40.00, 'R', '2024-06-19', 2, 'Atención lenta', 'Tuve que esperar 2 horas', 'Compensación por espera', NULL, 1, 1, 161, '140110', 1);
+(10, 'Daniela Chávez', 'Av. Colonial 333', 'daniela.chavez@mail.com', '990123456', '88990011', 15.00, 'S', 40.00, 'R', '2024-06-19', 2, 'Atención lenta', 'Tuve que esperar 2 horas', 'Compensación por espera', NULL, 1, 1, 161, '140110', 1),
+(11, 'Franco', 'su casa', 'fran@gmail.com', '973822344', '74531255', 112.00, 'S', 82.00, 'N', '2025-07-02', 1, 'Mi paquete lo trajo un venezolano', 'No tenia pasaporte', 'Exigjo mi dinero', 'tarata_fisico.png', 3, 2, 166, '10202', 3);
 
 -- --------------------------------------------------------
 
@@ -1341,7 +1346,8 @@ CREATE TABLE `seguimiento_reclamo` (
   `reclamoid` int(10) NOT NULL,
   `detalle_reclamoid` int(10) NOT NULL,
   `fecha` date NOT NULL,
-  `hora` time NOT NULL
+  `hora` time NOT NULL,
+  `comentario` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1426,7 +1432,7 @@ INSERT INTO `sucursal` (`id`, `abreviatura`, `codigo_postal`, `direccion`, `hora
 (54, 'CHI01', '14001', 'Mariscal Castilla, Urbanizacion Santa Victoria, Chiclayo, Lambayeque, 14001, Perú', '8am a 7pm', '9am a 7pm', -6.774925, -79.836803, NULL, NULL, 1, '130101'),
 (55, 'CHI02', '14008', 'Avenida Grau, Residencial Santa Fe del Valle, Picsi, Chiclayo, Lambayeque, Perú', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', -6.717460, -79.771240, NULL, NULL, 1, '130101'),
 (56, 'CHI03', '14013', 'Avenida Tacna, José Leonardo Ortiz, Chiclayo, Lambayeque, 14013, Perú', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', -6.774244, -79.846156, NULL, NULL, 1, '130101'),
-(57, 'CHI04',  '1400', '549, Calle José Balta, Área residencial Pimentel Centro, Pimentel, Chiclayo, Lambayeque, Perú', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', -6.838447, -79.934983, NULL, NULL, 1, '130110'),
+(57, 'CHI04', '1400', '549, Calle José Balta, Área residencial Pimentel Centro, Pimentel, Chiclayo, Lambayeque, Perú', '9am a 1pm y de 2pm a 6pm', '9am a 1pm', -6.838447, -79.934983, NULL, NULL, 1, '130110'),
 (58, 'LAM01', '14013', 'Avenida Huamachuco, Lambayeque, Perú', '9am a 2pm y de 3pm a 6pm', '9am a 1pm', -6.708217, -79.903525, NULL, NULL, 1, '130301'),
 (59, 'TRU01', '13011', 'Av. Tupac Amaru 1675 Urb Alto Mochica, Trujillo', '9am a 1pm y 1:45pm a 6pm', '9am a 1pm', NULL, NULL, NULL, NULL, 1, '120105'),
 (60, 'TRU02', '13008', 'Av. Santa 1260, Trujillo Ref. A media cuadra del cruce con Av. América', '8am a 6pm', '9am a 1pm', NULL, NULL, NULL, NULL, 1, '120105'),
@@ -1583,7 +1589,7 @@ INSERT INTO `tipo_comprobante` (`id`, `inicial`, `nombre`, `descripcion`, `activ
 (2, 'BV', 'Boleta', 'Boleta de Venta', 1, 'V'),
 (3, 'GR', 'Guia de remision', 'Guía de Remisión', 1, 'T'),
 (4, 'NC', 'Nota de crédito', 'Nota de Crédito', 1, 'R'),
-(5, 'ND', 'D', 'Nota de Débito', 1, 'R');
+(5, 'ND', 'Nota de Débito', 'Nota de Débito', 1, 'R');
 
 -- --------------------------------------------------------
 
@@ -1763,7 +1769,7 @@ CREATE TABLE `tipo_unidad` (
 
 INSERT INTO `tipo_unidad` (`id`, `nombre`, `descripcion`, `activo`) VALUES
 (1, 'Camión', 'Vehículo de carga pesada', 1),
-(2, 'Furgoneta', 'Vehículo de carga medianaa', 0),
+(2, 'Furgoneta', 'Vehículo de carga medianaa', 1),
 (3, 'Tráiler', 'Vehículo articulado para gran volumen de carga', 1),
 (4, 'Bus', 'Vehículo de transporte de pasajeros', 1),
 (5, 'Camioneta', 'Vehículo mixto de carga y pasajeros', 1);
@@ -3786,18 +3792,18 @@ CREATE TABLE `unidad` (
 --
 
 INSERT INTO `unidad` (`id`, `placa`, `MTC`, `TUC`, `capacidad`, `volumen`, `descripcion`, `estado`, `fecha_compra`, `modeloid`) VALUES
-(1, 'ABC1234', '1519036CN', '15M25016315E', 10.50, 20.00, 'Unidad para carga pesada', 'A', NULL, 1),
-(2, 'XYZ5678', '1519037DN', '15M25016316F', 12.00, 25.00, 'Camión de reparto urbano', 'A', NULL, 2),
-(3, 'JKL1234', '1519038EN', '15M25016317G', 15.00, 30.00, 'Unidad de carga mediana', 'A', NULL, 3),
-(4, 'QRS2345', '1519039FN', '15M25016318H', 20.00, 35.00, 'Camión de carga pesada', 'A', NULL, 4),
-(5, 'TUV3456', '1519040GN', '15M25016319I', 18.00, 40.00, 'Camión para transporte internacional', 'A', NULL, 5),
-(6, 'WXY4567', '1519041HN', '15M25016320J', 25.00, 45.00, 'Unidad para transporte de carga', 'A', NULL, 6),
-(7, 'LMN5678', '1519042IN', '15M25016321K', 12.50, 28.00, 'Unidad para transporte pesado', 'A', NULL, 7),
-(8, 'PQR6789', '1519043JN', '15M25016322L', 14.00, 30.50, 'Camión para carga ligera', 'A', NULL, 8),
-(9, 'STU7890', '1519044KN', '15M25016323M', 11.00, 23.00, 'Unidad para transporte urbano', 'A', NULL, 9),
-(10, 'VWX8901', '1519045LN', '15M25016324N', 16.50, 34.00, 'Unidad de carga mediana', 'A', NULL, 10),
-(11, 'YZA9012', '1519046MN', '15M25016325O', 22.00, 50.00, 'Unidad para transporte pesado', 'A', NULL, 11),
-(12, 'BCD0123', '1519047NN', '15M25016326P', 19.00, 40.00, 'Camión para largo alcance', 'A', NULL, 12);
+(1, 'ABC1234', '1519036CN', '15M25016315E', 10.50, 20.00, 'Unidad para carga pesada', 'D', NULL, 1),
+(2, 'XYZ5678', '1519037DN', '15M25016316F', 12.00, 25.00, 'Camión de reparto urbano', 'D', NULL, 2),
+(3, 'JKL1234', '1519038EN', '15M25016317G', 15.00, 30.00, 'Unidad de carga mediana', 'D', NULL, 3),
+(4, 'QRS2345', '1519039FN', '15M25016318H', 20.00, 35.00, 'Camión de carga pesada', 'D', NULL, 4),
+(5, 'TUV3456', '1519040GN', '15M25016319I', 18.00, 40.00, 'Camión para transporte internacional', 'D', NULL, 5),
+(6, 'WXY4567', '1519041HN', '15M25016320J', 25.00, 45.00, 'Unidad para transporte de carga', 'D', NULL, 6),
+(7, 'LMN5678', '1519042IN', '15M25016321K', 12.50, 28.00, 'Unidad para transporte pesado', 'D', NULL, 7),
+(8, 'PQR6789', '1519043JN', '15M25016322L', 14.00, 30.50, 'Camión para carga ligera', 'D', NULL, 8),
+(9, 'STU7890', '1519044KN', '15M25016323M', 11.00, 23.00, 'Unidad para transporte urbano', 'D', NULL, 9),
+(10, 'VWX8901', '1519045LN', '15M25016324N', 16.50, 34.00, 'Unidad de carga mediana', 'D', NULL, 10),
+(11, 'YZA9012', '1519046MN', '15M25016325O', 22.00, 50.00, 'Unidad para transporte pesado', 'D', NULL, 11),
+(12, 'BCD0123', '1519047NN', '15M25016326P', 19.00, 40.00, 'Camión para largo alcance', 'D', NULL, 12);
 
 -- --------------------------------------------------------
 
@@ -3830,7 +3836,33 @@ INSERT INTO `usuario` (`id`, `correo`, `contrasenia`, `tipo_usuario`, `activo`) 
 (10, 'luis.castillo@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
 (11, 'maria.lopez@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
 (12, 'javier.gomez@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
-(13, 'sofia.fernandez@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1);
+(13, 'sofia.fernandez@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(14, 'fiorella.salas@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(15, 'valeria.reyes@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(16, 'andres.cruz@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(17, 'lucero.medina@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(18, 'pablo.vargas@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(19, 'esteban.guerrero@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(20, 'nathaly.silva@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(21, 'oscar.huaman@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(22, 'brenda.campos@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(23, 'ismael.palacios@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(24, 'juliana.ortega@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(25, 'ricardo.delgado@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(26, 'milagros.leon@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(27, 'sebastian.calle@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(28, 'adriana.garcia@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(29, 'mario.vasquez@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(30, 'diana.rosales@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(31, 'alberto.reyna@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(32, 'valentina.perez@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(33, 'rosa.nunez@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(34, 'enrique.salazar@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(35, 'jimena.flores@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(36, 'diego.zamora@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(37, 'renzo.morales@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(38, 'karen.vera@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(39, 'miguel.torres@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1);
 
 --
 -- Índices para tablas volcadas
@@ -4213,13 +4245,13 @@ ALTER TABLE `articulo`
 -- AUTO_INCREMENT de la tabla `causa_reclamo`
 --
 ALTER TABLE `causa_reclamo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT de la tabla `cliente`
 --
 ALTER TABLE `cliente`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `contenido_paquete`
@@ -4255,7 +4287,7 @@ ALTER TABLE `empleado`
 -- AUTO_INCREMENT de la tabla `empresa`
 --
 ALTER TABLE `empresa`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `estado_encomienda`
@@ -4297,7 +4329,7 @@ ALTER TABLE `metodo_pago_venta`
 -- AUTO_INCREMENT de la tabla `modalidad_pago`
 --
 ALTER TABLE `modalidad_pago`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `modelo`
@@ -4321,7 +4353,7 @@ ALTER TABLE `motivo_reclamo`
 -- AUTO_INCREMENT de la tabla `pagina`
 --
 ALTER TABLE `pagina`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- AUTO_INCREMENT de la tabla `paquete`
@@ -4339,7 +4371,7 @@ ALTER TABLE `pregunta_frecuente`
 -- AUTO_INCREMENT de la tabla `reclamo`
 --
 ALTER TABLE `reclamo`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `regla_cargo`
@@ -4453,7 +4485,7 @@ ALTER TABLE `unidad`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- Restricciones para tablas volcadas
@@ -4653,5 +4685,3 @@ ALTER TABLE `transaccion_venta`
 ALTER TABLE `unidad`
   ADD CONSTRAINT `FKunidad608127` FOREIGN KEY (`modeloid`) REFERENCES `modelo` (`id`);
 COMMIT;
-
-Alter table seguimiento_reclamo add column comentario text;

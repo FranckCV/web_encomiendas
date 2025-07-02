@@ -570,7 +570,7 @@ Programar nueva salida
 
                     
                     <div class="form-field">
-                        <label for="origenSelect">Seleccionar destino de origen:</label>
+                        <label for="origenSelect">Seleccionar sucursal de origen:</label>
                         <select id="origenSelect" required onchange="cargarDestinos(this.value)">
                             <option value="">-- Seleccione el destino de origen --</option>
                               {% for fila in sucursal_origen %}
@@ -582,7 +582,7 @@ Programar nueva salida
                     </div>
 
                     <div class="form-field">
-                        <label for="destinoSelect">Seleccionar destino final:</label>
+                        <label for="destinoSelect">Seleccionar sucursal de destino:</label>
                         <select id="destinoSelect" required disabled onchange="validarDatosGenerales()">
                             <option value="">-- Primero seleccione un origen --</option>
                         </select>

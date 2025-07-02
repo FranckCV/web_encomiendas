@@ -227,9 +227,9 @@ Registro de Envíos Masivos
             <!-- PESTAÑA PAQUETE -->
             <div class="tab-panel" id="tab-paquete">
               <div class="campos-envio">
-                <div class="campo-grupo">
+                <div class="campo-grupo" data-group="1,2">
                   <label>Tipo de empaque *</label>
-                  <select id="m-tipoEmpaque" required onchange="toggleFolios(); toggleArticulos();">
+                  <select id="m-tipoEmpaque" required>
                     <option disabled selected value="">Seleccione tipo de empaque</option>
                     {% for fila in empaque %}
                     <option value="{{ fila.0 }}">{{ fila.1 }}</option>
@@ -237,7 +237,7 @@ Registro de Envíos Masivos
                   </select>
                 </div>
 
-                <div class="campo-grupo" id="grupo-articulos" style="display:none;">
+                <div class="campo-grupo" id="grupo-articulos" style="display:none;" data-group="1">
                   <label>Tipo de contenido *</label>
                   <select id="m-tipoArticulo">
                     <option disabled selected value="">Seleccione tipo de contenido</option>
@@ -247,37 +247,37 @@ Registro de Envíos Masivos
                   </select>
                 </div>
 
-                <div class="campo-grupo">
+                <div class="campo-grupo" data-group="1,2">
                   <label>Valor del paquete (S/) *</label>
                   <input type="number" id="m-valorEnvio" step="0.01" min="0" placeholder="0.00" required />
                 </div>
 
-                <div class="campo-grupo">
+                <div class="campo-grupo" data-group="1,2">
                   <label>Peso (kg) *</label>
                   <input type="number" id="m-peso" step="0.001" min="0.001" placeholder="0.00" required />
                 </div>
 
-                <div class="campo-grupo">
+                <div class="campo-grupo" data-group="1">
                   <label>Largo (cm) *</label>
                   <input type="number" id="m-largo" step="0.1" min="0.1" placeholder="0.0" required />
                 </div>
 
-                <div class="campo-grupo">
+                <div class="campo-grupo" data-group="1">
                   <label>Ancho (cm) *</label>
                   <input type="number" id="m-ancho" step="0.1" min="0.1" placeholder="0.0" required />
                 </div>
 
-                <div class="campo-grupo">
+                <div class="campo-grupo" data-group="1">
                   <label>Alto (cm) *</label>
                   <input type="number" id="m-alto" step="0.1" min="0.1" placeholder="0.0" required />
                 </div>
 
-                <div class="campo-grupo" id="grupo-folios" style="display:none;">
+                <div class="campo-grupo" id="grupo-folios" style="display:none;" data-group="2">
                   <label># Folios *</label>
                   <input type="number" id="m-folios" min="1" placeholder="Cantidad de hojas" />
                 </div>
 
-                <div class="campo-grupo campo-descripcion">
+                <div class="campo-grupo campo-descripcion" data-group="1,2">
                   <label>Descripción(Opcional)</label>
                   <textarea id="m-descripcionArticulo" placeholder="Descripción detallada del contenido"></textarea>
                 </div>
@@ -544,10 +544,14 @@ Registro de Envíos Masivos
     if (numero.length === 8 && tipo === '1') {
       consultarDocumento(parseInt(tipo), numero, data => {
         document.getElementById("remitente-nombre").value = `${data.nombre_siglas} ${data.apellidos_razon}`.trim();
+        document.getElementById("remitente-nombre").dispatchEvent(new Event('input'));
+      
       });
     } else if (numero.length === 11 && tipo === '2') {
       consultarDocumento(parseInt(tipo), numero, data => {
         document.getElementById("remitente-nombre").value = `${data.nombre_siglas}`.trim();
+        document.getElementById("remitente-nombre").dispatchEvent(new Event('input'));
+
       });
     } else {
       console.log("Tipo Doc no soportado")

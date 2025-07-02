@@ -62,9 +62,9 @@ def get_table():
     columnas = {
         'id': ['ID', 0.5],
         'abreviatura': ['Abreviatura', 1],
-        'codigo_postal': ['C. Postal', 1], 
-        'direccion': ['Dirección', 3],
-        'ubigeo': ['Ubigeo', 2.5],
+        'codigo_postal': ['C. Postal', 3], 
+        'direccion': ['Dirección', 2.75 ],
+        'ubigeo': ['Ubigeo', 2.75], 
         # 'horario_l_v': ['Horario L-V', 2.5],
         # 'horario_s_d': ['Horario S-D', 2.5],
         # 'teléfono': ['Teléfono', 1.5],
@@ -416,7 +416,7 @@ def sucursales_origen():
         FROM tarifa_ruta tr
         INNER JOIN sucursal s ON s.id = tr.sucursal_origen_id
         INNER JOIN ubigeo u ON u.codigo = s.ubigeocodigo
-        where s.latitud is not null and s.longitud is not null;
+        where s.latitud is not null and s.longitud is not null
     '''
     
     filas_raw = sql_select_fetchall(sql)

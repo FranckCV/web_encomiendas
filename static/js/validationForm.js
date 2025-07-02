@@ -94,11 +94,13 @@ function validarCampo(el, tipo, matchId = null) {
     if (tipo === "checkbox") {
         if (!el.checked) {
             el.classList.add("input-error");
+            el.classList.remove("input-ok");
             msgError.textContent = tiposValidacion[tipo].mensaje;
             msgError.style.display = "block";
             return false;
         } else {
             el.classList.remove("input-error");
+            el.classList.add("input-ok");
             msgError.textContent = "";
             msgError.style.display = "none";
             return true;
@@ -111,11 +113,13 @@ function validarCampo(el, tipo, matchId = null) {
         const isInvalid = val === "" || val === "-1" || el.options[el.selectedIndex]?.disabled;
         if (isInvalid) {
             el.classList.add("input-error");
+            el.classList.remove("input-ok");
             msgError.textContent = tiposValidacion[tipo].mensaje;
             msgError.style.display = "block";
             return false;
         } else {
             el.classList.remove("input-error");
+            el.classList.add("input-ok");
             msgError.textContent = "";
             msgError.style.display = "none";
             return true;
@@ -128,11 +132,13 @@ function validarCampo(el, tipo, matchId = null) {
         const mismoValor = otroCampo && el.value === otroCampo.value;
         if (!mismoValor) {
             el.classList.add("input-error");
+            el.classList.remove("input-ok");
             msgError.textContent = tiposValidacion["match"].mensaje;
             msgError.style.display = "block";
             return false;
         } else {
             el.classList.remove("input-error");
+            el.classList.add("input-ok");
             msgError.textContent = "";
             msgError.style.display = "none";
             return true;
@@ -144,11 +150,13 @@ function validarCampo(el, tipo, matchId = null) {
         const min = parseInt(tipo.split(":")[1]);
         if (el.value.length < min) {
             el.classList.add("input-error");
+            el.classList.remove("input-ok");
             msgError.textContent = `Mínimo ${min} caracteres`;
             msgError.style.display = "block";
             return false;
         } else {
             el.classList.remove("input-error");
+            el.classList.add("input-ok");
             msgError.textContent = "";
             msgError.style.display = "none";
             return true;
@@ -159,11 +167,13 @@ function validarCampo(el, tipo, matchId = null) {
         const max = parseInt(tipo.split(":")[1]);
         if (el.value.length > max) {
             el.classList.add("input-error");
+            el.classList.remove("input-ok");
             msgError.textContent = `Máximo ${max} caracteres`;
             msgError.style.display = "block";
             return false;
         } else {
             el.classList.remove("input-error");
+            el.classList.add("input-ok");
             msgError.textContent = "";
             msgError.style.display = "none";
             return true;
@@ -178,11 +188,13 @@ function validarCampo(el, tipo, matchId = null) {
 
     if (!regex || val === "" || !regex.test(val)) {
         el.classList.add("input-error");
+            el.classList.remove("input-ok");
         msgError.textContent = mensaje || "Campo inválido";
         msgError.style.display = "block";
         return false;
     } else {
         el.classList.remove("input-error");
+            el.classList.add("input-ok");
         msgError.textContent = "";
         msgError.style.display = "none";
         return true;

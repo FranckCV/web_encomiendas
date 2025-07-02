@@ -141,11 +141,11 @@ button {
 
 /* Esto es para que vean cuales son los enlaces que no llevan a nada */
 
-a[href=""],
+/* a[href=""],
 a[href="#"] {
     text-decoration: underline !important;
     color: red !important;
-}
+} */
 
 
 .modalMsg * {

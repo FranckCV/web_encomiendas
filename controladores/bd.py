@@ -1,5 +1,14 @@
 import pymysql
 from pymysql.cursors import DictCursor
+#Establecemos la conexión
+def obtener_conexion():
+    return pymysql.connect(host='localhost',
+                                port=3306,
+                                user='root',
+                                password='',
+                                db='bd_encomiendas' ,
+                                cursorclass=DictCursor
+                                )
 
 def obtener_conexion():
     return pymysql.connect(

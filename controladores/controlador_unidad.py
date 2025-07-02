@@ -49,15 +49,22 @@ def get_table():
             ud.capacidad ,
             ud.volumen ,
             ud.descripcion ,
-            ud.estado ,
-            ud.modeloid ,
+            ud.estado,
+            CASE ud.estado
+                WHEN 'D' THEN 'Disponible'
+                WHEN 'C' THEN 'En curso'
+                WHEN 'M' THEN 'En mantenimiento'
+                WHEN 'N' THEN 'No disponible'
+                ELSE 'Desconocido'
+            END AS estado_desc,
+            ud.modeloid,
 
             mo.nombre as nom_modelo ,
             tip.id ,
             tip.nombre as nom_tipounidad ,
             mar.nombre as nom_marca,
             mar.id
-        from {table_name} ud
+        from unidad ud
         inner join modelo mo on ud.modeloid = mo.id
         inner join tipo_unidad tip on mo.tipo_unidadid = tip.id
         inner join marca mar on mo.marcaid = mar.id
@@ -69,7 +76,7 @@ def get_table():
         'placa' : ['Placa' , 1.5]  , 
         'mtc' : ['MTC' , 1.5]  , 
         'tuc' : ['TUC' , 1.5]  , 
-        'estado' : ['Estado' , 1]  , 
+        'estado_desc' : ['Estado' , 1]  , 
         'nom_tipounidad' : ['Tipo de unidad' , 1.5] ,
         'nom_modelo' : ['Modelo' , 1.5] ,
         'nom_marca' :     ['Marca' , 1.5] ,
@@ -117,7 +124,12 @@ def update_row( id , placa , mtc , tuc , capacidad , volumen , modeloid , estado
 
 #####_ ADICIONALES _#####
 
-
+TIPO_UNIDAD = {
+    'D': 'Disponible'      ,
+    'C': 'En curso'        ,
+    'M': 'En mantenimiento',
+    'N': 'No disponible'   ,
+}
 
 def get_report_test():
     sql= f'''
