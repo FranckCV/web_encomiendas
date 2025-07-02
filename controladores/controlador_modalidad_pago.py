@@ -36,11 +36,11 @@ def table_fetchall():
 def get_table():
     sql= f'''
         select 
-            est.id ,
-            est.nombre,
-            est.descripcion,
-            est.activo 
-        from {table_name} est
+            mdp.id ,
+            mdp.nombre,
+            mdp.descripcion,
+            mdp.activo 
+        from {table_name} mdp
     '''
     columnas = {
         'id': ['ID' , 0.5 ] , 

@@ -43,7 +43,7 @@ def get_table():
             tr.sucursal_origen_id,
             tr.sucursal_destino_id,
             concat(so.abreviatura,' - ',uo.departamento,' / ',uo.provincia,' / ',uo.distrito) AS sucursal_origen,
-            concat(sd.abreviatura,'-',ud.departamento,' / ',ud.provincia,' / ',ud.distrito) AS sucursal_destino,
+            concat(sd.abreviatura,' - ',ud.departamento,' / ',ud.provincia,' / ',ud.distrito) AS sucursal_destino,
             tr.tarifa
         FROM 
             tarifa_ruta tr

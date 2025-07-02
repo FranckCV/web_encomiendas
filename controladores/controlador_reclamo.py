@@ -119,7 +119,7 @@ def get_table():
         LEFT JOIN tipo_indemnizacion ti ON ti.id = r.tipo_indemnizacionid
         LEFT JOIN ubigeo u ON u.codigo = r.ubigeocodigo
         LEFT JOIN tipo_documento td ON td.id = r.tipo_documentoid
-        ORDER BY r.id DESC;
+        ORDER BY r.id asc;
     '''
 
     columnas = {

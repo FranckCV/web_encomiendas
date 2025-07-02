@@ -423,7 +423,7 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-"reclamo": {
+    "reclamo": {
     "active": True,
     "id": "reclamo",
     "titulo": "Reclamos",
@@ -869,12 +869,11 @@ CONTROLADORES = {
         ] ,
         "fields_form": [
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['correo',      'Correo electronico',          'Correo',      'text',     True ,     True  ,        None ],
-            ['contrasenia',      'Contraseña',          'Contraseña',      'password',     True ,     True  ,        None ],
-            # ['tipo_usuario',      'Tipo de usuario',          'Tipo de usuario',      'text',     True ,     True  ,        None ],
-            ['tipo_usuario', 'Tipo de usuario', 'Tipo de usuario', 'select', True, True, [lambda: controlador_usuario.get_tipos_usuarios(), '                                                       ']],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['id',           'ID',                'ID',          'text',     True ,     False ,        None ],
+            ['correo',       'Correo electronico','Correo',      'text',     True ,     True  ,        None ],
+            ['contrasenia',  'Contraseña',        'Contraseña',      'password',     True ,     True  ,        None ],
+            ['tipo_usuario', 'Tipo de usuario',   'Tipo de usuario', 'select', True, True, [lambda: controlador_usuario.get_tipos_usuarios(), '                                                       ']],
+            ['activo',        f'{TITLE_STATE}',   'Activo',      'p',        True ,     False ,        None ],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -1136,7 +1135,60 @@ CONTROLADORES = {
         }
     },
 
-    # huh?
+# huh?
+    "modalidad_pago": {
+        "active" : True ,
+        "titulo": "modalidades de pago",
+        "icon_page": 'fa-solid fa-truck-plane',
+        "nombre_tabla": "modalidad de pago",
+        "controlador": controlador_modalidad_pago,
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "regla_cargo": {
+        "active" : True ,
+        "titulo": "reglas de cargo",
+        "icon_page": 'fa-solid fa-dollar',
+        "nombre_tabla": "regla de cargo",
+        "controlador": controlador_regla_cargo,
+        "filters": [
+            # ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME             LABEL              PLACEHOLDER            TYPE        REQUIRED  ABLE/DISABLE   DATOS
+            ['id',             'ID',                 'ID',                'text',      True ,    False ,       None ],
+            ['tipo_condicion', 'Tipo de condición',  'Tipo de condición', 'text',      True ,    True  ,       None ],
+            ['inferior',       'Inferior',           'Activo',            'p',         True ,    False ,       None ],
+            ['superior',       'Superior',           'Superior',          'textarea',  False,    True  ,       None ],
+            ['porcentaje',     'Porcentaje',         'Porcentaje',        'textarea',  False,    True  ,       None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
     "descuento": {
         "active" : True ,
         "titulo": "Descuentos",
@@ -1249,96 +1301,6 @@ CONTROLADORES = {
     },
 
 # _BORRAR
-    "ubigeo" : {
-        "active":True,
-        "titulo":"Ubigeo",
-        "nombre_tabla":"ubigeo",
-        "controlador": controlador_ubigeo,
-        "icon_page" : "ri-map-pin-line",
-        "filters":[
-            ['activo', f'{TITLE_STATE}', get_options_active() ],
-        ],
-        "fields_form": [
-#            ID/NAME   LABEL     PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
-            ['codigo','Código',     'Código',  'text',   True ,       False ,      None ],
-            ['distrito', 'Distrito', 'Distrito',   'text',  True ,      True ,         None ],
-            ['provincia', 'Provincia', 'Provincia',   'text',  True ,      True ,         None ],
-            ['departamento', 'Departamento', 'Departamento',   'text',  True ,      True ,         None ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": False ,
-            "crud_update": False ,
-            "crud_delete": False ,
-            "crud_unactive": False ,
-        }
-    },
-    "modalidad_pago": {
-        "active" : True ,
-        "titulo": "modalidad de pago",
-        "icon_page": 'fa-solid fa-truck-plane',
-        "nombre_tabla": "modalidad_pago",
-        "controlador": controlador_modalidad_pago,
-        "filters": [
-            ['activo', f'{TITLE_STATE}', get_options_active() ],
-        ] ,
-        "fields_form": [
-#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
-    
-    # "paquete": {
-    #     "active": True,
-    #     "titulo": "Paquetes",
-    #     "nombre_tabla": "paquete",
-    #     "controlador": controlador_paquete,
-    #     "icon_page": "fa-solid fa-box",
-    #     "filters": [
-    #     ],
-    #     "fields_form": [
-    #         #   ID/NAME                        LABEL                         PLACEHOLDER                TYPE       REQUIRED  ABLE   DATOS
-    #         ['tracking',                      'Tracking',                   'Id',            'text',     False,    False, True],
-    #         ['valor',                         'Valor (S/.)',                'Valor',                   'number',   True,     True,  None],
-    #         ['peso',                          'Peso (kg)',                  'Peso',                    'number',   True,     True,  None],
-    #         ['estado_pago',                   'Estado de pago',             '0 = Pagado, 1 = Pendiente','select',  True,     True,  [['0', 'Pagado'], ['1', 'Pendiente']]],
-    #         ['nombres_contacto_destinatario', 'Nombres contacto',           'Nombres',                 'text',     True,     True,  None],
-    #         ['apellidos_razon_destinatario',  'Apellidos o Razón Social',   'Apellidos o Razón',       'text',     True,     True,  None],
-    #         ['num_documento_destinatario',    'N° Documento',               'Documento',               'text',     True,     True,  None],
-    #         ['tipo_documento_destinatario_id','Tipo de Documento',          'Elegir tipo',             'select',   True,     True,  [lambda: controlador_tipo_documento.get_options(), 'tipo_documento']],
-    #         ['tipo_empaqueid',                'Tipo de Empaque',            'Elegir tipo',             'select',   True,     True,  [lambda: controlador_tipo_empaque.get_options(), 'tipo_empaque']],
-    #         ['contenido_paqueteid',           'Contenido del Paquete',      'Elegir contenido',        'select',   False,    True,  [lambda: controlador_contenido_paquete.get_options(), 'contenido_paquete']],
-    #         ['tipo_recepcionid',              'Tipo de Recepción',          'Elegir recepción',        'select',   True,     True,  [lambda: controlador_tipo_recepcion.get_options(), 'tipo_recepcion']],
-    #         ['modalidad_pagoid',              'Modalidad de Pago',          'Elegir modalidad',        'select',   True,     True,  [lambda: controlador_modalidad_pago.get_options(), 'modalidad_pago']],
-    #         ['sucursal_destino_id',           'Sucursal Destino',           'Elegir sucursal',         'select',   True,     True,  [lambda: controlador_sucursal.get_options(), 'direccion_destino']],
-    #         ['descripcion',                   'Descripción',                'Descripción del paquete', 'textarea', False,    True,  None],
-    #     ],
-    #     "crud_forms": {
-    #         "crud_list": True,
-    #         "crud_search": True,
-    #         "crud_consult": True,
-    #         "crud_insert": True,
-    #         "crud_update": True,
-    #         "crud_delete": True,
-    #         "crud_unactive": True,
-    #     }
-    # }
-
-    
 }
 
 
@@ -1592,7 +1554,7 @@ TRANSACCIONES = {
             # [True, 'fa-solid fa-map-location-dot', "#9856EE", 'seguimiento_tracking', {"tracking": "tracking"} , '' , 'seguimiento'],
             [True, 'fa-solid fa-route', "#9856EE", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"} , '' , 'seguimiento' , False],
             [True, 'fa-solid fa-qrcode', "#2195DC", 'ver_img_qr',  {"tracking": "tracking"} , '' , 'qr_code' , True],
-            [True, 'fa-solid fa-qrcode', "#DC8521", 'ver_guia_remision',  {"tracking": "tracking"} , '' , 'guia_remision' , True],
+            [True, 'fa-solid fa-file', "#DC8521", 'ver_guia_remision',  {"tracking": "tracking"} , '' , 'guia_remision' , True],
             [True, 'fa-solid fa-dollar', "#6FDC21", 'pagar_paquete',  {"tracking": "tracking"} , '' , 'pago' , False],
         ],
         "options": [
