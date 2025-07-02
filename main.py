@@ -76,6 +76,7 @@ from werkzeug.routing import MapAdapter
 import configuraciones
 from functools import wraps
 import inspect
+import socket
 
 from io import BytesIO
 from reportlab.lib.pagesizes import A4
@@ -147,24 +148,6 @@ ICON_UNACTIVE          = configuraciones.ICON_UNACTIVE
 ICON_UNLOCK            = configuraciones.ICON_UNLOCK
 
 
-
-# def obtener_ip_local():
-#     try:
-#         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#         # No necesita conexión real
-#         s.connect(("8.8.8.8", 80))
-#         ip_local = s.getsockname()[0]
-#         s.close()
-#         return ip_local
-#     except:
-#         return "127.0.0.1"
-
-# if __name__ == "__main__":
-#     ip_local = obtener_ip_local()
-#     print(f"🌐 Puedes acceder en este dispositivo con http://127.0.0.1:8000")
-#     print(f"📡 Puedes acceder desde tu red local con http://{ip_local}:8000")
-
-#     app.run(host="0.0.0.0", port=5000, debug=True)
 
 ###########_ TEST FUNCIONES _#############
 
@@ -299,6 +282,18 @@ def esSesionIniciada():
         return False
     
 
+def obtener_ip_local():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # No necesita conexión real
+        s.connect(("8.8.8.8", 80))
+        ip_local = s.getsockname()[0]
+        s.close()
+        return ip_local
+    except:
+        return "127.0.0.1"
+
+        
 # UPLOAD_FOLDER = 'static/uploads/empresa'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -976,7 +971,7 @@ CONTROLADORES = {
             ['id',          'ID',              'ID',          'text',     True ,     False ,        None , 'alfanumerico'],
             ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None , 'alfanumerico'],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None , 'alfanumerico'],
-            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None  , 'texto_avanzado'],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None , 'texto_avanzado'],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -1800,6 +1795,7 @@ def inject_globals():
     menu_tipos_paginas = []
     menu_paginas = []
     menu_rolid = None
+    # print(obtener_ip_local())
 
     main_information = controlador_empresa.get_information()
     cookie_error = request.cookies.get('error')
@@ -4327,6 +4323,7 @@ def obtener_coordenadas():
         return jsonify({'error': str(e),
                         "status":-1}), 500
 
+
 @app.route('/cambiar_estado_salida', methods=['POST'])
 def cambiar_estado_salida():
     try:
@@ -4362,7 +4359,9 @@ def seguimiento_unidad_prueba():
     }]
     info = controlador_salida.get_data_by_id_salida(id)
     print(info)
-    return render_template('seguimiento_empleado.html', data=data,info=info)
+    ip_local = obtener_ip_local()
+
+    return render_template('seguimiento_empleado.html', data=data,info=info , ip_local = ip_local)
 
 
 
