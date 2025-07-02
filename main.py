@@ -97,7 +97,6 @@ from collections import defaultdict
 from api_enrutar import ApiEnrutar
 
 
-
 app = Flask(__name__, template_folder='templates')
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -146,6 +145,26 @@ ICON_DELETE            = configuraciones.ICON_DELETE
 ICON_ACTIVE            = configuraciones.ICON_ACTIVE
 ICON_UNACTIVE          = configuraciones.ICON_UNACTIVE
 ICON_UNLOCK            = configuraciones.ICON_UNLOCK
+
+
+
+# def obtener_ip_local():
+#     try:
+#         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#         # No necesita conexión real
+#         s.connect(("8.8.8.8", 80))
+#         ip_local = s.getsockname()[0]
+#         s.close()
+#         return ip_local
+#     except:
+#         return "127.0.0.1"
+
+# if __name__ == "__main__":
+#     ip_local = obtener_ip_local()
+#     print(f"🌐 Puedes acceder en este dispositivo con http://127.0.0.1:8000")
+#     print(f"📡 Puedes acceder desde tu red local con http://{ip_local}:8000")
+
+#     app.run(host="0.0.0.0", port=5000, debug=True)
 
 ###########_ TEST FUNCIONES _#############
 
@@ -3213,19 +3232,44 @@ def insertar_envio_api():
 
             destinatario_email = cliente_data['correo']
             if destinatario_email:
-                try:
-                    # Preparar el mensaje
+              try:
+                    # Intentamos convertir tipo_comprobante a entero, si falla, asignamos 0
+                    try:
+                        tipo_comprobante = int(tipo_comprobante.strip())  # Usar strip() por si hay espacios
+                    except ValueError:
+                        tipo_comprobante = 0  # Si no es un número válido, asignamos 0
+                    
+                    # Log para ver el tipo de comprobante y asegurarnos que es correcto
+                    print(f"Tipo de comprobante: {tipo_comprobante} (Tipo: {type(tipo_comprobante)})")
+                    
                     msg = Message(
                         subject=f"{nombre_empresa} Envío registrado: {num_serie}",
                         sender=app.config['MAIL_USERNAME'],
                         recipients=[destinatario_email]
                     )
-                    msg.body = (
-                        f"Hola {cliente_data['nombre_siglas']},\n\n"
-                        f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
-                        "Adjunto encontrarás el rótulo PDF para cada paquete con los datos de envío.\n\n"
-                        f"¡Gracias por confiar en {nombre_empresa}!"
-                    )
+
+                    # Cambiar el cuerpo del mensaje según si es factura o boleta
+                    if tipo_comprobante == 1:  # Si es factura
+                        msg.body = (
+                            f"Hola {cliente_data['nombre_siglas']},\n\n"
+                            f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
+                            "Adjunto encontrarás la factura de pago para tu paquete y podrás acercarte a dejarlo en nuestra sucursal.\n\n"
+                            f"¡Gracias por confiar en {nombre_empresa}!"
+                        )
+                    elif tipo_comprobante == 2:  # Si es boleta
+                        msg.body = (
+                            f"Hola {cliente_data['nombre_siglas']},\n\n"
+                            f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
+                            "Adjunto encontrarás la boleta de pago para tu paquete. Ya puedes acercarte a dejar el paquete.\n\n"
+                            f"¡Gracias por confiar en {nombre_empresa}!"
+                        )
+                    else:
+                        msg.body = (
+                            f"Hola {cliente_data['nombre_siglas']},\n\n"
+                            f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
+                            "Te invitamos a acercarte a nuestra sucursal para realizar el pago.\n\n"
+                            f"¡Gracias por confiar en {nombre_empresa}!"
+                        )
 
                     # Adjuntar los rótulos
                     for tracking in trackings:
@@ -3235,27 +3279,20 @@ def insertar_envio_api():
                                 rotulo_data = f.read()
                             msg.attach(f"rotulo_{tracking}.pdf", 'application/pdf', rotulo_data)
 
-                    # Verificar el tipo de comprobante y enviar el archivo correspondiente
-                    if tipo_comprobante == 1:  # Si es factura
-                        for tracking in trackings:
-                            factura_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'comprobante.pdf')
-                            if os.path.exists(factura_path):
-                                with open(factura_path, 'rb') as f:
-                                    factura_data = f.read()
-                                msg.attach(f"factura_{tracking}.pdf", 'application/pdf', factura_data)
-
-                    elif tipo_comprobante == 2:  # Si es boleta
-                        for tracking in trackings:
-                            boleta_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'comprobante.pdf')
-                            if os.path.exists(boleta_path):
-                                with open(boleta_path, 'rb') as f:
-                                    boleta_data = f.read()
-                                msg.attach(f"boleta_{tracking}.pdf", 'application/pdf', boleta_data)
+                        # Adjuntar el comprobante
+                        comprobante_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'comprobante.pdf')
+                        if os.path.exists(comprobante_path):
+                            current_app.logger.info(f"Adjuntando comprobante en: {comprobante_path}")  # Log de verificación
+                            with open(comprobante_path, 'rb') as f:
+                                comprobante_data = f.read()
+                            msg.attach(f"comprobante_{tracking}.pdf", 'application/pdf', comprobante_data)
+                        else:
+                            current_app.logger.warning(f"El archivo de comprobante no se encuentra: {comprobante_path}")
 
                     # Enviar el correo
                     mail.send(msg)
 
-                except Exception as email_err:
+              except Exception as email_err:
                     current_app.logger.warning(f"Error enviando email: {email_err}")
 
         # Limpiar la sesión
@@ -3497,13 +3534,18 @@ def generar_qr_paquetes(trackings):
             (qr_rel_path, tracking)
         )
 
-
 @app.route('/generar_boleta', methods=['POST'])
 def generar_boleta_post():
-    tracking = request.json.get('tracking')
+    data = request.get_json()
+    tracking = data.get('tracking')
+    tipo_comprobante_id = data.get('tipo_comprobante')
+
     if not tracking:
         return "Falta el campo 'tracking'", 400
-    return redirect(url_for('generar_comprobante', tracking=tracking))
+    
+    # Llamar directamente a la función 'generar_comprobante' y pasar los parámetros
+    return generar_comprobante(tracking=tracking, tipo_comprobante_id=tipo_comprobante_id)
+
 
 
 def generar_comprobante(tracking, tipo_comprobante_id):

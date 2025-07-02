@@ -61,33 +61,82 @@ class ComprobantePDF(FPDF):
         self.ln(3)
 
     def items_table(self, items):
-        # Encabezados de la tabla
+        # Encabezados de la tabla con anchos ajustados
         self.set_font("Helvetica", "B", 9)
-        self.cell(30, 7, "Cant.", border=1, align="C")
+        self.cell(20, 7, "Cant.", border=1, align="C")
         self.cell(40, 7, "Unidad", border=1, align="C")
-        self.cell(60, 7, "Servicio", border=1, align="C")
-        self.cell(30, 7, "V. Unit.", border=1, align="C")
-        self.cell(30, 7, "Importe", border=1, align="C")
+        self.cell(90, 7, "Servicio", border=1, align="C")
+        self.cell(25, 7, "V. Unit.", border=1, align="C")
+        self.cell(25, 7, "Importe", border=1, align="C")
         self.ln()
 
         # Contenido
-        self.set_font("Helvetica", "", 9)
+        self.set_font("Helvetica", "", 8)
         for item in items:
             cantidad = 1
-            unidad = "SERVICIO"
-            servicio = f"{item['origen']['distrito']} - {item['destino']['distrito']}"
+            unidad = "SERVICIO DE TRANSPORTE"
+            # Cambio de formato: departamento/provincia/distrito
+            servicio = f"{item['origen']['departamento']}/{item['origen']['provincia']}/{item['origen']['distrito']} -> {item['destino']['departamento']}/{item['destino']['provincia']}/{item['destino']['distrito']}"
             try:
                 tarifa = float(item.get('tarifa') or 0)
             except:
                 tarifa = 0.00
             importe = tarifa * cantidad
 
-            self.cell(30, 7, str(cantidad), border=1, align="C")
-            self.cell(40, 7, unidad, border=1, align="C")
-            self.cell(60, 7, servicio, border=1, align="L")
-            self.cell(30, 7, f"S/ {tarifa:.2f}", border=1, align="R")
-            self.cell(30, 7, f"S/ {importe:.2f}", border=1, align="R")
-            self.ln()
+            # Calcular altura necesaria para el texto del servicio
+            servicio_lines = self.get_text_lines(servicio, 90)
+            line_height = 7
+            cell_height = max(line_height, len(servicio_lines) * 4)
+
+            # Guardar posición Y inicial
+            y_start = self.get_y()
+
+            # Cantidad
+            self.cell(20, cell_height, str(cantidad), border=1, align="C")
+            
+            # Unidad
+            self.cell(40, cell_height, unidad, border=1, align="C")
+            
+            # Servicio (texto multilínea)
+            x_servicio = self.get_x()
+            self.cell(90, cell_height, "", border=1)  # Celda vacía con borde
+            self.set_xy(x_servicio + 1, y_start + 1)  # Posición dentro de la celda
+            for i, line in enumerate(servicio_lines):
+                if i > 0:
+                    self.ln(4)
+                    self.set_x(x_servicio + 1)
+                self.cell(88, 4, line, align="L")
+            
+            # Volver a la posición correcta para las siguientes celdas
+            self.set_xy(x_servicio + 90, y_start)
+            
+            # Valor unitario
+            self.cell(25, cell_height, f"S/ {tarifa:.2f}", border=1, align="R")
+            
+            # Importe
+            self.cell(25, cell_height, f"S/ {importe:.2f}", border=1, align="R")
+            
+            self.ln(cell_height)
+
+    def get_text_lines(self, text, max_width):
+        """Divide el texto en líneas que caben en el ancho especificado"""
+        words = text.split()
+        lines = []
+        current_line = ""
+        
+        for word in words:
+            test_line = f"{current_line} {word}".strip()
+            if self.get_string_width(test_line) <= max_width - 2:  # -2 para margen
+                current_line = test_line
+            else:
+                if current_line:
+                    lines.append(current_line)
+                current_line = word
+        
+        if current_line:
+            lines.append(current_line)
+            
+        return lines if lines else [text]
 
     def totales_section(self, resumen):
         x_start = 120
