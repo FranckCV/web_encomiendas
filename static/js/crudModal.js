@@ -155,7 +155,6 @@ document.querySelectorAll('.clickable-modal').forEach(button => {
 
 
 const divs = document.querySelectorAll('.td_content:not(.td_primary_key)');
-
 divs.forEach(div => {
     let elementP = div.querySelector('.p_value');
     if (elementP) {

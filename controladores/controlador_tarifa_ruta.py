@@ -54,9 +54,9 @@ def get_table():
     '''
 
     columnas = {
-        'sucursal_origen': ['Sucursal Origen', 2],
-        'sucursal_destino': ['Sucursal Destino', 2],
-        'tarifa': ['Tarifa (S/)', 1.5]
+        'sucursal_origen': ['Sucursal Origen', 4],
+        'sucursal_destino': ['Sucursal Destino', 4],
+        'tarifa': ['Tarifa (S/.)', 2] 
     }
 
     filas = sql_select_fetchall(sql)

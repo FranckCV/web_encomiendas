@@ -477,9 +477,9 @@ CONTROLADORES = {
         "fields_form": [
             #  ID/NAME          LABEL              PLACEHOLDER            TYPE      REQUIRED  ABLE/DISABLE  DATOS
             ['id',              'ID',              'ID',                  'text',     True,     False,       None],
-            ['titulo',          'Título',          'Título',              'text',     True,     True,        None],
-            ['descripcion',     'Descripción',     'Descripción',         'textarea', True,     True,        None],
             ['activo',          f'{TITLE_STATE}',  'Activo',              'p',        True,     False,       None],
+            ['titulo',          'Título',          'Título',              'textarea',     True,     True,        None],
+            ['descripcion',     'Descripción',     'Descripción',         'textarea', True,     True,        None],
         ],
         "crud_forms": {
             "crud_list": True,
@@ -1135,7 +1135,7 @@ CONTROLADORES = {
         }
     },
 
-# huh?
+####
     "modalidad_pago": {
         "active" : True ,
         "titulo": "modalidades de pago",
@@ -1300,7 +1300,6 @@ CONTROLADORES = {
         "no_crud" : 'administrar_paginas' ,
     },
 
-# _BORRAR
 }
 
 
@@ -1467,7 +1466,7 @@ TRANSACCIONES = {
            # hay_parametros  icon         color              enlace_function      parametros   clase_html   modo(insert ,update , consult)
             # [False,   f'{ICON_CONSULT}',   'var(--color-consult)',  'salida_informacion', {} , '' , 'consult'],
             # [False,   f'{ICON_UPDATE}',   'var(--color-update)',  'salida_informacion', {} , '' ,'update'],
-            [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa' , 'mapa'], 
+            [False,   f'fa-solid fa-location-dot',   "#8851fd",  None , {} , 'btn-ver-mapa' , 'mapa'], 
             # [True,   f'fa-solid fa-location-dot',   'grey',  'seguimiento_empleado_prueba' , {"placa": "placa"}],
             # [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa',], 
         ],
@@ -1497,10 +1496,10 @@ TRANSACCIONES = {
             ['descripcion',         'Descripcion',            'Descripcion',        'textarea',    True,  True,   None],
         ],
         "crud_forms": {
-            "crud_list": True,
+            "crud_list": False,
             "crud_search": True,
             "crud_consult": True,
-            "crud_insert": True,
+            "crud_insert": False,
             "crud_update": True,
             "crud_delete": True,
             "crud_unactive": False
@@ -1510,6 +1509,7 @@ TRANSACCIONES = {
             [True, 'fa-solid fa-boxes', "#77D62E", 'transaccion', {"tabla": "::paquete", "pk_foreign": "num_serie"} , '' ,    'paquete'],
         ],
         "options": [
+            [False,   f'{ICON_INSERT}',   'var(--color-insert)',  'Agregar', 'tipos_envio', {},         'insert'],
         ],
     },
     "paquete": {
@@ -1551,10 +1551,10 @@ TRANSACCIONES = {
         },
         "buttons": [
         # hay_parametros  icon         color              enlace_function      parametros   clase_html   modo(insert ,update , consult)
-            # [True, 'fa-solid fa-map-location-dot', "#9856EE", 'seguimiento_tracking', {"tracking": "tracking"} , '' , 'seguimiento'],
             [True, 'fa-solid fa-route', "#9856EE", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"} , '' , 'seguimiento' , False],
             [True, 'fa-solid fa-qrcode', "#2195DC", 'ver_img_qr',  {"tracking": "tracking"} , '' , 'qr_code' , True],
             [True, 'fa-solid fa-file', "#DC8521", 'ver_guia_remision',  {"tracking": "tracking"} , '' , 'guia_remision' , True],
+            [True, 'fa-solid fa-note-sticky', "#21DCC9", 'ver_rotulo',  {"tracking": "tracking"} , '' , 'rotulo' , True],
             [True, 'fa-solid fa-dollar', "#6FDC21", 'pagar_paquete',  {"tracking": "tracking"} , '' , 'pago' , False],
         ],
         "options": [
@@ -5239,6 +5239,15 @@ def interfaz_insertar_estado():
 
 
 
+@app.route("/ver_rotulo=<int:tracking>")
+def ver_rotulo(tracking):
+    # datos = controlador_estado_encomienda.get_data_package(tracking)
+    # if datos.get('salidaid') is None:
+    #     return rdrct_error(redirect(url_for('transaccion',tabla = 'paquete',pk_foreign = datos.get('num_serie'))) ,'No posee rótulo')
+    # else:
+        return send_from_directory(f"static/comprobantes/{tracking}",f"rotulo.pdf")
+
+
 @app.route("/ver_guia_remision=<int:tracking>")
 def ver_guia_remision(tracking):
     datos = controlador_estado_encomienda.get_data_package(tracking)
@@ -5248,10 +5257,14 @@ def ver_guia_remision(tracking):
         return send_from_directory(f"static/img/guias/",f"guia_{tracking}.pdf")
 
 
-
 @app.route("/ver_img_qr=<int:tracking>")
 def ver_img_qr(tracking):
-    return send_from_directory(f"static/comprobantes/{tracking}","qr.png")
+    datos = controlador_estado_encomienda.get_data_package(tracking)
+    file = send_from_directory(f"static/comprobantes/{tracking}","qr.png")
+    if file:
+        return file 
+    else:
+        return rdrct_error(redirect(url_for('transaccion',tabla = 'paquete',pk_foreign = datos.get('num_serie'))) ,'No posee QR')
 
 
 @app.route('/api_insertar_estado', methods=['POST'])

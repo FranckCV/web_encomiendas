@@ -62,9 +62,9 @@ def get_table():
     columnas = {
         'id': ['ID', 0.5],
         'abreviatura': ['Abreviatura', 1],
-        'codigo_postal': ['C. Postal', 1], 
-        'direccion': ['Dirección', 3],
-        'ubigeo': ['Ubigeo', 2.5],
+        'codigo_postal': ['C. Postal', 3], 
+        'direccion': ['Dirección', 2.75 ],
+        'ubigeo': ['Ubigeo', 2.75], 
         # 'horario_l_v': ['Horario L-V', 2.5],
         # 'horario_s_d': ['Horario S-D', 2.5],
         # 'teléfono': ['Teléfono', 1.5],
