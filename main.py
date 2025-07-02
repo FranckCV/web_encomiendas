@@ -315,7 +315,6 @@ ERRORES = {
     "'NoneType' object is not subscriptable" : "Inicie sesión con su cuenta correspondiente",
     "foreign key constraint fails" : 'No es posible eliminar dicha fila' ,
     "404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again." : "El enlace al que intentó ingresar no existe." ,
-    "INICIAR_SESION_REQUERIDO" : "Debes iniciar sesion para poder agregar a carrito",
 }
 
 
@@ -423,7 +422,7 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-    "reclamo": {
+"reclamo": {
     "active": True,
     "id": "reclamo",
     "titulo": "Reclamos",
@@ -464,6 +463,7 @@ CONTROLADORES = {
         "crud_unactive": False
     }
 },
+
     "pregunta_frecuente": {
         "active": True,
         "titulo": "preguntas frecuentes",
@@ -476,9 +476,9 @@ CONTROLADORES = {
         "fields_form": [
             #  ID/NAME          LABEL              PLACEHOLDER            TYPE      REQUIRED  ABLE/DISABLE  DATOS
             ['id',              'ID',              'ID',                  'text',     True,     False,       None],
-            ['activo',          f'{TITLE_STATE}',  'Activo',              'p',        True,     False,       None],
-            ['titulo',          'Título',          'Título',              'textarea',     True,     True,        None],
+            ['titulo',          'Título',          'Título',              'text',     True,     True,        None],
             ['descripcion',     'Descripción',     'Descripción',         'textarea', True,     True,        None],
+            ['activo',          f'{TITLE_STATE}',  'Activo',              'p',        True,     False,       None],
         ],
         "crud_forms": {
             "crud_list": True,
@@ -655,7 +655,7 @@ CONTROLADORES = {
     "causa_reclamo": {
         "active" : True ,
         "titulo": "Causa de reclamo",
-        "nombre_tabla": "causa de reclamo",
+        "nombre_tabla": "causa_reclamo",
         "controlador": controlador_causa_reclamo,
         "icon_page": '',
         "filters": [
@@ -665,8 +665,8 @@ CONTROLADORES = {
 #            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
             ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
             ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['motivo_reclamoid',  'Nombre de motivo de reclamo', 'Elegir motivo de reclamo', 'select', True ,True, [lambda: controlador_motivo_reclamo.get_options() , 'nom_motivo' ] ],
             ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+            ['motivo_reclamoid',  'Nombre de motivo de reclamo', 'Elegir motivo de reclamo', 'select', True ,True, [lambda: controlador_motivo_reclamo.get_options() , 'nom_motivo' ] ],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -868,11 +868,11 @@ CONTROLADORES = {
         ] ,
         "fields_form": [
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',           'ID',                'ID',          'text',     True ,     False ,        None ],
-            ['correo',       'Correo electronico','Correo',      'text',     True ,     True  ,        None ],
-            ['contrasenia',  'Contraseña',        'Contraseña',      'password',     True ,     True  ,        None ],
-            ['tipo_usuario', 'Tipo de usuario',   'Tipo de usuario', 'select', True, True, [lambda: controlador_usuario.get_tipos_usuarios(), '                                                       ']],
-            ['activo',        f'{TITLE_STATE}',   'Activo',      'p',        True ,     False ,        None ],
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['correo',      'correo',          'Correo',      'text',     True ,     True  ,        None ],
+            ['contrasenia',      'contrasenia',          'Contraseña',      'password',     True ,     True  ,        None ],
+            ['tipo_usuario',      'tipo_usuario',          'Tipo de usuario',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -883,7 +883,7 @@ CONTROLADORES = {
             "crud_delete": True ,
             "crud_unactive": True ,
         }
-    }, 
+    },
     "cliente": {
         "active": True,
         "titulo": "clientes",
@@ -1134,60 +1134,7 @@ CONTROLADORES = {
         }
     },
 
-####
-    "modalidad_pago": {
-        "active" : True ,
-        "titulo": "modalidades de pago",
-        "icon_page": 'fa-solid fa-truck-plane',
-        "nombre_tabla": "modalidad de pago",
-        "controlador": controlador_modalidad_pago,
-        "filters": [
-            ['activo', f'{TITLE_STATE}', get_options_active() ],
-        ] ,
-        "fields_form": [
-#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
-    "regla_cargo": {
-        "active" : True ,
-        "titulo": "reglas de cargo",
-        "icon_page": 'fa-solid fa-dollar',
-        "nombre_tabla": "regla de cargo",
-        "controlador": controlador_regla_cargo,
-        "filters": [
-            # ['activo', f'{TITLE_STATE}', get_options_active() ],
-        ] ,
-        "fields_form": [
-#            ID/NAME             LABEL              PLACEHOLDER            TYPE        REQUIRED  ABLE/DISABLE   DATOS
-            ['id',             'ID',                 'ID',                'text',      True ,    False ,       None ],
-            ['tipo_condicion', 'Tipo de condición',  'Tipo de condición', 'text',      True ,    True  ,       None ],
-            ['inferior',       'Inferior',           'Activo',            'p',         True ,    False ,       None ],
-            ['superior',       'Superior',           'Superior',          'textarea',  False,    True  ,       None ],
-            ['porcentaje',     'Porcentaje',         'Porcentaje',        'textarea',  False,    True  ,       None ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
+    # huh?
     "descuento": {
         "active" : True ,
         "titulo": "Descuentos",
@@ -1299,6 +1246,97 @@ CONTROLADORES = {
         "no_crud" : 'administrar_paginas' ,
     },
 
+# _BORRAR
+    "ubigeo" : {
+        "active":True,
+        "titulo":"Ubigeo",
+        "nombre_tabla":"ubigeo",
+        "controlador": controlador_ubigeo,
+        "icon_page" : "ri-map-pin-line",
+        "filters":[
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ],
+        "fields_form": [
+#            ID/NAME   LABEL     PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
+            ['codigo','Código',     'Código',  'text',   True ,       False ,      None ],
+            ['distrito', 'Distrito', 'Distrito',   'text',  True ,      True ,         None ],
+            ['provincia', 'Provincia', 'Provincia',   'text',  True ,      True ,         None ],
+            ['departamento', 'Departamento', 'Departamento',   'text',  True ,      True ,         None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": False ,
+            "crud_update": False ,
+            "crud_delete": False ,
+            "crud_unactive": False ,
+        }
+    },
+    "modalidad_pago": {
+        "active" : True ,
+        "titulo": "modalidad de pago",
+        "icon_page": 'fa-solid fa-truck-plane',
+        "nombre_tabla": "modalidad_pago",
+        "controlador": controlador_modalidad_pago,
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    
+    # "paquete": {
+    #     "active": True,
+    #     "titulo": "Paquetes",
+    #     "nombre_tabla": "paquete",
+    #     "controlador": controlador_paquete,
+    #     "icon_page": "fa-solid fa-box",
+    #     "filters": [
+    #     ],
+    #     "fields_form": [
+    #         #   ID/NAME                        LABEL                         PLACEHOLDER                TYPE       REQUIRED  ABLE   DATOS
+    #         ['tracking',                      'Tracking',                   'Id',            'text',     False,    False, True],
+    #         ['valor',                         'Valor (S/.)',                'Valor',                   'number',   True,     True,  None],
+    #         ['peso',                          'Peso (kg)',                  'Peso',                    'number',   True,     True,  None],
+    #         ['estado_pago',                   'Estado de pago',             '0 = Pagado, 1 = Pendiente','select',  True,     True,  [['0', 'Pagado'], ['1', 'Pendiente']]],
+    #         ['nombres_contacto_destinatario', 'Nombres contacto',           'Nombres',                 'text',     True,     True,  None],
+    #         ['apellidos_razon_destinatario',  'Apellidos o Razón Social',   'Apellidos o Razón',       'text',     True,     True,  None],
+    #         ['num_documento_destinatario',    'N° Documento',               'Documento',               'text',     True,     True,  None],
+    #         ['tipo_documento_destinatario_id','Tipo de Documento',          'Elegir tipo',             'select',   True,     True,  [lambda: controlador_tipo_documento.get_options(), 'tipo_documento']],
+    #         ['tipo_empaqueid',                'Tipo de Empaque',            'Elegir tipo',             'select',   True,     True,  [lambda: controlador_tipo_empaque.get_options(), 'tipo_empaque']],
+    #         ['contenido_paqueteid',           'Contenido del Paquete',      'Elegir contenido',        'select',   False,    True,  [lambda: controlador_contenido_paquete.get_options(), 'contenido_paquete']],
+    #         ['tipo_recepcionid',              'Tipo de Recepción',          'Elegir recepción',        'select',   True,     True,  [lambda: controlador_tipo_recepcion.get_options(), 'tipo_recepcion']],
+    #         ['modalidad_pagoid',              'Modalidad de Pago',          'Elegir modalidad',        'select',   True,     True,  [lambda: controlador_modalidad_pago.get_options(), 'modalidad_pago']],
+    #         ['sucursal_destino_id',           'Sucursal Destino',           'Elegir sucursal',         'select',   True,     True,  [lambda: controlador_sucursal.get_options(), 'direccion_destino']],
+    #         ['descripcion',                   'Descripción',                'Descripción del paquete', 'textarea', False,    True,  None],
+    #     ],
+    #     "crud_forms": {
+    #         "crud_list": True,
+    #         "crud_search": True,
+    #         "crud_consult": True,
+    #         "crud_insert": True,
+    #         "crud_update": True,
+    #         "crud_delete": True,
+    #         "crud_unactive": True,
+    #     }
+    # }
+
+    
 }
 
 
@@ -1356,7 +1394,7 @@ REPORTES = {
         ],
     },     
     
-    # Ventas 
+    # Ventas
     "ventas_periodo": {
         "active" : True ,
         'icon_page' : 'fa-solid fa-sack-dollar' ,   
@@ -1465,7 +1503,7 @@ TRANSACCIONES = {
            # hay_parametros  icon         color              enlace_function      parametros   clase_html   modo(insert ,update , consult)
             # [False,   f'{ICON_CONSULT}',   'var(--color-consult)',  'salida_informacion', {} , '' , 'consult'],
             # [False,   f'{ICON_UPDATE}',   'var(--color-update)',  'salida_informacion', {} , '' ,'update'],
-            [False,   f'fa-solid fa-location-dot',   "#8851fd",  None , {} , 'btn-ver-mapa' , 'mapa'], 
+            [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa' , 'mapa'], 
             # [True,   f'fa-solid fa-location-dot',   'grey',  'seguimiento_empleado_prueba' , {"placa": "placa"}],
             # [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa',], 
         ],
@@ -1495,10 +1533,10 @@ TRANSACCIONES = {
             ['descripcion',         'Descripcion',            'Descripcion',        'textarea',    True,  True,   None],
         ],
         "crud_forms": {
-            "crud_list": False,
+            "crud_list": True,
             "crud_search": True,
             "crud_consult": True,
-            "crud_insert": False,
+            "crud_insert": True,
             "crud_update": True,
             "crud_delete": True,
             "crud_unactive": False
@@ -1508,7 +1546,6 @@ TRANSACCIONES = {
             [True, 'fa-solid fa-boxes', "#77D62E", 'transaccion', {"tabla": "::paquete", "pk_foreign": "num_serie"} , '' ,    'paquete'],
         ],
         "options": [
-            [False,   f'{ICON_INSERT}',   'var(--color-insert)',  'Agregar', 'tipos_envio', {},         'insert'],
         ],
     },
     "paquete": {
@@ -1550,10 +1587,9 @@ TRANSACCIONES = {
         },
         "buttons": [
         # hay_parametros  icon         color              enlace_function      parametros   clase_html   modo(insert ,update , consult)
+            # [True, 'fa-solid fa-map-location-dot', "#9856EE", 'seguimiento_tracking', {"tracking": "tracking"} , '' , 'seguimiento'],
             [True, 'fa-solid fa-route', "#9856EE", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"} , '' , 'seguimiento' , False],
             [True, 'fa-solid fa-qrcode', "#2195DC", 'ver_img_qr',  {"tracking": "tracking"} , '' , 'qr_code' , True],
-            [True, 'fa-solid fa-file', "#DC8521", 'ver_guia_remision',  {"tracking": "tracking"} , '' , 'guia_remision' , True],
-            [True, 'fa-solid fa-note-sticky', "#21DCC9", 'ver_rotulo',  {"tracking": "tracking"} , '' , 'rotulo' , True],
             [True, 'fa-solid fa-dollar', "#6FDC21", 'pagar_paquete',  {"tracking": "tracking"} , '' , 'pago' , False],
         ],
         "options": [
@@ -2288,8 +2324,7 @@ def registrar_item_carrito():
     # clienteid = data.get("clienteid", 1)
     clientecorreo = request.cookies.get('correo')
     if not clientecorreo:
-        return rdrct_error(redirect_url('login'), "INICIAR_SESION_REQUERIDO")
-        # return jsonify({"error": "No se encontró la cookie de correo"}), 400
+        return jsonify({"error": "No se encontró la cookie de correo"}), 400
 
     cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
     if not cliente:
@@ -2333,14 +2368,6 @@ def registrar_item_carrito_json():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# @app.route("/verificar_sesion")
-# def verificar_sesion():
-#     clientecorreo = request.cookies.get("correo")
-#     if not clientecorreo:
-#         return rdrct_error(redirect_url("login"), "INICIAR_SESION_REQUERIDO")
-    
-#     # Si hay cookie, no hace nada, responde sin contenido
-#     return "", 204
 
 @app.route("/eliminar-item-carrito", methods=["POST"])
 def eliminar_item_carrito():
@@ -2442,7 +2469,7 @@ def metodo_pago():
     # clienteid = 1  # O request.cookies.get("idlogin")
     clientecorreo = request.cookies.get('correo')
     if not clientecorreo:
-        return redirect("/login")
+        return jsonify({"error": "No se encontró la cookie de correo"}), 400
 
     cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
     if not cliente:
@@ -3447,7 +3474,7 @@ def generar_qr_paquetes(trackings):
     ip_address = socket.gethostbyname(hostname)
     print(ip_address)
     for tracking in trackings:
-        qr_data = f"http://192.168.239.37:8000/insertar_estado?tracking={tracking}"
+        qr_data = f"http://192.168.100.15:8000/insertar_estado?tracking={tracking}"
 
         img = qrcode.make(qr_data)
 
@@ -5262,32 +5289,9 @@ def interfaz_insertar_estado():
 
 
 
-@app.route("/ver_rotulo=<int:tracking>")
-def ver_rotulo(tracking):
-    # datos = controlador_estado_encomienda.get_data_package(tracking)
-    # if datos.get('salidaid') is None:
-    #     return rdrct_error(redirect(url_for('transaccion',tabla = 'paquete',pk_foreign = datos.get('num_serie'))) ,'No posee rótulo')
-    # else:
-        return send_from_directory(f"static/comprobantes/{tracking}",f"rotulo.pdf")
-
-
-@app.route("/ver_guia_remision=<int:tracking>")
-def ver_guia_remision(tracking):
-    datos = controlador_estado_encomienda.get_data_package(tracking)
-    if datos.get('salidaid') is None:
-        return rdrct_error(redirect(url_for('transaccion',tabla = 'paquete',pk_foreign = datos.get('num_serie'))) ,'No posee guia de remisión')
-    else:
-        return send_from_directory(f"static/img/guias/",f"guia_{tracking}.pdf")
-
-
 @app.route("/ver_img_qr=<int:tracking>")
 def ver_img_qr(tracking):
-    datos = controlador_estado_encomienda.get_data_package(tracking)
-    file = send_from_directory(f"static/comprobantes/{tracking}","qr.png")
-    if file:
-        return file 
-    else:
-        return rdrct_error(redirect(url_for('transaccion',tabla = 'paquete',pk_foreign = datos.get('num_serie'))) ,'No posee QR')
+    return send_from_directory(f"static/comprobantes/{tracking}","qr.png")
 
 
 @app.route('/api_insertar_estado', methods=['POST'])
@@ -6358,7 +6362,6 @@ def generar_guia_remision(transaccion_id):
 
     return send_file(path, as_attachment=True)
 
-
 @app.route("/descargar_guia/<string:tracking>")
 def descargar_guia_remision(tracking):
     from controladores import reporte_pepo as reporte_pepo
@@ -6371,7 +6374,7 @@ def descargar_guia_remision(tracking):
     if not data:
         return "Datos insuficientes para generar la guía", 400
 
-    filename = f"guia_{tracking}.pdf"
+    filename = f"guia_{num_serie}.pdf"
     path = f"static/img/guias/{filename}"
 
     reporte_pepo.generar_guia_pdf(data, filename=path)
