@@ -3,7 +3,7 @@
 - Pasarela de pago en parte administrativa
 - En el registro de la encomienda, si recarga la página aunque no haya hecho nada, sale estás seguro de recargar? 
 - Campos con autocompletado, se toma como que nunca tocaste el campo y te pide "completa todos los campos"
-- Por paquete: rótulo , boleta o factura , guía de remisión
+<!-- - Por paquete: rótulo , boleta o factura , guía de remisión -->
 
 
 En el registro también yo le quité el botón de editar, no sé si creen que sí debemos incluirlo
