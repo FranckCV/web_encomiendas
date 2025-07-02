@@ -3146,6 +3146,7 @@ def insertar_envio():
         }), 500
         
         
+
 @app.route('/insertar_envio_api', methods=['POST'])
 def insertar_envio_api():
     try:
@@ -3159,11 +3160,11 @@ def insertar_envio_api():
         origen_data = session.get('origen_data')
         sucursal_origen = origen_data.get('sucursal_origen') if isinstance(origen_data, dict) else origen_data
         remitente = session.get('remitente_data', {})
-        
+
         # Validaciones
         if not registros:
             return jsonify({'status': 'error', 'message': 'No hay registros de paquetes'}), 400
-            
+
         if not sucursal_origen:
             return jsonify({'status': 'error', 'message': 'Sucursal de origen no proporcionada'}), 400
 
@@ -3198,17 +3199,22 @@ def insertar_envio_api():
             registros, cliente_data, tipo_comprobante, metodo_pago, sucursal_origen, modo
         )
 
-        # Generar QR y enviar email si es exitoso
+        # Generar QR, rótulos, y comprobantes si es necesario
         if num_serie:
             try:
                 generar_qr_paquetes(trackings)
-                generar_rotulos_paquetes(trackings) 
+                generar_rotulos_paquetes(trackings)
+                if requiere_datos_pago:
+                    for tracking in trackings:
+                        generar_comprobante(tracking, tipo_comprobante)  # Llamada a generar_comprobante para cada tracking
+
             except Exception as qr_err:
                 current_app.logger.warning(f"Error generando QR: {qr_err}")
 
             destinatario_email = cliente_data['correo']
             if destinatario_email:
                 try:
+                    # Preparar el mensaje
                     msg = Message(
                         subject=f"{nombre_empresa} Envío registrado: {num_serie}",
                         sender=app.config['MAIL_USERNAME'],
@@ -3221,24 +3227,43 @@ def insertar_envio_api():
                         f"¡Gracias por confiar en {nombre_empresa}!"
                     )
 
+                    # Adjuntar los rótulos
                     for tracking in trackings:
-
                         rotulo_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'rotulo.pdf')
-                        
                         if os.path.exists(rotulo_path):
                             with open(rotulo_path, 'rb') as f:
                                 rotulo_data = f.read()
                             msg.attach(f"rotulo_{tracking}.pdf", 'application/pdf', rotulo_data)
 
+                    # Verificar el tipo de comprobante y enviar el archivo correspondiente
+                    if tipo_comprobante == 1:  # Si es factura
+                        for tracking in trackings:
+                            factura_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'comprobante.pdf')
+                            if os.path.exists(factura_path):
+                                with open(factura_path, 'rb') as f:
+                                    factura_data = f.read()
+                                msg.attach(f"factura_{tracking}.pdf", 'application/pdf', factura_data)
+
+                    elif tipo_comprobante == 2:  # Si es boleta
+                        for tracking in trackings:
+                            boleta_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'comprobante.pdf')
+                            if os.path.exists(boleta_path):
+                                with open(boleta_path, 'rb') as f:
+                                    boleta_data = f.read()
+                                msg.attach(f"boleta_{tracking}.pdf", 'application/pdf', boleta_data)
+
+                    # Enviar el correo
                     mail.send(msg)
+
                 except Exception as email_err:
                     current_app.logger.warning(f"Error enviando email: {email_err}")
 
+        # Limpiar la sesión
         session.pop('datos_pago', None)
         session.pop('resumen_envios', None)
         session.pop('remitente_data', None)
-        session.pop('origen_data', None)     
-        session.pop('tipo_envio', None)      
+        session.pop('origen_data', None)
+        session.pop('tipo_envio', None)
 
         current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
 
@@ -3257,7 +3282,9 @@ def insertar_envio_api():
             'status': 'error',
             'message': 'Ocurrió un error al procesar el envío'
         }), 500
-        
+
+
+
         
 @app.route("/API_ENRUTAR", methods=["GET"])
 def api_enrutar():
@@ -3479,45 +3506,40 @@ def generar_boleta_post():
     return redirect(url_for('generar_comprobante', tracking=tracking))
 
 
-@app.route('/comprobante=<tracking>', methods=['POST'])
-def generar_comprobante(tracking):
-    from controladores import reporte_comprobante as reporte_comprobante  
+def generar_comprobante(tracking, tipo_comprobante_id):
+    from controladores import reporte_comprobante as reporte_comprobante
     try:
-        data = request.get_json()
-        tipo_comprobante = data.get('comprobante', 'BOLETA')
-        print(tipo_comprobante)
-        
-        if not tipo_comprobante:
+        # Obtener datos del tipo de comprobante usando el ID
+        comprobante = controlador_tipo_comprobante.get_data_comprobante(tipo_comprobante_id)
+        if not comprobante:
             return jsonify({
                 'success': False, 
-                'message': 'Tipo de comprobante requerido'
-            }), 400
+                'message': 'Tipo de comprobante no encontrado'
+            }), 404
         
         transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
-        if not transaccion or not isinstance(transaccion, dict):
+        if not transaccion:
             return jsonify({
                 'success': False, 
                 'message': 'Transacción no encontrada'
             }), 404
         
-        # Generar serie del comprobante
+        # Generar la serie del comprobante con ceros a la izquierda (6 dígitos)
         num_serie = transaccion.get('num_serie')
-        if tipo_comprobante.upper() == 'BOLETA':
-            comprobante_serie = f"B361-{num_serie}"
-        else:
-            comprobante_serie = f"F361-{num_serie}"
+        numero_formateado = str(num_serie).zfill(6)  # Ej: 22 → 000022
+        comprobante_serie = f"{comprobante['inicial']}-{numero_formateado}"
         
-        # Crear directorio
-        carpeta = os.path.join("static", "comprobantes", str(tracking))
+        # Crear directorio para guardar el comprobante
+        carpeta = os.path.join(current_app.static_folder, "comprobantes", str(tracking))
         os.makedirs(carpeta, exist_ok=True)
         ruta_pdf = os.path.join(carpeta, "comprobante.pdf")
         
-        # Si existe, devolverlo
+        # Si ya existe el PDF, devolverlo directamente
         if os.path.exists(ruta_pdf):
             return send_file(ruta_pdf, as_attachment=True,
-                           download_name=f"comprobante_{tracking}.pdf")
+                             download_name=f"comprobante_{tracking}.pdf")
         
-        # Obtener datos necesarios
+        # Datos de empresa
         empresa = controlador_empresa.getDataComprobante()
         if not empresa:
             return jsonify({
@@ -3533,14 +3555,13 @@ def generar_comprobante(tracking):
             'direccion': transaccion.get('direccion_destino', '')
         }
         
-        # Obtener items
+        # Obtener ítems
         items, masivo = controlador_encomienda.obtener_items_por_num_serie(num_serie)
-        print(items)
+        
         # Calcular resumen
         monto_total = float(transaccion.get('monto_total', 0))
         igv_rate = float(empresa.get('igv', 18)) / 100
         
-        # Calcular valores
         if igv_rate > 0:
             op_gravada = monto_total / (1 + igv_rate)
             igv = monto_total - op_gravada
@@ -3560,31 +3581,34 @@ def generar_comprobante(tracking):
             'importe_total': monto_total
         }
         
-        # Generar código QR
+        # Ruta del QR
         qr_path = os.path.join(carpeta, "qr.png")
         
-        # Generar PDF
+        # Generar el PDF del comprobante
         reporte_comprobante.generar_comprobante_pdf(
             transaccion=transaccion,
             cliente=cliente,
             empresa=empresa,
-            tipo_comprobante=tipo_comprobante,
+            tipo_comprobante=comprobante['nombre'],  # Ej: "BOLETA"
             comprobante_serie=comprobante_serie,
             items=items,
             resumen=resumen,
             qr_path=qr_path,
             masivo=masivo,
-            ruta_pdf=ruta_pdf
+            ruta_pdf=ruta_pdf  # Guardar en la ruta del directorio
         )
         
+        # Enviar el comprobante generado como archivo adjunto
         return send_file(ruta_pdf, as_attachment=True,
-                        download_name=f"comprobante_{tracking}.pdf")
+                         download_name=f"comprobante_{tracking}.pdf")
         
     except Exception as e:
+        current_app.logger.error(f"Error al generar comprobante: {str(e)}")
         return jsonify({
             'success': False, 
             'message': f'Error al generar comprobante: {str(e)}'
         }), 500
+
 
 
 def generar_rotulos_paquetes(trackings):
