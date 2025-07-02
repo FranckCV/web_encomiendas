@@ -119,6 +119,7 @@
         {% elif campo[3] == 'textarea' %}
           <textarea id="{{campo[0]}}" name="{{campo[0]}}"
             {% if campo[4] %}required{% endif %}
+            {% if campo[7] and campo[7] != '' %}data-tipo="{{campo[7]}}"{% endif %}
             {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}>{{ fila[campo[0]] if fila else '' }}</textarea>
 
         {% elif campo[3] == 'p' %}
@@ -148,6 +149,7 @@
           value="{{fila[campo[0]]}}" 
           placeholder="Valor hexadecimal" 
           {% if campo[4] %}required{% endif %} 
+          data-tipo="hexadecimal"
           {% if modo_modal == 'consult' or campo[5] == False %}disabled{% endif %}
           >
           <input 
@@ -194,6 +196,7 @@
             step="0.000001"
             {% if campo[4] %}required{% endif %}
             {% if campo[5] == False or modo_modal == 'consult' %}disabled{% endif %}
+            data-tipo="decimal6"
             value="{% if fila and fila[campo[0]] != None %}{{fila[campo[0]]}}{% endif %}">
 
         {% elif campo[3] == 'decimal_2' %}
@@ -202,14 +205,15 @@
             step="0.01"
             {% if campo[4] %}required{% endif %}
             {% if campo[5] == False or modo_modal == 'consult' %}disabled{% endif %}
+            data-tipo="decimal2"
             value="{% if fila and fila[campo[0]] != None %}{{fila[campo[0]]}}{% endif %}">
-
 
         {% else %}
           <input id="{{campo[0]}}" name="{{campo[0]}}"
             type="{{campo[3]}}" placeholder="{{campo[2]}}"
             {% if campo[4] %}required{% endif %}
             {% if campo[5] == False or modo_modal == 'consult' %}disabled{% endif %}
+            {% if campo[7] and campo[7] != '' %}data-tipo="{{campo[7]}}"{% endif %}
             value="{% if fila and fila[campo[0]] != None %}{{fila[campo[0]]}}{% endif %}">
 
         {% endif %}
