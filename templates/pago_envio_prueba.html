@@ -1,6 +1,6 @@
 {% extends 'MAESTRA_GENERAL.html' %}
 
-{% block titulo %}Medios de Pago{% endblock %}
+{% block titulo %}Medios de pago{% endblock %}
 
 {% block estilos %}
   <link rel="stylesheet" href="/static/css/pago_envio.css" />
@@ -309,7 +309,7 @@
                 <td class="value-td">S/ {{ "%.2f"|format((total_pago_online * 0.18 / 1.18)|round(2)) }}</td>
               </tr>
               <tr class="total">
-                <td><strong>Total a Pagar en línea:</strong></td>
+                <td><strong>Total a pagar en línea:</strong></td>
                 <td class="value-td"><strong>S/ {{ "%.2f"|format(total_pago_online) }}</strong></td>
               </tr>
             </table>
@@ -338,7 +338,7 @@
       <div class="mensaje-simple">
         <h3>
           
-          Generar Rótulo de Envío</h3>
+          Generar rótulo de envío</h3>
         
         <div class="resumen-box" style="margin: 2rem auto; max-width: 400px;">
           <h3>Resumen</h3>
@@ -355,7 +355,7 @@
         </div>
 
         <button class="btn-pagar" onclick="generarRotulo()">
-          GENERAR RÓTULO
+          Generar rótulo
         </button>
       </div>
     {% endif %}
@@ -403,10 +403,10 @@ function mostrarModal() {
   const contenido = document.getElementById('contenidoModal');
   
   if (nombreMetodoPago && nombreMetodoPago.toLowerCase().includes('yape')) {
-    titulo.textContent = 'Pago con Yape';
+    titulo.textContent = 'Pago con yape';
     contenido.innerHTML = `
       <div class="form-group">
-        <label for="numeroConfirmacion">Número de Confirmación Yape:</label>
+        <label for="numeroConfirmacion">Número de confirmación yape:</label>
         <input type="text" id="numeroConfirmacion" placeholder="Ej: 972345678" maxlength="9" required>
       </div>
       <p style="font-size: 0.9em; color: #666;">
@@ -414,10 +414,10 @@ function mostrarModal() {
       </p>
     `;
   } else {
-    titulo.textContent = 'Pago con Tarjeta';
+    titulo.textContent = 'Pago con tarjeta';
     contenido.innerHTML = `
       <div class="form-group">
-        <label for="numeroTarjeta">Número de Tarjeta:</label>
+        <label for="numeroTarjeta">Número de tarjeta:</label>
         <input type="text" id="numeroTarjeta" placeholder="1234 5678 9012 3456" maxlength="19" required>
       </div>
       <div class="form-row">
@@ -431,7 +431,7 @@ function mostrarModal() {
         </div>
       </div>
       <div class="form-group">
-        <label for="nombreTitular">Nombre del Titular:</label>
+        <label for="nombreTitular">Nombre del titular:</label>
         <input type="text" id="nombreTitular" placeholder="Como aparece en la tarjeta" required>
       </div>
     `;
