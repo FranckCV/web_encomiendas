@@ -51,9 +51,9 @@ def get_table():
     '''
     columnas = {
         'id': ['ID', 0.5],
-        'nombre': ['Nombre del Rol', 1.5],
+        'nombre': ['Nombre del Rol', 3],
         'descripcion': ['Descripción', 2],
-        'nom_tiporol': ['Tipo de Rol', 1.5],
+        'nom_tiporol': ['Tipo de Rol', 2],
         'activo': ['Activo', 0.5]
     }
     filas = sql_select_fetchall(sql)

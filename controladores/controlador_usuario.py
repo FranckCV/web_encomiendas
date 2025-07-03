@@ -42,12 +42,12 @@ def get_table():
         SELECT 
             usu.id,
             usu.correo,
-            -- usu.contrasenia,  -- comentado según tu ejemplo
+            usu.tipo_usuario,
             CASE 
                 WHEN usu.tipo_usuario = 'E' THEN 'Empleado'
                 WHEN usu.tipo_usuario = 'C' THEN 'Cliente'
                 ELSE 'Otro'
-            END AS tipo_usuario,
+            END AS tipo_usuario_nom,
             usu.activo
         FROM {table_name} usu
     '''
@@ -55,7 +55,7 @@ def get_table():
     columnas = {
         'id'           : ['ID', 0.5],
         'correo'       : ['Correo', 4.5],
-        'tipo_usuario' : ['Tipo Usuario', 4.5],
+        'tipo_usuario_nom' : ['Tipo Usuario', 4.5],
         'activo'       : ['Actividad', 1],
     }
 
@@ -71,24 +71,33 @@ def unactive_row( id ):
     unactive_row_table(table_name , id)
 
 
-def insert_row( nombre ):
+def insert_row( correo , contrasenia , tipo_usuario ):
     sql = f'''
         INSERT INTO 
             {table_name} 
-            ( nombre , activo )
+            ( correo , contrasenia , tipo_usuario , activo )
         VALUES 
-            ( %s , 1 )
+            ( %s , %s , %s , 1 )
     '''
-    sql_execute(sql,( nombre ))
+    sql_execute(sql,( correo , contrasenia , tipo_usuario ))
 
 
-def update_row( id , nombre ):
+def update_row( id ,  correo  , tipo_usuario , contrasenia=None ):
     sql = f'''
         update {table_name} set 
-        nombre = %s 
-        where {get_primary_key()} = {id}
+        correo = %s ,        
+        tipo_usuario = %s 
+        where id = {id}
     '''
-    sql_execute(sql, (nombre ))
+    sql_execute(sql, ( correo , tipo_usuario  ))
+
+    if contrasenia:
+        sql_c = f'''
+            update {table_name} set 
+            contrasenia = %s 
+            where id = {id}
+        '''
+        sql_execute(sql_c, ( contrasenia  ))
 
 
 #####_ ADICIONALES _#####

@@ -38,6 +38,7 @@ def get_table():
         FROM {table_name} det
         INNER JOIN estado_reclamo est 
         ON est.id= det.estado_reclamoid
+        order by 1
     '''
     columnas = {
         'id': ['ID', 0.5],
@@ -54,23 +55,23 @@ def unactive_row(id):
     unactive_row_table(table_name, id)
 
 
-def insert_row(nombre, descripcion, tipo_rolid):
+def insert_row(nombre, descripcion, estado_reclamoid):
     sql = f'''
-        INSERT INTO {table_name} (nombre, descripcion, activo, tipo_rolid)
+        INSERT INTO {table_name} (nombre, descripcion, activo, estado_reclamoid)
         VALUES (%s, %s, 1, %s)
     '''
-    sql_execute(sql, (nombre, descripcion, tipo_rolid))
+    sql_execute(sql, (nombre, descripcion, estado_reclamoid))
 
 
-def update_row(id, nombre, descripcion, tipo_rolid):
+def update_row(id, nombre, descripcion, estado_reclamoid):
     sql = f'''
         UPDATE {table_name}
         SET nombre = %s,
             descripcion = %s,
-            tipo_rolid = %s
+            estado_reclamoid = %s
         WHERE id = {id}
     '''
-    sql_execute(sql, (nombre, descripcion, tipo_rolid))
+    sql_execute(sql, (nombre, descripcion, estado_reclamoid))
 
 
 def get_options():

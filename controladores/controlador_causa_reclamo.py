@@ -42,6 +42,7 @@ def get_table():
             ca.id ,
             ca.nombre ,
             ca.descripcion,
+            ca.motivo_reclamoid ,
             mot.nombre as nom_mot 
         from {table_name} ca
         inner join motivo_reclamo mot on mot.id = ca.motivo_reclamoid
@@ -49,8 +50,8 @@ def get_table():
     '''
     columnas = {
         'id': ['ID' , 0.5 ] , 
-        'nombre' : ['Nombre' , 3] , 
-        'descripcion' : ['descripcion' , 3] , 
+        'nombre' : ['Nombre' , 2] , 
+        'descripcion' : ['Descripcion' , 4] , 
         'nom_mot' : ['Motivo de reclamo' , 3],
     }
     filas = sql_select_fetchall(sql)
