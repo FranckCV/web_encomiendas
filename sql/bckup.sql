@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 02-07-2025 a las 09:49:06
+-- Tiempo de generación: 03-07-2025 a las 06:35:49
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.1.17
 
@@ -129,7 +129,8 @@ INSERT INTO `cliente` (`id`, `correo`, `telefono`, `num_documento`, `nombre_sigl
 (5, 'aaa@gmail.com', '76767434324', '75645375', 'Juan José', 'Paredes', 3, 2),
 (6, 'ana@example.com', '987654320', '87654321', 'Ana', 'Torres', 1, 1),
 (7, 'fabianapm060126@gmail.com', '987654345', '72428857', 'Liliana', 'Mejia', 1, 1),
-(8, 'edgaralarconhd@gmail.com', '948811527', '71309189', 'Edgar', 'Ivan Alarcon Chapoñan', 1, 1);
+(8, 'edgaralarconhd@gmail.com', '948811527', '71309189', 'Edgar', 'Ivan Alarcon Chapoñan', 1, 1),
+(10, 'jhgjas@khki.com', '894234234', '73682736', 'Armando', 'Casas', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -3862,7 +3863,8 @@ INSERT INTO `usuario` (`id`, `correo`, `contrasenia`, `tipo_usuario`, `activo`) 
 (36, 'diego.zamora@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
 (37, 'renzo.morales@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
 (38, 'karen.vera@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
-(39, 'miguel.torres@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1);
+(39, 'miguel.torres@transportes.com', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'E', 1),
+(40, 'jhgjas@khki.com', 'c775e7b757ede630cd0aa1113bd102661ab38829ca52a6422ab782862f268646', 'C', 1);
 
 --
 -- Índices para tablas volcadas
@@ -4251,7 +4253,7 @@ ALTER TABLE `causa_reclamo`
 -- AUTO_INCREMENT de la tabla `cliente`
 --
 ALTER TABLE `cliente`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de la tabla `contenido_paquete`
@@ -4305,7 +4307,7 @@ ALTER TABLE `estado_reclamo`
 -- AUTO_INCREMENT de la tabla `marca`
 --
 ALTER TABLE `marca`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de la tabla `mensaje_contacto`
@@ -4485,7 +4487,7 @@ ALTER TABLE `unidad`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- Restricciones para tablas volcadas

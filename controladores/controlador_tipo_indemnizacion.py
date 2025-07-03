@@ -36,12 +36,14 @@ def get_table():
         SELECT 
             mp.id,
             mp.nombre,
+            mp.descripcion,
             mp.activo
         FROM {table_name} mp
     '''
     columnas = {
         'id': ['ID', 1],
         'nombre': ['Nombre', 5],
+        'descripcion': ['Descripción', 5],
         'activo': ['Activo', 1]
     }
     filas = sql_select_fetchall(sql)
@@ -52,15 +54,15 @@ def get_table():
 def unactive_row(id):
     unactive_row_table(table_name, id)
 
-def insert_row(nombre):
+def insert_row(nombre , descripcion):
     sql = f'''
         INSERT INTO 
             {table_name} 
-            (nombre, activo)
+            (nombre , descripcion , activo)
         VALUES 
-            (%s, 1)
+            (%s, %s, 1)
     '''
-    sql_execute(sql, (nombre,))
+    sql_execute(sql, (nombre, descripcion))
 
 def update_row(id, nombre):
     sql = f'''
