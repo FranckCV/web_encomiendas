@@ -1531,7 +1531,7 @@ TRANSACCIONES = {
             "crud_search": True,
             "crud_consult": True,
             "crud_insert": True,
-            "crud_update": True,
+            "crud_update": False,
             "crud_delete": True,
             "crud_unactive": False
         },

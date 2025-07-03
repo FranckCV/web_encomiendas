@@ -507,14 +507,38 @@ def get_paquetes_detallados_por_ruta(sucursal_origen_id, sucursal_destino_id):
     filas = sql_select_fetchall(sql, (sucursal_origen_id, sucursal_destino_id))
     return filas if filas else []
 
-
 def get_data_pay(tracking):
     sql = '''
-    select estado_pago, ultimo_estado from paquete where tracking = %s
+    SELECT 
+        CASE 
+            WHEN p.estado_pago = 'P' THEN 'Pendiente'
+            WHEN p.estado_pago = 'C' THEN 'Completado'
+            ELSE p.estado_pago
+        END AS nombre_estado_pago,
+        
+        p.estado_pago,
+        
+        p.ultimo_estado,
+        
+        CASE 
+            WHEN p.ultimo_estado = 'PE' THEN 'Pendiente de entrega en sucursal de origen'
+            WHEN p.ultimo_estado = 'EO' THEN 'En sucursal de origen'
+            WHEN p.ultimo_estado = 'RD' THEN 'Entregado al destinatario'
+            WHEN p.salidaid IS NOT NULL AND sl.estado = 'P' THEN 'Listo para salir'
+            WHEN p.salidaid IS NOT NULL AND sl.estado = 'T' THEN 'En tránsito'
+            WHEN p.salidaid IS NOT NULL AND sl.estado = 'C' THEN 'En destino'
+            ELSE p.ultimo_estado
+        END AS nombre_estado
+        
+    FROM paquete p
+    LEFT JOIN salida sl ON sl.id = p.salidaid
+    WHERE p.tracking = %s
     '''
-    fila = sql_select_fetchone(sql,(tracking,))
+    
+    fila = sql_select_fetchone(sql, (tracking,))
     
     return fila
+
 
 def verificar_clave_seguridad(tracking, security_code):
     sql = '''
