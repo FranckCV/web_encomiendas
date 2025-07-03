@@ -1555,7 +1555,7 @@ TRANSACCIONES = {
         "fields_form": [
         #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
             ['detalle_estadoid',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_detalle() , 'nombre_det' ] ],
-            ['tipo_comprobante',  'Tipo de comprobante', 'Tipo de comprobante', 'select', True ,True, [lambda: controlador_tipo_comprobante.get_options() , 'tip_comp' ] ],
+            ['tipo_comprobante',  'Tipo de comprobante', 'Tipo de comprobante', 'select', False ,True, [lambda: controlador_tipo_comprobante.get_options() , 'tip_comp' ] ],
         ],
         "crud_forms": {
             "crud_list": True,
@@ -3782,12 +3782,14 @@ def registrar_envios_masivos():
 # }
 
 
+
+
 def generar_qr_paquetes(trackings):
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
     print(ip_address)
     for tracking in trackings:
-        qr_data = f"http://192.168.100.15:8000/insertar_estado?tracking={tracking}"
+        qr_data = f"http://192.168.239.37:8000/insertar_estado?tracking={tracking}"
 
         img = qrcode.make(qr_data)
 
@@ -6297,7 +6299,7 @@ def seguimiento_reclamo_directo(reclamo_id):
 # ========== ENDPOINTS PARA GESTIÓN ADMINISTRATIVA DE RECLAMOS ==========
 
 @app.route("/responder_reclamos", methods=["GET"])
-@validar_empleado()
+# @validar_empleado()
 def vista_responder_reclamos():
     """
     Vista principal para que los administradores respondan reclamos
@@ -6354,7 +6356,7 @@ def vista_responder_reclamos():
                              selected_option_crud=20)
 
 @app.route("/procesar_respuesta_reclamo", methods=["POST"])
-@validar_empleado()
+# @validar_empleado()
 def procesar_respuesta_reclamo_admin():
     """
     Procesa la respuesta enviada por el administrador a un reclamo
@@ -6475,7 +6477,7 @@ def api_info_reclamo(reclamo_id):
         }), 500
     
 @app.route("/api/obtener_historial_reclamo/<int:reclamo_id>", methods=["GET"])
-@validar_empleado()
+# @validar_empleado()
 def api_obtener_historial_reclamo(reclamo_id):
     """
     Obtiene el historial de seguimiento de un reclamo (para modal administrativo)
@@ -7147,6 +7149,8 @@ if __name__ == "__main__":
     # app.run(host='192.168.48.178', port=8000, debug=True, use_reloader=True)
     # Thread(target=enviar_posiciones).start()
     # app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=True)
+    # generar_qr_paquetes([179])
+
     socketio.run(app, host='0.0.0.0', port=8000, debug=True , use_reloader=True)
 
 
