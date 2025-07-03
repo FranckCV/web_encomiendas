@@ -38,7 +38,8 @@ Seguimiento
                 <ul class="lista_document">
                   {% for comp in comprobantes %}
                   <li>
-                    <a href="{{ url_for('generar_comprobante', tracking=tracking) }}" target="_blank"><i
+                      <a href="{{ url_for('descargar_comprobante', tracking=tracking) }}" target="_blank">
+                      <i
                         class="fa-solid fa-file-pdf"></i> {{ comp.tipo_comprobante|capitalize }}</a>
                   </li>
                   {% endfor %}

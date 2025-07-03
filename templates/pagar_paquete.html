@@ -74,6 +74,11 @@ body {
     color: var(--primary-blue);
     margin-bottom: 1rem;
 }
+#estado_paquete {
+    font-size: 11px;
+    color: grey;
+    font-style: italic; 
+}
 
 .card-header h1 {
     color: var(--text-blue);
@@ -411,7 +416,7 @@ body {
                                 <div class="alert alert-warning">
                                     <i class="fas fa-truck"></i>
                                     <div>
-                                        <strong>Paquete Listo para Entrega al Destinatario</strong><br>
+                                        <strong>Paquete listo para entrega al destinatario</strong><br>
                                         El paquete está listo para ser entregado. Ingrese su clave de seguridad y complete el pago.
                                     </div>
                                 </div>
@@ -462,7 +467,7 @@ body {
                                 <div class="alert alert-success">
                                     <i class="fas fa-check-circle"></i>
                                     <div>
-                                        <strong>Paquete Pagado - Listo para Entrega al Destinatario</strong><br>
+                                        <strong>Paquete pagado - Listo para entregar al destinatario</strong><br>
                                         El paquete ha sido pagado. Ingrese su clave de seguridad para completar la entrega.
                                     </div>
                                 </div>
@@ -492,11 +497,11 @@ body {
                         
                         {% else %}
                             <div class="alert alert-info">
-                                <i class="fas fa-info-circle"></i>
                                 <div>
-                                    <strong>Estado del Paquete</strong><br>
-                                    Estado de pago: {{ estados.estado_pago }}<br>
-                                    Último estado: {{ estados.ultimo_estado }}
+                                    <strong>Estado del Paquete:</strong><br>
+                                    <p id="estado_paquete">Con estos estados no se pueden hacer operaciones, espere a la actualización del estado</p>
+                                    Estado de pago: {{ estados.nombre_estado_pago }}<br>
+                                    Último estado: {{ estados.nombre_estado }}
                                 </div>
                             </div>
                         {% endif %}
