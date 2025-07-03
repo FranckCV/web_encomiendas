@@ -6850,7 +6850,8 @@ def entregar_sucursal():
     try:
         data = request.get_json()
         tracking = data.get('tracking')
-        
+        transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
+        tipo_comprobanteid = transaccion.get('tipo_comprobanteid', 2)
         if not tracking:
             return jsonify({
                 'success': False,
@@ -6859,6 +6860,7 @@ def entregar_sucursal():
         
         # Verificar que el paquete esté en estado correcto (C + PE)
         estados = controlador_paquete.get_data_pay(tracking)
+
         print(estados)
         
         if not estados or estados['estado_pago'] != 'C' or estados['ultimo_estado'] != 'PE':
@@ -6868,7 +6870,7 @@ def entregar_sucursal():
             }), 400
         
         # Actualizar el estado del paquete a entregado
-        resultado = controlador_paquete.actualizar_estado_entrega_sucursal(tracking)
+        resultado = controlador_paquete.actualizar_estado_entrega_sucursal(tracking, tipo_comprobanteid)
         print(resultado)
         
         if resultado:
@@ -6939,12 +6941,12 @@ def insertar_pago_paquete():
     num_serie = num_serie_data['transaccion_encomienda_num_serie']
     tipo_comprobante = data.get('tipo_comprobante')
     metodo_pago = data.get('metodo_pago')
-    
+
     try:
         pago = controlador_metodo_pago_venta.pagar_encomienda(num_serie, tipo_comprobante, metodo_pago, tracking)
         ultimo_estado = controlador_paquete.obtener_ultimo_estado(tracking)
         if ultimo_estado == 'PE':
-            controlador_paquete.actualizar_estado_entrega_sucursal(tracking)
+            controlador_paquete.actualizar_estado_entrega_sucursal(tracking, tipo_comprobante)
         elif ultimo_estado == 'ED':
             controlador_paquete.actualizar_estado_entrega_destinatario(tracking)
             
