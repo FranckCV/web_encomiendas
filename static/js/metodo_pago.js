@@ -1,12 +1,17 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Referencias a elementos DOM
     const tarjetaRadio = document.getElementById('tarjeta');
-    const bancoRadio = document.getElementById('banco');
+    // const bancoRadio = document.getElementById('banco');
     const tarjetaForm = document.getElementById('tarjeta-form');
-    const bancoForm = document.getElementById('banco-form');
+    // const bancoForm = document.getElementById('banco-form');
     const btnPagar = document.getElementById('btn-pagar');
     const montoPagar = document.getElementById('monto-pagar');
     const total = document.getElementById('total');
+
+    const yapeRadio = document.getElementById('yape');
+    const yapeForm = document.getElementById('yape-form');
+    const yapeNumber = document.getElementById('yape-number');
+
 
     // Campos del formulario de tarjeta
     const cardNumber = document.getElementById('card-number');
@@ -14,22 +19,74 @@ document.addEventListener('DOMContentLoaded', function () {
     const cardCvv = document.getElementById('card-cvv');
     const cardName = document.getElementById('card-name');
 
+    const comprobanteBoleta = document.getElementById('comprobante-boleta');
+    const comprobanteFactura = document.getElementById('comprobante-factura');
+
+    // function actualizarEstadoBoton() {
+    //     if (tarjetaRadio.checked) {
+    //         btnPagar.disabled = !validateCardForm();
+    //     } else if (yapeRadio.checked) {
+    //         btnPagar.disabled = !validateYapeNumber(yapeNumber);
+    //     }
+    // }
+
+    // [cardNumber, cardExpiry, cardCvv, cardName, yapeNumber].forEach(input => {
+    //     input.addEventListener('input', actualizarEstadoBoton);
+    // });
+
+    // [tarjetaRadio, yapeRadio].forEach(r => {
+    //     r.addEventListener('change', actualizarEstadoBoton);
+    // });
+
+
     // Cambiar entre formularios
+    // tarjetaRadio.addEventListener('change', function () {
+    //     if (this.checked) {
+    //         tarjetaForm.classList.add('active');
+    //         bancoForm.classList.remove('active');
+    //         animateFormTransition(tarjetaForm);
+    //     }
+    // });
+
     tarjetaRadio.addEventListener('change', function () {
         if (this.checked) {
             tarjetaForm.classList.add('active');
-            bancoForm.classList.remove('active');
+            yapeForm.classList.remove('active');
             animateFormTransition(tarjetaForm);
         }
     });
 
-    bancoRadio.addEventListener('change', function () {
+    function validateYapeNumber(input) {
+        const value = input.value.trim();
+        const valid = /^\d{9}$/.test(value); // 9 dígitos
+
+        updateValidationState(input, valid);
+        return valid;
+    }
+
+    yapeNumber.addEventListener('input', function (e) {
+        e.target.value = e.target.value.replace(/\D/g, ''); // Solo números
+        validateYapeNumber(e.target);
+        btnPagar.disabled = !validateYapeNumber(e.target);
+    });
+
+
+    yapeRadio.addEventListener('change', function () {
         if (this.checked) {
-            bancoForm.classList.add('active');
+            yapeForm.classList.add('active');
             tarjetaForm.classList.remove('active');
-            animateFormTransition(bancoForm);
+            animateFormTransition(yapeForm);
         }
     });
+
+
+    // bancoRadio.addEventListener('change', function () {
+    //     if (this.checked) {
+    //         bancoForm.classList.add('active');
+    //         tarjetaForm.classList.remove('active');
+    //         animateFormTransition(bancoForm);
+    //     }
+    // });
 
     // Formato de número de tarjeta (separado por grupos de 4)
     cardNumber.addEventListener('input', function (e) {
@@ -74,18 +131,80 @@ document.addEventListener('DOMContentLoaded', function () {
         validateCardName(e.target);
     });
 
+    btnPagar.addEventListener('click', procesarPago);
+
     // Botón de pago
-    btnPagar.addEventListener('click', function () {
-        if (tarjetaRadio.checked) {
-            if (validateCardForm()) {
-                procesarPago();
-            } else {
-                showToast('Por favor, completa todos los campos correctamente', 'error');
+    async function procesarPago() {
+        try {
+            btnPagar.disabled = true;
+            btnPagar.innerHTML = '<span class="loading-text">Procesando</span>';
+            btnPagar.classList.add('loading');
+
+            // Detectar método de pago
+            const metodo_pagoid = tarjetaRadio.checked ? 3 : 4;
+            const tipo_comprobanteid = comprobanteBoleta.checked ? 2 : 1;
+
+            const body = JSON.stringify({
+                metodo_pagoid,
+                tipo_comprobanteid,
+                numero_yape: yapeRadio.checked ? yapeNumber.value.trim() : null,
+            });
+
+            const res = await fetch("/confirmar-pago", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body
+            });
+
+            if (!res.ok) {
+                const error = await res.json();
+                throw new Error(error.error || "Error al confirmar pago");
             }
-        } else {
-            showToast('Procede con la transferencia bancaria según las instrucciones', 'info');
+
+            // Redirigir al usuario para descargar el comprobante
+            const blob = await res.blob(); // Procesar la respuesta como archivo binario
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "comprobante.pdf"; // Nombre del archivo descargado
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+
+            showToast('¡Pago procesado con éxito!', 'success');
+            btnPagar.innerHTML = `PAGO COMPLETADO`;
+            btnPagar.style.backgroundColor = '#27ae60';
+
+            localStorage.removeItem("carrito");
+
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1500);
+
+        } catch (error) {
+            showToast(error.message || "Error al procesar el pago", "error");
+
+            // Mostrar error debajo del botón de pago
+            let errorDiv = document.getElementById('error-pago');
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.id = 'error-pago';
+                errorDiv.style.color = '#e74c3c';
+                errorDiv.style.marginTop = '10px';
+                errorDiv.style.textAlign = 'center';
+                btnPagar.parentNode.appendChild(errorDiv);
+            }
+            errorDiv.textContent = error.message || "Error al procesar el pago";
+
+            btnPagar.disabled = false;
+            btnPagar.innerHTML = `PAGAR S/ <span id="monto-pagar">${montoPagar.textContent}</span>`;
+            btnPagar.classList.remove('loading');
+            console.error(error);
         }
-    });
+    }
+
 
     // Añadir efecto hover a las opciones de pago
     const paymentOptions = document.querySelectorAll('.option-container');
@@ -211,29 +330,6 @@ document.addEventListener('DOMContentLoaded', function () {
         form.style.animation = 'fadeIn 0.3s ease-in-out';
     }
 
-    function procesarPago() {
-        // Simulación de procesamiento de pago
-        btnPagar.disabled = true;
-        btnPagar.innerHTML = '<span class="loading-text">Procesando</span>';
-        btnPagar.classList.add('loading');
-
-        setTimeout(() => {
-            // Simular resultado exitoso
-            showToast('¡Pago procesado con éxito!', 'success');
-            btnPagar.disabled = false;
-            btnPagar.innerHTML = `PAGO COMPLETADO`;
-            btnPagar.classList.remove('loading');
-            btnPagar.style.backgroundColor = '#27ae60';
-
-            // Redireccionar después de un tiempo
-            setTimeout(() => {
-                // Aquí redireccionar a página de confirmación
-                // window.location.href = '/confirmacion';
-                console.log('Redireccionando a página de confirmación');
-            }, 2000);
-        }, 2000);
-    }
-
     // Sistema de notificaciones toast
     function showToast(message, type = 'info') {
         // Eliminar toast anteriores
@@ -270,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function () {
             setTimeout(() => {
                 toast.remove();
             }, 300);
-        }, 4000);
+        }, type === 'error' ? 8000 : 4000); // 8 segundos para error, 4 para otros
     }
 
     // Crear estilos para las notificaciones toast
@@ -409,42 +505,10 @@ document.addEventListener('DOMContentLoaded', function () {
     btnPagar.disabled = true;
 
     [cardNumber, cardExpiry, cardCvv, cardName].forEach(input => {
-    input.addEventListener('input', () => {
-        const ready = validateCardForm();
-        btnPagar.disabled = !ready;
+        input.addEventListener('input', () => {
+            const ready = validateCardForm();
+            btnPagar.disabled = !ready;
+        });
     });
-});
-
-async function procesarPago() {
-    try {
-        btnPagar.disabled = true;
-        btnPagar.innerHTML = '<span class="loading-text">Procesando</span>';
-        btnPagar.classList.add('loading');
-
-        const res = await fetch("/confirmar-pago", { method: "POST" });
-
-        if (!res.ok) throw new Error("No se pudo confirmar el pago");
-
-        // ✅ Éxito
-        localStorage.clear();  // opcional según tu lógica
-
-        const data = await res.json();
-        showToast('¡Pago procesado con éxito!', 'success');
-        btnPagar.innerHTML = `PAGO COMPLETADO`;
-        btnPagar.style.backgroundColor = '#27ae60';
-
-        setTimeout(() => {
-            window.location.href = '/'; // o la ruta final
-        }, 1500);
-
-    } catch (error) {
-        showToast("Error al procesar el pago. Intenta nuevamente", "error");
-        btnPagar.disabled = false;
-        btnPagar.innerHTML = `PAGAR S/ <span id="monto-pagar">${document.getElementById("monto-pagar").textContent}</span>`;
-        btnPagar.classList.remove('loading');
-
-        console.error(error);
-    }
-}
 
 });
