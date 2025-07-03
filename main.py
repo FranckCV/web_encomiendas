@@ -1453,6 +1453,7 @@ TRANSACCIONES = {
             # [False,   f'{ICON_UPDATE}',   'var(--color-update)',  'salida_informacion', {} , '' ,'update'],
             [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa' , 'mapa'], 
             [True, 'fa-solid fa-bus', "#482A6C", 'editar_salida_informacion',  {"salida_id": "id"} , '' , 'salida' , False],
+             [True, 'fa-duotone fa-regular fa-bullseye-pointer', "#A8D124", 'cambiar_estado_salida_web',  {"salida_id": "id"} , '' , 'salida' , False],
 
             # [True,   f'fa-solid fa-location-dot',   'grey',  'seguimiento_empleado_prueba' , {"placa": "placa"}],
             # [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa',], 
@@ -5744,7 +5745,35 @@ def insertar_detalle_estado():
     except Exception as e:
         return jsonify({"status": -1, "mensaje": f"Excepción: {str(e)}"}), 500
     
+ 
+@app.route('/cambiar_estado_salida_web/<int:salida_id>')
+def cambiar_estado_salida_web(salida_id):
+    return render_template('cambiar_estado_salida.html', salida_id=salida_id)
+
+
+
+@app.route('/actualizar_estado_salida', methods=['POST'])
+def actualizar_estado_salida():
+    try:
+        # Obtener el id y el estado del formulario
+        id = request.form.get('salida_id')
+        estado = request.form.get('estado')
+        
+        # Llamar al controlador para actualizar el estado
+        controlador_salida.cambiar_estado_salida_web(id, estado)
+        
+        # Usar flash para mostrar mensaje de éxito
+        flash('Estado de salida actualizado correctamente.', 'success')
+
+        # Redirigir usando JavaScript
+        return jsonify({'success': True, 'message': 'Estado actualizado correctamente', 'id': id})
     
+    except Exception as e:
+        # Mostrar mensaje de error
+        flash(f'Error al actualizar el estado de salida: {str(e)}', 'danger')
+        return jsonify({'success': False, 'message': f'Error al actualizar el estado de salida: {str(e)}'})
+
+
 @app.route('/salida_informacion')
 def salida_informacion():
     sucursal_origen = controlador_sucursal.sucursales_origen()
@@ -6044,6 +6073,9 @@ def obtener_unidades_devolucion():
             'success': False,
             'message': f'Error al obtener unidades: {str(e)}'
         }), 500
+
+
+
 
 
 @app.route("/programar_devolucion", methods=["POST"])
