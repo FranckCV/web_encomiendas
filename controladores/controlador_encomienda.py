@@ -259,6 +259,7 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante, meto
                 contenido_paqueteid = int(r.get('tipoArticuloId')) if tipo_empaque == 1 else None
                 cantidad_folios = r.get('cantidad_folios') if tipo_empaque == 2 else None
                 direccion_destinatario = r.get('direccion_destinatario') if tipo_entrega == 2 else ''
+                ultimo_estado = 'PE'
 
                 cursor.execute(
                     """
@@ -268,8 +269,8 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante, meto
                     sucursal_destino_id, tipo_documento_destinatario_id, tipo_empaqueid,
                     contenido_paqueteid, tipo_recepcionid, salidaid, transaccion_encomienda_num_serie,
                     qr_url, estado_pago, modalidad_pagoid, nombres_contacto_destinatario,
-                    apellidos_razon_destinatario, cantidad_folios)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    apellidos_razon_destinatario, cantidad_folios,ultimo_estado)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
                     """,
                     (
                         clave, valor, peso, alto, largo, tarifa, ancho, '',  # descripcion
@@ -277,7 +278,7 @@ def crear_transaccion_y_paquetes(registros, cliente_data, tipo_comprobante, meto
                         suc_dest_id, tipo_doc_dest, tipo_empaque,
                         contenido_paqueteid, tipo_entrega, None, num_serie,
                         None, estado_pago, modalidad_pago,
-                        nombre_contacto_destinatario, apellido_razon_destinatario, cantidad_folios
+                        nombre_contacto_destinatario, apellido_razon_destinatario, cantidad_folios,ultimo_estado
                     )
                 )
 

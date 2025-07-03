@@ -1452,6 +1452,8 @@ TRANSACCIONES = {
             # [False,   f'{ICON_CONSULT}',   'var(--color-consult)',  'salida_informacion', {} , '' , 'consult'],
             # [False,   f'{ICON_UPDATE}',   'var(--color-update)',  'salida_informacion', {} , '' ,'update'],
             [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa' , 'mapa'], 
+            [True, 'fa-solid fa-bus', "#482A6C", 'editar_salida_informacion',  {"salida_id": "id"} , '' , 'salida' , False],
+
             # [True,   f'fa-solid fa-location-dot',   'grey',  'seguimiento_empleado_prueba' , {"placa": "placa"}],
             # [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa',], 
         ],
@@ -3947,25 +3949,108 @@ def generar_rotulos_paquetes(trackings):
 
 @app.route('/descargar_comprobante/<tracking>', methods=['GET'])
 def descargar_comprobante(tracking):
+    from controladores import reporte_comprobante as reporte_comprobante
     try:
-        ruta_pdf = os.path.join("static", "comprobantes", str(tracking), "comprobante.pdf")
-
-        if not os.path.exists(ruta_pdf):
+        # Obtener el tipo de comprobante, puedes modificar esta parte para obtenerlo de alguna manera
+        tipo_comprobante_id = 1  # Aquí podrías obtener el tipo de comprobante basado en el contexto
+        comprobante = controlador_tipo_comprobante.get_data_comprobante(tipo_comprobante_id)
+        
+        if not comprobante:
             return jsonify({
-                'success': False,
-                'message': 'Comprobante no encontrado'
+                'success': False, 
+                'message': 'Tipo de comprobante no encontrado'
             }), 404
-
-        return send_file(
-            ruta_pdf,
-            as_attachment=True,
-            download_name=f"comprobante_{tracking}.pdf"
+        
+        transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
+        if not transaccion:
+            return jsonify({
+                'success': False, 
+                'message': 'Transacción no encontrada'
+            }), 404
+        
+        # Generar la serie del comprobante con ceros a la izquierda (6 dígitos)
+        num_serie = transaccion.get('num_serie')
+        numero_formateado = str(num_serie).zfill(6)  # Ej: 22 → 000022
+        comprobante_serie = f"{comprobante['inicial']}-{numero_formateado}"
+        
+        # Crear directorio para guardar el comprobante
+        carpeta = os.path.join(current_app.static_folder, "comprobantes", str(tracking))
+        os.makedirs(carpeta, exist_ok=True)
+        ruta_pdf = os.path.join(carpeta, "comprobante.pdf")
+        
+        # Si ya existe el PDF, devolverlo directamente
+        if os.path.exists(ruta_pdf):
+            return send_file(ruta_pdf, as_attachment=True,
+                             download_name=f"comprobante_{tracking}.pdf")
+        
+        # Datos de empresa
+        empresa = controlador_empresa.getDataComprobante()
+        if not empresa:
+            return jsonify({
+                'success': False, 
+                'message': 'Datos de empresa no disponibles'
+            }), 500
+        
+        # Datos del cliente
+        cliente = {
+            'nombre_siglas': transaccion.get('nombre_siglas', ''),
+            'apellidos_razon': transaccion.get('apellidos_razon', ''),
+            'documento_identidad': transaccion.get('documento_identidad', ''),
+            'direccion': transaccion.get('direccion_destino', '')
+        }
+        
+        # Obtener ítems
+        items, masivo = controlador_encomienda.obtener_items_por_num_serie(num_serie)
+        
+        # Calcular resumen
+        monto_total = float(transaccion.get('monto_total', 0))
+        igv_rate = float(empresa.get('igv', 18)) / 100
+        
+        if igv_rate > 0:
+            op_gravada = monto_total / (1 + igv_rate)
+            igv = monto_total - op_gravada
+        else:
+            op_gravada = monto_total
+            igv = 0
+        
+        resumen = {
+            'op_gravada': op_gravada,
+            'op_exonerada': 0,
+            'op_inafecta': 0,
+            'isc': 0,
+            'igv': igv,
+            'icbper': 0,
+            'otros_cargos': 0,
+            'otros_tributos': 0,
+            'importe_total': monto_total
+        }
+        
+        # Ruta del QR
+        qr_path = os.path.join(carpeta, "qr.png")
+        
+        # Generar el PDF del comprobante
+        reporte_comprobante.generar_comprobante_pdf(
+            transaccion=transaccion,
+            cliente=cliente,
+            empresa=empresa,
+            tipo_comprobante=comprobante['nombre'],  # Ej: "BOLETA"
+            comprobante_serie=comprobante_serie,
+            items=items,
+            resumen=resumen,
+            qr_path=qr_path,
+            masivo=masivo,
+            ruta_pdf=ruta_pdf  # Guardar en la ruta del directorio
         )
-
+        
+        # Enviar el comprobante generado como archivo adjunto
+        return send_file(ruta_pdf, as_attachment=True,
+                         download_name=f"comprobante_{tracking}.pdf")
+        
     except Exception as e:
+        current_app.logger.error(f"Error al generar comprobante: {str(e)}")
         return jsonify({
-            'success': False,
-            'message': f"Error al descargar comprobante: {str(e)}"
+            'success': False, 
+            'message': f'Error al generar comprobante: {str(e)}'
         }), 500
 
 
@@ -4379,7 +4464,6 @@ def generar_qr_boleta(datos):
 # Agregar esta importación al inicio del archivo main.py
 from controladores import controlador_perfil as controlador_perfil
 
-# Reemplazar el endpoint existente /perfil con este:
 @app.route("/perfil")
 # @validar_cliente()
 def perfil():
@@ -5653,6 +5737,69 @@ def salida_informacion():
                            paquetes = paquetes,
                            recojo_casa = recojo_casa)
 
+from controladores import controlador_editar_salida as controlador_editar_salida
+
+@app.route('/editar_salida_informacion/<int:salida_id>')
+def editar_salida_informacion(salida_id):
+    # try:
+        # Obtener datos de la salida existente
+        salida_data = controlador_editar_salida.obtener_salida_completa(salida_id)
+        
+        if not salida_data:
+            flash('Salida no encontrada', 'error')
+            return redirect(url_for('salida_informacion'))  # Redirigir a lista de salidas
+        
+        # Obtener datos base (igual que en crear salida)
+        sucursal_origen = controlador_sucursal.sucursales_origen()
+        unidades = controlador_unidad.get_capacidad_unidad()
+        empleados = controlador_empleado.get_driver_employee()
+        agencias = controlador_sucursal.get_agencias_data()
+        paquetes = controlador_paquete.listar_paquetes_por_sucursal_escalas()
+        recojo_casa = controlador_encomienda.get_recojo_casa()
+        
+        return render_template('editar_salida_informacion.html',
+                             salida_data=salida_data,
+                             sucursal_origen=sucursal_origen,
+                             unidades=unidades,
+                             empleados=empleados,
+                             agencias=agencias,
+                             paquetes=paquetes,
+                             recojo_casa=recojo_casa,
+                             page_titulo="Editar Salida",
+                             page_icono="fa-solid fa-edit")
+        
+    # except Exception as e:
+    #     print(f"Error al cargar salida para editar: {str(e)}")
+    #     flash('Error al cargar los datos de la salida', 'error')
+    #     return redirect(url_for('salida_informacion'))
+
+@app.route('/actualizar_salida/<int:salida_id>', methods=['POST'])
+def actualizar_salida(salida_id):
+    try:
+        data = request.get_json()
+        
+        # Actualizar la salida
+        resultado = controlador_editar_salida.actualizar_salida_completa(salida_id, data)
+        
+        if resultado['success']:
+            return jsonify({
+                'success': True,
+                'mensaje': 'Salida actualizada correctamente',
+                'salida_id': salida_id
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'mensaje': resultado['mensaje']
+            }), 400
+            
+    except Exception as e:
+        print(f"Error al actualizar salida: {str(e)}")
+        return jsonify({
+            'success': False,
+            'mensaje': f'Error interno: {str(e)}'
+        }), 500
+
 @app.route('/sucursales_destino_api',  methods=["POST"])
 def sucursales_destino_api():
     try:
@@ -6604,10 +6751,131 @@ def eliminar_ultimo_seguimiento(reclamoid):
 @app.route("/pagar_paquete",defaults={'tracking': None})
 @app.route("/pagar_paquete/<tracking>")
 def pagar_paquete(tracking):
+    estados = controlador_paquete.get_data_pay(tracking)
     
     tipo_comprobante = controlador_tipo_comprobante.get_tipo_comprobante_by_tipo()
     metodo_pago = controlador_metodo_pago.get_options()
-    return render_template('pagar_paquete.html',tracking = tracking ,metodo_pago=metodo_pago,tipo_comprobante=tipo_comprobante)
+    return render_template('pagar_paquete.html',tracking = tracking ,metodo_pago=metodo_pago,tipo_comprobante=tipo_comprobante, estados = estados)
+
+
+@app.route('/verificar_clave', methods=['POST'])
+def verificar_clave():
+
+    try:
+        data = request.get_json()
+        tracking = data.get('tracking')
+        security_code = data.get('security_code')
+        
+        if not tracking or not security_code:
+            return jsonify({
+                'success': False,
+                'message': 'Tracking y clave de seguridad son requeridos'
+            }), 400
+        
+        clave_valida = controlador_paquete.verificar_clave_seguridad(tracking, security_code)
+        
+        if clave_valida:
+            return jsonify({
+                'success': True,
+                'message': 'Clave verificada correctamente'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Clave de seguridad incorrecta'
+            }), 401
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al verificar clave: {str(e)}'
+        }), 500
+
+
+@app.route('/entregar_sucursal', methods=['POST'])
+def entregar_sucursal():
+    try:
+        data = request.get_json()
+        tracking = data.get('tracking')
+        
+        if not tracking:
+            return jsonify({
+                'success': False,
+                'message': 'Código de tracking es requerido'
+            }), 400
+        
+        # Verificar que el paquete esté en estado correcto (C + PE)
+        estados = controlador_paquete.get_data_pay(tracking)
+        print(estados)
+        
+        if not estados or estados['estado_pago'] != 'C' or estados['ultimo_estado'] != 'PE':
+            return jsonify({
+                'success': False,
+                'message': 'El paquete no está en estado válido para entrega en sucursal'
+            }), 400
+        
+        # Actualizar el estado del paquete a entregado
+        resultado = controlador_paquete.actualizar_estado_entrega_sucursal(tracking)
+        print(resultado)
+        
+        if resultado:
+            return jsonify({
+                'success': True,
+                'message': 'Paquete entregado exitosamente en sucursal'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Error al actualizar el estado del paquete'
+            }), 500
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Ocurrió un error: {str(e)}'
+        }), 500
+
+
+
+@app.route('/entregar_destinatario', methods=['POST'])
+def entregar_destinatario():
+
+    try:
+        data = request.get_json()
+        tracking = data.get('tracking')
+        
+        if not tracking:
+            return jsonify({
+                'success': False,
+                'message': 'Código de tracking es requerido'
+            }), 400
+        
+        estados = controlador_paquete.get_data_pay(tracking)
+        print(estados)
+        if not estados or estados['estado_pago'] != 'C' or estados['ultimo_estado'] != 'ED':
+            return jsonify({
+                'success': False,
+                'message': 'El paquete no está en estado válido para entrega al destinatario'
+            }), 400
+        
+        resultado = controlador_paquete.actualizar_estado_entrega_destinatario(tracking)
+        
+        if resultado:
+            return jsonify({
+                'success': True,
+                'message': 'Paquete entregado exitosamente al destinatario'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Error al actualizar el estado del paquete'
+            }), 500
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al entregar paquete: {str(e)}'
+        }), 500
 
 
 @app.route('/insertar_pago_paquete', methods=['POST'])
@@ -6621,6 +6889,13 @@ def insertar_pago_paquete():
     
     try:
         pago = controlador_metodo_pago_venta.pagar_encomienda(num_serie, tipo_comprobante, metodo_pago, tracking)
+        ultimo_estado = controlador_paquete.obtener_ultimo_estado(tracking)
+        if ultimo_estado == 'PE':
+            controlador_paquete.actualizar_estado_entrega_sucursal(tracking)
+        elif ultimo_estado == 'ED':
+            controlador_paquete.actualizar_estado_entrega_destinatario(tracking)
+            
+        generar_comprobante(tracking,tipo_comprobante)
         return jsonify({
             'success': True,
             'message': 'Pago procesado exitosamente',
