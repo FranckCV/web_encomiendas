@@ -1449,14 +1449,9 @@ TRANSACCIONES = {
         },
         "buttons": [
            # hay_parametros  icon         color              enlace_function      parametros   clase_html   modo(insert ,update , consult)
-            # [False,   f'{ICON_CONSULT}',   'var(--color-consult)',  'salida_informacion', {} , '' , 'consult'],
-            # [False,   f'{ICON_UPDATE}',   'var(--color-update)',  'salida_informacion', {} , '' ,'update'],
-            [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa' , 'mapa'], 
+            [False, f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa' , 'mapa'], 
             [True, 'fa-solid fa-bus', "#482A6C", 'editar_salida_informacion',  {"salida_id": "id"} , '' , 'salida' , False],
-             [True, 'fa-duotone fa-regular fa-bullseye-pointer', "#A8D124", 'cambiar_estado_salida_web',  {"salida_id": "id"} , '' , 'salida' , False],
-
-            # [True,   f'fa-solid fa-location-dot',   'grey',  'seguimiento_empleado_prueba' , {"placa": "placa"}],
-            # [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa',], 
+            [True, 'fa-solid fa-bars-progress', "#A8D124", 'cambiar_estado_salida_web',  {"salida_id": "id"} , '' , 'estado' , False],
         ],
         "options": [
         # mostrar_url       icon             color                  text           enlace_function    parametros  modo(insert ,update , consult)
@@ -5747,6 +5742,7 @@ def insertar_detalle_estado():
     
  
 @app.route('/cambiar_estado_salida_web/<int:salida_id>')
+@validar_empleado()
 def cambiar_estado_salida_web(salida_id):
     return render_template('cambiar_estado_salida.html', salida_id=salida_id)
 
@@ -5793,6 +5789,7 @@ def salida_informacion():
 from controladores import controlador_editar_salida as controlador_editar_salida
 
 @app.route('/editar_salida_informacion/<int:salida_id>')
+@validar_empleado()
 def editar_salida_informacion(salida_id):
     # try:
         # Obtener datos de la salida existente
