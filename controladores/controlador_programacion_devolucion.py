@@ -271,4 +271,5 @@ def obtener_paquetes_estado_17():
     AND p.estado_pago NOT IN ('E', 'D')
     ORDER BY s.fecha DESC, s.hora DESC
     """
+    # print(sql_select_fetchall(sql))
     return sql_select_fetchall(sql)

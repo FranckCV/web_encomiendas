@@ -1449,14 +1449,9 @@ TRANSACCIONES = {
         },
         "buttons": [
            # hay_parametros  icon         color              enlace_function      parametros   clase_html   modo(insert ,update , consult)
-            # [False,   f'{ICON_CONSULT}',   'var(--color-consult)',  'salida_informacion', {} , '' , 'consult'],
-            # [False,   f'{ICON_UPDATE}',   'var(--color-update)',  'salida_informacion', {} , '' ,'update'],
-            [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa' , 'mapa'], 
+            [False, f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa' , 'mapa'], 
             [True, 'fa-solid fa-bus', "#482A6C", 'editar_salida_informacion',  {"salida_id": "id"} , '' , 'salida' , False],
-             [True, 'fa-duotone fa-regular fa-bullseye-pointer', "#A8D124", 'cambiar_estado_salida_web',  {"salida_id": "id"} , '' , 'salida' , False],
-
-            # [True,   f'fa-solid fa-location-dot',   'grey',  'seguimiento_empleado_prueba' , {"placa": "placa"}],
-            # [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa',], 
+            [True, 'fa-solid fa-bars-progress', "#A8D124", 'cambiar_estado_salida_web',  {"salida_id": "id"} , '' , 'estado' , False],
         ],
         "options": [
         # mostrar_url       icon             color                  text           enlace_function    parametros  modo(insert ,update , consult)
@@ -5043,7 +5038,7 @@ def crud_generico(tabla):
             )
 
 
-
+ 
 @app.route("/transaccion=<tabla>",defaults={'pk_foreign': None})
 @app.route("/transaccion=<tabla>/<pk_foreign>")
 @validar_empleado() 
@@ -5747,6 +5742,7 @@ def insertar_detalle_estado():
     
  
 @app.route('/cambiar_estado_salida_web/<int:salida_id>')
+@validar_empleado()
 def cambiar_estado_salida_web(salida_id):
     return render_template('cambiar_estado_salida.html', salida_id=salida_id)
 
@@ -5793,6 +5789,7 @@ def salida_informacion():
 from controladores import controlador_editar_salida as controlador_editar_salida
 
 @app.route('/editar_salida_informacion/<int:salida_id>')
+@validar_empleado()
 def editar_salida_informacion(salida_id):
     # try:
         # Obtener datos de la salida existente
@@ -6186,14 +6183,14 @@ def validar_paquete_devolucion_endpoint(tracking):
 
 
 @app.route("/obtener_paquetes_estado_17", methods=["GET"])
-@validar_empleado()
+# @validar_empleado()
 def obtener_paquetes_estado_17():
     """
     Endpoint para obtener paquetes con detalle_estado_id = 17
     """
     try:
         paquetes = controlador_programacion_devolucion.obtener_paquetes_estado_17()
-        
+        print(paquetes)
         return jsonify({
             'success': True,
             'paquetes': paquetes
@@ -6853,7 +6850,8 @@ def entregar_sucursal():
     try:
         data = request.get_json()
         tracking = data.get('tracking')
-        
+        transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
+        tipo_comprobanteid = transaccion.get('tipo_comprobanteid', 2)
         if not tracking:
             return jsonify({
                 'success': False,
@@ -6862,6 +6860,7 @@ def entregar_sucursal():
         
         # Verificar que el paquete esté en estado correcto (C + PE)
         estados = controlador_paquete.get_data_pay(tracking)
+
         print(estados)
         
         if not estados or estados['estado_pago'] != 'C' or estados['ultimo_estado'] != 'PE':
@@ -6871,7 +6870,7 @@ def entregar_sucursal():
             }), 400
         
         # Actualizar el estado del paquete a entregado
-        resultado = controlador_paquete.actualizar_estado_entrega_sucursal(tracking)
+        resultado = controlador_paquete.actualizar_estado_entrega_sucursal(tracking, tipo_comprobanteid)
         print(resultado)
         
         if resultado:
@@ -6942,12 +6941,12 @@ def insertar_pago_paquete():
     num_serie = num_serie_data['transaccion_encomienda_num_serie']
     tipo_comprobante = data.get('tipo_comprobante')
     metodo_pago = data.get('metodo_pago')
-    
+
     try:
         pago = controlador_metodo_pago_venta.pagar_encomienda(num_serie, tipo_comprobante, metodo_pago, tracking)
         ultimo_estado = controlador_paquete.obtener_ultimo_estado(tracking)
         if ultimo_estado == 'PE':
-            controlador_paquete.actualizar_estado_entrega_sucursal(tracking)
+            controlador_paquete.actualizar_estado_entrega_sucursal(tracking, tipo_comprobante)
         elif ultimo_estado == 'ED':
             controlador_paquete.actualizar_estado_entrega_destinatario(tracking)
             
