@@ -103,15 +103,22 @@ def get_table():
         
 #     except Exception as e:
         
-def update_row( id , nombre ):
+def update_row(num_serie, masivo, descripcion, monto_total, recojo_casa, id_sucursal_origen, fecha, hora, direccion_recojo, clienteid):
     sql = f'''
-        update {table_name} set 
-        nombre = %s 
-        where {get_primary_key()} = {id}
+        UPDATE transaccion_encomienda SET 
+        masivo=%s,
+        descripcion=%s,
+        monto_total=%s,
+        recojo_casa=%s,
+        id_sucursal_origen=%s,
+        fecha=%s,
+        hora=%s,
+        direccion_recojo=%s,
+        clienteid=%s
+        where num_serie = %s
     '''
-    sql_execute(sql, (nombre ))
+    sql_execute(sql, (masivo, descripcion, monto_total, recojo_casa, id_sucursal_origen, fecha, hora, direccion_recojo, clienteid , num_serie))
 
-    unactive_row_table(table_name , id)
  
 
 def insert_cliente(correo, telefono, num_doc, nombre, tipo_doc):
