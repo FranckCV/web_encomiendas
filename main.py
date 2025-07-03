@@ -1452,6 +1452,8 @@ TRANSACCIONES = {
             # [False,   f'{ICON_CONSULT}',   'var(--color-consult)',  'salida_informacion', {} , '' , 'consult'],
             # [False,   f'{ICON_UPDATE}',   'var(--color-update)',  'salida_informacion', {} , '' ,'update'],
             [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa' , 'mapa'], 
+            [True, 'fa-solid fa-bus', "#482A6C", 'editar_salida_informacion',  {"salida_id": "id"} , '' , 'salida' , False],
+
             # [True,   f'fa-solid fa-location-dot',   'grey',  'seguimiento_empleado_prueba' , {"placa": "placa"}],
             # [False,   f'fa-solid fa-location-dot',   'grey',  None , {} , 'btn-ver-mapa',], 
         ],
@@ -4379,7 +4381,6 @@ def generar_qr_boleta(datos):
 # Agregar esta importación al inicio del archivo main.py
 from controladores import controlador_perfil as controlador_perfil
 
-# Reemplazar el endpoint existente /perfil con este:
 @app.route("/perfil")
 # @validar_cliente()
 def perfil():
@@ -5652,6 +5653,69 @@ def salida_informacion():
                            agencias=agencias,
                            paquetes = paquetes,
                            recojo_casa = recojo_casa)
+
+from controladores import controlador_editar_salida as controlador_editar_salida
+
+@app.route('/editar_salida_informacion/<int:salida_id>')
+def editar_salida_informacion(salida_id):
+    # try:
+        # Obtener datos de la salida existente
+        salida_data = controlador_editar_salida.obtener_salida_completa(salida_id)
+        
+        if not salida_data:
+            flash('Salida no encontrada', 'error')
+            return redirect(url_for('salida_informacion'))  # Redirigir a lista de salidas
+        
+        # Obtener datos base (igual que en crear salida)
+        sucursal_origen = controlador_sucursal.sucursales_origen()
+        unidades = controlador_unidad.get_capacidad_unidad()
+        empleados = controlador_empleado.get_driver_employee()
+        agencias = controlador_sucursal.get_agencias_data()
+        paquetes = controlador_paquete.listar_paquetes_por_sucursal_escalas()
+        recojo_casa = controlador_encomienda.get_recojo_casa()
+        
+        return render_template('editar_salida_informacion.html',
+                             salida_data=salida_data,
+                             sucursal_origen=sucursal_origen,
+                             unidades=unidades,
+                             empleados=empleados,
+                             agencias=agencias,
+                             paquetes=paquetes,
+                             recojo_casa=recojo_casa,
+                             page_titulo="Editar Salida",
+                             page_icono="fa-solid fa-edit")
+        
+    # except Exception as e:
+    #     print(f"Error al cargar salida para editar: {str(e)}")
+    #     flash('Error al cargar los datos de la salida', 'error')
+    #     return redirect(url_for('salida_informacion'))
+
+@app.route('/actualizar_salida/<int:salida_id>', methods=['POST'])
+def actualizar_salida(salida_id):
+    try:
+        data = request.get_json()
+        
+        # Actualizar la salida
+        resultado = controlador_editar_salida.actualizar_salida_completa(salida_id, data)
+        
+        if resultado['success']:
+            return jsonify({
+                'success': True,
+                'mensaje': 'Salida actualizada correctamente',
+                'salida_id': salida_id
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'mensaje': resultado['mensaje']
+            }), 400
+            
+    except Exception as e:
+        print(f"Error al actualizar salida: {str(e)}")
+        return jsonify({
+            'success': False,
+            'mensaje': f'Error interno: {str(e)}'
+        }), 500
 
 @app.route('/sucursales_destino_api',  methods=["POST"])
 def sucursales_destino_api():

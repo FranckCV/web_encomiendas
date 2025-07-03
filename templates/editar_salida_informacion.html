@@ -1,0 +1,2591 @@
+{% extends "MAESTRA_ADMIN.html" %}
+
+{% block estilos %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<style>
+    /* ========================================
+   ESTILOS PARA CONTROL DE CAPACIDAD POR TRAMOS
+   ======================================== */
+
+.control-capacidad-tramos {
+    margin-top: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.vehiculo-control-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.vehiculo-resumen {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 1px solid #dee2e6;
+}
+
+.vehiculo-icon {
+    font-size: 2.5rem;
+    margin-right: 15px;
+    background: #fff;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.vehiculo-info {
+    flex: 1;
+}
+
+.vehiculo-info h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.vehiculo-tag {
+    background: #28a745;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.capacidad-general {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    text-align: right;
+    min-width: 200px;
+}
+
+.barra-capacidad-general {
+    padding: 0 20px 20px 20px;
+}
+
+.barra-fondo {
+    width: 100%;
+    height: 20px;
+    margin-top: 18px;
+    background-color: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.barra-relleno {
+    height: 100%;
+    transition: width 0.3s ease;
+    border-radius: 10px;
+    position: relative;
+}
+
+.barra-relleno.dentro-limite {
+    background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+}
+
+.barra-relleno.cerca-limite {
+    background: linear-gradient(90deg, #ffc107 0%, #fd7e14 100%);
+}
+
+.barra-relleno.excede-limite {
+    background: linear-gradient(90deg, #dc3545 0%, #e91e63 100%);
+}
+
+.vehiculo-seleccionado-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.vehiculo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.vehiculo-nombre {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #2c3e50;
+}
+
+.vehiculo-capacidad {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.btn-cambiar-vehiculo {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-cambiar-vehiculo:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+}
+
+.detalle-tramos {
+    background: #fff;
+    border-top: 1px solid #dee2e6;
+}
+
+.detalle-header {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.detalle-icon {
+    font-size: 1.5rem;
+    margin-right: 10px;
+}
+
+.detalle-header h4 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.tabla-tramos {
+    display: flex;
+    flex-direction: column;
+}
+
+.tabla-header {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1.5fr;
+    gap: 15px;
+    padding: 15px 20px;
+    background: #e9ecef;
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.fila-tramo {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1.5fr;
+    gap: 15px;
+    padding: 15px 20px;
+    border-bottom: 1px solid #f1f3f4;
+    transition: background-color 0.2s ease;
+}
+
+.fila-tramo:hover {
+    background-color: #f8f9fa;
+}
+
+.fila-tramo:last-child {
+    border-bottom: none;
+}
+
+.columna-tramo strong {
+    color: #2c3e50;
+    font-size: 0.95rem;
+}
+
+.columna-peso {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.peso-valor {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.95rem;
+}
+
+.barra-mini {
+    width: 100%;
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.barra-mini-relleno {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.barra-mini-relleno.dentro-limite {
+    background: #28a745;
+}
+
+.barra-mini-relleno.cerca-limite {
+    background: #ffc107;
+}
+
+.barra-mini-relleno.excede-limite {
+    background: #dc3545;
+}
+
+.porcentaje {
+    color: #6c757d;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.estado-badge {
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.estado-badge.dentro-limite {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.estado-badge.cerca-limite {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.estado-badge.excede-limite {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Badge para edición */
+.edicion-badge {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .vehiculo-resumen {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .vehiculo-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .tabla-header,
+    .fila-tramo {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .tabla-header {
+        display: none; /* Ocultar headers en móvil */
+    }
+    
+    .fila-tramo {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+}
+
+/* Animaciones */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.control-capacidad-tramos {
+    animation: slideIn 0.3s ease;
+}
+
+#map {
+  height: 400px;
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.leaflet-popup-content .btn-agregar-escala {
+    display: inline-block;
+    background-color: #28a745;
+    color: white;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    border: none;
+    border-radius: 5px;
+    margin-top: 6px;
+    cursor: pointer;
+}
+
+.leaflet-popup-content .btn-eliminar-escala {
+    display: inline-block;
+    background-color: #dc3545;
+    color: white;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    border: none;
+    border-radius: 5px;
+    margin-top: 6px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+/* Estilos para marcadores numerados */
+.marker-numero {
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    border: 2px solid white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.marker-escala {
+    background-color: #28a745;
+}
+
+.marker-origen {
+    background-color: #ff6b6b;
+}
+
+.marker-destino {
+    background-color: #4ecdc4;
+}
+
+/* Estilos para las escalas */
+.escala-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.escala-item:hover {
+    background: #f8f9fa;
+    border-color: #007bff;
+}
+
+.escala-number {
+    background: #007bff;
+    color: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.escalas-info {
+    background: #e3f2fd;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    color: #1976d2;
+}
+
+/* Estilos para pestañas deshabilitadas */
+.tabs-container.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.form-disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+</style>
+<link rel="stylesheet" href="/static/css/salida_informacion.css">
+
+{% endblock estilos %}
+
+{% block titulo %}
+{{ page_titulo or "Editar Salida" }}
+{% endblock %}
+
+{% block contenido %}
+
+<div class="container">
+    <!-- Header -->
+    <!-- <div class="block_crud block_title" style="padding: 20px 10px 30px 10px; font-size: 1rem;">
+        <h3 class="crud_title">
+            <i class="{{ page_icono or 'fa-solid fa-edit' }}"></i> 
+            {{ page_titulo or "Editar Salida" }} #{{ salida_data.id }}
+            <span class="edicion-badge">
+                <i class="fa-solid fa-pencil"></i>
+                Modo Edición
+            </span>
+        </h3>
+    </div> -->
+
+    <!-- Resumen Superior -->
+    <div class="summary-container">
+        <h2 class="summary-title">
+            <i class="fa-solid fa-edit"></i>
+            Edición de la Salida #{{ salida_data.id }}
+        </h2>
+
+        <!-- Datos Generales -->
+        <div class="general-data-section">
+            <h3 class="general-title">
+                <i class="fa-solid fa-calendar-days"></i>
+                Datos Generales
+            </h3>
+            <div class="form-group">
+                <div class="form-field">
+                    <label for="fecha">Fecha de salida:</label>
+                    <input type="date" id="fecha" required value="{{ salida_data.fecha }}" onchange="validarDatosGenerales()">
+                </div>
+                <div class="form-field">
+                    <label for="hora">Hora de salida:</label>
+                    <input type="time" id="hora" required value="{{ salida_data.hora }}" onchange="validarDatosGenerales()">
+                </div>
+
+                <div class="form-field">
+                    <label for="origenSelect">Seleccionar sucursal de origen:</label>
+                    <select id="origenSelect" required onchange="cargarDestinos(this.value)">
+                        <option value="">-- Seleccione el destino de origen --</option>
+                        {% for fila in sucursal_origen %}
+                        <option value="{{ fila.sucursal_origen_id }}" 
+                                data-lat="{{ fila.latitud }}" 
+                                data-lng="{{ fila.longitud }}"
+                                {{ 'selected' if fila.sucursal_origen_id == salida_data.origen.id else '' }}>
+                            {{ fila.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="destinoSelect">Seleccionar sucursal de destino:</label>
+                    <select id="destinoSelect" required onchange="validarDatosGenerales()">
+                        <option value="">-- Primero seleccione un origen --</option>
+                        <!-- Se cargarán dinámicamente y se preseleccionará el destino actual -->
+                    </select>
+                </div>
+            </div>
+            
+            <div class="alert alert-info" id="alertaDatosGenerales" style="display: none;">
+                <i class="fa-solid fa-info-circle"></i>
+                Complete todos los datos generales para habilitar la configuración de la salida.
+            </div>
+        </div>
+    </div>
+
+    <!-- Sistema de Pestañas -->
+    <div class="tabs-container" id="tabsContainer">
+        <div class="tabs-nav">
+            <button class="tab-btn active" onclick="openTab(event, 'tab-vehiculo')">
+                <i class="fa-solid fa-truck"></i>
+                Unidad
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-empleados')">
+                <i class="fa-solid fa-users"></i>
+                Empleados
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-escalas')">
+                <i class="fa-solid fa-route"></i>
+                Escalas
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-paquetes')">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                Paquetes
+            </button>
+        </div>
+
+        <!-- Contenido Pestaña: Vehículo -->
+        <div id="tab-vehiculo" class="tab-content active">
+            <div class="section">
+                <h2 class="section-title">🚚 Selección de unidad</h2>
+                <div class="alert alert-error" id="errorVehiculo"></div>
+                
+                <!-- Tabla de vehículos (se oculta al seleccionar) -->
+                <table id="vehiculosTabla">
+                    <thead>
+                        <tr>
+                            <th>Vehículo</th>
+                            <th>Capacidad Máxima (kg)</th>
+                            <th>Capacidad Usada (kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <!-- Vehículo seleccionado (se muestra al seleccionar) -->
+                <div class="assigned-items" id="vehiculoSeleccionado" style="display: none;">
+                    <div id="vehiculoInfo">
+                        <!-- El contenido se genera dinámicamente -->
+                    </div>
+                    
+                    <!-- Barra de capacidad básica (se mantiene para compatibilidad) -->
+                    <div class="capacity-bar" style="margin-top: 10px; display: none;">
+                        <div id="capacityFill" class="capacity-fill" style="width: 0%"></div>
+                    </div>
+                    <div id="capacityText" style="margin-top: 5px; font-size: 0.9rem; color: #666; display: none;">0 kg / 0 kg (0%)</div>
+                </div>
+                
+                <!-- Control de capacidad por tramos (se genera dinámicamente) -->
+                <div id="controlCapacidadTramos" class="control-capacidad-tramos" style="display: none;">
+                    <!-- El contenido se genera dinámicamente con JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido Pestaña: Empleados -->
+        <div id="tab-empleados" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">👥 Gestión de Empleados</h2>
+                
+                <table id="empleadosTabla">
+                    <thead>
+                        <tr>
+                            <th>Empleado</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <div class="assigned-items">
+                    <h4>👥 Empleados Asignados:</h4>
+                    <div id="empleadosAsignados">
+                        <span style="color: #666; font-style: italic;">No hay empleados asignados</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido Pestaña: Paquetes -->
+        <div id="tab-paquetes" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">📦 Gestión de Paquetes</h2>
+                <div class="alert alert-error" id="errorPaquetes"></div>
+                
+                <div class="alert alert-info" id="infoPaquetes">
+                    <i class="fa-solid fa-info-circle"></i>
+                    Los paquetes se cargarán automáticamente según el origen y destino seleccionados.
+                </div>
+                
+                <table id="paquetesTabla">
+                    <thead>
+                        <tr>
+                            <th>Tracking</th>
+                            <th>Descripción</th>
+                            <th>Peso (kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <div class="assigned-items">
+                    <h4>📦 Paquetes Asignados:</h4>
+                    <div id="paquetesAsignados">
+                        <span style="color: #666; font-style: italic;">No hay paquetes asignados</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido Pestaña: Escalas -->
+        <div id="tab-escalas" class="tab-content">
+            <div class="section">
+                <h2 class="section-title">🗺️ Escalas de ruta</h2>
+
+                <div class="escalas-container">
+                    <h4>📍 Escalas programadas (<span id="contadorEscalas">0</span>/5):</h4>
+                    <div id="escalasLista">
+                        <span style="color: #666; font-style: italic;">No hay escalas programadas</span>
+                    </div>
+                </div>
+
+                <div class="mapa-container col">
+                    <div id="map" class="mt-3" style="height: 400px;">
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón Actualizar -->
+    <div class="save-section">
+        <button class="btn btn-success" onclick="actualizarSalida()" id="btnActualizar">
+            <i class="fa-solid fa-save"></i> Actualizar salida
+        </button>
+        <button class="btn btn-secondary" onclick="cancelarEdicion()" style="margin-left: 10px;">
+            <i class="fa-solid fa-times"></i> Cancelar
+        </button>
+        <div class="alert" id="mensajeGuardado" style="margin-top: 15px;"></div>
+    </div>
+</div>
+
+{% endblock contenido %}
+
+{% block scripts %}
+<script>
+// Variables globales (igual que salida_informacion.html)
+const vehiculos = {{ unidades | tojson }};
+const sucursalesOrigen = {{ sucursal_origen | tojson }};
+const empleados = {{ empleados | tojson }};
+const agencias = {{ agencias | tojson }};
+const paquetes = {{ paquetes | tojson }};
+const transaccionesRecojo = {{ recojo_casa | tojson }};
+
+// ✅ NUEVAS VARIABLES PARA EDICIÓN
+const salidaData = {{ salida_data | tojson }};
+const salidaId = {{ salida_data.id }};
+
+// Variables de estado (iguales que salida_informacion.html)
+let escalas = [];
+let map;
+let rutaLayer = null;
+let agenciaMarkers = [];
+let escalasMarkers = [];
+let origenMarker = null;
+let destinoMarker = null;
+const MAX_ESCALAS = 5;
+
+let origenSeleccionado = null;
+let destinoSeleccionado = null;
+let destinosDisponibles = [];
+
+let vehiculoSeleccionado = null;
+let empleadosAsignados = [];
+let paquetesAsignados = [];
+let recojosAsignados = [];
+let pesoTotal = 0;
+
+// ✅ FUNCIÓN PARA PRECARGAR DATOS
+function precargarDatosExistentes() {
+    console.log('🔄 Precargando datos existentes...');
+    
+    // ✅ VALIDACIÓN MEJORADA DE FECHAS
+    const fechaGuardada = new Date(salidaData.fecha + 'T00:00:00');
+    const ahora = new Date();
+    const fechaActual = new Date();
+    fechaActual.setHours(0, 0, 0, 0); // Solo comparar fechas, no horas
+    
+    let fechaValida = salidaData.fecha;
+    let horaValida = salidaData.hora;
+    let fechaActualizada = false;
+    
+    // Si la fecha guardada es anterior a hoy
+    if (fechaGuardada < fechaActual) {
+        const fechaHoy = ahora.toISOString().split('T')[0];
+        const horaMinima = new Date();
+        horaMinima.setMinutes(horaMinima.getMinutes() + 30);
+        const horaMinStr = horaMinima.toTimeString().split(' ')[0].substring(0, 5);
+        
+        fechaValida = fechaHoy;
+        horaValida = horaMinStr;
+        fechaActualizada = true;
+        
+        console.log('⚠️ Fecha/hora originales ya pasaron, usando valores actuales');
+    } else if (fechaGuardada.getTime() === fechaActual.getTime()) {
+        // Si es hoy, validar que la hora no haya pasado
+        const horaActual = ahora.getHours() * 60 + ahora.getMinutes();
+        const [horaGuardadaH, horaGuardadaM] = salidaData.hora.split(':').map(Number);
+        const horaGuardadaMin = horaGuardadaH * 60 + horaGuardadaM;
+        
+        if (horaGuardadaMin <= horaActual + 30) {
+            const horaMinima = new Date();
+            horaMinima.setMinutes(horaMinima.getMinutes() + 30);
+            horaValida = horaMinima.toTimeString().split(' ')[0].substring(0, 5);
+            fechaActualizada = true;
+        }
+    }
+    
+    // Actualizar los campos con valores válidos
+    document.getElementById('fecha').value = fechaValida;
+    document.getElementById('hora').value = horaValida;
+    
+    if (fechaActualizada) {
+        showAlert('mensajeGuardado', 'La fecha y hora originales ya pasaron. Se han actualizado a valores válidos.', 'warning');
+    }
+    
+    // 1. Precargar origen
+    origenSeleccionado = {
+        id: salidaData.origen.id,
+        nombre: salidaData.origen.nombre,
+        lat: salidaData.origen.lat,
+        lng: salidaData.origen.lng
+    };
+    
+    // 2. Precargar destino
+    destinoSeleccionado = {
+        id: salidaData.destino.id,
+        nombre: salidaData.destino.nombre,
+        lat: salidaData.destino.lat,
+        lng: salidaData.destino.lng
+    };
+    
+    // 3. Precargar vehículo seleccionado
+    vehiculoSeleccionado = salidaData.vehiculo.id;
+    
+    // 4. Precargar empleados asignados
+    empleadosAsignados = salidaData.empleados.map(emp => ({
+        id: emp.id,
+        nombre: emp.nombre
+    }));
+    
+    // 5. Precargar escalas
+    escalas = salidaData.escalas.map(escala => ({
+        id: escala.id,
+        nombre: escala.nombre,
+        direccion: escala.direccion,
+        lat: escala.lat,
+        lng: escala.lng,
+        distrito: escala.distrito,
+        provincia: escala.provincia,
+        telefono: escala.telefono,
+        horario: escala.horario
+    }));
+    
+    // 6. Precargar paquetes asignados
+    paquetesAsignados = salidaData.paquetes.map(paq => ({
+        id: paq.tracking,
+        tracking: paq.tracking,
+        peso: paq.peso,
+        valor: paq.valor,
+        descripcion: paq.descripcion,
+        contenido: paq.contenido,
+        destinatario: paq.destinatario,
+        origen_id: paq.origen_id,
+        destino_id: paq.destino_id
+    }));
+    
+    // 7. Calcular peso total
+    pesoTotal = paquetesAsignados.reduce((total, paq) => total + paq.peso, 0);
+    
+    console.log('✅ Datos precargados:', {
+        origen: origenSeleccionado,
+        destino: destinoSeleccionado,
+        vehiculo: vehiculoSeleccionado,
+        empleados: empleadosAsignados.length,
+        escalas: escalas.length,
+        paquetes: paquetesAsignados.length,
+        pesoTotal: pesoTotal,
+        fechaActualizada: fechaValida !== salidaData.fecha
+    });
+    
+    // 8. Cargar destinos disponibles para este origen
+    cargarDestinos(origenSeleccionado.id);
+    
+    // 9. Actualizar interfaz
+    setTimeout(() => {
+        actualizarInterfazCompleta();
+    }, 500);
+}
+// ✅ FUNCIÓN PARA ACTUALIZAR TODA LA INTERFAZ
+async function actualizarInterfazCompleta() {
+    console.log('🔄 Actualizando interfaz completa...');
+    
+    // Habilitar pestañas
+    document.getElementById('tabsContainer').classList.remove('disabled');
+    const alertaDatos = document.getElementById('alertaDatosGenerales');
+    if (alertaDatos) alertaDatos.style.display = 'none';
+    
+    // ✅ ESPERAR A QUE SE CARGUEN LOS DESTINOS ANTES DE CONTINUAR
+    if (origenSeleccionado && origenSeleccionado.id) {
+        await cargarDestinos(origenSeleccionado.id);
+    }
+    
+    // Actualizar vehículo
+    if (vehiculoSeleccionado) {
+        const vehiculo = vehiculos.find(v => v.unidadid === vehiculoSeleccionado);
+        if (vehiculo) {
+            mostrarVehiculoSeleccionado(vehiculo);
+            actualizarCapacidadVehiculo();
+        }
+    }
+    
+    // Actualizar empleados
+    actualizarEmpleadosAsignados();
+    renderizarEmpleados();
+    
+    // Actualizar escalas
+    actualizarEscalas();
+    
+    // ✅ CARGAR PAQUETES DESPUÉS DE QUE TODO ESTÉ LISTO
+    setTimeout(() => {
+        cargarPaquetesParaRuta();
+        actualizarPaquetesAsignados();
+        
+        // Actualizar control de capacidad
+        if (vehiculoSeleccionado) {
+            actualizarControlCapacidadTramos();
+        }
+        
+        // Actualizar mapa
+        if (map) {
+            actualizarMapaConRutaPrincipal();
+            actualizarRutaEnMapa();
+        }
+        
+        console.log('✅ Interfaz actualizada completamente');
+    }, 500);
+}
+
+// ✅ FUNCIÓN PARA ACTUALIZAR SALIDA (en lugar de guardar)
+function actualizarSalida() {
+    if (!validarFormulario()) {
+        return;
+    }
+    
+    const datosActualizados = {
+        fecha: document.getElementById('fecha').value,
+        hora: document.getElementById('hora').value,
+        vehiculo: {
+            id: vehiculoSeleccionado,
+            origen_inicio_id: parseInt(origenSeleccionado.id),
+            destino_final_id: parseInt(destinoSeleccionado.id)
+        },
+        empleados: empleadosAsignados.map(e => e.id),
+        escalas: escalas.map(e => e.id),
+        paquetes: paquetesAsignados.map(p => ({ tracking: p.tracking }))
+    };
+    
+    console.log('📤 Actualizando salida:', datosActualizados);
+    
+    fetch(`/actualizar_salida/${salidaId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datosActualizados)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('mensajeGuardado', `✅ ${data.mensaje}`, 'success');
+            
+            // Opcional: redirigir después de un tiempo
+            setTimeout(() => {
+                window.location.href = '/salidas'; // O la ruta de lista de salidas
+            }, 2000);
+        } else {
+            showAlert('mensajeGuardado', `❌ Error: ${data.mensaje}`, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('❌ Error en la API:', error);
+        showAlert('mensajeGuardado', 'Error de conexión al actualizar salida', 'error');
+    });
+}
+
+// ✅ FUNCIÓN PARA CANCELAR EDICIÓN
+function cancelarEdicion() {
+    if (confirm('¿Está seguro de cancelar la edición? Los cambios no guardados se perderán.')) {
+        window.location.href = '/transaccion=salida'; // O la ruta apropiada
+    }
+}
+
+// ✅ FUNCIÓN MEJORADA PARA CARGAR DESTINOS EN EDICIÓN
+async function cargarDestinos(sucursal_origen_id) {
+    try {
+        if (!sucursal_origen_id) {
+            const destinoSelect = document.getElementById('destinoSelect');
+            destinoSelect.innerHTML = '<option value="">-- Primero seleccione un origen --</option>';
+            destinoSelect.disabled = true;
+            return;
+        }
+
+        const response = await fetch('/sucursales_destino_api', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sucursal_origen_id: sucursal_origen_id })
+        });
+
+        const data = await response.json();
+        
+        if (data.status === 1) {
+            destinosDisponibles = data.data;
+            updateSelect('destinoSelect', data.data, 'nombre', '-- Seleccione el destino final --', 'sucursal_destino_id');
+            
+            // ✅ PRESELECCIONAR DESTINO EN EDICIÓN - CORREGIDO
+            if (destinoSeleccionado && destinoSeleccionado.id) {
+                setTimeout(() => {
+                    const destinoSelect = document.getElementById('destinoSelect');
+                    destinoSelect.value = destinoSeleccionado.id;
+                    
+                    // Verificar que se seleccionó correctamente
+                    if (destinoSelect.value == destinoSeleccionado.id) {
+                        console.log('✅ Destino preseleccionado correctamente');
+                        validarDatosGenerales(); // Disparar validación
+                    } else {
+                        console.warn('⚠️ No se pudo preseleccionar el destino:', destinoSeleccionado.id);
+                    }
+                }, 100);
+            }
+            
+            document.getElementById('destinoSelect').disabled = false;
+            
+            // Guardar datos del origen seleccionado
+            const origenSelect = document.getElementById('origenSelect');
+            const selectedOption = origenSelect.options[origenSelect.selectedIndex];
+            origenSeleccionado = {
+                id: sucursal_origen_id,
+                nombre: selectedOption.text,
+                lat: parseFloat(selectedOption.dataset.lat),
+                lng: parseFloat(selectedOption.dataset.lng)
+            };
+            
+        } else {
+            showAlert('mensajeGuardado', 'Error al cargar destinos: ' + data.msg, 'error');
+        }
+    } catch (error) {
+        console.error('Error cargando destinos:', error);
+        showAlert('mensajeGuardado', 'Error de conexión al cargar destinos', 'error');
+    }
+}
+
+// ============================================
+// COPIAR TODAS LAS DEMÁS FUNCIONES DE salida_informacion.html
+// ============================================
+
+// Función para inicializar el mapa
+function inicializarMapa() {
+    if (map) return; // Ya está inicializado
+    
+    map = L.map('map').setView([-6.77, -79.84], 6);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+}
+
+// Función para actualizar un select
+function updateSelect(selectId, data, textField, placeholder, valueField = null) {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+
+    select.innerHTML = `<option value="">${placeholder}</option>`;
+
+    if (data && Array.isArray(data)) {
+        data.forEach(item => {
+            const value = valueField ? item[valueField] : item[textField];
+            const text = item[textField];
+            const option = new Option(text, value);
+            
+            // Agregar data attributes para latitud y longitud si están disponibles
+            if (item.latitud && item.longitud) {
+                option.dataset.lat = item.latitud;
+                option.dataset.lng = item.longitud;
+            }
+            
+            select.appendChild(option);
+        });
+    }
+}
+
+// Función para validar datos generales y habilitar pestañas
+function validarDatosGenerales() {
+    const fecha = document.getElementById('fecha').value;
+    const hora = document.getElementById('hora').value;
+    const origen = document.getElementById('origenSelect').value;
+    const destino = document.getElementById('destinoSelect').value;
+    
+    const tabsContainer = document.getElementById('tabsContainer');
+    const alertaDatos = document.getElementById('alertaDatosGenerales');
+    const btnActualizar = document.getElementById('btnActualizar');
+    
+    // Contar campos completados
+    const camposCompletos = [fecha, hora, origen, destino].filter(campo => campo).length;
+    const totalCampos = 4;
+    
+    // Actualizar mensaje de alerta con progreso
+    if (camposCompletos === totalCampos) {
+        // Todos los datos están completos
+        tabsContainer.classList.remove('disabled');
+        if (alertaDatos) alertaDatos.style.display = 'none';
+        if (btnActualizar) btnActualizar.disabled = false;
+        
+        // Guardar datos del destino seleccionado
+        const destinoSelect = document.getElementById('destinoSelect');
+        const selectedDestino = destinoSelect.options[destinoSelect.selectedIndex];
+        
+        if (selectedDestino.dataset.lat && selectedDestino.dataset.lng) {
+            destinoSeleccionado = {
+                id: destino,
+                nombre: selectedDestino.text,
+                lat: parseFloat(selectedDestino.dataset.lat),
+                lng: parseFloat(selectedDestino.dataset.lng)
+            };
+        } else {
+            // Buscar en destinosDisponibles
+            const destinoData = destinosDisponibles.find(d => d.sucursal_destino_id == destino);
+            if (destinoData) {
+                destinoSeleccionado = {
+                    id: destino,
+                    nombre: destinoData.nombre,
+                    lat: parseFloat(destinoData.latitud),
+                    lng: parseFloat(destinoData.longitud)
+                };
+            }
+        }
+        
+        console.log('Destino seleccionado:', destinoSeleccionado);
+        
+        // Cargar paquetes para esta ruta
+        cargarPaquetesParaRuta();
+        
+        // Actualizar mapa con origen y destino
+        if (map) {
+            actualizarMapaConRutaPrincipal();
+        }
+        
+    } else {
+        // Faltan datos - mostrar progreso
+        tabsContainer.classList.add('disabled');
+        if (alertaDatos) {
+            alertaDatos.style.display = 'block';
+            
+            // Mensaje dinámico según el progreso
+            let mensaje = `Complete todos los datos generales para continuar (${camposCompletos}/${totalCampos}): `;
+            const faltantes = [];
+            
+            if (!fecha) faltantes.push('Fecha de salida');
+            if (!hora) faltantes.push('Hora de salida');
+            if (!origen) faltantes.push('Origen');
+            if (!destino) faltantes.push('Destino final');
+            
+            mensaje += faltantes.join(', ');
+            
+            alertaDatos.innerHTML = `
+                <i class="fa-solid fa-info-circle"></i>
+                ${mensaje}
+                <div style="background: #fff; border-radius: 10px; margin-top: 8px; overflow: hidden;">
+                    <div style="background: #28a745; height: 4px; width: ${(camposCompletos/totalCampos)*100}%; transition: width 0.3s ease;"></div>
+                </div>
+            `;
+        }
+        
+        if (btnActualizar) btnActualizar.disabled = true;
+    }
+}
+
+function crearIndicePaquetes() {
+    if (!paquetes || !Array.isArray(paquetes)) return {};
+    
+    const indice = {
+        porOrigen: {},
+        porDestino: {},
+        porRuta: {}
+    };
+    
+    paquetes.forEach(paquete => {
+        const origen = parseInt(paquete.id_sucursal_origen);
+        const destino = parseInt(paquete.sucursal_destino_id);
+        
+        // Índice por origen
+        if (!indice.porOrigen[origen]) indice.porOrigen[origen] = [];
+        indice.porOrigen[origen].push(paquete);
+        
+        // Índice por destino
+        if (!indice.porDestino[destino]) indice.porDestino[destino] = [];
+        indice.porDestino[destino].push(paquete);
+        
+        // Índice por ruta (origen-destino)
+        const claveRuta = `${origen}-${destino}`;
+        if (!indice.porRuta[claveRuta]) indice.porRuta[claveRuta] = [];
+        indice.porRuta[claveRuta].push(paquete);
+    });
+    
+    return indice;
+}
+
+// Función para actualizar mapa con ruta principal
+function actualizarMapaConRutaPrincipal() {
+    if (!map || !origenSeleccionado || !destinoSeleccionado) return;
+    
+    // Limpiar marcadores de origen y destino anteriores
+    if (origenMarker) {
+        map.removeLayer(origenMarker);
+    }
+    if (destinoMarker) {
+        map.removeLayer(destinoMarker);
+    }
+    
+    // Crear marcador de origen
+    origenMarker = L.marker([origenSeleccionado.lat, origenSeleccionado.lng], {
+        icon: L.divIcon({
+            className: 'marker-numero marker-origen',
+            html: `<div class="marker-numero marker-origen">O</div>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        })
+    }).addTo(map);
+    
+    origenMarker.bindPopup(`
+        <strong>🚀 ORIGEN</strong><br>
+        ${origenSeleccionado.nombre}
+    `);
+    
+    // Crear marcador de destino
+    destinoMarker = L.marker([destinoSeleccionado.lat, destinoSeleccionado.lng], {
+        icon: L.divIcon({
+            className: 'marker-numero marker-destino',
+            html: `<div class="marker-numero marker-destino">D</div>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        })
+    }).addTo(map);
+    
+    destinoMarker.bindPopup(`
+        <strong>🎯 DESTINO FINAL</strong><br>
+        ${destinoSeleccionado.nombre}
+    `);
+    
+    // Actualizar vista del mapa para incluir origen y destino
+    actualizarRutaEnMapa();
+}
+
+// Función para cambiar pestañas
+function openTab(evt, tabName) {
+    var i, tabcontent, tablinks;
+    
+    // Ocultar todo el contenido de pestañas
+    tabcontent = document.getElementsByClassName("tab-content");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].classList.remove("active");
+    }
+    
+    // Remover la clase activa de todos los botones de pestañas
+    tablinks = document.getElementsByClassName("tab-btn");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].classList.remove("active");
+    }
+    
+    // Mostrar la pestaña actual y marcar el botón como activo
+    document.getElementById(tabName).classList.add("active");
+    evt.currentTarget.classList.add("active");
+
+    // Inicializar mapa cuando se abre la pestaña de escalas
+    if (tabName === 'tab-escalas') {
+        setTimeout(() => {
+            inicializarMapa();
+            if (map) {
+                map.invalidateSize();
+                mostrarAgenciasEnMapa();
+                actualizarMapaConRutaPrincipal();
+                actualizarRutaEnMapa();
+            }
+        }, 100);
+    }
+}
+
+// Función para configurar fecha y hora mínimas
+function configurarFechaHoraMinimas() {
+    const ahora = new Date();
+    const fechaInput = document.getElementById('fecha');
+    const horaInput = document.getElementById('hora');
+    
+    // Configurar fecha mínima (hoy)
+    const fechaHoy = ahora.toISOString().split('T')[0];
+    fechaInput.min = fechaHoy;
+    
+    // ✅ VALIDACIÓN ESPECIAL PARA EDICIÓN: Si la fecha guardada ya pasó, usar fecha actual
+    const fechaGuardada = new Date(fechaInput.value);
+    const fechaActual = new Date();
+    fechaActual.setHours(0, 0, 0, 0);
+    
+    if (fechaGuardada < fechaActual) {
+        console.log('⚠️ La fecha guardada ya pasó, actualizando a fecha actual');
+        fechaInput.value = fechaHoy;
+        
+        // También actualizar la hora a actual + 30 minutos
+        const horaMinima = new Date();
+        horaMinima.setMinutes(horaMinima.getMinutes() + 30);
+        const horaMinStr = horaMinima.toTimeString().split(' ')[0].substring(0, 5);
+        horaInput.value = horaMinStr;
+        
+        showAlert('mensajeGuardado', 'La fecha y hora originales ya pasaron. Se han actualizado a valores válidos.', 'warning');
+    }
+    
+    // Event listeners para validar fecha y hora
+    fechaInput.addEventListener('change', function() {
+        validarFechaHora();
+    });
+    
+    horaInput.addEventListener('change', function() {
+        validarFechaHora();
+    });
+    
+    // Validación inicial
+    validarFechaHora();
+}
+
+// ✅ FUNCIÓN MEJORADA PARA VALIDAR FECHA Y HORA EN EDICIÓN
+function validarFechaHora() {
+    const fechaInput = document.getElementById('fecha');
+    const horaInput = document.getElementById('hora');
+    const ahora = new Date();
+    
+    const fechaSeleccionada = new Date(fechaInput.value);
+    const fechaHoy = new Date();
+    fechaHoy.setHours(0, 0, 0, 0);
+    
+    // Si la fecha seleccionada es hoy
+    if (fechaSeleccionada.getTime() === fechaHoy.getTime()) {
+        // Configurar hora mínima como la actual + 30 minutos
+        const horaMinima = new Date();
+        horaMinima.setMinutes(horaMinima.getMinutes() + 30);
+        const horaMinStr = horaMinima.toTimeString().split(' ')[0].substring(0, 5);
+        
+        horaInput.min = horaMinStr;
+        
+        // Si la hora actual es menor que la mínima, ajustarla
+        if (horaInput.value < horaMinStr) {
+            horaInput.value = horaMinStr;
+            showAlert('mensajeGuardado', 'La hora de salida debe ser al menos 30 minutos después de la hora actual', 'warning');
+        }
+    } else {
+        // Si es una fecha futura, no hay restricción de hora
+        horaInput.min = '00:00';
+    }
+    
+    // Validar que la fecha no sea pasada
+    if (fechaSeleccionada < fechaHoy) {
+        fechaInput.value = fechaHoy.toISOString().split('T')[0];
+        
+        // También ajustar hora si es necesario
+        const horaMinima = new Date();
+        horaMinima.setMinutes(horaMinima.getMinutes() + 30);
+        const horaMinStr = horaMinima.toTimeString().split(' ')[0].substring(0, 5);
+        horaInput.value = horaMinStr;
+        
+        showAlert('mensajeGuardado', 'No se puede seleccionar una fecha pasada. Se actualizó automáticamente.', 'error');
+    }
+    
+    validarDatosGenerales();
+}
+
+
+function renderizarVehiculos() {
+    const tbody = document.querySelector('#vehiculosTabla tbody');
+    tbody.innerHTML = vehiculos.map(vehiculo => {
+        // Conversión segura
+        const capacidad = Number(vehiculo.capacidad);
+        let capacidadUsada = Number(vehiculo.capacidad_usada);
+
+        if (vehiculo.unidadid === vehiculoSeleccionado) {
+            capacidadUsada = paquetesAsignados.length === 0 
+                ? Number(vehiculo.capacidad_usada) 
+                : pesoTotal;
+        }
+
+        const porcentaje = capacidad > 0 ? (capacidadUsada / capacidad) * 100 : 0;
+        const isSelected = vehiculoSeleccionado === vehiculo.unidadid;
+
+        return `
+            <tr class="vehicle-row ${isSelected ? 'selected' : ''}" onclick="seleccionarVehiculo(${vehiculo.unidadid})">
+                <td>${vehiculo.nombre_unidad}</td>
+                <td>${capacidad.toFixed(2)}</td>
+                <td>
+                    <div class="capacity-bar">
+                        <div class="capacity-fill ${porcentaje >= 90 ? 'danger' : porcentaje >= 70 ? 'warning' : ''}" 
+                            style="width: ${Math.min(porcentaje, 100)}%"></div>
+                    </div>
+                    ${capacidadUsada.toFixed(2)} / ${capacidad.toFixed(2)} kg (${porcentaje.toFixed(1)}%)
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function renderizarEmpleados() {
+    const tbody = document.querySelector('#empleadosTabla tbody');
+    tbody.innerHTML = empleados.map(empleado => {
+        const yaAsignado = empleadosAsignados.some(e => e.id === empleado.id);
+        
+        return `
+            <tr class="employee-row ${yaAsignado ? 'selected' : ''}" 
+                onclick="toggleEmpleado(${empleado.id})">
+                <td>${empleado.nombre}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function togglePaquete(paqueteId) {
+    if (!vehiculoSeleccionado) {
+        showAlert('errorPaquetes', 'Debe seleccionar un vehículo antes de agregar paquetes', 'error');
+        return;
+    }
+
+    // Buscar el paquete por su tracking
+    const paquete = (window.paquetesDisponibles || []).find(p => p.tracking === paqueteId);
+    if (!paquete) {
+        console.warn(`⚠️ Paquete con ID ${paqueteId} no encontrado`);
+        return;
+    }
+
+    // Verificar si ya está asignado
+    const index = paquetesAsignados.findIndex(p => p.tracking === paqueteId);
+
+    const vehiculo = vehiculos.find(v => v.unidadid == vehiculoSeleccionado);
+    if (!vehiculo) {
+        console.warn('⚠️ Vehículo no encontrado');
+        return;
+    }
+
+    if (index === -1) {
+        // Validar si puede agregarse
+        const validacion = puedeAgregarPaquete(
+            paquete, 
+            paquetesAsignados, 
+            vehiculo.capacidad,
+            origenSeleccionado,
+            destinoSeleccionado,
+            escalas
+        );
+        
+        if (!validacion.puedeAgregar) {
+            showAlert('errorPaquetes', `No se puede agregar el paquete: ${validacion.razon}`, 'error');
+            return;
+        }
+
+        // Agregar paquete
+        paquetesAsignados.push(paquete);
+        pesoTotal += parseFloat(paquete.peso);
+    } else {
+        // Quitar paquete
+        pesoTotal -= parseFloat(paquete.peso);
+        paquetesAsignados.splice(index, 1);
+    }
+
+    actualizarPaquetesAsignados();
+    actualizarCapacidadVehiculo();
+    renderizarPaquetes();
+    hideAlert('errorPaquetes');
+    actualizarControlCapacidadTramos(); // Tramos actualizados
+}
+
+function renderizarPaquetes() {
+    const tbody = document.querySelector('#paquetesTabla tbody');
+    
+    // ✅ CORREGIDO: Primero obtener paquetes disponibles
+    if (!window.paquetesDisponibles) {
+        window.paquetesDisponibles = obtenerPaquetesParaRuta();
+    }
+    
+    // Verificar si hay paquetes disponibles
+    if (!window.paquetesDisponibles || window.paquetesDisponibles.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="3" style="text-align: center; color: #666; font-style: italic;">
+                    No hay paquetes disponibles para esta ruta
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = window.paquetesDisponibles.map(paquete => {
+        const yaAsignado = paquetesAsignados.some(p => p.id === paquete.id);
+        
+        // Colores por tipo
+        let colorTipo = '#ecf0f1';
+        let iconoTipo = '📦';
+        
+        switch(paquete.tipo) {
+            case 'largo_recorrido':
+                colorTipo = '#e8f5e8'; // Verde claro
+                iconoTipo = '🚀';
+                break;
+            case 'entrega_intermedia':
+                colorTipo = '#fff3cd'; // Amarillo claro
+                iconoTipo = '📤';
+                break;
+            case 'recojo_intermedio':
+                colorTipo = '#cce5ff'; // Azul claro
+                iconoTipo = '📥';
+                break;
+            case 'entre_escalas':
+                colorTipo = '#f8d7da'; // Rosa claro
+                iconoTipo = '🔄';
+                break;
+        }
+        
+        return `
+            <tr class="package-row ${yaAsignado ? 'selected' : ''}" onclick="togglePaquete(${paquete.tracking})">
+                <td>
+                    <strong style="color: #2c3e50;">${paquete.tracking}</strong>
+                </td>
+                <td>
+                    <div style="background: ${colorTipo}; padding: 4px 8px; border-radius: 5px; margin-bottom: 4px;">
+                        ${iconoTipo} ${paquete.descripcion}
+                    </div>
+                    <small style="color: #666;">Tipo: ${paquete.tipo.replace(/_/g, ' ')}</small>
+                </td>
+                <td>
+                    <span style="background: #ecf0f1; padding: 4px 8px; border-radius: 8px; font-weight: 600;">
+                        ${paquete.peso} kg
+                    </span>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+async function cargarPaquetesParaRuta() {
+    if (!origenSeleccionado || !destinoSeleccionado) {
+        console.log('⚠️ No hay origen o destino seleccionado');
+        window.paquetesDisponibles = [];
+        renderizarPaquetes();
+        actualizarInfoPaquetes();
+        return;
+    }
+    
+    try {
+        console.log('🔄 Filtrando paquetes para la ruta...');
+        console.log(`📍 Ruta: ${origenSeleccionado.nombre.split(' / ')[0]} → ${destinoSeleccionado.nombre.split(' / ')[0]}`);
+        
+        if (escalas.length > 0) {
+            console.log(`📍 Escalas: ${escalas.map(e => e.nombre.split(' / ')[0]).join(' → ')}`);
+        }
+        
+        // ✅ Filtrar paquetes usando los datos ya cargados
+        const paquetesParaRuta = obtenerPaquetesParaRuta();
+        
+        // ✅ Actualizar variable global
+        window.paquetesDisponibles = paquetesParaRuta;
+        
+        console.log(`📦 Resultado: ${paquetesParaRuta.length} paquetes disponibles`);
+        
+        // ✅ Actualizar interfaz
+        renderizarPaquetes();
+        actualizarInfoPaquetes(paquetesParaRuta);
+        
+    } catch (error) {
+        console.error('❌ Error filtrando paquetes:', error);
+        window.paquetesDisponibles = [];
+        renderizarPaquetes();
+        actualizarInfoPaquetes([]);
+    }
+}
+
+function actualizarInfoPaquetes(paquetesParaRuta = []) {
+    const infoElement = document.getElementById('infoPaquetes');
+    if (!infoElement) return;
+    
+    if (paquetesParaRuta.length === 0) {
+        infoElement.innerHTML = `
+            <i class="fa-solid fa-info-circle"></i>
+            No hay paquetes disponibles para la ruta seleccionada.
+        `;
+        infoElement.className = 'alert alert-warning';
+    } else {
+        // Crear resumen por tipo
+        const resumenTipos = paquetesParaRuta.reduce((acc, paquete) => {
+            const tipoLegible = paquete.tipo.replace(/_/g, ' ');
+            acc[tipoLegible] = (acc[tipoLegible] || 0) + 1;
+            return acc;
+        }, {});
+        
+        const pesoTotal = paquetesParaRuta.reduce((sum, p) => sum + p.peso, 0);
+        
+        const resumenTexto = Object.entries(resumenTipos)
+            .map(([tipo, cantidad]) => `${tipo}: ${cantidad}`)
+            .join(', ');
+        
+        infoElement.innerHTML = `
+            <i class="fa-solid fa-check-circle"></i>
+            <strong>${paquetesParaRuta.length} paquetes disponibles</strong> 
+            (${pesoTotal.toFixed(1)}kg total)<br>
+            <small style="color: #666;">${resumenTexto}</small>
+        `;
+        infoElement.className = 'alert alert-info';
+    }
+}
+
+function verificarDatosPaquetes() {
+    console.log('🔍 Verificando estructura de datos...');
+    
+    if (!paquetes || !Array.isArray(paquetes)) {
+        console.error('❌ La variable paquetes no existe o no es un array');
+        return false;
+    }
+    
+    console.log(`📊 Total paquetes cargados: ${paquetes.length}`);
+    
+    return true;
+}
+
+function seleccionarVehiculo(vehiculoId) {
+    vehiculoSeleccionado = vehiculoId;
+    const vehiculo = vehiculos.find(v => v.unidadid === vehiculoId);
+    
+    // Mostrar solo el vehículo seleccionado
+    mostrarVehiculoSeleccionado(vehiculo);
+    
+    // Actualizar capacidad inicial
+    actualizarCapacidadVehiculo();
+    
+    // Ocultar errores
+    hideAlert('errorVehiculo');
+    
+    // Actualizar control de capacidad por tramos
+    actualizarControlCapacidadTramos();
+}
+
+function mostrarVehiculoSeleccionado(vehiculo) {
+    // Ocultar la tabla de vehículos
+    const tabla = document.getElementById('vehiculosTabla');
+    tabla.style.display = 'none';
+    
+    // Mostrar el vehículo seleccionado
+    const contenedorSeleccionado = document.getElementById('vehiculoSeleccionado');
+    contenedorSeleccionado.style.display = 'block';
+    
+    // Actualizar información del vehículo
+    document.getElementById('vehiculoInfo').innerHTML = `
+        <div class="vehiculo-seleccionado-card">
+            <div class="vehiculo-header">
+                <span class="vehiculo-nombre">${vehiculo.nombre_unidad}</span>
+                <span class="vehiculo-capacidad">Capacidad: ${vehiculo.capacidad} kg</span>
+                <button class="btn-cambiar-vehiculo" onclick="cambiarVehiculo()">
+                    <i class="fa-solid fa-exchange-alt"></i> Cambiar vehículo
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function cambiarVehiculo() {
+    // Mostrar la tabla de vehículos nuevamente
+    const tabla = document.getElementById('vehiculosTabla');
+    tabla.style.display = 'table';
+    
+    // Ocultar el vehículo seleccionado
+    const contenedorSeleccionado = document.getElementById('vehiculoSeleccionado');
+    contenedorSeleccionado.style.display = 'none';
+    
+    // Limpiar selección
+    vehiculoSeleccionado = null;
+    
+    // Limpiar paquetes asignados
+    paquetesAsignados = [];
+    pesoTotal = 0;
+    actualizarPaquetesAsignados();
+    
+    // Ocultar control de tramos
+    const controlTramos = document.getElementById('controlCapacidadTramos');
+    if (controlTramos) {
+        controlTramos.style.display = 'none';
+    }
+    
+    // Re-renderizar tabla
+    renderizarVehiculos();
+}
+
+function toggleEmpleado(empleadoId) {
+    const empleado = empleados.find(e => e.id === empleadoId);
+    const index = empleadosAsignados.findIndex(e => e.id === empleadoId);
+    
+    if (index === -1) {
+        empleadosAsignados.push(empleado);
+    } else {
+        empleadosAsignados.splice(index, 1);
+    }
+    
+    actualizarEmpleadosAsignados();
+    renderizarEmpleados();
+}
+
+function obtenerPaquetesParaRuta() {
+    if (!origenSeleccionado || !destinoSeleccionado) {
+        console.log('⚠️ No hay origen o destino seleccionado');
+        return [];
+    }
+    
+    // Crear ruta completa: [origen, escalas..., destino]
+    const rutaCompleta = [
+        { id: parseInt(origenSeleccionado.id), nombre: origenSeleccionado.nombre },
+        ...escalas.map(escala => ({ id: escala.id, nombre: escala.nombre })),
+        { id: parseInt(destinoSeleccionado.id), nombre: destinoSeleccionado.nombre }
+    ];
+    
+    console.log('🗺️ Ruta completa:', rutaCompleta.map(r => r.nombre).join(' → '));
+    
+    // ✅ VALIDACIÓN MEJORADA: Verificar orden correcto
+    const paquetesValidos = paquetes.filter(paquete => {
+        const origenPaquete = parseInt(paquete.id_sucursal_origen);
+        const destinoPaquete = parseInt(paquete.sucursal_destino_id);
+        
+        // Verificar que origen y destino sean diferentes
+        if (origenPaquete === destinoPaquete) {
+            return false;
+        }
+        
+        // Encontrar índices en la ruta
+        const indiceOrigen = rutaCompleta.findIndex(punto => punto.id === origenPaquete);
+        const indiceDestino = rutaCompleta.findIndex(punto => punto.id === destinoPaquete);
+        
+        // Ambos puntos deben existir en la ruta
+        if (indiceOrigen === -1 || indiceDestino === -1) {
+            return false;
+        }
+        
+        // ✅ CRÍTICO: El origen debe ser ANTERIOR al destino en la ruta
+        if (indiceOrigen >= indiceDestino) {
+            console.log(`❌ Paquete ${paquete.tracking}: Orden incorrecto (origen: ${indiceOrigen}, destino: ${indiceDestino})`);
+            return false;
+        }
+        
+        return true;
+    });
+    
+    console.log(`📦 Paquetes válidos encontrados: ${paquetesValidos.length}/${paquetes.length}`);
+    
+    // Categorizar y enriquecer cada paquete
+    const paquetesCategorizados = paquetesValidos.map(paquete => {
+        const origenPaquete = parseInt(paquete.id_sucursal_origen);
+        const destinoPaquete = parseInt(paquete.sucursal_destino_id);
+        
+        const indiceCarga = rutaCompleta.findIndex(punto => punto.id === origenPaquete);
+        const indiceDescarga = rutaCompleta.findIndex(punto => punto.id === destinoPaquete);
+        
+        // Determinar tipo de paquete
+        let tipo = 'entre_escalas';
+        let descripcionRuta = '';
+        let iconoTipo = '📦';
+        
+        const puntoOrigen = rutaCompleta[indiceCarga]?.nombre.split(' / ')[0] || 'Origen';
+        const puntoDestino = rutaCompleta[indiceDescarga]?.nombre.split(' / ')[0] || 'Destino';
+        
+        if (indiceCarga === 0 && indiceDescarga === rutaCompleta.length - 1) {
+            tipo = 'largo_recorrido';
+            iconoTipo = '🚀';
+            descripcionRuta = `${puntoOrigen} → ${puntoDestino} (Viaje completo)`;
+        } else if (indiceCarga === 0) {
+            tipo = 'entrega_intermedia';
+            iconoTipo = '📤';
+            descripcionRuta = `${puntoOrigen} → ${puntoDestino} (Entrega en escala)`;
+        } else if (indiceDescarga === rutaCompleta.length - 1) {
+            tipo = 'recojo_intermedio';
+            iconoTipo = '📥';
+            descripcionRuta = `${puntoOrigen} → ${puntoDestino} (Recojo en escala)`;
+        } else {
+            tipo = 'entre_escalas';
+            iconoTipo = '🔄';
+            descripcionRuta = `${puntoOrigen} → ${puntoDestino} (Entre escalas)`;
+        }
+        
+        return {
+            id: paquete.tracking,
+            tracking: paquete.tracking,
+            descripcion: descripcionRuta,
+            peso: parseFloat(paquete.peso),
+            punto_carga: indiceCarga,
+            punto_descarga: indiceDescarga,
+            tipo: tipo,
+            origen_id: origenPaquete,
+            destino_id: destinoPaquete,
+            icono: iconoTipo,
+            // ✅ NUEVO: Calcular tramos ocupados
+            tramos_ocupados: calcularTramosOcupados(indiceCarga, indiceDescarga)
+        };
+    });
+    
+    // Estadísticas para debug
+    const estadisticas = paquetesCategorizados.reduce((acc, paquete) => {
+        acc[paquete.tipo] = (acc[paquete.tipo] || 0) + 1;
+        return acc;
+    }, {});
+    
+    console.log('📊 Estadísticas de paquetes:', estadisticas);
+    
+    return paquetesCategorizados;
+}
+
+function calcularTramosOcupados(indiceCarga, indiceDescarga) {
+    const tramos = [];
+    for (let i = indiceCarga; i < indiceDescarga; i++) {
+        tramos.push(i); // ✅ CORREGIDO: usar números, no strings
+    }
+    return tramos;
+}
+
+function mostrarAgenciasEnMapa() {
+    if (!map) return;
+
+    // Limpiar marcadores anteriores
+    agenciaMarkers.forEach(marker => map.removeLayer(marker));
+    agenciaMarkers = [];
+
+    agencias.forEach(agencia => {
+        if (agencia.lat && agencia.lng) {
+            // Verificar si esta agencia ya está en escalas
+            const yaEsEscala = escalas.some(escala => escala.id === agencia.id);
+            
+            // Verificar si es origen o destino
+            const esOrigen = origenSeleccionado && agencia.id == origenSeleccionado.id;
+            const esDestino = destinoSeleccionado && agencia.id == destinoSeleccionado.id;
+            const esOrigenODestino = esOrigen || esDestino;
+            
+            const marker = L.marker([agencia.lat, agencia.lng]).addTo(map);
+            
+            // Crear popup dinámico
+            let popupContent = `
+                <strong>${agencia.nombre}</strong><br>
+                📍 ${agencia.direccion}<br>
+                📞 ${agencia.telefono || 'Sin teléfono'}<br>
+                🕒 ${agencia.horario || 'Horario no disponible'}<br>
+                📍 ${agencia.distrito}, ${agencia.provincia}<br>
+            `;
+            
+            if (esOrigenODestino) {
+                // Si es origen o destino, mostrar mensaje informativo
+                popupContent += `
+                    <div style="background: #e3f2fd; padding: 8px; border-radius: 5px; margin-top: 8px; font-size: 0.8rem; color: #1976d2;">
+                        <i class="fa-solid fa-info-circle"></i>
+                        ${esOrigen ? '🚀 Esta es su sucursal de ORIGEN' : '🎯 Esta es su sucursal de DESTINO'}
+                    </div>
+                `;
+            } else if (yaEsEscala) {
+                // Si ya es una escala, mostrar botón para quitar
+                popupContent += `
+                    <button onclick="eliminarEscalaDesdeMapa(${agencia.id})" class="btn-eliminar-escala">
+                        ❌ Quitar escala
+                    </button>
+                `;
+            } else {
+                // Si no es origen, destino ni escala, mostrar botón para agregar
+                popupContent += `
+                    <button onclick="agregarEscalaDesdeMapa(${agencia.id})" class="btn-agregar-escala">
+                        ➕ Agregar como escala
+                    </button>
+                `;
+            }
+            
+            marker.bindPopup(popupContent);
+            
+            // Evento de doble clic solo si no es origen o destino
+            if (!esOrigenODestino) {
+                marker.on('dblclick', function() {
+                    if (yaEsEscala) {
+                        eliminarEscalaDesdeMapa(agencia.id);
+                    } else {
+                        agregarEscalaDesdeMapa(agencia.id);
+                    }
+                });
+            }
+
+            agenciaMarkers.push(marker);
+        }
+    });
+
+    // Ajustar vista si hay marcadores
+    if (agenciaMarkers.length > 0) {
+        const group = new L.featureGroup(agenciaMarkers);
+        map.fitBounds(group.getBounds().pad(0.1));
+    }
+}
+
+function crearRutaCompleta(origen, destino, escalas) {
+    const ruta = [
+        { 
+            id: parseInt(origen.id), 
+            nombre: origen.nombre, 
+            lat: origen.lat, 
+            lng: origen.lng,
+            orden: 0,
+            tipo: 'origen'
+        }
+    ];
+    
+    // Agregar escalas con orden secuencial
+    escalas.forEach((escala, index) => {
+        ruta.push({
+            id: parseInt(escala.id),
+            nombre: escala.nombre,
+            lat: escala.lat,
+            lng: escala.lng,
+            orden: index + 1,
+            tipo: 'escala'
+        });
+    });
+    
+    // Agregar destino final
+    ruta.push({
+        id: parseInt(destino.id),
+        nombre: destino.nombre,
+        lat: destino.lat,
+        lng: destino.lng,
+        orden: escalas.length + 1,
+        tipo: 'destino'
+    });
+    
+    return ruta;
+}
+
+function actualizarControlCapacidadTramos() {
+    if (!vehiculoSeleccionado || !origenSeleccionado || !destinoSeleccionado) {
+        const control = document.getElementById('controlCapacidadTramos');
+        if (control) {
+            control.style.display = 'none';
+        }
+        return;
+    }
+
+    const vehiculo = vehiculos.find(v => v.unidadid === vehiculoSeleccionado);
+    if (!vehiculo) return;
+
+    // Crear ruta completa
+    const rutaCompleta = crearRutaCompleta(origenSeleccionado, destinoSeleccionado, escalas);
+    
+    // Generar control de capacidad
+    generarControlCapacidadHTML(vehiculo, rutaCompleta, paquetesAsignados);
+}
+
+function generarFilasTramos(rutaCompleta, capacidadPorTramos, capacidadMaxima) {
+    let filasHTML = '';
+
+    for (let i = 0; i < rutaCompleta.length - 1; i++) {
+        const puntoOrigen = rutaCompleta[i];
+        const puntoDestino = rutaCompleta[i + 1];
+        const pesoTramo = capacidadPorTramos[i] || 0;
+        const porcentajeTramo = (pesoTramo / capacidadMaxima) * 100;
+
+        // Determinar estado del tramo
+        let claseEstado = 'dentro-limite';
+        let textoEstado = 'Normal';
+        
+        if (porcentajeTramo >= 100) {
+            claseEstado = 'excede-limite';
+            textoEstado = 'Sobrecarga';
+        } else if (porcentajeTramo >= 80) {
+            claseEstado = 'cerca-limite';
+            textoEstado = 'Cerca del límite';
+        }
+
+        const nombreOrigen = puntoOrigen.nombre.split(' / ')[0] || puntoOrigen.nombre;
+        const nombreDestino = puntoDestino.nombre.split(' / ')[0] || puntoDestino.nombre;
+
+        filasHTML += `
+            <div class="fila-tramo">
+                <div class="columna-tramo">
+                    <strong>${nombreOrigen} → ${nombreDestino}</strong>
+                    <br>
+                    <small style="color: #666;">Tramo ${i + 1}</small>
+                </div>
+                <div class="columna-peso">
+                    <div class="peso-valor">${pesoTramo.toFixed(2)} kg</div>
+                    <div class="barra-mini">
+                        <div class="barra-mini-relleno ${claseEstado}" style="width: ${Math.min(porcentajeTramo, 100)}%"></div>
+                    </div>
+                    <div class="porcentaje">${porcentajeTramo.toFixed(1)}%</div>
+                </div>
+                <div class="columna-estado">
+                    <div class="estado-badge ${claseEstado}">
+                        ${textoEstado}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    return filasHTML;
+}
+
+function calcularCapacidadPorTramos(paquetesAsignados, rutaCompleta) {
+    const capacidadPorTramo = {};
+
+    // Inicializar todos los tramos con peso 0
+    for (let i = 0; i < rutaCompleta.length - 1; i++) {
+        capacidadPorTramo[i] = 0;
+    }
+
+    // Calcular peso por tramo
+    paquetesAsignados.forEach(paquete => {
+        if (paquete.tramos_ocupados && Array.isArray(paquete.tramos_ocupados)) {
+            paquete.tramos_ocupados.forEach(tramoIndex => {
+                if (typeof tramoIndex === 'number') {
+                    capacidadPorTramo[tramoIndex] = (capacidadPorTramo[tramoIndex] || 0) + paquete.peso;
+                }
+            });
+        } else {
+            // Fallback: calcular tramos ocupados
+            const tramosOcupados = calcularTramosOcupados(paquete.punto_carga, paquete.punto_descarga);
+            tramosOcupados.forEach(tramoIndex => {
+                capacidadPorTramo[tramoIndex] = (capacidadPorTramo[tramoIndex] || 0) + paquete.peso;
+            });
+        }
+    });
+
+    return capacidadPorTramo;
+}
+
+function validarCapacidadPorTramos(todosPaquetes, rutaCompleta, capacidadMaxima) {
+    const capacidadPorTramo = calcularCapacidadPorTramos(todosPaquetes, rutaCompleta);
+    const alertas = [];
+    let esValido = true;
+    let tramoProblematico = null;
+    let capacidadMaximaUsada = 0;
+
+    // Verificar cada tramo
+    Object.entries(capacidadPorTramo).forEach(([tramoIndex, peso]) => {
+        const indice = parseInt(tramoIndex);
+        const porcentaje = (peso / capacidadMaxima) * 100;
+        capacidadMaximaUsada = Math.max(capacidadMaximaUsada, peso);
+
+        if (peso > capacidadMaxima) {
+            esValido = false;
+            tramoProblematico = indice;
+            
+            const puntoOrigen = rutaCompleta[indice]?.nombre.split(' / ')[0] || `Punto ${indice}`;
+            const puntoDestino = rutaCompleta[indice + 1]?.nombre.split(' / ')[0] || `Punto ${indice + 1}`;
+            
+            alertas.push({
+                tipo: 'error',
+                mensaje: `Sobrecarga en tramo ${puntoOrigen} → ${puntoDestino}: ${peso.toFixed(2)}kg (${porcentaje.toFixed(1)}%)`,
+                tramo: indice,
+                peso: peso,
+                porcentaje: porcentaje
+            });
+        } else if (peso > capacidadMaxima * 0.8) {
+            // Warning para capacidad alta pero no crítica
+            const puntoOrigen = rutaCompleta[indice]?.nombre.split(' / ')[0] || `Punto ${indice}`;
+            const puntoDestino = rutaCompleta[indice + 1]?.nombre.split(' / ')[0] || `Punto ${indice + 1}`;
+            
+            alertas.push({
+                tipo: 'warning',
+                mensaje: `Capacidad alta en tramo ${puntoOrigen} → ${puntoDestino}: ${peso.toFixed(2)}kg (${porcentaje.toFixed(1)}%)`,
+                tramo: indice,
+                peso: peso,
+                porcentaje: porcentaje
+            });
+        }
+    });
+
+    return {
+        esValido,
+        alertas,
+        capacidadPorTramo,
+        tramoProblematico,
+        capacidadMaximaUsada
+    };
+}
+
+function puedeAgregarPaquete(paqueteNuevo, paquetesActuales, capacidadVehiculo, origenSeleccionado, destinoSeleccionado, escalas) {
+    
+    // 🔍 PASO 1: Verificaciones básicas
+    if (!paqueteNuevo) {
+        return {
+            puedeAgregar: false,
+            razon: 'Paquete no válido',
+            alertas: [],
+            tipo: 'error'
+        };
+    }
+    
+    if (!origenSeleccionado || !destinoSeleccionado) {
+        return {
+            puedeAgregar: false,
+            razon: 'No hay ruta definida (falta origen o destino)',
+            alertas: [],
+            tipo: 'error'
+        };
+    }
+    
+    if (!capacidadVehiculo || capacidadVehiculo <= 0) {
+        return {
+            puedeAgregar: false,
+            razon: 'Capacidad del vehículo no válida',
+            alertas: [],
+            tipo: 'error'
+        };
+    }
+    
+    // 🔍 PASO 2: Verificar que el paquete no esté ya asignado
+    const yaAsignado = paquetesActuales.some(p => p.id === paqueteNuevo.id || p.tracking === paqueteNuevo.tracking);
+    if (yaAsignado) {
+       
+        return {
+            puedeAgregar: false,
+            razon: 'Este paquete ya está asignado',
+            alertas: [],
+            tipo: 'warning'
+        };
+    }
+    
+    // 🔍 PASO 3: Crear la lista completa de paquetes (actuales + nuevo)
+    const todosLosPaquetes = [...paquetesActuales, paqueteNuevo];
+    
+    // 🔍 PASO 4: Crear ruta completa para validación
+    const rutaCompleta = crearRutaCompleta(origenSeleccionado, destinoSeleccionado, escalas);
+    
+    // 🔍 PASO 5: Validar capacidad por todos los tramos
+    const validacionCapacidad = validarCapacidadPorTramos(todosLosPaquetes, rutaCompleta, capacidadVehiculo);
+    
+    // 🔍 PASO 6: Verificar el resultado
+    if (!validacionCapacidad.esValido) {
+        // Buscar el primer error crítico
+        const errorPrincipal = validacionCapacidad.alertas.find(alerta => alerta.tipo === 'error');
+        
+        if (errorPrincipal) {
+            return {
+                puedeAgregar: false,
+                razon: errorPrincipal.mensaje,
+                alertas: validacionCapacidad.alertas,
+                tipo: 'error',
+                detalles: {
+                    capacidadPorTramo: validacionCapacidad.capacidadPorTramo,
+                    tramoProblematico: validacionCapacidad.tramoProblematico,
+                    capacidadMaximaUsada: validacionCapacidad.capacidadMaximaUsada
+                }
+            };
+        }
+    }
+    
+    // 🔍 PASO 7: Verificar warnings (capacidad alta pero no crítica)
+    const warnings = validacionCapacidad.alertas.filter(alerta => alerta.tipo === 'warning');
+    
+    // ✅ PASO 8: El paquete se puede agregar
+    return {
+        puedeAgregar: true,
+        razon: 'El paquete se puede agregar sin problemas',
+        alertas: warnings, // Incluir warnings si los hay
+        tipo: warnings.length > 0 ? 'warning' : 'success',
+        detalles: {
+            pesoNuevoPaquete: paqueteNuevo.peso,
+            pesoTotalActual: paquetesActuales.reduce((sum, p) => sum + p.peso, 0),
+            pesoTotalNuevo: todosLosPaquetes.reduce((sum, p) => sum + p.peso, 0),
+            capacidadPorTramo: validacionCapacidad.capacidadPorTramo,
+            capacidadMaximaUsada: validacionCapacidad.capacidadMaximaUsada,
+            porcentajeUsoMaximo: ((validacionCapacidad.capacidadMaximaUsada / capacidadVehiculo) * 100).toFixed(1)
+        }
+    };
+}
+
+function generarControlCapacidadHTML(vehiculo, rutaCompleta, paquetesAsignados) {
+    const controlContainer = document.getElementById('controlCapacidadTramos');
+    if (!controlContainer) return;
+
+    // Calcular capacidad por tramos
+    const capacidadPorTramos = calcularCapacidadPorTramos(paquetesAsignados, rutaCompleta);
+    const capacidadMaxima = parseFloat(vehiculo.capacidad);
+    const capacidadMaximaUsada = Math.max(...Object.values(capacidadPorTramos));
+    const porcentajeGeneral = (capacidadMaximaUsada / capacidadMaxima) * 100;
+
+    // Determinar clase de estado general
+    let claseEstadoGeneral = 'dentro-limite';
+    if (porcentajeGeneral >= 100) {
+        claseEstadoGeneral = 'excede-limite';
+    } else if (porcentajeGeneral >= 80) {
+        claseEstadoGeneral = 'cerca-limite';
+    }
+
+    // Generar HTML
+    controlContainer.innerHTML = `
+        <div class="vehiculo-control-card">
+            <!-- Resumen del vehículo -->
+            <div class="vehiculo-resumen">
+                <div class="vehiculo-icon">
+                    🚚
+                </div>
+                <div class="vehiculo-info">
+                    <h3>${vehiculo.nombre_unidad}</h3>
+                    <div class="vehiculo-tag">
+                        ${paquetesAsignados.length} paquetes asignados
+                    </div>
+                </div>
+                <div class="capacidad-general">
+                    ${capacidadMaximaUsada.toFixed(2)} / ${capacidadMaxima.toFixed(2)} kg
+                    <br>
+                    <small style="color: #666;">(${porcentajeGeneral.toFixed(1)}% máximo)</small>
+                </div>
+            </div>
+
+            <!-- Barra de capacidad general -->
+            <div class="barra-capacidad-general">
+                <div class="barra-fondo">
+                    <div class="barra-relleno ${claseEstadoGeneral}" style="width: ${Math.min(porcentajeGeneral, 100)}%"></div>
+                </div>
+            </div>
+
+            <!-- Detalle por tramos -->
+            <div class="detalle-tramos">
+                <div class="detalle-header">
+                    <span class="detalle-icon">📊</span>
+                    <h4>Capacidad por tramos de ruta</h4>
+                </div>
+                
+                <div class="tabla-tramos">
+                    <div class="tabla-header">
+                        <div>Tramo</div>
+                        <div>Peso transportado</div>
+                        <div>Estado</div>
+                    </div>
+                    ${generarFilasTramos(rutaCompleta, capacidadPorTramos, capacidadMaxima)}
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Mostrar el control
+    controlContainer.style.display = 'block';
+}
+
+function agregarEscalaDesdeMapa(idAgencia) {
+    // Verificar que no sea origen o destino
+    if (origenSeleccionado && idAgencia == origenSeleccionado.id) {
+        alert("No puede agregar la sucursal de origen como escala");
+        return;
+    }
+    
+    if (destinoSeleccionado && idAgencia == destinoSeleccionado.id) {
+        alert("No puede agregar la sucursal de destino como escala");
+        return;
+    }
+    
+    // Verificar límite máximo
+    if (escalas.length >= MAX_ESCALAS) {
+        alert(`Máximo ${MAX_ESCALAS} escalas permitidas`);
+        return;
+    }
+
+    const agencia = agencias.find(a => a.id === parseInt(idAgencia));
+    
+    if (!agencia) {
+        alert("No se encontró la agencia.");
+        return;
+    }
+
+    if (escalas.some(e => e.id === idAgencia)) {
+        alert("Esta agencia ya ha sido agregada como escala.");
+        return;
+    }
+
+    escalas.push(agencia);
+    actualizarEscalas();
+    mostrarAgenciasEnMapa(); // Actualizar marcadores
+    actualizarRutaEnMapa();
+    
+    // Recargar paquetes con las nuevas escalas
+    cargarPaquetesParaRuta();
+}
+
+function eliminarEscalaDesdeMapa(idAgencia) {
+    escalas = escalas.filter(e => e.id !== parseInt(idAgencia));
+    actualizarEscalas();
+    mostrarAgenciasEnMapa(); // Actualizar marcadores
+    actualizarRutaEnMapa();
+    
+    // Recargar paquetes sin la escala eliminada
+    cargarPaquetesParaRuta();
+}
+
+function actualizarEscalas() {
+    const contenedor = document.getElementById('escalasLista');
+    
+    if (escalas.length === 0) {
+        contenedor.innerHTML = '<span style="color: #666; font-style: italic;">No hay escalas programadas</span>';
+    } else {
+        contenedor.innerHTML = escalas.map((escala, index) => 
+            `<div class="escala-item" draggable="true" ondragstart="iniciarArrastre(event, ${index})" ondragover="permitirSoltar(event)" ondrop="soltarEscala(event, ${index})">
+                <div class="escala-number">${index + 1}</div>
+                <div style="flex: 1;">
+                    <strong>${escala.nombre}</strong><br>
+                    <small style="color: #666;">📍 ${escala.direccion}</small><br>
+                    <small style="color: #888;">🏛️ ${escala.distrito}, ${escala.provincia}</small>
+                </div>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn btn-secondary" onclick="subirEscala(${index})" style="padding: 5px 8px; font-size: 0.7rem;" title="Subir escala">
+                        <i class="fa-solid fa-arrow-up"></i>
+                    </button>
+                    <button class="btn btn-secondary" onclick="bajarEscala(${index})" style="padding: 5px 8px; font-size: 0.7rem;" title="Bajar escala">
+                        <i class="fa-solid fa-arrow-down"></i>
+                    </button>
+                    <button class="btn btn-danger" onclick="eliminarEscala(${escala.id})" style="padding: 5px 10px; font-size: 0.8rem;">
+                        <i class="fa-solid fa-trash"></i> Quitar
+                    </button>
+                </div>
+            </div>`
+        ).join('');
+    }
+    
+    actualizarContadorEscalas();
+    actualizarRutaEnMapa();
+    
+    if (origenSeleccionado && destinoSeleccionado) {
+        cargarPaquetesParaRuta();
+    }
+    
+    // Actualizar control de tramos si hay vehículo seleccionado
+    if (vehiculoSeleccionado) {
+        actualizarControlCapacidadTramos();
+    }
+}
+
+function eliminarEscala(agenciaId) {
+    escalas = escalas.filter(e => e.id !== agenciaId);
+    actualizarEscalas();
+    mostrarAgenciasEnMapa();
+    cargarPaquetesParaRuta();
+}
+
+function actualizarContadorEscalas() {
+    document.getElementById('contadorEscalas').textContent = escalas.length;
+}
+
+function actualizarRutaEnMapa() {
+    if (!map) return;
+    
+    // Limpiar ruta anterior
+    if (rutaLayer) {
+        map.removeLayer(rutaLayer);
+        rutaLayer = null;
+    }
+    
+    // Limpiar marcadores de escalas anteriores
+    escalasMarkers.forEach(marker => map.removeLayer(marker));
+    escalasMarkers = [];
+    
+    // Crear array de puntos para la ruta completa
+    let puntosRuta = [];
+    
+    // Agregar origen si existe
+    if (origenSeleccionado) {
+        puntosRuta.push([origenSeleccionado.lat, origenSeleccionado.lng]);
+    }
+    
+    // Agregar escalas en orden
+    escalas.forEach((escala, index) => {
+        if (escala.lat && escala.lng) {
+            puntosRuta.push([escala.lat, escala.lng]);
+            
+            // Crear marcador numerado para la escala
+            const marker = L.marker([escala.lat, escala.lng], {
+                icon: L.divIcon({
+                    className: 'marker-numero marker-escala',
+                    html: `<div class="marker-numero marker-escala">${index + 1}</div>`,
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                })
+            }).addTo(map);
+            
+            marker.bindPopup(`
+                <strong>Escala ${index + 1}: ${escala.nombre}</strong><br>
+                📍 ${escala.direccion}<br>
+                🏛️ ${escala.distrito}, ${escala.provincia}<br>
+                <button onclick="eliminarEscala(${escala.id})" class="btn-eliminar-escala">
+                    ❌ Quitar escala
+                </button>
+            `);
+            
+            escalasMarkers.push(marker);
+        }
+    });
+    
+    // Agregar destino final si existe
+    if (destinoSeleccionado) {
+        puntosRuta.push([destinoSeleccionado.lat, destinoSeleccionado.lng]);
+    }
+    
+    // Crear línea de ruta si hay al menos 2 puntos
+    if (puntosRuta.length >= 2) {
+        rutaLayer = L.polyline(puntosRuta, { 
+            color: '#007bff', 
+            weight: 4,
+            opacity: 0.7
+        }).addTo(map);
+        
+        // Ajustar vista a la ruta completa
+        const allMarkers = [];
+        if (origenMarker) allMarkers.push(origenMarker);
+        if (destinoMarker) allMarkers.push(destinoMarker);
+        allMarkers.push(...escalasMarkers);
+        
+        if (allMarkers.length > 0) {
+            const group = new L.featureGroup(allMarkers);
+            map.fitBounds(group.getBounds(), { padding: [20, 20] });
+        }
+    }
+}
+
+// Funciones para drag & drop de escalas
+let elementoArrastrado = null;
+
+function iniciarArrastre(event, index) {
+    elementoArrastrado = index;
+    event.dataTransfer.effectAllowed = "move";
+}
+
+function permitirSoltar(event) {
+    event.preventDefault();
+}
+
+function soltarEscala(event, index) {
+    event.preventDefault();
+    
+    if (elementoArrastrado !== null && elementoArrastrado !== index) {
+        // Reordenar escalas
+        const escalaMovida = escalas[elementoArrastrado];
+        escalas.splice(elementoArrastrado, 1);
+        escalas.splice(index, 0, escalaMovida);
+        
+        actualizarEscalas();
+        actualizarRutaEnMapa();
+    }
+    
+    elementoArrastrado = null;
+}
+
+// Funciones para reordenar escalas
+function subirEscala(index) {
+    if (index === 0) {
+        alert('Esta escala ya se encuentra en la primera posición');
+        return;
+    }
+    
+    // Intercambiar posiciones
+    const temp = escalas[index];
+    escalas[index] = escalas[index - 1];
+    escalas[index - 1] = temp;
+    
+    actualizarEscalas();
+    actualizarRutaEnMapa();
+}
+
+function bajarEscala(index) {
+    if (index === escalas.length - 1) {
+        alert('Esta escala ya se encuentra en la última posición');
+        return;
+    }
+    
+    // Intercambiar posiciones
+    const temp = escalas[index];
+    escalas[index] = escalas[index + 1];
+    escalas[index + 1] = temp;
+    
+    actualizarEscalas();
+    actualizarRutaEnMapa();
+}
+
+function actualizarEmpleadosAsignados() {
+    const contenedor = document.getElementById('empleadosAsignados');
+    if (empleadosAsignados.length === 0) {
+        contenedor.innerHTML = '<span style="color: #666; font-style: italic;">No hay empleados asignados</span>';
+    } else {
+        contenedor.innerHTML = empleadosAsignados.map(empleado => 
+            `<span class="item-tag">
+                ${empleado.nombre} 
+                <button class="remove-btn" onclick="toggleEmpleado(${empleado.id})">×</button>
+            </span>`
+        ).join('');
+    }
+}
+
+function actualizarPaquetesAsignados() {
+    const contenedor = document.getElementById('paquetesAsignados');
+    if (paquetesAsignados.length === 0) {
+        contenedor.innerHTML = '<span style="color: #666; font-style: italic;">No hay paquetes asignados</span>';
+    } else {
+        contenedor.innerHTML = paquetesAsignados.map(paquete => 
+            `<span class="item-tag">
+                ${paquete.tracking} - ${paquete.peso}kg
+                <button class="remove-btn" onclick="togglePaquete(${paquete.tracking})">×</button>
+            </span>`
+        ).join('');
+    }
+}
+
+function actualizarCapacidadVehiculo() {
+    if (!vehiculoSeleccionado) return;
+
+    const vehiculo = vehiculos.find(v => v.unidadid === vehiculoSeleccionado);
+    const capacidad = Number(vehiculo.capacidad);
+
+    // Si no hay paquetes asignados, usar lo que viene de backend
+    const capacidadUsada = paquetesAsignados.length === 0 
+        ? Number(vehiculo.capacidad_usada) 
+        : pesoTotal;
+
+    const porcentaje = capacidad > 0 ? (capacidadUsada / capacidad) * 100 : 0;
+
+    const capacityText = document.getElementById('capacityText');
+    if (capacityText) {
+        capacityText.textContent = 
+            `${capacidadUsada.toFixed(2)} kg / ${capacidad.toFixed(2)} kg (${porcentaje.toFixed(1)}%)`;
+    }
+
+    const fill = document.getElementById('capacityFill');
+    if (fill) {
+        fill.style.width = `${Math.min(porcentaje, 100)}%`;
+        fill.className = 'capacity-fill';
+        if (porcentaje >= 90) fill.classList.add('danger');
+        else if (porcentaje >= 70) fill.classList.add('warning');
+    }
+}
+
+function showAlert(elementId, mensaje, tipo) {
+    const elemento = document.getElementById(elementId);
+    if (!elemento) return;
+    
+    elemento.innerHTML = mensaje;
+    elemento.className = `alert alert-${tipo} show`;
+    
+    // Auto-ocultar después de 5 segundos, excepto para warnings importantes
+    if (tipo !== 'warning' || !mensaje.includes('30 minutos')) {
+        setTimeout(() => {
+            elemento.classList.remove('show');
+        }, 5000);
+    } else {
+        // Para warnings importantes, mantener visible más tiempo
+        setTimeout(() => {
+            elemento.classList.remove('show');
+        }, 8000);
+    }
+}
+
+function hideAlert(elementId) {
+    const elemento = document.getElementById(elementId);
+    if (elemento) {
+        elemento.classList.remove('show');
+    }
+}
+
+function validarFormulario() {
+    const fecha = document.getElementById('fecha').value;
+    const hora = document.getElementById('hora').value;
+    const origen = document.getElementById('origenSelect').value;
+    const destino = document.getElementById('destinoSelect').value;
+    
+    // ✅ VALIDACIÓN ESPECIAL: fecha y hora deben ser futuras
+    const ahora = new Date();
+    const fechaHoraSeleccionada = new Date(`${fecha}T${hora}`);
+    
+    if (fechaHoraSeleccionada <= ahora) {
+        showAlert('mensajeGuardado', 'La fecha y hora de salida deben ser posteriores a la actual', 'error');
+        return false;
+    }
+    
+    if (!fecha) {
+        showAlert('mensajeGuardado', 'Por favor, seleccione una fecha', 'error');
+        return false;
+    }
+    
+    if (!hora) {
+        showAlert('mensajeGuardado', 'Por favor, seleccione una hora', 'error');
+        return false;
+    }
+    
+    if (!origen) {
+        showAlert('mensajeGuardado', 'Por favor, seleccione un origen', 'error');
+        return false;
+    }
+    
+    if (!destino) {
+        showAlert('mensajeGuardado', 'Por favor, seleccione un destino', 'error');
+        return false;
+    }
+    
+    if (!vehiculoSeleccionado) {
+        showAlert('mensajeGuardado', 'Por favor, seleccione un vehículo', 'error');
+        return false;
+    }
+    
+    if (empleadosAsignados.length === 0) {
+        showAlert('mensajeGuardado', 'Debe asignar al menos un empleado', 'error');
+        return false;
+    }
+    
+    if (paquetesAsignados.length === 0) {
+        showAlert('mensajeGuardado', 'Debe asignar al menos un paquete', 'error');
+        return false;
+    }
+    
+    return true;
+}
+
+// ✅ INICIALIZACIÓN MODIFICADA PARA EDICIÓN
+document.addEventListener('DOMContentLoaded', function() {
+    configurarFechaHoraMinimas(); // ✅ AGREGADO
+    
+    renderizarVehiculos();
+    renderizarEmpleados();
+    renderizarPaquetes();
+    actualizarContadorEscalas();
+    
+    // Inicializar variable global para paquetes
+    window.paquetesDisponibles = [];
+    window.indicePaquetes = crearIndicePaquetes();
+    
+    // ✅ PRECARGAR DATOS EN EDICIÓN
+    precargarDatosExistentes();
+});
+
+</script>
+{% endblock %}
