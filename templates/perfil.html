@@ -210,7 +210,7 @@ Mi perfil
                             <th>Monto Total</th>
                             <th>Método de Pago</th>
                             <th>Estado Pago</th>
-                            <!-- <th>Acciones</th> -->
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -221,9 +221,9 @@ Mi perfil
                             <td>S/ {{ "%.2f"|format(compra.monto_total) if compra.monto_total else '0.00' }}</td>
                             <td>{{ compra.metodo_pago or 'No especificado' }}</td>
                             <td><span class="status-badge status-{{ compra.estado_clase }}">{{ compra.estado_pago }}</span></td>
-                            <!-- <td>
-                                <a href="{{ url_for('descargar_comprobante_venta', num_serie=compra.num_comprobante) }}" class="btn-action btn-download">📄 Descargar</a>
-                            </td> -->
+                            <td>
+                                <a href="{{ url_for('ver_comprobante_venta', num_serie=compra.num_comprobante) }}" class="btn-action btn-download" style="color: #fff !important;">📄 Descargar</a>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
