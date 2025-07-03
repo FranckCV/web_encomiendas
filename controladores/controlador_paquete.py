@@ -559,29 +559,27 @@ def verificar_clave_seguridad(tracking, security_code):
 
 
 def actualizar_estado_entrega_sucursal(tracking, tipo_comprobante):
-    sql = '''
-        UPDATE paquete 
-        SET ultimo_estado = 'EO' 
+    sql_update = '''
+        UPDATE paquete
+        SET ultimo_estado = 'EO'
         WHERE tracking = %s
     '''
     try:
-        # Ejecutar la actualización del estado
-        sql_execute(sql, (tracking,))  
+        sql_execute(sql_update, (tracking,))
 
-        # Insertar en la tabla de seguimiento con fecha y hora actuales usando NOW()
-        sql_insert = '''
-            INSERT INTO seguimiento (paquetetracking, detalle_estadoid, tipo_comprobanteid, fecha, hora) 
-            VALUES (%s, 2, %s, NOW(), NOW())
-        '''
-        sql_execute(sql_insert, (tracking, tipo_comprobante))  # Ejecuta la inserción en seguimiento
+        for estado_id in range(2, 7):  
+            sql_insert = '''
+                INSERT INTO seguimiento (paquetetracking, detalle_estadoid, tipo_comprobanteid, fecha, hora)
+                VALUES (%s, %s, %s, NOW(), NOW())
+            '''
+            sql_execute(sql_insert, (tracking, estado_id, tipo_comprobante))
 
-        # Retornar True si ambas operaciones fueron exitosas
-        return True 
-    
+        return True
+
     except Exception as e:
-        # Capturar cualquier error y devolver False
         print(f"Error al actualizar estado: {e}")
         return False
+
 
 
 

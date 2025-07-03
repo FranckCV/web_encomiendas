@@ -243,3 +243,5 @@ def cambiar_estado_salida_web(id, estado):
             WHERE salidaid = %s
         '''
         sql_execute(sql_update, (id,))
+        
+    
