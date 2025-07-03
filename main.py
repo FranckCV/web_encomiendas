@@ -2503,6 +2503,204 @@ def confirmar_pago():
         print("Error en confirmar_pago:", e)
         return jsonify({"error": "Ocurrió un error al procesar el pago"}), 500
 
+@app.route('/comprobante-venta/<int:num_serie>', methods=['POST'])
+def generar_comprobante_venta(num_serie):
+    """
+    Endpoint para generar comprobantes de venta (Boletas/Facturas) usando reporte_boleta_2.py
+    """
+    from controladores import reporte_boleta_2
+    
+    try:
+        data = request.get_json()
+        tipo_comprobante = data.get('comprobante', 'BOLETA').upper()
+        
+        print(f"Generando {tipo_comprobante} para transacción: {num_serie}")
+        
+        if tipo_comprobante not in ['BOLETA', 'FACTURA']:
+            return jsonify({
+                'success': False, 
+                'message': 'Tipo de comprobante debe ser BOLETA o FACTURA'
+            }), 400
+        
+        # Obtener la transacción de venta
+        transaccion = controlador_transaccion_venta.obtener_transaccion_por_num_serie(num_serie)
+        if not transaccion or not isinstance(transaccion, dict):
+            return jsonify({
+                'success': False, 
+                'message': 'Transacción de venta no encontrada'
+            }), 404
+        
+        # Verificar que la transacción esté pagada (estado = 1)
+        if transaccion.get('estado') != 1:
+            return jsonify({
+                'success': False, 
+                'message': 'La transacción debe estar confirmada para generar comprobante'
+            }), 400
+        
+        # Generar serie del comprobante según el tipo
+        if tipo_comprobante == 'BOLETA':
+            comprobante_serie = f"B001-{num_serie:08d}"
+        else:  # FACTURA
+            comprobante_serie = f"F001-{num_serie:08d}"
+        
+        # Crear directorio para comprobantes
+        carpeta = os.path.join("static", "comprobantes", "ventas", str(num_serie))
+        os.makedirs(carpeta, exist_ok=True)
+        
+        # Nombre del archivo según el tipo de comprobante
+        nombre_archivo = f"{tipo_comprobante.lower()}_{num_serie}.pdf"
+        ruta_pdf = os.path.join(carpeta, nombre_archivo)
+        
+        # Si el comprobante ya existe, devolverlo directamente
+        if os.path.exists(ruta_pdf):
+            print(f"Comprobante existente encontrado: {ruta_pdf}")
+            return send_file(ruta_pdf, as_attachment=True,
+                           download_name=f"{tipo_comprobante.lower()}_venta_{num_serie}.pdf")
+        
+        # === OBTENER DATOS NECESARIOS ===
+        
+        # Datos de la empresa
+        empresa = controlador_empresa.getDataComprobante()
+        if not empresa:
+            return jsonify({
+                'success': False, 
+                'message': 'No se pudieron obtener los datos de la empresa'
+            }), 500
+        
+        # Datos del cliente
+        cliente_data = controlador_transaccion_venta.obtener_cliente_por_id(transaccion.get('clienteid'))
+        if not cliente_data:
+            return jsonify({
+                'success': False, 
+                'message': 'Cliente no encontrado para esta transacción'
+            }), 404
+        
+        # Formatear datos del cliente para el comprobante
+        cliente = {
+            'nombre_siglas': cliente_data.get('nombre_siglas', ''),
+            'apellidos_razon': cliente_data.get('apellidos_razon', ''),
+            'documento_identidad': cliente_data.get('num_documento', ''),
+            'tipo_documento': cliente_data.get('tipo_documento', 'DNI'),
+            'correo': cliente_data.get('correo', ''),
+            'telefono': cliente_data.get('telefono', ''),
+            'direccion': cliente_data.get('direccion', 'No especificada')
+        }
+        
+        # Obtener los artículos de la venta
+        items = controlador_transaccion_venta.obtener_detalle_venta(num_serie)
+        if not items or len(items) == 0:
+            return jsonify({
+                'success': False, 
+                'message': 'No se encontraron artículos en esta venta'
+            }), 404
+        
+        # === CALCULAR TOTALES Y TRIBUTOS ===
+        
+        monto_total = float(transaccion.get('monto_total', 0))
+        igv_rate = float(empresa.get('igv', 18)) / 100
+        
+        # Calcular valores según si tiene IGV o no
+        if igv_rate > 0:
+            # Operación gravada (monto sin IGV)
+            op_gravada = monto_total / (1 + igv_rate)
+            igv_monto = monto_total - op_gravada
+            op_exonerada = 0
+            op_inafecta = 0
+        else:
+            # Sin IGV
+            op_gravada = 0
+            igv_monto = 0
+            op_exonerada = monto_total  # Operación exonerada
+            op_inafecta = 0
+        
+        # Resumen de totales para el comprobante
+        resumen = {
+            'op_gravada': round(op_gravada, 2),
+            'op_exonerada': round(op_exonerada, 2),
+            'op_inafecta': round(op_inafecta, 2),
+            'isc': 0.00,  # Impuesto Selectivo al Consumo
+            'igv': round(igv_monto, 2),
+            'icbper': 0.00,  # Impuesto a las Bolsas de Plástico
+            'otros_cargos': 0.00,
+            'otros_tributos': 0.00,
+            'importe_total': round(monto_total, 2)
+        }
+        
+        # Formatear datos de la transacción
+        transaccion_formateada = {
+            'num_serie': num_serie,
+            'fecha': transaccion.get('fecha'),
+            'hora': transaccion.get('hora'),
+            'monto_total': monto_total,
+            'estado': transaccion.get('estado'),
+            'clienteid': transaccion.get('clienteid')
+        }
+        
+        # === GENERAR EL PDF USANDO reporte_boleta_2 ===
+        
+        print(f"Generando PDF: {ruta_pdf}")
+        print(f"Empresa: {empresa.get('nombre', 'N/A')}")
+        print(f"Cliente: {cliente.get('nombre_siglas', '')} {cliente.get('apellidos_razon', '')}")
+        print(f"Items: {len(items)} artículos")
+        print(f"Total: S/ {monto_total:.2f}")
+        
+        # Llamar a la función del módulo reporte_boleta_2
+        resultado = reporte_boleta_2.generar_comprobante_venta_pdf(
+            transaccion=transaccion_formateada,
+            cliente=cliente,
+            empresa=empresa,
+            tipo_comprobante=tipo_comprobante,
+            comprobante_serie=comprobante_serie,
+            items=items,
+            resumen=resumen,
+            qr_path=None,  # Se genera automáticamente
+            ruta_pdf=ruta_pdf
+        )
+        
+        if not resultado:
+            return jsonify({
+                'success': False, 
+                'message': 'Error al generar el archivo PDF del comprobante'
+            }), 500
+        
+        # Verificar que el archivo se haya creado correctamente
+        if not os.path.exists(ruta_pdf):
+            return jsonify({
+                'success': False, 
+                'message': 'El archivo PDF no se generó correctamente'
+            }), 500
+        
+        print(f"Comprobante generado exitosamente: {ruta_pdf}")
+        
+        # Devolver el archivo PDF
+        return send_file(
+            ruta_pdf, 
+            as_attachment=True,
+            download_name=f"{tipo_comprobante.lower()}_venta_{num_serie}.pdf",
+            mimetype='application/pdf'
+        )
+        
+    except ImportError as e:
+        print(f"Error al importar reporte_boleta_2: {str(e)}")
+        return jsonify({
+            'success': False, 
+            'message': 'Módulo de generación de comprobantes no disponible'
+        }), 500
+        
+    except FileNotFoundError as e:
+        print(f"Error de archivo no encontrado: {str(e)}")
+        return jsonify({
+            'success': False, 
+            'message': 'Error al acceder a archivos del sistema'
+        }), 500
+        
+    except Exception as e:
+        print(f"Error general al generar comprobante: {str(e)}")
+        return jsonify({
+            'success': False, 
+            'message': f'Error interno del servidor: {str(e)}'
+        }), 500
+
 
 @app.route("/venta/registrar", methods=["POST"])
 def registrar_venta():
@@ -5293,6 +5491,23 @@ def interfaz_insertar_estado():
                            tracking=tracking,
                            detalles_estado=detalles_estado)
 
+
+
+@app.route("/ver_guia_remision=<int:tracking>")
+def ver_guia_remision(tracking):
+    datos = controlador_estado_encomienda.get_data_package(tracking)
+    if datos.get('salidaid') is None:
+        return rdrct_error(redirect(url_for('transaccion',tabla = 'paquete',pk_foreign = datos.get('num_serie'))) ,'No posee guia de remisión')
+    else:
+        return send_from_directory(f"static/img/guias/",f"guia_{tracking}.pdf")
+
+@app.route("/ver_boleta_venta=<int:num_serie>")
+def ver_boleta_venta(num_serie):
+    datos = controlador_estado_encomienda.get_data_package(num_serie)
+    if datos.get('salidaid') is None:
+        return rdrct_error(redirect(url_for('perfil') ,'No posee boleta disponible'))
+    else:
+        return send_from_directory(f"static/comprobantes/venta/",f"boleta_{num_serie}.pdf")
 
 
 @app.route("/ver_img_qr=<int:tracking>")
