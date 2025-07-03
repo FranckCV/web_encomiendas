@@ -45,12 +45,11 @@ def get_table():
             tip.nombre ,
             tip.activo 
         from {table_name} tip
-
     '''
     columnas = {
         'id': ['ID' , 0.5] , 
-        'siglas' : ['Siglas' , 2] , 
-        'nombre' : ['Nombre' , 5] , 
+        'siglas' : ['Siglas' , 1.5] , 
+        'nombre' : ['Nombre' , 6] , 
         'activo' : ['Actividad' , 1] 
         }
     filas = sql_select_fetchall(sql)
@@ -64,24 +63,25 @@ def unactive_row( id ):
     unactive_row_table(table_name , id)
 
 
-def insert_row( nombre ):
+def insert_row( siglas, nombre ):
     sql = f'''
         INSERT INTO 
             {table_name} 
-            ( nombre , activo )
+            ( siglas , nombre , activo )
         VALUES 
-            ( %s , 1 )
+            ( %s , %s , 1 )
     '''
-    sql_execute(sql,( nombre ))
+    sql_execute(sql,( siglas , nombre ))
 
 
-def update_row( id , nombre ):
+def update_row( id , siglas , nombre ):
     sql = f'''
         update {table_name} set 
+        siglas = %s ,
         nombre = %s 
         where {get_primary_key()} = {id}
     '''
-    sql_execute(sql, (nombre ))
+    sql_execute(sql, (siglas , nombre ))
 
 
 #####_ ADICIONALES _#####

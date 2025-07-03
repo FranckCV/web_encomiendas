@@ -345,9 +345,10 @@ CONTROLADORES = {
         ] ,
         "fields_form": [
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None , ''],
+            ['siglas',      'Siglas',          'Siglas',      'text',     True ,     True  ,        None , 'mayusculas,max:3'],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None , 'letras'],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None , ''],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -370,11 +371,11 @@ CONTROLADORES = {
         ] ,
         "fields_form": [
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['inicial',          'Inicial',    'Inicial',     'text',     True ,     True ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None , 'texto_avanzado'],
+            ['id',          'ID',              'ID',          'text',     True ,     False ,  None , '' ],
+            ['inicial',     'Inicial',         'Inicial',     'text',     True ,     True ,   None , 'mayusculas' ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,  None , 'letras' ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,  None , '' ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,  None , 'texto_avanzado'],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -397,9 +398,10 @@ CONTROLADORES = {
         ],
         "fields_form": [
             #  ID/NAME     LABEL             PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
-            ['id',        'ID',             'ID',          'text',  True,      False,         None],
-            ['nombre',    'Nombre',         'Nombre',      'text',  True,      True,          None],
-            ['activo',    f'{TITLE_STATE}', 'Activo',      'p',     True,      False,         None],
+            ['id',            'ID',             'ID',       'text',      True,      False,   None , ''],
+            ['nombre',        'Nombre',         'Nombre',   'text',      True,      True,    None , 'letras'],
+            ['activo',        f'{TITLE_STATE}', 'Activo',   'p',         True,      False,   None , ''],
+            ['descripcion',   'Descripción',    'Nombre',   'textarea',  False,     True,    None , 'texto_avanzado'],
         ],
         "crud_forms": {
             "crud_list": True,
@@ -422,9 +424,9 @@ CONTROLADORES = {
         ] ,
         "fields_form": [
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None , ''],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None , 'letras'],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None , ''],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -437,46 +439,46 @@ CONTROLADORES = {
         }
     },
     "reclamo": {
-    "active": True,
-    "id": "reclamo",
-    "titulo": "Reclamos",
-    "nombre_tabla": "reclamo",
-    "controlador": controlador_reclamo,
-    "icon_page": "fa-solid fa-file",
-    "filters": [],
-    "fields_form": [
-        ['id', 'ID', 'ID', 'text', True, False, None],
-        ['nombres_razon', 'Cliente', 'Cliente', 'text', True, True, None],
-        ['direccion', 'Dirección', 'Dirección', 'text', True, True, None],
-        ['correo', 'Correo', 'Correo', 'email', True, True, None],
-        ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None],
-        ['n_documento', 'N° Documento', '', 'text', True, True, None],
-        ['bien_contratado', 'Bien Contratado', '', 'select', True, True, [lambda:controlador_reclamo.get_list_bien_contratado(), '']],
-        ['monto_reclamado', 'Monto Reclamado', '0.00', 'number', True, True, None],
-        ['monto_indemnizado', 'Monto Indemnizado', '0.00', 'number', True, True, None],
-        ['relacion', 'Relación con el bien', '', 'text', True, True, None],
-        ['fecha_recepcion', 'Fecha de recepción', '', 'date', True, True, None],
-        ['descripcion', 'Descripción', '', 'textarea', True, True, None , 'texto_avanzado'],
-        ['detalles', 'Detalles adicionales', '', 'textarea', True, True, None , 'texto_avanzado'],
-        ['pedido', 'Pedido', '', 'text', True, True, None],
-        ['foto', 'Foto del reclamo', '', 'img', False, True, None],
-        ['sucursal_id', 'Sucursal', '', 'select', True, True, [lambda: controlador_sucursal.get_options(), 'direccion']],
-        ['causa_reclamoid', 'Causa del Reclamo', '', 'select', True, True, [lambda: controlador_causa_reclamo.get_options(), 'nombre']],
-        ['tipo_indemnizacionid', 'Tipo de Indemnización', '', 'select', True, True, [lambda: controlador_tipo_indemnizacion.get_options(), 'nombre']],
-        ['paquetetracking', 'Tracking', '', 'text', True, True, None],
-        ['ubigeocodigo', 'Ubigeo', '', 'select', True, True, [lambda: controlador_ubigeo.get_options(), 'codigo']],
-        ['tipo_documentoid', 'Tipo Documento', '', 'select', True, True, [lambda: controlador_tipo_documento.get_options(), 'nombre']]
-    ],
-    "crud_forms": {
-        "crud_list": True,
-        "crud_search": True,
-        "crud_consult": True,
-        "crud_insert": True,
-        "crud_update": True,
-        "crud_delete": True,
-        "crud_unactive": False
-    }
-},
+        "active": True,
+        "id": "reclamo",
+        "titulo": "Reclamos",
+        "nombre_tabla": "reclamo",
+        "controlador": controlador_reclamo,
+        "icon_page": "fa-solid fa-file",
+        "filters": [],
+        "fields_form": [
+            ['id', 'ID', 'ID', 'text', True, False, None, '' ],
+            ['nombres_razon', 'Cliente', 'Cliente', 'text', True, True, None, 'alfanumerico_simbolos' ],
+            ['foto', 'Foto del reclamo', '', 'img', False, True, None, '' ],
+            ['direccion', 'Dirección', 'Dirección', 'text', True, True, None, 'texto_avanzado' ],
+            ['correo', 'Correo', 'Correo', 'email', True, True, None, 'email' ],
+            ['telefono', 'Teléfono', 'Teléfono', 'text', True, True, None, 'telefono' ],
+            ['n_documento', 'N° Documento', '', 'text', True, True, None, '' ],
+            ['bien_contratado', 'Bien Contratado', '', 'select', True, True, [lambda:controlador_reclamo.get_list_bien_contratado(), ''], '' ],
+            ['monto_reclamado', 'Monto Reclamado', '0.00', 'decimal2', True, True, None, 'decimal2' ],
+            ['monto_indemnizado', 'Monto Indemnizado', '0.00', 'decimal2', True, True, None, 'decimal2' ],
+            ['relacion', 'Relación con el bien', '', 'text', True, True, None, 'alfanumerico_simbolos' ],
+            ['fecha_recepcion', 'Fecha de recepción', '', 'date', True, True, None, '' ],
+            ['descripcion', 'Descripción', '', 'textarea', True, True, None , 'texto_avanzado'],
+            ['detalles', 'Detalles adicionales', '', 'textarea', True, True, None , 'texto_avanzado'],
+            ['pedido', 'Pedido', '', 'textarea', True, True, None, 'texto_avanzado' ],
+            ['sucursal_id', 'Sucursal', 'Elegir sucursal', 'select', True, True, [lambda: controlador_sucursal.get_options(), 'direccion'], '' ],
+            ['causa_reclamoid', 'Causa del Reclamo', 'Elegir causa de reclamo', 'select', True, True, [lambda: controlador_causa_reclamo.get_options(), 'nombre'], '' ],
+            ['tipo_indemnizacionid', 'Tipo de Indemnización', '', 'select', True, True, [lambda: controlador_tipo_indemnizacion.get_options(), 'nombre'], '' ],
+            ['paquetetracking', 'Tracking', '', 'text', True, True, None, 'numeros' ],
+            ['ubigeocodigo', 'Ubigeo', '', 'select', True, True, [lambda: controlador_ubigeo.get_options(), 'codigo'], '' ],
+            ['tipo_documentoid', 'Tipo Documento', '', 'select', True, True, [lambda: controlador_tipo_documento.get_options(), 'nombre'], '' ]
+        ],
+        "crud_forms": {
+            "crud_list": True,
+            "crud_search": True,
+            "crud_consult": True,
+            "crud_insert": True,
+            "crud_update": True,
+            "crud_delete": True,
+            "crud_unactive": False
+        }
+    },
     "pregunta_frecuente": {
         "active": True,
         "titulo": "preguntas frecuentes",
@@ -489,9 +491,9 @@ CONTROLADORES = {
         "fields_form": [
             #  ID/NAME          LABEL              PLACEHOLDER            TYPE      REQUIRED  ABLE/DISABLE  DATOS
             ['id',              'ID',              'ID',                  'text',     True,     False,       None],
-            ['activo',          f'{TITLE_STATE}',  'Activo',              'p',        True,     False,       None],
-            ['titulo',          'Título',          'Título',              'textarea',     True,     True,        None , 'texto_avanzado'],
-            ['descripcion',     'Descripción',     'Descripción',         'textarea', True,     True,        None] , 'texto_avanzado',
+            ['titulo',          'Título',          'Título',              'text',     True,     True,        None , 'texto_avanzado'],
+            ['activo',          f'{TITLE_STATE}',  'Activo',              'p',        True,     False,       None], 
+            ['descripcion',     'Descripción',     'Descripción',         'textarea', True,     True,        None , 'texto_avanzado'],
         ],
         "crud_forms": {
             "crud_list": True,
@@ -517,7 +519,7 @@ CONTROLADORES = {
         "fields_form": [
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
             ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None , 'mayusculas,max:5'],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
         ],
         "crud_forms": {
@@ -542,7 +544,7 @@ CONTROLADORES = {
         "fields_form": [
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
             ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None , 'alfanumerico'],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
         ],
         "crud_forms": {
@@ -566,14 +568,14 @@ CONTROLADORES = {
         ] ,
         "fields_form": [
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['precio',      'Precio',          'Precio',      'number',   True ,     True  ,        None ],
-            ['stock',       'Stock',           'Stock',       'number',   True ,     True  ,        None ],
-            ['dimensiones', 'Dimensiones',     'Dimensiones', 'text',     False ,     True  ,        None ],
-            ['tamaño_cajaid','Tamaño de Caja',    'Tamaño de Caja', 'select',   False ,     True  ,        [lambda: controlador_tamanio_caja.get_options() , 'tam_nombre' ]  ],
-            ['img',         'Imagen',          'Imagen',      'img',      True ,     True  ,        None ],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None , ''],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None , 'alfanumerico'],
+            ['precio',      'Precio',          'Precio',      'decimal2',   True ,     True  ,        None , 'decimal2'],
+            ['stock',       'Stock',           'Stock',       'decimal2',   True ,     True  ,        None , 'decimal2'],
+            ['dimensiones', 'Dimensiones',     'Dimensiones', 'text',     False ,     True  ,       None , 'alfanumerico_simbolos'],
+            ['tamaño_cajaid','Tamaño de Caja', 'Tamaño de Caja', 'select',   False ,     True  ,    [lambda: controlador_tamanio_caja.get_options() , 'tam_nombre' ]  ],
+            ['img',         'Imagen',          'Imagen',      'img',      True ,     True  ,        None , ''],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None , ''],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -701,7 +703,7 @@ CONTROLADORES = {
         ] ,
         "fields_form": [
 #            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
-            ['tarifa',      'Tarifa',          'Tarifa',      'decimal_2',     True ,     True  ,        None ],
+            ['tarifa',      'Tarifa',          'Tarifa',      'decimal2',     True ,     True  ,        None ],
             ['sucursal_origen_id',  'Sucursal de origen', 'Sucursal de origen', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_origen' ] ],
             ['sucursal_destino_id',  'Sucursal de destino', 'Sucursal de destino', 'select', True ,True, [lambda: controlador_sucursal.get_options() , 'sucursal_destino' ] ],
         ],
@@ -733,10 +735,10 @@ CONTROLADORES = {
             ['direccion',     'Dirección',       'Dirección',       'text',      True ,    True,       'map' ],
             ['teléfono',      'Teléfono',        'Teléfono',        'text',      False,    True,       None ],
             ['horario_l_v',   'Horario L-V',     'Ej: 9am - 6pm',   'text',      False,    True,       None ],
-            ['latitud',       'Latitud',         'Latitud',         'decimal_6',    False,    True,       'map' ],
+            ['latitud',       'Latitud',         'Latitud',         'decimal6',    False,    True,       'map' ],
             ['horario_s_d',   'Horario S-D',     'Ej: 9am - 1pm',   'text',      False,    True,       None ],
             ['referencia',    'Referencia',      'Referencia',      'text',      False,    True,       None ],
-            ['longitud',      'Longitud',        'Longitud',        'decimal_6',    False,    True,       'map' ],
+            ['longitud',      'Longitud',        'Longitud',        'decimal6',    False,    True,       'map' ],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -995,8 +997,8 @@ CONTROLADORES = {
         "fields_form": [
 #            ID/NAME    LABEL             PLACEHOLDER  TYPE     REQUIRED   ABLE/DISABLE   DATOS    Validacion JS 
             ['id',      'ID',             'ID',        'text',  True ,     False ,        None  , '' ],
-            ['nombre',  'Nombre',         'Nombre',    'text',  True ,     True ,         None  , 'alfanumerico,max:8' ], 
-            ['activo',  f'{TITLE_STATE}', 'Activo',    'p',     True ,     False ,        None  , 'alfanumerico' ],
+            ['nombre',  'Nombre',         'Nombre',    'text',  True ,     True ,         None  , 'alfanumerico_simbolos,max:100' ], 
+            ['activo',  f'{TITLE_STATE}', 'Activo',    'p',     True ,     False ,        None  , '' ],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -1160,7 +1162,7 @@ CONTROLADORES = {
         "fields_form": [
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
             ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None , 'alfanumerico_simbolos'],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
             ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None  , 'texto_avanzado'],
         ],
@@ -1187,9 +1189,9 @@ CONTROLADORES = {
 #            ID/NAME             LABEL              PLACEHOLDER            TYPE        REQUIRED  ABLE/DISABLE   DATOS
             ['id',             'ID',                 'ID',                'text',       True ,    False ,       None ],
             ['tipo_condicion', 'Tipo de condición',  'Tipo de condición', 'text',       True ,    True  ,       None ],
-            ['inferior',       'Valor Inferior',     'Inferior',          'decimal_2',  True ,    True ,        None ],
-            ['superior',       'Valor Superior',     'Superior',          'decimal_2',  False,    True  ,       None ],
-            ['porcentaje',     'Porcentaje',         'Porcentaje',        'decimal_2',  False,    True  ,       None ],
+            ['inferior',       'Valor Inferior',     'Inferior',          'decimal2',  True ,    True ,        None ],
+            ['superior',       'Valor Superior',     'Superior',          'decimal2',  False,    True  ,       None ],
+            ['porcentaje',     'Porcentaje',         'Porcentaje',        'decimal2',  False,    True  ,       None ],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -1504,7 +1506,7 @@ TRANSACCIONES = {
             ['id_sucursal_origen',  'Sucursal de origen', 'Sucursales de origen',                          'select',    True,  True,   [lambda: controlador_tarifa_ruta.get_options_select_sucursal_origen(), 'nombre']],
             ['clienteid',           'Cliente',            'Clientes',                          'select',    True,  True,   [lambda: controlador_cliente.get_select_cliente(), 'nombre']],
 
-            ['monto_total',         'Monto Total',        'Monto total',             'decimal_2', True,  True,   None],
+            ['monto_total',         'Monto Total',        'Monto total',             'decimal2', True,  True,   None],
             ['direccion_recojo',    'Direccion de recojo',    'Direccion de recojo',            'text',    True,  True,   None],
             ['descripcion',         'Descripcion',            'Descripcion',        'textarea',    True,  True,   None , 'texto_avanzado'],
         ],
@@ -4694,7 +4696,6 @@ def seguimiento_unidad_prueba():
     id = request.args.get('id')
     
     data = [{
-        
         'iniciolat_via': lat1,
         'iniciolon_via': lon1,
         'finlat_via': lat2,

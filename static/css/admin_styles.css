@@ -807,10 +807,11 @@ label {
     scrollbar-color: var(--color1) #f0f0f0;
     display: flex;
     gap: 10px;
-    row-gap: 17px;
+    /* row-gap: 17px; */
     position: relative;
     padding-inline: 15px;
     width: 100%;
+    min-height: 12.5vh;
 }
 
 .form_fields {
@@ -833,6 +834,7 @@ label {
     flex-direction: column;
     margin-bottom: 10px;
     position: relative;
+    height: fit-content;
 }
 
 .form_field::-webkit-scrollbar-thumb {
@@ -1231,8 +1233,9 @@ input[type="number"],
 
 
 .form_field .mensaje-error {
-    position: absolute;
-    bottom: -20px;
+    /* position: absolute; */
+    /* bottom: -5px; */
+    margin: 0;
     color: rgb(155, 0, 0);
     font-size: 90%;
 }
