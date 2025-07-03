@@ -89,14 +89,7 @@ def get_table():
 #     sql_execute(sql,( nombre , descripcion ))
 
 
-# def update_row( id , nombre , descripcion =None ):
-#     sql = f'''
-#         update {table_name} set 
-#         nombre = %s ,
-#         descripcion = %s
-#         where {get_primary_key()} = {id}
-#     '''
-#     sql_execute(sql,(nombre , descripcion))
+
 
 
 #####_ ADICIONALES _#####
@@ -232,3 +225,21 @@ def crear_transaccion_salida(vehiculo, empleados, escalas, paquetes):
         conexion.commit()
         return salida_id
 
+
+def cambiar_estado_salida_web(id, estado):
+    # Actualizar el estado de la salida
+    sql = '''
+        UPDATE salida 
+        SET estado = %s 
+        WHERE id = %s
+    '''
+    sql_execute(sql, (estado, id))
+
+    # Si el estado de la salida es 'C', actualizar todos los paquetes relacionados
+    if estado == 'C':
+        sql_update = '''
+            UPDATE paquete 
+            SET ultimo_estado = 'ED' 
+            WHERE salidaid = %s
+        '''
+        sql_execute(sql_update, (id,))

@@ -1,0 +1,156 @@
+{% extends "MAESTRA_ADMIN.html" %}
+
+{% block estilos %}
+<style>
+
+    h1 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #555;
+    }
+    input[type="radio"] {
+        margin-right: 10px;
+    }
+    .radio-option {
+        padding: 10px;
+        margin: 5px 0;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+    }
+    .radio-option:hover {
+        background-color: #f0f0f0;
+    }
+    .radio-option.selected {
+        border-color: #007bff;
+        background-color: #e7f3ff;
+    }
+    .btn {
+        background-color: #007bff;
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+        margin-top: 20px;
+    }
+    .btn:hover {
+        background-color: #0056b3;
+    }
+    .btn:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+    .salida-info {
+        background-color: #e9ecef;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+</style>
+{% endblock estilos %}
+
+{% block contenido %}
+<div class="container">
+    <h1>Cambiar Estado de Salida</h1>
+    
+    <div class="salida-info">
+        <strong>ID de Salida: {{ salida_id }}</strong>
+    </div>
+
+    <form id="estadoForm" method="POST">
+        <input type="hidden" name="salida_id" value="{{ salida_id }}">
+        
+        <div class="form-group">
+            <label>Selecciona el nuevo estado:</label>
+            
+            <div class="radio-option" onclick="selectOption('T')">
+                <input type="radio" name="estado" value="T" id="transito" required>
+                <label for="transito">En Tránsito</label>
+            </div>
+            
+            <div class="radio-option" onclick="selectOption('C')">
+                <input type="radio" name="estado" value="C" id="completada" required>
+                <label for="completada">Completada</label>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn" id="submitBtn" disabled>
+            Actualizar Estado
+        </button>
+    </form>
+</div>
+
+{% endblock contenido %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function selectOption(value) {
+        // Limpiar selecciones anteriores
+        document.querySelectorAll('.radio-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        
+        // Seleccionar la opción clickeada
+        document.querySelector(`input[value="${value}"]`).checked = true;
+        document.querySelector(`input[value="${value}"]`).closest('.radio-option').classList.add('selected');
+        
+        // Habilitar el botón
+        document.getElementById('submitBtn').disabled = false;
+    }
+
+    document.getElementById('estadoForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevenir el envío del formulario tradicional
+
+        // Realizar la solicitud AJAX
+        var formData = new FormData(this);
+
+        fetch('{{ url_for("actualizar_estado_salida") }}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Mostrar SweetAlert de éxito
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Estado actualizado',
+                    text: data.message
+                }).then(() => {
+                    // Redirigir a la página de transacción de salida
+                    window.location.href = '/transaccion=salida';                });
+            } else {
+                // Mostrar SweetAlert de error
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error al actualizar',
+                text: 'Hubo un problema con la actualización del estado.'
+            });
+        });
+    });
+</script>
+{% endblock scripts %}
