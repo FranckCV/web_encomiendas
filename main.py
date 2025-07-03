@@ -5753,10 +5753,14 @@ def actualizar_estado_salida():
     try:
         # Obtener el id y el estado del formulario
         id = request.form.get('salida_id')
+        
         estado = request.form.get('estado')
         
-        # Llamar al controlador para actualizar el estado
+        
+
         controlador_salida.cambiar_estado_salida_web(id, estado)
+        
+        
         
         # Usar flash para mostrar mensaje de éxito
         flash('Estado de salida actualizado correctamente.', 'success')
