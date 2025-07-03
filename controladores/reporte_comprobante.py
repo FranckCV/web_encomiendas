@@ -63,7 +63,7 @@ class ComprobantePDF(FPDF):
     def items_table(self, items):
         # Encabezados de la tabla con anchos ajustados
         self.set_font("Helvetica", "B", 9)
-        self.cell(20, 7, "Cant.", border=1, align="C")
+        self.cell(10, 7, "Cant.", border=1, align="C")
         self.cell(40, 7, "Unidad", border=1, align="C")
         self.cell(90, 7, "Servicio", border=1, align="C")
         self.cell(25, 7, "V. Unit.", border=1, align="C")
@@ -75,37 +75,40 @@ class ComprobantePDF(FPDF):
         for item in items:
             cantidad = 1
             unidad = "SERVICIO DE TRANSPORTE"
-            # Cambio de formato: departamento/provincia/distrito
-            servicio = f"{item['origen']['departamento']}/{item['origen']['provincia']}/{item['origen']['distrito']} -> {item['destino']['departamento']}/{item['destino']['provincia']}/{item['destino']['distrito']}"
+            
+            # ✅ NUEVO FORMATO SIMPLIFICADO
+            origen = f"{item['origen']['departamento']}/{item['origen']['provincia']}/{item['origen']['distrito']}"
+            destino = f"{item['destino']['departamento']}/{item['destino']['provincia']}/{item['destino']['distrito']}"
+            
             try:
                 tarifa = float(item.get('tarifa') or 0)
             except:
                 tarifa = 0.00
             importe = tarifa * cantidad
 
-            # Calcular altura necesaria para el texto del servicio
-            servicio_lines = self.get_text_lines(servicio, 90)
-            line_height = 7
-            cell_height = max(line_height, len(servicio_lines) * 4)
+            # ✅ ALTURA FIJA PARA DOS LÍNEAS
+            cell_height = 14  # Altura para 2 líneas de texto
 
             # Guardar posición Y inicial
             y_start = self.get_y()
 
             # Cantidad
-            self.cell(20, cell_height, str(cantidad), border=1, align="C")
+            self.cell(10, cell_height, str(cantidad), border=1, align="C")
             
             # Unidad
             self.cell(40, cell_height, unidad, border=1, align="C")
             
-            # Servicio (texto multilínea)
+            # ✅ SERVICIO (formato de dos líneas)
             x_servicio = self.get_x()
             self.cell(90, cell_height, "", border=1)  # Celda vacía con borde
-            self.set_xy(x_servicio + 1, y_start + 1)  # Posición dentro de la celda
-            for i, line in enumerate(servicio_lines):
-                if i > 0:
-                    self.ln(4)
-                    self.set_x(x_servicio + 1)
-                self.cell(88, 4, line, align="L")
+            
+            # Escribir "Desde:" en la primera línea
+            self.set_xy(x_servicio + 2, y_start + 2)
+            self.cell(86, 5, f"Desde: {origen}", align="L")
+            
+            # Escribir "Hasta:" en la segunda línea
+            self.set_xy(x_servicio + 2, y_start + 7)
+            self.cell(86, 5, f"Hasta: {destino}", align="L")
             
             # Volver a la posición correcta para las siguientes celdas
             self.set_xy(x_servicio + 90, y_start)
@@ -205,7 +208,7 @@ class ComprobantePDF(FPDF):
         footer_msg = (
             "Esta es una representación impresa de la Boleta de Venta Electrónica, "
             "generada en el Sistema de la SUNAT. El Emisor Electrónico puede verificarla "
-            "utilizando su clave SOL, el Adquiriente o Usuario puede consultar su validez "
+            "utilizando su clave SOL, el Adquirente o Usuario puede consultar su validez "
             "en SUNAT Virtual: www.sunat.gob.pe, en Opciones sin Clave SOL / Consulta de Validez"
         )
 

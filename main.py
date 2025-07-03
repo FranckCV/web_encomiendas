@@ -1532,7 +1532,7 @@ TRANSACCIONES = {
             "crud_search": True,
             "crud_consult": True,
             "crud_insert": True,
-            "crud_update": True,
+            "crud_update": False,
             "crud_delete": True,
             "crud_unactive": False
         },
@@ -1542,6 +1542,7 @@ TRANSACCIONES = {
             [True, 'fa-solid fa-route', "#9856EE", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"} , '' , 'seguimiento' , False],
             [True, 'fa-solid fa-qrcode', "#2195DC", 'ver_img_qr',  {"tracking": "tracking"} , '' , 'qr_code' , True],
             [True, 'fa-solid fa-dollar', "#6FDC21", 'pagar_paquete',  {"tracking": "tracking"} , '' , 'pago' , False],
+            [True, 'fa-solid fa-receipt', "#1E3548", 'ver_comprobante_paquete',  {"tracking": "tracking"} , '' , 'ver_boleta' , False],
         ],
         "options": [
         # mostrar_url       icon             color                  text                 enlace_function       parametros                    modo(insert ,update , consult)
@@ -5697,6 +5698,28 @@ def ver_comprobante_venta(num_serie):
         else:
             return send_from_directory(f"static/comprobantes/ventas/{num_serie}",f"boleta_{num_serie}.pdf")
 
+@app.route("/ver_comprobante_paquete=<int:tracking>")
+def ver_comprobante_paquete(tracking):
+    transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
+    tipo_comprobanteid = transaccion.get('tipo_comprobanteid', 2)
+    
+    # Obtener datos del comprobante si es necesario (aunque aquí no parece usarse)
+    # comprobante = controlador_tipo_comprobante.get_data_comprobante(tipo_comprobanteid)
+
+    # Verificar que haya salidaid
+    if transaccion.get('monto_total') is None:
+        return rdrct_error(
+            redirect(url_for('transaccion', tabla='paquete', pk_foreign=transaccion.get('num_serie'))),
+            'No se obtuvo comprobante disponible, contactarse con soporte'
+        )
+
+    ruta_archivo = f"static/comprobantes/{tracking}/comprobante.pdf"
+
+    if not os.path.exists(ruta_archivo):
+        generar_comprobante(tracking, tipo_comprobanteid)
+
+    # Enviar el archivo
+    return send_from_directory(f"static/comprobantes/{tracking}", "comprobante.pdf")
 
 @app.route("/ver_img_qr=<int:tracking>")
 def ver_img_qr(tracking):
