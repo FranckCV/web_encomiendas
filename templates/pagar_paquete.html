@@ -12,6 +12,7 @@
     --text-blue: #1e40af;
     --success-green: #059669;
     --error-red: #dc2626;
+    --warning-yellow: #f59e0b;
     --gray-50: #f8fafc;
     --gray-100: #f1f5f9;
     --gray-300: #cbd5e1;
@@ -34,11 +35,10 @@ body {
     padding: 0;
 }
 
-/* Contenedor principal centrado */
 .main-container {
     min-height: 100vh;
     display: flex;
-        width: 100%;
+    width: 100%;
     align-items: center;
     justify-content: center;
     padding: 2rem 1rem;
@@ -177,10 +177,6 @@ body {
     box-shadow: var(--shadow-md);
 }
 
-.btn-primary:active {
-    transform: translateY(0);
-}
-
 .btn-secondary {
     background-color: var(--gray-100);
     color: var(--gray-700);
@@ -202,6 +198,16 @@ body {
     color: white;
 }
 
+.btn-warning {
+    background-color: var(--warning-yellow);
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: #d97706;
+    color: white;
+}
+
 .btn-group {
     display: flex;
     gap: 1rem;
@@ -212,128 +218,6 @@ body {
     flex: 1;
 }
 
-/* Validación */
-.is-valid {
-    border-color: var(--success-green) !important;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23059669' d='m2.3 6.73.94-.94 1.44 1.44 2.75-2.75.94.94L3.64 8.84z'/%3e%3c/svg%3e");
-    background-position: right 0.5rem center;
-    background-repeat: no-repeat;
-    background-size: 1rem 1rem;
-}
-
-.is-invalid {
-    border-color: var(--error-red) !important;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc2626'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.5 5.5 1 1m0 -1-1 1'/%3e%3c/svg%3e");
-    background-position: right 0.5rem center;
-    background-repeat: no-repeat;
-    background-size: 1rem 1rem;
-}
-
-.form-select.is-valid {
-    background-position: right 2.5rem center, right 0.5rem center;
-}
-
-.form-select.is-invalid {
-    background-position: right 2.5rem center, right 0.5rem center;
-}
-
-.invalid-feedback {
-    color: var(--error-red);
-    font-size: 0.8125rem;
-    margin-top: 0.25rem;
-    display: none;
-}
-
-.is-invalid + .invalid-feedback {
-    display: block;
-}
-
-/* Modales */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.modal.show {
-    display: flex;
-    opacity: 1;
-}
-
-.modal-dialog {
-    width: 100%;
-    max-width: 500px;
-    margin: 1rem;
-    transform: translateY(-20px);
-    transition: transform 0.3s ease;
-}
-
-.modal.show .modal-dialog {
-    transform: translateY(0);
-}
-
-.modal-content {
-    background: white;
-    border-radius: 16px;
-    box-shadow: var(--shadow-lg);
-    overflow: hidden;
-}
-
-.modal-header {
-    background: linear-gradient(135deg, var(--lighter-blue) 0%, var(--light-blue) 100%);
-    border-bottom: 1px solid var(--border-blue);
-    padding: 1.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.modal-title {
-    color: var(--text-blue);
-    font-weight: 600;
-    margin: 0;
-    font-size: 1.25rem;
-}
-
-.btn-close {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--gray-500);
-    padding: 0.25rem;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-}
-
-.btn-close:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-    color: var(--gray-700);
-}
-
-.modal-body {
-    padding: 2rem;
-}
-
-.modal-footer {
-    border-top: 1px solid var(--gray-100);
-    padding: 1.5rem;
-    background-color: var(--gray-50);
-    display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
-}
-
-/* Alertas */
 .alert {
     border: none;
     border-radius: 12px;
@@ -351,70 +235,73 @@ body {
     border-left: 4px solid var(--success-green);
 }
 
-.alert-danger {
-    background-color: #fef2f2;
-    color: #991b1b;
-    border-left: 4px solid var(--error-red);
-}
-
 .alert-info {
     background-color: var(--lighter-blue);
     color: var(--text-blue);
     border-left: 4px solid var(--primary-blue);
 }
 
-.alert h6 {
-    margin: 0 0 0.5rem 0;
-    font-weight: 600;
+.alert-warning {
+    background-color: #fef3c7;
+    color: #92400e;
+    border-left: 4px solid var(--warning-yellow);
 }
 
-.alert p {
-    margin: 0;
+.alert-danger {
+    background-color: #fef2f2;
+    color: #991b1b;
+    border-left: 4px solid var(--error-red);
 }
 
-/* Información del paquete */
-.package-info {
-    background: var(--lighter-blue);
-    border: 1px solid var(--border-blue);
-    border-radius: 12px;
+.status-section {
+    margin-bottom: 2rem;
+}
+
+.payment-methods {
+    display: none;
+    margin-top: 1.5rem;
+}
+
+.payment-methods.show {
+    display: block;
+}
+
+.payment-gateway {
+    display: none;
+    margin-top: 1.5rem;
     padding: 1.5rem;
-    margin-bottom: 1.5rem;
+    background: var(--gray-50);
+    border-radius: 12px;
+    border: 1px solid var(--gray-300);
 }
 
-.package-info h6 {
-    color: var(--text-blue);
-    font-weight: 600;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.payment-gateway.show {
+    display: block;
 }
 
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid var(--border-blue);
+.security-code-section {
+    margin-top: 1.5rem;
 }
 
-.info-row:last-child {
-    border-bottom: none;
-    font-weight: 600;
-    color: var(--text-blue);
+.is-valid {
+    border-color: var(--success-green) !important;
 }
 
-.info-label {
-    color: var(--gray-700);
-    font-weight: 500;
+.is-invalid {
+    border-color: var(--error-red) !important;
 }
 
-.info-value {
-    color: var(--text-blue);
-    font-weight: 600;
+.invalid-feedback {
+    color: var(--error-red);
+    font-size: 0.8125rem;
+    margin-top: 0.25rem;
+    display: none;
 }
 
-/* Spinner */
+.is-invalid + .invalid-feedback {
+    display: block;
+}
+
 .spinner {
     display: inline-block;
     width: 1rem;
@@ -429,15 +316,17 @@ body {
     to { transform: rotate(360deg); }
 }
 
-/* Responsive */
+.hidden {
+    display: none !important;
+}
+
 @media (max-width: 768px) {
     .main-container {
         padding: 1rem;
     }
     
     .card-header,
-    .card-body,
-    .modal-body {
+    .card-body {
         padding: 1.5rem;
     }
     
@@ -447,18 +336,6 @@ body {
     
     .btn-group .btn {
         width: 100%;
-    }
-    
-    .modal-footer {
-        flex-direction: column-reverse;
-    }
-    
-    .modal-footer .btn {
-        width: 100%;
-    }
-    
-    .form-container {
-        max-width: 100%;
     }
 }
 </style>
@@ -470,164 +347,262 @@ body {
         <div class="card">
             <div class="card-header">
                 <div class="card-header-icon">
-                    <i class="fas fa-credit-card"></i>
+                    <i class="fas fa-box"></i>
                 </div>
-                <h1>Procesar Pago de Paquete</h1>
+                <h1>Gestión de paquete</h1>
+                <p>Código: {{ tracking or 'No especificado' }}</p>
             </div>
             <div class="card-body">
-                <form id="formPagarPaquete">
-                    <!-- Campo Tracking -->
-                    <div class="form-group">
-                        <label for="tracking" class="form-label">
-                            <i class="fas fa-barcode"></i>
-                            Código de Tracking *
-                        </label>
-                        <input type="text" 
-                               class="form-control" 
-                               id="tracking" 
-                               placeholder="Ingrese su número de tracking"
-                               name="tracking" 
-                               required value="{{tracking}}" 
-                               {% if tracking %} disabled {% endif %}
-                               >
-                        <div class="invalid-feedback">
-                            <i class="fas fa-exclamation-circle"></i>
-                            Por favor ingrese el código de tracking.
+                
+                {% if not tracking %}
+                    <!-- Sección para ingresar tracking -->
+                    <div class="status-section">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <strong>Buscar Paquete</strong><br>
+                                Ingrese el código de tracking para continuar.
+                            </div>
+                        </div>
+                        
+                        <form id="trackingForm">
+                            <div class="form-group">
+                                <label for="tracking_input" class="form-label">
+                                    <i class="fas fa-barcode"></i>
+                                    Código de Tracking *
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="tracking_input" 
+                                       placeholder="Ingrese el código de tracking"
+                                       required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                                Buscar Paquete
+                            </button>
+                        </form>
+                    </div>
+                
+                {% else %}
+                    <!-- Contenido basado en el estado del paquete -->
+                    {% if estados %}
+                        
+                        <!-- Estado P + PE: Pago pendiente, entrega en sucursal -->
+                        {% if estados.estado_pago == 'P' and estados.ultimo_estado == 'PE' %}
+                            <div class="status-section">
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-store"></i>
+                                    <div>
+                                        <strong>Paquete con pendiente de pago y entrega en sucursal de origen</strong><br>
+                                        En espera de que el remitente entregue el paquete y sea pagado en sucursal de origen.
+                                    </div>
+                                </div>
+                                
+                                <button type="button" class="btn btn-warning" onclick="mostrarMetodosPago()">
+                                    <i class="fas fa-credit-card"></i>
+                                    Procesar Pago
+                                </button>
+                            </div>
+                        
+                        <!-- Estado P + ED: Pago pendiente, entrega a destinatario -->
+                        {% elif estados.estado_pago == 'P' and estados.ultimo_estado == 'ED' %}
+                            <div class="status-section">
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-truck"></i>
+                                    <div>
+                                        <strong>Paquete Listo para Entrega al Destinatario</strong><br>
+                                        El paquete está listo para ser entregado. Ingrese su clave de seguridad y complete el pago.
+                                    </div>
+                                </div>
+                                
+                                <div class="security-code-section">
+                                    <div class="form-group">
+                                        <label for="security_code" class="form-label">
+                                            <i class="fas fa-key"></i>
+                                            Clave de Seguridad *
+                                        </label>
+                                        <input type="password" 
+                                               class="form-control" 
+                                               id="security_code" 
+                                               placeholder="Ingrese su clave de seguridad"
+                                               required>
+                                        <div class="invalid-feedback">
+                                            Clave de seguridad incorrecta.
+                                        </div>
+                                    </div>
+                                    
+                                    <button type="button" class="btn btn-primary" onclick="verificarClave()">
+                                        <i class="fas fa-check"></i>
+                                        Verificar Clave
+                                    </button>
+                                </div>
+                            </div>
+                        
+                        <!-- Estado C + PE: Pagado, entrega en sucursal -->
+                        {% elif estados.estado_pago == 'C' and estados.ultimo_estado == 'PE' %}
+                            <div class="status-section">
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle"></i>
+                                    <div>
+                                        <strong>Paquete pagado - Listo para entrega en sucursal de origen</strong><br>
+                                        Su paquete ha sido pagado, el remitente debe entregarlo en sucursal de origen.
+                                    </div>
+                                </div>
+                                
+                                <button type="button" class="btn btn-success" onclick="confirmarEntregaSucursal()">
+                                    <i class="fas fa-hand-holding-box"></i>
+                                    Entregar en Sucursal
+                                </button>
+                            </div>
+                        
+                        <!-- Estado C + ED: Pagado, entrega a destinatario -->
+                        {% elif estados.estado_pago == 'C' and estados.ultimo_estado == 'ED' %}
+                            <div class="status-section">
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle"></i>
+                                    <div>
+                                        <strong>Paquete Pagado - Listo para Entrega al Destinatario</strong><br>
+                                        El paquete ha sido pagado. Ingrese su clave de seguridad para completar la entrega.
+                                    </div>
+                                </div>
+                                
+                                <div class="security-code-section">
+                                    <div class="form-group">
+                                        <label for="security_code_final" class="form-label">
+                                            <i class="fas fa-key"></i>
+                                            Clave de Seguridad *
+                                        </label>
+                                        <input type="password" 
+                                               class="form-control" 
+                                               id="security_code_final" 
+                                               placeholder="Ingrese su clave de seguridad"
+                                               required>
+                                        <div class="invalid-feedback">
+                                            Clave de seguridad incorrecta.
+                                        </div>
+                                    </div>
+                                    
+                                    <button type="button" class="btn btn-success" onclick="verificarClaveEntrega()">
+                                        <i class="fas fa-truck"></i>
+                                        Entregar al Destinatario
+                                    </button>
+                                </div>
+                            </div>
+                        
+                        {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <div>
+                                    <strong>Estado del Paquete</strong><br>
+                                    Estado de pago: {{ estados.estado_pago }}<br>
+                                    Último estado: {{ estados.ultimo_estado }}
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                    {% else %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div>
+                                <strong>Paquete No Encontrado</strong><br>
+                                No se encontró información para el código de tracking proporcionado.
+                            </div>
+                        </div>
+                    {% endif %}
+                
+                {% endif %}
+                
+                <!-- Sección de métodos de pago (oculta inicialmente) -->
+                <div class="payment-methods" id="paymentMethods">
+                    <div class="alert alert-info">
+                        <i class="fas fa-credit-card"></i>
+                        <div>
+                            <strong>Seleccione el método de pago</strong><br>
+                            Complete la información para procesar el pago.
                         </div>
                     </div>
-
-                    <!-- Tipo de Comprobante -->
-                    <div class="form-group">
-                        <label for="tipo_comprobante" class="form-label">
-                            <i class="fas fa-file-invoice"></i>
-                            Tipo de Comprobante *
-                        </label>
-                        <select class="form-select" 
-                                id="tipo_comprobante" 
-                                name="tipo_comprobante" 
-                                required>
-                            <option value="">Seleccione tipo de comprobante</option>
-                            {% for fila in tipo_comprobante %}
-                                <option value="{{ fila.id }}">{{ fila.nombre }}</option>
-                            {% endfor %}
-                        </select>
-                        <div class="invalid-feedback">
-                            <i class="fas fa-exclamation-circle"></i>
-                            Por favor seleccione un tipo de comprobante.
+                    
+                    <form id="paymentForm">
+                        <div class="form-group">
+                            <label for="tipo_comprobante" class="form-label">
+                                <i class="fas fa-file-invoice"></i>
+                                Tipo de Comprobante *
+                            </label>
+                            <select class="form-select" id="tipo_comprobante" name="tipo_comprobante" required>
+                                <option value="">Seleccione tipo de comprobante</option>
+                                {% for fila in tipo_comprobante %}
+                                    <option value="{{ fila.id }}">{{ fila.nombre }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
-                    </div>
 
-                    <!-- Método de Pago -->
-                    <div class="form-group">
-                        <label for="metodo_pago" class="form-label">
-                            <i class="fas fa-wallet"></i>
-                            Método de Pago *
-                        </label>
-                        <select class="form-select" 
-                                id="metodo_pago" 
-                                name="metodo_pago" 
-                                required>
-                            <option value="">Seleccione método de pago</option>
-                            {% for fila in metodo_pago %}
-                                <option value="{{ fila.id }}">{{ fila.nombre }}</option>
-                            {% endfor %}
-                        </select>
-                        <div class="invalid-feedback">
-                            <i class="fas fa-exclamation-circle"></i>
-                            Por favor seleccione un método de pago.
+                        <div class="form-group">
+                            <label for="metodo_pago" class="form-label">
+                                <i class="fas fa-wallet"></i>
+                                Método de Pago *
+                            </label>
+                            <select class="form-select" id="metodo_pago" name="metodo_pago" required onchange="mostrarPasarela()">
+                                <option value="">Seleccione método de pago</option>
+                                {% for fila in metodo_pago %}
+                                    <option value="{{ fila.id }}">{{ fila.nombre }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
-                    </div>
 
-                    <!-- Botones -->
-                    <div class="btn-group">
-                                                <button type="button" class="btn btn-secondary" onclick="limpiarFormulario()">
-                            <i class="fas fa-broom"></i>
-                            Limpiar
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-credit-card"></i>
+                            Continuar con el Pago
                         </button>
-                        <button type="submit" class="btn btn-primary" id="btnPagar">
+                    </form>
+                </div>
+                
+                <!-- Pasarelas de pago -->
+                <div class="payment-gateway" id="efectivoPasarela">
+                    <h5><i class="fas fa-money-bill-wave"></i> Pago en Efectivo</h5>
+                    <p>El pago se realizará en efectivo al momento de la entrega.</p>
+                    <button type="button" class="btn btn-success" onclick="procesarPagoEfectivo()">
+                        <i class="fas fa-check"></i>
+                        Confirmar Pago en Efectivo
+                    </button>
+                </div>
+                
+                <div class="payment-gateway" id="tarjetaPasarela">
+                    <h5><i class="fas fa-credit-card"></i> Pago con Tarjeta</h5>
+                    <form id="tarjetaForm">
+                        <div class="form-group">
+                            <label class="form-label">Número de Tarjeta</label>
+                            <input type="text" class="form-control" placeholder="1234 5678 9012 3456" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Fecha de Vencimiento</label>
+                            <input type="text" class="form-control" placeholder="MM/AA" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">CVV</label>
+                            <input type="text" class="form-control" placeholder="123" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">
                             <i class="fas fa-credit-card"></i>
                             Procesar Pago
                         </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal de Confirmación -->
-<div class="modal" id="modalConfirmacion">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="fas fa-check-circle"></i>
-                    Confirmar Pago
-                </h5>
-                <button type="button" class="btn-close" onclick="cerrarModal('modalConfirmacion')">
-                    &times;
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i>
-                    <div>
-                        <strong>Revise los datos antes de confirmar</strong><br>
-                        Esta acción no se puede deshacer una vez confirmada.
-                    </div>
+                    </form>
                 </div>
                 
-                <div class="package-info">
-                    <h6>
-                        <i class="fas fa-box"></i>
-                        Información del Pago
-                    </h6>
-                    <div class="info-row">
-                        <span class="info-label">Código de Tracking:</span>
-                        <span class="info-value" id="trackingConfirm">-</span>
+                <div class="payment-gateway" id="yapePasarela">
+                    <h5><i class="fas fa-mobile-alt"></i> Pago con Yape</h5>
+                    <p>Escanee el código QR con su aplicación Yape para realizar el pago.</p>
+                    <div style="text-align: center; margin: 1rem 0;">
+                        <div style="width: 150px; height: 150px; background: #f0f0f0; margin: 0 auto; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-qrcode" style="font-size: 3rem; color: #666;"></i>
+                        </div>
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">Tipo de Comprobante:</span>
-                        <span class="info-value" id="tipoComprobanteConfirm">-</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Método de Pago:</span>
-                        <span class="info-value" id="metodoPagoConfirm">-</span>
-                    </div>
+                    <button type="button" class="btn btn-success" onclick="procesarPagoYape()">
+                        <i class="fas fa-check"></i>
+                        Confirmar Pago Yape
+                    </button>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="cerrarModal('modalConfirmacion')">
-                    <i class="fas fa-times"></i>
-                    Cancelar
-                </button>
-                <button type="button" class="btn btn-success" id="btnConfirmarPago">
-                    <i class="fas fa-check"></i>
-                    Confirmar Pago
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal de Resultado -->
-<div class="modal" id="modalResultado">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalResultadoLabel">Resultado</h5>
-                <button type="button" class="btn-close" onclick="cerrarModal('modalResultado')">
-                    &times;
-                </button>
-            </div>
-            <div class="modal-body" id="modalResultadoBody">
-                <!-- El contenido se genera dinámicamente -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" onclick="cerrarModal('modalResultado')">
-                    <i class="fas fa-check"></i>
-                    Entendido
-                </button>
+                
             </div>
         </div>
     </div>
@@ -637,175 +612,273 @@ body {
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('formPagarPaquete');
-    const btnPagar = document.getElementById('btnPagar');
-    const btnConfirmarPago = document.getElementById('btnConfirmarPago');
-    
-    let datosFormulario = {};
-
-    // Validación en tiempo real
-    form.addEventListener('input', function(e) {
-        validateField(e.target);
-    });
-
-    // Envío del formulario
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        if (validateForm()) {
-            // Recopilar datos
-            const tipoComprobanteSelect = document.getElementById('tipo_comprobante');
-            const metodoPagoSelect = document.getElementById('metodo_pago');
-            
-            datosFormulario = {
-                tracking: document.getElementById('tracking').value.trim(),
-                tipo_comprobante: tipoComprobanteSelect.value,
-                metodo_pago: metodoPagoSelect.value,
-                tipo_comprobante_nombre: tipoComprobanteSelect.options[tipoComprobanteSelect.selectedIndex].text,
-                metodo_pago_nombre: metodoPagoSelect.options[metodoPagoSelect.selectedIndex].text
-            };
-            
-            // Mostrar datos en el modal de confirmación
-            document.getElementById('trackingConfirm').textContent = datosFormulario.tracking;
-            document.getElementById('tipoComprobanteConfirm').textContent = datosFormulario.tipo_comprobante_nombre;
-            document.getElementById('metodoPagoConfirm').textContent = datosFormulario.metodo_pago_nombre;
-            
-            mostrarModal('modalConfirmacion');
-        }
-    });
-
-    // Confirmar pago
-    btnConfirmarPago.addEventListener('click', function() {
-        cerrarModal('modalConfirmacion');
-        procesarPago(datosFormulario);
-    });
-
-    function validateField(field) {
-        const isValid = field.checkValidity() && field.value.trim() !== '';
-        field.classList.toggle('is-invalid', !isValid);
-        field.classList.toggle('is-valid', isValid);
-        return isValid;
-    }
-
-    function validateForm() {
-        const fields = form.querySelectorAll('input[required], select[required]');
-        let isValid = true;
-        
-        fields.forEach(field => {
-            if (!validateField(field)) {
-                isValid = false;
+    // Manejo del formulario de tracking
+    const trackingForm = document.getElementById('trackingForm');
+    if (trackingForm) {
+        trackingForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const tracking = document.getElementById('tracking_input').value.trim();
+            if (tracking) {
+                window.location.href = `/pagar_paquete/${tracking}`;
             }
         });
-        
-        return isValid;
     }
+    
+    // Manejo del formulario de pago
+    const paymentForm = document.getElementById('paymentForm');
+    if (paymentForm) {
+        paymentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const metodoPago = document.getElementById('metodo_pago').value;
+            if (metodoPago) {
+                mostrarPasarela();
+            }
+        });
+    }
+});
 
-    function procesarPago(datos) {
-        // Mostrar loading
-        btnPagar.disabled = true;
-        btnPagar.innerHTML = '<span class="spinner"></span>Procesando...';
-        
-        fetch('/insertar_pago_paquete', {
+function mostrarMetodosPago() {
+    const paymentMethods = document.getElementById('paymentMethods');
+    paymentMethods.classList.add('show');
+    paymentMethods.scrollIntoView({ behavior: 'smooth' });
+}
+
+function verificarClave() {
+    const securityCode = document.getElementById('security_code').value;
+    const codeInput = document.getElementById('security_code');
+    
+    if (!securityCode) {
+        codeInput.classList.add('is-invalid');
+        return;
+    }
+    
+    // Simular verificación de clave (aquí deberías hacer una llamada al servidor)
+    if (securityCode === '1234') { // Ejemplo de clave válida
+        codeInput.classList.remove('is-invalid');
+        codeInput.classList.add('is-valid');
+        mostrarMetodosPago();
+    } else {
+        codeInput.classList.add('is-invalid');
+    }
+}
+
+function verificarClaveEntrega() {
+    const securityCode = document.getElementById('security_code_final').value;
+    const codeInput = document.getElementById('security_code_final');
+    
+    if (!securityCode) {
+        codeInput.classList.add('is-invalid');
+        return;
+    }
+    
+    // Simular verificación de clave
+    if (securityCode === '1234') {
+        codeInput.classList.remove('is-invalid');
+        codeInput.classList.add('is-valid');
+        entregarDestinatario();
+    } else {
+        codeInput.classList.add('is-invalid');
+    }
+}
+
+function mostrarPasarela() {
+    const metodoPago = document.getElementById('metodo_pago').value;
+    
+    // Ocultar todas las pasarelas
+    document.querySelectorAll('.payment-gateway').forEach(gateway => {
+        gateway.classList.remove('show');
+    });
+    
+    // Mostrar la pasarela correspondiente
+    switch(metodoPago) {
+        case '1': // Efectivo
+            document.getElementById('efectivoPasarela').classList.add('show');
+            break;
+        case '2': // Tarjeta de crédito
+        case '3': // Tarjeta de débito
+            document.getElementById('tarjetaPasarela').classList.add('show');
+            break;
+        case '4': // Yape
+            document.getElementById('yapePasarela').classList.add('show');
+            break;
+    }
+}
+
+function procesarPagoEfectivo() {
+    const datos = obtenerDatosPago();
+    enviarPago(datos);
+}
+
+function procesarPagoYape() {
+    const datos = obtenerDatosPago();
+    enviarPago(datos);
+}
+
+function obtenerDatosPago() {
+    return {
+        tracking: '{{ tracking }}',
+        tipo_comprobante: document.getElementById('tipo_comprobante').value,
+        metodo_pago: document.getElementById('metodo_pago').value
+    };
+}
+
+function enviarPago(datos) {
+    fetch('/insertar_pago_paquete', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(datos)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Pago procesado exitosamente');
+            location.reload();
+        } else {
+            alert('Error al procesar el pago: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al procesar el pago');
+    });
+}
+
+function confirmarEntregaSucursal() {
+    if (confirm('¿Confirma la entrega del paquete en sucursal?')) {
+        // Aquí puedes agregar la lógica para actualizar el estado del paquete
+        fetch('/entregar_sucursal', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                tracking: datos.tracking,
-                tipo_comprobante: datos.tipo_comprobante,
-                metodo_pago: datos.metodo_pago
+                tracking: '{{ tracking }}'
             })
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            mostrarResultado('success', 'Pago Procesado Exitosamente', 
-                `El pago para el paquete <strong>${datos.tracking}</strong> ha sido registrado correctamente en el sistema.`);
-            limpiarFormulario();
+            if (data.success) {
+                alert('Paquete entregado exitosamente en sucursal');
+                location.reload();
+            } else {
+                alert('Error al entregar el paquete: ' + data.message);
+            }
         })
         .catch(error => {
             console.error('Error:', error);
-            mostrarResultado('error', 'Error al Procesar el Pago', 
-                'No se pudo procesar el pago en este momento. Por favor, verifique los datos e intente nuevamente.');
+            alert('Error al entregar el paquete');
+        });
+    }
+}
+
+function verificarClave() {
+    const securityCode = document.getElementById('security_code').value;
+    const codeInput = document.getElementById('security_code');
+    
+    if (!securityCode) {
+        codeInput.classList.add('is-invalid');
+        return;
+    }
+    
+    // Llamada al servidor para verificar la clave
+    fetch('/verificar_clave', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            tracking: '{{ tracking }}',
+            security_code: securityCode
         })
-        .finally(() => {
-            // Restaurar botón
-            btnPagar.disabled = false;
-            btnPagar.innerHTML = '<i class="fas fa-credit-card"></i>Procesar Pago';
-        });
-    }
-
-    function mostrarResultado(tipo, titulo, mensaje) {
-        const modalBody = document.getElementById('modalResultadoBody');
-        const alertClass = tipo === 'success' ? 'alert-success' : 'alert-danger';
-        const icon = tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
-        
-        modalBody.innerHTML = `
-            <div class="alert ${alertClass}">
-                <i class="fas ${icon}" style="font-size: 1.5rem;"></i>
-                <div>
-                    <h6>${titulo}</h6>
-                    <p>${mensaje}</p>
-                </div>
-            </div>
-        `;
-        
-        document.getElementById('modalResultadoLabel').textContent = titulo;
-        mostrarModal('modalResultado');
-    }
-
-    // Función global para limpiar formulario
-    window.limpiarFormulario = function() {
-        form.reset();
-        form.querySelectorAll('.is-valid, .is-invalid').forEach(field => {
-            field.classList.remove('is-valid', 'is-invalid');
-        });
-        datosFormulario = {};
-    };
-
-    // Validación del tracking al escribir
-    document.getElementById('tracking').addEventListener('input', function() {
-        this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            codeInput.classList.remove('is-invalid');
+            codeInput.classList.add('is-valid');
+            mostrarMetodosPago();
+        } else {
+            codeInput.classList.add('is-invalid');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        codeInput.classList.add('is-invalid');
     });
-
-    // Mejorar la experiencia al cambiar selects
-    document.querySelectorAll('select').forEach(select => {
-        select.addEventListener('change', function() {
-            validateField(this);
-        });
-    });
-});
-
-// Funciones para manejar modales
-function mostrarModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
 }
 
-function cerrarModal(modalId) {
-    const modal = document.getElementById(modalId);
-    modal.classList.remove('show');
-    document.body.style.overflow = '';
+function verificarClaveEntrega() {
+    const securityCode = document.getElementById('security_code_final').value;
+    const codeInput = document.getElementById('security_code_final');
+    
+    if (!securityCode) {
+        codeInput.classList.add('is-invalid');
+        return;
+    }
+    
+    fetch('/verificar_clave', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            tracking: '{{ tracking }}',
+            security_code: securityCode
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            codeInput.classList.remove('is-invalid');
+            codeInput.classList.add('is-valid');
+            entregarDestinatario();
+        } else {
+            codeInput.classList.add('is-invalid');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        codeInput.classList.add('is-invalid');
+    });
 }
 
-// Cerrar modal al hacer clic fuera de él
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('modal')) {
-        cerrarModal(e.target.id);
+function entregarDestinatario() {
+    if (confirm('¿Confirma la entrega del paquete al destinatario?')) {
+        fetch('/entregar_destinatario', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                tracking: '{{ tracking }}'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Paquete entregado exitosamente al destinatario');
+                location.reload();
+            } else {
+                alert('Error al entregar el paquete: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al entregar el paquete');
+        });
     }
-});
+}
 
-// Cerrar modal con tecla Escape
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        const modals = document.querySelectorAll('.modal.show');
-        modals.forEach(modal => {
-            cerrarModal(modal.id);
+// Manejo del formulario de tarjeta
+document.addEventListener('DOMContentLoaded', function() {
+    const tarjetaForm = document.getElementById('tarjetaForm');
+    if (tarjetaForm) {
+        tarjetaForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const datos = obtenerDatosPago();
+            enviarPago(datos);
         });
     }
 });

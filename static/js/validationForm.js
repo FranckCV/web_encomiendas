@@ -14,6 +14,10 @@ const tiposValidacion = {
         regex: /^\d+$/,
         mensaje: "Solo números"
     },
+    entero_positivo: {
+        regex: /^[1-9]\d*$/,
+        mensaje: "Solo números enteros positivos "
+    },
     alfanumerico: {
         regex: /^[a-zA-Záéíóúñ0-9\s]+$/,
         mensaje: "Solo letras, números y espacios"
@@ -31,9 +35,10 @@ const tiposValidacion = {
         mensaje: "URL inválida"
     },
     placa_peru: {
-        regex: /^[A-Z]{3}\d{3}$/,
-        mensaje: "Placa inválida (formato ABC123)"
+        regex: /^[A-Z0-9]{6}$/,
+        mensaje: "Placa inválida (debe tener 6 caracteres alfanuméricos en mayúsculas)"
     },
+
     ip: {
         regex: /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/,
         mensaje: "IP inválida"
@@ -61,6 +66,14 @@ const tiposValidacion = {
     pas: {
         regex: /^[a-zA-Z0-9]{6,12}$/,
         mensaje: "Pasaporte inválido"
+    },
+    tuc: {
+        regex: /^[A-Z0-9]{6,12}$/,
+        mensaje: "TUC inválido (6 a 12 caracteres alfanuméricos en mayúsculas, sin espacios)"
+    },
+    mtc: {
+        regex: /^\d{6,10}$/,
+        mensaje: "MTC inválido (debe estar 6 a 10 dígitos)"
     },
     checkbox: {
         mensaje: "Este campo debe estar marcado"
@@ -163,7 +176,7 @@ function validarCampo(el, tipo, matchId = null) {
                 errores.push(`Mínimo ${min} caracteres`);
             }
             continue;
-        }
+        }      
 
         // max:X
         if (t.startsWith("max:")) {
@@ -174,12 +187,36 @@ function validarCampo(el, tipo, matchId = null) {
             continue;
         }
 
+        // min_val:X.Y
+        if (t.startsWith("min_val:")) {
+            const min = parseFloat(t.split(":")[1]);
+            const valNum = parseFloat(el.value);
+            if (!isNaN(valNum) && valNum < min) {
+                errores.push(`El valor mínimo es ${min}`);
+            }
+            continue;
+        }
+
+        // max_val:X.Y
+        if (t.startsWith("max_val:")) {
+            const max = parseFloat(t.split(":")[1]);
+            const valNum = parseFloat(el.value);
+            if (!isNaN(valNum) && valNum > max) {
+                errores.push(`El valor máximo es ${max}`);
+            }
+            continue;
+        }
+
+
         // Validación normal con regex
         const val = el.value.trim();
         const tipoBase = t.includes(":") ? t.split(":")[0] : t;
         const { regex, mensaje } = tiposValidacion[tipoBase] || {};
 
-        if (!regex || val === "" || !regex.test(val)) {
+        if (!el.required && val === "") {
+            continue;
+        }
+        if (!regex || !regex.test(val)) {
             errores.push(mensaje || "Campo inválido");
         }
     }

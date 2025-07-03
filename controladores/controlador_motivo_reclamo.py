@@ -42,6 +42,7 @@ def get_table():
             mo.id ,
             mo.nombre ,
             mo.descripcion,
+            mo.tipo_reclamoid ,
             tip.nombre as nom_tip 
         from {table_name} mo
         inner join tipo_reclamo tip on tip.id = mo.tipo_reclamoid

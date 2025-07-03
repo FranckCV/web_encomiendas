@@ -10,7 +10,7 @@ def exists_Activo():
 def get_primary_key():
     return show_primary_key(table_name)
 
-def get_report_test():
+def get_report_estado_fecha():
     sql = f'''
         SELECT 
             paq.*, 
@@ -56,30 +56,37 @@ def buscar_paquete(tracking, anio):
 def get_table_paquete_detalle(num_serie):
     sql = '''
         
-        SELECT 
-          p.tracking,
-          p.valor,
-          p.peso,
-          p.estado_pago,
-          p.qr_url,
-          p.nombres_contacto_destinatario,
-          p.apellidos_razon_destinatario,
-          p.num_documento_destinatario,
+         SELECT 
+            p.tracking,
+            p.valor,
+            p.peso,
+            p.estado_pago,
+            p.qr_url,
+            p.nombres_contacto_destinatario,
+            p.apellidos_razon_destinatario,
+            p.num_documento_destinatario,
+            td.nombre AS tipo_documento,
+            te.nombre AS tipo_empaque,
+            cp.nombre AS contenido_paquete,
+            tr.nombre AS tipo_recepcion,
+            mp.nombre AS modalidad_pago,
+            s.direccion AS direccion_destino,
+            CONCAT(u.departamento, '/', u.provincia, '/', u.distrito) AS localidad,
+            t.num_serie,
+            t.fecha,
+            t.hora,
+            t.monto_total,
 
-          td.nombre AS tipo_documento,
-          te.nombre AS tipo_empaque,
-          cp.nombre AS contenido_paquete,
-          tr.nombre AS tipo_recepcion,
-          mp.nombre AS modalidad_pago,
-
-          s.direccion AS direccion_destino,
-          CONCAT(u.departamento, '/', u.provincia, '/', u.distrito) AS localidad,
-
-          t.num_serie,
-          t.fecha,
-          t.hora,
-          t.monto_total
-
+            -- Condicional para el último estado
+            CASE 
+                WHEN p.ultimo_estado = 'PE' THEN 'Pendiente de entrega en sucursal de origen'
+                WHEN p.ultimo_estado = 'EO' THEN 'En sucursal de origen'
+                WHEN p.salidaid IS NOT NULL AND sl.estado = 'P' THEN 'Listo para salir'
+                WHEN p.salidaid IS NOT NULL AND sl.estado = 'T' THEN 'En tránsito'
+                WHEN p.salidaid IS NOT NULL AND sl.estado = 'C' THEN 'ED'
+                ELSE p.ultimo_estado
+            END AS ultimo_estado
+        
         FROM paquete p
         LEFT JOIN tipo_documento td ON td.id = p.tipo_documento_destinatario_id
         LEFT JOIN tipo_empaque te ON te.id = p.tipo_empaqueid
@@ -89,8 +96,10 @@ def get_table_paquete_detalle(num_serie):
         LEFT JOIN sucursal s ON s.id = p.sucursal_destino_id
         LEFT JOIN ubigeo u ON u.codigo = s.ubigeocodigo
         LEFT JOIN transaccion_encomienda t ON t.num_serie = p.transaccion_encomienda_num_serie
+        LEFT JOIN salida sl ON sl.id = p.salidaid 
 
-        WHERE t.num_serie = %s
+        WHERE t.num_serie = %s;
+
     '''
 
     columnas = {
@@ -98,6 +107,7 @@ def get_table_paquete_detalle(num_serie):
         'valor': ['Valor S/.', 1],
         'peso': ['Peso (kg)', 1],
         'estado_pago': ['Pago', 0.7],
+        'ultimo_estado':['Ultimo estado',4],
         'nombres_contacto_destinatario': ['Nombre destinatario', 2],
         'apellidos_razon_destinatario': ['Apellido/Razón', 2],
         'num_documento_destinatario': ['Doc. Identidad', 1.2],
@@ -123,35 +133,41 @@ def get_table_paquete_detalle(num_serie):
 def get_table():
     sql = '''
         
-        SELECT 
-          p.tracking,
-          p.valor,
-          p.peso,
-          CASE 
-        WHEN p.estado_pago = 'P' THEN 'Pendiente'
-        WHEN p.estado_pago = 'C' THEN 'Pagado'
-        ELSE 'Desconocido'
-    END AS estado_pago,
-          
-          p.qr_url,
-          p.nombres_contacto_destinatario,
-          p.apellidos_razon_destinatario,
-          p.num_documento_destinatario,
+         SELECT 
+            p.tracking,
+            p.valor,
+            p.peso,
+            CASE 
+                    WHEN p.estado_pago = 'P' THEN 'Pendiente'
+                    WHEN p.estado_pago = 'C' THEN 'Completado'
+                    ELSE p.estado_pago
+                END AS estado_pago,            
+                p.qr_url,
+            p.nombres_contacto_destinatario,
+            p.apellidos_razon_destinatario,
+            p.num_documento_destinatario,
+            td.nombre AS tipo_documento,
+            te.nombre AS tipo_empaque,
+            cp.nombre AS contenido_paquete,
+            tr.nombre AS tipo_recepcion,
+            mp.nombre AS modalidad_pago,
+            s.direccion AS direccion_destino,
+            CONCAT(u.departamento, '/', u.provincia, '/', u.distrito) AS localidad,
+            t.num_serie,
+            t.fecha,
+            t.hora,
+            t.monto_total,
 
-          td.siglas AS tipo_documento, 
-          te.nombre AS tipo_empaque,
-          cp.nombre AS contenido_paquete,
-          tr.nombre AS tipo_recepcion,
-          mp.nombre AS modalidad_pago,
-
-          s.direccion AS direccion_destino,
-          CONCAT(u.departamento, '/', u.provincia, '/', u.distrito) AS localidad,
-
-          t.num_serie,
-          t.fecha,
-          t.hora,
-          t.monto_total
-
+            -- Condicional para el último estado
+            CASE 
+                WHEN p.ultimo_estado = 'PE' THEN 'Pendiente de entrega en sucursal de origen'
+                WHEN p.ultimo_estado = 'EO' THEN 'En sucursal de origen'
+                WHEN p.salidaid IS NOT NULL AND sl.estado = 'P' THEN 'Listo para salir'
+                WHEN p.salidaid IS NOT NULL AND sl.estado = 'T' THEN 'En tránsito'
+                WHEN p.salidaid IS NOT NULL AND sl.estado = 'C' THEN 'ED'
+                ELSE p.ultimo_estado
+            END AS ultimo_estado
+        
         FROM paquete p
         LEFT JOIN tipo_documento td ON td.id = p.tipo_documento_destinatario_id
         LEFT JOIN tipo_empaque te ON te.id = p.tipo_empaqueid
@@ -161,6 +177,7 @@ def get_table():
         LEFT JOIN sucursal s ON s.id = p.sucursal_destino_id
         LEFT JOIN ubigeo u ON u.codigo = s.ubigeocodigo
         LEFT JOIN transaccion_encomienda t ON t.num_serie = p.transaccion_encomienda_num_serie
+        LEFT JOIN salida sl ON sl.id = p.salidaid 
 
     '''
 
@@ -168,7 +185,8 @@ def get_table():
         'tracking': ['Tracking', 1],
         'valor': ['Valor S/.', 1],
         'peso': ['Peso (kg)', 1],
-        'estado_pago': ['Pago', 0.7],
+        'estado_pago': ['Pago', 1],
+        'ultimo_estado':['Ultimo estado',3.5],
         'nombres_contacto_destinatario': ['Nombre destinatario', 2],
         'apellidos_razon_destinatario': ['Apellido/Razón', 2],
         'num_documento_destinatario': ['Doc. Identidad', 1.2],
@@ -194,34 +212,41 @@ def get_table():
 def get_table_pk_foreign(pk_foreign):
     sql = '''
         
-        SELECT 
-          p.tracking,
-          p.valor,
-          p.peso,
-         CASE 
-        WHEN p.estado_pago = 'P' THEN 'Pendiente'
-        WHEN p.estado_pago = 'C' THEN 'Pagado'
-        ELSE 'Desconocido'
-    END AS estado_pago,
-          p.qr_url,
-          p.nombres_contacto_destinatario,
-          p.apellidos_razon_destinatario,
-          p.num_documento_destinatario,
+            SELECT 
+            p.tracking,
+            p.valor,
+            p.peso,
+                        CASE 
+                    WHEN p.estado_pago = 'P' THEN 'Pendiente'
+                    WHEN p.estado_pago = 'C' THEN 'Completado'
+                    ELSE p.estado_pago
+                END AS estado_pago,  
+            p.qr_url,
+            p.nombres_contacto_destinatario,
+            p.apellidos_razon_destinatario,
+            p.num_documento_destinatario,
+            td.nombre AS tipo_documento,
+            te.nombre AS tipo_empaque,
+            cp.nombre AS contenido_paquete,
+            tr.nombre AS tipo_recepcion,
+            mp.nombre AS modalidad_pago,
+            s.direccion AS direccion_destino,
+            CONCAT(u.departamento, '/', u.provincia, '/', u.distrito) AS localidad,
+            t.num_serie,
+            t.fecha,
+            t.hora,
+            t.monto_total,
 
-          td.siglas AS tipo_documento,
-          te.nombre AS tipo_empaque,
-          cp.nombre AS contenido_paquete,
-          tr.nombre AS tipo_recepcion,
-          mp.nombre AS modalidad_pago,
-
-          s.direccion AS direccion_destino,
-          CONCAT(u.departamento, '/', u.provincia, '/', u.distrito) AS localidad,
-
-          t.num_serie,
-          t.fecha,
-          t.hora,
-          t.monto_total
-
+            -- Condicional para el último estado
+            CASE 
+                WHEN p.ultimo_estado = 'PE' THEN 'Pendiente de entrega en sucursal de origen'
+                WHEN p.ultimo_estado = 'EO' THEN 'En sucursal de origen'
+                WHEN p.salidaid IS NOT NULL AND sl.estado = 'P' THEN 'Listo para salir'
+                WHEN p.salidaid IS NOT NULL AND sl.estado = 'T' THEN 'En tránsito'
+                WHEN p.salidaid IS NOT NULL AND sl.estado = 'C' THEN 'ED'
+                ELSE p.ultimo_estado
+            END AS ultimo_estado
+        
         FROM paquete p
         LEFT JOIN tipo_documento td ON td.id = p.tipo_documento_destinatario_id
         LEFT JOIN tipo_empaque te ON te.id = p.tipo_empaqueid
@@ -231,8 +256,10 @@ def get_table_pk_foreign(pk_foreign):
         LEFT JOIN sucursal s ON s.id = p.sucursal_destino_id
         LEFT JOIN ubigeo u ON u.codigo = s.ubigeocodigo
         LEFT JOIN transaccion_encomienda t ON t.num_serie = p.transaccion_encomienda_num_serie
+        LEFT JOIN salida sl ON sl.id = p.salidaid 
 
-        WHERE t.num_serie = %s
+        WHERE t.num_serie = %s;
+
     '''
 
     columnas = {
@@ -240,6 +267,7 @@ def get_table_pk_foreign(pk_foreign):
         'valor': ['Valor S/.', 1],
         'peso': ['Peso (kg)', 1],
         'estado_pago': ['Pago', 0.7],
+        'ultimo_estado':['Ultimo estado',4],
         'nombres_contacto_destinatario': ['Nombre destinatario', 2],
         'apellidos_razon_destinatario': ['Apellido/Razón', 2],
         'num_documento_destinatario': ['Doc. Identidad', 1.2],
@@ -283,19 +311,20 @@ def get_paquete_by_tracking(tracking):
         SELECT 
             p.clave,
             p.tracking,
-            p.estado_pago,
-            -- Origen
+                        CASE 
+                    WHEN p.estado_pago = 'P' THEN 'Pendiente'
+                    WHEN p.estado_pago = 'C' THEN 'Completado'
+                    ELSE p.estado_pago
+                END AS estado_pago,  
             so.direccion AS sucursal_origen,
             uo.distrito AS distrito_origen,
             uo.provincia AS provincia_origen,
             uo.departamento AS departamento_origen,
-            -- Destino
             sd.abreviatura,
             sd.direccion AS sucursal_destino,
             ud.distrito AS distrito_destino,
             ud.provincia AS provincia_destino,
             ud.departamento AS departamento_destino,
-            -- Empaque
             te.nombre AS tipo_empaque,
             cp.nombre AS contenido_paquete
         FROM paquete p
@@ -473,3 +502,65 @@ def get_paquetes_detallados_por_ruta(sucursal_origen_id, sucursal_destino_id):
     
     filas = sql_select_fetchall(sql, (sucursal_origen_id, sucursal_destino_id))
     return filas if filas else []
+
+
+def get_data_pay(tracking):
+    sql = '''
+    select estado_pago, ultimo_estado from paquete where tracking = %s
+    '''
+    fila = sql_select_fetchone(sql,(tracking,))
+    
+    return fila
+
+def verificar_clave_seguridad(tracking, security_code):
+    sql = '''
+            SELECT clave FROM paquete WHERE tracking = %s
+    '''
+    fila = sql_select_fetchone(sql, (tracking,))
+    
+    if fila is None:
+        return False
+
+    if 'clave' in fila and fila['clave'] == security_code:
+        return True
+    
+    if fila[0] == security_code:
+        return True
+
+    return False
+
+
+def actualizar_estado_entrega_sucursal(tracking):
+    sql = '''
+        UPDATE paquete 
+        SET ultimo_estado = 'EO' 
+        WHERE tracking = %s
+    '''
+    try:
+        sql_execute(sql, (tracking,))  
+
+        return True 
+
+    except Exception as e:
+        print(f"Error al actualizar estado: {e}")
+        return False 
+
+
+
+
+def actualizar_estado_entrega_destinatario(tracking):
+    sql = '''
+        UPDATE paquete 
+        SET ultimo_estado = 'PD' 
+        WHERE tracking = %s
+    '''
+    try:
+        id = sql_execute_lastrowid(sql, (tracking,))
+        
+        if id > 0: 
+            return True
+        return False
+    
+    except Exception as e:
+        print(f"Error al actualizar estado: {e}")
+        return False

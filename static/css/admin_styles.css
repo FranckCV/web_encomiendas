@@ -1257,3 +1257,7 @@ input[type="number"],
 .input-ok {
     border-color: #22c55e;
 } */
+
+.filterSelect option[value=""] {
+    background-color: color-mix(in srgb, var(--color-thr) 50%, #c5c5c5 10%);
+}

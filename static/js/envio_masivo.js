@@ -1576,7 +1576,6 @@ class FieldManager {
 
   static mostrarCamposReceptor() {
     const tipo = document.getElementById('m-tipoDocumento')?.value;
-    console.log(tipo)
     const elementos = {
       camposRazon: document.getElementById('campo-razon-ruc'),
       camposContacto: document.getElementById('campo-contacto-ruc'),
@@ -1652,6 +1651,7 @@ class AppInitializer {
           const grupoFolios = document.getElementById('grupo-folios');
           if (grupoFolios) grupoFolios.style.display = 'none';
         }
+        FieldManager.toggleTipoEmpaque();
 
         const tablaEnvios = document.querySelector('.tabla-envios');
         const btnAgregar = document.querySelector('.btn-agregar');
@@ -1668,19 +1668,25 @@ class AppInitializer {
   }
 
   static hasFilledFields(seccion) {
-    const seccionMasiva = document.getElementById(seccion);
-    if (!seccionMasiva) return false;
+    const seccionElement = document.getElementById(seccion);
+    if (!seccionElement) return false;
 
-    const fields = seccionMasiva.querySelectorAll('input, select, textarea');
+    const fields = seccionElement.querySelectorAll('input, select, textarea');
+
+    const ignoredSelectors = ['#m-tipoEmpaque'];
 
     return Array.from(fields).some(field => {
+      if (ignoredSelectors.some(selector => field.matches(selector))) {
+        return false;
+      }
+
       if (field.type === 'radio') {
         return field.checked;
       }
+
       return field.value && field.value.trim() !== '';
     });
   }
-
 
   static setupBeforeUnloadWarning() {
   // Variable para controlar si estamos en proceso de continuar
@@ -1693,6 +1699,7 @@ class AppInitializer {
     }
 
     if (this.hasFilledAll()) {
+      
       const message = '¿Estás seguro de que quieres salir? Perderás todo el progreso actual.';
       e.preventDefault();
       e.returnValue = message;
@@ -1717,6 +1724,13 @@ class AppInitializer {
       continuandoProceso = true;
     });
   }
+
+  document.querySelectorAll('input, select, textarea').forEach((elemento) => {
+    elemento.addEventListener('blur', () => {
+      elemento.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  });
+
 }
   
 
