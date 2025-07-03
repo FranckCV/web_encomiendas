@@ -23,7 +23,8 @@ def pagar_encomienda(num_serie, tipo_comprobante, metodo_pago, tracking):
                 WHERE tracking = %s
             '''
             cursor.execute(sql, (tracking,))
-        
+            
+            
         conexion.commit()
     finally:
         conexion.close()

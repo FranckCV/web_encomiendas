@@ -3949,25 +3949,108 @@ def generar_rotulos_paquetes(trackings):
 
 @app.route('/descargar_comprobante/<tracking>', methods=['GET'])
 def descargar_comprobante(tracking):
+    from controladores import reporte_comprobante as reporte_comprobante
     try:
-        ruta_pdf = os.path.join("static", "comprobantes", str(tracking), "comprobante.pdf")
-
-        if not os.path.exists(ruta_pdf):
+        # Obtener el tipo de comprobante, puedes modificar esta parte para obtenerlo de alguna manera
+        tipo_comprobante_id = 1  # Aquí podrías obtener el tipo de comprobante basado en el contexto
+        comprobante = controlador_tipo_comprobante.get_data_comprobante(tipo_comprobante_id)
+        
+        if not comprobante:
             return jsonify({
-                'success': False,
-                'message': 'Comprobante no encontrado'
+                'success': False, 
+                'message': 'Tipo de comprobante no encontrado'
             }), 404
-
-        return send_file(
-            ruta_pdf,
-            as_attachment=True,
-            download_name=f"comprobante_{tracking}.pdf"
+        
+        transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
+        if not transaccion:
+            return jsonify({
+                'success': False, 
+                'message': 'Transacción no encontrada'
+            }), 404
+        
+        # Generar la serie del comprobante con ceros a la izquierda (6 dígitos)
+        num_serie = transaccion.get('num_serie')
+        numero_formateado = str(num_serie).zfill(6)  # Ej: 22 → 000022
+        comprobante_serie = f"{comprobante['inicial']}-{numero_formateado}"
+        
+        # Crear directorio para guardar el comprobante
+        carpeta = os.path.join(current_app.static_folder, "comprobantes", str(tracking))
+        os.makedirs(carpeta, exist_ok=True)
+        ruta_pdf = os.path.join(carpeta, "comprobante.pdf")
+        
+        # Si ya existe el PDF, devolverlo directamente
+        if os.path.exists(ruta_pdf):
+            return send_file(ruta_pdf, as_attachment=True,
+                             download_name=f"comprobante_{tracking}.pdf")
+        
+        # Datos de empresa
+        empresa = controlador_empresa.getDataComprobante()
+        if not empresa:
+            return jsonify({
+                'success': False, 
+                'message': 'Datos de empresa no disponibles'
+            }), 500
+        
+        # Datos del cliente
+        cliente = {
+            'nombre_siglas': transaccion.get('nombre_siglas', ''),
+            'apellidos_razon': transaccion.get('apellidos_razon', ''),
+            'documento_identidad': transaccion.get('documento_identidad', ''),
+            'direccion': transaccion.get('direccion_destino', '')
+        }
+        
+        # Obtener ítems
+        items, masivo = controlador_encomienda.obtener_items_por_num_serie(num_serie)
+        
+        # Calcular resumen
+        monto_total = float(transaccion.get('monto_total', 0))
+        igv_rate = float(empresa.get('igv', 18)) / 100
+        
+        if igv_rate > 0:
+            op_gravada = monto_total / (1 + igv_rate)
+            igv = monto_total - op_gravada
+        else:
+            op_gravada = monto_total
+            igv = 0
+        
+        resumen = {
+            'op_gravada': op_gravada,
+            'op_exonerada': 0,
+            'op_inafecta': 0,
+            'isc': 0,
+            'igv': igv,
+            'icbper': 0,
+            'otros_cargos': 0,
+            'otros_tributos': 0,
+            'importe_total': monto_total
+        }
+        
+        # Ruta del QR
+        qr_path = os.path.join(carpeta, "qr.png")
+        
+        # Generar el PDF del comprobante
+        reporte_comprobante.generar_comprobante_pdf(
+            transaccion=transaccion,
+            cliente=cliente,
+            empresa=empresa,
+            tipo_comprobante=comprobante['nombre'],  # Ej: "BOLETA"
+            comprobante_serie=comprobante_serie,
+            items=items,
+            resumen=resumen,
+            qr_path=qr_path,
+            masivo=masivo,
+            ruta_pdf=ruta_pdf  # Guardar en la ruta del directorio
         )
-
+        
+        # Enviar el comprobante generado como archivo adjunto
+        return send_file(ruta_pdf, as_attachment=True,
+                         download_name=f"comprobante_{tracking}.pdf")
+        
     except Exception as e:
+        current_app.logger.error(f"Error al generar comprobante: {str(e)}")
         return jsonify({
-            'success': False,
-            'message': f"Error al descargar comprobante: {str(e)}"
+            'success': False, 
+            'message': f'Error al generar comprobante: {str(e)}'
         }), 500
 
 
