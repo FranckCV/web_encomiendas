@@ -243,9 +243,14 @@ class FormManager {
     this.setupAddressValidation();
     this.setupNumberFieldsValidation();
     this.setupPinInputs();
+    // this.setupRecipientNameValidation();
   }
 
-  static setupValueValidation() {
+
+
+
+  
+static setupValueValidation() {
     const valorInput = document.getElementById('m-valorEnvio');
     if (!valorInput) return;
 

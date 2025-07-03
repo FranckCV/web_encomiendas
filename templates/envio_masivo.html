@@ -543,14 +543,23 @@ Registro de Envíos Masivos
 
     if (numero.length === 8 && tipo === '1') {
       consultarDocumento(parseInt(tipo), numero, data => {
-        document.getElementById("remitente-nombre").value = `${data.nombre_siglas} ${data.apellidos_razon}`.trim();
-        document.getElementById("remitente-nombre").dispatchEvent(new Event('input'));
-      
+        // document.getElementById("remitente-nombre").value = `${data.nombre_siglas} ${data.apellidos_razon}`.trim();
+        // document.getElementById("remitente-nombre").dispatchEvent(new Event('input'));
+        const nombresRInput = document.getElementById("remitente-nombre");
+        nombresRInput.value = `${data.nombre_siglas} ${data.apellidos_razon}`.trim();
+        // nombresRInput.dispatchEvent(new Event('input', { bubbles: true }));
+        // FormManager.validateInputField(nombresRInput);
+
+        
       });
     } else if (numero.length === 11 && tipo === '2') {
       consultarDocumento(parseInt(tipo), numero, data => {
-        document.getElementById("remitente-nombre").value = `${data.nombre_siglas}`.trim();
-        document.getElementById("remitente-nombre").dispatchEvent(new Event('input'));
+        // document.getElementById("remitente-nombre").value = `${data.nombre_siglas}`.trim();
+        // document.getElementById("remitente-nombre").dispatchEvent(new Event('input'));
+        const nombresRInput = document.getElementById("remitente-nombre");
+        nombresRInput.value = `${data.nombre_siglas}`.trim();
+        // nombresRInput.dispatchEvent(new Event('input', { bubbles: true }));
+        // FormManager.validateInputField(nombresRInput);
 
       });
     } else {
@@ -564,17 +573,128 @@ Registro de Envíos Masivos
 
     if (numero.length === 8 && tipo === '1') {
       consultarDocumento(parseInt(tipo), numero, data => {
-        document.getElementById("m-nombres").value = data.nombre_siglas;
-        document.getElementById("m-apellidos").value = data.apellidos_razon;
+      
+        // document.getElementById("m-nombres").value = data.nombre_siglas;
+        // document.getElementById("m-nombres").dispatchEvent(new Event('input', { bubbles: true }));
+        // // document.getElementById("m-nombres").dispatchEvent(new Event('change', { bubbles: true }));
+        // document.getElementById("m-apellidos").value = data.apellidos_razon;
+        // document.getElementById("m-apellidos").dispatchEvent(new Event('input', { bubbles: true }));
+        // // document.getElementById("m-apellidos").dispatchEvent(new Event('change', { bubbles: true }));
+
+        const nombresField = document.getElementById("m-nombres");
+nombresField.value = data.nombre_siglas;
+// nombresField.dispatchEvent(new Event('input', { bubbles: true }));
+// validarCampoNombreDestinatario(nombresField);
+
+        const apellidosField = document.getElementById("m-apellidos");
+apellidosField.value = data.apellidos_razon;
+// apellidosField.dispatchEvent(new Event('input', { bubbles: true }));
+// validarCampoApellidoDestinatario(apellidosField);
+
+
       });
     } else if (numero.length === 11 && tipo === '2') {
       consultarDocumento(parseInt(tipo), numero, data => {
-        document.getElementById("m-razonSocial").value = data.nombre_siglas;
+        // document.getElementById("m-razonSocial").value = data.nombre_siglas;
+        // document.getElementById("m-razonSocial").dispatchEvent(new Event('input', { bubbles: true }));
+
+        const razonSocialField = document.getElementById("m-razonSocial");
+razonSocialField.value = data.razon_social;
+// razonSocialField.dispatchEvent(new Event('input', { bubbles: true }));
+// validarCampoRazonSocial(razonSocialField);
+
       });
     } else {
       console.log("Tipo Doc no soportado")
     }
   });
+
+function validarCampoNombreDestinatario(input) {
+    const valor = input.value.trim();
+    const valido = Validator.validateName(valor);
+    if (valor === "") {
+        input.style.borderColor = "";
+    } else if (valido) {
+        input.style.borderColor = "#48bb78";
+    } else {
+        input.style.borderColor = "#fc8181";
+    }
+}
+
+function validarCampoApellidoDestinatario(input) {
+    const valor = input.value.trim();
+    const valido = Validator.validateName(valor);
+    if (valor === "") {
+        input.style.borderColor = "";
+    } else if (valido) {
+        input.style.borderColor = "#48bb78";
+    } else {
+        input.style.borderColor = "#fc8181";
+    }
+}
+
+function validarCampoRazonSocial(input) {
+    const valor = input.value.trim();
+    const valido = Validator.validateName(valor);
+    if (valor === "") {
+        input.style.borderColor = "";
+    } else if (valido) {
+        input.style.borderColor = "#48bb78";
+    } else {
+        input.style.borderColor = "#fc8181";
+    }
+}
+
+
+
+
+
+
+function validarCampoConFuncion(input, funcionValidacion) {
+    const valor = input.value.trim();
+    const valido = funcionValidacion(valor);
+
+    if (valor === "") {
+        input.style.borderColor = "";
+    } else if (valido) {
+        input.style.borderColor = "#48bb78";
+    } else {
+        input.style.borderColor = "#fc8181";
+    }
+}
+
+document.querySelectorAll('input').forEach(input => {
+    if (input.value.trim() !== "") {
+        const validador = obtenerValidadorParaCampo(input);
+        if (validador) {
+            validarCampoConFuncion(input, validador);
+        }
+    }
+});
+
+document.querySelectorAll('input').forEach(input => {
+    const validador = obtenerValidadorParaCampo(input);
+    if (validador) {
+        input.addEventListener('input', () => {
+            validarCampoConFuncion(input, validador);
+        });
+    }
+});
+
+
+function obtenerValidadorParaCampo(input) {
+    if (input.id === "m-nombres" || input.id === "m-apellidos" || input.id === "m-razonSocial" || input.id === "remitente-nombre") {
+        return Validator.validateName;
+    }
+    if (input.id === "m-dni") {
+        return Validator.validateDNI;
+    }
+    // Agrega más campos según tu sistema...
+    return null;
+}
+
+
+
 
 
   // function consultarDocumento(tipo, numero, callback) {
