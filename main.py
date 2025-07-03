@@ -1431,7 +1431,7 @@ TRANSACCIONES = {
         "fields_form" : [
             ['id',          'ID',            'ID',             'text',   True,   False,   None],
             ['nom_conductor','Conductor',    'Nombre del conductor', 'text', True, False,   None],
-            ['placa',       'Placa de unidad','Placa de unidad', 'text',   True,   True,    None],
+            ['placa',       'Placa de unidad','Placa de unidad', 'text',   True,   True,    None , 'placa_peru'],
             ['destino',     'Destino',       'Destino',         'text',   True,   True,    None],
             ['fecha',       'Fecha',         'YYYY-MM-DD',      'date',   True,   True,    None],
             ['hora',        'Hora',          'HH:MM',           'time',   True,   True,    None],
@@ -1472,22 +1472,22 @@ TRANSACCIONES = {
         "filters": [],
         "fields_form": [
             ['num_serie',           'N° Serie',           'Número de Serie',           'text',      True,  True,   None],
-            ['masivo',              'Tipo de Envío',      'Tipo de Envío', 'select',    True,  True,   [lambda: controlador_encomienda.get_select_tipo_envio(), 'nombre']],
-            ['recojo_casa',         'Recojo a Domicilio', 'Recojo de paquete',             'select',    True,  True,   [lambda: controlador_encomienda.get_select_recojo_casa(), 'nombre']],
+            ['masivo',              'Tipo de Envío',      'Tipo de Envío',             'select',    True,  True,   [lambda: controlador_encomienda.get_select_tipo_envio(), 'masivo_txt']],
+            ['recojo_casa',         'Recojo a Domicilio', 'Recojo de paquete',         'select',    True,  True,   [lambda: controlador_encomienda.get_select_recojo_casa(), 'recojo_casa_txt']],
             ['fecha',               'Fecha',              'Fecha',                     'date',      True,  True,   None],
             ['hora',                'Hora',               'Hora',                      'time',      True,  True,   None],
-            ['id_sucursal_origen',  'Sucursal de origen', 'Sucursales de origen',                          'select',    True,  True,   [lambda: controlador_tarifa_ruta.get_options_select_sucursal_origen(), 'nombre']],
-            ['clienteid',           'Cliente',            'Clientes',                          'select',    True,  True,   [lambda: controlador_cliente.get_select_cliente(), 'nombre']],
+            ['id_sucursal_origen',  'Sucursal de origen', 'Sucursales de origen',      'select',    True,  True,   [lambda: controlador_tarifa_ruta.get_options_select_sucursal_origen(), 'nom_sucursal_origen']],
+            ['clienteid',           'Cliente',            'Clientes',                  'select',    True,  True,   [lambda: controlador_cliente.get_select_cliente(), 'nombre_cliente']],
 
-            ['monto_total',         'Monto Total',        'Monto total',             'decimal2', True,  True,   None],
-            ['direccion_recojo',    'Direccion de recojo',    'Direccion de recojo',            'text',    True,  True,   None],
+            ['monto_total',         'Monto Total',        'Monto total',             'decimal2', True,  True,   None , ''],
+            ['direccion_recojo',    'Direccion de recojo',    'Direccion de recojo',            'text',    True,  True,   None, 'texto_avanzado'],
             ['descripcion',         'Descripcion',            'Descripcion',        'textarea',    True,  True,   None , 'texto_avanzado'],
         ],
         "crud_forms": {
             "crud_list": True,
             "crud_search": True,
             "crud_consult": True,
-            "crud_insert": True,
+            "crud_insert": False,
             "crud_update": True,
             "crud_delete": True,
             "crud_unactive": False
@@ -1497,6 +1497,7 @@ TRANSACCIONES = {
             [True, 'fa-solid fa-boxes', "#77D62E", 'transaccion', {"tabla": "::paquete", "pk_foreign": "num_serie"} , '' ,    'paquete'],
         ],
         "options": [
+            [False,   f'{ICON_INSERT}',   'var(--color-insert)',  'Agregar', 'tipos_envio', {},         'insert'],
         ],
     },
     "paquete": {
@@ -1508,24 +1509,24 @@ TRANSACCIONES = {
         "filters": [], 
         "fields_form": [
         #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
-            ['tracking',                       'Tracking',             'Tracking',             'text',   False,  True,   None],
-            ['valor',                          'Valor',                'Valor',                'text',   False,  True,   None],
-            ['peso',                           'Peso',                 'Peso',                 'text',   False,  True,   None],
-            ['estado_pago',                    'Pago',                 'Pago',                 'text',   False,  True,   None],
-            ['nombres_contacto_destinatario',  'Nombre destinatario',  'Nombre destinatario',  'text',   False,  True,   None],
-            ['apellidos_razon_destinatario',   'Apellido/Razón',       'Apellido/Razón',       'text',   False,  True,   None],
-            ['num_documento_destinatario',     'Doc. Identidad',       'Doc. Identidadaa',     'text',   False,  True,   None],
-            ['tipo_documento',                 'Tipo Documento',       'Tipo Documento',       'text',   False,  True,   None],
-            ['tipo_empaque',                   'Empaque',              'Empaque',              'text',   False,  True,   None],
-            ['contenido_paquete',              'Contenido',            'Contenido',            'text',   False,  True,   None],
-            ['tipo_recepcion',                 'Recepción',            'Recepción',            'text',   False,  True,   None],
-            ['modalidad_pago',                 'Pago modalidad',       'Pago modalidad',       'text',   False,  True,   None],
-            ['direccion_destino',              'Dirección destino',    'Dirección destino',    'text',   False,  True,   None],
-            ['localidad',                      'Ubigeo destino',       'Ubigeo destino',       'text',   False,  True,   None],
-            ['num_serie',                      'N° Serie',             'N° Serie',             'text',   False,  True,   None],
-            ['fecha',                          'Fecha envío',          'Fecha envío',          'text',   False,  True,   None],
-            ['hora',                           'Hora envío',           'Hora envío',           'text',   False,  True,   None],
-            ['monto_total',                    'Total S/.',            'Total S/.',            'text',   False,  True,   None],
+            ['tracking',                       'Tracking',             'Tracking',             'text',   False,  True,   None , 'numeros'],
+            ['valor',                          'Valor',                'Valor',                'decimal2',   False,  True,   None , 'decimal2'],
+            ['peso',                           'Peso',                 'Peso',                 'decimal2',   False,  True,   None , 'decimal2'],
+            ['estado_pago',                    'Pago',                 'Pago',                 'text',   False,  True,   None , ''],
+            ['nombres_contacto_destinatario',  'Nombre destinatario',  'Nombre destinatario',  'text',   False,  True,   None , 'alfanumerico_simbolos'],
+            ['apellidos_razon_destinatario',   'Apellido/Razón',       'Apellido/Razón',       'text',   False,  True,   None , 'alfanumerico_simbolos'],
+            ['num_documento_destinatario',     'Doc. Identidad',       'Doc. Identidadaa',     'text',   False,  True,   None , ''],
+            ['tipo_documento',                 'Tipo Documento',       'Tipo Documento',       'text',   False,  True,   None , ''],
+            ['tipo_empaque',                   'Empaque',              'Empaque',              'text',   False,  True,   None , ''],
+            ['contenido_paquete',              'Contenido',            'Contenido',            'text',   False,  True,   None , ''],
+            ['tipo_recepcion',                 'Recepción',            'Recepción',            'text',   False,  True,   None , ''],
+            ['modalidad_pago',                 'Pago modalidad',       'Pago modalidad',       'text',   False,  True,   None , ''],
+            ['direccion_destino',              'Dirección destino',    'Dirección destino',    'text',   False,  True,   None , ''],
+            ['localidad',                      'Ubigeo destino',       'Ubigeo destino',       'text',   False,  True,   None , ''],
+            ['num_serie',                      'N° Serie',             'N° Serie',             'text',   False,  True,   None , ''],
+            ['fecha',                          'Fecha envío',          'Fecha envío',          'text',   False,  True,   None , ''],
+            ['hora',                           'Hora envío',           'Hora envío',           'text',   False,  True,   None , ''],
+            ['monto_total',                    'Total S/.',            'Total S/.',            'decimal2',   False,  True,   None , 'decimal2'],
         ],
         "crud_forms": {
             "crud_list": True,
@@ -1542,6 +1543,7 @@ TRANSACCIONES = {
             [True, 'fa-solid fa-route', "#9856EE", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"} , '' , 'seguimiento' , False],
             [True, 'fa-solid fa-qrcode', "#2195DC", 'ver_img_qr',  {"tracking": "tracking"} , '' , 'qr_code' , True],
             [True, 'fa-solid fa-dollar', "#6FDC21", 'pagar_paquete',  {"tracking": "tracking"} , '' , 'pago' , False],
+            [True, 'fa-solid fa-receipt', "#1E3548", 'ver_comprobante_paquete',  {"tracking": "tracking"} , '' , 'ver_boleta' , False],
         ],
         "options": [
         # mostrar_url       icon             color                  text                 enlace_function       parametros                    modo(insert ,update , consult)
@@ -4466,7 +4468,7 @@ def generar_qr_boleta(datos):
 from controladores import controlador_perfil as controlador_perfil
 
 @app.route("/perfil")
-# @validar_cliente()
+@validar_cliente()
 def perfil():
     # try:
         # Obtener datos del usuario logueado
@@ -5044,7 +5046,7 @@ def crud_generico(tabla):
 
 @app.route("/transaccion=<tabla>",defaults={'pk_foreign': None})
 @app.route("/transaccion=<tabla>/<pk_foreign>")
-# @validar_empleado()
+@validar_empleado() 
 def transaccion(tabla , pk_foreign):
     config = TRANSACCIONES.get(tabla)
     page = permiso.get_pagina_key(tabla)
@@ -5270,8 +5272,8 @@ def informacion_empresa():
 ##################_ PAGINAS EMPLEADO METHOD POST _################## 
 
 @app.route("/insert_row=<tabla>", methods=["POST"])
-# @validar_empleado()
-# @validar_error_crud()
+@validar_empleado()
+@validar_error_crud()
 def crud_insert(tabla):
     # try:
         if tabla in CONTROLADORES.keys():    
@@ -5697,6 +5699,28 @@ def ver_comprobante_venta(num_serie):
         else:
             return send_from_directory(f"static/comprobantes/ventas/{num_serie}",f"boleta_{num_serie}.pdf")
 
+@app.route("/ver_comprobante_paquete=<int:tracking>")
+def ver_comprobante_paquete(tracking):
+    transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
+    tipo_comprobanteid = transaccion.get('tipo_comprobanteid', 2)
+    
+    # Obtener datos del comprobante si es necesario (aunque aquí no parece usarse)
+    # comprobante = controlador_tipo_comprobante.get_data_comprobante(tipo_comprobanteid)
+
+    # Verificar que haya salidaid
+    if transaccion.get('monto_total') is None:
+        return rdrct_error(
+            redirect(url_for('transaccion', tabla='paquete', pk_foreign=transaccion.get('num_serie'))),
+            'No se obtuvo comprobante disponible, contactarse con soporte'
+        )
+
+    ruta_archivo = f"static/comprobantes/{tracking}/comprobante.pdf"
+
+    if not os.path.exists(ruta_archivo):
+        generar_comprobante(tracking, tipo_comprobanteid)
+
+    # Enviar el archivo
+    return send_from_directory(f"static/comprobantes/{tracking}", "comprobante.pdf")
 
 @app.route("/ver_img_qr=<int:tracking>")
 def ver_img_qr(tracking):
@@ -6272,7 +6296,7 @@ def seguimiento_reclamo_directo(reclamo_id):
 # ========== ENDPOINTS PARA GESTIÓN ADMINISTRATIVA DE RECLAMOS ==========
 
 @app.route("/responder_reclamos", methods=["GET"])
-# @validar_empleado()
+@validar_empleado()
 def vista_responder_reclamos():
     """
     Vista principal para que los administradores respondan reclamos
@@ -6450,7 +6474,7 @@ def api_info_reclamo(reclamo_id):
         }), 500
     
 @app.route("/api/obtener_historial_reclamo/<int:reclamo_id>", methods=["GET"])
-# @validar_empleado()
+@validar_empleado()
 def api_obtener_historial_reclamo(reclamo_id):
     """
     Obtiene el historial de seguimiento de un reclamo (para modal administrativo)

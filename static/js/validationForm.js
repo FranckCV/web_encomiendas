@@ -38,7 +38,6 @@ const tiposValidacion = {
         regex: /^[A-Z0-9]{6}$/,
         mensaje: "Placa inválida (debe tener 6 caracteres alfanuméricos en mayúsculas)"
     },
-
     ip: {
         regex: /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/,
         mensaje: "IP inválida"
@@ -108,7 +107,6 @@ const tiposValidacion = {
         regex: /^[0-9A-Fa-f]+$/,
         mensaje: "Valor hexadecimal inválido"
     },
-
 
 };
 
