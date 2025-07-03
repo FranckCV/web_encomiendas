@@ -31,7 +31,7 @@ function validarFormularioDirecto(form) {
     if (!form) return;
 
     form.addEventListener("submit", e => {
-        const inputs = form.querySelectorAll("input, select, textarea");
+        const inputs = form.querySelectorAll("input, select:not(.filterSelect), textarea");
         let validos = true;
 
         inputs.forEach(input => {

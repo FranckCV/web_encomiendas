@@ -10,7 +10,7 @@ def exists_Activo():
 def get_primary_key():
     return show_primary_key(table_name)
 
-def get_report_test():
+def get_report_estado_fecha():
     sql = f'''
         SELECT 
             paq.*, 

@@ -46,9 +46,9 @@ def get_table():
         INNER JOIN rol r ON e.rolid = r.id
     '''
     columnas = {
-        'id': ['Usuario ID', 1],
-        'nombre': ['Nombre', 1.5],
+        'id': ['ID', 1],
         'apellidos': ['Apellidos', 1.5],
+        'nombre': ['Nombres', 1.5],
         'correo': ['Correo', 1.5],
         'nom_rol': ['Rol', 1.5],
     }
