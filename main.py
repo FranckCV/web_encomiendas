@@ -5789,7 +5789,7 @@ def salida_informacion():
 from controladores import controlador_editar_salida as controlador_editar_salida
 
 @app.route('/editar_salida_informacion/<int:salida_id>')
-@validar_empleado()
+# @validar_empleado()
 def editar_salida_informacion(salida_id):
     # try:
         # Obtener datos de la salida existente
@@ -5799,9 +5799,9 @@ def editar_salida_informacion(salida_id):
             flash('Salida no encontrada', 'error')
             return redirect(url_for('salida_informacion'))  # Redirigir a lista de salidas
         
-        # Obtener datos base (igual que en crear salida)
+        # Obtener datos base (para edición necesitamos incluir el vehículo actual)
         sucursal_origen = controlador_sucursal.sucursales_origen()
-        unidades = controlador_unidad.get_capacidad_unidad()
+        unidades = controlador_editar_salida.obtener_vehiculos_para_edicion(salida_id)
         empleados = controlador_empleado.get_driver_employee()
         agencias = controlador_sucursal.get_agencias_data()
         paquetes = controlador_paquete.listar_paquetes_por_sucursal_escalas()

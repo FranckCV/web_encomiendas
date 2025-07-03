@@ -793,6 +793,27 @@ function precargarDatosExistentes() {
     
     // 3. Precargar vehículo seleccionado
     vehiculoSeleccionado = salidaData.vehiculo.id;
+    console.log('🚚 Vehículo preseleccionado:', vehiculoSeleccionado);
+    console.log('📋 Lista de vehículos disponibles:', vehiculos.map(v => ({ id: v.unidadid, nombre: v.nombre_unidad })));
+    
+    // Verificar que el vehículo existe en la lista
+    const vehiculoEncontrado = vehiculos.find(v => v.unidadid === vehiculoSeleccionado);
+    if (!vehiculoEncontrado) {
+        console.warn('⚠️ Vehículo no encontrado en la lista:', vehiculoSeleccionado);
+        console.warn('💡 Esto puede ser porque el vehículo está en otra salida activa');
+        // En modo edición, mantener el vehículo aunque no esté en la lista
+        console.log('🔧 Creando entrada temporal para el vehículo de la salida actual');
+        const vehiculoTemporal = {
+            unidadid: vehiculoSeleccionado,
+            nombre_unidad: salidaData.vehiculo.placa || `Vehículo ${vehiculoSeleccionado}`,
+            capacidad: salidaData.vehiculo.capacidad || 0,
+            capacidad_usada: 0
+        };
+        vehiculos.push(vehiculoTemporal);
+        console.log('✅ Vehículo temporal agregado:', vehiculoTemporal);
+    } else {
+        console.log('✅ Vehículo encontrado:', vehiculoEncontrado.nombre_unidad);
+    }
     
     // 4. Precargar empleados asignados
     empleadosAsignados = salidaData.empleados.map(emp => ({
@@ -869,6 +890,9 @@ async function actualizarInterfazCompleta() {
             mostrarVehiculoSeleccionado(vehiculo);
             actualizarCapacidadVehiculo();
         }
+    } else {
+        // Si no hay vehículo seleccionado, mostrar tabla de vehículos
+        renderizarVehiculos();
     }
     
     // Actualizar empleados
@@ -931,7 +955,7 @@ function actualizarSalida() {
             
             // Opcional: redirigir después de un tiempo
             setTimeout(() => {
-                window.location.href = '/salidas'; // O la ruta de lista de salidas
+                window.location.href = '/transaccion=salida'; // O la ruta de lista de salidas
             }, 2000);
         } else {
             showAlert('mensajeGuardado', `❌ Error: ${data.mensaje}`, 'error');
@@ -1385,6 +1409,8 @@ function togglePaquete(paqueteId) {
 
     // Buscar el paquete por su tracking
     const paquete = (window.paquetesDisponibles || []).find(p => p.tracking === paqueteId);
+    // console.log(paquete?.tracking, "este es el tracking")
+    // console.log(paqueteId, "este es el paqueteid")
     if (!paquete) {
         console.warn(`⚠️ Paquete con ID ${paqueteId} no encontrado`);
         return;
@@ -1608,8 +1634,8 @@ function mostrarVehiculoSeleccionado(vehiculo) {
     const contenedorSeleccionado = document.getElementById('vehiculoSeleccionado');
     contenedorSeleccionado.style.display = 'block';
     
-    // Actualizar información del vehículo
-    document.getElementById('vehiculoInfo').innerHTML = `
+    // Actualizar información del vehículo directamente en el contenedor
+    contenedorSeleccionado.innerHTML = `
         <div class="vehiculo-seleccionado-card">
             <div class="vehiculo-header">
                 <span class="vehiculo-nombre">${vehiculo.nombre_unidad}</span>
@@ -2574,17 +2600,17 @@ function validarFormulario() {
 document.addEventListener('DOMContentLoaded', function() {
     configurarFechaHoraMinimas(); // ✅ AGREGADO
     
-    renderizarVehiculos();
-    renderizarEmpleados();
-    renderizarPaquetes();
-    actualizarContadorEscalas();
-    
     // Inicializar variable global para paquetes
     window.paquetesDisponibles = [];
     window.indicePaquetes = crearIndicePaquetes();
     
-    // ✅ PRECARGAR DATOS EN EDICIÓN
+    // ✅ PRECARGAR DATOS EN EDICIÓN PRIMERO
     precargarDatosExistentes();
+    
+    // Renderizar tablas después (se actualizarán en actualizarInterfazCompleta)
+    renderizarEmpleados();
+    renderizarPaquetes();
+    actualizarContadorEscalas();
 });
 
 </script>
