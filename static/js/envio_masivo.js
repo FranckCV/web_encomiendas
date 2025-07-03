@@ -1554,6 +1554,25 @@ class FieldManager {
       if (select) select.setAttribute('required', '');
     }
   }
+  static toggleTipoEmpaque() {
+    const tipo = document.getElementById('m-tipoEmpaque')?.value;
+
+    const grupos = document.querySelectorAll('#tab-paquete .campo-grupo');
+
+    grupos.forEach(grupo => {
+      const grupoTipos = grupo.getAttribute('data-group')?.split(',').map(t => t.trim());
+
+      if (grupoTipos?.includes(tipo)) {
+        grupo.style.display = 'flex';
+        grupo.querySelectorAll('input, select').forEach(field => field.setAttribute('required', ''));
+      } else {
+        grupo.style.display = 'none';
+        grupo.querySelectorAll('input').forEach(function(field) {field.value = ''})
+        grupo.querySelectorAll('input, select').forEach(field => field.removeAttribute('required'));
+      }
+    });
+  }
+
 
   static mostrarCamposReceptor() {
     const tipo = document.getElementById('m-tipoDocumento')?.value;
@@ -1726,8 +1745,7 @@ class AppInitializer {
     const tipoEmpaque = document.getElementById('m-tipoEmpaque');
     if (tipoEmpaque) {
       tipoEmpaque.addEventListener('change', () => {
-        FieldManager.toggleFolios();
-        FieldManager.toggleArticulos();
+        FieldManager.toggleTipoEmpaque();
       });
     }
 

@@ -116,7 +116,7 @@
                     {% for page in menu_paginas %}
 
                     {% if page['tipo_paginaid'] == tipo_pag['id'] and page['moduloid'] == cur_modulo_id    %}
-                        {% if (menu_rolid != 1 and page['acceso'] == 1) or menu_rolid == 1 %}
+                        {% if page['acceso'] == 1 %}
 
                             {% if page['tipo_paginaid'] == 1 %}
                             <a class="mu_page" href="{{url_for('crud_generico',tabla = page['key'] )}}">

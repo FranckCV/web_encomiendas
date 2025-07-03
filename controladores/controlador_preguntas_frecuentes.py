@@ -52,7 +52,7 @@ def get_table():
     columnas = {
         'id': ['ID', 0.5],
         'titulo': ['Título', 3],
-        'descripcion': ['Descripción', 6],
+        'descripcion': ['Descripción', 4],
         'activo': ['Actividad', 1]
     }
     filas = sql_select_fetchall(sql)

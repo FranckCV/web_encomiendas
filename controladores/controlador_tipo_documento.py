@@ -41,6 +41,7 @@ def get_table():
     sql= f'''
         select 
             tip.id ,
+            tip.siglas,
             tip.nombre ,
             tip.activo 
         from {table_name} tip
@@ -48,7 +49,8 @@ def get_table():
     '''
     columnas = {
         'id': ['ID' , 0.5] , 
-        'nombre' : ['Nombre' , 4.5] , 
+        'siglas' : ['Siglas' , 2] , 
+        'nombre' : ['Nombre' , 5] , 
         'activo' : ['Actividad' , 1] 
         }
     filas = sql_select_fetchall(sql)

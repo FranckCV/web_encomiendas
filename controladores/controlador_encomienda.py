@@ -86,7 +86,7 @@ def get_table():
         'masivo_txt': ['Tipo de Envío', 1.2], 
         'monto_total': ['Monto Total S/.', 1],
         'nom_sucursal_origen': ['Sucursal Origen', 4],
-        'recojo_casa_txt': ['¿Recojo en casa?', 1],
+        # 'recojo_casa_txt': ['¿Recojo en casa?', 1],
         'fecha': ['Fecha', 1],
         'hora': ['Hora', 1],
         'nombre_cliente': ['Cliente', 2],

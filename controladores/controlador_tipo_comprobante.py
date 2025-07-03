@@ -123,3 +123,10 @@ def get_tipo_comprobante_by_tipo():
     '''
     filas = sql_select_fetchall(sql)
     return filas
+
+def get_data_comprobante(id):
+    sql = '''
+        select id, nombre,inicial from tipo_comprobante where id = %s;   
+        '''
+    filas = sql_select_fetchone(sql,(id,))
+    return filas

@@ -18,6 +18,38 @@ const tiposValidacion = {
         regex: /^[a-zA-Z0-9]+$/, // sin espacios
         mensaje: "Solo letras y números"
     },
+    alfanumerico_espacios: {
+        regex: /^[a-zA-Z0-9\s]+$/,
+        mensaje: "Solo letras, números y espacios"
+    },
+    alfanumerico_simbolos: {
+        regex: /^[a-zA-Z0-9\s.,\-_/()]+$/,
+        mensaje: "Solo letras, números y algunos símbolos (.,-_/())"
+    },
+    texto_avanzado: {
+        regex: /^[a-zA-Z0-9\s.,;:!¡¿?()@#&%$'"\-_/]+$/,
+        mensaje: "Texto con caracteres inválidos"
+    },
+    url: {
+        regex: /^(https?:\/\/)?([\w\-]+(\.[\w\-]+)+)(\/[\w\-.,@?^=%&:/~+#]*)?$/,
+        mensaje: "URL inválida"
+    },
+    placa_peru: {
+        regex: /^[A-Z]{3}\d{3}$/,
+        mensaje: "Placa inválida (formato ABC123)"
+    },
+    ip: {
+        regex: /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}$/,
+        mensaje: "IP inválida"
+    },
+    mayusculas: {
+        regex: /^[A-Z]+$/,
+        mensaje: "Solo letras mayúsculas"
+    },
+    minusculas: {
+        regex: /^[a-z]+$/,
+        mensaje: "Solo letras minúsculas"
+    },
     dni: {
         regex: /^\d{8}$/,
         mensaje: "DNI debe tener 8 dígitos"
@@ -41,12 +73,16 @@ const tiposValidacion = {
         mensaje: "Debe seleccionar una opción válida"
     },
     decimal2: {
-        regex: /^\d+(\.\d{1,2})?$/,
-        mensaje: "Máximo 2 decimales"
+        regex: /^(0|[1-9]\d*)(\.\d{1,2})?$/,
+        mensaje: "Solo números positivos con máximo 2 decimales"
     },
     decimal6: {
-        regex: /^\d+(\.\d{1,6})?$/,
-        mensaje: "Máximo 6 decimales"
+        regex: /^(0|[1-9]\d*)(\.\d{1,6})?$/,
+        mensaje: "Solo números positivos con máximo 6 decimales"
+    },
+    coordenada: {
+        regex: /^-?(0|[1-9]\d*)(\.\d{1,10})?$/,
+        mensaje: "Coordenada inválida (número con decimales, puede ser negativo)"
     },
     min8: {
         regex: /^.{8,}$/,
@@ -59,6 +95,11 @@ const tiposValidacion = {
         regex: /^\d{9,15}$/,  // entre 9 y 15 dígitos
         mensaje: "Teléfono inválido (mínimo 9 dígitos)"
     },
+    hexadecimal: {
+        regex: /^[0-9A-Fa-f]+$/,
+        mensaje: "Valor hexadecimal inválido"
+    },
+
 
 };
 
@@ -94,11 +135,13 @@ function validarCampo(el, tipo, matchId = null) {
     if (tipo === "checkbox") {
         if (!el.checked) {
             el.classList.add("input-error");
+            el.classList.remove("input-ok");
             msgError.textContent = tiposValidacion[tipo].mensaje;
             msgError.style.display = "block";
             return false;
         } else {
             el.classList.remove("input-error");
+            el.classList.add("input-ok");
             msgError.textContent = "";
             msgError.style.display = "none";
             return true;
@@ -111,11 +154,13 @@ function validarCampo(el, tipo, matchId = null) {
         const isInvalid = val === "" || val === "-1" || el.options[el.selectedIndex]?.disabled;
         if (isInvalid) {
             el.classList.add("input-error");
+            el.classList.remove("input-ok");
             msgError.textContent = tiposValidacion[tipo].mensaje;
             msgError.style.display = "block";
             return false;
         } else {
             el.classList.remove("input-error");
+            el.classList.add("input-ok");
             msgError.textContent = "";
             msgError.style.display = "none";
             return true;
@@ -128,11 +173,13 @@ function validarCampo(el, tipo, matchId = null) {
         const mismoValor = otroCampo && el.value === otroCampo.value;
         if (!mismoValor) {
             el.classList.add("input-error");
+            el.classList.remove("input-ok");
             msgError.textContent = tiposValidacion["match"].mensaje;
             msgError.style.display = "block";
             return false;
         } else {
             el.classList.remove("input-error");
+            el.classList.add("input-ok");
             msgError.textContent = "";
             msgError.style.display = "none";
             return true;
@@ -144,11 +191,13 @@ function validarCampo(el, tipo, matchId = null) {
         const min = parseInt(tipo.split(":")[1]);
         if (el.value.length < min) {
             el.classList.add("input-error");
+            el.classList.remove("input-ok");
             msgError.textContent = `Mínimo ${min} caracteres`;
             msgError.style.display = "block";
             return false;
         } else {
             el.classList.remove("input-error");
+            el.classList.add("input-ok");
             msgError.textContent = "";
             msgError.style.display = "none";
             return true;
@@ -159,11 +208,13 @@ function validarCampo(el, tipo, matchId = null) {
         const max = parseInt(tipo.split(":")[1]);
         if (el.value.length > max) {
             el.classList.add("input-error");
+            el.classList.remove("input-ok");
             msgError.textContent = `Máximo ${max} caracteres`;
             msgError.style.display = "block";
             return false;
         } else {
             el.classList.remove("input-error");
+            el.classList.add("input-ok");
             msgError.textContent = "";
             msgError.style.display = "none";
             return true;
@@ -178,11 +229,13 @@ function validarCampo(el, tipo, matchId = null) {
 
     if (!regex || val === "" || !regex.test(val)) {
         el.classList.add("input-error");
+            el.classList.remove("input-ok");
         msgError.textContent = mensaje || "Campo inválido";
         msgError.style.display = "block";
         return false;
     } else {
         el.classList.remove("input-error");
+            el.classList.add("input-ok");
         msgError.textContent = "";
         msgError.style.display = "none";
         return true;

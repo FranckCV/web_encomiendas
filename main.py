@@ -76,6 +76,7 @@ from werkzeug.routing import MapAdapter
 import configuraciones
 from functools import wraps
 import inspect
+import socket
 
 from io import BytesIO
 from reportlab.lib.pagesizes import A4
@@ -95,7 +96,6 @@ import os
 from collections import defaultdict
 
 from api_enrutar import ApiEnrutar
-
 
 
 app = Flask(__name__, template_folder='templates')
@@ -146,6 +146,8 @@ ICON_DELETE            = configuraciones.ICON_DELETE
 ICON_ACTIVE            = configuraciones.ICON_ACTIVE
 ICON_UNACTIVE          = configuraciones.ICON_UNACTIVE
 ICON_UNLOCK            = configuraciones.ICON_UNLOCK
+
+
 
 ###########_ TEST FUNCIONES _#############
 
@@ -280,6 +282,18 @@ def esSesionIniciada():
         return False
     
 
+def obtener_ip_local():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # No necesita conexión real
+        s.connect(("8.8.8.8", 80))
+        ip_local = s.getsockname()[0]
+        s.close()
+        return ip_local
+    except:
+        return "127.0.0.1"
+
+        
 # UPLOAD_FOLDER = 'static/uploads/empresa'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
@@ -315,7 +329,6 @@ ERRORES = {
     "'NoneType' object is not subscriptable" : "Inicie sesión con su cuenta correspondiente",
     "foreign key constraint fails" : 'No es posible eliminar dicha fila' ,
     "404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again." : "El enlace al que intentó ingresar no existe." ,
-    "INICIAR_SESION_REQUERIDO" : "Debes iniciar sesion para poder agregar a carrito",
 }
 
 
@@ -361,7 +374,7 @@ CONTROLADORES = {
             ['inicial',          'Inicial',    'Inicial',     'text',     True ,     True ,        None ],
             ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None , 'texto_avanzado'],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -423,7 +436,7 @@ CONTROLADORES = {
             "crud_unactive": True ,
         }
     },
-"reclamo": {
+    "reclamo": {
     "active": True,
     "id": "reclamo",
     "titulo": "Reclamos",
@@ -443,8 +456,8 @@ CONTROLADORES = {
         ['monto_indemnizado', 'Monto Indemnizado', '0.00', 'number', True, True, None],
         ['relacion', 'Relación con el bien', '', 'text', True, True, None],
         ['fecha_recepcion', 'Fecha de recepción', '', 'date', True, True, None],
-        ['descripcion', 'Descripción', '', 'textarea', True, True, None],
-        ['detalles', 'Detalles adicionales', '', 'textarea', True, True, None],
+        ['descripcion', 'Descripción', '', 'textarea', True, True, None , 'texto_avanzado'],
+        ['detalles', 'Detalles adicionales', '', 'textarea', True, True, None , 'texto_avanzado'],
         ['pedido', 'Pedido', '', 'text', True, True, None],
         ['foto', 'Foto del reclamo', '', 'img', False, True, None],
         ['sucursal_id', 'Sucursal', '', 'select', True, True, [lambda: controlador_sucursal.get_options(), 'direccion']],
@@ -464,7 +477,6 @@ CONTROLADORES = {
         "crud_unactive": False
     }
 },
-
     "pregunta_frecuente": {
         "active": True,
         "titulo": "preguntas frecuentes",
@@ -477,9 +489,9 @@ CONTROLADORES = {
         "fields_form": [
             #  ID/NAME          LABEL              PLACEHOLDER            TYPE      REQUIRED  ABLE/DISABLE  DATOS
             ['id',              'ID',              'ID',                  'text',     True,     False,       None],
-            ['titulo',          'Título',          'Título',              'text',     True,     True,        None],
-            ['descripcion',     'Descripción',     'Descripción',         'textarea', True,     True,        None],
             ['activo',          f'{TITLE_STATE}',  'Activo',              'p',        True,     False,       None],
+            ['titulo',          'Título',          'Título',              'textarea',     True,     True,        None , 'texto_avanzado'],
+            ['descripcion',     'Descripción',     'Descripción',         'textarea', True,     True,        None] , 'texto_avanzado',
         ],
         "crud_forms": {
             "crud_list": True,
@@ -587,7 +599,7 @@ CONTROLADORES = {
             ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
             ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None  , 'texto_avanzado'],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -613,7 +625,7 @@ CONTROLADORES = {
             ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
             ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None  , 'texto_avanzado'],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -640,7 +652,7 @@ CONTROLADORES = {
     #            ID/NAME          LABEL               PLACEHOLDER      TYPE         REQUIRED   ABLE/DISABLE   DATOS
             ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
             ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None  , 'texto_avanzado'],
             ['tipo_reclamoid',  'Nombre de tipo de reclamo', 'Elegir tipo de reclamo', 'select',    True ,     True, [lambda: controlador_tipo_reclamo.get_options() , 'nom_tip' ] ],
         ],
         "crud_forms": {
@@ -667,7 +679,7 @@ CONTROLADORES = {
             ['id',            'ID',               'ID',            'text',      False ,    False,         True ],
             ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
             ['motivo_reclamoid',  'Nombre de motivo de reclamo', 'Elegir motivo de reclamo', 'select', True ,True, [lambda: controlador_motivo_reclamo.get_options() , 'nom_motivo' ] ],
-            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None  , 'texto_avanzado'],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -750,7 +762,7 @@ CONTROLADORES = {
             ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
             ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
             ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None  , 'texto_avanzado'],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -869,12 +881,11 @@ CONTROLADORES = {
         ] ,
         "fields_form": [
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['correo',      'Correo electronico',          'Correo',      'text',     True ,     True  ,        None ],
-            ['contrasenia',      'Contraseña',          'Contraseña',      'password',     True ,     True  ,        None ],
-            # ['tipo_usuario',      'Tipo de usuario',          'Tipo de usuario',      'text',     True ,     True  ,        None ],
-            ['tipo_usuario', 'Tipo de usuario', 'Tipo de usuario', 'select', True, True, [lambda: controlador_usuario.get_tipos_usuarios(), '                                                       ']],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['id',           'ID',                'ID',          'text',     True ,     False ,        None ],
+            ['correo',       'Correo electronico','Correo',      'text',     True ,     True  ,        None ],
+            ['contrasenia',  'Contraseña',        'Contraseña',      'password',     True ,     True  ,        None ],
+            ['tipo_usuario', 'Tipo de usuario',   'Tipo de usuario', 'select', True, True, [lambda: controlador_usuario.get_tipos_usuarios(), '                                                       ']],
+            ['activo',        f'{TITLE_STATE}',   'Activo',      'p',        True ,     False ,        None ],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -930,7 +941,7 @@ CONTROLADORES = {
         "fields_form": [
             ['id', 'ID', 'ID', 'text', False, False, True],
             ['nombre', 'Nombre del Rol', 'Rol', 'text', True, True, True],
-            ['descripcion', 'Descripción', 'Descripción del rol', 'textarea', False, True, None],
+            ['descripcion', 'Descripción', 'Descripción del rol', 'textarea', False, True, None , 'texto_avanzado'],
             ['activo', f'{TITLE_STATE}', 'activo', 'p', True, True, None],
             ['tipo_rolid', 'Tipo de Rol', 'Seleccionar', 'select', True, True, [lambda: controlador_tipo_rol.get_options(), 'nombre']],
         ],
@@ -957,10 +968,10 @@ CONTROLADORES = {
         ] ,
         "fields_form": [
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None , 'alfanumerico'],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None , 'alfanumerico'],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None , 'alfanumerico'],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None , 'texto_avanzado'],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -982,10 +993,10 @@ CONTROLADORES = {
             ['activo', f'{TITLE_STATE}', get_options_active() ],
         ] ,
         "fields_form": [
-#            ID/NAME   LABEL     PLACEHOLDER  TYPE     REQUIRED   ABLE/DISABLE   DATOS
-            ['id',     'ID',     'ID',        'text',  True ,     False ,        None ],
-            ['nombre', 'Nombre', 'Nombre',    'text',  True ,     True ,         None ],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+#            ID/NAME    LABEL             PLACEHOLDER  TYPE     REQUIRED   ABLE/DISABLE   DATOS    Validacion JS 
+            ['id',      'ID',             'ID',        'text',  True ,     False ,        None  , '' ],
+            ['nombre',  'Nombre',         'Nombre',    'text',  True ,     True ,         None  , 'alfanumerico,max:8' ], 
+            ['activo',  f'{TITLE_STATE}', 'Activo',    'p',     True ,     False ,        None  , 'alfanumerico' ],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -1044,7 +1055,7 @@ CONTROLADORES = {
             ['tuc',           'TUC',              'TUC',           'text',      True ,     True,          True ],
             ['capacidad',     'Capacidad',        'Capacidad',     'number',    True ,     True,          True ],
             ['volumen',       'Volumen',          'Volumen',       'number',    True ,     True,          None ],
-            ['descripcion', 'Descripción',    'Descripción', 'textarea',  False,     True,          None ],
+            ['descripcion', 'Descripción',    'Descripción', 'textarea',  False,     True,          None  , 'texto_avanzado'],
         ],
         "crud_forms": {
             "crud_list": True ,
@@ -1121,7 +1132,7 @@ CONTROLADORES = {
 #            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
             ['id', 'ID', 'ID', 'text', False, False, True],
             ['nombre', 'Nombre del Rol', 'Rol', 'text', True, True, True],
-            ['descripcion', 'Descripción', 'Descripción del rol', 'textarea', False, True, None],
+            ['descripcion', 'Descripción', 'Descripción del rol', 'textarea', False, True, None , 'texto_avanzado'],
             ['activo', f'{TITLE_STATE}', 'activo', 'p', True, True, None],
             ['estado_reclamoid', 'Estado de reclamo', 'Seleccionar', 'select', True, True, [lambda: controlador_estado_reclamo.get_options(), 'est_nom' ]],
         ],
@@ -1136,7 +1147,60 @@ CONTROLADORES = {
         }
     },
 
-    # huh?
+####
+    "modalidad_pago": {
+        "active" : True ,
+        "titulo": "modalidades de pago",
+        "icon_page": 'fa-solid fa-truck-plane',
+        "nombre_tabla": "modalidad de pago",
+        "controlador": controlador_modalidad_pago,
+        "filters": [
+            ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
+            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
+            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
+            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
+            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None  , 'texto_avanzado'],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
+    "regla_cargo": {
+        "active" : True ,
+        "titulo": "reglas de cargo",
+        "icon_page": 'fa-solid fa-dollar',
+        "nombre_tabla": "regla de cargo",
+        "controlador": controlador_regla_cargo,
+        "filters": [
+            # ['activo', f'{TITLE_STATE}', get_options_active() ],
+        ] ,
+        "fields_form": [
+#            ID/NAME             LABEL              PLACEHOLDER            TYPE        REQUIRED  ABLE/DISABLE   DATOS
+            ['id',             'ID',                 'ID',                'text',       True ,    False ,       None ],
+            ['tipo_condicion', 'Tipo de condición',  'Tipo de condición', 'text',       True ,    True  ,       None ],
+            ['inferior',       'Valor Inferior',     'Inferior',          'decimal_2',  True ,    True ,        None ],
+            ['superior',       'Valor Superior',     'Superior',          'decimal_2',  False,    True  ,       None ],
+            ['porcentaje',     'Porcentaje',         'Porcentaje',        'decimal_2',  False,    True  ,       None ],
+        ],
+        "crud_forms": {
+            "crud_list": True ,
+            "crud_search": True ,
+            "crud_consult": True ,
+            "crud_insert": True ,
+            "crud_update": True ,
+            "crud_delete": True ,
+            "crud_unactive": True ,
+        }
+    },
     "descuento": {
         "active" : True ,
         "titulo": "Descuentos",
@@ -1248,98 +1312,8 @@ CONTROLADORES = {
         "no_crud" : 'administrar_paginas' ,
     },
 
-# _BORRAR
-    "ubigeo" : {
-        "active":True,
-        "titulo":"Ubigeo",
-        "nombre_tabla":"ubigeo",
-        "controlador": controlador_ubigeo,
-        "icon_page" : "ri-map-pin-line",
-        "filters":[
-            ['activo', f'{TITLE_STATE}', get_options_active() ],
-        ],
-        "fields_form": [
-#            ID/NAME   LABEL     PLACEHOLDER   TYPE     REQUIRED   ABLE/DISABLE   DATOS
-            ['codigo','Código',     'Código',  'text',   True ,       False ,      None ],
-            ['distrito', 'Distrito', 'Distrito',   'text',  True ,      True ,         None ],
-            ['provincia', 'Provincia', 'Provincia',   'text',  True ,      True ,         None ],
-            ['departamento', 'Departamento', 'Departamento',   'text',  True ,      True ,         None ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": False ,
-            "crud_update": False ,
-            "crud_delete": False ,
-            "crud_unactive": False ,
-        }
-    },
-    "modalidad_pago": {
-        "active" : True ,
-        "titulo": "modalidad de pago",
-        "icon_page": 'fa-solid fa-truck-plane',
-        "nombre_tabla": "modalidad_pago",
-        "controlador": controlador_modalidad_pago,
-        "filters": [
-            ['activo', f'{TITLE_STATE}', get_options_active() ],
-        ] ,
-        "fields_form": [
-#            ID/NAME       LABEL              PLACEHOLDER    TYPE        REQUIRED   ABLE/DISABLE   DATOS
-            ['id',          'ID',              'ID',          'text',     True ,     False ,        None ],
-            ['nombre',      'Nombre',          'Nombre',      'text',     True ,     True  ,        None ],
-            ['activo',      f'{TITLE_STATE}',  'Activo',      'p',        True ,     False ,        None ],
-            ['descripcion', 'Descripción',     'descripcion', 'textarea', False,     True  ,        None ],
-        ],
-        "crud_forms": {
-            "crud_list": True ,
-            "crud_search": True ,
-            "crud_consult": True ,
-            "crud_insert": True ,
-            "crud_update": True ,
-            "crud_delete": True ,
-            "crud_unactive": True ,
-        }
-    },
-    
-    # "paquete": {
-    #     "active": True,
-    #     "titulo": "Paquetes",
-    #     "nombre_tabla": "paquete",
-    #     "controlador": controlador_paquete,
-    #     "icon_page": "fa-solid fa-box",
-    #     "filters": [
-    #     ],
-    #     "fields_form": [
-    #         #   ID/NAME                        LABEL                         PLACEHOLDER                TYPE       REQUIRED  ABLE   DATOS
-    #         ['tracking',                      'Tracking',                   'Id',            'text',     False,    False, True],
-    #         ['valor',                         'Valor (S/.)',                'Valor',                   'number',   True,     True,  None],
-    #         ['peso',                          'Peso (kg)',                  'Peso',                    'number',   True,     True,  None],
-    #         ['estado_pago',                   'Estado de pago',             '0 = Pagado, 1 = Pendiente','select',  True,     True,  [['0', 'Pagado'], ['1', 'Pendiente']]],
-    #         ['nombres_contacto_destinatario', 'Nombres contacto',           'Nombres',                 'text',     True,     True,  None],
-    #         ['apellidos_razon_destinatario',  'Apellidos o Razón Social',   'Apellidos o Razón',       'text',     True,     True,  None],
-    #         ['num_documento_destinatario',    'N° Documento',               'Documento',               'text',     True,     True,  None],
-    #         ['tipo_documento_destinatario_id','Tipo de Documento',          'Elegir tipo',             'select',   True,     True,  [lambda: controlador_tipo_documento.get_options(), 'tipo_documento']],
-    #         ['tipo_empaqueid',                'Tipo de Empaque',            'Elegir tipo',             'select',   True,     True,  [lambda: controlador_tipo_empaque.get_options(), 'tipo_empaque']],
-    #         ['contenido_paqueteid',           'Contenido del Paquete',      'Elegir contenido',        'select',   False,    True,  [lambda: controlador_contenido_paquete.get_options(), 'contenido_paquete']],
-    #         ['tipo_recepcionid',              'Tipo de Recepción',          'Elegir recepción',        'select',   True,     True,  [lambda: controlador_tipo_recepcion.get_options(), 'tipo_recepcion']],
-    #         ['modalidad_pagoid',              'Modalidad de Pago',          'Elegir modalidad',        'select',   True,     True,  [lambda: controlador_modalidad_pago.get_options(), 'modalidad_pago']],
-    #         ['sucursal_destino_id',           'Sucursal Destino',           'Elegir sucursal',         'select',   True,     True,  [lambda: controlador_sucursal.get_options(), 'direccion_destino']],
-    #         ['descripcion',                   'Descripción',                'Descripción del paquete', 'textarea', False,    True,  None],
-    #     ],
-    #     "crud_forms": {
-    #         "crud_list": True,
-    #         "crud_search": True,
-    #         "crud_consult": True,
-    #         "crud_insert": True,
-    #         "crud_update": True,
-    #         "crud_delete": True,
-    #         "crud_unactive": True,
-    #     }
-    # }
-
-    
 }
+
 
 
 REPORTES = {   
@@ -1396,7 +1370,7 @@ REPORTES = {
         ],
     },     
     
-    # Ventas 
+    # Ventas
     "ventas_periodo": {
         "active" : True ,
         'icon_page' : 'fa-solid fa-sack-dollar' ,   
@@ -1532,7 +1506,7 @@ TRANSACCIONES = {
 
             ['monto_total',         'Monto Total',        'Monto total',             'decimal_2', True,  True,   None],
             ['direccion_recojo',    'Direccion de recojo',    'Direccion de recojo',            'text',    True,  True,   None],
-            ['descripcion',         'Descripcion',            'Descripcion',        'textarea',    True,  True,   None],
+            ['descripcion',         'Descripcion',            'Descripcion',        'textarea',    True,  True,   None , 'texto_avanzado'],
         ],
         "crud_forms": {
             "crud_list": True,
@@ -1592,7 +1566,6 @@ TRANSACCIONES = {
             # [True, 'fa-solid fa-map-location-dot', "#9856EE", 'seguimiento_tracking', {"tracking": "tracking"} , '' , 'seguimiento'],
             [True, 'fa-solid fa-route', "#9856EE", 'transaccion',  {"tabla": "::seguimiento", "pk_foreign": "tracking"} , '' , 'seguimiento' , False],
             [True, 'fa-solid fa-qrcode', "#2195DC", 'ver_img_qr',  {"tracking": "tracking"} , '' , 'qr_code' , True],
-            [True, 'fa-solid fa-qrcode', "#DC8521", 'ver_guia_remision',  {"tracking": "tracking"} , '' , 'guia_remision' , True],
             [True, 'fa-solid fa-dollar', "#6FDC21", 'pagar_paquete',  {"tracking": "tracking"} , '' , 'pago' , False],
         ],
         "options": [
@@ -1822,6 +1795,7 @@ def inject_globals():
     menu_tipos_paginas = []
     menu_paginas = []
     menu_rolid = None
+    # print(obtener_ip_local())
 
     main_information = controlador_empresa.get_information()
     cookie_error = request.cookies.get('error')
@@ -1848,6 +1822,8 @@ def inject_globals():
             datosUsuario = None
     else:
         tipoUsuario = None
+
+    # print(listar_fields_forms(CONTROLADORES))
 
     return dict(
         # todo el sistema
@@ -2327,8 +2303,7 @@ def registrar_item_carrito():
     # clienteid = data.get("clienteid", 1)
     clientecorreo = request.cookies.get('correo')
     if not clientecorreo:
-        return rdrct_error(redirect_url('login'), "INICIAR_SESION_REQUERIDO")
-        # return jsonify({"error": "No se encontró la cookie de correo"}), 400
+        return jsonify({"error": "No se encontró la cookie de correo"}), 400
 
     cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
     if not cliente:
@@ -2372,14 +2347,6 @@ def registrar_item_carrito_json():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# @app.route("/verificar_sesion")
-# def verificar_sesion():
-#     clientecorreo = request.cookies.get("correo")
-#     if not clientecorreo:
-#         return rdrct_error(redirect_url("login"), "INICIAR_SESION_REQUERIDO")
-    
-#     # Si hay cookie, no hace nada, responde sin contenido
-#     return "", 204
 
 @app.route("/eliminar-item-carrito", methods=["POST"])
 def eliminar_item_carrito():
@@ -2481,7 +2448,7 @@ def metodo_pago():
     # clienteid = 1  # O request.cookies.get("idlogin")
     clientecorreo = request.cookies.get('correo')
     if not clientecorreo:
-        return redirect("/login")
+        return jsonify({"error": "No se encontró la cookie de correo"}), 400
 
     cliente = controlador_cliente.get_cliente_por_correo(clientecorreo)
     if not cliente:
@@ -3356,6 +3323,7 @@ def insertar_envio():
         }), 500
         
         
+
 @app.route('/insertar_envio_api', methods=['POST'])
 def insertar_envio_api():
     try:
@@ -3369,11 +3337,11 @@ def insertar_envio_api():
         origen_data = session.get('origen_data')
         sucursal_origen = origen_data.get('sucursal_origen') if isinstance(origen_data, dict) else origen_data
         remitente = session.get('remitente_data', {})
-        
+
         # Validaciones
         if not registros:
             return jsonify({'status': 'error', 'message': 'No hay registros de paquetes'}), 400
-            
+
         if not sucursal_origen:
             return jsonify({'status': 'error', 'message': 'Sucursal de origen no proporcionada'}), 400
 
@@ -3408,47 +3376,89 @@ def insertar_envio_api():
             registros, cliente_data, tipo_comprobante, metodo_pago, sucursal_origen, modo
         )
 
-        # Generar QR y enviar email si es exitoso
+        # Generar QR, rótulos, y comprobantes si es necesario
         if num_serie:
             try:
                 generar_qr_paquetes(trackings)
-                generar_rotulos_paquetes(trackings) 
+                generar_rotulos_paquetes(trackings)
+                if requiere_datos_pago:
+                    for tracking in trackings:
+                        generar_comprobante(tracking, tipo_comprobante)  # Llamada a generar_comprobante para cada tracking
+
             except Exception as qr_err:
                 current_app.logger.warning(f"Error generando QR: {qr_err}")
 
             destinatario_email = cliente_data['correo']
             if destinatario_email:
-                try:
+              try:
+                    # Intentamos convertir tipo_comprobante a entero, si falla, asignamos 0
+                    try:
+                        tipo_comprobante = int(tipo_comprobante.strip())  # Usar strip() por si hay espacios
+                    except ValueError:
+                        tipo_comprobante = 0  # Si no es un número válido, asignamos 0
+                    
+                    # Log para ver el tipo de comprobante y asegurarnos que es correcto
+                    print(f"Tipo de comprobante: {tipo_comprobante} (Tipo: {type(tipo_comprobante)})")
+                    
                     msg = Message(
                         subject=f"{nombre_empresa} Envío registrado: {num_serie}",
                         sender=app.config['MAIL_USERNAME'],
                         recipients=[destinatario_email]
                     )
-                    msg.body = (
-                        f"Hola {cliente_data['nombre_siglas']},\n\n"
-                        f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
-                        "Adjunto encontrarás el rótulo PDF para cada paquete con los datos de envío.\n\n"
-                        f"¡Gracias por confiar en {nombre_empresa}!"
-                    )
 
+                    # Cambiar el cuerpo del mensaje según si es factura o boleta
+                    if tipo_comprobante == 1:  # Si es factura
+                        msg.body = (
+                            f"Hola {cliente_data['nombre_siglas']},\n\n"
+                            f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
+                            "Adjunto encontrarás la factura de pago para tu paquete y podrás acercarte a dejarlo en nuestra sucursal.\n\n"
+                            f"¡Gracias por confiar en {nombre_empresa}!"
+                        )
+                    elif tipo_comprobante == 2:  # Si es boleta
+                        msg.body = (
+                            f"Hola {cliente_data['nombre_siglas']},\n\n"
+                            f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
+                            "Adjunto encontrarás la boleta de pago para tu paquete. Ya puedes acercarte a dejar el paquete.\n\n"
+                            f"¡Gracias por confiar en {nombre_empresa}!"
+                        )
+                    else:
+                        msg.body = (
+                            f"Hola {cliente_data['nombre_siglas']},\n\n"
+                            f"Tu envío con número de serie {num_serie} ha sido registrado exitosamente.\n"
+                            "Te invitamos a acercarte a nuestra sucursal para realizar el pago.\n\n"
+                            f"¡Gracias por confiar en {nombre_empresa}!"
+                        )
+
+                    # Adjuntar los rótulos
                     for tracking in trackings:
-
                         rotulo_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'rotulo.pdf')
-                        
                         if os.path.exists(rotulo_path):
                             with open(rotulo_path, 'rb') as f:
                                 rotulo_data = f.read()
                             msg.attach(f"rotulo_{tracking}.pdf", 'application/pdf', rotulo_data)
 
+                        # Adjuntar el comprobante
+                        comprobante_path = os.path.join(app.static_folder, 'comprobantes', str(tracking), 'comprobante.pdf')
+                        if os.path.exists(comprobante_path):
+                            current_app.logger.info(f"Adjuntando comprobante en: {comprobante_path}")  # Log de verificación
+                            with open(comprobante_path, 'rb') as f:
+                                comprobante_data = f.read()
+                            msg.attach(f"comprobante_{tracking}.pdf", 'application/pdf', comprobante_data)
+                        else:
+                            current_app.logger.warning(f"El archivo de comprobante no se encuentra: {comprobante_path}")
+
+                    # Enviar el correo
                     mail.send(msg)
-                except Exception as email_err:
+
+              except Exception as email_err:
                     current_app.logger.warning(f"Error enviando email: {email_err}")
 
+        # Limpiar la sesión
         session.pop('datos_pago', None)
         session.pop('resumen_envios', None)
         session.pop('remitente_data', None)
-        session.pop('origen_data', None)     
-        session.pop('tipo_envio', None)      
+        session.pop('origen_data', None)
+        session.pop('tipo_envio', None)
 
         current_app.logger.info(f"Transacción creada con número de serie: {num_serie}")
 
@@ -3467,7 +3477,9 @@ def insertar_envio_api():
             'status': 'error',
             'message': 'Ocurrió un error al procesar el envío'
         }), 500
-        
+
+
+
         
 @app.route("/API_ENRUTAR", methods=["GET"])
 def api_enrutar():
@@ -3657,7 +3669,7 @@ def generar_qr_paquetes(trackings):
     ip_address = socket.gethostbyname(hostname)
     print(ip_address)
     for tracking in trackings:
-        qr_data = f"http://192.168.239.37:8000/insertar_estado?tracking={tracking}"
+        qr_data = f"http://192.168.100.15:8000/insertar_estado?tracking={tracking}"
 
         img = qrcode.make(qr_data)
 
@@ -3680,54 +3692,54 @@ def generar_qr_paquetes(trackings):
             (qr_rel_path, tracking)
         )
 
-
 @app.route('/generar_boleta', methods=['POST'])
 def generar_boleta_post():
-    tracking = request.json.get('tracking')
+    data = request.get_json()
+    tracking = data.get('tracking')
+    tipo_comprobante_id = data.get('tipo_comprobante')
+
     if not tracking:
         return "Falta el campo 'tracking'", 400
-    return redirect(url_for('generar_comprobante', tracking=tracking))
+    
+    # Llamar directamente a la función 'generar_comprobante' y pasar los parámetros
+    return generar_comprobante(tracking=tracking, tipo_comprobante_id=tipo_comprobante_id)
 
 
-@app.route('/comprobante=<tracking>', methods=['POST'])
-def generar_comprobante(tracking):
-    from controladores import reporte_comprobante as reporte_comprobante  
+
+def generar_comprobante(tracking, tipo_comprobante_id):
+    from controladores import reporte_comprobante as reporte_comprobante
     try:
-        data = request.get_json()
-        tipo_comprobante = data.get('comprobante', 'BOLETA')
-        print(tipo_comprobante)
-        
-        if not tipo_comprobante:
+        # Obtener datos del tipo de comprobante usando el ID
+        comprobante = controlador_tipo_comprobante.get_data_comprobante(tipo_comprobante_id)
+        if not comprobante:
             return jsonify({
                 'success': False, 
-                'message': 'Tipo de comprobante requerido'
-            }), 400
+                'message': 'Tipo de comprobante no encontrado'
+            }), 404
         
         transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
-        if not transaccion or not isinstance(transaccion, dict):
+        if not transaccion:
             return jsonify({
                 'success': False, 
                 'message': 'Transacción no encontrada'
             }), 404
         
-        # Generar serie del comprobante
+        # Generar la serie del comprobante con ceros a la izquierda (6 dígitos)
         num_serie = transaccion.get('num_serie')
-        if tipo_comprobante.upper() == 'BOLETA':
-            comprobante_serie = f"B361-{num_serie}"
-        else:
-            comprobante_serie = f"F361-{num_serie}"
+        numero_formateado = str(num_serie).zfill(6)  # Ej: 22 → 000022
+        comprobante_serie = f"{comprobante['inicial']}-{numero_formateado}"
         
-        # Crear directorio
-        carpeta = os.path.join("static", "comprobantes", str(tracking))
+        # Crear directorio para guardar el comprobante
+        carpeta = os.path.join(current_app.static_folder, "comprobantes", str(tracking))
         os.makedirs(carpeta, exist_ok=True)
         ruta_pdf = os.path.join(carpeta, "comprobante.pdf")
         
-        # Si existe, devolverlo
+        # Si ya existe el PDF, devolverlo directamente
         if os.path.exists(ruta_pdf):
             return send_file(ruta_pdf, as_attachment=True,
-                           download_name=f"comprobante_{tracking}.pdf")
+                             download_name=f"comprobante_{tracking}.pdf")
         
-        # Obtener datos necesarios
+        # Datos de empresa
         empresa = controlador_empresa.getDataComprobante()
         if not empresa:
             return jsonify({
@@ -3743,14 +3755,13 @@ def generar_comprobante(tracking):
             'direccion': transaccion.get('direccion_destino', '')
         }
         
-        # Obtener items
+        # Obtener ítems
         items, masivo = controlador_encomienda.obtener_items_por_num_serie(num_serie)
-        print(items)
+        
         # Calcular resumen
         monto_total = float(transaccion.get('monto_total', 0))
         igv_rate = float(empresa.get('igv', 18)) / 100
         
-        # Calcular valores
         if igv_rate > 0:
             op_gravada = monto_total / (1 + igv_rate)
             igv = monto_total - op_gravada
@@ -3770,31 +3781,34 @@ def generar_comprobante(tracking):
             'importe_total': monto_total
         }
         
-        # Generar código QR
+        # Ruta del QR
         qr_path = os.path.join(carpeta, "qr.png")
         
-        # Generar PDF
+        # Generar el PDF del comprobante
         reporte_comprobante.generar_comprobante_pdf(
             transaccion=transaccion,
             cliente=cliente,
             empresa=empresa,
-            tipo_comprobante=tipo_comprobante,
+            tipo_comprobante=comprobante['nombre'],  # Ej: "BOLETA"
             comprobante_serie=comprobante_serie,
             items=items,
             resumen=resumen,
             qr_path=qr_path,
             masivo=masivo,
-            ruta_pdf=ruta_pdf
+            ruta_pdf=ruta_pdf  # Guardar en la ruta del directorio
         )
         
+        # Enviar el comprobante generado como archivo adjunto
         return send_file(ruta_pdf, as_attachment=True,
-                        download_name=f"comprobante_{tracking}.pdf")
+                         download_name=f"comprobante_{tracking}.pdf")
         
     except Exception as e:
+        current_app.logger.error(f"Error al generar comprobante: {str(e)}")
         return jsonify({
             'success': False, 
             'message': f'Error al generar comprobante: {str(e)}'
         }), 500
+
 
 
 def generar_rotulos_paquetes(trackings):
@@ -4507,6 +4521,7 @@ def obtener_coordenadas():
         return jsonify({'error': str(e),
                         "status":-1}), 500
 
+
 @app.route('/cambiar_estado_salida', methods=['POST'])
 def cambiar_estado_salida():
     try:
@@ -4542,7 +4557,9 @@ def seguimiento_unidad_prueba():
     }]
     info = controlador_salida.get_data_by_id_salida(id)
     print(info)
-    return render_template('seguimiento_empleado.html', data=data,info=info)
+    ip_local = obtener_ip_local()
+
+    return render_template('seguimiento_empleado.html', data=data,info=info , ip_local = ip_local)
 
 
 
@@ -6565,7 +6582,6 @@ def generar_guia_remision(transaccion_id):
 
     return send_file(path, as_attachment=True)
 
-
 @app.route("/descargar_guia/<string:tracking>")
 def descargar_guia_remision(tracking):
     from controladores import reporte_pepo as reporte_pepo
@@ -6578,7 +6594,7 @@ def descargar_guia_remision(tracking):
     if not data:
         return "Datos insuficientes para generar la guía", 400
 
-    filename = f"guia_{tracking}.pdf"
+    filename = f"guia_{num_serie}.pdf"
     path = f"static/img/guias/{filename}"
 
     reporte_pepo.generar_guia_pdf(data, filename=path)

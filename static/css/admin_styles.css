@@ -19,14 +19,12 @@
     /* --color-bg-admin: linear-gradient(170deg, var(--color4)  45%, color-mix(in srgb , var(--color-sec) 100% , var(--color4) 100% ) 100%); */
     /* --color-bg-admin: linear-gradient(155deg, var(--color4)  30%, color-mix(in srgb , var(--color-sec) 100% , var(--color4) 100% ) 100%) ; */
 
-    --color-bg-admin: linear-gradient(
-        165deg, 
-        var(--color4)  40%, 
-        color-mix(in srgb , var(--color-sec) 100% , var(--color4) 45% ) 100%
-        );
+    --color-bg-admin: linear-gradient(165deg,
+            var(--color4) 40%,
+            color-mix(in srgb, var(--color-sec) 100%, var(--color4) 45%) 100%);
 
 
-    
+
 }
 
 
@@ -59,7 +57,7 @@ body {
     /* background-color: color-mix(in srgb, var(--color-sec) 90%, transparent 90%); */
     /* box-shadow: 0px 0px 10px var(--color-sec); */
     transform: translateY(-8px);
-            /* box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3); */
+    /* box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3); */
 }
 
 /* .logo_admin {
@@ -294,7 +292,7 @@ aside .line_separator {
     /* --color-page : var(--color-sec); */
     /* --color-page : var(--color19); */
     /* --color-page : var(--color-thr); */
-    --color-page : color-mix(in srgb , var(--color-sec) 100% , var(--color-thr) 100%) ;
+    --color-page: color-mix(in srgb, var(--color-sec) 100%, var(--color-thr) 100%);
 }
 
 .mu_page {
@@ -311,7 +309,7 @@ aside .line_separator {
     color: white;
     border-radius: 5px;
     border-bottom-right-radius: 25px;
-    border-top-right-radius:    25px;
+    border-top-right-radius: 25px;
     align-items: center;
     transition: 0.1s ease-in-out;
 }
@@ -507,6 +505,7 @@ i {
     scrollbar-width: thin;
     scrollbar-color: var(--color1) #f0f0f0;
     box-shadow: 0 4px 5px #0000006c;
+    font-size: 90%;
 }
 
 .table-container::-webkit-scrollbar {
@@ -641,6 +640,7 @@ th.opciones_column {
 
 .td_right {
     justify-content: flex-end;
+    max-width: 100% !important;
     /* justify-self: flex-end; */
 }
 
@@ -655,9 +655,10 @@ th.opciones_column {
 .opciones_fila button {
     border: 0;
     border-radius: 100%;
-    height: 30px;
-    width: 30px;
+    height: 27px;
+    width: 27px;
     color: var(--color-contrast);
+    font-size: 95%;
 }
 
 p.text_none {
@@ -678,7 +679,7 @@ p.activo {
     border-radius: 10px;
     padding-inline: 10px;
     width: fit-content;
-    background-color: white ;
+    background-color: white;
     font-weight: bold;
     padding-block: 2px;
 }
@@ -806,6 +807,7 @@ label {
     scrollbar-color: var(--color1) #f0f0f0;
     display: flex;
     gap: 10px;
+    row-gap: 17px;
     position: relative;
     padding-inline: 15px;
     width: 100%;
@@ -830,6 +832,7 @@ label {
     display: flex;
     flex-direction: column;
     margin-bottom: 10px;
+    position: relative;
 }
 
 .form_field::-webkit-scrollbar-thumb {
@@ -852,6 +855,15 @@ label {
     font-size: 95%;
 }
 
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
+    box-shadow: none;
+    /* si quieres quitar también sombras al focus */
+}
+
 .form_field select option {
     text-align: left !important;
 }
@@ -865,9 +877,10 @@ label {
 
 .form_field textarea {
     text-align: left;
+    height: 80px;
 }
 
-input[type="number"] ,
+input[type="number"],
 .form_number input {
     text-align: right !important;
 }
@@ -1217,4 +1230,27 @@ input[type="number"] ,
 
 
 
+.form_field .mensaje-error {
+    position: absolute;
+    bottom: -20px;
+    color: rgb(155, 0, 0);
+    font-size: 90%;
+}
 
+.input-error {
+    box-shadow: 0px 0px 3px red;
+}
+
+:root {
+    --color-ok: var(--color-acept);
+}
+
+.input-ok {
+    border: 1px solid color-mix(in srgb, var(--color-ok) 60%, white) !important; 
+    background-color: color-mix(in srgb, var(--color-ok) 5%, white) !important;
+    box-shadow: 0px 0px 3px color-mix(in srgb, var(--color-ok) 55%, white) !important;
+}
+/* 
+.input-ok {
+    border-color: #22c55e;
+} */
