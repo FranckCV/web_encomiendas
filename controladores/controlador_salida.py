@@ -226,22 +226,39 @@ def crear_transaccion_salida(vehiculo, empleados, escalas, paquetes):
         return salida_id
 
 
-def cambiar_estado_salida_web(id, estado):
+def cambiar_estado_salida_web(id, estado, tracking, tipo):
     # Actualizar el estado de la salida
-    sql = '''
+    sql_update_salida = '''
         UPDATE salida 
         SET estado = %s 
         WHERE id = %s
     '''
-    sql_execute(sql, (estado, id))
+    sql_execute(sql_update_salida, (estado, id))
 
-    # Si el estado de la salida es 'C', actualizar todos los paquetes relacionados
-    if estado == 'C':
-        sql_update = '''
-            UPDATE paquete 
-            SET ultimo_estado = 'ED' 
-            WHERE salidaid = %s
-        '''
-        sql_execute(sql_update, (id,))
-        
+    try:
+        if estado == 'T':
+            for estado_id in range(7, 10):  # 7 al 9
+                sql_insert = '''
+                    INSERT INTO seguimiento (paquetetracking, detalle_estadoid, tipo_comprobanteid, fecha, hora)
+                    VALUES (%s, %s, %s, NOW(), NOW())
+                '''
+                sql_execute(sql_insert, (tracking, estado_id, tipo))
+
+        elif estado == 'C':
+            for estado_id in range(7, 14):  # 7 al 13
+                sql_insert = '''
+                    INSERT INTO seguimiento (paquetetracking, detalle_estadoid, tipo_comprobanteid, fecha, hora)
+                    VALUES (%s, %s, %s, NOW(), NOW())
+                '''
+                sql_execute(sql_insert, (tracking, estado_id, tipo))
+
+            sql_update_paquete = '''
+                UPDATE paquete 
+                SET ultimo_estado = 'ED' 
+                WHERE salidaid = %s
+            '''
+            sql_execute(sql_update_paquete, (id,))
     
+    except Exception as e:
+        print("Error al cambiar el estado de la salida:", e)
+

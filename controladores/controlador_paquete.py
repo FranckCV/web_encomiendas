@@ -567,19 +567,21 @@ def actualizar_estado_entrega_sucursal(tracking, tipo_comprobante):
     try:
         sql_execute(sql_update, (tracking,))
 
-        for estado_id in range(2, 7):  
+        for estado_id in range(2, 7):  # del 2 al 6 inclusive
             sql_insert = '''
                 INSERT INTO seguimiento (paquetetracking, detalle_estadoid, tipo_comprobanteid, fecha, hora)
                 VALUES (%s, %s, %s, NOW(), NOW())
             '''
-            sql_execute(sql_insert, (tracking, estado_id, tipo_comprobante))
+
+            tipo = tipo_comprobante if estado_id == 2 else None
+
+            sql_execute(sql_insert, (tracking, estado_id, tipo))
 
         return True
 
     except Exception as e:
         print(f"Error al actualizar estado: {e}")
         return False
-
 
 
 
