@@ -1,17 +1,37 @@
 from controladores.bd import sql_select_fetchall, sql_select_fetchone, sql_execute, sql_execute_lastrowid
 
 def get_estadisticas_cliente(cliente_id):
-    """Obtiene estadísticas del cliente"""
+    """Obtiene estadísticas del cliente basadas en el estado real desde seguimiento"""
     try:
-        # Consulta más simple para evitar errores
+        # Consulta que obtiene el estado real desde la tabla seguimiento
         sql = """
         SELECT 
             COUNT(p.tracking) as total_envios,
-            SUM(CASE WHEN p.estado_pago = 'C' THEN 1 ELSE 0 END) as entregados,
-            SUM(CASE WHEN p.estado_pago = 'T' THEN 1 ELSE 0 END) as en_transito,
-            SUM(CASE WHEN p.estado_pago = 'P' THEN 1 ELSE 0 END) as pendientes
+            SUM(CASE WHEN ee.id = 4 THEN 1 ELSE 0 END) as entregados,
+            SUM(CASE WHEN ee.id IN (2, 3) THEN 1 ELSE 0 END) as en_transito,
+            SUM(CASE WHEN ee.id = 1 THEN 1 ELSE 0 END) as pendientes,
+            SUM(CASE WHEN ee.id IS NULL THEN 1 ELSE 0 END) as sin_estado
         FROM transaccion_encomienda te
         LEFT JOIN paquete p ON te.num_serie = p.transaccion_encomienda_num_serie
+        LEFT JOIN (
+            SELECT 
+                s1.paquetetracking,
+                s1.detalle_estadoid
+            FROM seguimiento s1
+            WHERE s1.fecha = (
+                SELECT MAX(s2.fecha)
+                FROM seguimiento s2
+                WHERE s2.paquetetracking = s1.paquetetracking
+            )
+            AND s1.hora = (
+                SELECT MAX(s3.hora)
+                FROM seguimiento s3
+                WHERE s3.paquetetracking = s1.paquetetracking
+                AND s3.fecha = s1.fecha
+            )
+        ) s ON p.tracking = s.paquetetracking
+        LEFT JOIN detalle_estado de ON s.detalle_estadoid = de.id
+        LEFT JOIN estado_encomienda ee ON de.estado_encomiendaid = ee.id
         WHERE te.clienteid = %s
         """
         
@@ -24,7 +44,8 @@ def get_estadisticas_cliente(cliente_id):
                 'total_envios': 0,
                 'entregados': 0,
                 'en_transito': 0,
-                'pendientes': 0
+                'pendientes': 0,
+                'sin_estado': 0
             }
         
         if result:
@@ -32,14 +53,16 @@ def get_estadisticas_cliente(cliente_id):
                 'total_envios': result['total_envios'] or 0,
                 'entregados': result['entregados'] or 0,
                 'en_transito': result['en_transito'] or 0,
-                'pendientes': result['pendientes'] or 0
+                'pendientes': result['pendientes'] or 0,
+                'sin_estado': result['sin_estado'] or 0
             }
         else:
             return {
                 'total_envios': 0,
                 'entregados': 0,
                 'en_transito': 0,
-                'pendientes': 0
+                'pendientes': 0,
+                'sin_estado': 0
             }
             
     except Exception as e:
@@ -48,7 +71,8 @@ def get_estadisticas_cliente(cliente_id):
             'total_envios': 0,
             'entregados': 0,
             'en_transito': 0,
-            'pendientes': 0
+            'pendientes': 0,
+            'sin_estado': 0
         }
 
 def get_reclamos_cliente(cliente_id):
@@ -78,7 +102,7 @@ def get_reclamos_cliente(cliente_id):
 def get_paquetes_cliente(cliente_id):
     """Obtiene los paquetes del cliente con información de seguimiento"""
     try:
-        # Consulta simplificada
+        # Consulta con el estado real desde la tabla seguimiento
         sql = """
         SELECT 
             te.num_serie as num_comprobante,
@@ -87,13 +111,8 @@ def get_paquetes_cliente(cliente_id):
             suc_destino.direccion as destino,
             te.fecha as fecha_envio,
             p.estado_pago,
-            CASE p.estado_pago
-                WHEN 'C' THEN 'Completado'
-                WHEN 'P' THEN 'Pendiente' 
-                WHEN 'T' THEN 'En tránsito'
-                ELSE 'Sin estado'
-            END as estado_nombre,
-            CASE p.estado_pago
+            COALESCE(ee.nombre, 'Sin estado') as estado_nombre,
+            CASE ee.tipoEstado
                 WHEN 'C' THEN 'delivered'
                 WHEN 'P' THEN 'pending'
                 WHEN 'T' THEN 'transit'
@@ -102,12 +121,35 @@ def get_paquetes_cliente(cliente_id):
             p.nombres_contacto_destinatario,
             p.apellidos_razon_destinatario,
             p.valor,
-            COALESCE(cp.nombre, 'Sin especificar') as contenido
+            COALESCE(cp.nombre, 'Sin especificar') as contenido,
+            s.fecha as fecha_ultimo_estado,
+            s.hora as hora_ultimo_estado
         FROM transaccion_encomienda te
         INNER JOIN paquete p ON te.num_serie = p.transaccion_encomienda_num_serie
         LEFT JOIN sucursal suc_origen ON te.id_sucursal_origen = suc_origen.id
         LEFT JOIN sucursal suc_destino ON p.sucursal_destino_id = suc_destino.id
         LEFT JOIN contenido_paquete cp ON p.contenido_paqueteid = cp.id
+        LEFT JOIN (
+            SELECT 
+                s1.paquetetracking,
+                s1.detalle_estadoid,
+                s1.fecha,
+                s1.hora
+            FROM seguimiento s1
+            WHERE s1.fecha = (
+                SELECT MAX(s2.fecha)
+                FROM seguimiento s2
+                WHERE s2.paquetetracking = s1.paquetetracking
+            )
+            AND s1.hora = (
+                SELECT MAX(s3.hora)
+                FROM seguimiento s3
+                WHERE s3.paquetetracking = s1.paquetetracking
+                AND s3.fecha = s1.fecha
+            )
+        ) s ON p.tracking = s.paquetetracking
+        LEFT JOIN detalle_estado de ON s.detalle_estadoid = de.id
+        LEFT JOIN estado_encomienda ee ON de.estado_encomiendaid = ee.id
         WHERE te.clienteid = %s
         ORDER BY te.fecha DESC, te.hora DESC
         LIMIT 20
@@ -222,14 +264,44 @@ def get_reclamos_detalle_cliente(cliente_id):
             r.paquetetracking as num_envio,
             COALESCE(cr.nombre, 'Sin motivo') as motivo,
             r.fecha_recepcion as fecha_reclamo,
-            'Sin estado' as estado,
-            'pending' as estado_clase,
+            COALESCE(er.nombre, 'Sin estado') as estado,
+            CASE 
+                WHEN er.id = 5 THEN 'delivered'
+                WHEN er.id = 2 THEN 'delivered'
+                WHEN er.id = 3 THEN 'pending'
+                WHEN er.id = 4 THEN 'transit'
+                WHEN er.id = 1 THEN 'pending'
+                ELSE 'pending'
+            END as estado_clase,
             r.descripcion,
-            r.monto_reclamado
+            r.monto_reclamado,
+            sr.fecha as fecha_ultimo_estado,
+            sr.hora as hora_ultimo_estado
         FROM reclamo r
         INNER JOIN paquete p ON r.paquetetracking = p.tracking
         INNER JOIN transaccion_encomienda te ON p.transaccion_encomienda_num_serie = te.num_serie
         LEFT JOIN causa_reclamo cr ON r.causa_reclamoid = cr.id
+        LEFT JOIN (
+            SELECT DISTINCT
+                sr1.reclamoid,
+                sr1.detalle_reclamoid,
+                sr1.fecha,
+                sr1.hora
+            FROM seguimiento_reclamo sr1
+            WHERE sr1.fecha = (
+                SELECT MAX(sr2.fecha)
+                FROM seguimiento_reclamo sr2
+                WHERE sr2.reclamoid = sr1.reclamoid
+            )
+            AND sr1.hora = (
+                SELECT MAX(sr3.hora)
+                FROM seguimiento_reclamo sr3
+                WHERE sr3.reclamoid = sr1.reclamoid
+                AND sr3.fecha = sr1.fecha
+            )
+        ) sr ON r.id = sr.reclamoid
+        LEFT JOIN detalle_reclamo dr ON sr.detalle_reclamoid = dr.id
+        LEFT JOIN estado_reclamo er ON dr.estado_reclamoid = er.id
         WHERE te.clienteid = %s
         ORDER BY r.fecha_recepcion DESC
         LIMIT 20

@@ -168,7 +168,7 @@ Mi perfil
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>N° Comprobante</th>
+                            <!-- <th>N° Comprobante</th> -->
                             <th>N° Seguimiento</th>
                             <th>Origen</th>
                             <th>Destino</th>
@@ -180,13 +180,13 @@ Mi perfil
                     <tbody>
                         {% for paquete in paquetes %}
                         <tr>
-                            <td><strong>{{ paquete.num_comprobante }}</strong></td>
+                            <!-- <td><strong>{{ paquete.num_comprobante }}</strong></td> -->
                             <td><strong>{{ paquete.num_seguimiento }}</strong></td>
                             <td>{{ paquete.origen or 'No especificado' }}</td>
                             <td>{{ paquete.destino or 'No especificado' }}</td>
                             <td>{{ paquete.fecha_envio.strftime('%d/%m/%Y') if paquete.fecha_envio else 'No registrada' }}</td>
                             <td><span class="status-badge status-{{ paquete.estado_clase }}">{{ paquete.estado_nombre }}</span></td>
-                            <td><a href="{{ url_for('seguimiento_tracking', tracking=paquete.num_seguimiento) }}" class="btn-action">Ver detalles</a></td>
+                            <td><a href="{{ url_for('seguimiento_tracking', tracking=paquete.num_seguimiento) }}" class="btn-action">Detalles</a></td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -222,7 +222,7 @@ Mi perfil
                             <td>{{ compra.metodo_pago or 'No especificado' }}</td>
                             <td><span class="status-badge status-{{ compra.estado_clase }}">{{ compra.estado_pago }}</span></td>
                             <td>
-                                <a href="{{ url_for('ver_comprobante_venta', num_serie=compra.num_comprobante) }}" class="btn-action btn-download" style="color: #fff !important;">📄 Descargar</a>
+                                <a target="_blank" href="{{ url_for('ver_comprobante_venta', num_serie=compra.num_comprobante) }}" class="btn-action btn-download" style="color: #fff !important;">📄 Descargar</a>
                             </td>
                         </tr>
                         {% endfor %}
