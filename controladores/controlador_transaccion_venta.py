@@ -225,3 +225,224 @@ def obtener_monto_total(num_serie):
 #     '''
 
 #     return sql_select_fetchall(sql, (num_serie, tipo_comprobanteid))
+
+def obtener_detalle_venta(num_serie):
+    """
+    Obtiene los artículos vendidos en una transacción
+    """
+    try:
+        sql = '''
+            SELECT 
+                dv.articuloid,
+                dv.cantidad,
+                a.nombre as articulo_nombre,
+                a.precio as precio_unitario,
+                (dv.cantidad * a.precio) as subtotal,
+                a.dimensiones,
+                tc.nombre as tamaño_caja
+            FROM detalle_venta dv
+            INNER JOIN articulo a ON dv.articuloid = a.id
+            LEFT JOIN tamanio_caja tc ON a.tamaño_cajaid = tc.id
+            WHERE dv.ventanum_serie = %s
+            AND a.activo = 1
+        '''
+        
+        # Usar fetchall en lugar de fetchone para obtener todos los registros
+        result = sql_select_fetchall(sql, (num_serie,))
+        
+        print(f"Debug - Resultado de la consulta: {result}")
+        print(f"Debug - Tipo de resultado: {type(result)}")
+        
+        # Verificar que result sea una lista
+        if not isinstance(result, list):
+            print(f"Error: La consulta devolvió {type(result)} en lugar de lista: {result}")
+            return []
+        
+        if not result:
+            print(f"No se encontraron artículos para la venta {num_serie}")
+            return []
+        
+        items = []
+        for row in result:
+            # Verificar que row sea un diccionario
+            if not isinstance(row, dict):
+                print(f"Error: La fila no es un diccionario: {row} (tipo: {type(row)})")
+                continue
+                
+            try:
+                item = {
+                    'codigo': str(row.get('articuloid', '')),
+                    'descripcion': str(row.get('articulo_nombre', '')),
+                    'cantidad': float(row.get('cantidad', 1)),
+                    'precio_unitario': float(row.get('precio_unitario', 0)),
+                    'subtotal': float(row.get('subtotal', 0)),
+                    'dimensiones': str(row.get('dimensiones', '') or ''),
+                    'tamaño': str(row.get('tamaño_caja', '') or '')
+                }
+                items.append(item)
+                print(f"Debug - Item agregado: {item}")
+                
+            except Exception as item_error:
+                print(f"Error al procesar item: {item_error}, row: {row}")
+                continue
+        
+        print(f"Debug - Total items procesados: {len(items)}")
+        return items
+        
+    except Exception as e:
+        print(f"Error al obtener detalle de venta: {e}")
+        print(f"Debug - num_serie: {num_serie}, tipo: {type(num_serie)}")
+        return []
+
+
+# Función alternativa si la anterior no funciona
+def obtener_detalle_venta_alternativa(num_serie):
+    """
+    Versión alternativa usando una consulta más simple
+    """
+    try:
+        # Consulta más simple para debugging
+        sql = '''
+            SELECT 
+                dv.articuloid,
+                dv.cantidad,
+                a.nombre,
+                a.precio
+            FROM detalle_venta dv
+            INNER JOIN articulo a ON dv.articuloid = a.id
+            WHERE dv.ventanum_serie = %s
+        '''
+        
+        result = sql_select_fetchall(sql, (num_serie,))
+        
+        print(f"Debug alternativa - Resultado: {result}")
+        print(f"Debug alternativa - Tipo: {type(result)}")
+        
+        if not isinstance(result, list):
+            return []
+        
+        items = []
+        for row in result:
+            if isinstance(row, dict):
+                item = {
+                    'codigo': str(row.get('articuloid', '')),
+                    'descripcion': str(row.get('nombre', '')),
+                    'cantidad': float(row.get('cantidad', 1)),
+                    'precio_unitario': float(row.get('precio', 0)),
+                    'subtotal': float(row.get('cantidad', 1)) * float(row.get('precio', 0)),
+                    'dimensiones': '',
+                    'tamaño': ''
+                }
+                items.append(item)
+            elif isinstance(row, (list, tuple)) and len(row) >= 4:
+                # Si viene como tupla/lista
+                item = {
+                    'codigo': str(row[0]),
+                    'descripcion': str(row[2]),
+                    'cantidad': float(row[1]),
+                    'precio_unitario': float(row[3]),
+                    'subtotal': float(row[1]) * float(row[3]),
+                    'dimensiones': '',
+                    'tamaño': ''
+                }
+                items.append(item)
+        
+        return items
+        
+    except Exception as e:
+        print(f"Error en consulta alternativa: {e}")
+        return []
+
+
+# Función de debugging para verificar la estructura de datos
+def debug_detalle_venta(num_serie):
+    """
+    Función para hacer debugging de la consulta
+    """
+    print(f"=== DEBUG DETALLE VENTA ===")
+    print(f"num_serie: {num_serie} (tipo: {type(num_serie)})")
+    
+    try:
+        # Verificar que existe la venta
+        sql_venta = "SELECT * FROM transaccion_venta WHERE num_serie = %s"
+        venta = sql_select_fetchone(sql_venta, (num_serie,))
+        print(f"Venta encontrada: {venta}")
+        
+        # Verificar detalle_venta
+        sql_detalle = "SELECT * FROM detalle_venta WHERE ventanum_serie = %s"
+        detalle = sql_select_fetchall(sql_detalle, (num_serie,))
+        print(f"Detalle encontrado: {detalle}")
+        print(f"Tipo de detalle: {type(detalle)}")
+        
+        # Verificar artículos
+        if isinstance(detalle, list) and detalle:
+            for item in detalle:
+                if isinstance(item, dict):
+                    articulo_id = item.get('articuloid')
+                    sql_articulo = "SELECT * FROM articulo WHERE id = %s"
+                    articulo = sql_select_fetchone(sql_articulo, (articulo_id,))
+                    print(f"Artículo {articulo_id}: {articulo}")
+        
+    except Exception as e:
+        print(f"Error en debug: {e}")
+    
+    print(f"=== FIN DEBUG ===")
+    
+    # Intentar obtener el detalle normal
+    return obtener_detalle_venta(num_serie)
+
+
+# Agregar a controlador_transaccion_venta.py
+def obtener_transaccion_por_num_serie(num_serie):
+    """
+    Obtiene una transacción de venta por su número de serie
+    """
+    try:
+        sql = '''
+            SELECT 
+                tv.num_serie,
+                tv.tipo_comprobanteid,
+                tv.estado,
+                tv.monto_total,
+                tv.fecha,
+                tv.hora,
+                tv.clienteid,
+                tc.nombre as tipo_comprobante_nombre
+            FROM transaccion_venta tv
+            LEFT JOIN tipo_comprobante tc ON tv.tipo_comprobanteid = tc.id
+            WHERE tv.num_serie = %s
+        '''
+        
+        result = sql_select_fetchone(sql, (num_serie,))
+        return result
+        
+    except Exception as e:
+        print(f"Error al obtener transacción: {e}")
+# Agregar a controlador_cliente.py
+def obtener_cliente_por_id(cliente_id):
+    """
+    Obtiene los datos completos de un cliente por su ID
+    """
+    try:
+        sql = '''
+            SELECT 
+                c.id,
+                c.correo,
+                c.telefono,
+                c.num_documento,
+                c.nombre_siglas,
+                c.apellidos_razon,
+                td.siglas as tipo_documento,
+                tc.nombre as tipo_cliente
+            FROM cliente c
+            LEFT JOIN tipo_documento td ON c.tipo_documentoid = td.id
+            LEFT JOIN tipo_cliente tc ON c.tipo_clienteid = tc.id
+            WHERE c.id = %s
+        '''
+        
+        result = sql_select_fetchone(sql, (cliente_id,))
+        return result
+        
+    except Exception as e:
+        print(f"Error al obtener cliente por ID: {e}")
+        return None
