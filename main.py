@@ -6186,14 +6186,14 @@ def validar_paquete_devolucion_endpoint(tracking):
 
 
 @app.route("/obtener_paquetes_estado_17", methods=["GET"])
-@validar_empleado()
+# @validar_empleado()
 def obtener_paquetes_estado_17():
     """
     Endpoint para obtener paquetes con detalle_estado_id = 17
     """
     try:
         paquetes = controlador_programacion_devolucion.obtener_paquetes_estado_17()
-        
+        print(paquetes)
         return jsonify({
             'success': True,
             'paquetes': paquetes
