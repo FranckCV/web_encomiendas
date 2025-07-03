@@ -5647,13 +5647,16 @@ def ver_guia_remision(tracking):
     else:
         return send_from_directory(f"static/img/guias/",f"guia_{tracking}.pdf")
 
-@app.route("/ver_boleta_venta=<int:num_serie>")
-def ver_boleta_venta(num_serie):
+@app.route("/ver_comprobante_venta=<int:num_serie>")
+def ver_comprobante_venta(num_serie):
     datos = controlador_transaccion_venta.obtener_transaccion_por_num_serie(num_serie)
-    if datos.get('num_serie') is None:
+    if datos.get('tipo_comprobanteid') is None:
         return rdrct_error(redirect(url_for('perfil') ,'No posee boleta disponible'))
     else:
-        return send_from_directory(f"static/comprobantes/ventas/{num_serie}",f"boleta_{num_serie}.pdf")
+        if datos.get("tipo_comprobanteid") == 1:
+            return send_from_directory(f"static/comprobantes/ventas/{num_serie}",f"factura_{num_serie}.pdf")
+        else:
+            return send_from_directory(f"static/comprobantes/ventas/{num_serie}",f"boleta_{num_serie}.pdf")
 
 
 @app.route("/ver_img_qr=<int:tracking>")

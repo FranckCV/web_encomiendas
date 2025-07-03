@@ -222,7 +222,7 @@ Mi perfil
                             <td>{{ compra.metodo_pago or 'No especificado' }}</td>
                             <td><span class="status-badge status-{{ compra.estado_clase }}">{{ compra.estado_pago }}</span></td>
                             <td>
-                                <a href="{{ url_for('ver_boleta_venta', num_serie=compra.num_comprobante) }}" class="btn-action btn-download" style="color: #fff !important;">📄 Descargar</a>
+                                <a href="{{ url_for('ver_comprobante_venta', num_serie=compra.num_comprobante) }}" class="btn-action btn-download" style="color: #fff !important;">📄 Descargar</a>
                             </td>
                         </tr>
                         {% endfor %}
