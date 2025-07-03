@@ -6650,10 +6650,131 @@ def eliminar_ultimo_seguimiento(reclamoid):
 @app.route("/pagar_paquete",defaults={'tracking': None})
 @app.route("/pagar_paquete/<tracking>")
 def pagar_paquete(tracking):
+    estados = controlador_paquete.get_data_pay(tracking)
     
     tipo_comprobante = controlador_tipo_comprobante.get_tipo_comprobante_by_tipo()
     metodo_pago = controlador_metodo_pago.get_options()
-    return render_template('pagar_paquete.html',tracking = tracking ,metodo_pago=metodo_pago,tipo_comprobante=tipo_comprobante)
+    return render_template('pagar_paquete.html',tracking = tracking ,metodo_pago=metodo_pago,tipo_comprobante=tipo_comprobante, estados = estados)
+
+
+@app.route('/verificar_clave', methods=['POST'])
+def verificar_clave():
+
+    try:
+        data = request.get_json()
+        tracking = data.get('tracking')
+        security_code = data.get('security_code')
+        
+        if not tracking or not security_code:
+            return jsonify({
+                'success': False,
+                'message': 'Tracking y clave de seguridad son requeridos'
+            }), 400
+        
+        clave_valida = controlador_paquete.verificar_clave_seguridad(tracking, security_code)
+        
+        if clave_valida:
+            return jsonify({
+                'success': True,
+                'message': 'Clave verificada correctamente'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Clave de seguridad incorrecta'
+            }), 401
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al verificar clave: {str(e)}'
+        }), 500
+
+
+@app.route('/entregar_sucursal', methods=['POST'])
+def entregar_sucursal():
+    try:
+        data = request.get_json()
+        tracking = data.get('tracking')
+        
+        if not tracking:
+            return jsonify({
+                'success': False,
+                'message': 'Código de tracking es requerido'
+            }), 400
+        
+        # Verificar que el paquete esté en estado correcto (C + PE)
+        estados = controlador_paquete.get_data_pay(tracking)
+        print(estados)
+        
+        if not estados or estados['estado_pago'] != 'C' or estados['ultimo_estado'] != 'PE':
+            return jsonify({
+                'success': False,
+                'message': 'El paquete no está en estado válido para entrega en sucursal'
+            }), 400
+        
+        # Actualizar el estado del paquete a entregado
+        resultado = controlador_paquete.actualizar_estado_entrega_sucursal(tracking)
+        print(resultado)
+        
+        if resultado:
+            return jsonify({
+                'success': True,
+                'message': 'Paquete entregado exitosamente en sucursal'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Error al actualizar el estado del paquete'
+            }), 500
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Ocurrió un error: {str(e)}'
+        }), 500
+
+
+
+@app.route('/entregar_destinatario', methods=['POST'])
+def entregar_destinatario():
+
+    try:
+        data = request.get_json()
+        tracking = data.get('tracking')
+        
+        if not tracking:
+            return jsonify({
+                'success': False,
+                'message': 'Código de tracking es requerido'
+            }), 400
+        
+        estados = controlador_paquete.get_data_pay(tracking)
+        print(estados)
+        if not estados or estados['estado_pago'] != 'C' or estados['ultimo_estado'] != 'ED':
+            return jsonify({
+                'success': False,
+                'message': 'El paquete no está en estado válido para entrega al destinatario'
+            }), 400
+        
+        resultado = controlador_paquete.actualizar_estado_entrega_destinatario(tracking)
+        
+        if resultado:
+            return jsonify({
+                'success': True,
+                'message': 'Paquete entregado exitosamente al destinatario'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Error al actualizar el estado del paquete'
+            }), 500
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error al entregar paquete: {str(e)}'
+        }), 500
 
 
 @app.route('/insertar_pago_paquete', methods=['POST'])
@@ -6667,6 +6788,7 @@ def insertar_pago_paquete():
     
     try:
         pago = controlador_metodo_pago_venta.pagar_encomienda(num_serie, tipo_comprobante, metodo_pago, tracking)
+        controlador_paquete.actualizar_estado_entrega_sucursal(tracking)
         return jsonify({
             'success': True,
             'message': 'Pago procesado exitosamente',
