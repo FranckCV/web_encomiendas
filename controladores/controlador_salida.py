@@ -225,7 +225,7 @@ def crear_transaccion_salida(vehiculo, empleados, escalas, paquetes):
                 cursor.execute(sql_escala, (sucursal_id, salida_id))
 
             # 5. Actualizar paquetes
-            sql_paquete = 'UPDATE paquete SET salidaid = %s WHERE tracking = %s'
+            sql_paquete = "UPDATE paquete SET salidaid = %s, ultimo_estado = 'ET' WHERE tracking = %s"
             for paquete in paquetes:
                 cursor.execute(sql_paquete, (salida_id, paquete['tracking']))
 

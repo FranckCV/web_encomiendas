@@ -6742,7 +6742,13 @@ def insertar_pago_paquete():
     
     try:
         pago = controlador_metodo_pago_venta.pagar_encomienda(num_serie, tipo_comprobante, metodo_pago, tracking)
-        controlador_paquete.actualizar_estado_entrega_sucursal(tracking)
+        ultimo_estado = controlador_paquete.obtener_ultimo_estado(tracking)
+        if ultimo_estado == 'PE':
+            controlador_paquete.actualizar_estado_entrega_sucursal(tracking)
+        elif ultimo_estado == 'ED':
+            controlador_paquete.actualizar_estado_entrega_destinatario(tracking)
+            
+        generar_comprobante(tracking,tipo_comprobante)
         return jsonify({
             'success': True,
             'message': 'Pago procesado exitosamente',

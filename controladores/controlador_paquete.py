@@ -77,13 +77,15 @@ def get_table_paquete_detalle(num_serie):
             t.hora,
             t.monto_total,
 
-            -- Condicional para el último estado
+           
+             
             CASE 
                 WHEN p.ultimo_estado = 'PE' THEN 'Pendiente de entrega en sucursal de origen'
                 WHEN p.ultimo_estado = 'EO' THEN 'En sucursal de origen'
+                WHEN p.ultimo_estado = 'RD' THEN 'Entregado al destinatario'
                 WHEN p.salidaid IS NOT NULL AND sl.estado = 'P' THEN 'Listo para salir'
                 WHEN p.salidaid IS NOT NULL AND sl.estado = 'T' THEN 'En tránsito'
-                WHEN p.salidaid IS NOT NULL AND sl.estado = 'C' THEN 'ED'
+                WHEN p.salidaid IS NOT NULL AND sl.estado = 'C' THEN 'En destino'
                 ELSE p.ultimo_estado
             END AS ultimo_estado
         
@@ -158,13 +160,14 @@ def get_table():
             t.hora,
             t.monto_total,
 
-            -- Condicional para el último estado
+            
             CASE 
                 WHEN p.ultimo_estado = 'PE' THEN 'Pendiente de entrega en sucursal de origen'
                 WHEN p.ultimo_estado = 'EO' THEN 'En sucursal de origen'
+                WHEN p.ultimo_estado = 'RD' THEN 'Entregado al destinatario'
                 WHEN p.salidaid IS NOT NULL AND sl.estado = 'P' THEN 'Listo para salir'
                 WHEN p.salidaid IS NOT NULL AND sl.estado = 'T' THEN 'En tránsito'
-                WHEN p.salidaid IS NOT NULL AND sl.estado = 'C' THEN 'ED'
+                WHEN p.salidaid IS NOT NULL AND sl.estado = 'C' THEN 'En destino'
                 ELSE p.ultimo_estado
             END AS ultimo_estado
         
@@ -237,13 +240,14 @@ def get_table_pk_foreign(pk_foreign):
             t.hora,
             t.monto_total,
 
-            -- Condicional para el último estado
+             
             CASE 
                 WHEN p.ultimo_estado = 'PE' THEN 'Pendiente de entrega en sucursal de origen'
                 WHEN p.ultimo_estado = 'EO' THEN 'En sucursal de origen'
+                WHEN p.ultimo_estado = 'RD' THEN 'Entregado al destinatario'
                 WHEN p.salidaid IS NOT NULL AND sl.estado = 'P' THEN 'Listo para salir'
                 WHEN p.salidaid IS NOT NULL AND sl.estado = 'T' THEN 'En tránsito'
-                WHEN p.salidaid IS NOT NULL AND sl.estado = 'C' THEN 'ED'
+                WHEN p.salidaid IS NOT NULL AND sl.estado = 'C' THEN 'En destino'
                 ELSE p.ultimo_estado
             END AS ultimo_estado
         
@@ -551,16 +555,22 @@ def actualizar_estado_entrega_sucursal(tracking):
 def actualizar_estado_entrega_destinatario(tracking):
     sql = '''
         UPDATE paquete 
-        SET ultimo_estado = 'PD' 
+        SET ultimo_estado = 'RD' 
         WHERE tracking = %s
     '''
     try:
-        id = sql_execute_lastrowid(sql, (tracking,))
-        
-        if id > 0: 
-            return True
-        return False
-    
+        sql_execute(sql, (tracking,))  
+
+        return True 
+
     except Exception as e:
         print(f"Error al actualizar estado: {e}")
-        return False
+        return False 
+
+def obtener_ultimo_estado(tracking):
+    sql = '''
+        select ultimo_estado from paquete where tracking = %s
+    '''
+    fila = sql_select_fetchone(sql,(tracking))
+    return fila
+
