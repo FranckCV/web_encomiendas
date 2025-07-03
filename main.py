@@ -6285,6 +6285,7 @@ def eliminar_ultimo_seguimiento(reclamoid):
 @app.route("/pagar_paquete",defaults={'tracking': None})
 @app.route("/pagar_paquete/<tracking>")
 def pagar_paquete(tracking):
+    
     tipo_comprobante = controlador_tipo_comprobante.get_tipo_comprobante_by_tipo()
     metodo_pago = controlador_metodo_pago.get_options()
     return render_template('pagar_paquete.html',tracking = tracking ,metodo_pago=metodo_pago,tipo_comprobante=tipo_comprobante)
