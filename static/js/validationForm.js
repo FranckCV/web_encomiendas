@@ -15,19 +15,15 @@ const tiposValidacion = {
         mensaje: "Solo números"
     },
     alfanumerico: {
-        regex: /^[a-zA-Z0-9]+$/, // sin espacios
-        mensaje: "Solo letras y números"
-    },
-    alfanumerico_espacios: {
-        regex: /^[a-zA-Z0-9\s]+$/,
+        regex: /^[a-zA-Záéíóúñ0-9\s]+$/,
         mensaje: "Solo letras, números y espacios"
     },
     alfanumerico_simbolos: {
-        regex: /^[a-zA-Z0-9\s.,\-_/()]+$/,
+        regex: /^[a-zA-Záéíóúñ0-9\s.,\-_/()]+$/,
         mensaje: "Solo letras, números y algunos símbolos (.,-_/())"
     },
     texto_avanzado: {
-        regex: /^[a-zA-Z0-9\s.,;:!¡¿?()@#&%$'"\-_/]+$/,
+        regex: /^[a-zA-Záéíóúñ0-9\s.,;:!¡¿?()@#&%$'"\-_/]+$/,
         mensaje: "Texto con caracteres inválidos"
     },
     url: {
@@ -110,12 +106,8 @@ function configurarValidacion({ tipo, selector, id }) {
         el.dataset.tipo = tipo;
 
         el.addEventListener("input", () => {
-            const tipos = tipo.split(",");
-            let valido = true;
-            for (let t of tipos) {
-                const matchId = t.startsWith("match:") ? t.split(":")[1] : null;
-                if (!validarCampo(el, t, matchId)) valido = false;
-            }
+            const tipoData = el.dataset.tipo;
+            validarCampo(el, tipoData);
         });
 
         let msgError = el.parentElement.querySelector(".mensaje-error");
@@ -128,114 +120,79 @@ function configurarValidacion({ tipo, selector, id }) {
 }
 
 
+
 function validarCampo(el, tipo, matchId = null) {
     const msgError = el.parentElement.querySelector(".mensaje-error");
+    const tipos = tipo.split(",");
+    const errores = [];
 
-    // Checkbox
-    if (tipo === "checkbox") {
-        if (!el.checked) {
-            el.classList.add("input-error");
-            el.classList.remove("input-ok");
-            msgError.textContent = tiposValidacion[tipo].mensaje;
-            msgError.style.display = "block";
-            return false;
-        } else {
-            el.classList.remove("input-error");
-            el.classList.add("input-ok");
-            msgError.textContent = "";
-            msgError.style.display = "none";
-            return true;
+    for (let t of tipos) {
+        const matchIdLocal = t.startsWith("match:") ? t.split(":")[1] : null;
+
+        // Checkbox
+        if (t === "checkbox") {
+            if (!el.checked) {
+                errores.push(tiposValidacion[t].mensaje);
+            }
+            continue;
+        }
+
+        // Select
+        if (t === "select") {
+            const val = el.value;
+            const isInvalid = val === "" || val === "-1" || el.options[el.selectedIndex]?.disabled;
+            if (isInvalid) {
+                errores.push(tiposValidacion[t].mensaje);
+            }
+            continue;
+        }
+
+        // match: campo igual a otro
+        if (t.startsWith("match:")) {
+            const otroCampo = document.querySelector(`#${matchIdLocal}`);
+            if (!otroCampo || el.value !== otroCampo.value) {
+                errores.push(tiposValidacion["match"].mensaje);
+            }
+            continue;
+        }
+
+        // min:X
+        if (t.startsWith("min:")) {
+            const min = parseInt(t.split(":")[1]);
+            if (el.value.length < min) {
+                errores.push(`Mínimo ${min} caracteres`);
+            }
+            continue;
+        }
+
+        // max:X
+        if (t.startsWith("max:")) {
+            const max = parseInt(t.split(":")[1]);
+            if (el.value.length > max) {
+                errores.push(`Máximo ${max} caracteres`);
+            }
+            continue;
+        }
+
+        // Validación normal con regex
+        const val = el.value.trim();
+        const tipoBase = t.includes(":") ? t.split(":")[0] : t;
+        const { regex, mensaje } = tiposValidacion[tipoBase] || {};
+
+        if (!regex || val === "" || !regex.test(val)) {
+            errores.push(mensaje || "Campo inválido");
         }
     }
 
-    // Select
-    if (tipo === "select") {
-        const val = el.value;
-        const isInvalid = val === "" || val === "-1" || el.options[el.selectedIndex]?.disabled;
-        if (isInvalid) {
-            el.classList.add("input-error");
-            el.classList.remove("input-ok");
-            msgError.textContent = tiposValidacion[tipo].mensaje;
-            msgError.style.display = "block";
-            return false;
-        } else {
-            el.classList.remove("input-error");
-            el.classList.add("input-ok");
-            msgError.textContent = "";
-            msgError.style.display = "none";
-            return true;
-        }
-    }
-
-    // match: campo igual a otro
-    if (tipo.startsWith("match:")) {
-        const otroCampo = document.querySelector(`#${matchId}`);
-        const mismoValor = otroCampo && el.value === otroCampo.value;
-        if (!mismoValor) {
-            el.classList.add("input-error");
-            el.classList.remove("input-ok");
-            msgError.textContent = tiposValidacion["match"].mensaje;
-            msgError.style.display = "block";
-            return false;
-        } else {
-            el.classList.remove("input-error");
-            el.classList.add("input-ok");
-            msgError.textContent = "";
-            msgError.style.display = "none";
-            return true;
-        }
-    }
-
-    // Validaciones min / max dinámicas
-    if (tipo.startsWith("min:")) {
-        const min = parseInt(tipo.split(":")[1]);
-        if (el.value.length < min) {
-            el.classList.add("input-error");
-            el.classList.remove("input-ok");
-            msgError.textContent = `Mínimo ${min} caracteres`;
-            msgError.style.display = "block";
-            return false;
-        } else {
-            el.classList.remove("input-error");
-            el.classList.add("input-ok");
-            msgError.textContent = "";
-            msgError.style.display = "none";
-            return true;
-        }
-    }
-
-    if (tipo.startsWith("max:")) {
-        const max = parseInt(tipo.split(":")[1]);
-        if (el.value.length > max) {
-            el.classList.add("input-error");
-            el.classList.remove("input-ok");
-            msgError.textContent = `Máximo ${max} caracteres`;
-            msgError.style.display = "block";
-            return false;
-        } else {
-            el.classList.remove("input-error");
-            el.classList.add("input-ok");
-            msgError.textContent = "";
-            msgError.style.display = "none";
-            return true;
-        }
-    }
-
-
-    // Validación normal con regex
-    const val = el.value.trim();
-    const tipoBase = tipo.includes(":") ? tipo.split(":")[0] : tipo;
-    const { regex, mensaje } = tiposValidacion[tipoBase] || {};
-
-    if (!regex || val === "" || !regex.test(val)) {
+    if (errores.length > 0) {
         el.classList.add("input-error");
-            el.classList.remove("input-ok");
-        msgError.textContent = mensaje || "Campo inválido";
+        el.classList.remove("input-ok");
+        msgError.textContent = errores.map(e => `${e}`).join(" / ");
         msgError.style.display = "block";
         return false;
     } else {
         el.classList.remove("input-error");
-            el.classList.add("input-ok");
+        el.classList.add("input-ok");
         msgError.textContent = "";
         msgError.style.display = "none";
         return true;

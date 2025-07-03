@@ -103,7 +103,7 @@
                 id="{{campo[0]}}" 
                 name="{{campo[0]}}"
                 data-select="{{campo[0]}}"
-                {% if campo[4] %}required{% endif %} 
+                {% if campo[4] %}required data-tipo="select" {% endif %} 
                 {% if modo_modal != 'insert' and fila[campo[0]] is not none %} data-select-value="{{fila[campo[0]]}}" {% endif %}
                 {% if modo_modal == 'consult' or campo[5] == False %} disabled {% endif %}
                 >
@@ -190,7 +190,7 @@
           </div>
           {% endif %}
 
-        {% elif campo[3] == 'decimal_6' %}
+        {% elif campo[3] == 'decimal6' %}
           <input id="{{campo[0]}}" name="{{campo[0]}}"
             type="number" placeholder="{{campo[2]}}"
             step="0.000001"
@@ -199,7 +199,7 @@
             data-tipo="decimal6"
             value="{% if fila and fila[campo[0]] != None %}{{fila[campo[0]]}}{% endif %}">
 
-        {% elif campo[3] == 'decimal_2' %}
+        {% elif campo[3] == 'decimal2' %}
           <input id="{{campo[0]}}" name="{{campo[0]}}"
             type="number" placeholder="{{campo[2]}}"
             step="0.01"
@@ -255,7 +255,7 @@
 
     {% endif %}
     {% if modo_modal in ['insert', 'update', 'consult'] %}
-    <div class="row">
+    <div class="row" style="font-size: 90%;">
       <p>Todos los campos con asterisco <span style="color: red;">*</span> deben ser llenados obligatoriamente.</p>
     </div>
     {% endif %}

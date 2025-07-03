@@ -5,6 +5,48 @@
 <link rel="stylesheet" href="/static/css/metodo_pago.css">
 <!-- Font Awesome para iconos -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group>label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .radio-options {
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+    }
+
+    .radio-options label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        /* font-size: 1rem; */
+        cursor: pointer;
+        padding: 0.3rem 0.6rem;
+        border-radius: 5px;
+        transition: background-color 0.2s;
+    }
+
+    .radio-options label:hover {
+        background-color: #f0f0f0;
+    }
+
+    input[type="radio"] {
+        accent-color: #007bff;
+        width: 16px;
+        height: 16px;
+    }
+
+    .toast-notification {
+        z-index: 99999 !important;
+    }
+</style>
 {% endblock %}
 
 {% block titulo %}
@@ -14,6 +56,22 @@ Método de Pago - Caja Shalom
 {% block contenido %}
 <div class="pago-container">
     <div class="pago-content">
+        <div class="form-group">
+            <div for="tipo-comprobante" class="pago-header">
+                <h1>Tipo de comprobante</h1>
+            </div>
+            <div class="radio-options">
+                <label for="comprobante-boleta">
+                    <input type="radio" name="tipo-comprobante" id="comprobante-boleta" value="2" checked>
+                    Boleta
+                </label>
+                <label for="comprobante-factura">
+                    <input type="radio" name="tipo-comprobante" id="comprobante-factura" value="1">
+                    Factura
+                </label>
+            </div>
+        </div>
+
         <div class="pago-header">
             <h1>Elige tu medio de pago</h1>
         </div>
@@ -38,7 +96,7 @@ Método de Pago - Caja Shalom
             </div>
 
             <!-- Opción de pago por banco -->
-            <div class="pago-option">
+            <!-- <div class="pago-option">
                 <label class="option-container">
                     <input type="radio" name="metodo-pago" id="banco">
                     <div class="option-content">
@@ -48,7 +106,24 @@ Método de Pago - Caja Shalom
                         </div>
                     </div>
                 </label>
+            </div> -->
+
+            <!-- Opción de pago con Yape -->
+            <div class="pago-option">
+                <label class="option-container">
+                    <input type="radio" name="metodo-pago" id="yape">
+                    <div class="option-content">
+                        <span class="option-text">Pago con Yape (código QR o número).</span>
+                        <div class="payment-icons">
+                            <img src="/static/img/yape.png" alt="Yape">
+                        </div>
+                        <div class="payment-icon">
+                            <i class="fa-brands fa-y-combinator"></i>
+                        </div>
+                    </div>
+                </label>
             </div>
+
         </div>
 
         <!-- Formulario de tarjeta (visible por defecto) -->
@@ -74,7 +149,7 @@ Método de Pago - Caja Shalom
         </div>
 
         <!-- Formulario de banco (oculto por defecto) -->
-        <div id="banco-form" class="payment-form">
+        <!-- <div id="banco-form" class="payment-form">
             <div class="bank-info">
                 <h3>Información de la Cuenta Bancaria</h3>
                 <div class="bank-detail">
@@ -89,8 +164,17 @@ Método de Pago - Caja Shalom
                     <p>3. En un plazo máximo de 24 horas validaremos tu pago.</p>
                 </div>
             </div>
+        </div> -->
+        <!-- Formulario de Yape (instrucciones) -->
+        <div id="yape-form" class="payment-form">
+            <div class="form-group">
+                <label for="yape-number">Número de teléfono Yape:</label>
+                <input type="text" id="yape-number" placeholder="987654321" maxlength="9" />
+            </div>
         </div>
-        
+
+
+
         <!-- Se eliminó el botón de pago de aquí ya que se movió al resumen -->
     </div>
 
@@ -122,7 +206,7 @@ Método de Pago - Caja Shalom
                 <button id="validar-cupon">VALIDAR</button>
             </div> -->
         </div>
-        
+
         <!-- Botón de pago colocado debajo del resumen -->
         <div class="pago-button-container">
             <button id="btn-pagar" class="btn-pagar">

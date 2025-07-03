@@ -189,6 +189,7 @@ def getDataComprobante():
         select e.nombre,e.ruc,e.nro_telefono,e.correo,e.igv,s.direccion,u.departamento,u.distrito,u.provincia from empresa e 
         inner join sucursal s on s.id = e.id_sucursal
         inner join ubigeo u on u.codigo=s.ubigeocodigo
+        where e.actual = 1
             '''
     fila = sql_select_fetchone(sql)
     return fila
