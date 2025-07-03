@@ -245,7 +245,7 @@ Mi perfil
                             <th>N° Comprobante</th>
                             <th>Fecha Orden</th>
                             <th>Paquetes Registrados</th>
-                            <th>Estado General</th>
+                            <!-- <th>Estado General</th> -->
                             <th>Total Paquetes</th>
                             <th>Monto Total</th>
                             <!-- <th>Acciones</th> -->
@@ -263,7 +263,7 @@ Mi perfil
                                     {% endfor %}
                                 </div>
                             </td>
-                            <td><span class="status-badge status-{{ orden.estado_clase }}">{{ orden.estado_general }}</span></td>
+                            <!-- <td><span class="status-badge status-{{ orden.estado_clase }}">{{ orden.estado_general }}</span></td> -->
                             <td>{{ orden.total_paquetes or 0 }}</td>
                             <td>S/ {{ "%.2f"|format(orden.monto_total) if orden.monto_total else '0.00' }}</td>
                             <!-- <td>

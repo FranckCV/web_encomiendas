@@ -2984,7 +2984,33 @@ function guardarSalida() {
 .then(response => response.json())
 .then(data => {
     if (data.salida_id) {
-        showAlert('mensajeGuardado', `✅ Salida registrada correctamente. ID: ${data.salida_id}`, 'success');
+        // showAlert('mensajeGuardado', `✅ Salida registrada correctamente. ID: ${data.salida_id}`, 'success');
+         let segundosRestantes = 5;
+            
+            const actualizarMensaje = () => {
+                showAlert('mensajeGuardado', 
+                    `✅ <strong>Salida registrada correctamente</strong><br>
+                    📋 ID de salida: <strong>${data.salida_id}</strong><br>
+                    <div style="background: #e8f5e8; padding: 10px; border-radius: 8px; margin-top: 10px;">
+                        <i class="fa-solid fa-clock"></i> 
+                        Redirigiendo al listado de salidas en <strong>${segundosRestantes}</strong> segundo${segundosRestantes !== 1 ? 's' : ''}...
+                    </div>`, 
+                    'success');
+                
+                segundosRestantes--;
+                
+                if (segundosRestantes >= 0) {
+                    setTimeout(actualizarMensaje, 1000);
+                } else {
+                    window.location.href = '/transaccion=salida';
+                }
+            };
+            
+            actualizarMensaje();
+            
+            // Cambiar el botón
+            btnGuardar.innerHTML = '<i class="fa-solid fa-check"></i> Salida guardada - Redirigiendo...';
+            
     } else {
         showAlert('mensajeGuardado', `❌ Error: ${data.mensaje || 'Error desconocido'}`, 'error');
     }
