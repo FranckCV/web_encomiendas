@@ -5042,7 +5042,7 @@ def crud_generico(tabla):
             )
 
 
-
+ 
 @app.route("/transaccion=<tabla>",defaults={'pk_foreign': None})
 @app.route("/transaccion=<tabla>/<pk_foreign>")
 @validar_empleado() 
