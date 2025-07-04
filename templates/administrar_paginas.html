@@ -562,6 +562,16 @@ Permisos para {{info_rol.get('nombre')}}
                         <i class="{{ page.get('icono') or ICON_PAGE_NOICON }}"></i>
                         <p> {{ page.get('titulo') }} </p>
                         {% endif %}
+
+                        <!-- 
+                        {% set page_url = url_for('crud_generico',tabla = page.get('key')) if page.tipo_paginaid == 1 else '' %}
+                        {% set page_url = url_for('transaccion',tabla = page.get('key')) if page.tipo_paginaid == 3 else '' %}
+                        {% set page_url = url_for('reporte',report_name = page.get('key')) if page.tipo_paginaid == 4 else '' %}
+                        <a href="{{ page_url }}" class="btn_opt">
+                            <button>
+                                <i class="fa-solid fa-link"></i>
+                            </button>
+                        </a> -->
                     </div>
 
                     {% if rolid %}
@@ -666,7 +676,7 @@ Permisos para {{info_rol.get('nombre')}}
 
                             {% endif %}                           
 
-
+                            
 
                             {% if opts_crud.crud_consult %}
                             <div class="opciones_fila">
