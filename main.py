@@ -1318,7 +1318,15 @@ REPORTES = {
             ['fecha', 'Fecha', None, 'interval_date' ],
         ] ,
     },
-    
+    "envios_sucursales_personal": {
+        "active" : True ,
+        'icon_page' : 'fa-solid fa-box' ,
+        "titulo": "Listado de paquetes por estado actual y fecha",
+        "table" : controlador_paquete.get_report_estado_fecha(),
+        "filters": [
+            ['fecha', 'Fecha', None, 'interval_date' ],
+        ] ,
+    },
     # Logistica
 
     # Personal
@@ -1370,7 +1378,6 @@ REPORTES = {
         "filters": [
         ],
     },
-
     "lista_unidades": {
         "active" : True ,
         'icon_page' : 'fa-solid fa-truck' ,
@@ -1379,7 +1386,6 @@ REPORTES = {
         "filters": [
             ['modeloid', 'Modelo', lambda: controlador_modelo.get_options() ],
         ] ,
-        
     },
     "reporte_uso_unidades": {
         "active" : True,
@@ -1395,7 +1401,6 @@ REPORTES = {
         "table": reporte_Viajes_por_Unidad.get_reporte_viajes_por_unidad(),  # 👈 FUNCIÓN EJECUTADA
         "filters": []
     },
-
     "encomiendas_listar": {
         "active": True,
         "icon_page": "fa-solid fa-boxes-packing",
@@ -1503,25 +1508,26 @@ TRANSACCIONES = {
         "icon_page": "fa-solid fa-boxes",
         "filters": [], 
         "fields_form": [
-        #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
-            ['tracking',                       'Tracking',             'Tracking',             'text',   False,  True,   None , 'numeros'],
-            ['valor',                          'Valor',                'Valor',                'decimal2',   False,  True,   None , 'decimal2'],
-            ['peso',                           'Peso',                 'Peso',                 'decimal2',   False,  True,   None , 'decimal2'],
-            ['estado_pago',                    'Pago',                 'Pago',                 'text',   False,  True,   None , ''],
-            ['nombres_contacto_destinatario',  'Nombre destinatario',  'Nombre destinatario',  'text',   False,  True,   None , 'alfanumerico_simbolos'],
-            ['apellidos_razon_destinatario',   'Apellido/Razón',       'Apellido/Razón',       'text',   False,  True,   None , 'alfanumerico_simbolos'],
-            ['num_documento_destinatario',     'Doc. Identidad',       'Doc. Identidadaa',     'text',   False,  True,   None , ''],
-            ['tipo_documento',                 'Tipo Documento',       'Tipo Documento',       'text',   False,  True,   None , ''],
-            ['tipo_empaque',                   'Empaque',              'Empaque',              'text',   False,  True,   None , ''],
-            ['contenido_paquete',              'Contenido',            'Contenido',            'text',   False,  True,   None , ''],
-            ['tipo_recepcion',                 'Recepción',            'Recepción',            'text',   False,  True,   None , ''],
-            ['modalidad_pago',                 'Pago modalidad',       'Pago modalidad',       'text',   False,  True,   None , ''],
-            ['direccion_destino',              'Dirección destino',    'Dirección destino',    'text',   False,  True,   None , ''],
-            ['localidad',                      'Ubigeo destino',       'Ubigeo destino',       'text',   False,  True,   None , ''],
-            ['num_serie',                      'N° Serie',             'N° Serie',             'text',   False,  True,   None , ''],
-            ['fecha',                          'Fecha envío',          'Fecha envío',          'text',   False,  True,   None , ''],
-            ['hora',                           'Hora envío',           'Hora envío',           'text',   False,  True,   None , ''],
-            ['monto_total',                    'Total S/.',            'Total S/.',            'decimal2',   False,  True,   None , 'decimal2'],
+        #   ID/NAME                            LABEL                   PLACEHOLDER             TYPE          REQUIRED  ABLE    DATOS
+            ['tracking',                       'Tracking',             'Tracking',             'text',       False,    True,   None , 'numeros'],
+            ['clave',                          'Clave',                'Clave',                'text',       False,    True,   None , 'numeros,max:4'],
+            ['valor',                          'Valor',                'Valor',                'decimal2',   False,    True,   None , 'decimal2'],
+            ['peso',                           'Peso',                 'Peso',                 'decimal2',   False,    True,   None , 'decimal2'],
+            ['estado_pago',                    'Pago',                 'Pago',                 'text',       False,    True,   None , ''],
+            ['nombres_contacto_destinatario',  'Nombre destinatario',  'Nombre destinatario',  'text',       False,    True,   None , 'alfanumerico_simbolos'],
+            ['apellidos_razon_destinatario',   'Apellido/Razón',       'Apellido/Razón',       'text',       False,    True,   None , 'alfanumerico_simbolos'],
+            ['num_documento_destinatario',     'Doc. Identidad',       'Doc. Identidad',       'text',       False,    True,   None , ''],
+            ['tipo_documento',                 'Tipo Documento',       'Tipo Documento',       'text',       False,    True,   None , ''],
+            ['tipo_empaque',                   'Tipo de empaque',      'Tipo de empaque',      'text',       False,    True,   None , ''],
+            ['contenido_paquete',              'Contenido',            'Contenido',            'text',       False,    True,   None , ''],
+            ['tipo_recepcion',                 'Recepción',            'Recepción',            'text',       False,    True,   None , ''],
+            ['modalidad_pago',                 'Pago modalidad',       'Pago modalidad',       'text',       False,    True,   None , ''],
+            ['direccion_destino',              'Dirección destino',    'Dirección destino',    'text',       False,    True,   None , ''],
+            ['localidad',                      'Ubigeo destino',       'Ubigeo destino',       'text',       False,    True,   None , ''],
+            ['num_serie',                      'N° Serie',             'N° Serie',             'text',       False,    True,   None , ''],
+            ['fecha',                          'Fecha envío',          'Fecha envío',          'text',       False,    True,   None , ''],
+            ['hora',                           'Hora envío',           'Hora envío',           'text',       False,    True,   None , ''],
+            ['monto_total',                    'Total S/.',            'Total S/.',            'decimal2',   False,    True,   None , 'decimal2'],
         ],
         "crud_forms": {
             "crud_list": True,

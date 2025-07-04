@@ -134,33 +134,38 @@ def get_table_paquete_detalle(num_serie):
 
 def get_table():
     sql = '''
-        
-         SELECT 
+        SELECT 
             p.tracking,
+            p.clave ,
             p.valor,
             p.peso,
+            p.qr_url,
+            p.alto ,
+            p.cantidad_folios ,
+            p.estado_pago ,
             CASE 
-                    WHEN p.estado_pago = 'P' THEN 'Pendiente'
-                    WHEN p.estado_pago = 'C' THEN 'Completado'
-                    ELSE p.estado_pago
-                END AS estado_pago,            
-                p.qr_url,
+                WHEN p.estado_pago = 'P' THEN 'Pendiente'
+                WHEN p.estado_pago = 'C' THEN 'Completado'
+                ELSE p.estado_pago
+            END AS estado_pago_nom ,
+            p.largo ,
+            p.ancho ,
+            p.precio_ruta ,
+            p.descripcion ,           
             p.nombres_contacto_destinatario,
             p.apellidos_razon_destinatario,
+            p.direccion_destinatario ,
+            p.telefono_destinatario ,
             p.num_documento_destinatario,
-            td.nombre AS tipo_documento,
-            te.nombre AS tipo_empaque,
-            cp.nombre AS contenido_paquete,
-            tr.nombre AS tipo_recepcion,
-            mp.nombre AS modalidad_pago,
-            s.direccion AS direccion_destino,
-            CONCAT(u.departamento, '/', u.provincia, '/', u.distrito) AS localidad,
-            t.num_serie,
-            t.fecha,
-            t.hora,
-            t.monto_total,
-
-            
+            p.sucursal_destino_id ,
+            p.tipo_documento_destinatario_id ,
+            p.tipo_empaqueid ,
+            p.contenido_paqueteid,
+            p.tipo_recepcionid ,
+            p.salidaid ,
+            p.transaccion_encomienda_num_serie ,
+            p.modalidad_pagoid ,
+            p.ultimo_estado  ,
             CASE 
                 WHEN p.ultimo_estado = 'PE' THEN 'Pendiente de entrega en sucursal de origen'
                 WHEN p.ultimo_estado = 'EO' THEN 'En sucursal de origen'
@@ -169,41 +174,25 @@ def get_table():
                 WHEN p.salidaid IS NOT NULL AND sl.estado = 'T' THEN 'En tránsito'
                 WHEN p.salidaid IS NOT NULL AND sl.estado = 'C' THEN 'En destino'
                 ELSE p.ultimo_estado
-            END AS ultimo_estado
-        
+            END AS ultimo_estado_nom      
         FROM paquete p
-        LEFT JOIN tipo_documento td ON td.id = p.tipo_documento_destinatario_id
-        LEFT JOIN tipo_empaque te ON te.id = p.tipo_empaqueid
-        LEFT JOIN contenido_paquete cp ON cp.id = p.contenido_paqueteid
-        LEFT JOIN tipo_recepcion tr ON tr.id = p.tipo_recepcionid
-        LEFT JOIN modalidad_pago mp ON mp.id = p.modalidad_pagoid
-        LEFT JOIN sucursal s ON s.id = p.sucursal_destino_id
-        LEFT JOIN ubigeo u ON u.codigo = s.ubigeocodigo
-        LEFT JOIN transaccion_encomienda t ON t.num_serie = p.transaccion_encomienda_num_serie
-        LEFT JOIN salida sl ON sl.id = p.salidaid 
-
+        LEFT JOIN salida sl ON sl.id = p.salidaid
     '''
 
     columnas = {
         'tracking': ['Tracking', 1],
-        'valor': ['Valor S/.', 1],
+        'transaccion_encomienda_num_serie': ['N° Serie Encomienda', 1],
+        'valor': ['Valor (S/.)', 1],
         'peso': ['Peso (kg)', 1],
-        'estado_pago': ['Pago', 1],
-        'ultimo_estado':['Ultimo estado',3.5],
-        'nombres_contacto_destinatario': ['Nombre destinatario', 2],
-        'apellidos_razon_destinatario': ['Apellido/Razón', 2],
-        'num_documento_destinatario': ['Doc. Identidad', 1.2],
-        'tipo_documento': ['Tipo Doc.', 1],
-        'tipo_empaque': ['Empaque', 1],
-        'contenido_paquete': ['Contenido', 1.5],
-        'tipo_recepcion': ['Recepción', 1.3],
-        'modalidad_pago': ['Pago modalidad', 1.3],
-        # 'direccion_destino': ['Dirección destino', 2.5],
-        'localidad': ['Ubigeo destino', 2],
-        'num_serie': ['N° Serie', 1],
-        'fecha': ['Fecha envío', 1],
-        'hora': ['Hora envío', 1],
-        'monto_total': ['Total S/.', 1.2],
+        'ultimo_estado_nom': ['Último estado', 1],
+        'estado_pago_nom': ['Estado de pago', 3],
+        'contenido_paqueteid': ['Contenido de paquete', 1],
+        'apellidos_razon_destinatario': ['Dest. Apellidos / Razon Social', 1],
+        'nombres_contacto_destinatario': ['Dest. Nombres', 1],
+        'sucursal_destino_id': ['Sucursal de destino', 1],
+        'precio_ruta': ['Precio de ruta', 1],
+        'salidaid': ['Salida', 1],
+        'tipo_recepcionid': ['Tipo de recepción', 1],
     }
 
     filas = sql_select_fetchall(sql)

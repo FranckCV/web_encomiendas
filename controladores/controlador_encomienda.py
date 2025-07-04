@@ -336,7 +336,6 @@ SELECT
     return fila
 
 
-
 def obtener_items_por_num_serie(num_serie):
     transaccion = sql_select_fetchone("""
         SELECT masivo, id_sucursal_origen
@@ -400,9 +399,6 @@ def obtener_items_por_num_serie(num_serie):
     return items, masivo
 
 
-
-
-
 def calcular_resumen_venta(monto_total, igv):
     monto_total = Decimal(monto_total)
     igv = Decimal(igv)
@@ -421,7 +417,6 @@ def calcular_resumen_venta(monto_total, igv):
         'total': monto_total,
         'importe_letras': importe_letras
     }
-
 
 
 def insert_row(
@@ -477,13 +472,13 @@ def get_select_recojo_casa():
 def get_recojo_casa():
     sql = '''
         select
-    num_serie,
-    direccion_recojo,
-    concat(c.nombre_siglas,' ',c.apellidos_razon),
-    c.telefono
-    from transaccion_encomienda te 
-    inner join cliente c on c.id = te.clienteid
-    where te.recojo_casa != 0
+            num_serie,
+            direccion_recojo,
+            concat(c.nombre_siglas,' ',c.apellidos_razon),
+            c.telefono
+        from transaccion_encomienda te 
+        inner join cliente c on c.id = te.clienteid
+        where te.recojo_casa != 0
     '''
     fila = sql_select_fetchall(sql)
     return fila
