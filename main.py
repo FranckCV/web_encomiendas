@@ -5764,7 +5764,7 @@ def actualizar_estado_salida():
 
         controlador_salida.cambiar_estado_salida_web(id, estado)
         
-        
+    
         
         # Usar flash para mostrar mensaje de éxito
         flash('Estado de salida actualizado correctamente.', 'success')
@@ -6879,6 +6879,7 @@ def entregar_sucursal():
         
         # Actualizar el estado del paquete a entregado
         resultado = controlador_paquete.actualizar_estado_entrega_sucursal(tracking, tipo_comprobanteid)
+        
         print(resultado)
         
         if resultado:

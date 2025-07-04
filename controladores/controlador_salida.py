@@ -226,20 +226,71 @@ def crear_transaccion_salida(vehiculo, empleados, escalas, paquetes):
         return salida_id
 
 
+
 def cambiar_estado_salida_web(id, estado):
+
     # Actualizar el estado de la salida
-    sql = '''
+    sql_update_salida = '''
         UPDATE salida 
         SET estado = %s 
         WHERE id = %s
     '''
-    sql_execute(sql, (estado, id))
+    sql_execute(sql_update_salida, (estado, id))
+    print("Estado de salida actualizado correctamente.")
 
-    # Si el estado de la salida es 'C', actualizar todos los paquetes relacionados
-    if estado == 'C':
-        sql_update = '''
-            UPDATE paquete 
-            SET ultimo_estado = 'ED' 
-            WHERE salidaid = %s
+    try:
+        # Obtener todos los trackings relacionados con la salida
+        sql = '''
+            SELECT tracking FROM paquete WHERE salidaid = %s
         '''
-        sql_execute(sql_update, (id,))
+        trackings = sql_select_fetchall(sql, (id,))
+        print("Trackings encontrados:", trackings)
+
+        if estado == 'T':
+            estado_maximo = 9
+        elif estado == 'C':
+            estado_maximo = 13
+        else:
+            print("Estado no válido")
+            return
+
+        for row in trackings:
+            tracking = row['tracking']
+            print(f"Procesando tracking: {tracking}")
+
+            # Obtener el último estado registrado
+            sql_ultimo = '''
+                SELECT MAX(detalle_estadoid) as ultimo_estado 
+                FROM seguimiento 
+                WHERE paquetetracking = %s
+            '''
+            result = sql_select_fetchone(sql_ultimo, (tracking,))
+            print(f"Resultado del último estado para {tracking}: {result}")
+
+            if result and result['ultimo_estado']:
+                ultimo_estado = result['ultimo_estado']
+            else:
+                ultimo_estado = 0  # ← cambia aquí: si no hay ninguno, empieza desde 1
+
+            print(f"Último estado registrado: {ultimo_estado}")
+
+            # Insertar los estados faltantes
+            for estado_id in range(ultimo_estado + 1, estado_maximo + 1):
+                sql_insert = '''
+                    INSERT INTO seguimiento (paquetetracking, detalle_estadoid, tipo_comprobanteid, fecha, hora)
+                    VALUES (%s, %s, NULL, NOW(), NOW())
+                '''
+                print(f"Insertando estado {estado_id} para tracking {tracking}")
+                sql_execute(sql_insert, (tracking, estado_id))
+
+        if estado == 'C':
+            sql_update_paquete = '''
+                UPDATE paquete 
+                SET ultimo_estado = 'ED' 
+                WHERE salidaid = %s
+            '''
+            sql_execute(sql_update_paquete, (id,))
+            print("Paquete actualizado a 'ED'.")
+
+    except Exception as e:
+        print("Error al cambiar el estado de la salida:", repr(e))
