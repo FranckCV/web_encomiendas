@@ -1561,7 +1561,7 @@ TRANSACCIONES = {
         "fields_form": [
         #   ID/NAME                        LABEL                       PLACEHOLDER           TYPE       REQUIRED  ABLE   DATOS
             ['detalle_estadoid',  'Detalle de estado', 'Detalle de estado', 'select', True ,True, [lambda: controlador_estado_reclamo.get_detalle() , 'nombre_det' ] ],
-            ['tipo_comprobante',  'Tipo de comprobante', 'Tipo de comprobante', 'select', True ,True, [lambda: controlador_tipo_comprobante.get_options() , 'tip_comp' ] ],
+            ['tipo_comprobante',  'Tipo de comprobante', 'Tipo de comprobante', 'select', False ,True, [lambda: controlador_tipo_comprobante.get_options() , 'tip_comp' ] ],
         ],
         "crud_forms": {
             "crud_list": True,
@@ -3788,18 +3788,20 @@ def registrar_envios_masivos():
 # }
 
 
+
+
 def generar_qr_paquetes(trackings):
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
     print(ip_address)
     for tracking in trackings:
-        qr_data = f"http://192.168.100.15:8000/insertar_estado?tracking={tracking}"
+        qr_data = f"http://{ip_address}:8000/insertar_estado?tracking={tracking}"
 
         img = qrcode.make(qr_data)
 
         # 3) Crear carpeta del paquete
         carpeta = os.path.join(
-            current_app.static_folder,
+            'static',
             'comprobantes',
             str(tracking)
         )
@@ -3815,6 +3817,8 @@ def generar_qr_paquetes(trackings):
             "UPDATE paquete SET qr_url = %s WHERE tracking = %s",
             (qr_rel_path, tracking)
         )
+
+# generar_qr_paquetes([179])
 
 @app.route('/generar_boleta', methods=['POST'])
 def generar_boleta_post():
@@ -5759,10 +5763,14 @@ def actualizar_estado_salida():
     try:
         # Obtener el id y el estado del formulario
         id = request.form.get('salida_id')
+        
         estado = request.form.get('estado')
         
-        # Llamar al controlador para actualizar el estado
+        
+
         controlador_salida.cambiar_estado_salida_web(id, estado)
+        
+    
         
         # Usar flash para mostrar mensaje de éxito
         flash('Estado de salida actualizado correctamente.', 'success')
@@ -5795,7 +5803,7 @@ def salida_informacion():
 from controladores import controlador_editar_salida as controlador_editar_salida
 
 @app.route('/editar_salida_informacion/<int:salida_id>')
-@validar_empleado()
+# @validar_empleado()
 def editar_salida_informacion(salida_id):
     # try:
         # Obtener datos de la salida existente
@@ -5805,9 +5813,9 @@ def editar_salida_informacion(salida_id):
             flash('Salida no encontrada', 'error')
             return redirect(url_for('salida_informacion'))  # Redirigir a lista de salidas
         
-        # Obtener datos base (igual que en crear salida)
+        # Obtener datos base (para edición necesitamos incluir el vehículo actual)
         sucursal_origen = controlador_sucursal.sucursales_origen()
-        unidades = controlador_unidad.get_capacidad_unidad()
+        unidades = controlador_editar_salida.obtener_vehiculos_para_edicion(salida_id)
         empleados = controlador_empleado.get_driver_employee()
         agencias = controlador_sucursal.get_agencias_data()
         paquetes = controlador_paquete.listar_paquetes_por_sucursal_escalas()
@@ -6189,14 +6197,14 @@ def validar_paquete_devolucion_endpoint(tracking):
 
 
 @app.route("/obtener_paquetes_estado_17", methods=["GET"])
-@validar_empleado()
+# @validar_empleado()
 def obtener_paquetes_estado_17():
     """
     Endpoint para obtener paquetes con detalle_estado_id = 17
     """
     try:
         paquetes = controlador_programacion_devolucion.obtener_paquetes_estado_17()
-        
+        print(paquetes)
         return jsonify({
             'success': True,
             'paquetes': paquetes
@@ -6299,7 +6307,7 @@ def seguimiento_reclamo_directo(reclamo_id):
 # ========== ENDPOINTS PARA GESTIÓN ADMINISTRATIVA DE RECLAMOS ==========
 
 @app.route("/responder_reclamos", methods=["GET"])
-@validar_empleado()
+# @validar_empleado()
 def vista_responder_reclamos():
     """
     Vista principal para que los administradores respondan reclamos
@@ -6356,7 +6364,7 @@ def vista_responder_reclamos():
                              selected_option_crud=20)
 
 @app.route("/procesar_respuesta_reclamo", methods=["POST"])
-@validar_empleado()
+# @validar_empleado()
 def procesar_respuesta_reclamo_admin():
     """
     Procesa la respuesta enviada por el administrador a un reclamo
@@ -6477,7 +6485,7 @@ def api_info_reclamo(reclamo_id):
         }), 500
     
 @app.route("/api/obtener_historial_reclamo/<int:reclamo_id>", methods=["GET"])
-@validar_empleado()
+# @validar_empleado()
 def api_obtener_historial_reclamo(reclamo_id):
     """
     Obtiene el historial de seguimiento de un reclamo (para modal administrativo)
@@ -6856,7 +6864,8 @@ def entregar_sucursal():
     try:
         data = request.get_json()
         tracking = data.get('tracking')
-        
+        transaccion = controlador_encomienda.get_transaction_by_tracking(tracking)
+        tipo_comprobanteid = transaccion.get('tipo_comprobanteid', 2)
         if not tracking:
             return jsonify({
                 'success': False,
@@ -6865,6 +6874,7 @@ def entregar_sucursal():
         
         # Verificar que el paquete esté en estado correcto (C + PE)
         estados = controlador_paquete.get_data_pay(tracking)
+
         print(estados)
         
         if not estados or estados['estado_pago'] != 'C' or estados['ultimo_estado'] != 'PE':
@@ -6874,7 +6884,8 @@ def entregar_sucursal():
             }), 400
         
         # Actualizar el estado del paquete a entregado
-        resultado = controlador_paquete.actualizar_estado_entrega_sucursal(tracking)
+        resultado = controlador_paquete.actualizar_estado_entrega_sucursal(tracking, tipo_comprobanteid)
+        
         print(resultado)
         
         if resultado:
@@ -6945,12 +6956,12 @@ def insertar_pago_paquete():
     num_serie = num_serie_data['transaccion_encomienda_num_serie']
     tipo_comprobante = data.get('tipo_comprobante')
     metodo_pago = data.get('metodo_pago')
-    
+
     try:
         pago = controlador_metodo_pago_venta.pagar_encomienda(num_serie, tipo_comprobante, metodo_pago, tracking)
         ultimo_estado = controlador_paquete.obtener_ultimo_estado(tracking)
         if ultimo_estado == 'PE':
-            controlador_paquete.actualizar_estado_entrega_sucursal(tracking)
+            controlador_paquete.actualizar_estado_entrega_sucursal(tracking, tipo_comprobante)
         elif ultimo_estado == 'ED':
             controlador_paquete.actualizar_estado_entrega_destinatario(tracking)
             
@@ -7147,6 +7158,8 @@ if __name__ == "__main__":
     # app.run(host='192.168.48.178', port=8000, debug=True, use_reloader=True)
     # Thread(target=enviar_posiciones).start()
     # app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=True)
+    # generar_qr_paquetes([179])
+
     socketio.run(app, host='0.0.0.0', port=8000, debug=True , use_reloader=True)
 
 

@@ -305,3 +305,75 @@ def verificar_salida_existe(salida_id):
     except Exception as e:
         print(f"Error al verificar salida: {str(e)}")
         return False
+
+def obtener_vehiculos_para_edicion(salida_id):
+    """
+    Obtiene todos los vehículos disponibles incluyendo el de la salida actual
+    """
+    try:
+        # Primero obtener el vehículo de la salida actual
+        sql_vehiculo_actual = """
+        SELECT 
+            s.unidadid,
+            CONCAT(tu.nombre, ' ', m.nombre, ' - ', u.placa) AS nombre_unidad,
+            u.capacidad,
+            SUM(COALESCE(p.peso, 0)) AS capacidad_usada
+        FROM salida s
+        INNER JOIN unidad u ON s.unidadid = u.id
+        INNER JOIN modelo m ON m.id = u.modeloid
+        INNER JOIN tipo_unidad tu ON tu.id = m.tipo_unidadid
+        LEFT JOIN paquete p ON p.salidaid = s.id
+        WHERE s.id = %s
+        GROUP BY s.unidadid, tu.nombre, m.nombre, u.placa, u.capacidad
+        """
+        
+        vehiculo_actual = sql_select_fetchone(sql_vehiculo_actual, (salida_id,))
+        
+        # Luego obtener todos los demás vehículos disponibles
+        sql_otros_vehiculos = """
+        SELECT 
+            u.id as unidadid,
+            CONCAT(tu.nombre, ' ', m.nombre, ' - ', u.placa) AS nombre_unidad,
+            u.capacidad,
+            COALESCE(capacidad_usada.peso_total, 0) AS capacidad_usada
+        FROM unidad u
+        INNER JOIN modelo m ON m.id = u.modeloid
+        INNER JOIN tipo_unidad tu ON tu.id = m.tipo_unidadid
+        LEFT JOIN (
+            SELECT 
+                s.unidadid,
+                SUM(COALESCE(p.peso, 0)) AS peso_total
+            FROM salida s 
+            LEFT JOIN paquete p ON p.salidaid = s.id
+            WHERE 
+                s.estado IN ('P', 'T') 
+                AND s.fecha BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 2 DAY)
+                AND s.id != %s  -- Excluir la salida actual
+            GROUP BY s.unidadid
+        ) capacidad_usada ON capacidad_usada.unidadid = u.id
+        WHERE u.estado = 'D' AND u.id != (
+            SELECT unidadid FROM salida WHERE id = %s
+        )
+        ORDER BY nombre_unidad
+        """
+        
+        otros_vehiculos = sql_select_fetchall(sql_otros_vehiculos, (salida_id, salida_id))
+        
+        # Combinar resultados
+        vehiculos = []
+        
+        # Agregar el vehículo actual primero
+        if vehiculo_actual and not isinstance(vehiculo_actual, Exception):
+            vehiculos.append(vehiculo_actual)
+        
+        # Agregar los demás vehículos
+        if otros_vehiculos and not isinstance(otros_vehiculos, Exception):
+            vehiculos.extend(otros_vehiculos)
+        
+        print(f"✅ Obtenidos {len(vehiculos)} vehículos para edición de salida {salida_id}")
+        
+        return vehiculos
+        
+    except Exception as e:
+        print(f"Error al obtener vehículos para edición: {str(e)}")
+        return []

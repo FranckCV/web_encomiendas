@@ -1395,7 +1395,7 @@ function actualizarInfoPaquetes(paquetesParaRuta = []) {
     if (paquetesParaRuta.length === 0) {
         infoElement.innerHTML = `
             <i class="fa-solid fa-info-circle"></i>
-            No hay paquetes disponibles para la ruta seleccionada.
+            No hay paquetes disponibles para la ruta seleccionada o tienen pendiente de pago.
         `;
         infoElement.className = 'alert alert-warning';
     } else {
