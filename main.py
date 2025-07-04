@@ -3787,13 +3787,17 @@ def registrar_envios_masivos():
 #   ]
 # }
 
+def mostrar_ip_actual():
+    hostname = socket.gethostname()
+    ip_address = socket.gethostbyname(hostname)
+    return ip_address
 
-
+print(mostrar_ip_actual())
 
 def generar_qr_paquetes(trackings):
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
-    print(ip_address)
+    # print(ip_address)
     for tracking in trackings:
         qr_data = f"http://{ip_address}:8000/insertar_estado?tracking={tracking}"
 
