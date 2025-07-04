@@ -355,7 +355,7 @@ def listar_paquetes_por_sucursal_escalas():
         FROM paquete p 
         INNER JOIN transaccion_encomienda te 
             ON te.num_serie = p.transaccion_encomienda_num_serie
-        WHERE p.salidaid is null   
+        WHERE p.salidaid is null and p.estado_pago  = 'C'
         ORDER BY p.tracking;
 
     '''
@@ -594,6 +594,14 @@ def actualizar_estado_entrega_destinatario(tracking):
     '''
     try:
         sql_execute(sql, (tracking,))  
+        
+        for estado_id in range(2, 7):  # del 2 al 6 inclusive
+            sql_insert = '''
+                INSERT INTO seguimiento (paquetetracking, detalle_estadoid, tipo_comprobanteid, fecha, hora)
+                VALUES (%s, %s, %s, NOW(), NOW())
+            '''
+
+            sql_execute(sql_insert, (tracking, estado_id, tipo))
 
         return True 
 

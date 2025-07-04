@@ -3789,7 +3789,7 @@ def generar_qr_paquetes(trackings):
     ip_address = socket.gethostbyname(hostname)
     print(ip_address)
     for tracking in trackings:
-        qr_data = f"http://192.168.239.37:8000/insertar_estado?tracking={tracking}"
+        qr_data = f"http://127.0.0.1:8000/insertar_estado?tracking={tracking}"
 
         img = qrcode.make(qr_data)
 
@@ -6877,6 +6877,7 @@ def entregar_sucursal():
         
         # Actualizar el estado del paquete a entregado
         resultado = controlador_paquete.actualizar_estado_entrega_sucursal(tracking, tipo_comprobanteid)
+        
         print(resultado)
         
         if resultado:
