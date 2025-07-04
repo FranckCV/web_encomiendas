@@ -7157,12 +7157,12 @@ def buscar_cliente():
 ######################################
 ##############################################3
 ##############################################
+# generar_qr_paquetes([181])
 
 if __name__ == "__main__":
     # app.run(host='192.168.48.178', port=8000, debug=True, use_reloader=True)
     # Thread(target=enviar_posiciones).start()
     # app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=True)
-    # generar_qr_paquetes([179])
 
     socketio.run(app, host='0.0.0.0', port=8000, debug=True , use_reloader=True)
 
