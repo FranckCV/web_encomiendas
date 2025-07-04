@@ -3789,13 +3789,13 @@ def generar_qr_paquetes(trackings):
     ip_address = socket.gethostbyname(hostname)
     print(ip_address)
     for tracking in trackings:
-        qr_data = f"http://192.168.239.37:8000/insertar_estado?tracking={tracking}"
+        qr_data = f"http://{ip_address}:8000/insertar_estado?tracking={tracking}"
 
         img = qrcode.make(qr_data)
 
         # 3) Crear carpeta del paquete
         carpeta = os.path.join(
-            current_app.static_folder,
+            'static',
             'comprobantes',
             str(tracking)
         )
@@ -3811,6 +3811,8 @@ def generar_qr_paquetes(trackings):
             "UPDATE paquete SET qr_url = %s WHERE tracking = %s",
             (qr_rel_path, tracking)
         )
+
+# generar_qr_paquetes([179])
 
 @app.route('/generar_boleta', methods=['POST'])
 def generar_boleta_post():

@@ -258,5 +258,5 @@ def get_estados_restantes(tracking):
 where de.id not in (select detalle_estadoid from seguimiento where paquetetracking = %s)
 limit 1
     '''
-    filas = sql_select_fetchall(sql,tracking)
+    filas = sql_select_fetchall(sql,(tracking))
     return filas
