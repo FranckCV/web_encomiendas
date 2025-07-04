@@ -52,6 +52,13 @@ def get_table():
             te.masivo,
             te.id_sucursal_origen,
             te.monto_total,
+                        CONCAT(
+                u.departamento, '/', u.provincia, '/', u.distrito, ' - ', s.direccion
+            ) AS nom_sucursal_origen,
+            CONCAT(
+                COALESCE(c.nombre_siglas, ''), ' ', COALESCE(c.apellidos_razon, '')
+            ) AS nombre_cliente,
+            c.num_documento,
             te.fecha,
             te.hora,
             te.clienteid,
@@ -66,14 +73,7 @@ def get_table():
             CASE 
                 WHEN te.recojo_casa = 1 THEN 'Sí'
                 ELSE 'No'
-            END AS recojo_casa_txt,
-            CONCAT(
-                u.departamento, '/', u.provincia, '/', u.distrito, ' - ', s.direccion
-            ) AS nom_sucursal_origen,
-            CONCAT(
-                COALESCE(c.nombre_siglas, ''), ' ', COALESCE(c.apellidos_razon, '')
-            ) AS nombre_cliente 
-
+            END AS recojo_casa_txt
         FROM transaccion_encomienda te
         INNER JOIN cliente c ON c.id = te.clienteid
         INNER JOIN sucursal s ON s.id = te.id_sucursal_origen
@@ -83,13 +83,14 @@ def get_table():
 
     columnas = {
         'num_serie': ['N° Serie', 2],
+        'nombre_cliente': ['Cliente', 2],
+        'num_documento':['Número de documento',2],
         'masivo_txt': ['Tipo de Envío', 1.2], 
         'monto_total': ['Monto Total S/.', 1],
         'nom_sucursal_origen': ['Sucursal Origen', 4],
         # 'recojo_casa_txt': ['¿Recojo en casa?', 1],
         'fecha': ['Fecha', 1],
-        'hora': ['Hora', 1],
-        'nombre_cliente': ['Cliente', 2],
+        'hora': ['Hora', 1]
     }
 
     filas = sql_select_fetchall(sql)

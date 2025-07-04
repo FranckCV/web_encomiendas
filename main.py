@@ -6967,7 +6967,7 @@ def insertar_pago_paquete():
         if ultimo_estado == 'PE':
             controlador_paquete.actualizar_estado_entrega_sucursal(tracking, tipo_comprobante)
         elif ultimo_estado == 'ED':
-            controlador_paquete.actualizar_estado_entrega_destinatario(tracking)
+            controlador_paquete.actualizar_estado_entrega_destinatario(tracking,tipo_comprobante)
             
         generar_comprobante(tracking,tipo_comprobante)
         return jsonify({

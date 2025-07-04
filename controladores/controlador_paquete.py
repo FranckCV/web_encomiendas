@@ -76,8 +76,6 @@ def get_table_paquete_detalle(num_serie):
             t.fecha,
             t.hora,
             t.monto_total,
-
-           
              
             CASE 
                 WHEN p.ultimo_estado = 'PE' THEN 'Pendiente de entrega en sucursal de origen'
@@ -99,9 +97,8 @@ def get_table_paquete_detalle(num_serie):
         LEFT JOIN ubigeo u ON u.codigo = s.ubigeocodigo
         LEFT JOIN transaccion_encomienda t ON t.num_serie = p.transaccion_encomienda_num_serie
         LEFT JOIN salida sl ON sl.id = p.salidaid 
-
-        WHERE t.num_serie = %s;
-
+        WHERE t.num_serie = %s
+        order by t.fecha desc;
     '''
 
     columnas = {
@@ -177,7 +174,8 @@ def get_table():
             END AS ultimo_estado_nom      
         FROM paquete p
         LEFT JOIN salida sl ON sl.id = p.salidaid
-    '''
+        order by p.tracking desc;
+        '''
 
     columnas = {
         'tracking': ['Tracking', 1],
@@ -250,8 +248,8 @@ def get_table_pk_foreign(pk_foreign):
         LEFT JOIN ubigeo u ON u.codigo = s.ubigeocodigo
         LEFT JOIN transaccion_encomienda t ON t.num_serie = p.transaccion_encomienda_num_serie
         LEFT JOIN salida sl ON sl.id = p.salidaid 
-
-        WHERE t.num_serie = %s;
+        WHERE t.num_serie = %s
+        order by t.fecha desc;
 
     '''
 
@@ -259,8 +257,8 @@ def get_table_pk_foreign(pk_foreign):
         'tracking': ['Tracking', 1],
         'valor': ['Valor S/.', 1],
         'peso': ['Peso (kg)', 1],
-        'estado_pago': ['Pago', 0.7],
-        'ultimo_estado':['Ultimo estado',4],
+        'estado_pago': ['Pago', 1],
+        'ultimo_estado':['Ultimo estado',3.5],
         'nombres_contacto_destinatario': ['Nombre destinatario', 2],
         'apellidos_razon_destinatario': ['Apellido/Razón', 2],
         'num_documento_destinatario': ['Doc. Identidad', 1.2],
@@ -334,9 +332,8 @@ def get_paquete_by_tracking(tracking):
 
 
 def listar_paquetes_por_sucursal_escalas():
-    sql = '''
-        
-        SELECT 
+    sql = '''  
+          SELECT 
             p.tracking,                  
             p.peso,                     
             te.id_sucursal_origen,       
@@ -344,7 +341,7 @@ def listar_paquetes_por_sucursal_escalas():
         FROM paquete p 
         INNER JOIN transaccion_encomienda te 
             ON te.num_serie = p.transaccion_encomienda_num_serie
-        WHERE p.salidaid is null and p.estado_pago  = 'C'
+        WHERE p.salidaid is null and p.estado_pago  = 'C' and p.ultimo_estado='EO'
         ORDER BY p.tracking;
 
     '''
@@ -574,29 +571,36 @@ def actualizar_estado_entrega_sucursal(tracking, tipo_comprobante):
 
 
 
-
-def actualizar_estado_entrega_destinatario(tracking):
-    sql = '''
+def actualizar_estado_entrega_destinatario(tracking, tipo_comprobante=None):
+    sql_update = '''
         UPDATE paquete 
         SET ultimo_estado = 'RD' 
         WHERE tracking = %s
     '''
     try:
-        sql_execute(sql, (tracking,))  
-        
-        for estado_id in range(2, 7):  # del 2 al 6 inclusive
-            sql_insert = '''
-                INSERT INTO seguimiento (paquetetracking, detalle_estadoid, tipo_comprobanteid, fecha, hora)
-                VALUES (%s, %s, %s, NOW(), NOW())
-            '''
+        sql_execute(sql_update, (tracking,))
+        print(f"Estado 'RD' actualizado para tracking: {tracking}")
 
-            sql_execute(sql_insert, (tracking, estado_id, tipo))
+        sql_insert_19 = '''
+            INSERT INTO seguimiento (paquetetracking, detalle_estadoid, tipo_comprobanteid, fecha, hora)
+            VALUES (%s, 19, %s, NOW(), NOW())
+        '''
+        sql_execute(sql_insert_19, (tracking, tipo_comprobante))
+        print(f"Insertado estado 19 con tipo_comprobante = {tipo_comprobante}")
 
-        return True 
+        sql_insert_21 = '''
+            INSERT INTO seguimiento (paquetetracking, detalle_estadoid, tipo_comprobanteid, fecha, hora)
+            VALUES (%s, 21, NULL, NOW(), NOW())
+        '''
+        sql_execute(sql_insert_21, (tracking,))
+        print("Insertado estado 21 sin tipo_comprobante")
+
+        return True
 
     except Exception as e:
         print(f"Error al actualizar estado: {e}")
-        return False 
+        return False
+
 
 def obtener_ultimo_estado(tracking):
     sql = '''
