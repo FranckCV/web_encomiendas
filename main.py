@@ -3788,12 +3788,17 @@ def registrar_envios_masivos():
 # }
 
 
+def mostrar_ip_actual():
+    hostname = socket.gethostname()
+    ip_address = socket.gethostbyname(hostname)
+    return ip_address
 
+print(mostrar_ip_actual())
 
 def generar_qr_paquetes(trackings):
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
-    print(ip_address)
+    # print(ip_address)
     for tracking in trackings:
         qr_data = f"http://{ip_address}:8000/insertar_estado?tracking={tracking}"
 
@@ -7153,12 +7158,12 @@ def buscar_cliente():
 ######################################
 ##############################################3
 ##############################################
+# generar_qr_paquetes([181])
 
 if __name__ == "__main__":
     # app.run(host='192.168.48.178', port=8000, debug=True, use_reloader=True)
     # Thread(target=enviar_posiciones).start()
     # app.run(host='0.0.0.0', port=8000, debug=True, use_reloader=True)
-    # generar_qr_paquetes([179])
 
     socketio.run(app, host='0.0.0.0', port=8000, debug=True , use_reloader=True)
 
